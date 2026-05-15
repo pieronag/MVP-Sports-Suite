@@ -1,0 +1,227 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ==========================================
+    // 👑 SEGURIDAD Y ROLES
+    // ==========================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getRole() {
+      let uid = request.auth.uid;
+      let userDoc = /databases/$(database)/documents/users/$(uid);
+      let profileDoc = /databases/$(database)/documents/profiles/$(uid);
+      let staffDoc = /databases/$(database)/documents/staff/$(uid);
+
+      return request.auth.token.role != null 
+        ? request.auth.token.role 
+        : exists(userDoc) 
+          ? get(userDoc).data.role 
+          : exists(profileDoc) 
+            ? get(profileDoc).data.role 
+            : exists(staffDoc)
+              ? get(staffDoc).data.role
+              : null;
+    }
+
+    function isSuperAdmin() {
+      let role = getRole();
+      return isAuthenticated() && (request.auth.token.email == 'piero.abarca@gmail.com' || role == 'admin' || role == 'superadmin');
+    }
+
+    function isOwner() {
+      let role = getRole();
+      return isAuthenticated() && (role == 'owner' || role == 'admin' || role == 'superadmin');
+    }
+
+    function isManager() {
+      let role = getRole();
+      return isAuthenticated() && (role == 'manager' || role == 'owner' || role == 'admin' || role == 'superadmin');
+    }
+
+    function isStaff() {
+      let role = getRole();
+      return isAuthenticated() && (role == 'staff' || role == 'manager' || role == 'owner' || role == 'admin' || role == 'superadmin');
+    }
+
+    // ==========================================
+    // 👤 PERFILES Y USUARIOS
+    // ==========================================
+    
+    // Perfiles unificados (App y Web)
+    match /profiles/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
+
+      // Subcolecciones (tarjetas, estadísticas, transacciones, etc.)
+      match /{subcollection=**} {
+        allow read: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
+        allow write: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
+      }
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
+      match /{subcollection=**} {
+        allow read: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
+        allow write: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
+      }
+    }
+
+    match /staff/{staffId} {
+      allow read: if isAuthenticated();
+      allow write: if isManager() || isSuperAdmin();
+    }
+
+    // ==========================================
+    // 🏛️ INFRAESTRUCTURA (RECINTOS Y CANCHAS)
+    // ==========================================
+    
+    match /tenants/{tenantId} {
+      allow read: if true;
+      allow create: if isSuperAdmin();
+      allow update: if isManager() || isSuperAdmin();
+      allow delete: if isSuperAdmin();
+    }
+    
+    match /courts/{courtId} {
+      allow read: if true;
+      allow write: if isManager() || isSuperAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    match /gamification/{id} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    // ==========================================
+    // 📅 RESERVAS Y OPERATIVA
+    // ==========================================
+    
+    match /bookings/{bookingId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        isStaff() ||
+        isSuperAdmin() ||
+        resource.data.userId == request.auth.uid || 
+        resource.data.userEmail == request.auth.token.email ||
+        // Fallback: Si el usuario tiene acceso al recinto (tenantId o tenantIds)
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.tenantId == resource.data.tenantId ||
+          resource.data.tenantId in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.tenantIds ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'manager'
+        )) ||
+        (exists(/databases/$(database)/documents/profiles/$(request.auth.uid)) && (
+          get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.tenantId == resource.data.tenantId ||
+          resource.data.tenantId in get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.tenantIds ||
+          get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'manager'
+        )) ||
+        (exists(/databases/$(database)/documents/staff/$(request.auth.uid)) && (
+          get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.tenantId == resource.data.tenantId ||
+          resource.data.tenantId in get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.tenantIds ||
+          get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role == 'manager'
+        ))
+      );
+      allow delete: if isManager() || isSuperAdmin();
+    }
+
+    match /maintenance/{mId} {
+      allow read: if isManager() || isSuperAdmin();
+      allow write: if isManager() || isSuperAdmin();
+    }
+
+    // ==========================================
+    // 💰 FINANZAS Y PAGOS
+    // ==========================================
+    
+    match /payments/{paymentId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isManager() || isSuperAdmin());
+      allow create: if isAuthenticated();
+      allow update, delete: if isSuperAdmin();
+    }
+
+    match /billing-subscription/{id} {
+      allow read: if isAuthenticated() && (resource.data.ownerId == request.auth.uid || isSuperAdmin());
+      allow write: if isSuperAdmin();
+    }
+
+    match /invoices/{invoiceId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isManager() || isSuperAdmin());
+      allow write: if isSuperAdmin();
+    }
+
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow write: if isManager() || isSuperAdmin();
+    }
+
+    // ==========================================
+    // 🏆 COMPETICIÓN Y EQUIPOS
+    // ==========================================
+    
+    match /teams/{teamId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && (resource.data.ownerId == request.auth.uid || isSuperAdmin());
+
+      // Chat de equipo (Solo miembros)
+      match /messages/{messageId} {
+        allow read, write: if isAuthenticated() && (
+          request.auth.uid in get(/databases/$(database)/documents/teams/$(teamId)).data.members
+        );
+      }
+    }
+
+    match /tournaments/{id} { 
+      allow read: if true; 
+      allow write: if isManager() || isSuperAdmin(); 
+    }
+
+    match /tournament_registrations/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    match /academy_classes/{id} { 
+      allow read: if true; 
+      allow write: if isManager() || isSuperAdmin(); 
+    }
+
+    // ==========================================
+    // 📢 FEEDBACK Y AUDITORÍA
+    // ==========================================
+    
+    match /reviews/{id} {
+      allow read: if true;
+      allow create: if isAuthenticated(); 
+      allow update, delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isSuperAdmin());
+    }
+
+    match /reports/{reportId} {
+      allow read: if isManager() || isSuperAdmin();
+      allow create: if isAuthenticated();
+      allow delete: if isSuperAdmin();
+    }
+
+    match /audit_logs/{id} {
+      allow read: if isSuperAdmin();
+      allow write: if isSuperAdmin(); 
+    }
+
+    match /audit/{id} {
+      allow read: if isSuperAdmin();
+      allow write: if isAuthenticated(); 
+    }
+  }
+}

@@ -1,0 +1,184 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ==========================================
+    // 👑 SEGURIDAD Y ROLES
+    // ==========================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isSuperAdmin() {
+      return isAuthenticated() && 
+             (request.auth.token.email == 'piero.abarca@gmail.com' || 
+              request.auth.token.role == 'admin' || 
+              request.auth.token.role == 'superadmin');
+    }
+
+    function isOwner() {
+      return isAuthenticated() && (request.auth.token.role == 'owner' || request.auth.token.role == 'admin' || request.auth.token.email == 'piero.abarca@gmail.com');
+    }
+
+    function isManager() {
+      return isAuthenticated() && (request.auth.token.role == 'manager' || request.auth.token.role == 'owner' || request.auth.token.role == 'admin');
+    }
+
+    // ==========================================
+    // 👤 PERFILES Y USUARIOS
+    // ==========================================
+    
+    // Perfiles unificados (App y Web)
+    match /profiles/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+
+      // Subcolecciones (tarjetas, estadísticas, transacciones, etc.)
+      match /{subcollection=**} {
+        allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+        allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+      }
+    }
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+      match /{subcollection=**} {
+        allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+        allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+      }
+    }
+
+    match /staff/{staffId} {
+      allow read: if isAuthenticated();
+      allow write: if isManager() || isSuperAdmin();
+    }
+
+    // ==========================================
+    // 🏛️ INFRAESTRUCTURA (RECINTOS Y CANCHAS)
+    // ==========================================
+    
+    match /tenants/{tenantId} {
+      allow read: if true;
+      allow create: if isSuperAdmin();
+      allow update: if isManager() || isSuperAdmin();
+      allow delete: if isSuperAdmin();
+    }
+    
+    match /courts/{courtId} {
+      allow read: if true;
+      allow write: if isManager() || isSuperAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    // ==========================================
+    // 📅 RESERVAS Y OPERATIVA
+    // ==========================================
+    
+    match /bookings/{bookingId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid || 
+        resource.data.userEmail == request.auth.token.email || 
+        isManager() || 
+        isSuperAdmin()
+      );
+      allow delete: if isManager() || isSuperAdmin();
+    }
+
+    match /maintenance/{mId} {
+      allow read: if isManager() || isSuperAdmin();
+      allow write: if isManager() || isSuperAdmin();
+    }
+
+    // ==========================================
+    // 💰 FINANZAS Y PAGOS
+    // ==========================================
+    
+    match /payments/{paymentId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isManager() || isSuperAdmin());
+      allow create: if isAuthenticated();
+      allow update, delete: if isSuperAdmin();
+    }
+
+    match /billing-subscription/{id} {
+      allow read: if isAuthenticated() && (resource.data.ownerId == request.auth.uid || isSuperAdmin());
+      allow write: if isSuperAdmin();
+    }
+
+    match /invoices/{invoiceId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isManager() || isSuperAdmin());
+      allow write: if isSuperAdmin();
+    }
+
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow write: if isManager() || isSuperAdmin();
+    }
+
+    // ==========================================
+    // 🏆 COMPETICIÓN Y EQUIPOS
+    // ==========================================
+    
+    match /teams/{teamId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && (resource.data.ownerId == request.auth.uid || isSuperAdmin());
+
+      // Chat de equipo (Solo miembros)
+      match /messages/{messageId} {
+        allow read, write: if isAuthenticated() && (
+          request.auth.uid in get(/databases/$(database)/documents/teams/$(teamId)).data.members
+        );
+      }
+    }
+
+    match /tournaments/{id} { 
+      allow read: if true; 
+      allow write: if isManager() || isSuperAdmin(); 
+    }
+
+    match /tournament_registrations/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    match /academy_classes/{id} { 
+      allow read: if true; 
+      allow write: if isManager() || isSuperAdmin(); 
+    }
+
+    // ==========================================
+    // 📢 FEEDBACK Y AUDITORÍA
+    // ==========================================
+    
+    match /reviews/{id} {
+      allow read: if true;
+      allow create: if isAuthenticated(); 
+      allow update, delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isSuperAdmin());
+    }
+
+    match /reports/{reportId} {
+      allow read: if isManager() || isSuperAdmin();
+      allow create: if isAuthenticated();
+      allow delete: if isSuperAdmin();
+    }
+
+    match /audit/{id} {
+      allow read: if isSuperAdmin();
+      allow write: if isAuthenticated(); 
+    }
+
+    match /gamification/{id} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+  }
+}

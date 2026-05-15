@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px; /* Compensa el Navbar fijo */
+}
+
+/* 1. Animación Aurora Boreal */
+@keyframes aurora {
+  0% {
+    background-position: 50% 50%, 50% 50%;
+  }
+
+  100% {
+    background-position: 350% 50%, 350% 50%;
+  }
+}
+
+.animate-aurora {
+  animation: aurora 15s linear infinite;
+}
+
+/* 2. Textura de Ruido (Noise) */
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+/* === PERSONALIZACIÓN DE SCROLLBAR (LIGHT / DARK) === */
+@layer utilities {
+
+  /* Ancho de la barra */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+    /* Muy delgada y elegante */
+    height: 5px;
+  }
+
+  /* El fondo de la barra (Transparente siempre) */
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* EL DESLIZADOR (THUMB) */
+
+  /* 1. Modo CLARO (Light Mode) */
+  /* Gris suave que combina con el borde slate-200 */
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    /* slate-300 */
+    border-radius: 10px;
+  }
+
+  /* Hover en Claro */
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+    /* slate-400 */
+  }
+
+  /* 2. Modo OSCURO (Dark Mode) - Aquí ocurre la magia */
+  /* Usamos la clase .dark que pone el ThemeContext */
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    /* slate-800 (Casi invisible, muy elegante) */
+  }
+
+  /* Hover en Oscuro: Un toque de tu color VOLT para feedback visual */
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #00df82;
+    /* MVP Green */
+  }
+}
+
+/* 3. Glassmorphism Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass {
+  background: rgba(11, 15, 25, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* 4. Glow Utilities */
+.glow-emerald {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+.dark .glow-emerald {
+  box-shadow: 0 0 30px rgba(74, 222, 128, 0.05);
+}
+
+/* 5. Custom Landing Utilities */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.text-gradient {
+  background: linear-gradient(to right, #00df82, #10b981, #0ea5e9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-gradient-premium {
+  background: radial-gradient(circle at top right, rgba(0, 223, 130, 0.05), transparent),
+              radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.05), transparent);
+}
+
+/* 6. 2026 High-Tech Utilities */
+
+
+.glow-mesh {
+  background: radial-gradient(circle at 50% 50%, rgba(0, 223, 130, 0.1), transparent 50%),
+              radial-gradient(circle at 0% 0%, rgba(16, 185, 129, 0.05), transparent 30%),
+              radial-gradient(circle at 100% 100%, rgba(14, 165, 233, 0.05), transparent 30%);
+}
+
+.border-glow {
+  position: relative;
+}
+
+.border-glow::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(45deg, #00df82, transparent, #10b981, transparent, #0ea5e9);
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0.1;
+}
+
+.text-sharp {
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* 7. Staggered Animations */
+.stagger-1 { animation-delay: 100ms; }
+.stagger-2 { animation-delay: 200ms; }
+.stagger-3 { animation-delay: 300ms; }
+.stagger-4 { animation-delay: 400ms; }
+.stagger-5 { animation-delay: 500ms; }
+
+/* 8. 3D & Perspective */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.rotate-y-12 {
+  transform: rotateY(12deg);
+}
+
+.hover-3d:hover {
+  transform: translateY(-10px) rotateX(5deg) rotateY(-5deg);
+}
+
+/* 9. Floating Particles */
+@keyframes float-particle {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+}
+
+.particle {
+  position: absolute;
+  background: #00df82;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.animate-particle-1 { animation: float-particle 20s infinite linear; left: 10%; bottom: -10%; width: 4px; height: 4px; }
+.animate-particle-2 { animation: float-particle 25s infinite linear; left: 30%; bottom: -10%; width: 2px; height: 2px; animation-delay: 2s; }
+.animate-particle-3 { animation: float-particle 18s infinite linear; left: 50%; bottom: -10%; width: 6px; height: 6px; animation-delay: 5s; }
+.animate-particle-4 { animation: float-particle 22s infinite linear; left: 70%; bottom: -10%; width: 3px; height: 3px; animation-delay: 1s; }
+.animate-particle-5 { animation: float-particle 15s infinite linear; left: 90%; bottom: -10%; width: 5px; height: 5px; animation-delay: 8s; }

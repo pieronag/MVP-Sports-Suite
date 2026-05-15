@@ -1,0 +1,389 @@
+"use client";
+import { useState, useEffect } from "react";
+import { XMarkIcon, CheckCircleIcon, ArrowRightIcon, ArrowLeftIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { auth, db } from "../../services/firebase";
+import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
+import { doc, setDoc, getDoc, getDocs, collection, query, where } from "firebase/firestore";
+
+const SPORT_POSITIONS: Record<string, string[]> = {
+  'Fútbol': ['Arquero', 'Defensa', 'Lateral', 'Volante', 'Delantero'],
+  'Pádel': ['Lado Derecho', 'Lado Izquierdo'],
+  'Tenis': ['Individual', 'Dobles'],
+  'Básquetbol': ['Base', 'Escolta', 'Alero', 'Ala-Pívot', 'Pívot'],
+  'Voleibol': ['Armador', 'Atacante', 'Central', 'Líbero']
+};
+
+export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    displayName: "",
+    email: "",
+    phone: "",
+    rut: "",
+    password: "",
+    mainSport: "",
+    position: "",
+    dominantFoot: "",
+    height: "",
+    weight: "",
+    favTime: "",
+    frequency: "",
+    city: "",
+    birthDate: "",
+    gender: ""
+  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  // Resetear estado al abrir el modal
+  useEffect(() => {
+    if (isOpen) {
+      setStep(1);
+      setSuccess(false);
+      setError("");
+      // Opcional: Limpiar formulario al abrir
+      setFormData({
+        displayName: "", email: "", phone: "", rut: "", password: "",
+        mainSport: "", position: "", dominantFoot: "", height: "", weight: "",
+        favTime: "", frequency: "", city: "", birthDate: "", gender: ""
+      });
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  // --- VALIDATIONS ---
+  const validateRut = (rut: string) => {
+    if (!rut) return false;
+    let value = rut.replace(/\./g, "").replace("-", "");
+    if (value.length < 8) return false;
+    let cuerpo = value.slice(0, -1);
+    let dv = value.slice(-1).toUpperCase();
+    let suma = 0;
+    let multiplo = 2;
+    for (let i = 1; i <= cuerpo.length; i++) {
+      suma += multiplo * parseInt(value.charAt(cuerpo.length - i));
+      multiplo = multiplo < 7 ? multiplo + 1 : 2;
+    }
+    let dvEsperado = 11 - (suma % 11);
+    let dvFinal = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
+    return dv === dvFinal;
+  };
+
+  const validatePhone = (phone: string) => {
+    const digits = phone.replace(/\D/g, "");
+    return digits.length === 11 && digits.startsWith("569");
+  };
+
+  const isStepValid = () => {
+    switch (step) {
+      case 1:
+        return (
+          formData.displayName.trim().length > 3 &&
+          formData.email.includes("@") &&
+          validatePhone(formData.phone) &&
+          validateRut(formData.rut) &&
+          formData.password.length >= 6 &&
+          formData.city.trim().length > 2
+        );
+      case 2:
+        return (
+          formData.mainSport &&
+          formData.position &&
+          formData.dominantFoot &&
+          formData.height &&
+          formData.weight &&
+          formData.gender
+        );
+      case 3:
+        return (
+          formData.favTime &&
+          formData.frequency &&
+          formData.birthDate
+        );
+      default:
+        return false;
+    }
+  };
+
+  // --- MASKS & FORMATTERS ---
+  const formatRut = (rut: string) => {
+    let value = rut.replace(/[^0-9kK]/g, "").toUpperCase();
+    if (value.length <= 1) return value;
+    let cuerpo = value.slice(0, -1);
+    let dv = value.slice(-1);
+    return cuerpo.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") + "-" + dv;
+  };
+
+  const formatPhone = (phone: string) => {
+    let digits = phone.replace(/\D/g, "");
+    if (digits.startsWith("56")) digits = digits.slice(2);
+    if (digits.startsWith("9")) digits = digits.slice(1);
+    digits = digits.slice(0, 8);
+    if (digits.length === 0) return "+56 9 ";
+    return "+56 9 " + digits.replace(/(\d{4})(\d{0,4})/, "$1 $2").trim();
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    let formattedValue = value;
+    if (name === "rut") formattedValue = formatRut(value);
+    if (name === "phone") formattedValue = formatPhone(value);
+    setFormData({ ...formData, [name]: formattedValue });
+    setError("");
+  };
+
+  const nextStep = () => {
+    if (isStepValid()) { setStep(s => s + 1); setError(""); }
+    else { setError("Por favor completa todos los campos correctamente."); }
+  };
+
+  const prevStep = () => { setStep(s => s - 1); setError(""); };
+
+  const recalculateUserELO = async (userId: string, email: string) => {
+    try {
+      // 1. Obtener Configuración Global
+      const settingsSnap = await getDoc(doc(db, 'settings', 'global'));
+      const gamification = settingsSnap.exists() ? settingsSnap.data().gamification : {
+        xpPerMatch: 100, xpPerWin: 150, xpPerLoss: 50,
+        tiers: { silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 }
+      };
+      const maxXP = gamification.tiers?.legend || 25000;
+
+      // 2. Buscar Bookings (por si ya tiene historial con ese email)
+      const q1 = query(collection(db, "bookings"), where("userId", "==", userId));
+      const q2 = query(collection(db, "bookings"), where("playerId", "==", userId));
+      const q3 = query(collection(db, "bookings"), where("createdBy", "==", email));
+
+      const [snap1, snap2, snap3] = await Promise.all([getDocs(q1), getDocs(q2), getDocs(q3)]);
+      const allDocsMap = new Map();
+      [snap1, snap2, snap3].forEach(snap => snap.docs.forEach((d: any) => allDocsMap.set(d.id, d.data())));
+
+      const validDocs = Array.from(allDocsMap.values()).filter((b: any) => b.status === 'completed' || b.status === 'confirmed');
+
+      let calculatedXp = 0;
+      let totalWins = 0;
+      let totalGoals = 0;
+
+      validDocs.forEach((b: any) => {
+        calculatedXp += (gamification.xpPerMatch || 100);
+        if (b.isWin) {
+          calculatedXp += (gamification.xpPerWin || 150);
+          totalWins++;
+        }
+        totalGoals += (b.goals || 0);
+      });
+
+      // 3. Determinar Tier y OVR
+      let projectedTier = 'BRONCE';
+      if (gamification.tiers) {
+        const t = gamification.tiers;
+        if (calculatedXp >= t.legend) projectedTier = 'LEYENDA';
+        else if (calculatedXp >= t.elite) projectedTier = 'ÉLITE';
+        else if (calculatedXp >= t.diamond) projectedTier = 'DIAMANTE';
+        else if (calculatedXp >= t.platinum) projectedTier = 'PLATINO';
+        else if (calculatedXp >= t.gold) projectedTier = 'ORO';
+        else if (calculatedXp >= t.silver) projectedTier = 'PLATA';
+      }
+
+      const progress = Math.min(1, Math.sqrt(calculatedXp / maxXP));
+      const projectedOvr = Math.floor(40 + (progress * 59));
+
+      // 4. Actualizar Usuario
+      await setDoc(doc(db, "users", userId), {
+        xp: calculatedXp,
+        ovr: projectedOvr,
+        tier: projectedTier,
+        stats: {
+          played: validDocs.length,
+          won: totalWins,
+          lost: Math.max(0, validDocs.length - totalWins),
+          goals: totalGoals
+        },
+        lastELOUpdate: new Date().toISOString()
+      }, { merge: true });
+
+    } catch (err) {
+      console.error("Error en recalculateUserELO:", err);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isStepValid()) { setError("Faltan datos obligatorios."); return; }
+    setLoading(true);
+    setError("");
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      const user = userCredential.user;
+      await updateProfile(user, { displayName: formData.displayName });
+
+      // Guardar perfil base
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        email: formData.email,
+        displayName: formData.displayName,
+        phone: formData.phone,
+        rut: formData.rut,
+        city: formData.city,
+        mainSport: formData.mainSport,
+        position: formData.position,
+        dominantFoot: formData.dominantFoot,
+        height: Number(formData.height),
+        weight: Number(formData.weight),
+        gender: formData.gender,
+        favTime: formData.favTime,
+        frequency: formData.frequency,
+        birthDate: formData.birthDate,
+        role: "player",
+        createdAt: new Date().toISOString(),
+        xp: 0,
+        level: 1,
+        tier: 'BRONCE',
+        ovr: 40,
+        rating: 5.0,
+        status: "active"
+      });
+
+      // Ejecutar actualización de ELO para el nuevo usuario
+      await recalculateUserELO(user.uid, formData.email);
+
+      // Forzar cierre de sesión tras el registro como solicita el usuario
+      await signOut(auth);
+
+      setSuccess(true);
+    } catch (err: any) {
+      console.error(err);
+      if (err.code === "auth/email-already-in-use") setError("El correo ya existe.");
+      else setError("Error al crear cuenta.");
+    } finally { setLoading(false); }
+  };
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider border-l-2 border-[#00df82] pl-3">Cuenta</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Input label="Nombre" name="displayName" value={formData.displayName} onChange={handleInputChange} placeholder="Juan Pérez" />
+              <div className="relative">
+                <Input label="RUT" name="rut" value={formData.rut} onChange={handleInputChange} placeholder="12345678-9" maxLength={12} />
+                {formData.rut.length >= 8 && (
+                  <div className={`absolute right-3 top-[32px] text-[7px] font-black uppercase ${validateRut(formData.rut) ? 'text-[#00df82]' : 'text-red-500'}`}>
+                    {validateRut(formData.rut) ? '✓ OK' : '✗ NO'}
+                  </div>
+                )}
+              </div>
+              <Input label="Email" name="email" value={formData.email} onChange={handleInputChange} placeholder="usuario@email.com" type="email" />
+              <div className="relative">
+                <Input label="Teléfono" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+56 9 ..." maxLength={15} />
+                {formData.phone.length > 7 && (
+                  <div className={`absolute right-3 top-[32px] text-[7px] font-black uppercase ${validatePhone(formData.phone) ? 'text-[#00df82]' : 'text-red-500'}`}>
+                    {validatePhone(formData.phone) ? '✓ OK' : '✗ NO'}
+                  </div>
+                )}
+              </div>
+              <Input label="Password" name="password" value={formData.password} onChange={handleInputChange} placeholder="••••••••" type="password" />
+              <Input label="Ciudad" name="city" value={formData.city} onChange={handleInputChange} placeholder="Santiago" />
+            </div>
+          </div>
+        );
+      case 2:
+        return (
+          <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider border-l-2 border-[#00df82] pl-3">Deporte</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Select label="Deporte" name="mainSport" value={formData.mainSport} onChange={handleInputChange} options={['Fútbol', 'Pádel', 'Tenis', 'Básquetbol', 'Voleibol']} />
+              <Select label="Posición" name="position" value={formData.position} onChange={handleInputChange} options={formData.mainSport ? SPORT_POSITIONS[formData.mainSport] : []} disabled={!formData.mainSport} />
+              <Select label="Lado" name="dominantFoot" value={formData.dominantFoot} onChange={handleInputChange} options={['Derecho', 'Izquierdo', 'Ambidiestro']} />
+              <Input label="Altura (cm)" name="height" value={formData.height} onChange={handleInputChange} placeholder="180" type="number" />
+              <Input label="Peso (kg)" name="weight" value={formData.weight} onChange={handleInputChange} placeholder="75" type="number" />
+              <Select label="Género" name="gender" value={formData.gender} onChange={handleInputChange} options={['Masculino', 'Femenino', 'Otro']} />
+            </div>
+          </div>
+        );
+      case 3:
+        return (
+          <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider border-l-2 border-[#00df82] pl-3">Preferencias</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Select label="Horario" name="favTime" value={formData.favTime} onChange={handleInputChange} options={['Mañana', 'Tarde', 'Noche']} />
+              <Select label="Frecuencia" name="frequency" value={formData.frequency} onChange={handleInputChange} options={['De vez en cuando', '1-2 veces por semana', 'Casi todos los días']} />
+              <Input label="Nacimiento" name="birthDate" value={formData.birthDate} onChange={handleInputChange} type="date" />
+            </div>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl">
+      <div className="relative w-full max-w-xl bg-slate-900/50 border border-white/10 rounded-[2.5rem] shadow-[0_0_150px_rgba(0,0,0,0.7)] overflow-hidden">
+        <div className="absolute top-0 left-0 h-1 bg-[#00df82] transition-all duration-700" style={{ width: `${(step / 3) * 100}%` }} />
+        <button onClick={onClose} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white transition-colors z-20 bg-white/5 rounded-full">
+          <XMarkIcon className="w-4 h-4" />
+        </button>
+
+        {!success ? (
+          <div className="p-8 sm:p-10">
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 h-6 rounded-md bg-[#00df82] flex items-center justify-center text-slate-950 font-black text-[10px]">{step}</div>
+                <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Fase {step} / 3</span>
+              </div>
+              <h2 className="text-2xl font-black text-white font-heading uppercase tracking-tighter">Únete a la <span className="text-gradient">Élite.</span></h2>
+            </div>
+
+            <form onSubmit={handleSubmit} className="min-h-[280px] flex flex-col justify-between">
+              {renderStep()}
+              <div className="mt-6 space-y-4">
+                {error && <div className="text-[10px] text-red-400 font-bold flex items-center gap-2"><ExclamationCircleIcon className="w-4 h-4" /> {error}</div>}
+                <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                  {step > 1 ? <button type="button" onClick={prevStep} className="text-[8px] font-black uppercase text-slate-500 hover:text-white">Atrás</button> : <div />}
+                  {step < 3 ? (
+                    <button type="button" onClick={nextStep} className={`px-8 py-3 bg-white text-slate-950 font-black rounded-xl text-[10px] uppercase ${!isStepValid() ? 'opacity-30' : ''}`}>Siguiente</button>
+                  ) : (
+                    <button type="submit" disabled={loading || !isStepValid()} className="px-10 py-3 bg-[#00df82] text-slate-950 font-black rounded-xl text-[10px] uppercase shadow-[0_0_20px_rgba(0, 223, 130,0.3)] disabled:opacity-30">
+                      {loading ? "..." : "Registrarme"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </form>
+          </div>
+        ) : (
+          <div className="p-12 text-center space-y-6 animate-in zoom-in duration-500">
+            <CheckCircleIcon className="w-16 h-16 text-[#00df82] mx-auto animate-bounce" />
+            <div className="space-y-2">
+              <h2 className="text-2xl font-black text-white font-heading">¡CUENTA CREADA!</h2>
+              <p className="text-xs text-slate-400 max-w-[250px] mx-auto">Tu perfil ha sido registrado con éxito.</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Input({ label, ...props }: any) {
+  return (
+    <div className="space-y-1 text-left">
+      <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest">{label}</label>
+      <input className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:border-[#00df82] outline-none transition-all text-xs" required {...props} />
+    </div>
+  );
+}
+
+function Select({ label, options, ...props }: any) {
+  return (
+    <div className="space-y-1 text-left">
+      <label className="text-[8px] font-black text-slate-500 uppercase tracking-widest">{label}</label>
+      <select className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:border-[#00df82] outline-none appearance-none text-xs" required {...props}>
+        <option value="" disabled className="bg-slate-900">...</option>
+        {options.map((opt: string) => <option key={opt} value={opt} className="bg-slate-900">{opt}</option>)}
+      </select>
+    </div>
+  );
+}
