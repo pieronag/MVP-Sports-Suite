@@ -17,8 +17,8 @@ export interface Booking {
     duration?: number; // hours (web usa 1)
     price?: number; // web usa price + totalPrice
     totalPrice: number;
-    status: 'pending' | 'confirmed' | 'cancelled' | 'active' | 'completed' | 'past';
-    paymentStatus: 'paid' | 'pending' | 'partial';
+    status: 'pending' | 'confirmed' | 'cancelled' | 'active' | 'completed' | 'past' | 'no-show';
+    paymentStatus: 'paid' | 'pending' | 'partial' | 'no-show';
     source: 'mobile_app' | 'manual_dashboard';
     ownerId?: string;
     createdAt?: Timestamp;
@@ -32,6 +32,9 @@ export interface Booking {
     feedback?: string;
     teamId?: string;
     deposit?: number;
+    cancelledBy?: string;
+    noShow?: boolean;
+    notes?: string;
 }
 
 export const bookingService = {
@@ -39,18 +42,65 @@ export const bookingService = {
      * Get available time slots for a given court on a specific date string (YYYY-MM-DD).
      */
     async getAvailableTimeSlots(tenantId: string, courtId: string, dateStr: string): Promise<string[]> {
-        const slots: string[] = [];
-        for (let i = 10; i < 24; i++) {
+        let slots: string[] = [];
+        for (let i = 8; i < 24; i++) {
             slots.push(`${i.toString().padStart(2, '0')}:00`);
         }
 
         try {
+            // 1. Cargar el recinto para obtener el horario operativo y schedule semanal
+            const tenantDocRef = doc(db, 'tenants', tenantId);
+            const tenantSnap = await getDoc(tenantDocRef);
+            let openTime = '08:00';
+            let closeTime = '23:00';
+            let weeklySchedule: any = null;
+
+            if (tenantSnap.exists()) {
+                const tData = tenantSnap.data();
+                if (tData.openTime) openTime = tData.openTime;
+                if (tData.closeTime) closeTime = tData.closeTime;
+                if (tData.schedule) weeklySchedule = tData.schedule;
+            }
+
+            // 2. Resolver el día de la semana y su configuración de horario específico
             const [y, m, d] = dateStr.split('-').map(Number);
+            const bookingDate = new Date(y, m - 1, d);
+            const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            const dayName = daysOfWeek[bookingDate.getDay()];
+
+            if (weeklySchedule && weeklySchedule[dayName]) {
+                const dayConfig = weeklySchedule[dayName];
+                if (dayConfig.isOpen === false) {
+                    return []; // Cerrado este día
+                }
+                if (dayConfig.open) openTime = dayConfig.open;
+                if (dayConfig.close) closeTime = dayConfig.close;
+            }
+
+            // 3. Generar slots dinámicos basados en la hora de apertura y cierre
+            const dynamicSlots: string[] = [];
+            let openHour = parseInt(openTime.split(':')[0]);
+            if (isNaN(openHour)) openHour = 8;
+            let closeHour = parseInt(closeTime.split(':')[0]);
+            if (isNaN(closeHour)) closeHour = 23;
+
+            if (closeHour < openHour) {
+                closeHour += 24;
+            }
+            if (closeHour === 0 && closeTime !== '00:00') {
+                closeHour = 24;
+            }
+
+            for (let i = openHour; i < closeHour; i++) {
+                const hour = i % 24;
+                dynamicSlots.push(`${hour.toString().padStart(2, '0')}:00`);
+            }
+            slots = dynamicSlots;
+
             const startOfDay = new Date(y, m - 1, d, 0, 0, 0);
             const endOfDay = new Date(y, m - 1, d, 23, 59, 59);
 
             const bookingsRef = collection(db, 'bookings');
-            // Compatible con el esquema usado en web: algunas reservas antiguas usan startTime como Timestamp.
             const qByDate = query(
                 bookingsRef,
                 where('tenantId', '==', tenantId),
@@ -86,7 +136,7 @@ export const bookingService = {
             return slots.filter((slot) => !occupiedTimes.includes(slot));
         } catch (error) {
             console.error('Error fetching available slots:', error);
-            // Default to all slots on failure to not block user entirely from exploring
+            // Devolver slots por defecto en caso de error para no bloquear al usuario
             return slots;
         }
     },
@@ -260,13 +310,18 @@ export const bookingService = {
         });
     },
 
-    async checkOut(bookingId: string) {
+    async checkOut(bookingId: string, surveyData?: { rating?: number; feedback?: string }) {
         const ref = doc(db, 'bookings', bookingId);
-        await updateDoc(ref, { 
+        const updateData: any = { 
             checkOut: true, 
             checkOutTime: Timestamp.now(),
             status: 'completed'
-        });
+        };
+        if (surveyData) {
+            if (surveyData.rating !== undefined) updateData.rating = surveyData.rating;
+            if (surveyData.feedback !== undefined) updateData.feedback = surveyData.feedback;
+        }
+        await updateDoc(ref, updateData);
     },
 
     async saveMatchStats(stats: any) {

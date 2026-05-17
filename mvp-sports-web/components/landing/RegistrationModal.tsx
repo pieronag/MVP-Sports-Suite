@@ -13,6 +13,19 @@ const SPORT_POSITIONS: Record<string, string[]> = {
   'Voleibol': ['Armador', 'Atacante', 'Central', 'Líbero']
 };
 
+const normalizeBadgeId = (id: string): string => {
+  const normMap: Record<string, string> = {
+    goals: 'scorer',
+    assists: 'playmaker',
+    clean_sheets: 'defender',
+    won: 'wins',
+    played: 'experience',
+    sports_played: 'multi_sport',
+    loyalty: 'loyal'
+  };
+  return normMap[id] || id;
+};
+
 export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -141,7 +154,8 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
 
   const prevStep = () => { setStep(s => s - 1); setError(""); };
 
-  const recalculateUserELO = async (userId: string, email: string) => {
+  const recalculateUserELO = async (userId: string, email: string) => { return; };
+  const oldRecalculateUserELO = async (userId: string, email: string) => {
     try {
       // 1. Obtener Configuración Global
       const settingsSnap = await getDoc(doc(db, 'settings', 'global'));
@@ -150,6 +164,8 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
         tiers: { silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 }
       };
       const maxXP = gamification.tiers?.legend || 25000;
+      const badgeConfigs = gamification.badges || {};
+      const BADGE_XP = gamification.badgeXpValues || { bronze: 50, silver: 150, gold: 500 };
 
       // 2. Buscar Bookings (por si ya tiene historial con ese email)
       const q1 = query(collection(db, "bookings"), where("userId", "==", userId));
@@ -158,22 +174,195 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
 
       const [snap1, snap2, snap3] = await Promise.all([getDocs(q1), getDocs(q2), getDocs(q3)]);
       const allDocsMap = new Map();
-      [snap1, snap2, snap3].forEach(snap => snap.docs.forEach((d: any) => allDocsMap.set(d.id, d.data())));
+      [snap1, snap2, snap3].forEach(snap => snap.docs.forEach((d: any) => { if (!allDocsMap.has(d.id)) allDocsMap.set(d.id, d.data()); }));
 
-      const validDocs = Array.from(allDocsMap.values()).filter((b: any) => b.status === 'completed' || b.status === 'confirmed');
+      // Filtrar completed/confirmed/no-show para XP
+      const validDocs = Array.from(allDocsMap.values())
+        .filter((b: any) => {
+          const s = b.status;
+          const isNoShow = s === 'no-show' || 
+                           b.paymentStatus === 'no-show' || 
+                           b.noShow === true || 
+                           (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
+          return s === 'completed' || s === 'confirmed' || b.checkOut === true || isNoShow;
+        })
+        .sort((a: any, b: any) => {
+          const dateA = a.date?.seconds || 0;
+          const dateB = b.date?.seconds || 0;
+          return dateA - dateB;
+        });
 
+      let totalGoals = 0, totalAssists = 0, totalWins = 0, totalPlayed = validDocs.length, totalMVPs = 0, totalCleanSheets = 0, totalMinutes = 0;
+      let weekendMatches = 0, morningMatches = 0, nightMatches = 0;
+      let currentStreak = 0, maxStreak = 0;
+      const uniqueSports = new Set<string>();
       let calculatedXp = 0;
-      let totalWins = 0;
-      let totalGoals = 0;
 
       validDocs.forEach((b: any) => {
-        calculatedXp += (gamification.xpPerMatch || 100);
-        if (b.isWin) {
-          calculatedXp += (gamification.xpPerWin || 150);
-          totalWins++;
+        const isNoShow = b.status === 'no-show' || 
+                         b.paymentStatus === 'no-show' || 
+                         b.noShow === true || 
+                         (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
+        if (isNoShow) {
+            calculatedXp -= (gamification.xpPerNoShow || 50);
+            return;
         }
-        totalGoals += (b.goals || 0);
+
+        const isW = b.isWin === true;
+        
+        // Estadísticas básicas
+        totalGoals += (b.goals || 0); 
+        totalAssists += (b.assists || 0);
+        if (isW) {
+          totalWins++;
+          currentStreak++;
+          if (currentStreak > maxStreak) maxStreak = currentStreak;
+        } else {
+          currentStreak = 0;
+        }
+        
+        if (b.isMVP) totalMVPs++;
+        if (b.isCleanSheet) totalCleanSheets++;
+        totalMinutes += (b.durationMinutes || 60);
+        
+        const sportKey = (b.sport || 'Fútbol').toLowerCase();
+        uniqueSports.add(sportKey);
+
+        // Análisis de Tiempo y Fecha
+        if (b.date) {
+          const dateObj = b.date.toDate ? b.date.toDate() : (b.date.seconds ? new Date(b.date.seconds * 1000) : new Date(b.date));
+          const day = dateObj.getDay(); // 0=Dom, 6=Sab
+          if (day === 0 || day === 6) weekendMatches++;
+        }
+
+        if (b.startTime) {
+          const hour = typeof b.startTime === 'string' ? parseInt(b.startTime.split(':')[0]) : (b.startTime.toDate ? b.startTime.toDate().getHours() : 12);
+          if (hour < 12) morningMatches++;
+          else if (hour >= 18) nightMatches++;
+        }
+
+        // XP Calculation
+        const defaultOverrides = { 
+          winXP: gamification.xpPerWin || 150, 
+          lossXP: gamification.xpPerLoss || 50, 
+          countGoals: true, 
+          countAssists: true,
+          goalXP: gamification.xpPerGoal || 25,
+          assistXP: gamification.xpPerSpread || gamification.xpPerAssist || 15
+        };
+        const overrides = {
+          ...defaultOverrides,
+          ...(gamification.sportsOverrides?.[sportKey] || {})
+        };
+
+        calculatedXp += (gamification.xpPerMatch || 100);
+        if (b.checkIn) calculatedXp += (gamification.xpPerCheckin || 50);
+
+        const isL = b.isWin === false;
+        if (isW) calculatedXp += overrides.winXP; 
+        else if (isL) calculatedXp -= overrides.lossXP;
+
+        if (overrides.countGoals) calculatedXp += (b.goals || 0) * (overrides.goalXP !== undefined ? overrides.goalXP : 25);
+        if (overrides.countAssists) calculatedXp += (b.assists || 0) * (overrides.assistXP !== undefined ? overrides.assistXP : 15);
+        if (b.isMVP) calculatedXp += (gamification.xpPerMvp || 200);
       });
+
+      // === CALCULAR BADGES Y SU XP BONUS ===
+      const daysActive = 1; // Registro inicial
+      const statsMap: Record<string, number> = {
+        scorer: totalGoals,
+        goals: totalGoals,
+
+        playmaker: totalAssists,
+        assists: totalAssists,
+
+        defender: totalCleanSheets,
+        clean_sheets: totalCleanSheets,
+
+        wins: totalWins,
+        won: totalWins,
+
+        mvp: totalMVPs,
+        mvps: totalMVPs,
+
+        experience: totalPlayed,
+        played: totalPlayed,
+
+        multi_sport: uniqueSports.size,
+        sports_played: uniqueSports.size,
+
+        captaincy: 0,
+        captain_matches: 0,
+
+        comeback: 0,
+        comebacks: 0,
+
+        precision: 0,
+        precision_matches: 0,
+
+        clutch: 0,
+        clutch_goals: 0,
+
+        tournaments: 0,
+        tournaments_played: 0,
+
+        invictus: maxStreak,
+        longest_win_streak: maxStreak,
+
+        rivalry: 0,
+        rivalries_won: 0,
+
+        morning_player: morningMatches,
+        morning_matches: morningMatches,
+
+        night_player: nightMatches,
+        night_matches: nightMatches,
+
+        loyal: Math.floor(daysActive / 30),
+        loyalty: Math.floor(daysActive / 30),
+
+        weekend_warrior: weekendMatches,
+        weekend_matches: weekendMatches,
+
+        stamina: totalMinutes,
+        minutes_played: totalMinutes,
+
+        social: 0,
+        invited_players: 0
+      };
+
+      const earnedBadges: any[] = [];
+      let badgeXpBonus = 0;
+      Object.keys(badgeConfigs).forEach(badgeId => {
+        const config = badgeConfigs[badgeId] || { bronze: 5, silver: 15, gold: 30 };
+        const userVal = statsMap[badgeId] || 0;
+        let tier = null;
+
+        const goldVal = Number(config.gold || 0);
+        const silverVal = Number(config.silver || 0);
+        const bronzeVal = Number(config.bronze || 0);
+
+        if (userVal > 0) {
+          if (goldVal > 0 && userVal >= goldVal) { 
+            tier = 'gold'; 
+            badgeXpBonus += BADGE_XP.gold; 
+          } else if (silverVal > 0 && userVal >= silverVal) { 
+            tier = 'silver'; 
+            badgeXpBonus += BADGE_XP.silver; 
+          } else if (bronzeVal > 0 && userVal >= bronzeVal) { 
+            tier = 'bronze'; 
+            badgeXpBonus += BADGE_XP.bronze; 
+          }
+        }
+        if (tier) {
+          const normId = normalizeBadgeId(badgeId);
+          if (!earnedBadges.some(b => b.id === normId)) {
+            earnedBadges.push({ id: normId, tier, value: userVal });
+          }
+        }
+      });
+
+      calculatedXp += badgeXpBonus;
 
       // 3. Determinar Tier y OVR
       let projectedTier = 'BRONCE';
@@ -195,11 +384,22 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
         xp: calculatedXp,
         ovr: projectedOvr,
         tier: projectedTier,
+        badges: earnedBadges,
         stats: {
-          played: validDocs.length,
+          played: totalPlayed,
           won: totalWins,
-          lost: Math.max(0, validDocs.length - totalWins),
-          goals: totalGoals
+          lost: Math.max(0, totalPlayed - totalWins),
+          goals: totalGoals,
+          assists: totalAssists,
+          clean_sheets: totalCleanSheets,
+          mvps: totalMVPs,
+          sports_played: uniqueSports.size,
+          minutes_played: totalMinutes,
+          longest_win_streak: maxStreak,
+          weekend_matches: weekendMatches,
+          morning_matches: morningMatches,
+          night_matches: nightMatches,
+          loyal: Math.floor(daysActive / 30)
         },
         lastELOUpdate: new Date().toISOString()
       }, { merge: true });
@@ -219,7 +419,7 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
       const user = userCredential.user;
       await updateProfile(user, { displayName: formData.displayName });
 
-      // Guardar perfil base
+      // Guardar perfil base con estadísticas e insignias vacías por defecto
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
         email: formData.email,
@@ -243,11 +443,25 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
         tier: 'BRONCE',
         ovr: 40,
         rating: 5.0,
-        status: "active"
+        status: "active",
+        badges: [],
+        stats: {
+          played: 0,
+          won: 0,
+          lost: 0,
+          goals: 0,
+          assists: 0,
+          clean_sheets: 0,
+          mvp: 0,
+          sports_played: 1,
+          minutes_played: 0,
+          longest_win_streak: 0,
+          weekend_matches: 0,
+          morning_matches: 0,
+          night_matches: 0,
+          loyal: 0
+        }
       });
-
-      // Ejecutar actualización de ELO para el nuevo usuario
-      await recalculateUserELO(user.uid, formData.email);
 
       // Enviar correo electrónico confirmando el registro de manera asíncrona
       try {

@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { db } from '@/services/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import {
     XMarkIcon,
     EnvelopeIcon,
@@ -28,19 +29,188 @@ interface UserProfileModalProps {
 }
 
 export default function UserProfileModal({ user, isOpen, onClose }: UserProfileModalProps) {
+    const [gamification, setGamification] = useState<any>(null);
+
+    useEffect(() => {
+        if (isOpen) {
+            const fetchGamification = async () => {
+                try {
+                    const snap = await getDoc(doc(db, 'settings', 'global'));
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        setGamification({
+                            ...data.gamification,
+                            badges: data.badges || data.gamification?.badges || {}
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error fetching gamification settings in UserProfileModal:", error);
+                }
+            };
+            fetchGamification();
+        }
+    }, [isOpen]);
 
     if (!isOpen || !user) return null;
 
     const name = user.name || user.displayName || 'Sin Nombre';
     const email = user.email || '---';
     const role = user.role || 'Jugador';
-    const ovr = user.ovr || 0;
+    const ovr = user.ovr || 40;
     const tier = user.tier || 'Bronce';
     const teamList = user.teamList || [];
     const photoURL = user.photoURL || '';
     const stats = user.stats || { played: 0, won: 0, lost: 0, goals: 0 };
     const efficiency = user.efficiency || 0;
     const joinedStr = user.joined || '---';
+
+    // Rango y Experiencia
+    const xp = user.xp || 0;
+    const tiers = gamification?.tiers || {
+        bronze: 0,
+        silver: 1000,
+        gold: 3000,
+        platinum: 6000,
+        diamond: 10000,
+        elite: 15000,
+        legend: 25000
+    };
+
+    const RANGOS = [
+        { id: 'bronze', name: 'BRONCE', min: tiers.bronze || 0, color: 'text-amber-700 bg-amber-700/10' },
+        { id: 'silver', name: 'PLATA', min: tiers.silver || 1000, color: 'text-slate-400 bg-slate-400/10' },
+        { id: 'gold', name: 'ORO', min: tiers.gold || 3000, color: 'text-amber-500 bg-amber-500/10' },
+        { id: 'platinum', name: 'PLATINO', min: tiers.platinum || 6000, color: 'text-blue-500 bg-blue-500/10' },
+        { id: 'diamond', name: 'DIAMANTE', min: tiers.diamond || 10000, color: 'text-cyan-500 bg-cyan-500/10' },
+        { id: 'elite', name: 'ELITE', min: tiers.elite || 15000, color: 'text-emerald-500 bg-emerald-500/10' },
+        { id: 'legend', name: 'LEYENDA', min: tiers.legend || 25000, color: 'text-purple-500 bg-purple-500/10' }
+    ];
+
+    let rangoActual = RANGOS[0];
+    let siguienteRango = RANGOS[1];
+
+    for (let i = 0; i < RANGOS.length; i++) {
+        if (xp >= RANGOS[i].min) {
+            rangoActual = RANGOS[i];
+            siguienteRango = RANGOS[i + 1] || RANGOS[i];
+        }
+    }
+
+    const puntosEnEsteRango = xp - rangoActual.min;
+    const puntosNecesarios = siguienteRango.min - rangoActual.min;
+    const progreso = siguienteRango.id === rangoActual.id ? 100 : Math.min(100, Math.round((puntosEnEsteRango / puntosNecesarios) * 100));
+
+    // Fusión híbrida de insignias ganadas (sincronizada 100% con móvil y bulk recalculate)
+    const savedBadges = user?.badges || [];
+    let rawJoined = new Date();
+    if (user?.rawJoined) {
+        rawJoined = new Date(user.rawJoined);
+    } else if (user?.raw?.createdAt?.toDate) {
+        rawJoined = user.raw.createdAt.toDate();
+    } else if (user?.raw?.createdAt?.seconds) {
+        rawJoined = new Date(user.raw.createdAt.seconds * 1000);
+    } else if (user?.raw?.createdAt) {
+        rawJoined = new Date(user.raw.createdAt);
+    } else if (user?.createdAt?.toDate) {
+        rawJoined = user.createdAt.toDate();
+    } else if (user?.createdAt?.seconds) {
+        rawJoined = new Date(user.createdAt.seconds * 1000);
+    } else if (user?.createdAt) {
+        rawJoined = new Date(user.createdAt);
+    } else if (user?.joinedDate) {
+        rawJoined = new Date(user.joinedDate);
+    } else if (user?.joined) {
+        rawJoined = new Date(user.joined);
+    }
+    const daysActive = Math.max(1, (new Date().getTime() - rawJoined.getTime()) / (1000 * 60 * 60 * 24));
+
+    const statsMap: Record<string, number> = {
+        scorer: stats.goals || 0,
+        playmaker: stats.assists || 0,
+        defender: stats.clean_sheets || 0,
+        wins: stats.won || 0,
+        mvp: stats.mvps || stats.mvp || 0,
+        experience: stats.played || 0,
+        multi_sport: stats.sports_played || 1,
+        captaincy: stats.captain_matches || 0,
+        comeback: stats.comebacks || 0,
+        precision: stats.precision_matches || 0,
+        clutch: stats.clutch_goals || 0,
+        tournaments: stats.tournaments_played || 0,
+        invictus: stats.longest_win_streak || 0,
+        rivalry: stats.rivalries_won || 0,
+        morning_player: stats.morning_matches || 0,
+        night_player: stats.night_matches || 0,
+        loyal: Math.floor(daysActive / 30), 
+        weekend_warrior: stats.weekend_matches || 0,
+        stamina: stats.minutes_played || (stats.played || 0) * 60,
+        social: stats.invited_players || 0
+    };
+
+    const badgeConfigs = gamification?.badges || {};
+    const computedBadgesMap = new Map<string, string>();
+
+    // 1. Guardadas
+    const normalizeBadgeId = (id: string): string => {
+        const normMap: Record<string, string> = {
+            goals: 'scorer', assists: 'playmaker', clean_sheets: 'defender',
+            won: 'wins', played: 'experience', sports_played: 'multi_sport',
+            loyalty: 'loyal'
+        };
+        return normMap[id] || id;
+    };
+    savedBadges.forEach((b: any) => {
+        if (b.tier) {
+            const normId = normalizeBadgeId(b.id);
+            computedBadgesMap.set(normId, b.tier);
+        }
+    });
+
+    // 2. Fusionar
+    const tierScores: Record<string, number> = { gold: 3, silver: 2, bronze: 1 };
+    const ALL_BADGE_IDS = [
+        'scorer', 'playmaker', 'defender', 'wins', 'mvp', 'experience', 'multi_sport',
+        'captaincy', 'comeback', 'precision', 'clutch', 'tournaments', 'invictus',
+        'rivalry', 'morning_player', 'night_player', 'loyal', 'weekend_warrior', 'stamina', 'social'
+    ];
+    ALL_BADGE_IDS.forEach(id => {
+        const dbKeys: Record<string, string> = {
+            scorer: 'goals',
+            playmaker: 'assists',
+            defender: 'clean_sheets',
+            wins: 'won',
+            experience: 'played',
+            multi_sport: 'sports_played',
+            loyal: 'loyalty'
+        };
+        const dbKey = dbKeys[id] || id;
+        const config = badgeConfigs[id] || badgeConfigs[dbKey] || { bronze: 5, silver: 15, gold: 30 };
+        const userVal = statsMap[id] || 0;
+        let computedTier: string | null = null;
+
+        const goldVal = Number(config.gold || 0);
+        const silverVal = Number(config.silver || 0);
+        const bronzeVal = Number(config.bronze || 0);
+
+        if (userVal > 0) {
+            if (goldVal > 0 && userVal >= goldVal) computedTier = 'gold';
+            else if (silverVal > 0 && userVal >= silverVal) computedTier = 'silver';
+            else if (bronzeVal > 0 && userVal >= bronzeVal) computedTier = 'bronze';
+        }
+
+        if (computedTier) {
+            const existingTier = computedBadgesMap.get(id);
+            if (!existingTier || (tierScores[computedTier] > tierScores[existingTier])) {
+                computedBadgesMap.set(id, computedTier);
+            }
+        } else {
+            computedBadgesMap.delete(id);
+        }
+    });
+
+    const finalBadges = Array.from(computedBadgesMap.entries())
+        .map(([id, tier]) => ({ id, tier }))
+        .sort((a, b) => (tierScores[b.tier] || 0) - (tierScores[a.tier] || 0));
 
     const getTierConfig = (t: string) => {
         const lowerT = t.toLowerCase();
@@ -50,7 +220,7 @@ export default function UserProfileModal({ user, isOpen, onClose }: UserProfileM
         return { color: 'from-slate-400 to-slate-600', badge: 'bg-slate-500' };
     };
 
-    const tierStyle = getTierConfig(tier);
+    const tierStyle = getTierConfig(rangoActual.name);
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 dark:bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
@@ -90,10 +260,16 @@ export default function UserProfileModal({ user, isOpen, onClose }: UserProfileM
                             <div className="flex-1 text-center md:text-left">
                                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-2">
                                     <span className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest border shadow-sm ${user.status === 'Activo' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' : 'bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20'}`}>
-                                        {user.status.toUpperCase()}
+                                        {user.status ? user.status.toUpperCase() : 'ACTIVO'}
                                     </span>
                                     <span className="px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest bg-slate-50 text-slate-500 border border-slate-100 dark:bg-white/5 dark:text-slate-400 dark:border-white/10 shadow-sm">
                                         {role.toUpperCase()}
+                                    </span>
+                                    <span className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest border shadow-sm ${rangoActual.color}`}>
+                                        RANGO {rangoActual.name}
+                                    </span>
+                                    <span className="px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-sm font-mono">
+                                        {xp.toLocaleString()} XP
                                     </span>
                                 </div>
                                 <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tighter leading-none mb-2 uppercase">
@@ -110,7 +286,6 @@ export default function UserProfileModal({ user, isOpen, onClose }: UserProfileM
                                 </div>
                             </div>
                         </div>
-
                         {/* Stats Grid */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                             {[
@@ -157,10 +332,12 @@ export default function UserProfileModal({ user, isOpen, onClose }: UserProfileM
                             </h3>
 
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                {user.badges && user.badges.length > 0 ? (
-                                    user.badges.map((badge: any, idx: number) => {
+                                {finalBadges && finalBadges.length > 0 ? (
+                                    finalBadges.map((badge: any, idx: number) => {
                                         const config = getBadgeUIConfig(badge.id, badge.tier);
                                         const Icon = config.icon;
+                                        const BADGE_XP_VALUES: Record<string, number> = gamification?.badgeXpValues || { bronze: 50, silver: 150, gold: 500 };
+                                        const xpBonus = BADGE_XP_VALUES[badge.tier] || 0;
                                         return (
                                             <div key={idx} title={config.desc} className={`p-4 rounded-3xl border flex items-center gap-4 transition-all hover:-translate-y-1 cursor-help shadow-sm hover:shadow-xl ${config.bg} ${config.border} dark:bg-white/[0.02] dark:border-white/5`}>
                                                 <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-inner shrink-0 ${config.iconColor}`}>
@@ -168,8 +345,9 @@ export default function UserProfileModal({ user, isOpen, onClose }: UserProfileM
                                                 </div>
                                                 <div className="min-w-0">
                                                     <p className={`text-[10px] font-black uppercase truncate ${config.textColor} dark:text-white`}>{config.name.toUpperCase()}</p>
-                                                    <div className="flex items-center gap-1.5 opacity-60">
+                                                    <div className="flex flex-col gap-0.5 opacity-60">
                                                         <span className="text-[8px] font-bold uppercase dark:text-slate-400">NVL {badge.tier === 'gold' ? 'ORO' : badge.tier === 'silver' ? 'PLATA' : 'BRONCE'}</span>
+                                                        <span className="text-[7px] font-black uppercase text-emerald-500 bg-emerald-500/10 px-1 py-0.2 rounded w-fit">+{xpBonus} XP</span>
                                                     </div>
                                                 </div>
                                             </div>

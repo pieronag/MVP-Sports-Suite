@@ -44,7 +44,13 @@ Interfaz diseñada para la validación crítica de acceso y control de afluencia
 ### 2. Agenda de Operaciones Diaria (`/index`)
 *   **Monitor de Acceso**: Lista cronológica de reservas con identificación del cliente, cancha, hora y estado de pago (`PAGADO` / `COBRAR`).
 *   **Status Tracker**: Seguimiento visual de ingresos realizados vs. pendientes.
-*   **Ecosistema Multiplex**: Capacidad de alternar entre recintos si el manager tiene asignadas múltiples sedes administrativas.
+*   **Ecosistema Multiplex**: Capacidad de alternar entre recintos en tiempo real desde el selector de cabecera con recarga instantánea de estadísticas.
+*   **Double-Layer No-Show Engine**: Verificador proactivo local e intervalo de 15 minutos en segundo plano que cancela reservas expiradas sin pago y libera los cupos de cancha.
+*   **Visualización de Motivo Real**: Distinción clara en la agenda de anuladas entre `CANCELADO POR NO-SHOW` y `CANCELADO POR JUGADOR`.
+
+### 3. Perfil Administrativo (`/perfil`)
+*   **Switch de Modo Oscuro Nativo**: Integración de componente táctil de alta fidelidad para alternar de forma inmediata la visualización nocturna.
+*   **Estandarización de Marca**: Pie de página unificado de marca a nivel de aplicación móvil (`MVP SPORTS CHILE • 2026`).
 
 ---
 

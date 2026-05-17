@@ -47,12 +47,37 @@ export default function BilleteraScreen() {
         if (!refreshing) setLoading(true);
         try {
             const userBookings = await bookingService.getUserBookings(user.uid);
-            userBookings.sort((a, b) => {
+            
+            // Filtrar según especificaciones:
+            // 1. Gastos relacionados a reservas finalizadas correctamente (completed/past/checkOut === true)
+            // 2. Canceladas por jugador NO se consideran
+            // 3. Canceladas por inasistencia (no-show) SOLO si hay pago online (paymentMethod === 'card')
+            const filteredBookings = userBookings.filter(b => {
+                const isNoShow = b.status === 'no-show' || 
+                                 b.paymentStatus === 'no-show' || 
+                                 b.noShow === true || 
+                                 (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
+
+                const isCompleted = b.status === 'completed' || b.status === 'past' || b.checkOut === true;
+                const isOnline = b.paymentMethod === 'card';
+
+                if (isCompleted) {
+                    return true;
+                }
+                
+                if (isNoShow && isOnline) {
+                    return true;
+                }
+
+                return false;
+            });
+
+            filteredBookings.sort((a, b) => {
                 const dateA = (a.date as any)?.toMillis ? (a.date as any).toMillis() : new Date(a.date).getTime();
                 const dateB = (b.date as any)?.toMillis ? (b.date as any).toMillis() : new Date(b.date).getTime();
                 return dateB - dateA;
             });
-            setBookings(userBookings.slice(0, 20));
+            setBookings(filteredBookings.slice(0, 20));
         } catch (error) {
             console.error("Error loading wallet transactions:", error);
         } finally {
@@ -154,9 +179,20 @@ export default function BilleteraScreen() {
                     {bookings.length > 0 ? (
                         bookings.map((match, idx) => {
                             const isOnline = match.paymentMethod === 'card';
-                            const methodBadgeColor = isOnline ? COLORS.accent : '#3b82f6';
-                            const methodBadgeBg = isOnline ? COLORS.accent + '15' : '#3b82f615';
-                            const methodLabel = isOnline ? 'PAGO ONLINE' : 'PAGO EN RECINTO';
+                            const isNoShow = match.status === 'no-show' || 
+                                             match.paymentStatus === 'no-show' || 
+                                             match.noShow === true || 
+                                             (match.notes && (match.notes.toLowerCase().includes('no-show') || match.notes.toLowerCase().includes('inasistencia')));
+
+                            const methodBadgeColor = isNoShow 
+                                ? COLORS.error 
+                                : (isOnline ? COLORS.accent : '#3b82f6');
+                            const methodBadgeBg = isNoShow 
+                                ? COLORS.error + '15' 
+                                : (isOnline ? COLORS.accent + '15' : '#3b82f615');
+                            const methodLabel = isNoShow 
+                                ? 'PAGO RETENIDO (INASISTENCIA)' 
+                                : (isOnline ? 'PAGO ONLINE' : 'PAGO EN RECINTO');
                             
                             // Formato de fecha
                             let dateStr = 'Reciente';
@@ -169,7 +205,9 @@ export default function BilleteraScreen() {
                                 <View key={match.id}>
                                     <View style={{ height: 95, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25 }}>
                                         <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: methodBadgeBg, alignItems: 'center', justifyContent: 'center' }}>
-                                            {isOnline ? (
+                                            {isNoShow ? (
+                                                <CreditCard color={methodBadgeColor} size={20} />
+                                            ) : isOnline ? (
                                                 <CreditCard color={methodBadgeColor} size={20} />
                                             ) : (
                                                 <Landmark color={methodBadgeColor} size={20} />

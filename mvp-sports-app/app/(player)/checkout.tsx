@@ -10,7 +10,7 @@ import { teamService, Team } from '../../services/teamService';
 import { tournamentService } from '../../services/tournamentService';
 import { venueService, Tenant } from '../../services/venueService';
 import { db } from '../../services/firebase';
-import { collection, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, Timestamp, deleteDoc, doc } from 'firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
@@ -68,6 +68,7 @@ export default function CheckoutScreen() {
     const [tenant, setTenant] = useState<Tenant | null>(null);
     const [loadingTenant, setLoadingTenant] = useState(true);
     const [webpayData, setWebpayData] = useState<any>(null);
+    const [isNewBookingCreated, setIsNewBookingCreated] = useState(false);
 
     // Parámetros dinámicos (pueden ser de Reserva o de Torneo)
     const { 
@@ -185,6 +186,10 @@ export default function CheckoutScreen() {
                 const endH = startH + 1;
                 const endTime = `${endH.toString().padStart(2, '0')}:${(startM || 0).toString().padStart(2, '0')}`;
                 
+                const bookingDate = new Date(`${date}T00:00:00`);
+                bookingDate.setHours(startH, startM || 0, 0, 0);
+                if (startH < 6) bookingDate.setDate(bookingDate.getDate() + 1);
+
                 const bookingData: any = {
                     userId: user.uid,
                     tenantId: tenantId as string,
@@ -193,7 +198,7 @@ export default function CheckoutScreen() {
                     courtName: courtName as string || 'Cancha',
                     clientName: clientName,
                     clientPhone: userProfile?.phone || '+56900000000',
-                    date: Timestamp.fromDate(new Date(`${date}T${startTime}:00`)),
+                    date: Timestamp.fromDate(bookingDate),
                     startTime: startTime as string,
                     endTime: endTime,
                     totalPrice: priceNum,
@@ -218,8 +223,10 @@ export default function CheckoutScreen() {
                     bookingData.paymentMethod = 'card';
                     if (finalBookingId) {
                         await bookingService.updateBooking(finalBookingId, bookingData);
+                        setIsNewBookingCreated(false);
                     } else {
                         finalBookingId = await bookingService.createBooking(bookingData);
+                        setIsNewBookingCreated(true);
                     }
 
                     // AHORA LLAMAMOS AL SISTEMA EXTERNO PARA INICIAR EL PAGO
@@ -492,11 +499,33 @@ export default function CheckoutScreen() {
             </View>
 
             {/* WEBVIEW TRANSBANK DIRECT ONLINE PAYMENT */}
-            <Modal visible={showWebView} animationType="slide">
+            <Modal 
+                visible={showWebView} 
+                animationType="slide"
+                onRequestClose={async () => {
+                    setShowWebView(false);
+                    if (webpayData?.bookingId && !isTournament && isNewBookingCreated) {
+                        try {
+                            await deleteDoc(doc(db, 'bookings', webpayData.bookingId));
+                        } catch (e) {
+                            console.error("Error deleting back-closed booking:", e);
+                        }
+                    }
+                }}
+            >
                 <View style={{ flex: 1, backgroundColor: 'white' }}>
                     <View style={{ paddingTop: 60, paddingBottom: 20, paddingHorizontal: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }}>
                         <Text style={{ fontSize: 18, fontWeight: '900' }}>PAGO ONLINE SEGURO</Text>
-                        <TouchableOpacity onPress={() => setShowWebView(false)}>
+                        <TouchableOpacity onPress={async () => {
+                            setShowWebView(false);
+                            if (webpayData?.bookingId && !isTournament && isNewBookingCreated) {
+                                try {
+                                    await deleteDoc(doc(db, 'bookings', webpayData.bookingId));
+                                } catch (e) {
+                                    console.error("Error deleting closed booking:", e);
+                                }
+                            }
+                        }}>
                             <X color="black" size={24} />
                         </TouchableOpacity>
                     </View>
@@ -560,6 +589,16 @@ export default function CheckoutScreen() {
                                     }
                                 } else if (navState.url.includes('checkout/error')) {
                                     setShowWebView(false);
+                                    
+                                    // Borrar la reserva si el pago falló o fue cancelado
+                                    if (webpayData?.bookingId && !isTournament && isNewBookingCreated) {
+                                        try {
+                                            await deleteDoc(doc(db, 'bookings', webpayData.bookingId));
+                                        } catch (e) {
+                                            console.error("Error deleting failed booking:", e);
+                                        }
+                                    }
+                                    
                                     setCustomAlert({ 
                                         visible: true, 
                                         title: 'PAGO CANCELADO', 

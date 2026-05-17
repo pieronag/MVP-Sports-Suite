@@ -20,7 +20,49 @@ import { venueService, Tenant } from '../../../services/venueService';
 import { teamService, Team } from '../../../services/teamService';
 import { tournamentService } from '../../../services/tournamentService';
 import { db } from '../../../services/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+
+const getSantiagoDateTime = (date: Date) => {
+    try {
+        const formatter = new Intl.DateTimeFormat("en-US", {
+            timeZone: "America/Santiago",
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+            hour12: false
+        });
+        const parts = formatter.formatToParts(date);
+        const getPart = (type: string) => Number(parts.find(p => p.type === type)?.value || 0);
+        return new Date(getPart("year"), getPart("month") - 1, getPart("day"), getPart("hour"), getPart("minute"), 0, 0);
+    } catch (e) {
+        return new Date();
+    }
+};
+
+const getBookingDateTimeChile = (bookingDate: Date, startTime: string) => {
+    try {
+        const formatter = new Intl.DateTimeFormat("en-US", {
+            timeZone: "America/Santiago",
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour12: false
+        });
+        const parts = formatter.formatToParts(bookingDate);
+        const getPart = (type: string) => Number(parts.find(p => p.type === type)?.value || 0);
+        const [hours, minutes] = (startTime || "00:00").split(':').map(Number);
+        const res = new Date(getPart("year"), getPart("month") - 1, getPart("day"), hours, minutes, 0, 0);
+        if (hours < 6) {
+            res.setDate(res.getDate() + 1);
+        }
+        return res;
+    } catch (e) {
+        return new Date();
+    }
+};
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -78,11 +120,19 @@ const getFormattedDate = (date: any) => {
 
 const getStatusInfo = (booking: Booking | null, C: any) => {
     if (!booking) return { label: 'DESCONOCIDO', color: C.sub };
-    if (booking.status === 'cancelled') return { label: 'ANULADO', color: COLORS.error };
-    if (booking.status === 'active') return { label: 'EN JUEGO', color: '#3b82f6' }; // Azul vibrante para partidos en curso
-    if (booking.status === 'completed' || booking.status === 'past') return { label: 'FINALIZADO', color: C.sub };
+    const isNoShow = booking.status === 'no-show' || 
+                     booking.paymentStatus === 'no-show' || 
+                     booking.noShow === true || 
+                     (booking.notes && (booking.notes.toLowerCase().includes('no-show') || booking.notes.toLowerCase().includes('inasistencia')));
+
+    if (isNoShow) return { label: 'CANCELADO POR INASISTENCIA', color: COLORS.error };
+    if (booking.status === 'cancelled') {
+        if (booking.cancelledBy) return { label: 'CANCELADO POR JUGADOR', color: COLORS.error };
+        return { label: 'ANULADO', color: COLORS.error };
+    }
+    if (booking.status === 'active' && !booking.checkOut) return { label: 'EN JUEGO', color: '#3b82f6' };
+    if (booking.status === 'completed' || booking.status === 'past' || booking.checkOut === true) return { label: 'FINALIZADO', color: C.sub };
     
-    // Mostrar Pago Pendiente solo si no está en juego o anulado
     if (booking.paymentStatus === 'pending') {
         return { label: 'PAGO PENDIENTE', color: '#f59e0b' };
     }
@@ -125,12 +175,56 @@ export default function MisReservasScreen() {
         if (!isRefreshing) setLoading(true);
         try {
             const all = await bookingService.getUserBookings(user.uid);
-            const tenantIds = Array.from(new Set(all.map(b => b.tenantId)));
+            
+            // Auto check-in local / no-show validation on loaded bookings
+            const nowChile = getSantiagoDateTime(new Date());
+
+            const verifiedBookings = await Promise.all(all.map(async (booking) => {
+                if (
+                    booking.status !== 'cancelled' && 
+                    booking.status !== 'completed' &&
+                    booking.checkIn !== true && 
+                    booking.date && 
+                    booking.startTime
+                ) {
+                    let bookingDate: Date;
+                    if ((booking.date as any).toDate) {
+                        bookingDate = (booking.date as any).toDate();
+                    } else {
+                        bookingDate = new Date(booking.date as any);
+                    }
+                    
+                    const startDateTime = getBookingDateTimeChile(bookingDate, booking.startTime);
+                    
+                    if (nowChile >= startDateTime) {
+                        try {
+                            const bookingRef = doc(db, 'bookings', booking.id as string);
+                            await updateDoc(bookingRef, {
+                                status: 'no-show',
+                                paymentStatus: 'no-show',
+                                notes: 'Cancelación automática por inasistencia sin check-in (No-Show).',
+                                updatedAt: new Date()
+                            });
+                            return {
+                                ...booking,
+                                status: 'no-show' as any,
+                                paymentStatus: 'no-show' as any,
+                                notes: 'Cancelación automática por inasistencia sin check-in (No-Show).'
+                            };
+                        } catch (e) {
+                            console.error("Player no-show update error:", e);
+                        }
+                    }
+                }
+                return booking;
+            }));
+
+            const tenantIds = Array.from(new Set(verifiedBookings.map(b => b.tenantId)));
             const venueList = await venueService.getVenuesByIds(tenantIds);
             const venueMap: Record<string, Tenant> = {};
             venueList.forEach(v => { venueMap[v.id] = v; });
             setVenues(venueMap);
-            setBookings(all.sort((a, b) => ((b.date as any)?.seconds || 0) - ((a.date as any)?.seconds || 0)));
+            setBookings(verifiedBookings.sort((a, b) => ((b.date as any)?.seconds || 0) - ((a.date as any)?.seconds || 0)));
         } catch (e) { console.error(e); } finally { setLoading(false); setRefreshing(false); }
     };
 
@@ -170,8 +264,7 @@ export default function MisReservasScreen() {
     const handleSaveSurvey = async (rating: number, feedback: string) => {
         if (!surveyBooking?.id) return;
         try {
-            await bookingService.checkOut(surveyBooking.id);
-            await bookingService.updateBooking(surveyBooking.id, { rating, feedback });
+            await bookingService.checkOut(surveyBooking.id, { rating, feedback });
             await venueService.submitVenueFeedback(
                 surveyBooking.tenantId,
                 surveyBooking.id,
@@ -228,18 +321,12 @@ export default function MisReservasScreen() {
     );
 
     const displayList = useMemo(() => {
-        const now = new Date();
         const filtered = bookings.filter(b => {
-            const bDate = (b.date as any)?.toDate ? (b.date as any).toDate() : new Date((b.date as any)?.seconds * 1000 || Date.now());
-            const [h, m] = (b.startTime || "00:00").split(':').map(Number);
-            const bookingDateTime = new Date(bDate);
-            bookingDateTime.setHours(h, m, 0, 0);
-            const isPast = bookingDateTime < now && b.status !== 'active';
-            const isFinished = ['cancelled', 'completed', 'past'].includes(b.status as string);
+            const isActive = ['confirmed', 'active', 'pending'].includes(b.status as string) && !b.checkOut;
             if (activeTab === 'activas') {
-                return !isPast && !isFinished && ['confirmed', 'active', 'pending'].includes(b.status as string);
+                return isActive;
             } else {
-                return isPast || isFinished;
+                return !isActive;
             }
         });
 
@@ -441,9 +528,9 @@ const BookingEliteCard = ({ booking, isDark, onView, onMaps, onCheckIn, onCheckO
     const sportInfo = getSportInfo(booking.sport || '');
     const status = getStatusInfo(booking, C);
     const dateInfo = getFormattedDate(booking.date);
-    const isConfirmed = booking.status === 'confirmed';
-    const isActive = booking.status === 'active';
-    const isCompleted = booking.status === 'completed' || booking.status === 'past';
+    const isConfirmed = booking.status === 'confirmed' && !booking.checkOut;
+    const isActive = booking.status === 'active' && !booking.checkOut;
+    const isCompleted = booking.status === 'completed' || booking.status === 'past' || booking.checkOut === true;
     const isCancelled = booking.status === 'cancelled';
 
     return (

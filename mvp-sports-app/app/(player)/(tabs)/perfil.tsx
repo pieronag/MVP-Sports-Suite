@@ -47,12 +47,10 @@ const COLORS = {
 export default function PerfilScreen() {
     const scrollViewRef = useRef<ScrollView>(null);
     const cardRef = useRef<View>(null);
-    const { user, profile: authProfile, signOut, toggleTheme, theme } = useAuth();
+    const { user, profile, reloadProfile, signOut, toggleTheme, theme } = useAuth();
     const router = useRouter();
     const isDark = theme === 'dark';
     const C = isDark ? COLORS.dark : COLORS.light;
-
-    const [profile, setProfile] = useState<UserProfile | null>(null);
     const [userTeams, setUserTeams] = useState<Team[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -72,20 +70,24 @@ export default function PerfilScreen() {
         if (!user) return;
         if (isRefreshing) setRefreshing(true);
         try {
-            const [profData, gamiData, myTeams] = await Promise.all([
-                userService.getUserProfile(user.uid),
+            const [gamiData, myTeams] = await Promise.all([
                 gamificationService.getSettings(),
                 teamService.getUserTeams(user.uid)
             ]);
-            setProfile(profData);
             setGamification(gamiData);
             setUserTeams(myTeams);
+            await reloadProfile();
 
             // Cargar config de badges desde Firestore
             try {
                 const settingsSnap = await getDoc(doc(db, 'settings', 'global'));
-                if (settingsSnap.exists() && settingsSnap.data().badges) {
-                    setBadgeConfigs(settingsSnap.data().badges);
+                if (settingsSnap.exists()) {
+                    const gamificationData = settingsSnap.data().gamification || {};
+                    if (gamificationData.badges) {
+                        setBadgeConfigs(gamificationData.badges);
+                    } else if (settingsSnap.data().badges) {
+                        setBadgeConfigs(settingsSnap.data().badges);
+                    }
                 }
             } catch (e) { console.warn('Error cargando badges config:', e); }
         } catch (error) {
@@ -200,11 +202,49 @@ export default function PerfilScreen() {
     const earnedBadgesCount = (() => {
         if (!profile) return 0;
         const savedBadges = (profile as any)?.badges as any[] || [];
-        if (savedBadges.length > 0) return savedBadges.filter(b => b.tier !== null).length;
-
         const stats = profile.stats || {};
         const config = badgeConfigs || {};
-        let count = 0;
+        const rawData = profile as any;
+        const createdAt = rawData?.createdAt?.seconds
+            ? new Date(rawData.createdAt.seconds * 1000)
+            : new Date();
+        const daysActive = Math.max(1, (new Date().getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+
+        const statsMap: Record<string, number> = {
+            scorer: (stats as any).goals || 0, playmaker: (stats as any).assists || 0,
+            defender: (stats as any).clean_sheets || 0, wins: (stats as any).won || 0,
+            mvp: (stats as any).mvps || (stats as any).mvp || 0,
+            experience: (stats as any).played || 0, multi_sport: (stats as any).sports_played || 1,
+            captaincy: (stats as any).captain_matches || 0, comeback: (stats as any).comebacks || 0,
+            precision: (stats as any).precision_matches || 0, clutch: (stats as any).clutch_goals || 0,
+            tournaments: (stats as any).tournaments_played || 0, invictus: (stats as any).longest_win_streak || 0,
+            rivalry: (stats as any).rivalries_won || 0, morning_player: (stats as any).morning_matches || 0,
+            night_player: (stats as any).night_matches || 0, loyal: Math.floor(daysActive / 30),
+            weekend_warrior: (stats as any).weekend_matches || 0,
+            stamina: (stats as any).minutes_played || ((stats as any).played || 0) * 60,
+            social: (stats as any).invited_players || 0
+        };
+
+        const computedBadgesMap = new Map<string, string>();
+
+        // 1. Cargar las guardadas
+        const normalizeBadgeId = (id: string): string => {
+            const normMap: Record<string, string> = {
+                goals: 'scorer', assists: 'playmaker', clean_sheets: 'defender',
+                won: 'wins', played: 'experience', sports_played: 'multi_sport',
+                loyalty: 'loyal'
+            };
+            return normMap[id] || id;
+        };
+        savedBadges.forEach((b: any) => {
+            if (b.tier) {
+                const normId = normalizeBadgeId(b.id);
+                computedBadgesMap.set(normId, b.tier);
+            }
+        });
+
+        // 2. Fusionar con cálculo local tomando el nivel más alto
+        const tierScores: Record<string, number> = { gold: 3, silver: 2, bronze: 1 };
         const allBadgeIds = [
             'scorer', 'playmaker', 'defender', 'wins', 'mvp', 'experience', 'multi_sport',
             'captaincy', 'comeback', 'precision', 'clutch', 'tournaments', 'invictus',
@@ -212,11 +252,22 @@ export default function PerfilScreen() {
         ];
 
         allBadgeIds.forEach(id => {
-            const val = (stats as any)[id] || 0;
-            const c = (config as any)[id] || { bronze: 5 };
-            if (val >= c.bronze) count++;
+            const val = statsMap[id] || 0;
+            const c = (config as any)[id] || { bronze: 5, silver: 15, gold: 30 };
+            let computedTier: string | null = null;
+            if (val >= c.gold) computedTier = 'gold';
+            else if (val >= c.silver) computedTier = 'silver';
+            else if (val >= c.bronze) computedTier = 'bronze';
+
+            if (computedTier) {
+                const existingTier = computedBadgesMap.get(id);
+                if (!existingTier || (tierScores[computedTier] > tierScores[existingTier])) {
+                    computedBadgesMap.set(id, computedTier);
+                }
+            }
         });
-        return count;
+
+        return computedBadgesMap.size;
     })();
 
     if (loading && !refreshing) {
@@ -330,10 +381,19 @@ export default function PerfilScreen() {
                         const savedBadges = (profile as any)?.badges as any[] | undefined;
                         const stats = profile?.stats || { played: 0, won: 0, lost: 0, goals: 0 };
                         const rawData = profile as any;
-                        const createdAt = rawData?.createdAt?.seconds
-                            ? new Date(rawData.createdAt.seconds * 1000)
-                            : new Date();
-                        const daysActive = Math.max(1, (new Date().getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+                        let rawJoined = new Date();
+                        if (rawData?.createdAt?.toDate) {
+                            rawJoined = rawData.createdAt.toDate();
+                        } else if (rawData?.createdAt?.seconds) {
+                            rawJoined = new Date(rawData.createdAt.seconds * 1000);
+                        } else if (rawData?.createdAt) {
+                            rawJoined = new Date(rawData.createdAt);
+                        } else if (rawData?.joinedDate) {
+                            rawJoined = new Date(rawData.joinedDate);
+                        } else if (rawData?.joined) {
+                            rawJoined = new Date(rawData.joined);
+                        }
+                        const daysActive = Math.max(1, (new Date().getTime() - rawJoined.getTime()) / (1000 * 60 * 60 * 24));
 
                         const BADGE_INFO: Record<string, { name: string; icon: any }> = {
                             scorer: { name: 'Artillero', icon: Target },
@@ -358,50 +418,91 @@ export default function PerfilScreen() {
                             social: { name: 'Sociable', icon: Share2 },
                         };
 
-                        const BADGE_XP_VALUES: Record<string, number> = { bronze: 50, silver: 150, gold: 500 };
-                        let earned: any[] = [];
+                        const BADGE_XP_VALUES: Record<string, number> = (gamification as any)?.badgeXpValues || { bronze: 50, silver: 150, gold: 500 };
+                        // Fusión híbrida consistente al 100% con estadísticas e historial
+                        const statsMap: Record<string, number> = {
+                            scorer: (stats as any).goals || 0, playmaker: (stats as any).assists || 0,
+                            defender: (stats as any).clean_sheets || 0, wins: (stats as any).won || 0,
+                            mvp: (stats as any).mvps || (stats as any).mvp || 0,
+                            experience: (stats as any).played || 0, multi_sport: (stats as any).sports_played || 1,
+                            captaincy: (stats as any).captain_matches || 0, comeback: (stats as any).comebacks || 0,
+                            precision: (stats as any).precision_matches || 0, clutch: (stats as any).clutch_goals || 0,
+                            tournaments: (stats as any).tournaments_played || 0, invictus: (stats as any).longest_win_streak || 0,
+                            rivalry: (stats as any).rivalries_won || 0, morning_player: (stats as any).morning_matches || 0,
+                            night_player: (stats as any).night_matches || 0, loyal: Math.floor(daysActive / 30),
+                            weekend_warrior: (stats as any).weekend_matches || 0,
+                            stamina: (stats as any).minutes_played || ((stats as any).played || 0) * 60,
+                            social: (stats as any).invited_players || 0
+                        };
 
-                        if (savedBadges && savedBadges.length > 0) {
-                            // Usar badges guardadas por el sync
-                            earned = Object.keys(BADGE_INFO).map(id => {
-                                const saved = savedBadges.find((b: any) => b.id === id);
-                                const info = BADGE_INFO[id];
-                                return {
-                                    id, name: info.name, icon: info.icon,
-                                    tier: saved?.tier || null,
-                                    xpBonus: saved?.tier ? BADGE_XP_VALUES[saved.tier] || 0 : 0
+                        const computedBadgesMap = new Map<string, string>();
+
+                        // 1. Cargar las guardadas
+                        if (savedBadges) {
+                            const normalizeBadgeId = (id: string): string => {
+                                const normMap: Record<string, string> = {
+                                    goals: 'scorer', assists: 'playmaker', clean_sheets: 'defender',
+                                    won: 'wins', played: 'experience', sports_played: 'multi_sport',
+                                    loyalty: 'loyal'
                                 };
-                            });
-                        } else {
-                            // Calcular localmente con thresholds reales de Firestore
-                            const statsMap: Record<string, number> = {
-                                scorer: (stats as any).goals || 0, playmaker: (stats as any).assists || 0,
-                                defender: (stats as any).clean_sheets || 0, wins: (stats as any).won || 0,
-                                mvp: (stats as any).mvps || (stats as any).mvp || 0,
-                                experience: (stats as any).played || 0, multi_sport: (stats as any).sports_played || 1,
-                                captaincy: (stats as any).captain_matches || 0, comeback: (stats as any).comebacks || 0,
-                                precision: (stats as any).precision_matches || 0, clutch: (stats as any).clutch_goals || 0,
-                                tournaments: (stats as any).tournaments_played || 0, invictus: (stats as any).longest_win_streak || 0,
-                                rivalry: (stats as any).rivalries_won || 0, morning_player: (stats as any).morning_matches || 0,
-                                night_player: (stats as any).night_matches || 0, loyal: Math.floor(daysActive / 30),
-                                weekend_warrior: (stats as any).weekend_matches || 0,
-                                stamina: (stats as any).minutes_played || ((stats as any).played || 0) * 60,
-                                social: (stats as any).invited_players || 0
+                                return normMap[id] || id;
                             };
-
-                            earned = Object.keys(BADGE_INFO).map(id => {
-                                const info = BADGE_INFO[id];
-                                const userVal = statsMap[id] || 0;
-                                const config = badgeConfigs[id] || { bronze: 5, silver: 15, gold: 30 };
-                                let tier: string | null = null;
-                                if (userVal >= config.gold) tier = 'gold';
-                                else if (userVal >= config.silver) tier = 'silver';
-                                else if (userVal >= config.bronze) tier = 'bronze';
-                                return { id, name: info.name, icon: info.icon, tier, xpBonus: tier ? BADGE_XP_VALUES[tier] || 0 : 0 };
+                            savedBadges.forEach((b: any) => {
+                                if (b.tier) {
+                                    const normId = normalizeBadgeId(b.id);
+                                    computedBadgesMap.set(normId, b.tier);
+                                }
                             });
                         }
 
+                        // 2. Fusionar con cálculo local tomando el nivel más alto
                         const tierScores: Record<string, number> = { gold: 3, silver: 2, bronze: 1 };
+                        Object.keys(BADGE_INFO).forEach(id => {
+                            const dbKeys: Record<string, string> = {
+                                scorer: 'goals',
+                                playmaker: 'assists',
+                                defender: 'clean_sheets',
+                                wins: 'won',
+                                experience: 'played',
+                                multi_sport: 'sports_played',
+                                loyal: 'loyalty'
+                            };
+                            const dbKey = dbKeys[id] || id;
+                            const config = badgeConfigs[id] || badgeConfigs[dbKey] || { bronze: 5, silver: 15, gold: 30 };
+                            const userVal = statsMap[id] || 0;
+                            let computedTier: string | null = null;
+
+                            const goldVal = Number(config.gold || 0);
+                            const silverVal = Number(config.silver || 0);
+                            const bronzeVal = Number(config.bronze || 0);
+
+                            if (userVal > 0) {
+                                if (goldVal > 0 && userVal >= goldVal) computedTier = 'gold';
+                                else if (silverVal > 0 && userVal >= silverVal) computedTier = 'silver';
+                                else if (bronzeVal > 0 && userVal >= bronzeVal) computedTier = 'bronze';
+                            }
+
+                            if (computedTier) {
+                                const existingTier = computedBadgesMap.get(id);
+                                if (!existingTier || (tierScores[computedTier] > tierScores[existingTier])) {
+                                    computedBadgesMap.set(id, computedTier);
+                                }
+                            } else {
+                                computedBadgesMap.delete(id);
+                            }
+                        });
+
+                        const earned = Object.keys(BADGE_INFO).map(id => {
+                            const info = BADGE_INFO[id];
+                            const tier = computedBadgesMap.get(id) || null;
+                            return {
+                                id,
+                                name: info.name,
+                                icon: info.icon,
+                                tier,
+                                xpBonus: tier ? BADGE_XP_VALUES[tier] || 0 : 0
+                            };
+                        });
                         const earnedBadges = earned
                             .filter(b => b.tier !== null)
                             .sort((a, b) => (tierScores[b.tier!] || 0) - (tierScores[a.tier!] || 0));
@@ -634,10 +735,19 @@ export default function PerfilScreen() {
                             {(() => {
                                 const stats = profile?.stats || { played: 0, won: 0, lost: 0, goals: 0 };
                                 const rawData = profile as any;
-                                const createdAt = rawData?.createdAt?.seconds
-                                    ? new Date(rawData.createdAt.seconds * 1000)
-                                    : new Date();
-                                const daysActive = Math.max(1, (new Date().getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+                                let rawJoined = new Date();
+                                if (rawData?.createdAt?.toDate) {
+                                    rawJoined = rawData.createdAt.toDate();
+                                } else if (rawData?.createdAt?.seconds) {
+                                    rawJoined = new Date(rawData.createdAt.seconds * 1000);
+                                } else if (rawData?.createdAt) {
+                                    rawJoined = new Date(rawData.createdAt);
+                                } else if (rawData?.joinedDate) {
+                                    rawJoined = new Date(rawData.joinedDate);
+                                } else if (rawData?.joined) {
+                                    rawJoined = new Date(rawData.joined);
+                                }
+                                const daysActive = Math.max(1, (new Date().getTime() - rawJoined.getTime()) / (1000 * 60 * 60 * 24));
 
                                 const statsMap: Record<string, number> = {
                                     scorer: (stats as any).goals || 0, playmaker: (stats as any).assists || 0,
@@ -653,6 +763,64 @@ export default function PerfilScreen() {
                                     stamina: (stats as any).minutes_played || ((stats as any).played || 0) * 60,
                                     social: (stats as any).invited_players || 0
                                 };
+
+                                const savedBadges = (profile as any)?.badges || [];
+                                const computedBadgesMap = new Map<string, string>();
+
+                                // 1. Cargar las guardadas
+                                if (savedBadges) {
+                                    const normalizeBadgeId = (id: string): string => {
+                                        const normMap: Record<string, string> = {
+                                            goals: 'scorer', assists: 'playmaker', clean_sheets: 'defender',
+                                            won: 'wins', played: 'experience', sports_played: 'multi_sport',
+                                            loyalty: 'loyal'
+                                        };
+                                        return normMap[id] || id;
+                                    };
+                                    savedBadges.forEach((b: any) => {
+                                        if (b.tier) {
+                                            const normId = normalizeBadgeId(b.id);
+                                            computedBadgesMap.set(normId, b.tier);
+                                        }
+                                    });
+                                }
+
+                                // 2. Fusionar con cálculo local tomando el nivel más alto
+                                const tierScores: Record<string, number> = { gold: 3, silver: 2, bronze: 1 };
+                                Object.keys(statsMap).forEach(id => {
+                                    const dbKeys: Record<string, string> = {
+                                        scorer: 'goals',
+                                        playmaker: 'assists',
+                                        defender: 'clean_sheets',
+                                        wins: 'won',
+                                        experience: 'played',
+                                        multi_sport: 'sports_played',
+                                        loyal: 'loyalty'
+                                    };
+                                    const dbKey = dbKeys[id] || id;
+                                    const config = badgeConfigs[id] || badgeConfigs[dbKey] || { bronze: 5, silver: 15, gold: 30 };
+                                    const userVal = statsMap[id] || 0;
+                                    let computedTier: string | null = null;
+
+                                    const goldVal = Number(config.gold || 0);
+                                    const silverVal = Number(config.silver || 0);
+                                    const bronzeVal = Number(config.bronze || 0);
+
+                                    if (userVal > 0) {
+                                        if (goldVal > 0 && userVal >= goldVal) computedTier = 'gold';
+                                        else if (silverVal > 0 && userVal >= silverVal) computedTier = 'silver';
+                                        else if (bronzeVal > 0 && userVal >= bronzeVal) computedTier = 'bronze';
+                                    }
+
+                                    if (computedTier) {
+                                        const existingTier = computedBadgesMap.get(id);
+                                        if (!existingTier || (tierScores[computedTier] > tierScores[existingTier])) {
+                                            computedBadgesMap.set(id, computedTier);
+                                        }
+                                    } else {
+                                        computedBadgesMap.delete(id);
+                                    }
+                                });
 
                                 return [
                                     { id: 'scorer', icon: Target, name: 'Artillero', desc: 'Anota puntos o goles en tus partidos', unit: 'Goles' },
@@ -676,52 +844,63 @@ export default function PerfilScreen() {
                                     { id: 'stamina', icon: Activity, name: 'Motor', desc: 'Acumula minutos jugados en cancha', unit: 'Minutos' },
                                     { id: 'social', icon: Share2, name: 'Sociable', desc: 'Invita amigos a jugar contigo', unit: 'Invitados' },
                                 ].map(b => {
-                                    const config = badgeConfigs[b.id] || { bronze: 5, silver: 15, gold: 30 };
-                                    const val = statsMap[b.id] || 0;
+                                     const dbKeys: Record<string, string> = {
+                                         scorer: 'goals',
+                                         playmaker: 'assists',
+                                         defender: 'clean_sheets',
+                                         wins: 'won',
+                                         experience: 'played',
+                                         multi_sport: 'sports_played',
+                                         loyal: 'loyalty'
+                                     };
+                                     const dbKey = dbKeys[b.id] || b.id;
+                                     const config = badgeConfigs[b.id] || badgeConfigs[dbKey] || { bronze: 5, silver: 15, gold: 30 };
+                                     const val = statsMap[b.id] || 0;
 
-                                    // Determinar tier y progreso para el sort
-                                    let tierScore = 0; // 0: Locked, 1: Bronze, 2: Silver, 3: Gold
-                                    let nextThreshold = config.bronze;
-                                    if (val >= config.gold) { tierScore = 3; nextThreshold = config.gold; }
-                                    else if (val >= config.silver) { tierScore = 2; nextThreshold = config.gold; }
-                                    else if (val >= config.bronze) { tierScore = 1; nextThreshold = config.silver; }
+                                    const hybridTier = computedBadgesMap.get(b.id) || null;
+                                    let tierScore = 0;
+                                    if (hybridTier === 'gold') tierScore = 3;
+                                    else if (hybridTier === 'silver') tierScore = 2;
+                                    else if (hybridTier === 'bronze') tierScore = 1;
 
-                                    const progressPct = Math.min(1, val / nextThreshold);
-                                    return { ...b, tierScore, progressPct, val, config };
+                                    let nextThreshold = Number(config.bronze || 5);
+                                    if (tierScore === 3) nextThreshold = Number(config.gold || 30);
+                                    else if (tierScore === 2) nextThreshold = Number(config.gold || 30);
+                                    else if (tierScore === 1) nextThreshold = Number(config.silver || 15);
+
+                                    const progressPct = nextThreshold > 0 ? Math.min(1, val / nextThreshold) : 0;
+                                    return { ...b, tierScore, progressPct, val, config, hybridTier };
                                 })
                                     .sort((a, b) => {
-                                        // Primero por tier (Oro > Plata > Bronce > Bloqueada)
                                         if (b.tierScore !== a.tierScore) return b.tierScore - a.tierScore;
-                                        // Segundo por porcentaje de progreso
                                         return b.progressPct - a.progressPct;
                                     })
                                     .map((b, i) => {
                                         const { config, val: currentVal } = b;
 
-                                        // Calcular visuales
-                                        let nextThreshold = config.bronze;
+                                        let nextThreshold = Number(config.bronze || 5);
                                         let currentTierLabel = "BLOQUEADA";
                                         let nextTierLabel = "BRONCE";
                                         let progressColor = COLORS.accent;
 
-                                        if (currentVal >= config.gold) {
-                                            nextThreshold = config.gold;
+                                        if (b.hybridTier === 'gold') {
+                                            nextThreshold = Number(config.gold || 30);
                                             currentTierLabel = "ORO";
                                             nextTierLabel = "MÁXIMO";
                                             progressColor = '#fbbf24';
-                                        } else if (currentVal >= config.silver) {
-                                            nextThreshold = config.gold;
+                                        } else if (b.hybridTier === 'silver') {
+                                            nextThreshold = Number(config.gold || 30);
                                             currentTierLabel = "PLATA";
                                             nextTierLabel = "ORO";
                                             progressColor = '#94a3b8';
-                                        } else if (currentVal >= config.bronze) {
-                                            nextThreshold = config.silver;
+                                        } else if (b.hybridTier === 'bronze') {
+                                            nextThreshold = Number(config.silver || 15);
                                             currentTierLabel = "BRONCE";
                                             nextTierLabel = "PLATA";
                                             progressColor = '#b45309';
                                         }
 
-                                        const progress = Math.min(1, currentVal / nextThreshold);
+                                        const progress = nextThreshold > 0 ? Math.min(1, currentVal / nextThreshold) : 0;
 
                                         return (
                                             <View key={i} style={{ backgroundColor: C.card, borderRadius: 30, padding: 25, marginBottom: 15, borderWidth: 1, borderColor: C.border }}>

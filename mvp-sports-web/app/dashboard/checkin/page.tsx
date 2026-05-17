@@ -64,7 +64,7 @@ interface Booking {
     startTimeStr?: string | null;
     endTimeStr?: string | null;
     status: string;
-    paymentStatus: 'paid' | 'pending' | 'partial';
+    paymentStatus: 'paid' | 'pending' | 'partial' | 'no-show';
     paymentMethod?: string;
     price: number;
     totalPrice?: number;
@@ -74,6 +74,7 @@ interface Booking {
     checkInTime?: Timestamp;
     userId?: string;
     noShow?: boolean;
+    notes?: string;
 }
 
 // --- HELPER: CHILE TIME ---
@@ -92,10 +93,11 @@ export default function CheckInPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [manualCode, setManualCode] = useState('');
     const [processingId, setProcessingId] = useState<string | null>(null);
-    const [filter, setFilter] = useState<'all' | 'pending' | 'completed' | 'cancelled'>('pending');
+    const [filter, setFilter] = useState<'all' | 'pending' | 'completed' | 'cancelled' | 'noshow'>('pending');
     const [selectedBookingForConfirm, setSelectedBookingForConfirm] = useState<Booking | null>(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('cash');
+    const [confirmActionType, setConfirmActionType] = useState<'pay' | 'checkin'>('checkin');
     // ESTADOS DE CÁMARA
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [cameraError, setCameraError] = useState<string | null>(null);
@@ -142,9 +144,14 @@ export default function CheckInPage() {
         setLoading(true);
         try {
             const now = getChileNow();
-            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-            const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-
+            if (now.getHours() < 6) {
+                now.setDate(now.getDate() - 1);
+            }
+            const startOfDay = new Date(now);
+            startOfDay.setHours(6, 0, 0, 0);
+            const endOfDay = new Date(now);
+            endOfDay.setDate(endOfDay.getDate() + 1);
+            endOfDay.setHours(5, 59, 59, 999);
             // Query por campo 'date' (Timestamp)
             const q1 = query(
                 collection(db, "bookings"),
@@ -189,7 +196,48 @@ export default function CheckInPage() {
                     endTimeStr: typeof data.endTime === 'string' ? data.endTime : null
                 } as Booking;
             });
-            setBookings(list);
+
+            // Obtener todos los bookingIds para buscar pagos en la colección 'payments'
+            const bookingIds = list.map(b => b.id);
+            const paidBookingIds = new Set<string>();
+
+            if (bookingIds.length > 0) {
+                const chunks: string[][] = [];
+                for (let i = 0; i < bookingIds.length; i += 30) {
+                    chunks.push(bookingIds.slice(i, i + 30));
+                }
+
+                const paymentSnaps = await Promise.all(
+                    chunks.map(chunk => 
+                        getDocs(query(
+                            collection(db, "payments"),
+                            where("bookingId", "in", chunk)
+                        )).catch(() => ({ docs: [] as any[] }))
+                    )
+                );
+
+                paymentSnaps.forEach(snap => {
+                    snap.docs.forEach(doc => {
+                        const payData = doc.data();
+                        if (payData && payData.bookingId) {
+                            paidBookingIds.add(payData.bookingId);
+                        }
+                    });
+                });
+            }
+
+            // Actualizar localmente el estado de pago a 'paid' si existe registro en 'payments'
+            const updatedList = list.map(b => {
+                if (paidBookingIds.has(b.id)) {
+                    return {
+                        ...b,
+                        paymentStatus: 'paid'
+                    } as Booking;
+                }
+                return b;
+            });
+
+            setBookings(updatedList);
         } catch (error) {
             console.error("Error fetching bookings:", error);
         } finally {
@@ -308,6 +356,11 @@ export default function CheckInPage() {
         const start = booking.startTime.toDate();
         const startChile = new Date(start.toLocaleString("en-US", { timeZone: "America/Santiago" }));
 
+        if (booking.startTimeStr) {
+            const [hours, minutes] = booking.startTimeStr.split(':').map(Number);
+            startChile.setHours(hours, minutes, 0, 0);
+        }
+
         const twoHoursBefore = new Date(startChile.getTime() - 2 * 60 * 60 * 1000);
         const fifteenMinsAfter = new Date(startChile.getTime() + 15 * 60 * 1000);
 
@@ -353,6 +406,7 @@ export default function CheckInPage() {
             startTime: Timestamp.fromDate(startTimeDate),
             endTime: Timestamp.fromDate(endTimeDate)
         });
+        setSelectedPaymentMethod('cash');
         setIsConfirmModalOpen(true);
     };
 
@@ -363,32 +417,29 @@ export default function CheckInPage() {
         setProcessingId(booking.id);
 
         try {
-            const updateData: any = {
-                checkIn: true,
-                checkInTime: Timestamp.now(),
-                status: 'confirmed'
-            };
-
-            // Si no estaba pagada, la marcamos como pagada al confirmar ingreso (Cobrar)
-            if (booking.paymentStatus !== 'paid') {
+            const updateData: any = {};
+            if (confirmActionType === 'pay') {
                 updateData.paymentStatus = 'paid';
                 updateData.remainingBalance = 0;
+                updateData.paymentMethod = selectedPaymentMethod;
+                
+                await updateDoc(doc(db, "bookings", booking.id), updateData);
+                setBookings(prev => prev.map(b => b.id === booking.id ? { ...b, paymentStatus: 'paid', paymentMethod: selectedPaymentMethod, remainingBalance: 0 } : b));
+                
+                setStatusModal({ isOpen: true, title: "Pago Registrado", message: `El pago de ${booking.clientName} ha sido procesado exitosamente.`, type: 'info' });
+            } else {
+                updateData.checkIn = true;
+                updateData.checkInTime = Timestamp.now();
+                updateData.status = 'active';
+                
+                await updateDoc(doc(db, "bookings", booking.id), updateData);
+                setBookings(prev => prev.map(b => b.id === booking.id ? { ...b, checkIn: true, status: 'active' } : b));
+                
+                setStatusModal({ isOpen: true, title: "Ingreso Exitoso", message: `El ingreso de ${booking.clientName} ha sido registrado correctamente y la reserva está en juego.`, type: 'info' });
             }
-
-            await updateDoc(doc(db, "bookings", booking.id), updateData);
-
-            setBookings(prev => prev.map(b =>
-                b.id === booking.id ? { ...b, checkIn: true, paymentStatus: 'paid', status: 'confirmed' } : b
-            ));
 
             setIsConfirmModalOpen(false);
             setSelectedBookingForConfirm(null);
-            setStatusModal({
-                isOpen: true,
-                title: "Ingreso Exitoso",
-                message: `El ingreso de ${booking.clientName} ha sido registrado correctamente.`,
-                type: 'info'
-            });
         } catch (error: any) {
             console.error("Error confirming check-in:", error);
             const errorMsg = error?.code === 'permission-denied'
@@ -466,25 +517,39 @@ export default function CheckInPage() {
         return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
     };
 
+    // HELPERS DE MOTIVOS DE CANCELACIÓN
+    const isBookingNoShow = (b: Booking) => {
+        if (b.paymentStatus === 'no-show' || b.noShow === true) return true;
+        if (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia'))) return true;
+        return false;
+    };
+
+    const isBookingNoShowOrLate = (b: Booking) => {
+        if (isBookingNoShow(b)) return true;
+        if (!b.checkIn && b.status !== 'cancelled' && validateCheckInTime(b).isLate) return true;
+        return false;
+    };
+
     // FILTROS
     const filteredBookings = bookings.filter(b => {
         const matchesSearch = b.clientName.toLowerCase().includes(searchTerm.toLowerCase()) || b.courtName.toLowerCase().includes(searchTerm.toLowerCase());
-        if (filter === 'pending') return matchesSearch && !b.checkIn && b.status !== 'cancelled';
+        if (filter === 'pending') return matchesSearch && !b.checkIn && b.status !== 'cancelled' && !isBookingNoShowOrLate(b);
         if (filter === 'completed') return matchesSearch && b.checkIn;
-        if (filter === 'cancelled') return matchesSearch && b.status === 'cancelled';
+        if (filter === 'cancelled') return matchesSearch && b.status === 'cancelled' && !isBookingNoShow(b);
+        if (filter === 'noshow') return matchesSearch && isBookingNoShowOrLate(b);
         return matchesSearch;
     });
 
     const stats = {
         total: bookings.length,
-        in: bookings.filter(b => b.checkIn).length,
+        in: bookings.filter(b => b.checkIn || (isBookingNoShowOrLate(b) && (b.paymentStatus === 'paid' || b.paymentStatus === 'partial'))).length,
         pending: bookings.filter(b => !b.checkIn && b.status !== 'cancelled' && !validateCheckInTime(b).isLate).length,
-        noShow: bookings.filter(b => !b.checkIn && b.status !== 'cancelled' && validateCheckInTime(b).isLate).length,
-        cancelled: bookings.filter(b => b.status === 'cancelled').length,
+        noShow: bookings.filter(b => isBookingNoShowOrLate(b)).length,
+        cancelled: bookings.filter(b => b.status === 'cancelled' && !isBookingNoShow(b)).length,
         paidCount: bookings.filter(b => b.paymentStatus === 'paid').length,
-        unpaidCount: bookings.filter(b => b.paymentStatus !== 'paid' && b.status !== 'cancelled').length,
+        unpaidCount: bookings.filter(b => b.paymentStatus !== 'paid' && b.status !== 'cancelled' && !isBookingNoShow(b)).length,
         totalDebt: bookings.reduce((acc, b) => {
-            if (b.paymentStatus === 'paid' || b.status === 'cancelled') return acc;
+            if (b.paymentStatus === 'paid' || b.status === 'cancelled' || isBookingNoShow(b)) return acc;
             const price = b.totalPrice || b.price || 0;
             const paid = b.paymentStatus === 'partial' ? (b.deposit || 0) : 0;
             return acc + (price - paid);
@@ -494,7 +559,11 @@ export default function CheckInPage() {
             if (b.paymentStatus === 'partial') return acc + (b.deposit || 0);
             return acc;
         }, 0),
-        lostRevenue: bookings.filter(b => !b.checkIn && (b.status === 'cancelled' || validateCheckInTime(b).isLate)).reduce((acc, b) => acc + (b.totalPrice || b.price || 0), 0),
+        lostRevenue: bookings.filter(b => !b.checkIn && (b.status === 'cancelled' || isBookingNoShowOrLate(b)) && b.paymentStatus !== 'paid').reduce((acc, b) => {
+            const price = b.totalPrice || b.price || 0;
+            const paid = b.paymentStatus === 'partial' ? (b.deposit || 0) : 0;
+            return acc + (price - paid);
+        }, 0),
         potentialTotal: bookings.reduce((acc, b) => acc + (b.totalPrice || b.price || 0), 0)
     };
 
@@ -634,11 +703,11 @@ export default function CheckInPage() {
                         <div className="p-1.5 bg-red-50 dark:bg-red-500/10 rounded-lg text-red-500">
                             <ExclamationTriangleIcon className="w-3.5 h-3.5" />
                         </div>
-                        <p className="text-[8px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Ausentes</p>
+                        <p className="text-[8px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Inasistencias</p>
                     </div>
                     <div className="flex items-baseline justify-between">
                         <p className="text-2xl font-black text-red-600 dark:text-red-400 tracking-tighter">{stats.noShow}</p>
-                        <p className="text-[10px] font-black text-red-600 dark:text-red-400 uppercase">NO-SHOW</p>
+                        <p className="text-[8px] font-black text-red-600 dark:text-red-400 uppercase">Por Inasistencia</p>
                     </div>
                 </div>
 
@@ -651,7 +720,7 @@ export default function CheckInPage() {
                     </div>
                     <div className="flex items-baseline justify-between">
                         <p className="text-2xl font-black text-slate-500 tracking-tighter">{stats.cancelled}</p>
-                        <p className="text-[10px] font-black text-slate-400 uppercase">MANUAL</p>
+                        <p className="text-[8px] font-black text-slate-400 uppercase">Cancelado por Jugador</p>
                     </div>
                 </div>
             </div>
@@ -706,7 +775,7 @@ export default function CheckInPage() {
                 </div>
             )}
 
-            {/* === FILTROS + BUSCAR === */}
+            {/* === BUSCAR === */}
             <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -720,37 +789,24 @@ export default function CheckInPage() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-                <div className="flex gap-1.5 shrink-0 overflow-x-auto">
-                    {(['all', 'pending', 'completed', 'cancelled'] as const).map((f) => (
-                        <button
-                            key={f}
-                            onClick={() => setFilter(f)}
-                            className={`px-2.5 md:px-3 py-1.5 rounded-lg text-[8px] md:text-[9px] font-black uppercase whitespace-nowrap transition-all border ${filter === f
-                                ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900 shadow-md'
-                                : 'bg-white dark:bg-[#0B0F19] text-slate-400 border-slate-200 dark:border-white/10 hover:border-slate-300'}`}
-                        >
-                            {f === 'all' ? `Todos (${stats.total})` : f === 'pending' ? `Pend. (${stats.pending})` : f === 'completed' ? `OK (${stats.in})` : `Anuladas (${stats.cancelled})`}
-                        </button>
-                    ))}
-                </div>
             </div>
 
             {/* === LISTA DE RESERVAS FINANCE STYLE COMPACT === */}
             <div className="bg-white dark:bg-[#0B0F19] rounded-2xl border border-slate-100 dark:border-white/5 shadow-xl overflow-hidden">
-                <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center justify-between">
-                    <h3 className="text-[9px] font-black text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-2">
+                <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <h3 className="text-[9px] font-black text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-2 shrink-0">
                         <ClockIcon className="w-3.5 h-3.5 text-emerald-500" /> Registro de Hoy
                     </h3>
-                    <div className="flex gap-1.5">
-                        {(['all', 'pending', 'completed', 'cancelled'] as const).map((f) => (
+                    <div className="flex gap-1.5 overflow-x-auto max-w-full pb-1 md:pb-0 scrollbar-thin">
+                        {(['all', 'pending', 'completed', 'cancelled', 'noshow'] as const).map((f) => (
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
-                                className={`px-3 py-1.5 rounded-lg text-[8px] font-black uppercase transition-all ${filter === f
-                                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-lg'
-                                    : 'bg-white dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/10 hover:border-emerald-500/50'}`}
+                                className={`px-2.5 py-1.5 rounded-lg text-[8px] font-black uppercase whitespace-nowrap transition-all border ${filter === f
+                                    ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 shadow-md'
+                                    : 'bg-white dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/10 hover:border-slate-300'}`}
                             >
-                                {f === 'all' ? `Todo` : f === 'pending' ? `Pendientes` : f === 'completed' ? `Listos` : `Anuladas`}
+                                {f === 'all' ? `Todos (${stats.total})` : f === 'pending' ? `Pendientes (${stats.pending})` : f === 'completed' ? `Listos (${stats.in})` : f === 'cancelled' ? `Por Jugador (${stats.cancelled})` : `Por Inasistencia (${stats.noShow})`}
                             </button>
                         ))}
                     </div>
@@ -774,10 +830,11 @@ export default function CheckInPage() {
                             const isPaid = booking.paymentStatus === 'paid';
                             const isCheckedIn = booking.checkIn;
                             const validation = validateCheckInTime(booking);
-                            const isCancelled = !isCheckedIn && validation.isLate;
+                            const isLateNoShow = !isCheckedIn && booking.status !== 'cancelled' && validation.isLate;
+                            const isNoShow = isBookingNoShow(booking) || isLateNoShow;
 
                             return (
-                                <div key={booking.id} className={`group flex items-center gap-4 p-3.5 transition-all hover:bg-slate-50/50 dark:hover:bg-white/[0.01] ${(isCheckedIn || booking.status === 'cancelled' || isCancelled) ? 'opacity-50 grayscale-[0.5]' : ''}`}>
+                                <div key={booking.id} className={`group flex items-center gap-4 p-3.5 transition-all hover:bg-slate-50/50 dark:hover:bg-white/[0.01] ${(isCheckedIn || booking.status === 'cancelled' || isLateNoShow) ? 'opacity-50 grayscale-[0.5]' : ''}`}>
                                     {/* INDICADOR DE HORA COMPACT */}
                                     <div className="flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg shrink-0 group-hover:scale-105 transition-transform">
                                         <span className="text-[11px] font-black tracking-tighter">{booking.startTimeStr || formatTime(booking.startTime)}</span>
@@ -790,13 +847,25 @@ export default function CheckInPage() {
                                             <h3 className="text-[11px] font-black text-slate-900 dark:text-white uppercase truncate">
                                                 {booking.clientName}
                                             </h3>
-                                            {!isCheckedIn && booking.status !== 'cancelled' && !isCancelled && (
+                                            {!isCheckedIn && booking.status !== 'cancelled' && !isLateNoShow ? (
                                                 isPaid ? (
                                                     <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 text-[7px] font-black uppercase rounded border border-emerald-500/20">Pagado</span>
                                                 ) : (
                                                     <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 text-[7px] font-black uppercase rounded border border-amber-500/20">Pendiente</span>
                                                 )
-                                            )}
+                                            ) : (booking.status === 'cancelled' || isLateNoShow) ? (
+                                                isNoShow ? (
+                                                    booking.paymentStatus === 'paid' ? (
+                                                        <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[7px] font-black uppercase rounded border border-emerald-500/20">No-Show con Pago Aprobado</span>
+                                                    ) : booking.paymentStatus === 'partial' ? (
+                                                        <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[7px] font-black uppercase rounded border border-amber-500/20">No-Show con Seña Retenida</span>
+                                                    ) : (
+                                                        <span className="px-1.5 py-0.5 bg-red-500/10 text-red-500 text-[7px] font-black uppercase rounded border border-red-500/20">Cancelado por No-Show</span>
+                                                    )
+                                                ) : (
+                                                    <span className="px-1.5 py-0.5 bg-slate-500/10 text-slate-500 text-[7px] font-black uppercase rounded border border-slate-500/20">Cancelado por Jugador</span>
+                                                )
+                                            ) : null}
                                         </div>
                                         <div className="flex items-center gap-3 text-slate-400">
                                             <div className="flex items-center gap-1.5">
@@ -815,7 +884,7 @@ export default function CheckInPage() {
 
                                     {/* ACCIONES COMPACT */}
                                     <div className="shrink-0 flex items-center gap-4">
-                                        {!isPaid && booking.status !== 'cancelled' && !isCancelled && (
+                                        {!isPaid && booking.status !== 'cancelled' && !isLateNoShow && (
                                             <div className="text-right hidden sm:block">
                                                 <p className="text-[8px] font-black text-amber-500 uppercase mb-0.5">Por Cobrar</p>
                                                 <p className="text-[10px] font-black text-amber-600 dark:text-amber-400">
@@ -833,18 +902,40 @@ export default function CheckInPage() {
                                                     </div>
                                                     <span className="text-[7px] font-bold text-slate-400 uppercase mr-1">Listo</span>
                                                 </div>
-                                            ) : (booking.status === 'cancelled' || isCancelled) ? (
+                                            ) : (booking.status === 'cancelled' || isLateNoShow) ? (
                                                 <div className="flex flex-col items-end gap-1">
-                                                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20">
-                                                        <NoSymbolIcon className="w-3.5 h-3.5 text-red-500" />
-                                                        <span className="text-[8px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Anulada</span>
+                                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full ${
+                                                        isNoShow && (booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial')
+                                                            ? 'bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
+                                                            : 'bg-red-500/10 border border-red-500/20'
+                                                    }`}>
+                                                        {isNoShow && (booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial') ? (
+                                                            <ShieldCheckIcon className="w-3.5 h-3.5 text-emerald-500" />
+                                                        ) : (
+                                                            <NoSymbolIcon className="w-3.5 h-3.5 text-red-500" />
+                                                        )}
+                                                        <span className={`text-[8px] font-black uppercase tracking-widest ${
+                                                            isNoShow && (booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial')
+                                                                ? 'text-emerald-600 dark:text-emerald-400'
+                                                                : 'text-red-600 dark:text-red-400'
+                                                        }`}>
+                                                            {isNoShow 
+                                                                ? (booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial' ? 'PAGO RETENIDO' : 'INASISTENCIA')
+                                                                : 'CANCELADO'
+                                                            }
+                                                        </span>
                                                     </div>
-                                                    <span className="text-[7px] font-bold text-slate-400 uppercase mr-1">No-Show</span>
+                                                    <span className="text-[7px] font-bold text-slate-400 uppercase mr-1">
+                                                        {isNoShow 
+                                                            ? (booking.paymentStatus === 'paid' ? 'No-Show Pagado' : booking.paymentStatus === 'partial' ? 'Seña Retenida' : 'No-Show')
+                                                            : 'Por Jugador'
+                                                        }
+                                                    </span>
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center gap-2">
                                                     <button
-                                                        onClick={() => handleCheckInAction(booking)}
+                                                        onClick={() => { setConfirmActionType(isPaid ? 'checkin' : 'pay'); handleCheckInAction(booking); }}
                                                         className={`h-9 px-4 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95
                                                             ${isPaid
                                                                 ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-105 shadow-slate-900/10'
@@ -878,14 +969,18 @@ export default function CheckInPage() {
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10 animate-scaleIn">
                         {/* Header Modal FINANCE STYLE */}
                         <div className="p-8 pb-4 text-center">
-                            <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 flex items-center justify-center mb-6 mx-auto border border-emerald-500/20">
-                                <ShieldCheckIcon className="w-8 h-8 text-emerald-500" />
+                            <div className={`w-16 h-16 rounded-3xl flex items-center justify-center mb-6 mx-auto border ${confirmActionType === 'pay' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-emerald-500/10 border-emerald-500/20'}`}>
+                                {confirmActionType === 'pay' ? <BanknotesIcon className="w-8 h-8 text-amber-500" /> : <ShieldCheckIcon className="w-8 h-8 text-emerald-500" />}
                             </div>
                             <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
-                                Autorización de <span className="text-emerald-500">Acceso</span>
+                                {confirmActionType === 'pay' ? (
+                                    <>Registro de <span className="text-amber-500">Pago</span></>
+                                ) : (
+                                    <>Autorización de <span className="text-emerald-500">Acceso</span></>
+                                )}
                             </h2>
                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-2">
-                                Protocolo de Seguridad v2.0
+                                {confirmActionType === 'pay' ? 'Módulo de Caja' : 'Protocolo de Seguridad v2.0'}
                             </p>
                         </div>
 
@@ -932,11 +1027,25 @@ export default function CheckInPage() {
                             </div>
 
                             {selectedBookingForConfirm?.paymentStatus !== 'paid' && (
-                                <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-xl p-3 flex gap-2.5">
-                                    <ExclamationTriangleIcon className="w-4 h-4 text-amber-600 shrink-0" />
-                                    <p className="text-[9px] leading-relaxed font-bold text-amber-700 dark:text-amber-400 uppercase">
-                                        Alerta: El cliente tiene saldos pendientes. ¿Autorizar ingreso de todas formas?
-                                    </p>
+                                <div className="space-y-3 mt-3">
+                                    <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-xl p-3 flex gap-2.5">
+                                        <ExclamationTriangleIcon className="w-4 h-4 text-amber-600 shrink-0" />
+                                        <p className="text-[9px] leading-relaxed font-bold text-amber-700 dark:text-amber-400 uppercase">
+                                            Alerta: El cliente tiene saldos pendientes. Al autorizar, se registrará el pago.
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Método de Pago</label>
+                                        <select 
+                                            value={selectedPaymentMethod} 
+                                            onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                                            className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-[10px] font-black uppercase text-slate-700 dark:text-white outline-none cursor-pointer appearance-none"
+                                        >
+                                            <option value="cash" className="dark:bg-[#0B0F19]">Efectivo</option>
+                                            <option value="transfer" className="dark:bg-[#0B0F19]">Transferencia</option>
+                                            <option value="pos" className="dark:bg-[#0B0F19]">Tarjeta / POS en Recinto</option>
+                                        </select>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -952,12 +1061,12 @@ export default function CheckInPage() {
                             <button
                                 onClick={confirmCheckIn}
                                 disabled={!!processingId}
-                                className="flex-[2] py-3.5 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                className={`flex-[2] py-3.5 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 ${confirmActionType === 'pay' ? 'bg-amber-500 text-white shadow-amber-500/20' : 'bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950'}`}
                             >
                                 {processingId ? (
                                     <ArrowPathIcon className="w-4 h-4 animate-spin" />
                                 ) : (
-                                    <>Confirmar Entrada <CheckCircleIcon className="w-4 h-4" /></>
+                                    confirmActionType === 'pay' ? <>Confirmar Cobro <BanknotesIcon className="w-4 h-4" /></> : <>Confirmar Entrada <CheckCircleIcon className="w-4 h-4" /></>
                                 )}
                             </button>
                         </div>

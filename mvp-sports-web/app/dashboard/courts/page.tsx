@@ -345,7 +345,33 @@ export default function CourtsPage() {
     const handleSaveConfig = async () => {
         if (!selectedVenue) return;
         try {
-            const updateData = { schedule: weeklySchedule, activeSports: selectedSports, amenities: selectedAmenities, pricing: pricingMatrix };
+            let minOpenStr = '08:00';
+            let maxCloseStr = '23:00';
+            
+            const openDays = Object.values(weeklySchedule).filter(day => day.isOpen);
+            if (openDays.length > 0) {
+                const sortedOpens = [...openDays].sort((a, b) => a.open.localeCompare(b.open));
+                minOpenStr = sortedOpens[0].open;
+                
+                const sortedCloses = [...openDays].sort((a, b) => {
+                    const parseToMinutes = (timeStr: string) => {
+                        const [h, m] = timeStr.split(':').map(Number);
+                        return h < 6 ? (h + 24) * 60 + m : h * 60 + m;
+                    };
+                    return parseToMinutes(b.close) - parseToMinutes(a.close);
+                });
+                maxCloseStr = sortedCloses[0].close;
+            }
+
+            const updateData = { 
+                schedule: weeklySchedule, 
+                activeSports: selectedSports, 
+                amenities: selectedAmenities, 
+                pricing: pricingMatrix,
+                openTime: minOpenStr,
+                closeTime: maxCloseStr,
+                openingHours: `${minOpenStr} - ${maxCloseStr}`
+            };
             await updateDoc(doc(db, "tenants", selectedVenue.id), updateData);
             setSelectedVenue({ ...selectedVenue, ...updateData });
             setVenues(prev => prev.map(v => v.id === selectedVenue.id ? { ...v, ...updateData } : v));

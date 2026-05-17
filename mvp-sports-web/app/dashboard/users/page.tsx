@@ -7,7 +7,7 @@ import {
   ArrowRightCircleIcon, PresentationChartLineIcon, FireIcon,
   AcademicCapIcon, ClockIcon, InformationCircleIcon,
   ExclamationTriangleIcon, PlusIcon, ChevronDownIcon,
-  ShieldCheckIcon, XMarkIcon
+  ShieldCheckIcon, XMarkIcon, ListBulletIcon, Squares2X2Icon
 } from '@heroicons/react/24/outline';
 import { collection, getDocs, doc, updateDoc, query, orderBy, where, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/services/firebase';
@@ -62,6 +62,19 @@ interface Toast {
   message: string;
 }
 
+const normalizeBadgeId = (id: string): string => {
+  const normMap: Record<string, string> = {
+    goals: 'scorer',
+    assists: 'playmaker',
+    clean_sheets: 'defender',
+    won: 'wins',
+    played: 'experience',
+    sports_played: 'multi_sport',
+    loyalty: 'loyal'
+  };
+  return normMap[id] || id;
+};
+
 export default function Page() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -70,7 +83,7 @@ export default function Page() {
 
   const [filter, setFilter] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'Standard' | 'Analytics'>('Standard');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,7 +109,13 @@ export default function Page() {
     setLoading(true);
     try {
       const settingsSnap = await getDoc(doc(db, 'settings', 'global'));
-      const gamification = settingsSnap.exists() ? settingsSnap.data().gamification : { tiers: { legend: 25000 } };
+      let gamification = settingsSnap.exists() ? settingsSnap.data().gamification : { tiers: { legend: 25000 } };
+      if (settingsSnap.exists()) {
+        const rootBadges = settingsSnap.data().badges;
+        if (rootBadges) {
+          gamification = { ...gamification, badges: rootBadges };
+        }
+      }
       setGamificationConfig(gamification);
       const maxXP = gamification?.tiers?.legend || 25000;
 
@@ -136,12 +155,12 @@ export default function Page() {
           } else if (data.joinedDate) {
             rawJoined = new Date(data.joinedDate);
           } else {
-            rawJoined = new Date(1704067200000);
+            rawJoined = new Date();
           }
           
           // Validar que la fecha sea válida
           if (isNaN(rawJoined.getTime())) {
-            rawJoined = new Date(1704067200000);
+            rawJoined = new Date();
           }
 
           const daysActive = Math.max(1, (new Date().getTime() - rawJoined.getTime()) / (1000 * 60 * 60 * 24));
@@ -160,29 +179,91 @@ export default function Page() {
           };
 
           const earnedBadges: any[] = [];
-          const badgeConfigs = settingsSnap.exists() ? settingsSnap.data().badges || {} : {};
+          const settingsData = settingsSnap.exists() ? settingsSnap.data() || {} : {};
+          const gamificationData = settingsData.gamification || {};
+          const badgeConfigs = gamificationData.badges || settingsData.badges || {};
           const statsMap: Record<string, number> = {
-            scorer: data.stats?.goals || 0, playmaker: data.stats?.assists || 0,
+            scorer: data.stats?.goals || 0,
+            goals: data.stats?.goals || 0,
+            
+            playmaker: data.stats?.assists || 0,
+            assists: data.stats?.assists || 0,
+            
             defender: data.stats?.clean_sheets || data.stats?.interceptions || 0,
-            wins: data.stats?.won || 0, mvp: data.stats?.mvp || 0,
-            experience: data.stats?.played || 0, multi_sport: data.stats?.sports_played || 1,
-            captaincy: data.stats?.captain_matches || 0, comeback: data.stats?.comebacks || 0,
-            precision: data.stats?.precision_matches || 0, clutch: data.stats?.clutch_goals || 0,
-            tournaments: data.stats?.tournaments_played || 0, invictus: data.stats?.longest_win_streak || 0,
-            rivalry: data.stats?.rivalries_won || 0, morning_player: data.stats?.morning_matches || 0,
-            night_player: data.stats?.night_matches || 0, loyal: Math.floor(daysActive / 30),
-            weekend_warrior: data.stats?.weekend_matches || 0, stamina: data.stats?.minutes_played || (data.stats?.played || 0) * 60,
-            social: data.stats?.invited_players || 0
+            clean_sheets: data.stats?.clean_sheets || data.stats?.interceptions || 0,
+            
+            wins: data.stats?.won || 0,
+            won: data.stats?.won || 0,
+            
+            mvp: data.stats?.mvp || data.stats?.mvps || 0,
+            mvps: data.stats?.mvp || data.stats?.mvps || 0,
+            
+            experience: data.stats?.played || 0,
+            played: data.stats?.played || 0,
+            
+            multi_sport: data.stats?.sports_played || 1,
+            sports_played: data.stats?.sports_played || 1,
+            
+            captaincy: data.stats?.captain_matches || 0,
+            captain_matches: data.stats?.captain_matches || 0,
+            
+            comeback: data.stats?.comebacks || 0,
+            comebacks: data.stats?.comebacks || 0,
+            
+            precision: data.stats?.precision_matches || 0,
+            precision_matches: data.stats?.precision_matches || 0,
+            
+            clutch: data.stats?.clutch_goals || 0,
+            clutch_goals: data.stats?.clutch_goals || 0,
+            
+            tournaments: data.stats?.tournaments_played || 0,
+            tournaments_played: data.stats?.tournaments_played || 0,
+            
+            invictus: data.stats?.longest_win_streak || 0,
+            longest_win_streak: data.stats?.longest_win_streak || 0,
+            
+            rivalry: data.stats?.rivalries_won || 0,
+            rivalries_won: data.stats?.rivalries_won || 0,
+            
+            morning_player: data.stats?.morning_matches || 0,
+            morning_matches: data.stats?.morning_matches || 0,
+            
+            night_player: data.stats?.night_matches || 0,
+            night_matches: data.stats?.night_matches || 0,
+            
+            loyal: Math.floor(daysActive / 30),
+            loyalty: Math.floor(daysActive / 30),
+            
+            weekend_warrior: data.stats?.weekend_matches || 0,
+            weekend_matches: data.stats?.weekend_matches || 0,
+            
+            stamina: data.stats?.minutes_played || (data.stats?.played || 0) * 60,
+            minutes_played: data.stats?.minutes_played || (data.stats?.played || 0) * 60,
+            
+            social: data.stats?.invited_players || 0,
+            invited_players: data.stats?.invited_players || 0
           };
 
           Object.keys(badgeConfigs).forEach(badgeId => {
-            const config = badgeConfigs[badgeId];
+            const config = badgeConfigs[badgeId] || { bronze: 5, silver: 15, gold: 30 };
             const userVal = statsMap[badgeId] || 0;
             let tier = null;
-            if (userVal >= config.gold) tier = 'gold';
-            else if (userVal >= config.silver) tier = 'silver';
-            else if (userVal >= config.bronze) tier = 'bronze';
-            if (tier) earnedBadges.push({ id: badgeId, tier });
+
+            const goldVal = Number(config.gold || 0);
+            const silverVal = Number(config.silver || 0);
+            const bronzeVal = Number(config.bronze || 0);
+
+            if (userVal > 0) {
+              if (goldVal > 0 && userVal >= goldVal) tier = 'gold';
+              else if (silverVal > 0 && userVal >= silverVal) tier = 'silver';
+              else if (bronzeVal > 0 && userVal >= bronzeVal) tier = 'bronze';
+            }
+            if (tier) {
+              const normId = normalizeBadgeId(badgeId);
+              if (!earnedBadges.some(b => b.id === normId)) {
+                earnedBadges.push({ id: normId, tier });
+              }
+            }
           });
 
           acc.push({
@@ -240,12 +321,13 @@ export default function Page() {
         setIsBulkLoading(true);
         try {
           const settingsSnap = await getDoc(doc(db, 'settings', 'global'));
-          const gamification = settingsSnap.exists() ? settingsSnap.data().gamification : {
+          const settingsData = settingsSnap.exists() ? settingsSnap.data() || {} : {};
+          const gamification = settingsData.gamification || {
             xpPerMatch: 100, xpPerWin: 150, xpPerLoss: 50,
             tiers: { silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 }
           };
-          const badgeConfigs = settingsSnap.exists() ? settingsSnap.data().badges || {} : {};
-          const BADGE_XP = { bronze: 50, silver: 150, gold: 500 };
+          const badgeConfigs = gamification.badges || settingsData.badges || {};
+          const BADGE_XP = gamification.badgeXpValues || { bronze: 50, silver: 150, gold: 500 };
           const maxXP = gamification.tiers?.legend || 25000;
           const batch = users.map(async (user) => {
             // Buscar por userId, playerId y createdBy — deduplicar
@@ -260,11 +342,16 @@ export default function Page() {
             const allDocsMap = new Map<string, any>();
             snaps.forEach(snap => { snap.docs.forEach((d: any) => { if (!allDocsMap.has(d.id)) allDocsMap.set(d.id, d); }); });
             
-            // Filtrar solo completed/confirmed para XP
+            // Filtrar solo completed/confirmed/no-show para XP
             const validDocs = Array.from(allDocsMap.values())
               .filter(d => {
-                const s = d.data().status;
-                return s === 'completed' || s === 'confirmed';
+                const bData = d.data();
+                const s = bData.status;
+                const isNoShow = s === 'no-show' || 
+                                 bData.paymentStatus === 'no-show' || 
+                                 bData.noShow === true || 
+                                 (bData.notes && (bData.notes.toLowerCase().includes('no-show') || bData.notes.toLowerCase().includes('inasistencia')));
+                return s === 'completed' || s === 'confirmed' || bData.checkOut === true || isNoShow;
               })
               .sort((a, b) => {
                 const dateA = a.data().date?.seconds || 0;
@@ -280,6 +367,15 @@ export default function Page() {
 
             validDocs.forEach(d => {
               const b = d.data();
+              const isNoShow = b.status === 'no-show' || 
+                               b.paymentStatus === 'no-show' || 
+                               b.noShow === true || 
+                               (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
+              if (isNoShow) {
+                  calculatedXp -= (gamification.xpPerNoShow || 50);
+                  return;
+              }
+
               const isW = (b.winnerTeam && b.winnerTeam === user.raw?.teamId) || b.isWin === true;
               
               // Estadísticas básicas
@@ -314,46 +410,125 @@ export default function Page() {
               }
 
               // XP Calculation
-              const overrides = gamification.sportsOverrides?.[sportKey] || { winXP: gamification.xpPerWin || 150, lossXP: gamification.xpPerLoss || 50, countGoals: true, countAssists: true, goalXP: gamification.xpPerGoal || 25, assistXP: gamification.xpPerAssist || 15 };
+              const defaultOverrides = { 
+                winXP: gamification.xpPerWin || 150, 
+                lossXP: gamification.xpPerLoss || 50, 
+                countGoals: true, 
+                countAssists: true,
+                goalXP: gamification.xpPerGoal || 25,
+                assistXP: gamification.xpPerAssist || 15
+              };
+              const overrides = {
+                ...defaultOverrides,
+                ...(gamification.sportsOverrides?.[sportKey] || {})
+              };
+
               calculatedXp += (gamification.xpPerMatch || 100);
               if (b.checkIn) calculatedXp += (gamification.xpPerCheckin || 50);
-              if (isW) calculatedXp += overrides.winXP; else calculatedXp -= overrides.lossXP;
-              if (overrides.countGoals) calculatedXp += (b.goals || 0) * (overrides.goalXP || 25);
-              if (overrides.countAssists) calculatedXp += (b.assists || 0) * (overrides.assistXP || 15);
+
+              const isL = b.isWin === false;
+              if (isW) calculatedXp += overrides.winXP; 
+              else if (isL) calculatedXp -= overrides.lossXP;
+
+              if (overrides.countGoals) calculatedXp += (b.goals || 0) * (overrides.goalXP !== undefined ? overrides.goalXP : 25);
+              if (overrides.countAssists) calculatedXp += (b.assists || 0) * (overrides.assistXP !== undefined ? overrides.assistXP : 15);
               if (b.isMVP) calculatedXp += (gamification.xpPerMvp || 200);
             });
 
             // === CALCULAR BADGES Y SU XP BONUS ===
             const daysActive = Math.max(1, (new Date().getTime() - user.rawJoined.getTime()) / (1000 * 60 * 60 * 24));
+            const existingStats = user.raw?.stats || {};
             const statsMap: Record<string, number> = {
-              scorer: totalGoals, playmaker: totalAssists,
-              defender: totalCleanSheets, wins: totalWins, mvp: totalMVPs,
-              experience: totalPlayed, multi_sport: Math.max(1, uniqueSports.size),
-              captaincy: user.stats?.captain_matches || 0, 
-              comeback: user.stats?.comebacks || 0,
-              precision: user.stats?.precision_matches || 0, 
-              clutch: user.stats?.clutch_goals || 0,
-              tournaments: user.stats?.tournaments_played || 0, 
-              invictus: maxStreak,
-              rivalry: user.stats?.rivalries_won || 0, 
-              morning_player: morningMatches,
-              night_player: nightMatches, 
-              loyal: Math.floor(daysActive / 30),
-              weekend_warrior: weekendMatches, 
-              stamina: totalMinutes,
-              social: user.stats?.invited_players || 0
+              scorer: Math.max(Number(existingStats.goals || 0), totalGoals),
+              goals: Math.max(Number(existingStats.goals || 0), totalGoals),
+
+              playmaker: Math.max(Number(existingStats.assists || 0), totalAssists),
+              assists: Math.max(Number(existingStats.assists || 0), totalAssists),
+
+              defender: Math.max(Number(existingStats.clean_sheets || 0), totalCleanSheets),
+              clean_sheets: Math.max(Number(existingStats.clean_sheets || 0), totalCleanSheets),
+
+              wins: Math.max(Number(existingStats.won || 0), totalWins),
+              won: Math.max(Number(existingStats.won || 0), totalWins),
+
+              mvp: Math.max(Number(existingStats.mvp || existingStats.mvps || 0), totalMVPs),
+              mvps: Math.max(Number(existingStats.mvp || existingStats.mvps || 0), totalMVPs),
+
+              experience: Math.max(Number(existingStats.played || 0), totalPlayed),
+              played: Math.max(Number(existingStats.played || 0), totalPlayed),
+
+              multi_sport: Math.max(Number(existingStats.sports_played || 1), uniqueSports.size),
+              sports_played: Math.max(Number(existingStats.sports_played || 1), uniqueSports.size),
+
+              captaincy: Number(existingStats.captain_matches || 0),
+              captain_matches: Number(existingStats.captain_matches || 0),
+
+              comeback: Number(existingStats.comebacks || 0),
+              comebacks: Number(existingStats.comebacks || 0),
+
+              precision: Number(existingStats.precision_matches || 0),
+              precision_matches: Number(existingStats.precision_matches || 0),
+
+              clutch: Number(existingStats.clutch_goals || 0),
+              clutch_goals: Number(existingStats.clutch_goals || 0),
+
+              tournaments: Number(existingStats.tournaments_played || 0),
+              tournaments_played: Number(existingStats.tournaments_played || 0),
+
+              invictus: Math.max(Number(existingStats.longest_win_streak || 0), maxStreak),
+              longest_win_streak: Math.max(Number(existingStats.longest_win_streak || 0), maxStreak),
+
+              rivalry: Number(existingStats.rivalries_won || 0),
+              rivalries_won: Number(existingStats.rivalries_won || 0),
+
+              morning_player: Math.max(Number(existingStats.morning_matches || 0), morningMatches),
+              morning_matches: Math.max(Number(existingStats.morning_matches || 0), morningMatches),
+
+              night_player: Math.max(Number(existingStats.night_matches || 0), nightMatches),
+              night_matches: Math.max(Number(existingStats.night_matches || 0), nightMatches),
+
+              loyal: Math.max(Number(existingStats.loyal || 0), Math.floor(daysActive / 30)),
+              loyalty: Math.max(Number(existingStats.loyal || 0), Math.floor(daysActive / 30)),
+
+              weekend_warrior: Math.max(Number(existingStats.weekend_matches || 0), weekendMatches),
+              weekend_matches: Math.max(Number(existingStats.weekend_matches || 0), weekendMatches),
+
+              stamina: Math.max(Number(existingStats.minutes_played || 0), totalMinutes),
+              minutes_played: Math.max(Number(existingStats.minutes_played || 0), totalMinutes),
+
+              social: Number(existingStats.invited_players || 0),
+              invited_players: Number(existingStats.invited_players || 0)
             };
 
             const earnedBadges: any[] = [];
             let badgeXpBonus = 0;
             Object.keys(badgeConfigs).forEach(badgeId => {
-              const config = badgeConfigs[badgeId];
+              const config = badgeConfigs[badgeId] || { bronze: 5, silver: 15, gold: 30 };
               const userVal = statsMap[badgeId] || 0;
               let tier = null;
-              if (userVal >= config.gold) { tier = 'gold'; badgeXpBonus += BADGE_XP.gold; }
-              else if (userVal >= config.silver) { tier = 'silver'; badgeXpBonus += BADGE_XP.silver; }
-              else if (userVal >= config.bronze) { tier = 'bronze'; badgeXpBonus += BADGE_XP.bronze; }
-              if (tier) earnedBadges.push({ id: badgeId, tier, value: userVal });
+
+              const goldVal = Number(config.gold || 0);
+              const silverVal = Number(config.silver || 0);
+              const bronzeVal = Number(config.bronze || 0);
+
+              if (userVal > 0) {
+                if (goldVal > 0 && userVal >= goldVal) { 
+                  tier = 'gold'; 
+                  badgeXpBonus += BADGE_XP.gold; 
+                } else if (silverVal > 0 && userVal >= silverVal) { 
+                  tier = 'silver'; 
+                  badgeXpBonus += BADGE_XP.silver; 
+                } else if (bronzeVal > 0 && userVal >= bronzeVal) { 
+                  tier = 'bronze'; 
+                  badgeXpBonus += BADGE_XP.bronze; 
+                }
+              }
+              if (tier) {
+                const normId = normalizeBadgeId(badgeId);
+                if (!earnedBadges.some(b => b.id === normId)) {
+                  earnedBadges.push({ id: normId, tier, value: userVal });
+                }
+              }
             });
 
             // Sumar XP de badges al total
@@ -374,15 +549,20 @@ export default function Page() {
             await updateDoc(doc(db, 'users', user.id), {
               stats: { 
                 ...user.stats, 
-                played: totalPlayed, won: totalWins, lost: Math.max(0, totalPlayed - totalWins), 
-                goals: totalGoals, assists: totalAssists, mvp: totalMVPs, 
-                minutes_played: totalMinutes, sports_played: Math.max(1, uniqueSports.size), 
-                clean_sheets: totalCleanSheets,
-                weekend_matches: weekendMatches,
-                morning_matches: morningMatches,
-                night_matches: nightMatches,
-                longest_win_streak: maxStreak,
-                loyal: Math.floor(daysActive / 30)
+                played: statsMap.experience, 
+                won: statsMap.wins, 
+                lost: Math.max(0, statsMap.experience - statsMap.wins), 
+                goals: statsMap.scorer, 
+                assists: statsMap.playmaker, 
+                mvp: statsMap.mvp, 
+                minutes_played: statsMap.stamina, 
+                sports_played: statsMap.multi_sport, 
+                clean_sheets: statsMap.defender,
+                weekend_matches: statsMap.weekend_warrior,
+                morning_matches: statsMap.morning_player,
+                night_matches: statsMap.night_player,
+                longest_win_streak: statsMap.invictus,
+                loyal: statsMap.loyal
               },
               xp: calculatedXp, ovr: projectedOvr, tier: projectedTier, 
               badges: earnedBadges, badgeXpBonus,
@@ -464,6 +644,24 @@ export default function Page() {
               {["Todos", "Suspendidos"].map((f) => (
                 <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-lg transition-all whitespace-nowrap ${filter === f ? "bg-white dark:bg-emerald-500 text-black shadow-sm" : "text-slate-400 hover:text-black dark:hover:text-white"}`}>{f.toUpperCase()}</button>
               ))}
+              <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10 mx-1 hidden md:block"></div>
+              <div className="flex items-center gap-0.5">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-[#0B0F19] text-emerald-500 dark:text-emerald-400 shadow-sm border border-slate-100 dark:border-white/5' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
+                  title="Vista Cuadrícula"
+                >
+                  <Squares2X2Icon className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white dark:bg-[#0B0F19] text-emerald-500 dark:text-emerald-400 shadow-sm border border-slate-100 dark:border-white/5' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
+                  title="Vista Listado"
+                >
+                  <ListBulletIcon className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10 mx-1"></div>
               <BotonAccion icon={<ArrowPathIcon className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />} onClick={fetchUsers} />
           </div>
       </PanelGlass>
@@ -476,107 +674,229 @@ export default function Page() {
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Analizando base de talento...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredUsers.map((user) => (
-              <div key={user.id} className={`bg-white dark:bg-[#0B0F19] rounded-3xl border transition-all flex flex-col group overflow-hidden ${user.status === 'Activo' ? 'border-slate-100 dark:border-white/5 shadow-xl shadow-slate-200/20' : 'border-red-100 opacity-70 shadow-none'}`}>
-                <div className="p-6 flex-1">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="relative">
-                      <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center font-black text-slate-500 text-xl shadow-inner overflow-hidden shrink-0">
-                        {user.photoURL ? <img src={user.photoURL} className="w-full h-full object-cover" /> : user.name.charAt(0)}
-                      </div>
-                      <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-lg border-2 border-white dark:border-[#0B0F19] flex items-center justify-center font-black text-[8px] shadow-sm ${getOvrColor(user.tier)}`}>
-                        {user.ovr}
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <span className={`px-2.5 py-1 rounded-xl text-[8px] font-black uppercase border ${user.status === 'Activo' ? 'bg-emerald-50 border-emerald-500/20 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-red-50 border-red-500/20 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
-                        {user.status}
-                      </span>
-                      <span className="px-2 py-0.5 bg-slate-50 dark:bg-white/5 rounded-lg text-[7px] font-black text-slate-400 border border-slate-100 dark:border-white/10 uppercase tracking-widest">{user.tier}</span>
-                    </div>
-                  </div>
+          viewMode === 'list' ? (
+            <PanelGlass className="overflow-hidden border border-slate-100 dark:border-white/5 rounded-3xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02]">
+                      <th className="py-4 px-6 text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Jugador</th>
+                      <th className="py-4 px-6 text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center">Valoración</th>
+                      <th className="py-4 px-6 text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Partidos / Récord</th>
+                      <th className="py-4 px-6 text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Goles / MVP</th>
+                      <th className="py-4 px-6 text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Equipos</th>
+                      <th className="py-4 px-6 text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Estado</th>
+                      <th className="py-4 px-6 text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                    {filteredUsers.map((user) => {
+                      const winRate = (user.stats.played || 0) > 0 ? Math.round(((user.stats.won || 0) / user.stats.played) * 100) : 0;
+                      return (
+                        <tr key={user.id} className="hover:bg-slate-50/30 dark:hover:bg-white/[0.01] transition-all group">
+                          {/* JUGADOR */}
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center font-black text-slate-500 text-sm overflow-hidden border border-slate-100 dark:border-white/10 shrink-0">
+                                {user.photoURL ? <img src={user.photoURL} className="w-full h-full object-cover" /> : user.name.charAt(0)}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-black text-[11px] text-slate-900 dark:text-white uppercase truncate leading-none">{user.name}</span>
+                                  {user.role === 'Capitán' && <span className="px-1.5 py-0.5 bg-amber-500 text-black rounded text-[6px] font-black uppercase tracking-tighter">CAP</span>}
+                                </div>
+                                <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase truncate block mt-1">{user.email}</span>
+                              </div>
+                            </div>
+                          </td>
 
-                  <h3 className="font-black text-slate-900 dark:text-white text-base uppercase truncate leading-tight group-hover:text-emerald-500 transition-colors mb-1">{user.name}</h3>
-                  <div className="flex items-center gap-2 mb-5">
-                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter truncate max-w-[150px]">{user.email}</p>
-                    {user.role === 'Capitán' && <span className="px-1.5 py-0.5 bg-amber-500 text-black rounded-lg text-[7px] font-black uppercase">Capitán</span>}
-                    {(user.strikes || 0) > 0 && (
-                      <span className="px-1.5 py-0.5 bg-rose-500 text-white rounded-lg text-[7px] font-black uppercase flex items-center gap-1">
-                        <NoSymbolIcon className="w-2.5 h-2.5" />
-                        {user.strikes} {user.strikes === 1 ? 'Strike' : 'Strikes'}
-                      </span>
-                    )}
-                  </div>
+                          {/* VALORACIÓN (OVR) */}
+                          <td className="py-4 px-6 text-center">
+                            <div className="inline-flex flex-col items-center gap-1">
+                              <div className={`px-2.5 py-1 rounded-xl text-[10px] font-black shadow-sm ${getOvrColor(user.tier)}`}>
+                                {user.ovr} OVR
+                              </div>
+                              <span className="text-[6px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{user.tier}</span>
+                            </div>
+                          </td>
 
-                  <div className="space-y-4">
-                    {/* STATS RAPIDAS */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="p-3 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-slate-100/50 dark:border-white/5">
-                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">Récord</p>
-                        <div className="flex items-center gap-1.5 font-mono">
-                          <span className="text-[10px] font-black text-emerald-500">{user.stats.won}W</span>
-                          <span className="text-[10px] font-black text-red-400">{user.stats.lost}L</span>
-                        </div>
-                      </div>
-                      <div className="p-3 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-slate-100/50 dark:border-white/5">
-                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">Goles</p>
-                        <div className="flex items-center gap-1.5">
-                          <FireIcon className="w-3 h-3 text-rose-500" />
-                          <span className="text-[10px] font-black text-slate-900 dark:text-white">{user.stats.goals}</span>
-                        </div>
-                      </div>
-                    </div>
+                          {/* RECORD Y RENDIMIENTO */}
+                          <td className="py-4 px-6">
+                            <div className="flex flex-col gap-1.5">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 font-mono">
+                                  {user.stats.played} PJ · <span className="text-emerald-500">{user.stats.won}W</span> / <span className="text-red-400">{user.stats.lost}L</span>
+                                </span>
+                                <span className="text-[7px] font-black text-slate-400 dark:text-slate-500 font-mono">({winRate}% WR)</span>
+                              </div>
+                              <div className="w-32 h-1 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${winRate}%` }}></div>
+                              </div>
+                            </div>
+                          </td>
 
+                          {/* GOLES / MVP */}
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-1.5">
+                                <FireIcon className="w-3.5 h-3.5 text-rose-500" />
+                                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 font-mono">{user.stats.goals || 0} <span className="text-[7px] font-bold text-slate-400 dark:text-slate-500 uppercase">Goles</span></span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <TrophyIcon className="w-3.5 h-3.5 text-amber-500" />
+                                <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 font-mono">{user.stats.mvp || 0} <span className="text-[7px] font-bold text-slate-400 dark:text-slate-500 uppercase">MVP</span></span>
+                              </div>
+                            </div>
+                          </td>
 
-                    {/* EQUIPOS & BADGES */}
-                    <div className="space-y-3">
-                        <div className="flex flex-col gap-1.5">
-                          <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Equipos Actuales</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {user.teamList.length > 0 ? (
+                          {/* EQUIPOS */}
+                          <td className="py-4 px-6">
+                            <div className="flex flex-wrap gap-1 max-w-[150px]">
+                              {user.teamList.length > 0 ? (
                                 user.teamList.map((t, idx) => (
-                                <span key={idx} className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[7px] font-black rounded-lg uppercase border border-indigo-500/10 tracking-tighter">{t}</span>
+                                  <span key={idx} className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[7px] font-black rounded uppercase border border-indigo-500/10 tracking-tighter">{t}</span>
                                 ))
-                            ) : (
-                                <span className="text-[7px] font-black text-slate-300 uppercase tracking-widest italic">Agente Libre</span>
-                            )}
+                              ) : (
+                                <span className="text-[7px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-widest italic">Libre</span>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* ESTADO */}
+                          <td className="py-4 px-6">
+                            <div className="flex flex-col gap-1">
+                              <span className={`px-2 py-0.5 rounded-lg text-[7px] font-black uppercase w-fit border ${user.status === 'Activo' ? 'bg-emerald-50 border-emerald-500/20 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-red-50 border-red-500/20 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
+                                {user.status}
+                              </span>
+                              {(user.strikes || 0) > 0 && (
+                                <span className="px-1.5 py-0.5 bg-rose-500 text-white rounded text-[6px] font-black uppercase flex items-center gap-1 w-fit">
+                                  <NoSymbolIcon className="w-2.5 h-2.5" />
+                                  {user.strikes} {user.strikes === 1 ? 'Strike' : 'Strikes'}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+
+                          {/* ACCIONES */}
+                          <td className="py-4 px-6 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button title="Historial" onClick={() => { setSelectedUser(user); setIsHistoryModalOpen(true); }} className="p-2 hover:bg-emerald-500 hover:text-white text-slate-400 dark:text-slate-500 rounded-xl transition-all active:scale-90"><ClockIcon className="w-4 h-4" /></button>
+                              <button title="Perfil" onClick={() => { setSelectedUser(user); setIsModalOpen(true); }} className="p-2 hover:bg-slate-900 dark:hover:bg-emerald-500 text-slate-400 dark:text-slate-500 hover:text-white rounded-xl transition-all active:scale-90"><UserCircleIcon className="w-4 h-4" /></button>
+                              <button onClick={() => toggleUserStatus(user.id, user.status)} className={`px-3 py-1.5 rounded-lg text-[7px] font-black uppercase transition-all active:scale-95 border ${user.status === 'Activo' ? 'border-red-200 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 dark:border-red-500/30' : 'border-emerald-200 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 dark:border-emerald-500/30'}`}>
+                                {user.status === 'Activo' ? 'Suspender' : 'Activar'}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </PanelGlass>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredUsers.map((user) => (
+                <div key={user.id} className={`bg-white dark:bg-[#0B0F19] rounded-3xl border transition-all flex flex-col group overflow-hidden ${user.status === 'Activo' ? 'border-slate-100 dark:border-white/5 shadow-xl shadow-slate-200/20' : 'border-red-100 opacity-70 shadow-none'}`}>
+                  <div className="p-6 flex-1">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="relative">
+                        <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center font-black text-slate-500 text-xl shadow-inner overflow-hidden shrink-0">
+                          {user.photoURL ? <img src={user.photoURL} className="w-full h-full object-cover" /> : user.name.charAt(0)}
+                        </div>
+                        <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-lg border-2 border-white dark:border-[#0B0F19] flex items-center justify-center font-black text-[8px] shadow-sm ${getOvrColor(user.tier)}`}>
+                          {user.ovr}
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-1">
+                        <span className={`px-2.5 py-1 rounded-xl text-[8px] font-black uppercase border ${user.status === 'Activo' ? 'bg-emerald-50 border-emerald-500/20 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-red-50 border-red-500/20 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
+                          {user.status}
+                        </span>
+                        <span className="px-2 py-0.5 bg-slate-50 dark:bg-white/5 rounded-lg text-[7px] font-black text-slate-400 border border-slate-100 dark:border-white/10 uppercase tracking-widest">{user.tier}</span>
+                      </div>
+                    </div>
+
+                    <h3 className="font-black text-slate-900 dark:text-white text-base uppercase truncate leading-tight group-hover:text-emerald-500 transition-colors mb-1">{user.name}</h3>
+                    <div className="flex items-center gap-2 mb-5">
+                      <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter truncate max-w-[150px]">{user.email}</p>
+                      {user.role === 'Capitán' && <span className="px-1.5 py-0.5 bg-amber-500 text-black rounded-lg text-[7px] font-black uppercase">Capitán</span>}
+                      {(user.strikes || 0) > 0 && (
+                        <span className="px-1.5 py-0.5 bg-rose-500 text-white rounded-lg text-[7px] font-black uppercase flex items-center gap-1">
+                          <NoSymbolIcon className="w-2.5 h-2.5" />
+                          {user.strikes} {user.strikes === 1 ? 'Strike' : 'Strikes'}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      {/* STATS RAPIDAS */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="p-3 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-slate-100/50 dark:border-white/5">
+                          <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">Récord</p>
+                          <div className="flex items-center gap-1.5 font-mono">
+                            <span className="text-[10px] font-black text-emerald-500">{user.stats.won}W</span>
+                            <span className="text-[10px] font-black text-red-400">{user.stats.lost}L</span>
                           </div>
                         </div>
-                        
-                        <div className="flex justify-between items-center pt-2 border-t border-slate-50 dark:border-white/5">
-                          <div className="flex flex-col">
-                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Insignias</p>
-                            <div className="flex gap-1 mt-1">
-                                {user.badges.length > 0 ? user.badges.slice(0, 5).map((b: any, i: number) => (
-                                    <span key={i} title={b.id} className="w-5 h-5 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center text-[8px] grayscale hover:grayscale-0 transition-all cursor-help shadow-sm">
-                                        {b.id === 'scorer' ? '⚽' : b.id === 'wins' ? '🏆' : '🎖️'}
-                                    </span>
-                                )) : <span className="text-[7px] font-bold text-slate-300 uppercase tracking-widest">---</span>}
-                                {user.badges.length > 5 && <span className="text-[8px] font-black text-slate-400 self-center ml-1">+{user.badges.length - 5}</span>}
+                        <div className="p-3 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-slate-100/50 dark:border-white/5">
+                          <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">Goles</p>
+                          <div className="flex items-center gap-1.5">
+                            <FireIcon className="w-3 h-3 text-rose-500" />
+                            <span className="text-[10px] font-black text-slate-900 dark:text-white">{user.stats.goals}</span>
+                          </div>
+                        </div>
+                      </div>
+
+
+                      {/* EQUIPOS & BADGES */}
+                      <div className="space-y-3">
+                          <div className="flex flex-col gap-1.5">
+                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Equipos Actuales</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {user.teamList.length > 0 ? (
+                                  user.teamList.map((t, idx) => (
+                                  <span key={idx} className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[7px] font-black rounded-lg uppercase border border-indigo-500/10 tracking-tighter">{t}</span>
+                                  ))
+                              ) : (
+                                  <span className="text-[7px] font-black text-slate-300 uppercase tracking-widest italic">Agente Libre</span>
+                              )}
                             </div>
                           </div>
-                          <div className="text-right">
-                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Miembro Desde</p>
-                            <p className="text-[8px] font-black text-slate-900 dark:text-white uppercase">{user.joined}</p>
+                          
+                          <div className="flex justify-between items-center pt-2 border-t border-slate-50 dark:border-white/5">
+                            <div className="flex flex-col">
+                              <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Insignias</p>
+                              <div className="flex gap-1 mt-1">
+                                  {user.badges.length > 0 ? user.badges.slice(0, 5).map((b: any, i: number) => (
+                                      <span key={i} title={b.id} className="w-5 h-5 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center text-[8px] grayscale hover:grayscale-0 transition-all cursor-help shadow-sm">
+                                          {b.id === 'scorer' ? '⚽' : b.id === 'wins' ? '🏆' : '🎖️'}
+                                      </span>
+                                  )) : <span className="text-[7px] font-bold text-slate-300 uppercase tracking-widest">---</span>}
+                                  {user.badges.length > 5 && <span className="text-[8px] font-black text-slate-400 self-center ml-1">+{user.badges.length - 5}</span>}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Miembro Desde</p>
+                              <p className="text-[8px] font-black text-slate-900 dark:text-white uppercase">{user.joined}</p>
+                            </div>
                           </div>
-                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="px-6 py-4 bg-slate-50/50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
-                  <div className="flex gap-1">
-                    <button title="Historial" onClick={() => { setSelectedUser(user); setIsHistoryModalOpen(true); }} className="p-2 hover:bg-emerald-500 hover:text-white text-slate-400 dark:text-slate-500 rounded-xl transition-all active:scale-90"><ClockIcon className="w-4 h-4" /></button>
-                    <button title="Perfil" onClick={() => { setSelectedUser(user); setIsModalOpen(true); }} className="p-2 hover:bg-slate-900 dark:hover:bg-emerald-500 text-slate-400 dark:text-slate-500 hover:text-white rounded-xl transition-all active:scale-90"><UserCircleIcon className="w-4 h-4" /></button>
+                  <div className="px-6 py-4 bg-slate-50/50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
+                    <div className="flex gap-1">
+                      <button title="Historial" onClick={() => { setSelectedUser(user); setIsHistoryModalOpen(true); }} className="p-2 hover:bg-emerald-500 hover:text-white text-slate-400 dark:text-slate-500 rounded-xl transition-all active:scale-90"><ClockIcon className="w-4 h-4" /></button>
+                      <button title="Perfil" onClick={() => { setSelectedUser(user); setIsModalOpen(true); }} className="p-2 hover:bg-slate-900 dark:hover:bg-emerald-500 text-slate-400 dark:text-slate-500 hover:text-white rounded-xl transition-all active:scale-90"><UserCircleIcon className="w-4 h-4" /></button>
+                    </div>
+                    <button onClick={() => toggleUserStatus(user.id, user.status)} className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase transition-all active:scale-95 ${user.status === 'Activo' ? 'bg-red-50 text-red-600 hover:bg-red-500 hover:text-white dark:bg-red-500/10' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10'}`}>
+                      {user.status === 'Activo' ? 'Suspender' : 'Activar'}
+                    </button>
                   </div>
-                  <button onClick={() => toggleUserStatus(user.id, user.status)} className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase transition-all active:scale-95 ${user.status === 'Activo' ? 'bg-red-50 text-red-600 hover:bg-red-500 hover:text-white dark:bg-red-500/10' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10'}`}>
-                    {user.status === 'Activo' ? 'Suspender' : 'Activar'}
-                  </button>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )
         )}
       </div>
 

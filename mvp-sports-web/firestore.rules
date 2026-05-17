@@ -11,19 +11,41 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function getRole() {
+      let uid = request.auth.uid;
+      let userDoc = /databases/$(database)/documents/users/$(uid);
+      let profileDoc = /databases/$(database)/documents/profiles/$(uid);
+      let staffDoc = /databases/$(database)/documents/staff/$(uid);
+
+      return request.auth.token.role != null 
+        ? request.auth.token.role 
+        : exists(userDoc) 
+          ? get(userDoc).data.role 
+          : exists(profileDoc) 
+            ? get(profileDoc).data.role 
+            : exists(staffDoc)
+              ? get(staffDoc).data.role
+              : null;
+    }
+
     function isSuperAdmin() {
-      return isAuthenticated() && 
-             (request.auth.token.email == 'piero.abarca@gmail.com' || 
-              request.auth.token.role == 'admin' || 
-              request.auth.token.role == 'superadmin');
+      let role = getRole();
+      return isAuthenticated() && (request.auth.token.email == 'piero.abarca@gmail.com' || role == 'admin' || role == 'superadmin');
     }
 
     function isOwner() {
-      return isAuthenticated() && (request.auth.token.role == 'owner' || request.auth.token.role == 'admin' || request.auth.token.email == 'piero.abarca@gmail.com');
+      let role = getRole();
+      return isAuthenticated() && (role == 'owner' || role == 'admin' || role == 'superadmin');
     }
 
     function isManager() {
-      return isAuthenticated() && (request.auth.token.role == 'manager' || request.auth.token.role == 'owner' || request.auth.token.role == 'admin');
+      let role = getRole();
+      return isAuthenticated() && (role == 'manager' || role == 'owner' || role == 'admin' || role == 'superadmin');
+    }
+
+    function isStaff() {
+      let role = getRole();
+      return isAuthenticated() && (role == 'staff' || role == 'manager' || role == 'owner' || role == 'admin' || role == 'superadmin');
     }
 
     // ==========================================
@@ -33,21 +55,21 @@ service cloud.firestore {
     // Perfiles unificados (App y Web)
     match /profiles/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+      allow write: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
 
       // Subcolecciones (tarjetas, estadísticas, transacciones, etc.)
       match /{subcollection=**} {
-        allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
-        allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+        allow read: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
+        allow write: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
       }
     }
 
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin() || isManager());
+      allow write: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
       match /{subcollection=**} {
-        allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
-        allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin() || isManager());
+        allow read: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
+        allow write: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
       }
     }
 
@@ -85,10 +107,26 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
       allow update: if isAuthenticated() && (
+        isStaff() ||
+        isSuperAdmin() ||
         resource.data.userId == request.auth.uid || 
-        resource.data.userEmail == request.auth.token.email || 
-        isManager() || 
-        isSuperAdmin()
+        resource.data.userEmail == request.auth.token.email ||
+        // Fallback: Si el usuario tiene acceso al recinto (tenantId o tenantIds)
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.tenantId == resource.data.tenantId ||
+          resource.data.tenantId in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.tenantIds ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'manager'
+        )) ||
+        (exists(/databases/$(database)/documents/profiles/$(request.auth.uid)) && (
+          get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.tenantId == resource.data.tenantId ||
+          resource.data.tenantId in get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.tenantIds ||
+          get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'manager'
+        )) ||
+        (exists(/databases/$(database)/documents/staff/$(request.auth.uid)) && (
+          get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.tenantId == resource.data.tenantId ||
+          resource.data.tenantId in get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.tenantIds ||
+          get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role == 'manager'
+        ))
       );
       allow delete: if isManager() || isSuperAdmin();
     }

@@ -13,8 +13,7 @@ import {
 
 const HOUR_HEIGHT = 80;
 const COLUMN_WIDTH = 180;
-const START_HOUR = 10;
-const END_HOUR = 24;
+
 
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructive = false, showCancel = true }: any) => {
     if (!isOpen) return null;
@@ -33,10 +32,6 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructi
     );
 };
 
-const TIME_SLOTS = Array.from({ length: END_HOUR - START_HOUR }, (_, i) => {
-    const h = START_HOUR + i;
-    return `${h.toString().padStart(2, '0')}:00`;
-});
 
 const formatCLP = (amount: any) => {
     const value = Number(amount) || 0;
@@ -49,6 +44,7 @@ interface Court { id: string; name: string; sport: string; }
 const getChileNow = () => new Date(new Date().toLocaleString("en-US", { timeZone: "America/Santiago" }));
 const getChileDateISO = () => {
     const now = getChileNow();
+    if (now.getHours() < 6) now.setDate(now.getDate() - 1);
     return now.getFullYear() + '-' + (now.getMonth() + 1).toString().padStart(2, '0') + '-' + now.getDate().toString().padStart(2, '0');
 };
 
@@ -71,6 +67,47 @@ export default function MasterCalendar() {
     });
 
     const [newRes, setNewRes] = useState({ tenantId: '', date: '', courtId: '', clientName: '', clientPhone: '', startTime: '18:00', duration: '1.0', price: '', paymentStatus: 'paid', deposit: '0', paymentMethod: 'cash', notes: '' });
+
+    const calendarConfig = React.useMemo(() => {
+        let openHour = 8;
+        let closeHour = 23;
+        
+        if (selectedVenueId && venues.length > 0) {
+            const venue = venues.find(v => v.id === selectedVenueId) as any;
+            if (venue) {
+                if (venue.openTime) openHour = parseInt(venue.openTime.split(':')[0]);
+                if (venue.closeTime) closeHour = parseInt(venue.closeTime.split(':')[0]);
+
+                if (venue.schedule && selectedDate) {
+                    const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+                    const d = new Date(selectedDate + "T12:00:00");
+                    const dayName = daysOfWeek[d.getDay()];
+                    const dayConfig = venue.schedule[dayName];
+                    if (dayConfig && dayConfig.isOpen !== false) {
+                        if (dayConfig.open) openHour = parseInt(dayConfig.open.split(':')[0]);
+                        if (dayConfig.close) closeHour = parseInt(dayConfig.close.split(':')[0]);
+                    }
+                }
+            }
+        }
+        
+        if (isNaN(openHour)) openHour = 8;
+        if (isNaN(closeHour)) closeHour = 23;
+
+        if (closeHour < openHour) {
+            closeHour += 24;
+        }
+        if (closeHour === 0) {
+            closeHour = 24;
+        }
+
+        const slots = [];
+        for (let i = openHour; i < closeHour; i++) {
+            slots.push(`${(i % 24).toString().padStart(2, '0')}:00`);
+        }
+        
+        return { startHour: openHour, endHour: closeHour, timeSlots: slots };
+    }, [selectedVenueId, venues, selectedDate]);
 
     useEffect(() => {
         const fetchVenues = async () => {
@@ -111,8 +148,12 @@ export default function MasterCalendar() {
             const courtsList = snapCourts.docs.map(d => ({ id: d.id, ...d.data() } as Court));
             setDashboardCourts(courtsList.sort((a, b) => a.name.localeCompare(b.name)));
 
-            const start = new Date(selectedDate + "T00:00:00");
-            const end = new Date(selectedDate + "T23:59:59");
+            const baseD = new Date(selectedDate + "T00:00:00");
+            const start = new Date(baseD);
+            start.setHours(6, 0, 0, 0);
+            const end = new Date(baseD);
+            end.setDate(end.getDate() + 1);
+            end.setHours(5, 59, 59, 999);
             const [snapByDate, snapByStartTime] = await Promise.all([
                 getDocs(query(collection(db, "bookings"), where("tenantId", "==", selectedVenueId), where("date", ">=", Timestamp.fromDate(start)), where("date", "<=", Timestamp.fromDate(end)))).catch(() => ({ docs: [] as any[] })),
                 getDocs(query(collection(db, "bookings"), where("tenantId", "==", selectedVenueId), where("startTime", ">=", Timestamp.fromDate(start)), where("startTime", "<=", Timestamp.fromDate(end)))).catch(() => ({ docs: [] as any[] }))
@@ -132,6 +173,11 @@ export default function MasterCalendar() {
                 if (typeof data.startTime === 'string' && data.startTime.includes(':')) {
                     const [h, m] = data.startTime.split(':').map(Number);
                     extractedHour = h + (m / 60);
+                }
+
+                // Ajuste para bloques de madrugada en la grilla visual
+                if (extractedHour < 6) {
+                    extractedHour += 24;
                 }
 
                 return { 
@@ -185,7 +231,10 @@ export default function MasterCalendar() {
             const checkRemote = async () => {
                 setAvailabilityStatus('checking');
                 try {
-                    const checkDate = new Date(`${newRes.date}T${newRes.startTime}`);
+                    const [ch, cm] = newRes.startTime.split(':').map(Number);
+                    const checkDate = new Date(`${newRes.date}T00:00:00`);
+                    checkDate.setHours(ch, cm, 0, 0);
+                    if (ch < 6) checkDate.setDate(checkDate.getDate() + 1);
                     const snap = await getDocs(query(collection(db, "bookings"), where("tenantId", "==", newRes.tenantId), where("courtId", "==", newRes.courtId), where("date", ">=", Timestamp.fromDate(checkDate)), where("date", "<=", Timestamp.fromDate(new Date(checkDate.getTime() + 3599000)))));
                     const active = snap.docs.filter(d => d.data().status !== 'cancelled');
                     if (active.length > 0) { setAvailabilityStatus('occupied'); setOccupiedBy(active[0].data().clientName || 'Reserva existente'); }
@@ -206,7 +255,12 @@ export default function MasterCalendar() {
         if (!newRes.clientPhone.trim()) { setOverlapError("Falta teléfono."); return; }
         if (!newRes.price || Number(newRes.price) <= 0) { setOverlapError("Ingresa precio válido."); return; }
         if (availabilityStatus === 'occupied') { setOverlapError("Horario ocupado."); return; }
-        const bookingDate = new Date(`${newRes.date}T${newRes.startTime}`);
+        const [bh, bm] = newRes.startTime.split(':').map(Number);
+        const bookingDate = new Date(`${newRes.date}T00:00:00`);
+        bookingDate.setHours(bh, bm, 0, 0);
+        if (bh < 6) {
+            bookingDate.setDate(bookingDate.getDate() + 1);
+        }
         if (bookingDate < getChileNow()) { setOverlapError("No puedes reservar en el pasado."); return; }
 
         setCreatingBooking(true);
@@ -295,7 +349,7 @@ export default function MasterCalendar() {
                         </div>
                         <div className="flex relative">
                             <div className="sticky left-0 z-20 w-14 bg-white dark:bg-[#0B0F19] border-r border-slate-100 dark:border-white/10">
-                                {TIME_SLOTS.map(h => <div key={h} style={{ height: HOUR_HEIGHT }} className="border-b border-slate-50 dark:border-white/[0.03] flex items-start justify-center pt-2.5"><span className="text-[10px] font-mono font-bold text-slate-400">{h}</span></div>)}
+                                {calendarConfig.timeSlots.map(h => <div key={h} style={{ height: HOUR_HEIGHT }} className="border-b border-slate-50 dark:border-white/[0.03] flex items-start justify-center pt-2.5"><span className="text-[10px] font-mono font-bold text-slate-400">{h}</span></div>)}
                             </div>
                             <div className="relative flex">
                                 {dashboardCourts.map(c => <div key={c.id} style={{ width: COLUMN_WIDTH }} className="border-r border-slate-50 dark:border-white/[0.04] h-full pointer-events-none"></div>)}
@@ -303,7 +357,7 @@ export default function MasterCalendar() {
                                     const cIndex = dashboardCourts.findIndex(c => c.name === b.courtName);
                                     if (cIndex === -1) return null;
                                     return (
-                                        <div key={b.id} onClick={() => setSelectedBooking(b)} className={`absolute z-10 p-2 mx-1 rounded-xl border-l-4 shadow-sm cursor-pointer flex flex-col justify-between overflow-hidden transition-all ${getCardStyle(b.paymentStatus, b.status)}`} style={{ top: (b.extractedHour - START_HOUR) * HOUR_HEIGHT + 2, height: HOUR_HEIGHT - 4, left: cIndex * COLUMN_WIDTH, width: COLUMN_WIDTH - 8 }}>
+                                        <div key={b.id} onClick={() => setSelectedBooking(b)} className={`absolute z-10 p-2 mx-1 rounded-xl border-l-4 shadow-sm cursor-pointer flex flex-col justify-between overflow-hidden transition-all ${getCardStyle(b.paymentStatus, b.status)}`} style={{ top: (b.extractedHour - calendarConfig.startHour) * HOUR_HEIGHT + 2, height: HOUR_HEIGHT - 4, left: cIndex * COLUMN_WIDTH, width: COLUMN_WIDTH - 8 }}>
                                             <div className="flex justify-between items-start">
                                                 <div>
                                                     <p className="text-[8px] font-bold opacity-40 uppercase mb-0.5">#{b.id.slice(-4)}</p>
@@ -385,7 +439,7 @@ export default function MasterCalendar() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div><label className="text-[10px] font-black text-slate-400 uppercase block mb-1">Cancha</label><select required value={newRes.courtId} onChange={e => setNewRes({ ...newRes, courtId: e.target.value })} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-[10px] font-black uppercase outline-none"><option value="">Cancha...</option>{modalCourts.map(c => <option key={c.id} value={c.id} className="dark:bg-black">{c.name} ({c.sport})</option>)}</select></div>
-                                    <div><label className="text-[10px] font-black text-slate-400 uppercase block mb-1">Hora Inicio</label><select required value={newRes.startTime} onChange={e => setNewRes({ ...newRes, startTime: e.target.value })} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-[10px] font-black outline-none">{TIME_SLOTS.map(t => <option key={t} value={t} className="dark:bg-black">{t}</option>)}</select></div>
+                                    <div><label className="text-[10px] font-black text-slate-400 uppercase block mb-1">Hora Inicio</label><select required value={newRes.startTime} onChange={e => setNewRes({ ...newRes, startTime: e.target.value })} className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-[10px] font-black outline-none">{calendarConfig.timeSlots.map(t => <option key={t} value={t} className="dark:bg-black">{t}</option>)}</select></div>
                                 </div>
                                 <div className="pt-4 space-y-4">
                                     <h4 className="text-[10px] font-black text-emerald-500 uppercase tracking-widest border-b border-slate-100 dark:border-white/5 pb-2">Cliente</h4>

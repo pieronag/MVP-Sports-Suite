@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StatusBar, StyleSheet, ActivityIndicator, Dimensions, RefreshControl, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StatusBar, StyleSheet, ActivityIndicator, Dimensions, RefreshControl, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { QrCode, CheckCircle2, Clock, Calendar, Building2, TrendingUp, DollarSign, ChevronRight, Zap, Target, ShieldCheck, ArrowUpRight, XCircle, ChevronDown } from 'lucide-react-native';
 import { useAuth } from '../../store/useAuth';
@@ -12,6 +12,47 @@ import { db } from '../../services/firebase';
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 
 const { width, height } = Dimensions.get('window');
+const getSantiagoDateTime = (date: Date) => {
+    try {
+        const formatter = new Intl.DateTimeFormat("en-US", {
+            timeZone: "America/Santiago",
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+            hour12: false
+        });
+        const parts = formatter.formatToParts(date);
+        const getPart = (type: string) => Number(parts.find(p => p.type === type)?.value || 0);
+        return new Date(getPart("year"), getPart("month") - 1, getPart("day"), getPart("hour"), getPart("minute"), 0, 0);
+    } catch (e) {
+        return new Date();
+    }
+};
+
+const getBookingDateTimeChile = (bookingDate: Date, startTime: string) => {
+    try {
+        const formatter = new Intl.DateTimeFormat("en-US", {
+            timeZone: "America/Santiago",
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour12: false
+        });
+        const parts = formatter.formatToParts(bookingDate);
+        const getPart = (type: string) => Number(parts.find(p => p.type === type)?.value || 0);
+        const [hours, minutes] = (startTime || "00:00").split(':').map(Number);
+        const res = new Date(getPart("year"), getPart("month") - 1, getPart("day"), hours, minutes, 0, 0);
+        if (hours < 6) {
+            res.setDate(res.getDate() + 1);
+        }
+        return res;
+    } catch (e) {
+        return new Date();
+    }
+};
 
 const COLORS = {
     light: {
@@ -47,6 +88,8 @@ export default function ManagerDashboard() {
     const [isSelectOpen, setIsSelectOpen] = useState(false);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [pendingTenant, setPendingTenant] = useState<Tenant | null>(null);
+    const [isNoShowConfirmOpen, setIsNoShowConfirmOpen] = useState(false);
+    const [isNoShowSuccessOpen, setIsNoShowSuccessOpen] = useState(false);
 
     useEffect(() => {
         const loadSavedTenant = async () => {
@@ -119,13 +162,13 @@ export default function ManagerDashboard() {
             const b = await bookingService.getBookingsByTenantForDate(currentTenantId, today);
             
             // Auto check-in local / no-show validation on loaded bookings
-            const nowChileStr = new Date().toLocaleString("en-US", { timeZone: "America/Santiago" });
-            const nowChile = new Date(nowChileStr);
+            const nowChile = getSantiagoDateTime(new Date());
 
             const verifiedBookings = await Promise.all(b.map(async (booking) => {
                 if (
                     booking.status !== 'cancelled' && 
-                    booking.paymentStatus === 'pending' && 
+                    booking.status !== 'completed' &&
+                    booking.checkIn !== true && 
                     booking.date && 
                     booking.startTime
                 ) {
@@ -136,8 +179,7 @@ export default function ManagerDashboard() {
                         bookingDate = new Date(booking.date as any);
                     }
                     
-                    const bookingDateChileStr = bookingDate.toLocaleString("en-US", { timeZone: "America/Santiago" });
-                    const startDateTime = new Date(bookingDateChileStr);
+                    const startDateTime = getBookingDateTimeChile(bookingDate, booking.startTime);
                     
                     if (nowChile >= startDateTime) {
                         try {
@@ -145,14 +187,14 @@ export default function ManagerDashboard() {
                             await updateDoc(bookingRef, {
                                 status: 'cancelled',
                                 paymentStatus: 'no-show',
-                                notes: 'Cancelación automática por inasistencia sin pago (No-Show).',
+                                notes: 'Cancelación automática por inasistencia sin check-in (No-Show).',
                                 updatedAt: new Date()
                             });
                             return {
                                 ...booking,
                                 status: 'cancelled' as const,
                                 paymentStatus: 'no-show' as any,
-                                notes: 'Cancelación automática por inasistencia sin pago (No-Show).'
+                                notes: 'Cancelación automática por inasistencia sin check-in (No-Show).'
                             };
                         } catch (e) {
                             console.error("No-show update error:", e);
@@ -356,6 +398,29 @@ export default function ManagerDashboard() {
                     </View>
                 )}
 
+                {/* BOTÓN MANUAL DE VERIFICACIÓN NO-SHOW */}
+                <View style={{ paddingHorizontal: 30, paddingTop: 5, paddingBottom: 5 }}>
+                    <TouchableOpacity
+                        onPress={() => setIsNoShowConfirmOpen(true)}
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            paddingVertical: 14,
+                            paddingHorizontal: 20,
+                            borderRadius: 20,
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 1,
+                            borderColor: 'rgba(16, 185, 129, 0.25)',
+                        }}
+                    >
+                        <Zap size={14} color={COLORS.accent} style={{ marginRight: 8 }} />
+                        <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>
+                            Validar y Limpiar No-Shows
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
                 {/* RESUMEN BANNER */}
                 <View style={{ padding: 30, paddingBottom: 10 }}>
                     <View style={{ backgroundColor: C.card, borderRadius: 35, padding: 30, borderWidth: 1, borderColor: C.border, shadowColor: '#000', shadowOpacity: isDark ? 0.3 : 0.05, shadowRadius: 15 }}>
@@ -544,6 +609,122 @@ export default function ManagerDashboard() {
                                 <Text style={{ color: 'white', fontSize: 12, fontWeight: '900', textTransform: 'uppercase' }}>Confirmar</Text>
                             </TouchableOpacity>
                         </View>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* MODAL DE CONFIRMACIÓN DE VALIDACIÓN NO-SHOW */}
+            <Modal visible={isNoShowConfirmOpen} animationType="fade" transparent>
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 40 }}>
+                    <View style={{ 
+                        backgroundColor: C.card, 
+                        borderRadius: 30, 
+                        padding: 30, 
+                        width: '100%', 
+                        borderWidth: 1, 
+                        borderColor: C.border,
+                        alignItems: 'center',
+                        shadowColor: '#000',
+                        shadowOpacity: 0.25,
+                        shadowRadius: 20,
+                        shadowOffset: { width: 0, height: 10 }
+                    }}>
+                        <View style={{ width: 60, height: 60, borderRadius: 20, backgroundColor: COLORS.accent + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+                            <Zap color={COLORS.accent} size={28} />
+                        </View>
+
+                        <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'center', marginBottom: 10 }}>
+                            ¿Validar No-Shows?
+                        </Text>
+                        
+                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', lineHeight: 20, marginBottom: 25 }}>
+                            Esta acción buscará y cancelará automáticamente todas las reservas pendientes impagas que hayan excedido su hora de inicio. ¿Deseas continuar?
+                        </Text>
+
+                        <View style={{ flexDirection: 'row', gap: 12, width: '100%' }}>
+                            <TouchableOpacity
+                                onPress={() => setIsNoShowConfirmOpen(false)}
+                                activeOpacity={0.8}
+                                style={{
+                                    flex: 1,
+                                    paddingVertical: 14,
+                                    borderRadius: 18,
+                                    borderWidth: 1,
+                                    borderColor: C.border,
+                                    backgroundColor: 'transparent',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <Text style={{ color: C.sub, fontSize: 12, fontWeight: '900', textTransform: 'uppercase' }}>Volver</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={async () => {
+                                    setIsNoShowConfirmOpen(false);
+                                    setRefreshing(true);
+                                    await fetchData();
+                                    setIsNoShowSuccessOpen(true);
+                                }}
+                                activeOpacity={0.8}
+                                style={{
+                                    flex: 1,
+                                    paddingVertical: 14,
+                                    borderRadius: 18,
+                                    backgroundColor: COLORS.accent,
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <Text style={{ color: 'white', fontSize: 12, fontWeight: '900', textTransform: 'uppercase' }}>Ejecutar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* MODAL DE ÉXITO DE VALIDACIÓN NO-SHOW */}
+            <Modal visible={isNoShowSuccessOpen} animationType="fade" transparent>
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 40 }}>
+                    <View style={{ 
+                        backgroundColor: C.card, 
+                        borderRadius: 30, 
+                        padding: 30, 
+                        width: '100%', 
+                        borderWidth: 1, 
+                        borderColor: C.border,
+                        alignItems: 'center',
+                        shadowColor: '#000',
+                        shadowOpacity: 0.25,
+                        shadowRadius: 20,
+                        shadowOffset: { width: 0, height: 10 }
+                    }}>
+                        <View style={{ width: 60, height: 60, borderRadius: 20, backgroundColor: COLORS.accent + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+                            <ShieldCheck color={COLORS.accent} size={28} />
+                        </View>
+
+                        <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'center', marginBottom: 10 }}>
+                            ¡Limpieza Completada!
+                        </Text>
+                        
+                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', lineHeight: 20, marginBottom: 25 }}>
+                            Se ha ejecutado la validación y limpieza de No-Shows de manera exitosa en tiempo real.
+                        </Text>
+
+                        <TouchableOpacity
+                            onPress={() => setIsNoShowSuccessOpen(false)}
+                            activeOpacity={0.8}
+                            style={{
+                                width: '100%',
+                                paddingVertical: 14,
+                                borderRadius: 18,
+                                backgroundColor: COLORS.accent,
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <Text style={{ color: 'white', fontSize: 12, fontWeight: '900', textTransform: 'uppercase' }}>Entendido</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>

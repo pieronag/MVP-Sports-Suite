@@ -36,6 +36,11 @@ interface GamificationParams {
     xpPerLoss: number;
     xpPerNoShow: number;
     sportsOverrides: Record<string, { winXP: number; lossXP: number; countGoals: boolean; countAssists: boolean; goalXP?: number; assistXP?: number }>;
+    badgeXpValues: {
+        bronze: number;
+        silver: number;
+        gold: number;
+    };
     tiers: {
         bronze: number;
         silver: number;
@@ -63,6 +68,11 @@ const DEFAULT_PARAMS: GamificationParams = {
         tenis: { winXP: 250, lossXP: 100, countGoals: false, countAssists: false, goalXP: 0, assistXP: 0 },
         basquetbol: { winXP: 180, lossXP: 60, countGoals: false, countAssists: false, goalXP: 5, assistXP: 5 }
     },
+    badgeXpValues: {
+        bronze: 50,
+        silver: 150,
+        gold: 500
+    },
     tiers: {
         bronze: 0,
         silver: 1000,
@@ -82,7 +92,7 @@ const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 
 
     return (
         <div className={`fixed top-5 right-5 z-[150] flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border animate-slideIn 
-            ${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-emerald-400 dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
+            \${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-emerald-400 dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
             {type === 'success' ? <CheckCircleIcon className="w-5 h-5 text-emerald-500" /> : <ExclamationTriangleIcon className="w-5 h-5 text-red-500" />}
             <span className="text-[10px] font-black uppercase tracking-widest">{message}</span>
         </div>
@@ -112,6 +122,10 @@ export default function GamificationSettingsPage() {
                             sportsOverrides: {
                                 ...DEFAULT_PARAMS.sportsOverrides,
                                 ...(data.gamification.sportsOverrides || {})
+                            },
+                            badgeXpValues: {
+                                ...DEFAULT_PARAMS.badgeXpValues,
+                                ...(data.gamification.badgeXpValues || {})
                             },
                             tiers: {
                                 ...DEFAULT_PARAMS.tiers,
@@ -227,6 +241,42 @@ export default function GamificationSettingsPage() {
                         <XPInputCard label="Partido Jugado" value={params.xpPerMatch} onChange={(v) => handleChange('xpPerMatch', v)} icon={<PresentationChartLineIcon className="w-5 h-5 text-blue-500" />} desc="Finalización" />
                         <XPInputCard label="Bono MVP" value={params.xpPerMvp} onChange={(v) => handleChange('xpPerMvp', v)} icon={<StarIcon className="w-5 h-5 text-indigo-500" />} desc="Destacado" />
                         <XPInputCard label="Inasistencia" value={params.xpPerNoShow} onChange={(v) => handleChange('xpPerNoShow', v)} icon={<ExclamationTriangleIcon className="w-5 h-5 text-red-500" />} isNegative desc="Penalidad" />
+                    </div>
+                </PanelGlass>
+
+                {/* REGLAS DE LOGROS/MEDALLAS */}
+                <PanelGlass className="p-6 space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-4">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-amber-500/10 rounded-xl text-amber-500"><TrophyIcon className="w-5 h-5" /></div>
+                            <div>
+                                <h2 className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest leading-none">Economía de Logros e Insignias</h2>
+                                <p className="text-[9px] text-slate-400 uppercase font-bold tracking-tighter mt-1">XP otorgada por cada nivel de medalla alcanzado</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <XPInputCard 
+                            label="Medalla Bronce" 
+                            value={params.badgeXpValues?.bronze ?? 50} 
+                            onChange={(v) => setParams(prev => ({ ...prev, badgeXpValues: { ...prev.badgeXpValues, bronze: v } }))} 
+                            icon={<TrophyIcon className="w-5 h-5 text-amber-600" />} 
+                            desc="Recompensa Bronce" 
+                        />
+                        <XPInputCard 
+                            label="Medalla Plata" 
+                            value={params.badgeXpValues?.silver ?? 150} 
+                            onChange={(v) => setParams(prev => ({ ...prev, badgeXpValues: { ...prev.badgeXpValues, silver: v } }))} 
+                            icon={<TrophyIcon className="w-5 h-5 text-slate-400" />} 
+                            desc="Recompensa Plata" 
+                        />
+                        <XPInputCard 
+                            label="Medalla Oro" 
+                            value={params.badgeXpValues?.gold ?? 500} 
+                            onChange={(v) => setParams(prev => ({ ...prev, badgeXpValues: { ...prev.badgeXpValues, gold: v } }))} 
+                            icon={<TrophyIcon className="w-5 h-5 text-amber-400" />} 
+                            desc="Recompensa Oro" 
+                        />
                     </div>
                 </PanelGlass>
 

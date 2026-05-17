@@ -54,6 +54,8 @@ export default function LoginPage() {
       {/* --- TEXTURA DE RUIDO --- */}
       <div className="absolute inset-0 bg-noise pointer-events-none z-50 opacity-40 mix-blend-overlay"></div>
 
+
+
       {/* --- BOTÓN SWITCH (INSTANTÁNEO) --- */}
       <button 
         onClick={toggleTheme}
@@ -186,15 +188,6 @@ export default function LoginPage() {
                     </label>
                 </div>
 
-                <div className="flex justify-between items-center text-[10px] font-bold">
-                    <label className="flex items-center gap-2 cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
-                        <input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-600 dark:bg-slate-800 dark:border-slate-700 w-3 h-3" />
-                        Recordarme
-                    </label>
-                    <a href="#" className="text-blue-600 dark:text-mvp-volt hover:underline underline-offset-4">
-                        Recuperar clave
-                    </a>
-                </div>
 
                 {error && (
                     <div className="p-2.5 rounded-lg flex items-center gap-2 animate-shake
@@ -234,10 +227,26 @@ export default function LoginPage() {
                         </div>
                     )}
                 </button>
+
+                <button
+                    type="button"
+                    onClick={() => router.push("/")}
+                    className="w-full py-3 rounded-lg font-heading font-black text-[10px] uppercase tracking-widest 
+                               bg-transparent border border-slate-200 dark:border-slate-800/80
+                               text-slate-500 dark:text-slate-400
+                               hover:bg-slate-50 dark:hover:bg-white/5
+                               hover:text-slate-900 dark:hover:text-white
+                               transition-all flex items-center justify-center gap-2 active:scale-95"
+                >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Volver al Inicio
+                </button>
             </form>
 
             <p className="text-center text-[9px] mt-8 font-bold tracking-widest uppercase text-slate-400 dark:text-slate-600">
-                Secured by MVP Sports V1.2
+                MVP SPORTS CHILE • 2026
             </p>
         </div>
       </div>

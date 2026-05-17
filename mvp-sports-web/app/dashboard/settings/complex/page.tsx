@@ -101,6 +101,31 @@ export default function TenantSettingsPage() {
     };
 
     const loadTenantData = (t: any) => {
+        let computedOpen = t.openTime || '08:00';
+        let computedClose = t.closeTime || '23:00';
+
+        if (t.schedule && typeof t.schedule === 'object') {
+            const openDays = Object.values(t.schedule).filter((day: any) => day && day.isOpen) as any[];
+            if (openDays.length > 0) {
+                const sortedOpens = [...openDays].sort((a: any, b: any) => (a.open || '').localeCompare(b.open || ''));
+                if (sortedOpens[0] && sortedOpens[0].open) {
+                    computedOpen = sortedOpens[0].open;
+                }
+                
+                const sortedCloses = [...openDays].sort((a: any, b: any) => {
+                    const parseToMinutes = (timeStr: string) => {
+                        if (!timeStr) return 0;
+                        const [h, m] = timeStr.split(':').map(Number);
+                        return h < 6 ? (h + 24) * 60 + m : h * 60 + m;
+                    };
+                    return parseToMinutes(b.close || '') - parseToMinutes(a.close || '');
+                });
+                if (sortedCloses[0] && sortedCloses[0].close) {
+                    computedClose = sortedCloses[0].close;
+                }
+            }
+        }
+
         setFormData({
             name: t.name || '', address: t.address || '', description: t.description || '',
             phone: t.phone || '', instagram: t.instagram || '', whatsapp: t.whatsapp || '',
@@ -109,7 +134,7 @@ export default function TenantSettingsPage() {
             isTransbankActive: t.isTransbankActive || false,
             transbankCommerceCode: t.transbankCommerceCode || '', transbankApiKey: t.transbankApiKey || '',
             isSiiActive: t.isSiiActive || false, siiRut: t.siiRut || '', siiApiKey: t.siiApiKey || '',
-            openTime: t.openTime || '08:00', closeTime: t.closeTime || '23:00',
+            openTime: computedOpen, closeTime: computedClose,
             cancellationPolicy: t.cancellationPolicy || '',
             rules: Array.isArray(t.rules) ? t.rules : [],
             website: t.website || '',
@@ -147,7 +172,8 @@ export default function TenantSettingsPage() {
             const updatedData = { 
                 ...formData,
                 isMercadopagoActive: isMpGloballyDisabled ? false : formData.isMercadopagoActive,
-                isTransbankActive: isTbGloballyDisabled ? false : formData.isTransbankActive
+                isTransbankActive: isTbGloballyDisabled ? false : formData.isTransbankActive,
+                openingHours: `${formData.openTime} - ${formData.closeTime}`
             };
 
             await updateDoc(doc(db, "tenants", selectedTenantId), updatedData);

@@ -13,16 +13,15 @@ export async function GET(request: Request) {
     const now = new Date(nowChileStr);
     const bookingsRef = adminDb.collection('bookings');
     
-    // Obtener reservas activas/pendientes que aún no están pagadas
+    // Obtener reservas activas/pendientes que aún no se han jugado (no han hecho check-in)
     const snapshot = await bookingsRef
-      .where('paymentStatus', '==', 'pending')
       .where('status', 'in', ['pending', 'confirmed'])
       .get();
 
     if (snapshot.empty) {
       return NextResponse.json({ 
         success: true, 
-        message: 'No pending unpaid bookings found.', 
+        message: 'No pending or confirmed bookings found.', 
         processedCount: 0 
       });
     }
@@ -47,11 +46,18 @@ export async function GET(request: Request) {
           bookingDate = new Date(bData.date);
         }
         
+        const [hours, minutes] = (bData.startTime || "00:00").split(':').map(Number);
         const bookingDateChileStr = bookingDate.toLocaleString("en-US", { timeZone: "America/Santiago" });
         const startDateTime = new Date(bookingDateChileStr);
+        startDateTime.setHours(hours, minutes, 0, 0);
 
-        // Si la hora de inicio de la reserva ya pasó en el tiempo real en Chile
-        if (now >= startDateTime) {
+        // Si la hora de inicio es de madrugada (< 6 AM), pertenece al día siguiente cronológico
+        if (hours < 6) {
+          startDateTime.setDate(startDateTime.getDate() + 1);
+        }
+
+        // Si la hora de inicio de la reserva ya pasó en el tiempo real en Chile y no ha hecho check-in
+        if (now >= startDateTime && bData.checkIn !== true) {
           isNoShow = true;
         }
       }
@@ -80,8 +86,10 @@ export async function GET(request: Request) {
         };
 
         if (isNoShow) {
-          updateData.paymentStatus = 'no-show';
-          updateData.notes = 'Cancelación automática por inasistencia sin pago (No-Show).';
+          if (bData.paymentStatus !== 'paid' && bData.paymentStatus !== 'partial') {
+            updateData.paymentStatus = 'no-show';
+          }
+          updateData.notes = 'Cancelación automática por inasistencia sin check-in (No-Show).';
         } else if (isTimeout) {
           updateData.paymentStatus = 'failed';
           updateData.notes = 'Liberación automática por tiempo de pago agotado en pasarela.';

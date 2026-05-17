@@ -21,10 +21,10 @@ export interface GamificationSettings {
 export const gamificationService = {
     async getSettings(): Promise<GamificationSettings | null> {
         try {
-            const docRef = doc(db, 'settings', 'gamification');
+            const docRef = doc(db, 'settings', 'global');
             const snap = await getDoc(docRef);
-            if (snap.exists()) {
-                return snap.data() as GamificationSettings;
+            if (snap.exists() && snap.data()?.gamification) {
+                return snap.data().gamification as GamificationSettings;
             }
             return null;
         } catch (error) {

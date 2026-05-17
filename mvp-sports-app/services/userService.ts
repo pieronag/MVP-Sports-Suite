@@ -13,7 +13,10 @@ export interface GamificationSettings {
         bronze: number;
         silver: number;
         gold: number;
+        platinum: number;
+        diamond: number;
         elite: number;
+        legend: number;
     };
 }
 
@@ -68,10 +71,10 @@ export const userService = {
 
     async getGamificationSettings(): Promise<GamificationSettings> {
         try {
-            const docRef = doc(db, 'settings', 'gamification');
+            const docRef = doc(db, 'settings', 'global');
             const snap = await getDoc(docRef);
-            if (snap.exists()) {
-                return snap.data() as GamificationSettings;
+            if (snap.exists() && snap.data()?.gamification) {
+                return snap.data().gamification as GamificationSettings;
             }
             return {
                 xpPerCheckin: 50,
@@ -92,7 +95,10 @@ export const userService = {
      */
     calculateTier(xp: number, settings: GamificationSettings): string {
         const { tiers } = settings;
+        if (xp >= tiers.legend) return 'Leyenda';
         if (xp >= tiers.elite) return 'Elite';
+        if (xp >= tiers.diamond) return 'Diamante';
+        if (xp >= tiers.platinum) return 'Platino';
         if (xp >= tiers.gold) return 'Oro';
         if (xp >= tiers.silver) return 'Plata';
         return 'Bronce';

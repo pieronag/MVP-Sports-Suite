@@ -46,7 +46,7 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
                 <p className="text-xl sm:text-2xl font-black text-white leading-tight">Toda tu carrera <br/> deportiva en un lugar.</p>
               </div>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed text-justify">
-                Sube de nivel con cada partido que juegues, gana reconocimientos por tu desempeño y usa tu código personal para entrar rápido al recinto.
+                Sube de nivel acumulando experiencia obtenida en tus partidos y colecciona insignias o logros ganados por tu desempeño.
               </p>
             </div>
             <div className="absolute -right-8 -bottom-8 opacity-5 group-hover:opacity-10 transition-opacity hidden sm:block">
@@ -58,8 +58,8 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           <div className="md:col-span-3 lg:col-span-4 lg:row-span-1 group p-8 rounded-[2rem] bg-emerald-500/10 border border-white/5 hover:border-emerald-500/30 transition-all duration-500 relative overflow-hidden">
             <div className="relative z-10">
               <h4 className="text-emerald-400 font-black text-[10px] uppercase tracking-[0.3em] mb-1">Pagos Digitales</h4>
-              <p className="text-lg font-bold text-white mb-2">Paga sin efectivo.</p>
-              <p className="text-xs text-slate-500 leading-tight">Carga dinero en tu cuenta, paga tus reservas directamente y divide los gastos con tus amigos de forma simple.</p>
+              <p className="text-lg font-bold text-white mb-2">Pago Online</p>
+              <p className="text-xs text-slate-500 leading-tight">Realiza tus pagos de forma rápida y segura online a través de Transbank, o si lo prefieres, directamente en el recinto de forma presencial.</p>
             </div>
           </div>
 
@@ -68,20 +68,20 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
             <div className="relative z-10">
               <h4 className="text-orange-400 font-black text-[10px] uppercase tracking-[0.3em] mb-1">Tus Estadísticas</h4>
               <p className="text-lg font-bold text-white mb-2">Mide tu nivel.</p>
-              <p className="text-xs text-slate-500 leading-tight">Mira cómo mejora tu juego con gráficos detallados y conoce tu nivel competitivo actualizado después de cada encuentro.</p>
+              <p className="text-xs text-slate-500 leading-tight">Sigue tu progreso en tiempo real y conoce tu nivel competitivo analizando detalladamente la experiencia (XP) que acumulas tras cada partido.</p>
             </div>
           </div>
 
           {/* Equipos */}
           <div className="md:col-span-2 lg:col-span-3 lg:row-span-1 group p-8 rounded-[2rem] bg-indigo-500/10 border border-white/5 hover:border-indigo-500/30 transition-all duration-500 flex flex-col justify-between gap-4">
             <h4 className="text-indigo-400 font-black text-[10px] uppercase tracking-[0.3em]">Crea tu Equipo</h4>
-            <p className="text-xs text-slate-400 leading-tight">Arma tu grupo de amigos, busca nuevos jugadores y compite contra otros equipos de tu ciudad.</p>
+            <p className="text-xs text-slate-400 leading-tight">Arma tu equipo con tus amigos, mantente en contacto a través de nuestro chat interno y coordinen sus encuentros deportivos fácilmente.</p>
           </div>
 
-          {/* Mapa */}
+          {/* Ficha / Carta de Jugador */}
           <div className="md:col-span-2 lg:col-span-3 lg:row-span-1 group p-8 rounded-[2rem] bg-sky-500/10 border border-white/5 hover:border-sky-500/30 transition-all duration-500 flex flex-col justify-between gap-4">
-            <h4 className="text-sky-400 font-black text-[10px] uppercase tracking-[0.3em]">Mapa de Canchas</h4>
-            <p className="text-xs text-slate-400 leading-tight">Encuentra todos los complejos deportivos en el mapa, mira fotos reales y conoce cómo llegar fácilmente.</p>
+            <h4 className="text-sky-400 font-black text-[10px] uppercase tracking-[0.3em]">Genera tu Carta</h4>
+            <p className="text-xs text-slate-400 leading-tight">Crea y descarga tu propia carta coleccionable Topps Now 2026 personalizada con tu valoración (OVR) y rango.</p>
           </div>
 
           {/* Historial */}

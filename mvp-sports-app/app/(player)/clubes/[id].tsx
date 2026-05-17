@@ -75,6 +75,15 @@ const getLocalISODate = (date: Date) => {
     return `${y}-${m}-${d}`;
 };
 
+const getOperationalDate = () => {
+    const d = new Date();
+    // Si es antes de las 6 AM, sigue siendo el día operativo anterior
+    if (d.getHours() < 6) {
+        d.setDate(d.getDate() - 1);
+    }
+    return getLocalISODate(d);
+};
+
 export default function VenueDetailsScreen() {
     const { id } = useLocalSearchParams();
     const { user, theme, profile } = useAuth();
@@ -89,7 +98,7 @@ export default function VenueDetailsScreen() {
     const [courts, setCourts] = useState<Court[]>([]);
     const [selectedSport, setSelectedSport] = useState<string | null>(null);
     const [selectedCourtId, setSelectedCourtId] = useState<string | null>(null);
-    const [selectedDate, setSelectedDate] = useState<string>(getLocalISODate(new Date()));
+    const [selectedDate, setSelectedDate] = useState<string>(getOperationalDate());
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
     const [bookingStep, setBookingStep] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -165,14 +174,54 @@ export default function VenueDetailsScreen() {
 
     const groupedSlots = useMemo(() => {
         const slots = { mañana: [] as string[], tarde: [] as string[], noche: [] as string[] };
-        availableSlots.sort().forEach(s => {
+        
+        // Ordenar los slots considerando que de 00:00 a 05:00 son horas tardías del día operativo
+        const sortedSlots = [...availableSlots].sort((a, b) => {
+            const parseToMinutes = (timeStr: string) => {
+                const [h, m] = timeStr.split(':').map(Number);
+                return h < 6 ? (h + 24) * 60 + m : h * 60 + m;
+            };
+            return parseToMinutes(a) - parseToMinutes(b);
+        });
+
+        sortedSlots.forEach(s => {
             const hour = parseInt(s.split(':')[0]);
-            if (hour < 12) slots.mañana.push(s);
-            else if (hour < 18) slots.tarde.push(s);
-            else slots.noche.push(s);
+            // De 6 AM a 12 PM es mañana
+            if (hour >= 6 && hour < 12) {
+                slots.mañana.push(s);
+            }
+            // De 12 PM a 6 PM es tarde
+            else if (hour >= 12 && hour < 18) {
+                slots.tarde.push(s);
+            }
+            // De 6 PM a 5:59 AM del día siguiente es noche (incluyendo de 00:00 a 05:00)
+            else {
+                slots.noche.push(s);
+            }
         });
         return slots;
     }, [availableSlots]);
+
+    const currentDayHours = useMemo(() => {
+        if (!venue) return '08:00 - 23:00';
+        
+        const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const currentDayIndex = new Date(getOperationalDate() + "T12:00:00").getDay();
+        const currentDayName = daysOfWeek[currentDayIndex];
+
+        const sched = (venue as any).schedule;
+        if (sched && typeof sched === 'object') {
+            const dayConfig = sched[currentDayName];
+            if (dayConfig) {
+                if (dayConfig.isOpen === false) {
+                    return 'Cerrado';
+                }
+                return `${dayConfig.open || '08:00'} - ${dayConfig.close || '23:00'}`;
+            }
+        }
+        
+        return venue.openingHours || '08:00 - 23:00';
+    }, [venue]);
 
     const venueCoords = useMemo(() => {
         if (!venue) return null;
@@ -312,9 +361,9 @@ export default function VenueDetailsScreen() {
                             <View style={{ flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', borderRadius: 20, padding: 15, borderWidth: 1, borderColor: C.border }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                                     <Clock color={accent} size={14} />
-                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', marginLeft: 6 }}>HORARIO</Text>
+                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', marginLeft: 6 }}>HORARIO DE HOY</Text>
                                 </View>
-                                <Text style={{ color: C.text, fontSize: 14, fontWeight: '800' }}>{venue?.openingHours || '08:00 - 23:00'}</Text>
+                                <Text style={{ color: C.text, fontSize: 13, fontWeight: '800' }}>{currentDayHours}</Text>
                             </View>
                             <View style={{ flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', borderRadius: 20, padding: 15, borderWidth: 1, borderColor: C.border }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
@@ -387,7 +436,7 @@ export default function VenueDetailsScreen() {
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 25 }}><Text style={{ color: C.text, fontSize: 22, fontWeight: '900' }}>Define tu Horario</Text><TouchableOpacity onPress={() => setBookingStep(2)} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : C.border, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}><ChevronLeft color={accent} size={20} /></TouchableOpacity></View>
                             
                             <View style={{ backgroundColor: C.card, borderRadius: 30, padding: 20, borderWidth: 1, borderColor: C.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 25, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10 }}>
-                                <TouchableOpacity onPress={() => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() - 1); const today = new Date(); today.setHours(0, 0, 0, 0); if (d >= today) setSelectedDate(getLocalISODate(d)); }} style={{ width: 44, height: 44, borderRadius: 15, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}><ChevronLeft color={activeSportInfo.color} size={20} /></TouchableOpacity>
+                                <TouchableOpacity onPress={() => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() - 1); const today = new Date(getOperationalDate() + 'T00:00:00'); if (d >= today) setSelectedDate(getLocalISODate(d)); }} style={{ width: 44, height: 44, borderRadius: 15, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}><ChevronLeft color={activeSportInfo.color} size={20} /></TouchableOpacity>
                                 <View style={{ alignItems: 'center' }}><Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase' }}>{new Date(selectedDate + 'T12:00:00').toLocaleDateString('es-CL', { weekday: 'long' })}</Text><Text style={{ color: C.text, fontSize: 20, fontWeight: '900', letterSpacing: -1 }}>{new Date(selectedDate + 'T12:00:00').toLocaleDateString('es-CL', { day: 'numeric', month: 'long' })}</Text></View>
                                 <TouchableOpacity onPress={() => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() + 1); setSelectedDate(getLocalISODate(d)); }} style={{ width: 44, height: 44, borderRadius: 15, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}><ChevronRight color={activeSportInfo.color} size={20} /></TouchableOpacity>
                             </View>
@@ -497,7 +546,7 @@ export default function VenueDetailsScreen() {
 
 const SlotGroup = ({ title, icon, slots, selectedTime, onSelect, C, activeColor, selectedDate, isDark }: any) => {
     if (slots.length === 0) return null;
-    const isToday = selectedDate === getLocalISODate(new Date());
+    const isToday = selectedDate === getOperationalDate();
     const now = new Date();
     return (
         <View style={{ marginBottom: 25 }}>
@@ -505,7 +554,13 @@ const SlotGroup = ({ title, icon, slots, selectedTime, onSelect, C, activeColor,
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
                 {slots.map((time: string) => {
                     const [h, m] = time.split(':').map(Number);
-                    const isPast = isToday && (h < now.getHours() || (h === now.getHours() && m <= now.getMinutes()));
+                    
+                    const parseToMinutes = (hourVal: number, minVal: number) => {
+                        return hourVal < 6 ? (hourVal + 24) * 60 + minVal : hourVal * 60 + minVal;
+                    };
+                    const slotMinutes = parseToMinutes(h, m);
+                    const currentMinutes = parseToMinutes(now.getHours(), now.getMinutes());
+                    const isPast = isToday && slotMinutes <= currentMinutes;
                     return (
                         <TouchableOpacity 
                             key={time} 
