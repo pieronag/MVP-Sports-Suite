@@ -1,222 +1,286 @@
 import React, { useState, useEffect } from 'react';
 import { 
     View, Text, TouchableOpacity, ScrollView, StatusBar, 
-    StyleSheet, ActivityIndicator, Alert, Image, Dimensions 
+    StyleSheet, ActivityIndicator, Image, Dimensions, Modal 
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { 
     User, Mail, Shield, LogOut, Camera, 
-    Building2, MapPin, ChevronRight, FileText
+    Building2, MapPin, ChevronRight, FileText, Sun, Moon, Zap, ShieldCheck, ChevronLeft, Save
 } from 'lucide-react-native';
 import { useAuth } from '../../store/useAuth';
 import * as ImagePicker from 'expo-image-picker';
+import { updateProfile } from 'firebase/auth';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { db, auth } from '../../services/firebase';
 import { userService } from '../../services/userService';
 import { venueService, Tenant } from '../../services/venueService';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
-const ACCENT = '#10b981'; // Emerald Premium
+
+const COLORS = {
+    light: {
+        bg: '#F8FAFC',
+        card: '#FFFFFF',
+        border: '#E2E8F0',
+        text: '#0F172A',
+        sub: '#64748B'
+    },
+    dark: {
+        bg: '#020617',
+        card: '#0F172A',
+        border: '#1E293B',
+        text: '#F8FAFC',
+        sub: '#94A3B8'
+    },
+    accent: '#10b981',
+    error: '#f43f5e'
+};
 
 export default function ProfileScreen() {
     const router = useRouter();
-    const { user, profile, signOut, theme } = useAuth();
+    const { user, profile, signOut, theme, toggleTheme } = useAuth();
     const isDark = theme === 'dark';
+    const C = isDark ? COLORS.dark : COLORS.light;
 
     const [loading, setLoading] = useState(false);
     const [userData, setUserData] = useState<any>(profile);
     const [managedVenues, setManagedVenues] = useState<Tenant[]>([]);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [successMsg, setSuccessMsg] = useState('');
 
     useEffect(() => {
         const fetchStaffAndProfile = async () => {
             if (!user?.uid) return;
-            
-            // Search manually in 'staff' collection by UID
-            const staffInfo = await userService.getStaffProfile(user.uid);
-            const userProfile = await userService.getUserProfile(user.uid);
-            
-            const mergedData = {
-                ...userProfile,
-                fullName: staffInfo?.fullName || userProfile?.displayName || user.displayName || 'MANAGER'
-            };
-            
-            setUserData(mergedData);
+            try {
+                const staffRes = await userService.getStaffProfile(user.uid);
+                const staffInfo = staffRes?.data;
+                const userProfile = await userService.getUserProfile(user.uid);
+                
+                const mergedData = {
+                    ...userProfile,
+                    fullName: staffInfo?.fullName || userProfile?.displayName || user.displayName || 'MANAGER'
+                };
+                
+                setUserData(mergedData);
 
-            const tenantIds = staffInfo?.tenantIds || mergedData.tenantIds || [];
-            if (tenantIds.length) {
-                const venues = await venueService.getVenuesByIds(tenantIds);
-                setManagedVenues(venues);
+                const tenantIds = staffInfo?.tenantIds || mergedData.tenantIds || [];
+                if (tenantIds.length) {
+                    const venues = await venueService.getVenuesByIds(tenantIds);
+                    setManagedVenues(venues);
+                }
+            } catch (err) {
+                console.error("Profile Load Error:", err);
             }
         };
         fetchStaffAndProfile();
     }, [user?.uid]);
 
     const handlePickImage = async () => {
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 0.5,
-        });
-
-        if (!result.canceled && result.assets[0].uri) {
-            setLoading(true);
-            try {
-                const newUri = result.assets[0].uri;
-                await userService.updateUserProfile(user!.uid, { photoURL: newUri });
-                setUserData({ ...userData, photoURL: newUri });
-            } catch (error) {
-                Alert.alert('Error', 'No se pudo actualizar la foto');
-            } finally {
-                setLoading(false);
+        try {
+            const permResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (!permResult.granted) {
+                Alert.alert('Permiso denegado', 'Necesitamos acceso a tu galería para cambiar la foto.');
+                return;
             }
+
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.5,
+                base64: true,
+            });
+
+            if (!result.canceled && result.assets[0].base64 && user) {
+                setLoading(true);
+                const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+                
+                // 1. Actualizar Firestore (users)
+                await updateDoc(doc(db, 'users', user.uid), { 
+                    photoURL: base64Image 
+                });
+
+                // 2. Actualizar Firestore (staff) - si existe
+                await userService.updateStaffProfile(user.uid, {
+                    photoURL: base64Image
+                });
+
+                // 3. Actualizar Firebase Auth Profile
+                try {
+                    await updateProfile(user, {
+                        photoURL: base64Image
+                    });
+                } catch (e) {
+                    console.warn("Auth update failed:", e);
+                }
+                
+                setUserData({ ...userData, photoURL: base64Image });
+                await useAuth.getState().reloadProfile();
+                
+                setSuccessMsg('Tu foto de perfil ha sido actualizada con éxito.');
+                setShowSuccessModal(true);
+            }
+        } catch (error) {
+            console.error("Photo Update Error:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleSignOut = async () => {
-        Alert.alert(
-            'Cerrar Sesión',
-            '¿Deseas salir del sistema?',
-            [
-                { text: 'Cancelar', style: 'cancel' },
-                { text: 'Salir', style: 'destructive', onPress: () => signOut() }
-            ]
-        );
+        signOut();
     };
 
     return (
-        <View className="flex-1 bg-white dark:bg-[#020617]">
+        <View style={{ flex: 1, backgroundColor: C.bg }}>
             <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} translucent />
 
-            <View className="absolute inset-0 pointer-events-none">
-                <LinearGradient
-                    colors={isDark ? ['#020617', '#064e3b10', '#020617'] : ['#f8fafc', '#ffffff']}
-                    style={StyleSheet.absoluteFill}
-                />
+            {/* CABECERA DNA ELITE */}
+            <View style={{ paddingTop: 60, paddingBottom: 20, paddingHorizontal: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: C.border }}>
+                <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
+                    <ChevronLeft color={COLORS.accent} size={24} />
+                </TouchableOpacity>
+                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase' }}>Perfil Staff</Text>
+                <TouchableOpacity onPress={handleSignOut} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: isDark ? COLORS.error + '22' : '#fef2f2', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: isDark ? COLORS.error + '44' : '#fee2e2' }}>
+                    <LogOut color={COLORS.error} size={20} />
+                </TouchableOpacity>
             </View>
 
             <ScrollView 
                 className="flex-1" 
-                contentContainerStyle={{ paddingBottom: 20 }} // Espacio reducido al mínimo
+                contentContainerStyle={{ paddingBottom: 100 }}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Header Unificado Estilo Inicio */}
-                <View className="pt-20 pb-10 px-8">
-                    <View className="flex-row justify-between items-start mb-2">
-                        <View>
-                            <View className="flex-row items-center mb-3">
-                                <View className="px-3 h-6 rounded-full items-center justify-center shadow-lg" style={{ backgroundColor: ACCENT }}>
-                                    <Text className="text-white font-black text-[8px] uppercase tracking-widest">Verificado</Text>
+                {/* BANNER IDENTIDAD DNA */}
+                <View style={{ padding: 30, paddingBottom: 10 }}>
+                    <View style={{ backgroundColor: C.card, borderRadius: 30, padding: 25, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: C.border }}>
+                        <TouchableOpacity onPress={handlePickImage} style={{ width: 70, height: 70, borderRadius: 22, backgroundColor: COLORS.accent + '11', overflow: 'hidden', borderWidth: 2, borderColor: COLORS.accent }}>
+                            {userData?.photoURL ? (
+                                <Image source={{ uri: userData.photoURL }} style={{ width: '100%', height: '100%' }} />
+                            ) : (
+                                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                    <User color={COLORS.accent} size={32} strokeWidth={1} />
                                 </View>
-                                <Text className="ml-3 text-slate-400 font-black text-[9px] uppercase tracking-[0.3em]">Gestión Personal</Text>
-                            </View>
-                            <Text className="text-slate-900 dark:text-white font-black text-5xl tracking-tighter leading-none">
-                                Perfil
-                            </Text>
-                        </View>
-                        <TouchableOpacity
-                            onPress={handleSignOut}
-                            className="w-14 h-14 bg-rose-500/10 dark:bg-rose-500/10 rounded-[22px] items-center justify-center border border-rose-500/20"
-                        >
-                            <LogOut color="#f43f5e" size={20} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-
-                {/* Identidad con fullName Totalmente Mayúscula */}
-                <View className="px-6 mb-12">
-                    <View className="bg-white dark:bg-white/[0.03] rounded-[44px] p-8 border border-slate-100 dark:border-white/5 shadow-2xl items-center relative overflow-hidden">
-                        <LinearGradient 
-                            colors={[ACCENT + '10', 'transparent']} 
-                            style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 100 }}
-                        />
-                        
-                        <TouchableOpacity 
-                            onPress={handlePickImage}
-                            className="relative mb-8"
-                            activeOpacity={0.9}
-                        >
-                            <View className="w-32 h-32 rounded-[44px] overflow-hidden border-4 border-white dark:border-[#0F172A] shadow-2xl bg-slate-50 dark:bg-[#0F172A]">
-                                {userData?.photoURL ? (
-                                    <Image source={{ uri: userData.photoURL }} className="w-full h-full" />
-                                ) : (
-                                    <View className="w-full h-full items-center justify-center">
-                                        <User color={ACCENT} size={44} strokeWidth={1.5} />
-                                    </View>
-                                )}
-                            </View>
-                            <View className="absolute bottom-0 right-0 w-9 h-9 bg-emerald-500 rounded-full border-4 border-white dark:border-[#020617] items-center justify-center shadow-lg">
-                                <Camera color="white" size={12} />
+                            )}
+                            <View style={{ position: 'absolute', bottom: 0, right: 0, left: 0, backgroundColor: 'rgba(0,0,0,0.5)', height: 20, alignItems: 'center', justifyContent: 'center' }}>
+                                <Camera color="white" size={10} />
                             </View>
                         </TouchableOpacity>
-
-                        <Text className="text-slate-900 dark:text-white font-black text-3xl tracking-tighter leading-none text-center mb-2 uppercase">
-                            {userData?.fullName || 'CARGANDO...'}
-                        </Text>
-                        <View className="px-6 h-7 rounded-full bg-slate-50 dark:bg-white/10 items-center justify-center mb-10 border border-slate-100 dark:border-white/5">
-                            <Text className="text-slate-400 dark:text-slate-400 font-bold text-[8px] uppercase tracking-[0.3em]">
-                                Acceso de Gestión {userData?.role || 'MANAGER'}
-                            </Text>
-                        </View>
-
-                        <View className="w-full h-[1px] bg-slate-100 dark:bg-white/5 mb-10" />
-
-                        <View className="w-full space-y-6 px-2">
-                            <InfoRow label="Correo Institucional" value={userData?.email || user?.email} icon={Mail} />
-                            <InfoRow label="Nivel Operativo" value="VERIFICADO" icon={Shield} color={ACCENT} />
-                            <InfoRow label="Registro Staff" value={user?.uid.substring(0, 18).toUpperCase()} icon={FileText} />
+                        <View style={{ marginLeft: 20, flex: 1 }}>
+                            <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', textTransform: 'uppercase' }}>{userData?.fullName || 'Manager'}</Text>
+                            <Text style={{ color: COLORS.accent, fontSize: 10, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>Acceso {userData?.role || 'Staff'}</Text>
                         </View>
                     </View>
                 </View>
 
-                {/* Establecimientos Gestionados */}
-                <View className="px-8 mb-6">
-                    <Text className="text-slate-400 font-black text-[9px] uppercase tracking-[0.4em] mb-6 ml-2">Establecimientos que Administra</Text>
-                    {managedVenues.length > 0 ? managedVenues.map(venue => (
-                        <View 
-                            key={venue.id}
-                            className="bg-white dark:bg-white/[0.03] rounded-[36px] p-6 border border-slate-100 dark:border-white/5 flex-row items-center mb-4 shadow-sm"
-                        >
-                            <View className="w-14 h-14 rounded-2xl bg-emerald-500/10 items-center justify-center mr-5">
-                                <Building2 color={ACCENT} size={24} strokeWidth={2.5} />
+                {/* MIS DATOS */}
+                <SectionLabel label="Mis Credenciales" />
+                <View style={{ marginHorizontal: 30, backgroundColor: C.card, borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
+                    <RefinedRow icon={Mail} color="#3b82f6" label="Correo Institucional" value={userData?.email || user?.email} isDark={isDark} />
+                    <Separator isDark={isDark} />
+                    <RefinedRow icon={ShieldCheck} color={COLORS.accent} label="Nivel Operativo" value="VERIFICADO" isDark={isDark} />
+                    <Separator isDark={isDark} />
+                    <RefinedRow icon={FileText} color="#6366f1" label="ID de Staff" value={user?.uid.substring(0, 16).toUpperCase()} isDark={isDark} />
+                </View>
+
+                {/* CENTROS DE OPERACIÓN */}
+                <SectionLabel label="Sedes Administradas" />
+                <View style={{ marginHorizontal: 30 }}>
+                    {managedVenues.length > 0 ? managedVenues.map((venue, idx) => (
+                        <View key={venue.id} style={{ backgroundColor: C.card, borderRadius: 25, padding: 25, marginBottom: 15, borderWidth: 1, borderColor: C.border, flexDirection: 'row', alignItems: 'center' }}>
+                            <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: COLORS.accent + '11', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORS.accent + '22' }}>
+                                <Building2 color={COLORS.accent} size={22} />
                             </View>
-                            <View className="flex-1">
-                                <Text className="text-slate-900 dark:text-white font-black text-lg tracking-tighter uppercase leading-none mb-1">{venue.name}</Text>
-                                <View className="flex-row items-center">
-                                    <MapPin size={8} color={ACCENT} className="mr-1" />
-                                    <Text className="text-slate-400 font-bold text-[8px] uppercase tracking-widest leading-none">Ubicación Registrada</Text>
+                            <View style={{ marginLeft: 15, flex: 1 }}>
+                                <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase' }}>{venue.name}</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                                    <MapPin size={10} color={C.sub} className="mr-1" />
+                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '700' }}>Centro de Control Activo</Text>
                                 </View>
                             </View>
-                            <ChevronRight color="#64748b" size={16} />
+                            <ChevronRight color={C.border} size={20} />
                         </View>
                     )) : (
-                        <View className="p-10 border-2 border-dashed border-slate-100 dark:border-white/5 rounded-[44px] items-center">
-                            <Text className="text-slate-400 font-bold text-[8px] uppercase tracking-widest text-center leading-relaxed">Sin centros asignados en esta cuenta</Text>
+                        <View style={{ padding: 40, alignItems: 'center', justifyContent: 'center', borderStyle: 'dashed', borderWidth: 2, borderColor: C.border, borderRadius: 30 }}>
+                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '800', textTransform: 'uppercase' }}>Sin sedes asignadas</Text>
                         </View>
                     )}
                 </View>
+
+                {/* AJUSTES */}
+                <SectionLabel label="Preferencias" />
+                <View style={{ marginHorizontal: 30, backgroundColor: C.card, borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
+                    <TouchableOpacity onPress={toggleTheme} style={{ height: 75, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25 }}>
+                        <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}>
+                            {isDark ? <Sun color={COLORS.accent} size={20} /> : <Moon color="#1e293b" size={20} />}
+                        </View>
+                        <Text style={{ color: C.text, fontSize: 14, fontWeight: '800', textTransform: 'uppercase', marginLeft: 15, flex: 1 }}>{isDark ? 'Modo Claro' : 'Modo Oscuro'}</Text>
+                        <ChevronRight color={C.border} size={18} />
+                    </TouchableOpacity>
+                </View>
+
+                <Text style={{ textAlign: 'center', color: C.sub, fontSize: 8, fontWeight: '700', marginTop: 40 }}>STAFF IDENTITY v1.2 • MVP SPORTS</Text>
             </ScrollView>
 
             {loading && (
-                <View className="absolute inset-0 bg-black/50 items-center justify-center z-50">
-                    <ActivityIndicator color={ACCENT} size="large" />
+                <View style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+                    <ActivityIndicator color={COLORS.accent} size="large" />
                 </View>
             )}
+
+            {/* MODAL DE ÉXITO PREMIUM */}
+            <Modal
+                visible={showSuccessModal}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowSuccessModal(false)}
+            >
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center', padding: 30 }}>
+                    <View style={{ backgroundColor: C.card, borderRadius: 30, padding: 35, width: '100%', alignItems: 'center', borderWidth: 1, borderColor: C.border }}>
+                        <View style={{ width: 80, height: 80, borderRadius: 30, backgroundColor: COLORS.accent + '22', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
+                            <ShieldCheck color={COLORS.accent} size={40} />
+                        </View>
+                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', marginBottom: 10 }}>¡Operación Exitosa!</Text>
+                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', textTransform: 'uppercase', marginBottom: 30 }}>{successMsg}</Text>
+                        
+                        <TouchableOpacity 
+                            onPress={() => setShowSuccessModal(false)}
+                            style={{ backgroundColor: COLORS.accent, paddingVertical: 18, paddingHorizontal: 40, borderRadius: 18, width: '100%', alignItems: 'center', shadowColor: COLORS.accent, shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.3, shadowRadius: 20 }}
+                        >
+                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 14, textTransform: 'uppercase' }}>Continuar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
 
-function InfoRow({ label, value, icon: Icon, color = '#64748b' }: any) {
+function SectionLabel({ label }: { label: string }) {
     return (
-        <View className="flex-row items-center justify-between py-1">
-            <View className="flex-row items-center">
-                <View className="w-7 h-7 rounded-xl bg-slate-100 dark:bg-white/5 items-center justify-center mr-4">
-                    <Icon size={12} color="#94a3b8" />
-                </View>
-                <Text className="text-slate-400 font-black text-[7px] uppercase tracking-widest">{label}</Text>
+        <Text style={{ color: COLORS.accent, fontWeight: '900', fontSize: 11, textTransform: 'uppercase', letterSpacing: 2, marginHorizontal: 40, marginTop: 35, marginBottom: 15 }}>{label}</Text>
+    );
+}
+
+function Separator({ isDark }: { isDark: boolean }) {
+    return (
+        <View style={{ height: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', marginHorizontal: 25 }} />
+    );
+}
+
+function RefinedRow({ icon: Icon, color, label, value, isDark }: any) {
+    const C = isDark ? COLORS.dark : COLORS.light;
+    return (
+        <View style={{ height: 80, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25 }}>
+            <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: color, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon color="white" size={20} />
             </View>
-            <Text className="text-slate-900 dark:text-white font-black text-[9px] uppercase tracking-widest" style={{ color: color !== '#64748b' ? color : undefined }}>
-                {value}
-            </Text>
+            <View style={{ marginLeft: 20, flex: 1 }}>
+                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', textTransform: 'uppercase' }}>{label}</Text>
+                <Text style={{ color: C.text, fontSize: 16, fontWeight: '800', marginTop: 2 }}>{value}</Text>
+            </View>
         </View>
     );
 }

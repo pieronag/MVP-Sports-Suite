@@ -235,7 +235,7 @@ const RecintoVerticalEliteCard = ({ venue, isDark, userLoc, C, accent }: any) =>
             elevation: isDark ? 10 : 0
         }}>
             <TouchableOpacity onPress={() => router.push({ pathname: '/(player)/clubes/[id]', params: { id: venue.id } } as any)} activeOpacity={0.9} style={{ width: '100%', aspectRatio: 1.6, backgroundColor: isDark ? '#0F172A' : '#F8FAFC' }}>
-                <Image source={{ uri: getVenueImage() }} style={StyleSheet.absoluteFill} contentFit="contain" />
+                <Image source={{ uri: getVenueImage() }} style={StyleSheet.absoluteFill} contentFit="cover" />
                 <LinearGradient colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.8)']} style={StyleSheet.absoluteFill} />
                 <View style={{ position: 'absolute', top: 20, left: 20, backgroundColor: 'rgba(16,185,129,0.9)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 }}>
                     <Text style={{ color: 'white', fontSize: 10, fontWeight: '900', letterSpacing: 1 }}>{sport.toUpperCase()}</Text>
@@ -253,7 +253,7 @@ const RecintoVerticalEliteCard = ({ venue, isDark, userLoc, C, accent }: any) =>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: accent + '15', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 }}>
                         <Star color={accent} size={14} fill={accent} />
-                        <Text style={{ color: accent, fontWeight: '900', fontSize: 14, marginLeft: 6 }}>{venue.rating || '4.8'}</Text>
+                        <Text style={{ color: accent, fontWeight: '900', fontSize: 14, marginLeft: 6 }}>{Number(venue.rating || 0).toFixed(1)}</Text>
                     </View>
                 </View>
 

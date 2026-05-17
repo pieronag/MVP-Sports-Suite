@@ -53,7 +53,7 @@ service cloud.firestore {
 
     match /staff/{staffId} {
       allow read: if isAuthenticated();
-      allow write: if isManager() || isSuperAdmin();
+      allow write: if isManager() || isSuperAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
     }
 
     // ==========================================

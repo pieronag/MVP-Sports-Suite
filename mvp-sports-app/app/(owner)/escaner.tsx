@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
     View, Text, TouchableOpacity, StatusBar, StyleSheet, 
-    Dimensions, Animated, Easing, ActivityIndicator, ScrollView, Modal
+    Dimensions, Animated, Easing, ActivityIndicator, ScrollView, Modal, Image
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import { 
     X, ScanLine, RefreshCcw, User, AlertTriangle,
-    ShieldCheck, Clock, CreditCard, Building2, CheckCircle2
+    ShieldCheck, Clock, CreditCard, Building2, CheckCircle2, Zap, ArrowUpRight, ChevronLeft
 } from 'lucide-react-native';
 import { useAuth } from '../../store/useAuth';
 import { bookingService } from '../../services/bookingService';
@@ -15,21 +15,39 @@ import { Timestamp } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
-const ACCENT = '#10b981'; // Emerald Premium
+
+const COLORS = {
+    light: {
+        bg: '#F8FAFC',
+        card: '#FFFFFF',
+        border: '#E2E8F0',
+        text: '#0F172A',
+        sub: '#64748B'
+    },
+    dark: {
+        bg: '#020617',
+        card: '#0F172A',
+        border: '#1E293B',
+        text: '#F8FAFC',
+        sub: '#94A3B8'
+    },
+    accent: '#10b981',
+    error: '#f43f5e'
+};
 
 export default function ScannerScreen() {
     const router = useRouter();
     const { theme, profile } = useAuth();
     const isDark = theme === 'dark';
-    const [permission, requestPermission] = useCameraPermissions();
+    const C = isDark ? COLORS.dark : COLORS.light;
     
+    const [permission, requestPermission] = useCameraPermissions();
     const [scanned, setScanned] = useState(false);
     const [loading, setLoading] = useState(false);
     const [scanResult, setScanResult] = useState<any>(null);
     const [scanError, setScanError] = useState<string | null>(null);
 
     const scanLineAnim = useRef(new Animated.Value(0)).current;
-    const fadeAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         if (!scanned) {
@@ -59,23 +77,6 @@ export default function ScannerScreen() {
         })();
     }, []);
 
-    const validateWindow = (dateTs: any) => {
-        const now = new Date();
-        const start = dateTs?.toDate ? dateTs.toDate() : (dateTs instanceof Date ? dateTs : null);
-        if (!start) return { ok: true, message: '' };
-
-        const twoHoursBefore = new Date(start.getTime() - 2 * 60 * 60 * 1000);
-        const fifteenAfter = new Date(start.getTime() + 15 * 60 * 1000);
-
-        if (now < twoHoursBefore) {
-            return { ok: false, message: 'Demasiado temprano para validar' };
-        }
-        if (now > fifteenAfter) {
-            return { ok: false, message: 'La ventana de ingreso ya expiró' };
-        }
-        return { ok: true, message: '' };
-    };
-
     const handleBarCodeScanned = async ({ data }: any) => {
         setScanned(true);
         setLoading(true);
@@ -100,19 +101,7 @@ export default function ScannerScreen() {
                 return;
             }
 
-            const window = validateWindow(booking.date);
-            if (!window.ok) {
-                setScanError(window.message);
-                return;
-            }
-
             setScanResult({ ...booking, id: bookingId });
-            Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: 400,
-                useNativeDriver: true,
-            }).start();
-
         } catch (e) {
             setScanError('Error crítico al procesar código');
         } finally {
@@ -145,14 +134,14 @@ export default function ScannerScreen() {
         }
     };
 
-    if (!permission) return <View className="flex-1 bg-black" />;
+    if (!permission) return <View style={{ flex: 1, backgroundColor: COLORS.dark.bg }} />;
 
     return (
-        <View style={styles.container} className="bg-black">
+        <View style={{ flex: 1, backgroundColor: '#000' }}>
             <StatusBar barStyle="light-content" translucent />
 
             {!scanned && permission.granted && (
-                <View style={styles.fullOverlay}>
+                <View style={StyleSheet.absoluteFill}>
                     <CameraView
                         style={StyleSheet.absoluteFill}
                         facing="back"
@@ -160,210 +149,239 @@ export default function ScannerScreen() {
                         onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
                     />
 
-                    {/* Visor HUD Centrado Absoluto */}
+                    {/* HUD OVERLAY DNA */}
                     <View style={styles.hudOverlay}>
                         <View style={styles.scannerBox}>
-                            {/* Bornes tácticos centrado total */}
-                            <View className="absolute top-0 left-0 w-20 h-20 border-t-[5px] border-l-[5px] border-emerald-500 rounded-tl-[44px]" />
-                            <View className="absolute top-0 right-0 w-20 h-20 border-t-[5px] border-r-[5px] border-emerald-500 rounded-tr-[44px]" />
-                            <View className="absolute bottom-0 left-0 w-20 h-20 border-b-[5px] border-l-[5px] border-emerald-500 rounded-bl-[44px]" />
-                            <View className="absolute bottom-0 right-0 w-20 h-20 border-b-[5px] border-r-[5px] border-emerald-500 rounded-br-[44px]" />
+                            {/* Bornes tácticos Elite */}
+                            <View style={[styles.corner, { top: 0, left: 0, borderTopWidth: 4, borderLeftWidth: 4, borderTopLeftRadius: 30 }]} />
+                            <View style={[styles.corner, { top: 0, right: 0, borderTopWidth: 4, borderRightWidth: 4, borderTopRightRadius: 30 }]} />
+                            <View style={[styles.corner, { bottom: 0, left: 0, borderBottomWidth: 4, borderLeftWidth: 4, borderBottomLeftRadius: 30 }]} />
+                            <View style={[styles.corner, { bottom: 0, right: 0, borderBottomWidth: 4, borderRightWidth: 4, borderBottomRightRadius: 30 }]} />
 
-                            <View className="absolute inset-6 border border-emerald-500/20 rounded-[30px] bg-emerald-500/5 overflow-hidden flex-row items-center justify-center">
-                                <Animated.View 
-                                    style={{ 
-                                        position: 'absolute', top: 0, left: 0, right: 0, height: 4, backgroundColor: '#10b981', 
-                                        borderRadius: 2, shadowColor: '#10b981', shadowOpacity: 1, shadowRadius: 15,
-                                        transform: [{ translateY: scanLineAnim }]
-                                    }} 
-                                />
-                                <ScanLine color="#10b981" size={56} opacity={0.2} />
-                            </View>
+                            <Animated.View 
+                                style={[styles.scanLine, { transform: [{ translateY: scanLineAnim }] }]} 
+                            />
                         </View>
+                        
+                        <Text style={styles.scanText}>Apunta al código QR</Text>
                     </View>
 
-                    {/* Header Independiente */}
-                    <View className="absolute top-0 left-0 right-0 z-[100] pt-20 px-8 flex-row justify-between items-start">
-                        <View>
-                            <View className="flex-row items-center mb-3">
-                                <View className="px-3 h-6 rounded-full items-center justify-center shadow-lg bg-emerald-500">
-                                    <Text className="text-white font-black text-[8px] uppercase tracking-widest">Activo</Text>
-                                </View>
-                                <Text className="ml-3 text-white/70 font-black text-[9px] uppercase tracking-[0.3em]">Scanner Instrumental</Text>
-                            </View>
-                            <Text className="text-white font-black text-5xl tracking-tighter leading-none">
-                                Escáner
-                            </Text>
-                        </View>
-                        <TouchableOpacity
-                            onPress={() => router.back()}
-                            className="w-14 h-14 bg-white/10 rounded-[22px] items-center justify-center border border-white/20"
-                        >
-                            <X color="#fff" size={24} />
+                    {/* HEADER DNA */}
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={() => router.back()} style={styles.headerBtn}>
+                            <ChevronLeft color={COLORS.accent} size={24} />
                         </TouchableOpacity>
+                        <Text style={styles.headerTitle}>Validar Ticket</Text>
+                        <View style={{ width: 44 }} />
                     </View>
                 </View>
             )}
 
-            {/* MODAL DE ERROR (Elite Alert) */}
-            <Modal
-                transparent
-                visible={scanError !== null}
-                animationType="fade"
-            >
-                <View className="flex-1 bg-black/95 items-center justify-center p-8">
-                    <View className="w-full bg-[#020617] rounded-[50px] p-10 items-center border border-white/10 shadow-2xl">
-                        <View className="bg-rose-500/10 p-10 rounded-[40px] mb-8 border border-rose-500/10">
-                            <AlertTriangle color="#f43f5e" size={72} strokeWidth={1} />
+            {/* RESULTADO DNA (Inspirado en Preferencias/Billetera) */}
+            <Modal visible={scanResult !== null && !loading} animationType="slide" transparent>
+                <View style={{ flex: 1, backgroundColor: C.bg }}>
+                    <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+                    
+                    {/* CABECERA RESULTADO */}
+                    <View style={{ paddingTop: 60, paddingBottom: 20, paddingHorizontal: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: C.border }}>
+                        <TouchableOpacity onPress={() => { setScanResult(null); setScanned(false); }} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
+                            <X color={COLORS.accent} size={24} />
+                        </TouchableOpacity>
+                        <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase' }}>Resumen de Acceso</Text>
+                        <View style={{ width: 44 }} />
+                    </View>
+
+                    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 60 }}>
+                        {/* BANNER CLIENTE (Saldo Style) */}
+                        <View style={{ padding: 30, paddingBottom: 10 }}>
+                            <View style={{ backgroundColor: C.card, borderRadius: 30, padding: 30, borderWidth: 1, borderColor: C.border, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                                    <View style={{ width: 60, height: 60, borderRadius: 20, backgroundColor: COLORS.accent + '15', alignItems: 'center', justifyContent: 'center' }}>
+                                        <User color={COLORS.accent} size={32} />
+                                    </View>
+                                    <View style={{ marginLeft: 20 }}>
+                                        <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', textTransform: 'uppercase' }}>{scanResult?.clientName?.split(' ')[0]}</Text>
+                                        <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '800' }}>TICKET VERIFICADO</Text>
+                                    </View>
+                                </View>
+                                <View style={{ height: 1, backgroundColor: C.border, marginBottom: 20 }} />
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                    <View>
+                                        <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', marginBottom: 4 }}>Estado de Pago</Text>
+                                        <Text style={{ color: scanResult?.paymentStatus === 'paid' ? COLORS.accent : '#f59e0b', fontSize: 16, fontWeight: '900' }}>
+                                            {scanResult?.paymentStatus === 'paid' ? 'LIQUIDADO' : 'PENDIENTE'}
+                                        </Text>
+                                    </View>
+                                    <ShieldCheck color={COLORS.accent} size={32} opacity={0.3} />
+                                </View>
+                            </View>
                         </View>
-                        <Text className="text-white font-black text-3xl text-center mb-4 tracking-tighter">Acceso Denegado</Text>
-                        <Text className="text-slate-500 text-center mb-12 font-bold uppercase text-[9px] tracking-[0.3em] leading-relaxed px-4 text-center">{scanError}</Text>
-                        
-                        <TouchableOpacity
+
+                        {/* DETALLES (Rows Style) */}
+                        <SectionLabel label="Detalles de la Reserva" />
+                        <View style={{ marginHorizontal: 30, backgroundColor: C.card, borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
+                            <RefinedRow icon={Building2} color="#3b82f6" label="Recinto" value={scanResult?.tenantName || 'MVP Arena'} isDark={isDark} />
+                            <Separator isDark={isDark} />
+                            <RefinedRow icon={Zap} color="#10b981" label="Servicio" value={scanResult?.courtName || 'Cancha Principal'} isDark={isDark} />
+                            <Separator isDark={isDark} />
+                            <RefinedRow icon={Clock} color="#f59e0b" label="Horario" value={`${scanResult?.startTime} a ${scanResult?.endTime}`} isDark={isDark} />
+                            <Separator isDark={isDark} />
+                            <RefinedRow icon={CreditCard} color="#6366f1" label="Total" value={'$' + (scanResult?.totalPrice || 0).toLocaleString('es-CL')} isDark={isDark} />
+                        </View>
+
+                        {/* ACCIONES DNA */}
+                        <View style={{ padding: 30, marginTop: 10 }}>
+                            {scanResult?.paymentStatus !== 'paid' ? (
+                                <TouchableOpacity 
+                                    onPress={() => confirmCheckIn(true)}
+                                    style={{ backgroundColor: COLORS.accent, height: 70, borderRadius: 22, alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.accent, shadowOpacity: 0.3, shadowRadius: 15 }}
+                                >
+                                    <Text style={{ color: 'white', fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Liquidar y Validar</Text>
+                                </TouchableOpacity>
+                            ) : (
+                                <TouchableOpacity 
+                                    onPress={() => confirmCheckIn(false)}
+                                    style={{ backgroundColor: COLORS.accent, height: 70, borderRadius: 22, alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.accent, shadowOpacity: 0.3, shadowRadius: 15 }}
+                                >
+                                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Autorizar Ingreso</Text>
+                                </TouchableOpacity>
+                            )}
+                            
+                            <TouchableOpacity 
+                                onPress={() => { setScanResult(null); setScanned(false); }}
+                                style={{ height: 60, alignItems: 'center', justifyContent: 'center', marginTop: 15 }}
+                            >
+                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '800', textTransform: 'uppercase' }}>Cancelar Validación</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </ScrollView>
+                </View>
+            </Modal>
+
+            {/* MODAL ERROR DNA */}
+            <Modal visible={scanError !== null} transparent animationType="fade">
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
+                    <View style={{ backgroundColor: C.card, borderRadius: 35, padding: 30, alignItems: 'center', width: '100%', borderWidth: 1, borderColor: C.border }}>
+                        <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.error + '22', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+                            <AlertTriangle color={COLORS.error} size={40} />
+                        </View>
+                        <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textAlign: 'center', marginBottom: 10, textTransform: 'uppercase' }}>Error de Acceso</Text>
+                        <Text style={{ color: C.sub, fontSize: 14, fontWeight: '600', textAlign: 'center', marginBottom: 30, lineHeight: 20 }}>{scanError}</Text>
+                        <TouchableOpacity 
                             onPress={() => { setScanned(false); setScanError(null); }}
-                            className="bg-white/10 h-18 w-full rounded-[28px] items-center justify-center border border-white/10 flex-row"
+                            style={{ backgroundColor: COLORS.error, height: 60, borderRadius: 20, width: '100%', alignItems: 'center', justifyContent: 'center' }}
                         >
-                            <RefreshCcw color="#fff" size={20} className="mr-4" />
-                            <Text className="text-white font-black uppercase tracking-[0.3em] text-[10px]">Reintentar Lectura</Text>
+                            <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Reintentar</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
 
-            {/* PESTAÑA DE RESUMEN (Elite Result) */}
-            {scanResult && !loading && (
-                <View style={styles.fullOverlay} className="bg-[#020617]">
-                    <LinearGradient colors={['#020617', '#064e3b15', '#020617']} style={StyleSheet.absoluteFill} />
-                    
-                    <ScrollView className="flex-1" contentContainerStyle={{ paddingTop: 80, paddingHorizontal: 32, paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
-                        <View className="mb-12">
-                            <View className="flex-row items-center mb-4">
-                                <View className="px-3 h-6 rounded-full items-center justify-center shadow-lg bg-emerald-500">
-                                    <Text className="text-white font-black text-[8px] uppercase tracking-widest">Validado</Text>
-                                </View>
-                                <Text className="ml-3 text-slate-400 font-black text-[9px] uppercase tracking-[0.3em]">Resumen de Entrada</Text>
-                            </View>
-                            <Text className="text-white font-black text-5xl tracking-tighter leading-none mb-2 uppercase">{scanResult.clientName || 'CLIENTE'}</Text>
-                        </View>
-
-                        <View className="rounded-[44px] overflow-hidden border border-white/5 bg-white/[0.03] shadow-2xl mb-10">
-                            <LinearGradient colors={[`${ACCENT}15`, 'transparent']} style={{ height: 100 }} />
-                            
-                            <View className="px-8 pb-12 items-center" style={{ marginTop: -40 }}>
-                                <View className="w-24 h-24 rounded-[36px] bg-[#020617] items-center justify-center mb-10 shadow-3xl border border-white/10">
-                                    <User color={ACCENT} size={48} strokeWidth={1.5} />
-                                </View>
-
-                                <View className="w-full space-y-6">
-                                    <SummaryRow label="Recinto" icon={Building2} value={scanResult.tenantName || 'MVP Arena'} />
-                                    <SummaryRow label="Actividad" icon={ShieldCheck} value={scanResult.courtName || 'Cancha'} />
-                                    <SummaryRow label="Horario" icon={Clock} value={`${scanResult.startTime || '--:--'} a ${scanResult.endTime || '--:--'}`} />
-                                    <SummaryRow 
-                                        label="Estado Pago" 
-                                        icon={CreditCard} 
-                                        value={scanResult.paymentStatus?.toUpperCase() || 'Pendiente'} 
-                                        color={scanResult.paymentStatus === 'paid' ? ACCENT : '#f59e0b'}
-                                    />
-                                </View>
-                            </View>
-                        </View>
-
-                        {scanResult.paymentStatus !== 'paid' ? (
-                            <View className="space-y-4">
-                                <TouchableOpacity
-                                    onPress={() => confirmCheckIn(true)}
-                                    className="bg-emerald-500 h-22 rounded-[44px] items-center justify-center flex-row shadow-2xl shadow-emerald-500/30"
-                                >
-                                    <CheckCircle2 color="#fff" size={24} strokeWidth={3} />
-                                    <Text className="text-white font-black text-[12px] uppercase tracking-[0.3em] ml-4">Registrar Pago & Ingreso</Text>
-                                </TouchableOpacity>
-                                
-                                <TouchableOpacity
-                                    onPress={() => confirmCheckIn(false)}
-                                    className="h-16 w-full items-center justify-center"
-                                >
-                                    <Text className="text-slate-500 font-black text-[9px] uppercase tracking-[0.4em]">Ignorar Pago Pendiente</Text>
-                                </TouchableOpacity>
-                            </View>
-                        ) : (
-                            <TouchableOpacity
-                                onPress={() => confirmCheckIn(false)}
-                                className="bg-emerald-500 h-24 rounded-[44px] items-center justify-center flex-row shadow-2xl shadow-emerald-500/40"
-                            >
-                                <CheckCircle2 color="#fff" size={32} strokeWidth={3} />
-                                <Text className="text-white font-black text-xl uppercase tracking-[0.3em] ml-5">Confirmar Acceso</Text>
-                            </TouchableOpacity>
-                        )}
-                    </ScrollView>
-                </View>
-            )}
-
             {loading && (
                 <View style={styles.loadingOverlay}>
-                    <ActivityIndicator color={ACCENT} size="large" />
-                    <Text className="text-emerald-500 font-black text-[10px] uppercase tracking-[0.6em] mt-10 text-center">Validando Identidad...</Text>
+                    <ActivityIndicator color={COLORS.accent} size="large" />
+                    <Text style={{ color: COLORS.accent, fontWeight: '900', fontSize: 10, textTransform: 'uppercase', marginTop: 20, letterSpacing: 2 }}>Procesando...</Text>
                 </View>
             )}
         </View>
     );
 }
 
-function SummaryRow({ label, icon: Icon, value, color }: any) {
+function SectionLabel({ label }: { label: string }) {
     return (
-        <View className="flex-row justify-between items-center py-1">
-            <View className="flex-row items-center">
-                <View className="w-7 h-7 rounded-xl bg-white/5 items-center justify-center mr-4">
-                    <Icon size={12} color="#94a3b8" />
-                </View>
-                <Text className="text-slate-500 font-black text-[8px] uppercase tracking-[0.3em]">{label}</Text>
+        <Text style={{ color: COLORS.accent, fontWeight: '900', fontSize: 11, textTransform: 'uppercase', letterSpacing: 2, marginHorizontal: 40, marginTop: 30, marginBottom: 10 }}>{label}</Text>
+    );
+}
+
+function Separator({ isDark }: { isDark: boolean }) {
+    return (
+        <View style={{ height: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)', marginHorizontal: 25 }} />
+    );
+}
+
+function RefinedRow({ icon: Icon, color, label, value, isDark }: any) {
+    const C = isDark ? COLORS.dark : COLORS.light;
+    return (
+        <View style={{ height: 75, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25 }}>
+            <View style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: color, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon color="white" size={18} />
             </View>
-            <Text 
-                style={{ color: color || '#FFF' }} 
-                className="font-black text-[10px] uppercase tracking-widest"
-            >
-                {value}
-            </Text>
+            <View style={{ marginLeft: 15, flex: 1 }}>
+                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', textTransform: 'uppercase' }}>{label}</Text>
+                <Text style={{ color: C.text, fontSize: 15, fontWeight: '800', marginTop: 1 }}>{value}</Text>
+            </View>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#000',
-    },
-    fullOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 9999, // Blindaje total sobre el menú
-        height: height,
-        width: width,
-    },
     hudOverlay: {
         ...StyleSheet.absoluteFillObject,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(0,0,0,0.4)',
+        backgroundColor: 'rgba(0,0,0,0.5)',
     },
     scannerBox: {
-        width: 320,
-        height: 320,
+        width: 260,
+        height: 260,
         position: 'relative',
-        alignItems: 'center',
-        justifyContent: 'center',
     },
-    loadingOverlay: {
+    corner: {
         position: 'absolute',
-        top: 0,
+        width: 40,
+        height: 40,
+        borderColor: COLORS.accent,
+    },
+    scanLine: {
+        position: 'absolute',
+        left: 10,
+        right: 10,
+        height: 2,
+        backgroundColor: COLORS.accent,
+        shadowColor: COLORS.accent,
+        shadowOpacity: 0.8,
+        shadowRadius: 10,
+    },
+    scanText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: '900',
+        textTransform: 'uppercase',
+        letterSpacing: 2,
+        marginTop: 40,
+        opacity: 0.8
+    },
+    header: {
+        position: 'absolute',
+        top: 60,
         left: 0,
         right: 0,
-        bottom: 0,
-        zIndex: 10000,
-        backgroundColor: 'rgba(0,0,0,0.85)',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 30,
+    },
+    headerBtn: {
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.1)',
         alignItems: 'center',
         justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    headerTitle: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: '900',
+        textTransform: 'uppercase',
+    },
+    loadingOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 100,
     }
 });

@@ -284,7 +284,7 @@ export default function MapaBusquedaScreen() {
                                     <Image 
                                         source={{ uri: v.imageURL || v.imageUrl || 'https://images.unsplash.com/photo-1599566150163-29194dcaad36' }} 
                                         style={{ width: '100%', height: '100%' }} 
-                                        resizeMode="contain" 
+                                        resizeMode="cover" 
                                     />
                                     <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '60%' }} />
                                     <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 25 }}>
@@ -294,7 +294,7 @@ export default function MapaBusquedaScreen() {
                                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
                                                     <View style={{ backgroundColor: 'rgba(16,185,129,0.2)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
                                                         <Star color={accent} size={10} fill={accent} />
-                                                        <Text style={{ color: accent, fontSize: 10, fontWeight: '900', marginLeft: 4 }}>4.9</Text>
+                                                        <Text style={{ color: accent, fontSize: 10, fontWeight: '900', marginLeft: 4 }}>{Number(v.rating || 0).toFixed(1)}</Text>
                                                     </View>
                                                     <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: '800' }}>{v.displaySports}</Text>
                                                 </View>

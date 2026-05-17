@@ -1,5 +1,6 @@
 import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from './firebase';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { db, storage } from './firebase';
 import { UserProfile } from '../types/user';
 
 export interface GamificationSettings {
@@ -18,20 +19,50 @@ export interface GamificationSettings {
 
 export const userService = {
     /**
+     * Uploads a base64 image to Firebase Storage and returns the URL
+     */
+    async uploadProfileImage(uid: string, base64: string): Promise<string> {
+        try {
+            const storageRef = ref(storage, `avatars/${uid}.jpg`);
+            // uploadString handles the data_url format
+            await uploadString(storageRef, base64, 'data_url');
+            const downloadURL = await getDownloadURL(storageRef);
+            return downloadURL;
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            throw error;
+        }
+    },
+    /**
      * Gets the global gamification settings
      */
-    async getStaffProfile(uid: string): Promise<any | null> {
+    async getStaffProfile(uid: string): Promise<{ id: string, data: any } | null> {
         try {
             const staffRef = collection(db, 'staff');
             const q = query(staffRef, where('uid', '==', uid));
             const snap = await getDocs(q);
             if (!snap.empty) {
-                return snap.docs[0].data();
+                return {
+                    id: snap.docs[0].id,
+                    data: snap.docs[0].data()
+                };
             }
             return null;
         } catch (error) {
             console.error('Error fetching staff profile:', error);
             return null;
+        }
+    },
+
+    async updateStaffProfile(uid: string, data: any): Promise<void> {
+        try {
+            const staffInfo = await this.getStaffProfile(uid);
+            if (staffInfo) {
+                const staffRef = doc(db, 'staff', staffInfo.id);
+                await updateDoc(staffRef, data);
+            }
+        } catch (error) {
+            console.error('Error updating staff profile:', error);
         }
     },
 

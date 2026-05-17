@@ -5,9 +5,10 @@ import { ChevronLeft, CreditCard, ShieldCheck, Zap, Calendar, Clock, Trophy, Map
 import { WebView } from 'react-native-webview';
 import { useAuth } from '../../store/useAuth';
 import { bookingService } from '../../services/bookingService';
-import { walletService, PaymentCard } from '../../services/walletService';
+import { walletService } from '../../services/walletService';
 import { teamService, Team } from '../../services/teamService';
 import { tournamentService } from '../../services/tournamentService';
+import { venueService, Tenant } from '../../services/venueService';
 import { db } from '../../services/firebase';
 import { collection, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 
@@ -53,8 +54,6 @@ export default function CheckoutScreen() {
     const C = isDark ? COLORS.dark : COLORS.light;
     
     const [processing, setProcessing] = useState(false);
-    const [cards, setCards] = useState<PaymentCard[]>([]);
-    const [loadingCards, setLoadingCards] = useState(true);
     const [customAlert, setCustomAlert] = useState<{
         visible: boolean;
         title: string;
@@ -63,11 +62,12 @@ export default function CheckoutScreen() {
         onClose?: () => void;
     }>({ visible: false, title: '', message: '', type: 'success' });
     const [userTeams, setUserTeams] = useState<Team[]>([]);
-    const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
     const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<'card' | 'venue'>('venue');
     const [showWebView, setShowWebView] = useState(false);
-    const [inscriptionData, setInscriptionData] = useState<any>(null);
+    const [tenant, setTenant] = useState<Tenant | null>(null);
+    const [loadingTenant, setLoadingTenant] = useState(true);
+    const [webpayData, setWebpayData] = useState<any>(null);
 
     // Parámetros dinámicos (pueden ser de Reserva o de Torneo)
     const { 
@@ -81,17 +81,38 @@ export default function CheckoutScreen() {
     const activeColor = (sportColor as string) || '#10b981';
     const isTournament = type === 'tournament';
 
+    // 1. CARGAR CONFIGURACIÓN DEL DUEÑO/TENANT PARA EL CHECKOUT
+    useEffect(() => {
+        if (tenantId) {
+            setLoadingTenant(true);
+            venueService.getVenueById(tenantId as string).then((data) => {
+                setTenant(data);
+                setLoadingTenant(false);
+            }).catch((err) => {
+                console.error("Error loading tenant in checkout:", err);
+                setLoadingTenant(false);
+            });
+        } else {
+            setLoadingTenant(false);
+        }
+    }, [tenantId]);
+
+    // 2. DETECTAR SI LA API DE PAGO ESTÁ CONFIGURADA Y ACTIVA
+    const isPaymentApiActive = 
+        (tenant as any)?.paymentApiActive === true || 
+        (tenant as any)?.isPaymentApiActive === true || 
+        ((tenant as any)?.transbankCommerceCode !== undefined && (tenant as any)?.transbankCommerceCode !== '') ||
+        ((tenant as any)?.availableGateways?.webpay === true || (tenant as any)?.availableGateways?.mercadoPago === true);
+
+    // Si la API del recinto no está configurada, forzar pago en recinto
+    useEffect(() => {
+        if (!loadingTenant && !isPaymentApiActive) {
+            setPaymentMethod('venue');
+        }
+    }, [loadingTenant, isPaymentApiActive]);
+
     useEffect(() => {
         if (user) {
-            walletService.getCards(user.uid).then((userCards) => {
-                setCards(userCards);
-                setLoadingCards(false);
-                if (userCards.length > 0) {
-                    setPaymentMethod('card');
-                    const defaultCard = userCards.find(c => c.isDefault) || userCards[0];
-                    setSelectedCardId(defaultCard.id || null);
-                }
-            });
             teamService.getUserTeams(user.uid).then(teams => {
                 const filtered = teams.filter(t => t.sport.toLowerCase() === (sport as string).toLowerCase());
                 setUserTeams(filtered);
@@ -109,12 +130,6 @@ export default function CheckoutScreen() {
     const handleConfirm = async () => {
         if (!user) return;
 
-        // Validar si eligió tarjeta pero no tiene ninguna (aunque el UI ya lo previene)
-        if (paymentMethod === 'card' && cards.length === 0) {
-            handleAddCard();
-            return;
-        }
-
         setProcessing(true);
         try {
             const priceNum = Number(price);
@@ -125,43 +140,50 @@ export default function CheckoutScreen() {
                 // FLUJO DE TORNEO
                 if (!tournamentId || !teamId) throw new Error("Datos de torneo incompletos.");
                 
-                // 1. Autorizar pago
-                const authResult = await walletService.authorizePayment(
-                    user.uid, 
-                    priceNum, 
-                    tournamentId as string, 
-                    tenantId as string || 'system',
-                    selectedCardId || undefined
-                );
-                if (!authResult.success) throw new Error(authResult.error || "Pago rechazado.");
+                if (paymentMethod === 'card') {
+                    // PAGO ONLINE EXTERNO DIRECTO PARA TORNEO
+                    const buyOrder = `TOR-${Date.now()}`;
+                    const webpayRes = await walletService.createWebpayTransaction(
+                        tournamentId as string,
+                        tenantId as string || 'system',
+                        priceNum,
+                        buyOrder
+                    );
 
-                // 2. Registrar oficialmente al equipo en el torneo
-                await tournamentService.registerTeamInTournament(
-                    tournamentId as string,
-                    { id: teamId as string, name: teamName as string },
-                    user.uid,
-                    clientName,
-                    priceNum
-                );
+                    setWebpayData({
+                        url: webpayRes.url,
+                        token: webpayRes.token,
+                        tournamentId: tournamentId as string,
+                        teamId: teamId as string,
+                        teamName: teamName as string,
+                        price: priceNum
+                    });
+                    setShowWebView(true);
+                } else {
+                    // PAGO EN EL RECINTO PARA TORNEO
+                    await tournamentService.registerTeamInTournament(
+                        tournamentId as string,
+                        { id: teamId as string, name: teamName as string },
+                        user.uid,
+                        clientName,
+                        priceNum
+                    );
 
-                setCustomAlert({
-                    visible: true,
-                    title: '¡INSCRIPCIÓN EXITOSA!',
-                    message: `TU EQUIPO ${teamName?.toString().toUpperCase()} HA SIDO INSCRITO EN EL TORNEO ${(tournamentName as string).toUpperCase()}.`,
-                    type: 'success',
-                    onClose: () => router.back()
-                });
+                    setCustomAlert({
+                        visible: true,
+                        title: '¡INSCRIPCIÓN EXITOSA!',
+                        message: `TU EQUIPO ${teamName?.toString().toUpperCase()} HA SIDO INSCRITO EN EL TORNEO ${(tournamentName as string).toUpperCase()}.`,
+                        type: 'success',
+                        onClose: () => router.back()
+                    });
+                }
 
             } else {
-                // FLUJO DE RESERVA (Optimizado para evitar registros con error)
+                // FLUJO DE RESERVA
                 const priceNum = Number(price);
                 const [startH, startM] = (startTime as string).split(':').map(Number);
                 const endH = startH + 1;
                 const endTime = `${endH.toString().padStart(2, '0')}:${(startM || 0).toString().padStart(2, '0')}`;
-                
-                // 1. Preparar los datos básicos
-                const userProfile = profile as any;
-                const clientName = userProfile?.displayName || userProfile?.fullName || user.displayName || 'Jugador MVP';
                 
                 const bookingData: any = {
                     userId: user.uid,
@@ -171,48 +193,52 @@ export default function CheckoutScreen() {
                     courtName: courtName as string || 'Cancha',
                     clientName: clientName,
                     clientPhone: userProfile?.phone || '+56900000000',
-                    date: Timestamp.fromDate(new Date(`${date}T${startTime}`)),
+                    date: Timestamp.fromDate(new Date(`${date}T${startTime}:00`)),
                     startTime: startTime as string,
                     endTime: endTime,
                     totalPrice: priceNum,
-                    status: paymentMethod === 'card' ? 'confirmed' : 'pending',
-                    paymentStatus: 'pending' as const,
-                    source: 'mobile_app' as const,
+                    status: 'confirmed', 
+                    paymentStatus: 'pending',
+                    source: 'mobile_app',
                     createdBy: user.email || user.uid,
                     paymentMethod: paymentMethod === 'card' ? 'card' : 'cash',
-                    sport: sport as string,
-                    teamId: selectedTeamId || undefined,
+                    sport: sport as string || 'futbol',
                     createdAt: Timestamp.now()
                 };
+
+                if (selectedTeamId) {
+                    bookingData.teamId = selectedTeamId;
+                }
 
                 let finalBookingId = bookingId as string;
 
                 if (paymentMethod === 'card') {
-                    // PROCESO CON TARJETA: PRIMERO COBRAMOS, LUEGO GUARDAMOS
-                    // Generamos un ID temporal para el buyOrder si no existe uno
-                    const tempId = finalBookingId || `TEMP_${Date.now()}_${user.uid.slice(0,5)}`;
-                    
-                    const authResult = await walletService.authorizePayment(
-                        user.uid, 
-                        priceNum, 
-                        tempId, 
-                        tenantId as string,
-                        selectedCardId || undefined
-                    );
-                    
-                    if (!authResult.success) {
-                        throw new Error(authResult.error || "PAGO RECHAZADO POR EL BANCO.");
-                    }
-
-                    // PAGO EXITOSO -> GUARDAMOS EN FIREBASE
-                    bookingData.paymentStatus = 'paid';
+                    // RESERVA PAGO ONLINE: CREAMOS PRIMERO LA RESERVA EN ESTADO PENDIENTE
+                    bookingData.paymentStatus = 'pending';
+                    bookingData.paymentMethod = 'card';
                     if (finalBookingId) {
                         await bookingService.updateBooking(finalBookingId, bookingData);
                     } else {
                         finalBookingId = await bookingService.createBooking(bookingData);
                     }
+
+                    // AHORA LLAMAMOS AL SISTEMA EXTERNO PARA INICIAR EL PAGO
+                    const buyOrder = `ORD-${Date.now()}`;
+                    const webpayRes = await walletService.createWebpayTransaction(
+                        finalBookingId,
+                        tenantId as string,
+                        priceNum,
+                        buyOrder
+                    );
+
+                    setWebpayData({
+                        url: webpayRes.url,
+                        token: webpayRes.token,
+                        bookingId: finalBookingId
+                    });
+                    setShowWebView(true);
                 } else {
-                    // PAGO EN RECINTO: GUARDAMOS DIRECTAMENTE
+                    // PAGO EN RECINTO: REGISTRO DIRECTO Y RUTA DE TICKET
                     bookingData.paymentStatus = 'pending';
                     bookingData.paymentMethod = 'cash';
                     if (finalBookingId) {
@@ -220,17 +246,17 @@ export default function CheckoutScreen() {
                     } else {
                         finalBookingId = await bookingService.createBooking(bookingData);
                     }
-                }
 
-                router.replace({
-                    pathname: '/ticket',
-                    params: { 
-                        bookingId: finalBookingId, sport, sportColor, 
-                        tenantName: (tenantName as string || '').toUpperCase(), 
-                        courtName: (courtName as string || '').toUpperCase(), 
-                        startTime, date, price: priceNum.toString() 
-                    }
-                } as any);
+                    router.replace({
+                        pathname: '/ticket',
+                        params: { 
+                            bookingId: finalBookingId, sport, sportColor, 
+                            tenantName: (tenantName as string || '').toUpperCase(), 
+                            courtName: (courtName as string || '').toUpperCase(), 
+                            startTime, date, price: priceNum.toString() 
+                        }
+                    } as any);
+                }
             }
 
         } catch (error: any) {
@@ -245,48 +271,15 @@ export default function CheckoutScreen() {
         }
     };
 
-    const handleAddCard = async () => {
-        if (!user) return;
-        setProcessing(true);
-        try {
-            const data = await walletService.startInscription(user.uid, user.email || '', {
-                returnUrl: 'mvpdeportes://wallet/success',
-                userName: profile?.displayName || user.displayName || user.email || 'Jugador MVP'
-            });
-            
-            if (data.url === null) {
-                setCustomAlert({
-                    visible: true,
-                    title: 'TARJETA VINCULADA',
-                    message: 'SE HA VINCULADO TU TARJETA DE PRUEBA EXITOSAMENTE.',
-                    type: 'success',
-                    onClose: () => {
-                        walletService.getCards(user.uid).then(c => {
-                            setCards(c);
-                            setPaymentMethod('card');
-                        });
-                    }
-                });
-            } else {
-                setInscriptionData(data);
-                setShowWebView(true);
-            }
-        } catch (error) {
-            setCustomAlert({ visible: true, title: 'ERROR', message: 'NO SE PUDO INICIAR LA VINCULACIÓN CON TRANSBANK.', type: 'error' });
-        } finally {
-            setProcessing(false);
-        }
-    };
+    // handleAddCard removido dado que el enrolamiento de tarjetas físicas fue descontinuado.
 
-    if (loadingCards) {
+    if (loadingTenant) {
         return (
             <View style={{ flex: 1, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center' }}>
                 <ActivityIndicator color={activeColor} size="large" />
             </View>
         );
     }
-
-    const hasCards = cards.length > 0;
 
     return (
         <View style={{ flex: 1, backgroundColor: C.bg }}>
@@ -422,63 +415,24 @@ export default function CheckoutScreen() {
                         {paymentMethod === 'venue' && <CheckCircle2 color={activeColor} size={20} />}
                     </TouchableOpacity>
 
-                    {/* OPCIÓN 2: TARJETA(S) REGISTRADA(S) */}
-                    {hasCards ? (
-                        <>
-                            {cards.map((card) => (
-                                <TouchableOpacity 
-                                    key={card.id}
-                                    onPress={() => {
-                                        setPaymentMethod('card');
-                                        setSelectedCardId(card.id || null);
-                                    }}
-                                    style={{ 
-                                        backgroundColor: C.card, borderRadius: 25, padding: 20, 
-                                        borderWidth: 2, 
-                                        borderColor: (paymentMethod === 'card' && selectedCardId === card.id) ? activeColor : C.border,
-                                        flexDirection: 'row', alignItems: 'center'
-                                    }}
-                                >
-                                    <View style={{ width: 45, height: 45, borderRadius: 12, backgroundColor: (paymentMethod === 'card' && selectedCardId === card.id) ? activeColor + '15' : C.bg, alignItems: 'center', justifyContent: 'center' }}>
-                                        <CreditCard color={(paymentMethod === 'card' && selectedCardId === card.id) ? activeColor : C.sub} size={22} />
-                                    </View>
-                                    <View style={{ marginLeft: 15, flex: 1 }}>
-                                        <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase' }}>{card.brand} Registrada</Text>
-                                        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700' }}>•••• {card.last4} {card.isDefault ? '(PRINCIPAL)' : ''}</Text>
-                                    </View>
-                                    {(paymentMethod === 'card' && selectedCardId === card.id) && <CheckCircle2 color={activeColor} size={20} />}
-                                </TouchableOpacity>
-                            ))}
-                            
-                            <TouchableOpacity 
-                                onPress={handleAddCard}
-                                style={{ 
-                                    backgroundColor: C.card, borderRadius: 25, padding: 15, 
-                                    borderStyle: 'dashed', borderWidth: 1, borderColor: C.border, 
-                                    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-                                    marginTop: 5
-                                }}
-                            >
-                                <Plus color={C.sub} size={16} />
-                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', marginLeft: 10, textTransform: 'uppercase' }}>Agregar otra tarjeta</Text>
-                            </TouchableOpacity>
-                        </>
-                    ) : (
+                    {/* OPCIÓN 2: PAGO ONLINE DIRECTO (Con llave de configuración) */}
+                    {isPaymentApiActive && (
                         <TouchableOpacity 
-                            onPress={handleAddCard}
+                            onPress={() => setPaymentMethod('card')}
                             style={{ 
                                 backgroundColor: C.card, borderRadius: 25, padding: 20, 
-                                borderStyle: 'dashed', borderWidth: 2, borderColor: activeColor, 
+                                borderWidth: 2, borderColor: paymentMethod === 'card' ? activeColor : C.border,
                                 flexDirection: 'row', alignItems: 'center'
                             }}
                         >
-                            <View style={{ width: 45, height: 45, borderRadius: 12, backgroundColor: activeColor + '10', alignItems: 'center', justifyContent: 'center' }}>
-                                <Plus color={activeColor} size={22} />
+                            <View style={{ width: 45, height: 45, borderRadius: 12, backgroundColor: paymentMethod === 'card' ? activeColor + '15' : C.bg, alignItems: 'center', justifyContent: 'center' }}>
+                                <CreditCard color={paymentMethod === 'card' ? activeColor : C.sub} size={22} />
                             </View>
                             <View style={{ marginLeft: 15, flex: 1 }}>
-                                <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase' }}>Vincular Tarjeta</Text>
-                                <Text style={{ color: activeColor, fontSize: 10, fontWeight: '700' }}>USA TUS TARJETAS PARA PAGAR RÁPIDO</Text>
+                                <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase' }}>Pago Online con Tarjeta</Text>
+                                <Text style={{ color: activeColor, fontSize: 10, fontWeight: '700' }}>PAGO SEGURO CON WEBPAY / REDCOMPRA</Text>
                             </View>
+                            {paymentMethod === 'card' && <CheckCircle2 color={activeColor} size={20} />}
                         </TouchableOpacity>
                     )}
                 </View>
@@ -491,28 +445,24 @@ export default function CheckoutScreen() {
                 </View>
             </ScrollView>
 
-            {/* MODAL DE ALERTA CUSTOM */}
+            {/* MODAL DE ALERTA ELITE */}
             <Modal visible={customAlert.visible} transparent animationType="fade">
-                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', alignItems: 'center', justifyContent: 'center', padding: 30 }}>
-                    <View style={{ backgroundColor: C.card, borderRadius: 35, width: '100%', padding: 35, alignItems: 'center', borderWidth: 1, borderColor: C.border }}>
-                        <View style={{ width: 80, height: 80, borderRadius: 30, backgroundColor: customAlert.type === 'success' ? '#10b98120' : '#ef444420', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
-                            {customAlert.type === 'success' ? (
-                                <CheckCircle2 color="#10b981" size={40} />
-                            ) : (
-                                <XCircle color="#ef4444" size={40} />
-                            )}
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
+                    <View style={{ backgroundColor: C.card, borderRadius: 35, padding: 35, alignItems: 'center', width: '100%', borderWidth: 1, borderColor: C.border }}>
+                        <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: (customAlert.type === 'success' ? '#10b981' : '#ef4444') + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
+                            {customAlert.type === 'success' ? <CheckCircle2 color="#10b981" size={40} /> : <XCircle color="#ef4444" size={40} />}
                         </View>
-                        <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', marginBottom: 10 }}>{customAlert.title}</Text>
-                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', lineHeight: 20, marginBottom: 30 }}>{customAlert.message}</Text>
-                        
+                        <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>{customAlert.title}</Text>
+                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '600', textAlign: 'center', marginBottom: 30, lineHeight: 20 }}>{customAlert.message}</Text>
+
                         <TouchableOpacity 
                             onPress={() => {
                                 setCustomAlert({ ...customAlert, visible: false });
                                 if (customAlert.onClose) customAlert.onClose();
                             }}
-                            style={{ backgroundColor: customAlert.type === 'success' ? '#10b981' : '#ef4444', height: 60, width: '100%', borderRadius: 18, alignItems: 'center', justifyContent: 'center' }}
+                            style={{ backgroundColor: customAlert.type === 'success' ? '#10b981' : '#ef4444', height: 60, width: '100%', borderRadius: 18, alignItems: 'center', justifyContent: 'center', shadowColor: (customAlert.type === 'success' ? '#10b981' : '#ef4444'), shadowOpacity: 0.3, shadowRadius: 10, elevation: 5 }}
                         >
-                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 14 }}>{customAlert.type === 'success' ? 'VER MI TICKET' : 'ENTENDIDO'}</Text>
+                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 13 }}>{customAlert.type === 'success' ? 'ENTENDIDO' : 'REINTENTAR'}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -540,36 +490,82 @@ export default function CheckoutScreen() {
                     )}
                 </TouchableOpacity>
             </View>
-            {/* WEBVIEW TRANSBANK */}
+
+            {/* WEBVIEW TRANSBANK DIRECT ONLINE PAYMENT */}
             <Modal visible={showWebView} animationType="slide">
                 <View style={{ flex: 1, backgroundColor: 'white' }}>
                     <View style={{ paddingTop: 60, paddingBottom: 20, paddingHorizontal: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }}>
-                        <Text style={{ fontSize: 18, fontWeight: '900' }}>VINCULACIÓN SEGURA</Text>
+                        <Text style={{ fontSize: 18, fontWeight: '900' }}>PAGO ONLINE SEGURO</Text>
                         <TouchableOpacity onPress={() => setShowWebView(false)}>
                             <X color="black" size={24} />
                         </TouchableOpacity>
                     </View>
-                    {inscriptionData && (
+                    {webpayData && (
                         <WebView
-                            source={{ uri: inscriptionData.url, method: 'POST', body: `TBK_TOKEN=${inscriptionData.token}` }}
-                            onNavigationStateChange={(navState) => {
-                                if (navState.url.includes('wallet/success')) {
+                            source={{ uri: webpayData.url, method: 'POST', body: `token_ws=${webpayData.token}` }}
+                            onNavigationStateChange={async (navState) => {
+                                if (navState.url.includes('checkout/success')) {
                                     setShowWebView(false);
-                                    setCustomAlert({
-                                        visible: true,
-                                        title: '¡ÉXITO!',
-                                        message: 'TARJETA VINCULADA CORRECTAMENTE.',
-                                        type: 'success',
-                                        onClose: () => {
-                                            walletService.getCards(user!.uid).then(c => {
-                                                setCards(c);
-                                                setPaymentMethod('card');
+                                    if (!user) return;
+                                    if (isTournament) {
+                                        setProcessing(true);
+                                        try {
+                                            const priceNum = Number(price);
+                                            const userProfile = profile as any;
+                                            const clientName = userProfile?.displayName || userProfile?.fullName || user.displayName || 'Jugador MVP';
+                                            
+                                            await tournamentService.registerTeamInTournament(
+                                                tournamentId as string,
+                                                { id: teamId as string, name: teamName as string },
+                                                user.uid,
+                                                clientName,
+                                                priceNum
+                                            );
+                                            
+                                            setCustomAlert({
+                                                visible: true,
+                                                title: '¡INSCRIPCIÓN EXITOSA!',
+                                                message: `TU EQUIPO ${teamName?.toString().toUpperCase()} HA SIDO INSCRITO EN EL TORNEO ${(tournamentName as string).toUpperCase()}.`,
+                                                type: 'success',
+                                                onClose: () => router.back()
                                             });
+                                        } catch (err: any) {
+                                            setCustomAlert({
+                                                visible: true,
+                                                title: 'ERROR INSCRIPCIÓN',
+                                                message: 'PAGO APROBADO PERO HUBO UN ERROR AL REGISTRAR EL EQUIPO.',
+                                                type: 'error'
+                                            });
+                                        } finally {
+                                            setProcessing(false);
                                         }
-                                    });
-                                } else if (navState.url.includes('wallet/error')) {
+                                    } else {
+                                        setCustomAlert({
+                                            visible: true,
+                                            title: '¡RESERVA CONFIRMADA!',
+                                            message: 'TU PAGO ONLINE HA SIDO PROCESADO Y TU RESERVA ESTÁ COMPLETADA.',
+                                            type: 'success',
+                                            onClose: () => {
+                                                router.replace({
+                                                    pathname: '/ticket',
+                                                    params: { 
+                                                        bookingId: webpayData.bookingId, sport, sportColor, 
+                                                        tenantName: (tenantName as string || '').toUpperCase(), 
+                                                        courtName: (courtName as string || '').toUpperCase(), 
+                                                        startTime, date, price: price.toString() 
+                                                    }
+                                                } as any);
+                                            }
+                                        });
+                                    }
+                                } else if (navState.url.includes('checkout/error')) {
                                     setShowWebView(false);
-                                    setCustomAlert({ visible: true, title: 'CANCELADO', message: 'LA VINCULACIÓN FUE CANCELADA.', type: 'error' });
+                                    setCustomAlert({ 
+                                        visible: true, 
+                                        title: 'PAGO CANCELADO', 
+                                        message: 'EL PAGO ONLINE CON TARJETA FUE CANCELADO O RECHAZADO POR EL BANCO.', 
+                                        type: 'error' 
+                                    });
                                 }
                             }}
                             style={{ flex: 1 }}

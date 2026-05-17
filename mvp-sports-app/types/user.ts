@@ -43,5 +43,6 @@ export interface UserProfile {
     form?: string[];
     teamName?: string;
     xp?: number;
+    position?: string;
 }
 

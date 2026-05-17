@@ -34,6 +34,8 @@ interface Tenant {
     infra: { courts: number; staff: number; sports: string[]; scheduleSummary: string; };
     todayStats: { bookings: number; capacity: number }; debt: number;
     lastSync: string; staffMembers: any[];
+    rating?: number;
+    totalFeedbacks?: number;
 }
 
 interface OwnerOption { id: string; name: string; email: string; }
@@ -96,6 +98,41 @@ export default function Page() {
                 const sampleDay = Object.values(schedule)[0] as any;
                 if (sampleDay?.isOpen) scheduleStr = `${sampleDay.open} - ${sampleDay.close}`;
 
+                // CALCULAR RATING REAL (COMBINANDO REVIEWS Y BOOKINGS DE-DUPLICADOS)
+                const qRev = query(collection(db, "reviews"), where("venueId", "==", tenantId));
+                const snapRev = await getDocs(qRev);
+                const revs = snapRev.docs.map(d => d.data());
+
+                const qBook = query(collection(db, "bookings"), where("tenantId", "==", tenantId));
+                const snapBook = await getDocs(qBook);
+                const books = snapBook.docs.map(d => d.data()).filter((b: any) => b.rating > 0);
+
+                const fMap = new Map();
+                const gck = (item: any) => {
+                    const commentNorm = (item.comment || item.feedback || '').trim().toLowerCase().substring(0, 30);
+                    const timeStr = item.date?.seconds || item.date?.toString() || '';
+                    return `${item.userId || item.createdBy || 'anon'}_${tenantId}_${item.rating}_${commentNorm}_${timeStr}`;
+                };
+                
+                revs.forEach((r: any) => fMap.set(r.bookingId || gck(r), r));
+                books.forEach((b: any) => { 
+                    const k = b.id;
+                    const ck = gck(b);
+                    if(!fMap.has(k) && !fMap.has(ck)) fMap.set(k, b); 
+                });
+
+                const allEvals = Array.from(fMap.values());
+                const rawAvg = allEvals.length > 0 
+                    ? (allEvals.reduce((acc, e) => acc + (e.rating || 0), 0) / allEvals.length)
+                    : 0;
+                const realRating = Math.round(rawAvg * 10) / 10;
+                const totalFeedbacks = allEvals.length;
+
+                // Sincronizar con Firestore si el valor almacenado es diferente
+                if (data.rating !== realRating || data.totalFeedbacks !== totalFeedbacks) {
+                    updateDoc(tenantRef, { rating: realRating, totalFeedbacks: totalFeedbacks }).catch(e => console.error(e));
+                }
+
                 // Manejo de multi-dueño con fallback a single-owner (ownerId/ownerName)
                 const ownerIds = data.ownerIds || (data.ownerId ? [data.ownerId] : []);
                 const ownerNames = data.ownerNames || (data.ownerName ? [data.ownerName] : (data.owner ? [data.owner] : []));
@@ -115,6 +152,8 @@ export default function Page() {
                     todayStats: { bookings: 0, capacity: 0 }, debt: data.debtStatus === "Vencido" ? data.planPrice : 0,
                     lastSync: "En línea", staffMembers: staffList,
                     transbankConfig: data.transbankConfig || { commerceCode: "", apiKey: "" },
+                    rating: Number(realRating.toFixed(1)),
+                    totalFeedbacks: allEvals.length,
                 };
             }));
             setTenants(tenantsList);
@@ -345,7 +384,7 @@ export default function Page() {
                                     </div>
 
                                     {/* Infraestructura */}
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-3 gap-2">
                                         <div className="p-2.5 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/10 flex flex-col items-center">
                                             <span className="text-lg font-black text-black dark:text-white leading-none">{t.infra.courts}</span>
                                             <span className="text-[7px] font-black text-slate-400 uppercase mt-1">Canchas</span>
@@ -353,6 +392,10 @@ export default function Page() {
                                         <div className="p-2.5 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/10 flex flex-col items-center">
                                             <span className="text-lg font-black text-black dark:text-white leading-none">{t.infra.staff}</span>
                                             <span className="text-[7px] font-black text-slate-400 uppercase mt-1">Staff</span>
+                                        </div>
+                                        <div className="p-2.5 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-2xl border border-emerald-500/20 flex flex-col items-center">
+                                            <span className="text-lg font-black text-emerald-600 dark:text-emerald-400 leading-none">{t.rating}</span>
+                                            <span className="text-[7px] font-black text-emerald-500 uppercase mt-1">Rating</span>
                                         </div>
                                     </div>
 

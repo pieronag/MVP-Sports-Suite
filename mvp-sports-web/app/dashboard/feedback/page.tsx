@@ -38,45 +38,114 @@ export default function FeedbackPage() {
     const [replyingId, setReplyingId] = useState<string | null>(null);
     const [isSubmittingReply, setIsSubmittingReply] = useState(false);
     const [notification, setNotification] = useState<{ msg: string, type: 'success' | 'error' } | null>(null);
+    
+    const [selectedMonth, setSelectedMonth] = useState<number | 'all'>('all');
+    const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+
+    const fetchData = async () => {
+        if (!user?.uid) return;
+        setLoading(true);
+        try {
+            // 1. Cargar recintos del owner
+            const qVenues = query(collection(db, "tenants"), where("ownerId", "==", user.uid));
+            const snapVenues = await getDocs(qVenues);
+            const venueList = snapVenues.docs.map(d => ({ id: d.id, name: d.data().name }));
+            setVenues(venueList);
+            const venueIds = venueList.map(v => v.id);
+
+            if (venueIds.length === 0) {
+                setLoading(false);
+                return;
+            }
+
+            // 2. Cargar de la colección 'reviews' (Feedback específico)
+            const qReviews = query(
+                collection(db, "reviews"),
+                where("ownerId", "==", user.uid),
+                orderBy("date", "desc")
+            );
+            const snapReviews = await getDocs(qReviews);
+            const reviewsList = snapReviews.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            // 3. Cargar de la colección 'bookings' (Calificaciones directas en la reserva)
+            const qBookings = query(
+                collection(db, "bookings"),
+                where("tenantId", "in", venueIds.slice(0, 10)),
+                orderBy("date", "desc")
+            );
+            const snapBookings = await getDocs(qBookings);
+            const bookingsWithRating = snapBookings.docs
+                .map(d => ({ id: d.id, ...d.data() }))
+                .filter((b: any) => b.rating > 0);
+
+            // 4. Normalizar y Combinar
+            const normalizedBookings = bookingsWithRating.map((b: any) => ({
+                id: b.id,
+                venueId: b.tenantId,
+                venueName: b.tenantName || venueList.find(v => v.id === b.tenantId)?.name || 'Recinto',
+                userId: b.userId || b.clientId || b.createdBy || 'anon',
+                userName: b.clientName || b.userName || 'Jugador MVP',
+                rating: b.rating,
+                comment: b.feedback || b.comment || 'Sin comentario',
+                date: b.date,
+                bookingId: b.id,
+                sport: b.sport,
+                bookingTime: b.startTime,
+                isFromBooking: true
+            }));
+
+            // Eliminar duplicados usando Map (priorizando reviews sobre bookings)
+            const feedbackMap = new Map();
+            
+            // Función para generar una clave de contenido (para de-duplicar si no hay bookingId)
+            const getContentKey = (item: any) => {
+                const commentNorm = (item.comment || '').trim().toLowerCase().substring(0, 30);
+                const timeStr = item.date?.seconds || item.date?.toString() || '';
+                return `${item.userId}_${item.venueId}_${item.rating}_${commentNorm}_${timeStr}`;
+            };
+
+            // 1. Procesar reviews primero
+            reviewsList.forEach(r => {
+                const key = (r as any).bookingId || getContentKey(r);
+                feedbackMap.set(key, r);
+            });
+
+            // 2. Procesar bookings normalizados (solo si no existe ya esa evaluación)
+            normalizedBookings.forEach(b => {
+                const key = (b as any).id;
+                const contentKey = getContentKey(b);
+                if (!feedbackMap.has(key) && !feedbackMap.has(contentKey)) {
+                    feedbackMap.set(key, b);
+                }
+            });
+
+            const uniqueFeedback = Array.from(feedbackMap.values()).sort((a: any, b: any) => {
+                const dateA = a.date?.seconds || 0;
+                const dateB = b.date?.seconds || 0;
+                return dateB - dateA;
+            });
+
+            setReviews(uniqueFeedback);
+        } catch (error) {
+            console.error("Error al cargar feedback:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            if (!user?.uid) return;
-            setLoading(true);
-            try {
-                const qVenues = query(collection(db, "tenants"), where("ownerId", "==", user.uid));
-                const snapVenues = await getDocs(qVenues);
-                const venueList = snapVenues.docs.map(d => ({ id: d.id, name: d.data().name }));
-                setVenues(venueList);
-
-                const qReviews = query(
-                    collection(db, "reviews"),
-                    where("ownerId", "==", user.uid),
-                    orderBy("date", "desc"),
-                    limit(100)
-                );
-
-                const snapReviews = await getDocs(qReviews);
-                const reviewsList = snapReviews.docs.map(d => {
-                    const data = d.data();
-                    const venueName = data.venueName || venueList.find(v => v.id === data.venueId)?.name || 'Recinto';
-                    return { id: d.id, ...data, venueName };
-                });
-
-                setReviews(reviewsList);
-            } catch (error) {
-                console.error("Error al cargar feedback:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchData();
     }, [user]);
 
     const filteredReviews = reviews.filter(r => {
         const matchVenue = selectedVenueId === 'all' || r.venueId === selectedVenueId;
         const matchRating = filterRating === 'all' || Math.floor(r.rating) === filterRating;
-        return matchVenue && matchRating;
+        
+        const revDate = r.date?.toDate();
+        const matchMonth = selectedMonth === 'all' || (revDate && revDate.getMonth() + 1 === selectedMonth);
+        const matchYear = revDate && revDate.getFullYear() === selectedYear;
+
+        return matchVenue && matchRating && matchMonth && matchYear;
     });
 
     const handleReply = async (reviewId: string) => {
@@ -100,8 +169,15 @@ export default function FeedbackPage() {
     };
 
     const avgRating = filteredReviews.length > 0
-        ? (filteredReviews.reduce((acc, r) => acc + r.rating, 0) / filteredReviews.length).toFixed(1)
+        ? (Math.round((filteredReviews.reduce((acc, r) => acc + r.rating, 0) / filteredReviews.length) * 10) / 10).toFixed(1)
         : '0.0';
+
+    const MESES = [
+        { id: 1, name: 'Enero' }, { id: 2, name: 'Febrero' }, { id: 3, name: 'Marzo' },
+        { id: 4, name: 'Abril' }, { id: 5, name: 'Mayo' }, { id: 6, name: 'Junio' },
+        { id: 7, name: 'Julio' }, { id: 8, name: 'Agosto' }, { id: 9, name: 'Septiembre' },
+        { id: 10, name: 'Octubre' }, { id: 11, name: 'Noviembre' }, { id: 12, name: 'Diciembre' }
+    ];
 
     return (
         <div className="w-full space-y-6 pb-12 relative animate-fadeIn">
@@ -121,23 +197,56 @@ export default function FeedbackPage() {
                     </h1>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-3">
+                    {/* Botón Actualizar */}
+                    <button 
+                        onClick={() => fetchData()}
+                        className="p-2.5 rounded-xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 text-slate-400 hover:text-emerald-500 hover:border-emerald-500/50 transition-all group"
+                        title="Actualizar Datos"
+                    >
+                        <ArrowPathIcon className={`w-4 h-4 group-hover:rotate-180 transition-transform duration-500`} />
+                    </button>
+
+                    {/* Filtro Recinto */}
                     <div className="relative">
-                        <BuildingStorefrontIcon className="w-4 h-4 text-emerald-500 absolute left-3 top-1/2 -translate-y-1/2 z-10" />
+                        <BuildingStorefrontIcon className="w-3.5 h-3.5 text-emerald-500 absolute left-3 top-1/2 -translate-y-1/2 z-10" />
                         <select
                             value={selectedVenueId}
                             onChange={(e) => setSelectedVenueId(e.target.value)}
-                            className="appearance-none bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl pl-9 pr-10 py-2.5 text-[10px] font-black outline-none text-slate-600 dark:text-slate-300 uppercase cursor-pointer transition-all hover:border-emerald-500/50"
+                            className="appearance-none bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl pl-8 pr-10 py-2 text-[9px] font-black outline-none text-slate-600 dark:text-slate-300 uppercase cursor-pointer transition-all hover:border-emerald-500/50"
                         >
                             <option value="all">TODOS LOS RECINTOS</option>
                             {venues.map(v => <option key={v.id} value={v.id}>{v.name.toUpperCase()}</option>)}
                         </select>
                     </div>
 
+                    {/* Filtro Mes */}
+                    <div className="relative">
+                        <select
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
+                            className="appearance-none bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl px-4 py-2 text-[9px] font-black outline-none text-slate-600 dark:text-slate-300 uppercase cursor-pointer transition-all hover:border-emerald-500/50"
+                        >
+                            <option value="all">TODOS LOS MESES</option>
+                            {MESES.map(m => <option key={m.id} value={m.id}>{m.name.toUpperCase()}</option>)}
+                        </select>
+                    </div>
+
+                    {/* Filtro Año */}
+                    <div className="relative">
+                        <select
+                            value={selectedYear}
+                            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                            className="appearance-none bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl px-4 py-2 text-[9px] font-black outline-none text-slate-600 dark:text-slate-300 uppercase cursor-pointer transition-all hover:border-emerald-500/50"
+                        >
+                            {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
+                        </select>
+                    </div>
+
                     <div className="flex items-center gap-1 bg-white dark:bg-white/5 p-1 rounded-xl border border-slate-100 dark:border-white/10">
                         <button 
                             onClick={() => setFilterRating('all')} 
-                            className={`px-4 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all ${filterRating === 'all' ? 'bg-slate-950 dark:bg-emerald-500 text-white dark:text-slate-950 shadow-lg' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
+                            className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase transition-all ${filterRating === 'all' ? 'bg-slate-950 dark:bg-emerald-500 text-white dark:text-slate-950 shadow-lg' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                         >
                             TODAS
                         </button>
@@ -145,9 +254,9 @@ export default function FeedbackPage() {
                             <button 
                                 key={star} 
                                 onClick={() => setFilterRating(star)} 
-                                className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[9px] font-black transition-all ${filterRating === star ? 'bg-slate-950 dark:bg-emerald-500 text-white dark:text-slate-950 shadow-lg' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
+                                className={`flex items-center gap-1 px-3 py-1 rounded-lg text-[9px] font-black transition-all ${filterRating === star ? 'bg-slate-950 dark:bg-emerald-500 text-white dark:text-slate-950 shadow-lg' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                             >
-                                {star} <StarIconSolid className="w-3.5 h-3.5 text-amber-500" />
+                                {star} <StarIconSolid className="w-3 h-3 text-amber-500" />
                             </button>
                         ))}
                     </div>
@@ -207,86 +316,65 @@ export default function FeedbackPage() {
                     <p className="text-[10px] font-black uppercase tracking-widest">Sín opiniones bajo estos criterios</p>
                 </PanelGlass>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-20">
                     {filteredReviews.map((review) => (
-                        <PanelGlass key={review.id} className="p-6 flex flex-col justify-between group hover:border-emerald-500/30 transition-all duration-500">
+                        <PanelGlass key={review.id} className="p-4 flex flex-col justify-between group hover:border-emerald-500/30 transition-all duration-500">
                             <div>
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 shrink-0 border border-slate-200 dark:border-white/10 group-hover:bg-emerald-500/10 group-hover:text-emerald-500 transition-all">
-                                            <UserCircleIcon className="w-7 h-7" />
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 shrink-0 border border-slate-200 dark:border-white/10 group-hover:bg-emerald-500/10 group-hover:text-emerald-500 transition-all">
+                                            <UserCircleIcon className="w-5 h-5" />
                                         </div>
-                                        <div>
-                                            <h4 className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-tight">{review.userName || 'Usuario Anónimo'}</h4>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded-full">{review.venueName}</span>
-                                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">
-                                                    {review.date?.toDate().toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                        <div className="min-w-0">
+                                            <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-tight truncate">
+                                                {typeof review.userName === 'string' ? review.userName : (review.userName?.userName || 'Jugador MVP')}
+                                            </h4>
+                                            <div className="flex flex-col gap-0.5 mt-0.5">
+                                                <span className="text-[7px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest truncate">{review.venueName}</span>
+                                                <span className="text-[7px] font-bold text-slate-400 uppercase">
+                                                    {review.date?.toDate ? review.date.toDate().toLocaleDateString('es-CL', { day: '2-digit', month: 'short' }) : 'Reciente'}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex text-amber-500 bg-amber-500/5 px-2.5 py-1 rounded-xl border border-amber-500/10">
+                                    <div className="flex text-amber-500 bg-amber-500/5 px-2 py-0.5 rounded-lg border border-amber-500/10">
                                         {[1, 2, 3, 4, 5].map(s => (
-                                            <StarIconSolid key={s} className={`w-3.5 h-3.5 ${s <= review.rating ? 'opacity-100' : 'opacity-10'}`} />
+                                            <StarIconSolid key={s} className={`w-2.5 h-2.5 ${s <= review.rating ? 'opacity-100' : 'opacity-10'}`} />
                                         ))}
                                     </div>
                                 </div>
 
-                                <div className="mb-8 relative">
-                                    <p className="text-xs text-slate-700 dark:text-slate-300 italic font-medium leading-relaxed bg-slate-50 dark:bg-white/5 p-4 rounded-2xl border border-slate-100 dark:border-white/5">
-                                        "{review.comment}"
+                                <div className="mb-4">
+                                    <p className="text-[11px] text-slate-700 dark:text-slate-300 italic font-medium leading-relaxed bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-100 dark:border-white/5 line-clamp-3 group-hover:line-clamp-none transition-all">
+                                        "{typeof review.comment === 'string' ? review.comment : 'Sin comentario'}"
                                     </p>
+                                    
+                                    {review.bookingId && (
+                                        <div className="mt-3 flex flex-wrap gap-1.5">
+                                            <div className="bg-slate-50 dark:bg-white/5 px-2 py-1 rounded-lg border border-slate-100 dark:border-white/5 flex items-center gap-1.5">
+                                                <span className="text-[7px] font-black text-slate-400 uppercase">ID</span>
+                                                <span className="text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase">#{review.bookingId.slice(-4).toUpperCase()}</span>
+                                            </div>
+                                            {review.sport && (
+                                                <div className="bg-slate-50 dark:bg-white/5 px-2 py-1 rounded-lg border border-slate-100 dark:border-white/5 flex items-center gap-1.5">
+                                                    <span className="text-[8px] font-black text-slate-600 dark:text-slate-300 uppercase">
+                                                        {typeof review.sport === 'string' ? review.sport : 'General'}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
-                            {/* SECCIÓN RESPUESTA PREMIUM */}
-                            <div className="mt-auto pt-6 border-t border-slate-100 dark:border-white/5">
-                                {review.reply ? (
-                                    <div className="bg-emerald-500/5 p-4 rounded-2xl border border-emerald-500/20 relative">
-                                        <div className="absolute top-0 left-0 w-1.5 h-full bg-emerald-500 rounded-l-2xl"></div>
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <p className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Respuesta del Recinto</p>
-                                        </div>
-                                        <p className="text-[11px] text-slate-600 dark:text-slate-400 font-bold leading-relaxed">{review.reply}</p>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        {replyingId === review.id ? (
-                                            <div className="flex flex-col gap-3 animate-fadeIn">
-                                                <textarea
-                                                    value={replyText}
-                                                    onChange={(e) => setReplyText(e.target.value)}
-                                                    placeholder="ESCRIBE TU RESPUESTA PÚBLICA..."
-                                                    className="w-full bg-white dark:bg-white/5 border border-emerald-500/30 rounded-xl px-4 py-3 text-[11px] font-bold outline-none focus:border-emerald-500 transition-all resize-none h-24 uppercase"
-                                                    autoFocus
-                                                />
-                                                <div className="flex gap-2">
-                                                    <button 
-                                                        onClick={() => setReplyingId(null)} 
-                                                        className="flex-1 py-2.5 text-[9px] font-black uppercase tracking-widest text-slate-500 border border-slate-100 dark:border-white/10 rounded-xl hover:bg-slate-50 transition-all"
-                                                    >
-                                                        CANCELAR
-                                                    </button>
-                                                    <button 
-                                                        onClick={() => handleReply(review.id)} 
-                                                        disabled={isSubmittingReply} 
-                                                        className="flex-1 bg-slate-950 dark:bg-emerald-500 text-white dark:text-slate-950 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-xl active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
-                                                    >
-                                                        {isSubmittingReply ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <PaperAirplaneIcon className="w-4 h-4" />}
-                                                        PUBLICAR
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <button 
-                                                onClick={() => setReplyingId(review.id)} 
-                                                className="w-full text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10 border border-emerald-500/20 py-3 rounded-2xl flex items-center justify-center gap-3 transition-all uppercase tracking-[0.15em]"
-                                            >
-                                                <ChatBubbleLeftRightIcon className="w-4 h-4" /> Responder al Cliente
-                                            </button>
-                                        )}
-                                    </div>
+                            {/* SECCIÓN INFO EXTRA (SIMPLE) */}
+                            <div className="mt-auto pt-4 border-t border-slate-100 dark:border-white/5 flex justify-between items-center">
+                                <div className="flex items-center gap-1.5">
+                                    <div className={`w-1.5 h-1.5 rounded-full ${review.rating >= 4 ? 'bg-emerald-500' : review.rating >= 3 ? 'bg-amber-500' : 'bg-red-500'}`}></div>
+                                    <p className="text-[7px] font-black text-slate-400 uppercase tracking-tighter">Verificado</p>
+                                </div>
+                                {review.reply && (
+                                    <span className="text-[7px] font-bold text-emerald-600 uppercase bg-emerald-500/10 px-2 py-0.5 rounded-md">Analizado</span>
                                 )}
                             </div>
                         </PanelGlass>

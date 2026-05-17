@@ -249,6 +249,24 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
       // Ejecutar actualización de ELO para el nuevo usuario
       await recalculateUserELO(user.uid, formData.email);
 
+      // Enviar correo electrónico confirmando el registro de manera asíncrona
+      try {
+        await fetch("/api/send-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: formData.displayName,
+            email: formData.email,
+            rut: formData.rut,
+            phone: formData.phone,
+            sport: formData.mainSport,
+            position: formData.position
+          })
+        });
+      } catch (emailErr) {
+        console.error("No se pudo enviar el correo de confirmación de registro:", emailErr);
+      }
+
       // Forzar cierre de sesión tras el registro como solicita el usuario
       await signOut(auth);
 

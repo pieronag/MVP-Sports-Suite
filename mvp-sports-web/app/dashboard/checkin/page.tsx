@@ -33,7 +33,7 @@ const StatusModal = ({ isOpen, title, message, type, onClose }: any) => {
     if (!isOpen) return null;
     const isError = type === 'error';
     const isWarning = type === 'warning';
-    
+
     return (
         <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={onClose}>
             <div className="bg-white dark:bg-[#0B0F19] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative text-center" onClick={(e) => e.stopPropagation()}>
@@ -92,7 +92,7 @@ export default function CheckInPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [manualCode, setManualCode] = useState('');
     const [processingId, setProcessingId] = useState<string | null>(null);
-    const [filter, setFilter] = useState<'all' | 'pending' | 'completed'>('all');
+    const [filter, setFilter] = useState<'all' | 'pending' | 'completed' | 'cancelled'>('pending');
     const [selectedBookingForConfirm, setSelectedBookingForConfirm] = useState<Booking | null>(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
@@ -213,7 +213,13 @@ export default function CheckInPage() {
                 qrScannerRef.current = scanner;
                 await scanner.start(
                     { facingMode: "environment" },
-                    { fps: 15, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
+                    { 
+                        fps: 30, 
+                        qrbox: (w, h) => {
+                            const size = Math.floor(Math.min(w, h) * 0.8);
+                            return { width: size, height: size };
+                        },
+                    },
                     (decodedText) => {
                         const found = bookings.find(b => b.id === decodedText || b.id.slice(-6).toUpperCase() === decodedText.toUpperCase());
                         if (found) {
@@ -341,7 +347,7 @@ export default function CheckInPage() {
         } else {
             endTimeDate = new Date(startTimeDate.getTime() + 3600000);
         }
-        
+
         setSelectedBookingForConfirm({
             ...booking,
             startTime: Timestamp.fromDate(startTimeDate),
@@ -370,22 +376,22 @@ export default function CheckInPage() {
             }
 
             await updateDoc(doc(db, "bookings", booking.id), updateData);
-            
-            setBookings(prev => prev.map(b => 
+
+            setBookings(prev => prev.map(b =>
                 b.id === booking.id ? { ...b, checkIn: true, paymentStatus: 'paid', status: 'confirmed' } : b
             ));
-            
+
             setIsConfirmModalOpen(false);
             setSelectedBookingForConfirm(null);
-            setStatusModal({ 
-                isOpen: true, 
-                title: "Ingreso Exitoso", 
-                message: `El ingreso de ${booking.clientName} ha sido registrado correctamente.`, 
-                type: 'info' 
+            setStatusModal({
+                isOpen: true,
+                title: "Ingreso Exitoso",
+                message: `El ingreso de ${booking.clientName} ha sido registrado correctamente.`,
+                type: 'info'
             });
         } catch (error: any) {
             console.error("Error confirming check-in:", error);
-            const errorMsg = error?.code === 'permission-denied' 
+            const errorMsg = error?.code === 'permission-denied'
                 ? "Permiso denegado. Tu cuenta no tiene privilegios para modificar esta reserva."
                 : "Hubo un error al procesar el ingreso. Reintenta.";
             setStatusModal({ isOpen: true, title: "Falla de Sistema", message: errorMsg, type: 'error' });
@@ -419,15 +425,15 @@ export default function CheckInPage() {
                 }
             }
 
-            setBookings(prev => prev.map(b => 
+            setBookings(prev => prev.map(b =>
                 b.id === booking.id ? { ...b, status: 'cancelled', noShow: true } : b
             ));
 
-            setStatusModal({ 
-                isOpen: true, 
-                title: "No-Show Registrado", 
-                message: `Se ha cancelado la reserva y aplicado un strike a ${booking.clientName}.`, 
-                type: 'info' 
+            setStatusModal({
+                isOpen: true,
+                title: "No-Show Registrado",
+                message: `Se ha cancelado la reserva y aplicado un strike a ${booking.clientName}.`,
+                type: 'info'
             });
         } catch (error) {
             console.error("Error in handleNoShow:", error);
@@ -463,39 +469,43 @@ export default function CheckInPage() {
     // FILTROS
     const filteredBookings = bookings.filter(b => {
         const matchesSearch = b.clientName.toLowerCase().includes(searchTerm.toLowerCase()) || b.courtName.toLowerCase().includes(searchTerm.toLowerCase());
-        if (filter === 'pending') return matchesSearch && !b.checkIn;
+        if (filter === 'pending') return matchesSearch && !b.checkIn && b.status !== 'cancelled';
         if (filter === 'completed') return matchesSearch && b.checkIn;
+        if (filter === 'cancelled') return matchesSearch && b.status === 'cancelled';
         return matchesSearch;
     });
 
     const stats = {
         total: bookings.length,
         in: bookings.filter(b => b.checkIn).length,
-        pending: bookings.filter(b => !b.checkIn && !validateCheckInTime(b).isLate).length,
-        cancelled: bookings.filter(b => !b.checkIn && validateCheckInTime(b).isLate).length,
+        pending: bookings.filter(b => !b.checkIn && b.status !== 'cancelled' && !validateCheckInTime(b).isLate).length,
+        noShow: bookings.filter(b => !b.checkIn && b.status !== 'cancelled' && validateCheckInTime(b).isLate).length,
+        cancelled: bookings.filter(b => b.status === 'cancelled').length,
         paidCount: bookings.filter(b => b.paymentStatus === 'paid').length,
-        unpaidCount: bookings.filter(b => b.paymentStatus !== 'paid').length,
+        unpaidCount: bookings.filter(b => b.paymentStatus !== 'paid' && b.status !== 'cancelled').length,
         totalDebt: bookings.reduce((acc, b) => {
-            if (b.paymentStatus === 'paid') return acc;
-            const debt = b.remainingBalance !== undefined ? b.remainingBalance : (b.price - (b.deposit || 0));
-            return acc + (debt > 0 ? debt : 0);
+            if (b.paymentStatus === 'paid' || b.status === 'cancelled') return acc;
+            const price = b.totalPrice || b.price || 0;
+            const paid = b.paymentStatus === 'partial' ? (b.deposit || 0) : 0;
+            return acc + (price - paid);
         }, 0),
         totalCollected: bookings.reduce((acc, b) => {
-            const paid = (b.price || 0) - (b.remainingBalance !== undefined ? b.remainingBalance : (b.price - (b.deposit || 0)));
-            return acc + (paid > 0 ? paid : 0);
+            if (b.paymentStatus === 'paid') return acc + (b.totalPrice || b.price || 0);
+            if (b.paymentStatus === 'partial') return acc + (b.deposit || 0);
+            return acc;
         }, 0),
-        lostRevenue: bookings.filter(b => !b.checkIn && validateCheckInTime(b).isLate).reduce((acc, b) => acc + (b.price || 0), 0),
-        potentialTotal: bookings.reduce((acc, b) => acc + (b.price || 0), 0)
+        lostRevenue: bookings.filter(b => !b.checkIn && (b.status === 'cancelled' || validateCheckInTime(b).isLate)).reduce((acc, b) => acc + (b.totalPrice || b.price || 0), 0),
+        potentialTotal: bookings.reduce((acc, b) => acc + (b.totalPrice || b.price || 0), 0)
     };
 
     return (
         <div className="space-y-6 animate-fadeIn font-sans pb-10 text-slate-600 dark:text-slate-300">
-            <StatusModal 
-                isOpen={statusModal.isOpen} 
-                title={statusModal.title} 
-                message={statusModal.message} 
-                type={statusModal.type} 
-                onClose={() => setStatusModal(prev => ({ ...prev, isOpen: false }))} 
+            <StatusModal
+                isOpen={statusModal.isOpen}
+                title={statusModal.title}
+                message={statusModal.message}
+                type={statusModal.type}
+                onClose={() => setStatusModal(prev => ({ ...prev, isOpen: false }))}
             />
 
             {/* === MODAL DE CÁMARA (Overlay Completo — funciona en móvil y web) === */}
@@ -511,25 +521,21 @@ export default function CheckInPage() {
                         </button>
                     </div>
 
-                    {/* Viewfinder */}
+                    {/* Viewfinder Tunnel View - Ajustado según el ALTO */}
                     <div className="flex-1 relative bg-black flex items-center justify-center overflow-hidden">
                         {!cameraError ? (
-                            <>
-                                <div id="qr-reader" className="w-full h-full"></div>
-                                {/* Guías Visuales (Overlay sobre el div de la librería) */}
-                                <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10">
-                                    <div className="relative w-64 h-64 border-2 border-emerald-500/40 rounded-3xl box-border shadow-[0_0_0_9999px_rgba(0,0,0,0.6)]">
-                                        <div className="absolute border-[3px] border-transparent border-t-emerald-400 border-r-emerald-400 w-10 h-10 -top-0.5 -right-0.5 rounded-tr-2xl"></div>
-                                        <div className="absolute border-[3px] border-transparent border-t-emerald-400 border-l-emerald-400 w-10 h-10 -top-0.5 -left-0.5 rounded-tl-2xl"></div>
-                                        <div className="absolute border-[3px] border-transparent border-b-emerald-400 border-l-emerald-400 w-10 h-10 -bottom-0.5 -left-0.5 rounded-bl-2xl"></div>
-                                        <div className="absolute border-[3px] border-transparent border-b-emerald-400 border-r-emerald-400 w-10 h-10 -bottom-0.5 -right-0.5 rounded-br-2xl"></div>
-                                        <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-400 shadow-[0_0_15px_#34D399] animate-scan-vertical opacity-80"></div>
-                                    </div>
+                            <div className="relative w-[70vh] h-[70vh] max-w-[90vw] max-h-[90vw] md:max-w-[400px] md:max-h-[400px] rounded-3xl overflow-hidden border-2 border-emerald-500/40 shadow-[0_0_40px_rgba(16,185,129,0.2)]">
+                                <div id="qr-reader" className="w-full h-full [&>video]:object-contain [&>video]:-scale-x-100"></div>
+                                
+                                {/* Guías Visuales Internas */}
+                                <div className="absolute inset-0 pointer-events-none z-10">
+                                    <div className="absolute border-[3px] border-transparent border-t-emerald-400 border-r-emerald-400 w-10 h-10 top-0 right-0 rounded-tr-2xl"></div>
+                                    <div className="absolute border-[3px] border-transparent border-t-emerald-400 border-l-emerald-400 w-10 h-10 top-0 left-0 rounded-tl-2xl"></div>
+                                    <div className="absolute border-[3px] border-transparent border-b-emerald-400 border-l-emerald-400 w-10 h-10 bottom-0 left-0 rounded-bl-2xl"></div>
+                                    <div className="absolute border-[3px] border-transparent border-b-emerald-400 border-r-emerald-400 w-10 h-10 bottom-0 right-0 rounded-br-2xl"></div>
+                                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-400 shadow-[0_0_15px_#34D399] animate-scan-vertical opacity-80"></div>
                                 </div>
-                                <p className="absolute bottom-24 z-20 text-white/90 text-[10px] font-bold uppercase bg-black/60 px-4 py-1.5 rounded-full backdrop-blur-md">
-                                    Apunta el código QR del cliente
-                                </p>
-                            </>
+                            </div>
                         ) : (
                             <div className="flex flex-col items-center text-white/70 gap-4 px-8 text-center max-w-sm">
                                 <div className="p-4 bg-red-500/20 rounded-full"><VideoCameraSlashIcon className="w-10 h-10 text-red-500" /></div>
@@ -582,7 +588,7 @@ export default function CheckInPage() {
             </div>
 
             {/* === KPI GRID PREMIUM COMPACT === */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-xl border border-slate-100 dark:border-white/5 shadow-sm relative overflow-hidden group">
                     <div className="flex items-center gap-2.5 mb-2">
                         <div className="p-1.5 bg-slate-50 dark:bg-white/5 rounded-lg text-slate-400 group-hover:text-emerald-500 transition-colors">
@@ -626,13 +632,26 @@ export default function CheckInPage() {
                 <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-xl border border-red-100 dark:border-red-500/20 shadow-sm group">
                     <div className="flex items-center gap-2.5 mb-2">
                         <div className="p-1.5 bg-red-50 dark:bg-red-500/10 rounded-lg text-red-500">
-                            <ExclamationCircleIcon className="w-3.5 h-3.5" />
+                            <ExclamationTriangleIcon className="w-3.5 h-3.5" />
                         </div>
                         <p className="text-[8px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Ausentes</p>
                     </div>
                     <div className="flex items-baseline justify-between">
-                        <p className="text-2xl font-black text-red-600 dark:text-red-400 tracking-tighter">{stats.cancelled}</p>
-                        <p className="text-[10px] font-black text-red-600 dark:text-red-400 uppercase">{formatMoney(stats.lostRevenue)}</p>
+                        <p className="text-2xl font-black text-red-600 dark:text-red-400 tracking-tighter">{stats.noShow}</p>
+                        <p className="text-[10px] font-black text-red-600 dark:text-red-400 uppercase">NO-SHOW</p>
+                    </div>
+                </div>
+
+                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm group">
+                    <div className="flex items-center gap-2.5 mb-2">
+                        <div className="p-1.5 bg-slate-100 dark:bg-white/5 rounded-lg text-slate-400">
+                            <NoSymbolIcon className="w-3.5 h-3.5" />
+                        </div>
+                        <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Anuladas</p>
+                    </div>
+                    <div className="flex items-baseline justify-between">
+                        <p className="text-2xl font-black text-slate-500 tracking-tighter">{stats.cancelled}</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase">MANUAL</p>
                     </div>
                 </div>
             </div>
@@ -702,7 +721,7 @@ export default function CheckInPage() {
                     />
                 </div>
                 <div className="flex gap-1.5 shrink-0 overflow-x-auto">
-                    {(['all', 'pending', 'completed'] as const).map((f) => (
+                    {(['all', 'pending', 'completed', 'cancelled'] as const).map((f) => (
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
@@ -710,7 +729,7 @@ export default function CheckInPage() {
                                 ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900 shadow-md'
                                 : 'bg-white dark:bg-[#0B0F19] text-slate-400 border-slate-200 dark:border-white/10 hover:border-slate-300'}`}
                         >
-                            {f === 'all' ? `Todos (${stats.total})` : f === 'pending' ? `Pend. (${stats.pending})` : `OK (${stats.in})`}
+                            {f === 'all' ? `Todos (${stats.total})` : f === 'pending' ? `Pend. (${stats.pending})` : f === 'completed' ? `OK (${stats.in})` : `Anuladas (${stats.cancelled})`}
                         </button>
                     ))}
                 </div>
@@ -723,7 +742,7 @@ export default function CheckInPage() {
                         <ClockIcon className="w-3.5 h-3.5 text-emerald-500" /> Registro de Hoy
                     </h3>
                     <div className="flex gap-1.5">
-                        {(['all', 'pending', 'completed'] as const).map((f) => (
+                        {(['all', 'pending', 'completed', 'cancelled'] as const).map((f) => (
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
@@ -731,7 +750,7 @@ export default function CheckInPage() {
                                     ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-lg'
                                     : 'bg-white dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/10 hover:border-emerald-500/50'}`}
                             >
-                                {f === 'all' ? `Todo` : f === 'pending' ? `Pendientes` : `Listos`}
+                                {f === 'all' ? `Todo` : f === 'pending' ? `Pendientes` : f === 'completed' ? `Listos` : `Anuladas`}
                             </button>
                         ))}
                     </div>
@@ -758,7 +777,7 @@ export default function CheckInPage() {
                             const isCancelled = !isCheckedIn && validation.isLate;
 
                             return (
-                                <div key={booking.id} className={`group flex items-center gap-4 p-3.5 transition-all hover:bg-slate-50/50 dark:hover:bg-white/[0.01] ${isCheckedIn ? 'opacity-60 grayscale-[0.3]' : ''}`}>
+                                <div key={booking.id} className={`group flex items-center gap-4 p-3.5 transition-all hover:bg-slate-50/50 dark:hover:bg-white/[0.01] ${(isCheckedIn || booking.status === 'cancelled' || isCancelled) ? 'opacity-50 grayscale-[0.5]' : ''}`}>
                                     {/* INDICADOR DE HORA COMPACT */}
                                     <div className="flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg shrink-0 group-hover:scale-105 transition-transform">
                                         <span className="text-[11px] font-black tracking-tighter">{booking.startTimeStr || formatTime(booking.startTime)}</span>
@@ -771,10 +790,12 @@ export default function CheckInPage() {
                                             <h3 className="text-[11px] font-black text-slate-900 dark:text-white uppercase truncate">
                                                 {booking.clientName}
                                             </h3>
-                                            {isPaid ? (
-                                                <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 text-[7px] font-black uppercase rounded border border-emerald-500/20">Pagado</span>
-                                            ) : (
-                                                <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 text-[7px] font-black uppercase rounded border border-amber-500/20">Pendiente</span>
+                                            {!isCheckedIn && booking.status !== 'cancelled' && !isCancelled && (
+                                                isPaid ? (
+                                                    <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 text-[7px] font-black uppercase rounded border border-emerald-500/20">Pagado</span>
+                                                ) : (
+                                                    <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 text-[7px] font-black uppercase rounded border border-amber-500/20">Pendiente</span>
+                                                )
                                             )}
                                         </div>
                                         <div className="flex items-center gap-3 text-slate-400">
@@ -794,7 +815,7 @@ export default function CheckInPage() {
 
                                     {/* ACCIONES COMPACT */}
                                     <div className="shrink-0 flex items-center gap-4">
-                                        {!isPaid && (
+                                        {!isPaid && booking.status !== 'cancelled' && !isCancelled && (
                                             <div className="text-right hidden sm:block">
                                                 <p className="text-[8px] font-black text-amber-500 uppercase mb-0.5">Por Cobrar</p>
                                                 <p className="text-[10px] font-black text-amber-600 dark:text-amber-400">
@@ -805,14 +826,20 @@ export default function CheckInPage() {
 
                                         <div className="flex items-center gap-2">
                                             {isCheckedIn ? (
-                                                <div className="flex flex-col items-center">
-                                                    <CheckCircleIcon className="w-5 h-5 text-emerald-500" />
-                                                    <span className="text-[6px] font-black text-emerald-500 uppercase">Ingresado</span>
+                                                <div className="flex flex-col items-end gap-1">
+                                                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
+                                                        <ShieldCheckIcon className="w-3.5 h-3.5 text-emerald-500" />
+                                                        <span className="text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Acceso OK</span>
+                                                    </div>
+                                                    <span className="text-[7px] font-bold text-slate-400 uppercase mr-1">Listo</span>
                                                 </div>
-                                            ) : booking.status === 'cancelled' || isCancelled ? (
-                                                <div className="flex flex-col items-center opacity-60">
-                                                    <NoSymbolIcon className="w-5 h-5 text-red-500" />
-                                                    <span className="text-[6px] font-black text-red-500 uppercase">Cancelada</span>
+                                            ) : (booking.status === 'cancelled' || isCancelled) ? (
+                                                <div className="flex flex-col items-end gap-1">
+                                                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20">
+                                                        <NoSymbolIcon className="w-3.5 h-3.5 text-red-500" />
+                                                        <span className="text-[8px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Anulada</span>
+                                                    </div>
+                                                    <span className="text-[7px] font-bold text-slate-400 uppercase mr-1">No-Show</span>
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center gap-2">
@@ -867,19 +894,20 @@ export default function CheckInPage() {
                             <div className="bg-slate-50 dark:bg-white/5 rounded-2xl p-4 space-y-3 border border-slate-100 dark:border-white/5 shadow-inner">
                                 <div className="flex justify-between items-center border-b border-slate-200/50 dark:border-white/5 pb-2">
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Cliente</span>
-                                    <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase">{selectedBookingForConfirm.clientName}</span>
+                                    <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase">{selectedBookingForConfirm?.clientName}</span>
                                 </div>
                                 <div className="flex justify-between items-center border-b border-slate-200/50 dark:border-white/5 pb-2">
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Cancha</span>
                                     <div className="text-right">
-                                        <div className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase">{selectedBookingForConfirm.courtName}</div>
-                                        {selectedBookingForConfirm.sport && <div className="text-[8px] font-bold text-slate-400 capitalize">{selectedBookingForConfirm.sport.toLowerCase()}</div>}
+                                        <div className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase">{selectedBookingForConfirm?.courtName}</div>
+                                        {selectedBookingForConfirm?.sport && <div className="text-[8px] font-bold text-slate-400 capitalize">{selectedBookingForConfirm.sport.toLowerCase()}</div>}
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-center border-b border-slate-200/50 dark:border-white/5 pb-2">
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Horario</span>
                                     <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase font-mono tracking-tighter">
                                         {(() => {
+                                            if (!selectedBookingForConfirm) return '--:--';
                                             const start = selectedBookingForConfirm.startTimeStr || formatTime(selectedBookingForConfirm.startTime);
                                             const endStr = selectedBookingForConfirm.endTimeStr;
                                             if (endStr) return `${start} - ${endStr}`;
@@ -894,16 +922,16 @@ export default function CheckInPage() {
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Estado Pago</span>
-                                    <span className={`text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider ${selectedBookingForConfirm.paymentStatus === 'paid'
+                                    <span className={`text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider ${selectedBookingForConfirm?.paymentStatus === 'paid'
                                         ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
                                         : 'bg-amber-500 text-white shadow-lg shadow-amber-500/20 animate-pulse'
                                         }`}>
-                                        {selectedBookingForConfirm.paymentStatus === 'paid' ? 'Al Día' : `Debe ${formatMoney(selectedBookingForConfirm.remainingBalance !== undefined ? selectedBookingForConfirm.remainingBalance : (selectedBookingForConfirm.price - (selectedBookingForConfirm.deposit || 0)))}`}
+                                        {selectedBookingForConfirm?.paymentStatus === 'paid' ? 'Al Día' : `Debe ${formatMoney(selectedBookingForConfirm?.remainingBalance !== undefined ? selectedBookingForConfirm.remainingBalance : ((selectedBookingForConfirm?.totalPrice || selectedBookingForConfirm?.price || 0) - (selectedBookingForConfirm?.deposit || 0)))}`}
                                     </span>
                                 </div>
                             </div>
 
-                            {selectedBookingForConfirm.paymentStatus !== 'paid' && (
+                            {selectedBookingForConfirm?.paymentStatus !== 'paid' && (
                                 <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-xl p-3 flex gap-2.5">
                                     <ExclamationTriangleIcon className="w-4 h-4 text-amber-600 shrink-0" />
                                     <p className="text-[9px] leading-relaxed font-bold text-amber-700 dark:text-amber-400 uppercase">

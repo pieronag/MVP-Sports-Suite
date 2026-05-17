@@ -304,8 +304,21 @@ export default function MasterCalendar() {
                                     if (cIndex === -1) return null;
                                     return (
                                         <div key={b.id} onClick={() => setSelectedBooking(b)} className={`absolute z-10 p-2 mx-1 rounded-xl border-l-4 shadow-sm cursor-pointer flex flex-col justify-between overflow-hidden transition-all ${getCardStyle(b.paymentStatus, b.status)}`} style={{ top: (b.extractedHour - START_HOUR) * HOUR_HEIGHT + 2, height: HOUR_HEIGHT - 4, left: cIndex * COLUMN_WIDTH, width: COLUMN_WIDTH - 8 }}>
-                                            <div><p className="text-[8px] font-bold opacity-40 uppercase mb-0.5">#{b.id.slice(-4)}</p><h5 className="text-[10px] font-black leading-tight uppercase truncate">{b.clientName || 'S/N'}</h5></div>
-                                            <div className="flex justify-between items-end pt-1 border-t border-black/5"><span className="text-[10px] font-black">{formatCLP(b.finalPrice)}</span><CheckCircleIcon className="w-3 h-3 opacity-20" /></div>
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <p className="text-[8px] font-bold opacity-40 uppercase mb-0.5">#{b.id.slice(-4)}</p>
+                                                    <h5 className="text-[10px] font-black leading-tight uppercase truncate">{b.clientName || 'S/N'}</h5>
+                                                </div>
+                                                {b.paymentStatus !== 'paid' && b.status !== 'cancelled' && (
+                                                    <div className="bg-white/40 dark:bg-black/20 p-1 rounded-lg">
+                                                        <BanknotesIcon className="w-3 h-3 text-amber-600 animate-pulse" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex justify-between items-end pt-1 border-t border-black/5">
+                                                <span className="text-[10px] font-black">{formatCLP(b.finalPrice)}</span>
+                                                <CheckCircleIcon className={`w-3 h-3 ${b.paymentStatus === 'paid' ? 'opacity-40 text-emerald-600' : 'opacity-10'}`} />
+                                            </div>
                                         </div>
                                     )
                                 })}
@@ -330,10 +343,25 @@ export default function MasterCalendar() {
                             </div>
                             <div className="grid grid-cols-2 gap-4 text-[10px] font-bold uppercase">
                                 <div><p className="text-slate-400 mb-1">Responsable</p><p className="text-slate-900 dark:text-white">{selectedBooking.createdBy || 'Sistema'}</p></div>
-                                <div><p className="text-slate-400 mb-1">Origen</p><p className={selectedBooking.source === 'manual_dashboard' ? 'text-amber-500' : 'text-blue-500'}>{selectedBooking.source === 'manual_dashboard' ? 'Web Admin' : 'App Movil'}</p></div>
+                                <div><p className="text-slate-400 mb-1">Estado Pago</p>
+                                    <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase border ${
+                                        selectedBooking.paymentStatus === 'paid' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500' :
+                                        selectedBooking.paymentStatus === 'pending' ? 'bg-sky-500/10 border-sky-500 text-sky-500' :
+                                        'bg-amber-500/10 border-amber-500 text-amber-500'
+                                    }`}>
+                                        {selectedBooking.paymentStatus === 'paid' ? 'Pagado Total' :
+                                         selectedBooking.paymentStatus === 'pending' ? 'Pago Pendiente' : 'Abono Parcial'}
+                                    </span>
+                                </div>
                             </div>
                             <div className="pt-4 border-t border-slate-100 dark:border-white/5 flex justify-between items-end">
-                                <div><p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Total Pagado</p><p className="text-xl font-black text-emerald-600">{formatCLP(selectedBooking.finalPrice)}</p></div>
+                                <div>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Monto Turno</p>
+                                    <p className="text-xl font-black text-emerald-600">{formatCLP(selectedBooking.finalPrice)}</p>
+                                    {selectedBooking.paymentStatus !== 'paid' && (
+                                        <p className="text-[9px] font-black text-amber-500 mt-1 animate-pulse">POR COBRAR: {formatCLP(selectedBooking.finalPrice - (selectedBooking.deposit || 0))}</p>
+                                    )}
+                                </div>
                                 <span className="px-3 py-1 bg-slate-100 dark:bg-white/5 rounded text-[10px] font-black text-slate-700 dark:text-white uppercase border border-slate-200 dark:border-white/10">{selectedBooking.displayTime} Hrs</span>
                             </div>
                         </div>

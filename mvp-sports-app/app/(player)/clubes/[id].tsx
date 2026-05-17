@@ -97,6 +97,7 @@ export default function VenueDetailsScreen() {
     const [availableSlots, setAvailableSlots] = useState<string[]>([]);
     const [refreshing, setRefreshing] = useState(false);
     const [isCreatingBooking, setIsCreatingBooking] = useState(false);
+    const [reviews, setReviews] = useState<any[]>([]);
 
     const fetchData = useCallback(async () => {
         if (!id) return;
@@ -105,6 +106,16 @@ export default function VenueDetailsScreen() {
             setVenue(v);
             const c = await venueService.getCourtsByTenant(id as string);
             setCourts(c);
+            const r = await venueService.getVenueFeedback(id as string);
+            setReviews(r);
+
+            // Sincronizar el rating real con el documento si hay discrepancia
+            if (r.length > 0 && v) {
+                const currentAvg = Math.round((r.reduce((acc, rev) => acc + rev.rating, 0) / r.length) * 10) / 10;
+                if (v.rating !== currentAvg || (v as any).totalFeedbacks !== r.length) {
+                    venueService.recalculateVenueRating(id as string).catch(e => console.error("Sync rating failed:", e));
+                }
+            }
         } catch (error) {
             console.error(error);
         } finally {
@@ -257,7 +268,7 @@ export default function VenueDetailsScreen() {
                     <Image
                         source={{ uri: venue?.imageUrl || 'https://images.unsplash.com/photo-1595435064215-68d148332009' }}
                         style={StyleSheet.absoluteFill}
-                        contentFit="contain"
+                        contentFit="cover"
                     />
                     <LinearGradient colors={['rgba(0,0,0,0.3)', 'transparent']} style={StyleSheet.absoluteFill} />
 
@@ -283,7 +294,12 @@ export default function VenueDetailsScreen() {
                             <Text style={{ color: C.text, fontSize: 28, fontWeight: '900', letterSpacing: -1, flex: 1 }}>{venue?.name}</Text>
                             <View style={{ backgroundColor: accent + '15', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, flexDirection: 'row', alignItems: 'center' }}>
                                 <Star color={accent} size={14} fill={accent} />
-                                <Text style={{ color: accent, fontWeight: '900', fontSize: 13, marginLeft: 6 }}>{venue?.rating || '4.9'}</Text>
+                                <Text style={{ color: accent, fontWeight: '900', fontSize: 13, marginLeft: 6 }}>
+                                    {reviews.length > 0 
+                                        ? (Math.round((reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length) * 10) / 10).toFixed(1)
+                                        : '0.0'
+                                    }
+                                </Text>
                             </View>
                         </View>
 
@@ -431,6 +447,48 @@ export default function VenueDetailsScreen() {
                             </TouchableOpacity>
                         </View>
                     )}
+
+                    {/* SECCIÓN DE OPINIONES */}
+                    <View style={{ marginTop: 40, paddingHorizontal: 30 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                            <Text style={{ color: C.text, fontSize: 22, fontWeight: '900' }}>Opiniones de Jugadores</Text>
+                            <View style={{ backgroundColor: accent + '10', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 }}>
+                                <Text style={{ color: accent, fontWeight: '900', fontSize: 12 }}>{reviews.length}</Text>
+                            </View>
+                        </View>
+
+                        {reviews.length === 0 ? (
+                            <View style={{ backgroundColor: C.card, borderRadius: 25, padding: 30, alignItems: 'center', borderWidth: 1, borderColor: C.border, borderStyle: 'dashed' }}>
+                                <Info color={C.sub} size={30} strokeWidth={1.5} />
+                                <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', marginTop: 15, textAlign: 'center' }}>Aún no hay valoraciones para este recinto. ¡Sé el primero en jugar y calificar!</Text>
+                            </View>
+                        ) : (
+                            <View style={{ gap: 15 }}>
+                                {reviews.map((rev) => (
+                                        <View key={rev.id} style={{ backgroundColor: C.card, borderRadius: 25, padding: 20, borderWidth: 1, borderColor: C.border }}>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                                                <View style={{ flex: 1, marginRight: 10 }}>
+                                                    <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', textTransform: 'uppercase' }} numberOfLines={1}>
+                                                        {typeof rev.userName === 'string' ? rev.userName : (rev.userName?.userName || 'Jugador MVP')}
+                                                    </Text>
+                                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '800' }}>
+                                                        {rev.date?.toDate ? rev.date.toDate().toLocaleDateString('es-CL', { day: '2-digit', month: 'short' }) : 'Reciente'} • {typeof rev.sport === 'string' ? rev.sport : 'General'}
+                                                    </Text>
+                                                </View>
+                                                <View style={{ flexDirection: 'row', gap: 2 }}>
+                                                    {[1, 2, 3, 4, 5].map(s => (
+                                                        <Star key={s} size={10} color={s <= rev.rating ? '#f59e0b' : C.sub} fill={s <= rev.rating ? '#f59e0b' : 'transparent'} />
+                                                    ))}
+                                                </View>
+                                            </View>
+                                            <Text style={{ color: C.text, fontSize: 12, fontWeight: '600', lineHeight: 18, fontStyle: 'italic', opacity: 0.8 }}>
+                                                "{typeof rev.comment === 'string' ? rev.comment : 'Sin comentario'}"
+                                            </Text>
+                                        </View>
+                                ))}
+                            </View>
+                        )}
+                    </View>
                 </View>
             </ScrollView>
         </View>

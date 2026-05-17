@@ -10,7 +10,8 @@ import * as Sharing from 'expo-sharing';
 import {
     Trophy, Activity, ChevronRight, Settings, LogOut, Sun, Moon,
     Camera, ChevronLeft, Users, Wallet, Star, Target, Shield,
-    Zap, TrendingUp, Handshake, Download, Share2, CheckCircle2, AlertCircle, Info, BookOpen
+    Zap, TrendingUp, Handshake, Download, Share2, CheckCircle2, AlertCircle, Info, BookOpen,
+    Medal, Swords, Heart, Calendar, Crosshair, Timer, Dribbble, ShieldCheck
 } from 'lucide-react-native';
 import { useAuth } from '../../../store/useAuth';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -164,6 +165,29 @@ export default function PerfilScreen() {
     // Image source logic
     const imageSource = photoURL ? { uri: photoURL } : require('../../../assets/images/mascot.png');
 
+    // Cálculo de insignias ganadas para la ficha (sincronizado con el sistema real)
+    const earnedBadgesCount = (() => {
+        if (!profile) return 0;
+        const savedBadges = (profile as any)?.badges as any[] || [];
+        if (savedBadges.length > 0) return savedBadges.filter(b => b.tier !== null).length;
+        
+        const stats = profile.stats || {};
+        const config = badgeConfigs || {};
+        let count = 0;
+        const allBadgeIds = [
+            'scorer', 'playmaker', 'defender', 'wins', 'mvp', 'experience', 'multi_sport',
+            'captaincy', 'comeback', 'precision', 'clutch', 'tournaments', 'invictus',
+            'rivalry', 'morning_player', 'night_player', 'loyal', 'weekend_warrior', 'stamina', 'social'
+        ];
+        
+        allBadgeIds.forEach(id => {
+            const val = (stats as any)[id] || 0;
+            const c = (config as any)[id] || { bronze: 5 };
+            if (val >= c.bronze) count++;
+        });
+        return count;
+    })();
+
     if (loading && !refreshing) {
         return (
             <View style={{ flex: 1, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center' }}>
@@ -280,40 +304,39 @@ export default function PerfilScreen() {
                             : new Date();
                         const daysActive = Math.max(1, (new Date().getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
                         
-                        const BADGE_NAMES: Record<string, { name: string; emoji: string }> = {
-                            scorer: { name: 'Artillero', emoji: '⚽' },
-                            playmaker: { name: 'Maestro', emoji: '🎯' },
-                            defender: { name: 'Muralla', emoji: '🛡️' },
-                            wins: { name: 'Ganador', emoji: '🏆' },
-                            mvp: { name: 'Estrella', emoji: '👑' },
-                            experience: { name: 'Leyenda', emoji: '⭐' },
-                            multi_sport: { name: 'Atleta Total', emoji: '🎾' },
-                            captaincy: { name: 'Capitán', emoji: '🎓' },
-                            comeback: { name: 'Ave Fénix', emoji: '🔥' },
-                            precision: { name: 'Francotirador', emoji: '🎯' },
-                            clutch: { name: 'Clutch', emoji: '⏱️' },
-                            tournaments: { name: 'Competidor', emoji: '🏅' },
-                            invictus: { name: 'Invicto', emoji: '💥' },
-                            rivalry: { name: 'Verdugo', emoji: '⚡' },
-                            morning_player: { name: 'Madrugador', emoji: '🌅' },
-                            night_player: { name: 'Nocturno', emoji: '🌙' },
-                            loyal: { name: 'Fiel', emoji: '❤️' },
-                            weekend_warrior: { name: 'Guerrero FDS', emoji: '📅' },
-                            stamina: { name: 'Motor', emoji: '💪' },
-                            social: { name: 'Sociable', emoji: '🤝' },
+                        const BADGE_INFO: Record<string, { name: string; icon: any }> = {
+                            scorer: { name: 'Artillero', icon: Target },
+                            playmaker: { name: 'Maestro', icon: Zap },
+                            defender: { name: 'Muralla', icon: Shield },
+                            wins: { name: 'Ganador', icon: Trophy },
+                            mvp: { name: 'Estrella', icon: Star },
+                            experience: { name: 'Leyenda', icon: Timer },
+                            multi_sport: { name: 'Atleta Total', icon: Dribbble },
+                            captaincy: { name: 'Capitán', icon: Users },
+                            comeback: { name: 'Ave Fénix', icon: TrendingUp },
+                            precision: { name: 'Francotirador', icon: Crosshair },
+                            clutch: { name: 'Clutch', icon: Zap },
+                            tournaments: { name: 'Competidor', icon: Medal },
+                            invictus: { name: 'Invicto', icon: ShieldCheck },
+                            rivalry: { name: 'Verdugo', icon: Swords },
+                            morning_player: { name: 'Madrugador', icon: Sun },
+                            night_player: { name: 'Nocturno', icon: Moon },
+                            loyal: { name: 'Fiel', icon: Heart },
+                            weekend_warrior: { name: 'Guerrero FDS', icon: Calendar },
+                            stamina: { name: 'Motor', icon: Activity },
+                            social: { name: 'Sociable', icon: Share2 },
                         };
 
                         const BADGE_XP_VALUES: Record<string, number> = { bronze: 50, silver: 150, gold: 500 };
-
-                        let earned: { id: string; name: string; emoji: string; tier: string | null; xpBonus: number }[] = [];
+                        let earned: any[] = [];
 
                         if (savedBadges && savedBadges.length > 0) {
                             // Usar badges guardadas por el sync
-                            earned = Object.keys(BADGE_NAMES).map(id => {
+                            earned = Object.keys(BADGE_INFO).map(id => {
                                 const saved = savedBadges.find((b: any) => b.id === id);
-                                const info = BADGE_NAMES[id];
+                                const info = BADGE_INFO[id];
                                 return {
-                                    id, name: info.name, emoji: info.emoji,
+                                    id, name: info.name, icon: info.icon,
                                     tier: saved?.tier || null,
                                     xpBonus: saved?.tier ? BADGE_XP_VALUES[saved.tier] || 0 : 0
                                 };
@@ -335,15 +358,15 @@ export default function PerfilScreen() {
                                 social: (stats as any).invited_players || 0
                             };
 
-                            earned = Object.keys(BADGE_NAMES).map(id => {
-                                const info = BADGE_NAMES[id];
+                            earned = Object.keys(BADGE_INFO).map(id => {
+                                const info = BADGE_INFO[id];
                                 const userVal = statsMap[id] || 0;
                                 const config = badgeConfigs[id] || { bronze: 5, silver: 15, gold: 30 };
                                 let tier: string | null = null;
                                 if (userVal >= config.gold) tier = 'gold';
                                 else if (userVal >= config.silver) tier = 'silver';
                                 else if (userVal >= config.bronze) tier = 'bronze';
-                                return { id, name: info.name, emoji: info.emoji, tier, xpBonus: tier ? BADGE_XP_VALUES[tier] || 0 : 0 };
+                                return { id, name: info.name, icon: info.icon, tier, xpBonus: tier ? BADGE_XP_VALUES[tier] || 0 : 0 };
                             });
                         }
 
@@ -354,9 +377,9 @@ export default function PerfilScreen() {
                         const lockedBadges = earned.filter(b => b.tier === null);
 
                         const tierColors: Record<string, string> = {
-                            gold: '#f59e0b',
+                            gold: '#fbbf24',
                             silver: '#94a3b8',
-                            bronze: '#d97706'
+                            bronze: '#b45309'
                         };
 
                         const tierNames: Record<string, string> = {
@@ -379,7 +402,9 @@ export default function PerfilScreen() {
                                                 borderWidth: 2,
                                                 borderColor: tierColors[b.tier!] + '40'
                                             }}>
-                                                <Text style={{ fontSize: 28, marginBottom: 6 }}>{b.emoji}</Text>
+                                                <View style={{ marginBottom: 8, width: 40, height: 40, borderRadius: 12, backgroundColor: tierColors[b.tier!] + '15', alignItems: 'center', justifyContent: 'center' }}>
+                                                    <b.icon color={tierColors[b.tier!]} size={22} strokeWidth={2.5} />
+                                                </View>
                                                 <Text style={{ color: C.text, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', textAlign: 'center', marginBottom: 3 }}>{b.name}</Text>
                                                 <View style={{ backgroundColor: tierColors[b.tier!] + '20', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
                                                     <Text style={{ color: tierColors[b.tier!], fontSize: 7, fontWeight: '900', letterSpacing: 1 }}>{tierNames[b.tier!]}</Text>
@@ -443,6 +468,14 @@ export default function PerfilScreen() {
                             <Text style={{ color: '#06b6d4', fontSize: 14, fontWeight: '900', letterSpacing: 5 }}>VALORACIÓN</Text>
                             <Text style={{ color: '#06b6d4', fontSize: 14, fontWeight: '900', letterSpacing: 5 }}>GENERAL</Text>
                         </View>
+                        <View style={{ marginTop: 20, backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
+                            <Text style={{ color: 'white', fontSize: 12, fontWeight: '900' }}>INSIGNIAS: {earnedBadgesCount}</Text>
+                        </View>
+                    </View>
+
+                    {/* PLAYER POSITION VERTICAL */}
+                    <View style={{ position: 'absolute', left: -40, top: '45%', transform: [{ rotate: '-90deg' }] }}>
+                        <Text style={{ color: 'white', fontSize: 70, fontWeight: '900', opacity: 0.5, letterSpacing: 10 }}>{profile?.position || 'JUGADOR'}</Text>
                     </View>
 
                     {/* Bottom Section: TOPPS NOW STYLE NAMEPLATE */}
@@ -583,26 +616,26 @@ export default function PerfilScreen() {
                                 };
 
                                 return [
-                                    { id: 'scorer', emoji: '⚽', name: 'Artillero', desc: 'Anota puntos o goles en tus partidos', unit: 'Goles' },
-                                    { id: 'playmaker', emoji: '🎯', name: 'Maestro', desc: 'Suma asistencias y pases clave', unit: 'Asistencias' },
-                                    { id: 'defender', emoji: '🛡️', name: 'Muralla', desc: 'Logra defensas o vallas invictas', unit: 'Defensas' },
-                                    { id: 'wins', emoji: '🏆', name: 'Ganador', desc: 'Acumula partidos ganados', unit: 'Victorias' },
-                                    { id: 'mvp', emoji: '👑', name: 'Estrella', desc: 'Sé elegido Mejor Jugador del partido', unit: 'MVPs' },
-                                    { id: 'experience', emoji: '⭐', name: 'Leyenda', desc: 'Disputa la mayor cantidad de partidos', unit: 'Partidos' },
-                                    { id: 'multi_sport', emoji: '🎾', name: 'Atleta Total', desc: 'Juega partidos en diferentes deportes', unit: 'Deportes' },
-                                    { id: 'captaincy', emoji: '🎓', name: 'Capitán', desc: 'Lidera a tu equipo como capitán', unit: 'Partidos' },
-                                    { id: 'comeback', emoji: '🔥', name: 'Ave Fénix', desc: 'Gana partidos remontando marcador', unit: 'Remontadas' },
-                                    { id: 'precision', emoji: '🎯', name: 'Francotirador', desc: 'Mantén alta efectividad o precisión', unit: 'Partidos' },
-                                    { id: 'clutch', emoji: '⏱️', name: 'Clutch', desc: 'Anota puntos decisivos al final', unit: 'Puntos' },
-                                    { id: 'tournaments', emoji: '🏅', name: 'Competidor', desc: 'Participa en torneos y ligas', unit: 'Torneos' },
-                                    { id: 'invictus', emoji: '💥', name: 'Invicto', desc: 'Logra rachas de victorias consecutivas', unit: 'Racha' },
-                                    { id: 'rivalry', emoji: '⚡', name: 'Verdugo', desc: 'Gana clásicos o revanchas', unit: 'Partidos' },
-                                    { id: 'morning_player', emoji: '🌅', name: 'Madrugador', desc: 'Juega partidos en horario matutino', unit: 'Partidos' },
-                                    { id: 'night_player', emoji: '🌙', name: 'Nocturno', desc: 'Juega partidos en horario nocturno', unit: 'Partidos' },
-                                    { id: 'loyal', emoji: '❤️', name: 'Fiel', desc: 'Mantente activo mes a mes', unit: 'Meses' },
-                                    { id: 'weekend_warrior', emoji: '📅', name: 'Guerrero FDS', desc: 'Juega partidos los fines de semana', unit: 'Partidos' },
-                                    { id: 'stamina', emoji: '💪', name: 'Motor', desc: 'Acumula minutos jugados en cancha', unit: 'Minutos' },
-                                    { id: 'social', emoji: '🤝', name: 'Sociable', desc: 'Invita amigos a jugar contigo', unit: 'Invitados' },
+                                    { id: 'scorer', icon: Target, name: 'Artillero', desc: 'Anota puntos o goles en tus partidos', unit: 'Goles' },
+                                    { id: 'playmaker', icon: Zap, name: 'Maestro', desc: 'Suma asistencias y pases clave', unit: 'Asistencias' },
+                                    { id: 'defender', icon: Shield, name: 'Muralla', desc: 'Logra defensas o vallas invictas', unit: 'Defensas' },
+                                    { id: 'wins', icon: Trophy, name: 'Ganador', desc: 'Acumula partidos ganados', unit: 'Victorias' },
+                                    { id: 'mvp', icon: Star, name: 'Estrella', desc: 'Sé elegido Mejor Jugador del partido', unit: 'MVPs' },
+                                    { id: 'experience', icon: Timer, name: 'Leyenda', desc: 'Disputa la mayor cantidad de partidos', unit: 'Partidos' },
+                                    { id: 'multi_sport', icon: Dribbble, name: 'Atleta Total', desc: 'Juega partidos en diferentes deportes', unit: 'Deportes' },
+                                    { id: 'captaincy', icon: Users, name: 'Capitán', desc: 'Lidera a tu equipo como capitán', unit: 'Partidos' },
+                                    { id: 'comeback', icon: TrendingUp, name: 'Ave Fénix', desc: 'Gana partidos remontando marcador', unit: 'Remontadas' },
+                                    { id: 'precision', icon: Crosshair, name: 'Francotirador', desc: 'Mantén alta efectividad o precisión', unit: 'Partidos' },
+                                    { id: 'clutch', icon: Zap, name: 'Clutch', desc: 'Anota puntos decisivos al final', unit: 'Puntos' },
+                                    { id: 'tournaments', icon: Medal, name: 'Competidor', desc: 'Participa en torneos y ligas', unit: 'Torneos' },
+                                    { id: 'invictus', icon: ShieldCheck, name: 'Invicto', desc: 'Logra rachas de victorias consecutivas', unit: 'Racha' },
+                                    { id: 'rivalry', icon: Swords, name: 'Verdugo', desc: 'Gana clásicos o revanchas', unit: 'Partidos' },
+                                    { id: 'morning_player', icon: Sun, name: 'Madrugador', desc: 'Juega partidos en horario matutino', unit: 'Partidos' },
+                                    { id: 'night_player', icon: Moon, name: 'Nocturno', desc: 'Juega partidos en horario nocturno', unit: 'Partidos' },
+                                    { id: 'loyal', icon: Heart, name: 'Fiel', desc: 'Mantente activo mes a mes', unit: 'Meses' },
+                                    { id: 'weekend_warrior', icon: Calendar, name: 'Guerrero FDS', desc: 'Juega partidos los fines de semana', unit: 'Partidos' },
+                                    { id: 'stamina', icon: Activity, name: 'Motor', desc: 'Acumula minutos jugados en cancha', unit: 'Minutos' },
+                                    { id: 'social', icon: Share2, name: 'Sociable', desc: 'Invita amigos a jugar contigo', unit: 'Invitados' },
                                 ].map(b => {
                                     const config = badgeConfigs[b.id] || { bronze: 5, silver: 15, gold: 30 };
                                     const val = statsMap[b.id] || 0;
@@ -636,7 +669,7 @@ export default function PerfilScreen() {
                                         nextThreshold = config.gold;
                                         currentTierLabel = "ORO";
                                         nextTierLabel = "MÁXIMO";
-                                        progressColor = '#f59e0b';
+                                        progressColor = '#fbbf24';
                                     } else if (currentVal >= config.silver) {
                                         nextThreshold = config.gold;
                                         currentTierLabel = "PLATA";
@@ -646,50 +679,60 @@ export default function PerfilScreen() {
                                         nextThreshold = config.silver;
                                         currentTierLabel = "BRONCE";
                                         nextTierLabel = "PLATA";
-                                        progressColor = '#d97706';
+                                        progressColor = '#b45309';
                                     }
 
                                     const progress = Math.min(1, currentVal / nextThreshold);
 
                                     return (
-                                        <View key={i} style={{ backgroundColor: C.card, borderRadius: 20, padding: 18, marginBottom: 15, borderWidth: 1, borderColor: C.border }}>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 }}>
-                                                <Text style={{ fontSize: 28 }}>{b.emoji}</Text>
+                                        <View key={i} style={{ backgroundColor: C.card, borderRadius: 30, padding: 25, marginBottom: 15, borderWidth: 1, borderColor: C.border }}>
+                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
+                                                {/* CONTENEDOR ICONO */}
+                                                <View style={{ width: 65, height: 65, borderRadius: 22, backgroundColor: progressColor + '10', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: progressColor + '20' }}>
+                                                    <b.icon color={progressColor} size={30} strokeWidth={2.5} />
+                                                </View>
+
+                                                {/* INFO Y TÍTULO */}
                                                 <View style={{ flex: 1 }}>
-                                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', textTransform: 'uppercase' }}>{b.name}</Text>
-                                                        <View style={{ backgroundColor: progressColor + '20', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
-                                                            <Text style={{ color: progressColor, fontSize: 7, fontWeight: '900' }}>{currentTierLabel}</Text>
+                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                        <View style={{ flex: 1 }}>
+                                                            <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{b.name}</Text>
+                                                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '600', marginTop: 2, lineHeight: 14 }}>{b.desc}</Text>
+                                                        </View>
+                                                        <View style={{ backgroundColor: progressColor, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, marginLeft: 10 }}>
+                                                            <Text style={{ color: 'white', fontSize: 8, fontWeight: '900' }}>{currentTierLabel}</Text>
                                                         </View>
                                                     </View>
-                                                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '600', marginTop: 2 }}>{b.desc}</Text>
+
+                                                    {/* BARRA DE PROGRESO INTEGRADA */}
+                                                    <View style={{ marginTop: 15 }}>
+                                                        <View style={{ height: 10, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: 5, overflow: 'hidden' }}>
+                                                            <View style={{ height: '100%', width: `${progress * 100}%`, backgroundColor: progressColor, borderRadius: 5 }} />
+                                                        </View>
+                                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
+                                                            <Text style={{ color: C.text, fontSize: 9, fontWeight: '900' }}>{currentVal} {b.unit}</Text>
+                                                            <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900' }}>{Math.floor(progress * 100)}% COMPLETADO</Text>
+                                                        </View>
+                                                    </View>
                                                 </View>
                                             </View>
 
-                                            {/* BARRA DE PROGRESO */}
-                                            <View style={{ marginTop: 5 }}>
-                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 }}>
-                                                    <Text style={{ color: C.sub, fontSize: 8, fontWeight: '800', textTransform: 'uppercase' }}>Progreso: {currentVal} / {nextThreshold} {b.unit}</Text>
-                                                    <Text style={{ color: C.sub, fontSize: 8, fontWeight: '800', textTransform: 'uppercase' }}>{Math.floor(progress * 100)}%</Text>
-                                                </View>
-                                                <View style={{ height: 6, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: 3, overflow: 'hidden' }}>
-                                                    <View style={{ height: '100%', width: `${progress * 100}%`, backgroundColor: progressColor }} />
-                                                </View>
-                                                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 4 }}>
-                                                    <Text style={{ color: C.sub, fontSize: 7, fontWeight: '700', textTransform: 'uppercase' }}>Meta: {nextTierLabel}</Text>
-                                                </View>
-                                            </View>
-
-                                            <View style={{ flexDirection: 'row', gap: 8, marginTop: 15, opacity: 0.6 }}>
-                                                <View style={{ flex: 1, backgroundColor: '#d9770615', borderRadius: 10, padding: 6, alignItems: 'center', borderWidth: 1, borderColor: currentVal >= config.bronze ? '#d97706' : 'transparent' }}>
-                                                    <Text style={{ color: '#d97706', fontSize: 6, fontWeight: '900' }}>BRONCE: {config.bronze}</Text>
-                                                </View>
-                                                <View style={{ flex: 1, backgroundColor: '#94a3b815', borderRadius: 10, padding: 6, alignItems: 'center', borderWidth: 1, borderColor: currentVal >= config.silver ? '#94a3b8' : 'transparent' }}>
-                                                    <Text style={{ color: '#94a3b8', fontSize: 6, fontWeight: '900' }}>PLATA: {config.silver}</Text>
-                                                </View>
-                                                <View style={{ flex: 1, backgroundColor: '#f59e0b15', borderRadius: 10, padding: 6, alignItems: 'center', borderWidth: 1, borderColor: currentVal >= config.gold ? '#f59e0b' : 'transparent' }}>
-                                                    <Text style={{ color: '#f59e0b', fontSize: 6, fontWeight: '900' }}>ORO: {config.gold}</Text>
-                                                </View>
+                                            {/* FOOTER DE HITOS (MILESTONES) */}
+                                            <View style={{ flexDirection: 'row', marginTop: 20, paddingTop: 15, borderTopWidth: 1, borderTopColor: C.border, gap: 15 }}>
+                                                {['bronze', 'silver', 'gold'].map((t: any) => {
+                                                    const milestoneColors: any = { bronze: '#b45309', silver: '#94a3b8', gold: '#fbbf24' };
+                                                    const milestoneNames: any = { bronze: 'BRONCE', silver: 'PLATA', gold: 'ORO' };
+                                                    const isActive = currentVal >= (config as any)[t];
+                                                    return (
+                                                        <View key={t} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, opacity: isActive ? 1 : 0.2 }}>
+                                                            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: milestoneColors[t] }} />
+                                                            <View>
+                                                                <Text style={{ color: C.text, fontSize: 9, fontWeight: '900' }}>{milestoneNames[t]}</Text>
+                                                                <Text style={{ color: C.sub, fontSize: 9, fontWeight: '800' }}>{(config as any)[t]} {b.unit}</Text>
+                                                            </View>
+                                                        </View>
+                                                    );
+                                                })}
                                             </View>
                                         </View>
                                     );

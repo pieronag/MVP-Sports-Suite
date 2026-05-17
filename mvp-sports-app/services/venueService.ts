@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs, GeoPoint, documentId, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, GeoPoint, documentId, doc, getDoc, addDoc, updateDoc, Timestamp, orderBy, limit } from 'firebase/firestore';
 import { db } from './firebase';
 import { courtSchema, tenantSchema } from './schemas';
 
@@ -66,7 +66,7 @@ const processTenantData = (id: string, raw: any): Tenant => {
         ...data,
         name: raw.name || 'Sin Nombre',
         imageUrl: finalImageUrl,
-        rating: data.rating || 4.8,
+        rating: data.rating !== undefined ? data.rating : 0,
         coordinates: coords,
         address: raw.coordinates?.fullAddress || raw.address || 'Ubicación no disponible'
     } as Tenant;
@@ -187,6 +187,142 @@ export const venueService = {
             return snap.docs.map(doc => processTenantData(doc.id, doc.data()));
         } catch (error) {
             console.error('Error fetching owner venues:', error);
+            return [];
+        }
+    },
+
+    async submitVenueFeedback(tenantId: string, bookingId: string, rating: number, comment: string, userName: string, extraInfo?: { sport?: string, bookingDate?: any, bookingTime?: string }) {
+        try {
+            const tenantRef = doc(db, 'tenants', tenantId);
+            const tenantSnap = await getDoc(tenantRef);
+            
+            if (!tenantSnap.exists()) return;
+            const tenantData = tenantSnap.data();
+            const ownerId = tenantData.ownerId;
+
+            // 1. Guardar en la colección de reviews (compatible con web dashboard)
+            const reviewsRef = collection(db, 'reviews');
+            await addDoc(reviewsRef, {
+                venueId: tenantId,
+                venueName: tenantData.name || 'Recinto',
+                bookingId,
+                rating,
+                comment,
+                userName,
+                ownerId: ownerId || null,
+                date: Timestamp.now(),
+                // Información extra de la reserva para mayor contexto en el dashboard
+                sport: extraInfo?.sport || null,
+                bookingDate: extraInfo?.bookingDate || null,
+                bookingTime: extraInfo?.bookingTime || null
+            });
+
+            // Actualizar el rating real usando el nuevo método de recalculo total
+            await this.recalculateVenueRating(tenantId);
+        } catch (error) {
+            console.error('Error submitting feedback:', error);
+            throw error;
+        }
+    },
+
+    // HELPER PARA NORMALIZAR Y DE-DUPLICAR (Asegura consistencia total)
+    processFeedbackData(tenantId: string, reviews: any[], bookings: any[]) {
+        const normalizedBookings = bookings.map((b: any) => ({
+            id: b.id,
+            venueId: b.tenantId || tenantId,
+            userId: b.userId || b.clientId || b.createdBy || 'anon',
+            userName: b.clientName || b.userName || 'Jugador MVP',
+            rating: Number(b.rating || 0),
+            comment: b.feedback || b.comment || 'Sin comentario',
+            date: b.date,
+            sport: b.sport,
+            isFromBooking: true
+        }));
+
+        const feedbackMap = new Map();
+        const getContentKey = (item: any) => {
+            const commentNorm = (item.comment || '').trim().toLowerCase().substring(0, 30);
+            const timeStr = item.date?.seconds || item.date?.toString() || '';
+            const uid = item.userId || item.createdBy || 'anon';
+            return `${uid}_${tenantId}_${item.rating}_${commentNorm}_${timeStr}`;
+        };
+
+        // 1. Reviews primero (prioridad)
+        reviews.forEach(r => {
+            const key = (r as any).bookingId || getContentKey(r);
+            feedbackMap.set(key, r);
+        });
+
+        // 2. Bookings después (si no existe ya)
+        normalizedBookings.forEach(b => {
+            const key = (b as any).id;
+            const ck = getContentKey(b);
+            if (!feedbackMap.has(key) && !feedbackMap.has(ck)) {
+                feedbackMap.set(key, b);
+            }
+        });
+
+        return Array.from(feedbackMap.values()).sort((a: any, b: any) => {
+            const dateA = (a.date as any)?.seconds || 0;
+            const dateB = (b.date as any)?.seconds || 0;
+            return dateB - dateA;
+        });
+    },
+
+    async recalculateVenueRating(tenantId: string) {
+        try {
+            const qReviews = query(collection(db, 'reviews'), where('venueId', '==', tenantId));
+            const snapReviews = await getDocs(qReviews);
+            const reviewsList = snapReviews.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            const qBookings = query(collection(db, 'bookings'), where('tenantId', '==', tenantId));
+            const snapBookings = await getDocs(qBookings);
+            const bookingsList = snapBookings.docs
+                .map(d => ({ id: d.id, ...d.data() }))
+                .filter((b: any) => b.rating > 0);
+
+            const allEvals = this.processFeedbackData(tenantId, reviewsList, bookingsList);
+            
+            const rawAvg = allEvals.length > 0 
+                ? (allEvals.reduce((acc, e) => acc + (e.rating || 0), 0) / allEvals.length)
+                : 0;
+            const realRating = Math.round(rawAvg * 10) / 10;
+
+            const tenantRef = doc(db, 'tenants', tenantId);
+            await updateDoc(tenantRef, {
+                rating: realRating,
+                totalFeedbacks: allEvals.length
+            });
+            return realRating;
+        } catch (error) {
+            console.error('Error recalculating rating:', error);
+            return 0;
+        }
+    },
+
+    async getVenueFeedback(tenantId: string) {
+        try {
+            const qReviews = query(
+                collection(db, 'reviews'),
+                where('venueId', '==', tenantId),
+                orderBy('date', 'desc')
+            );
+            const snapReviews = await getDocs(qReviews);
+            const reviewsList = snapReviews.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            const qBookings = query(
+                collection(db, 'bookings'),
+                where('tenantId', '==', tenantId),
+                orderBy('date', 'desc')
+            );
+            const snapBookings = await getDocs(qBookings);
+            const bookingsList = snapBookings.docs
+                .map(d => ({ id: d.id, ...d.data() }))
+                .filter((b: any) => b.rating > 0);
+
+            return this.processFeedbackData(tenantId, reviewsList, bookingsList);
+        } catch (error) {
+            console.error('Error fetching venue feedback:', error);
             return [];
         }
     }

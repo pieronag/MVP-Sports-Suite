@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
     View, Text, ScrollView, TouchableOpacity, RefreshControl,
     StatusBar, ActivityIndicator, Dimensions, StyleSheet,
-    BackHandler, Modal, Linking, Platform
+    BackHandler, Modal, Linking, Platform, TextInput
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import {
     ChevronLeft, Calendar, Clock, MapPin, CheckCircle2, AlertCircle,
     XCircle, ArrowRight, Activity, Receipt, MapPinned, Info, Ticket, X, Zap, Share2, Navigation, TrendingDown, Star,
-    ShieldCheck, CalendarDays, Timer, LayoutDashboard, History, Trophy, CircleDot, Dribbble, Medal, Navigation2, Plus, Minus, Users
+    ShieldCheck, CalendarDays, Timer, LayoutDashboard, History, Trophy, CircleDot, Dribbble, Medal, Navigation2, Plus, Minus, Users,
+    Trash2
 } from 'lucide-react-native';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -77,14 +78,16 @@ const getFormattedDate = (date: any) => {
 
 const getStatusInfo = (booking: Booking | null, C: any) => {
     if (!booking) return { label: 'DESCONOCIDO', color: C.sub };
-    const isCancelled = booking.status === 'cancelled';
-    const isPast = booking.status === 'completed' || booking.status === 'past';
-    if (isCancelled) return { label: 'ANULADO', color: COLORS.error };
-    if (isPast) return { label: 'FINALIZADO', color: C.sub };
-    // Si el pago está pendiente, mostrar estado de pago pendiente
-    if ((booking as any).paymentStatus === 'pending') return { label: 'PAGO PENDIENTE', color: '#f59e0b' };
+    if (booking.status === 'cancelled') return { label: 'ANULADO', color: COLORS.error };
+    if (booking.status === 'active') return { label: 'EN JUEGO', color: '#3b82f6' }; // Azul vibrante para partidos en curso
+    if (booking.status === 'completed' || booking.status === 'past') return { label: 'FINALIZADO', color: C.sub };
+    
+    // Mostrar Pago Pendiente solo si no está en juego o anulado
+    if (booking.paymentStatus === 'pending') {
+        return { label: 'PAGO PENDIENTE', color: '#f59e0b' };
+    }
+    
     if (booking.status === 'confirmed') return { label: 'CONFIRMADO', color: COLORS.accent };
-    if (booking.status === 'pending') return { label: 'PAGO PENDIENTE', color: '#f59e0b' };
     return { label: 'PENDIENTE', color: '#f59e0b' };
 };
 
@@ -108,6 +111,15 @@ export default function MisReservasScreen() {
     const [showStatsModal, setShowStatsModal] = useState(false);
     const [statsBooking, setStatsBooking] = useState<Booking | null>(null);
 
+    const [showSurveyModal, setShowSurveyModal] = useState(false);
+    const [surveyBooking, setSurveyBooking] = useState<Booking | null>(null);
+
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [bookingToCancel, setBookingToCancel] = useState<string | null>(null);
+
+    const [showCheckInModal, setShowCheckInModal] = useState(false);
+    const [bookingForCheckIn, setBookingForCheckIn] = useState<Booking | null>(null);
+
     const loadData = async (isRefreshing = false) => {
         if (!user?.uid) return;
         if (!isRefreshing) setLoading(true);
@@ -122,30 +134,86 @@ export default function MisReservasScreen() {
         } catch (e) { console.error(e); } finally { setLoading(false); setRefreshing(false); }
     };
 
-    const handleCheckIn = async (bookingId: string) => {
+    const handleCheckIn = (booking: Booking) => {
+        if (booking.paymentStatus !== 'paid') {
+            setFbType('error');
+            setFbMsg('Para iniciar el partido debes completar el pago en la recepción del recinto.');
+            setFbVisible(true);
+            return;
+        }
+        setBookingForCheckIn(booking);
+        setShowCheckInModal(true);
+    };
+
+    const confirmCheckIn = async () => {
+        if (!bookingForCheckIn?.id) return;
         try {
-            await bookingService.checkIn(bookingId);
+            await bookingService.checkIn(bookingForCheckIn.id);
             loadData();
+            setShowCheckInModal(false);
             setFbType('success');
-            setFbMsg('¡CHECK-IN EXITOSO! YA PUEDES COMENZAR TU PARTIDO.');
+            setFbMsg('¡Check-in exitoso! Ya puedes ingresar a la cancha.');
             setFbVisible(true);
         } catch (e) {
             setFbType('error');
-            setFbMsg('ERROR AL REALIZAR CHECK-IN.');
+            setFbMsg('No pudimos procesar tu llegada. Inténtalo de nuevo.');
             setFbVisible(true);
         }
     };
 
     const handleCheckOut = async (booking: Booking) => {
         if (!booking.id) return;
+        setSurveyBooking(booking);
+        setShowSurveyModal(true);
+    };
+
+    const handleSaveSurvey = async (rating: number, feedback: string) => {
+        if (!surveyBooking?.id) return;
         try {
-            await bookingService.checkOut(booking.id);
+            await bookingService.checkOut(surveyBooking.id);
+            await bookingService.updateBooking(surveyBooking.id, { rating, feedback });
+            await venueService.submitVenueFeedback(
+                surveyBooking.tenantId,
+                surveyBooking.id,
+                rating,
+                feedback,
+                user?.displayName || 'Jugador MVP',
+                {
+                    sport: surveyBooking.sport,
+                    bookingDate: surveyBooking.date,
+                    bookingTime: surveyBooking.startTime
+                }
+            );
+
             loadData();
-            setStatsBooking(booking);
-            setShowStatsModal(true);
+            setShowSurveyModal(false);
+            setFbType('success');
+            setFbMsg('¡Gracias por tu valoración! Partido finalizado con éxito.');
+            setFbVisible(true);
         } catch (e) {
             setFbType('error');
-            setFbMsg('ERROR AL REALIZAR CHECK-OUT.');
+            setFbMsg('Ocurrió un error al procesar el cierre. Intenta de nuevo.');
+            setFbVisible(true);
+        }
+    };
+
+    const handleCancel = (bookingId: string) => {
+        setBookingToCancel(bookingId);
+        setShowCancelModal(true);
+    };
+
+    const confirmCancel = async () => {
+        if (!bookingToCancel) return;
+        try {
+            await bookingService.cancelBooking({ bookingId: bookingToCancel, cancelledBy: user?.displayName || user?.email || 'User' });
+            loadData();
+            setShowCancelModal(false);
+            setFbType('success');
+            setFbMsg('Tu reserva ha sido cancelada correctamente.');
+            setFbVisible(true);
+        } catch (e) {
+            setFbType('error');
+            setFbMsg('Hubo un problema al cancelar. Contacta al soporte.');
             setFbVisible(true);
         }
     };
@@ -160,18 +228,28 @@ export default function MisReservasScreen() {
     );
 
     const displayList = useMemo(() => {
-        const statuses = activeTab === 'activas' ? ['confirmed', 'active', 'pending'] : ['cancelled', 'completed', 'past'];
-        const filtered = bookings.filter(b => statuses.includes(b.status as string));
-        
+        const now = new Date();
+        const filtered = bookings.filter(b => {
+            const bDate = (b.date as any)?.toDate ? (b.date as any).toDate() : new Date((b.date as any)?.seconds * 1000 || Date.now());
+            const [h, m] = (b.startTime || "00:00").split(':').map(Number);
+            const bookingDateTime = new Date(bDate);
+            bookingDateTime.setHours(h, m, 0, 0);
+            const isPast = bookingDateTime < now && b.status !== 'active';
+            const isFinished = ['cancelled', 'completed', 'past'].includes(b.status as string);
+            if (activeTab === 'activas') {
+                return !isPast && !isFinished && ['confirmed', 'active', 'pending'].includes(b.status as string);
+            } else {
+                return isPast || isFinished;
+            }
+        });
+
         return filtered.sort((a, b) => {
             const timeA = (a.date as any)?.seconds || 0;
             const timeB = (b.date as any)?.seconds || 0;
             if (activeTab === 'activas') {
-                // Próximas primero (Ascendente)
                 if (timeA !== timeB) return timeA - timeB;
                 return (a.startTime || "").localeCompare(b.startTime || "");
             } else {
-                // Más recientes primero (Descendente)
                 if (timeA !== timeB) return timeB - timeA;
                 return (b.startTime || "").localeCompare(a.startTime || "");
             }
@@ -202,8 +280,7 @@ export default function MisReservasScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: C.bg }}>
             <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
-            
-            {/* TOP BAR */}
+
             <View style={{ paddingTop: 60, paddingBottom: 20, paddingHorizontal: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: C.card }}>
                 <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={COLORS.accent} size={24} />
@@ -217,9 +294,9 @@ export default function MisReservasScreen() {
                 <TabButton label="HISTORIAL" active={activeTab === 'historial'} onPress={() => setActiveTab('historial')} isDark={isDark} />
             </View>
 
-            <ScrollView 
-                style={{ flex: 1 }} 
-                contentContainerStyle={{ paddingBottom: 120 }} 
+            <ScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={{ paddingBottom: 120 }}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(true); }} tintColor={COLORS.accent} />}
             >
                 <SectionLabel label={activeTab === 'activas' ? "Próximos Partidos" : "Partidos Finalizados"} />
@@ -231,74 +308,67 @@ export default function MisReservasScreen() {
                     </View>
                 ) : (
                     displayList.map((b) => (
-                        <BookingEliteCard 
-                        key={b.id} 
-                        booking={b} 
-                        isDark={isDark} 
-                        onView={() => { setSelectedBooking(b); setShowTicket(true); }}
-                        onMaps={() => handleOpenMaps(b)}
-                        onCheckIn={() => b.id && handleCheckIn(b.id)}
-                        onCheckOut={() => handleCheckOut(b)}
-                    />
+                        <BookingEliteCard
+                            key={b.id}
+                            booking={b}
+                            isDark={isDark}
+                            onView={() => { setSelectedBooking(b); setShowTicket(true); }}
+                            onMaps={() => handleOpenMaps(b)}
+                            onCheckIn={() => b.id && handleCheckIn(b)}
+                            onCheckOut={() => handleCheckOut(b)}
+                            onStats={(booking: any) => {
+                                setStatsBooking(booking);
+                                setShowStatsModal(true);
+                            }}
+                            onCancel={() => b.id && handleCancel(b.id)}
+                        />
                     ))
                 )}
             </ScrollView>
 
-            {/* MODAL TICKET ELITE */}
             <Modal visible={showTicket} animationType="slide" transparent={true}>
                 <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', padding: 30 }}>
-                    <View style={{ backgroundColor: '#FFFFFF', borderRadius: 40, overflow: 'hidden', borderWidth: 1, borderColor: '#E2E8F0' }}>
-                        
-                        {/* TICKET TOP */}
-                        <View style={{ padding: 30, borderBottomWidth: 2, borderBottomColor: '#F8FAFC', borderStyle: 'dashed' }}>
+                    <View style={{ backgroundColor: C.card, borderRadius: 40, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
+                        <View style={{ padding: 30, borderBottomWidth: 2, borderBottomColor: isDark ? 'rgba(255,255,255,0.1)' : '#F8FAFC', borderStyle: 'dashed' }}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                                 <View style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: modalSportInfo.color + '15', alignItems: 'center', justifyContent: 'center' }}>
                                     <modalSportInfo.icon color={modalSportInfo.color} size={24} />
                                 </View>
-                                <TouchableOpacity onPress={() => setShowTicket(false)} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
-                                    <X color="#0F172A" size={20} />
+                                <TouchableOpacity onPress={() => setShowTicket(false)} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
+                                    <X color={C.text} size={20} />
                                 </TouchableOpacity>
                             </View>
-
-                            <Text style={{ color: '#64748B', fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 5 }}>RECINTO</Text>
-                            <Text style={{ color: '#0F172A', fontSize: 24, fontWeight: '900', marginBottom: 20 }}>{selectedBooking?.tenantName}</Text>
-
+                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 5 }}>RECINTO</Text>
+                            <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', marginBottom: 20 }}>{selectedBooking?.tenantName}</Text>
                             <View style={{ flexDirection: 'row', gap: 30 }}>
                                 <View>
-                                    <Text style={{ color: '#64748B', fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>CANCHA</Text>
-                                    <Text style={{ color: '#0F172A', fontSize: 14, fontWeight: '800' }}>{selectedBooking?.courtName}</Text>
+                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>CANCHA</Text>
+                                    <Text style={{ color: C.text, fontSize: 14, fontWeight: '800' }}>{selectedBooking?.courtName}</Text>
                                 </View>
                                 <View>
-                                    <Text style={{ color: '#64748B', fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>ESTADO</Text>
+                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>ESTADO</Text>
                                     <Text style={{ color: modalStatus.color, fontSize: 14, fontWeight: '800' }}>{modalStatus.label}</Text>
                                 </View>
                             </View>
                         </View>
-
-                        {/* TICKET QR */}
-                        <View style={{ backgroundColor: '#F8FAFC', padding: 40, alignItems: 'center' }}>
+                        <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', padding: 40, alignItems: 'center' }}>
                             <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 25, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10 }}>
                                 {selectedBooking?.id && <QRCode value={selectedBooking.id} size={150} color="#0F172A" backgroundColor="white" />}
                             </View>
-                            <Text style={{ color: '#94A3B8', fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 4, marginTop: 25 }}>ID: {(selectedBooking?.id as string)?.slice(-8).toUpperCase()}</Text>
+                            <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 4, marginTop: 25 }}>ID: {(selectedBooking?.id as string)?.slice(-8).toUpperCase()}</Text>
                         </View>
-
-                        {/* TICKET BOTTOM */}
                         <View style={{ padding: 30 }}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <View style={{ gap: 8 }}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <Calendar color={modalSportInfo.color} size={14} />
-                                        <Text style={{ color: '#0F172A', fontSize: 13, fontWeight: '900', marginLeft: 10 }}>{getFormattedDate(selectedBooking?.date).full}</Text>
+                                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', marginLeft: 10 }}>{getFormattedDate(selectedBooking?.date).full}</Text>
                                     </View>
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                         <Clock color={modalSportInfo.color} size={14} />
-                                        <Text style={{ color: '#0F172A', fontSize: 13, fontWeight: '900', marginLeft: 10 }}>{selectedBooking?.startTime} HRS</Text>
+                                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', marginLeft: 10 }}>{selectedBooking?.startTime} HRS</Text>
                                     </View>
                                 </View>
-                                <TouchableOpacity style={{ width: 55, height: 55, borderRadius: 18, backgroundColor: modalSportInfo.color, alignItems: 'center', justifyContent: 'center' }}>
-                                    <Share2 color="white" size={20} />
-                                </TouchableOpacity>
                             </View>
                         </View>
                     </View>
@@ -306,25 +376,55 @@ export default function MisReservasScreen() {
             </Modal>
 
             <FeedbackModal visible={fbVisible} type={fbType} message={fbMsg} onClose={() => setFbVisible(false)} isDark={isDark} />
-            
-            <MatchStatsModal 
-                visible={showStatsModal} 
-                booking={statsBooking} 
-                onClose={() => setShowStatsModal(false)} 
+
+            <MatchStatsModal
+                visible={showStatsModal}
+                booking={statsBooking}
+                onClose={() => setShowStatsModal(false)}
                 isDark={isDark}
                 onSave={async (stats: any) => {
                     try {
                         await bookingService.saveMatchStats(stats);
                         setShowStatsModal(false);
                         setFbType('success');
-                        setFbMsg('¡ESTADÍSTICAS GUARDADAS! LOS PUNTOS HAN SIDO ACTUALIZADOS.');
+                        setFbMsg('¡Estadísticas guardadas con éxito!');
                         setFbVisible(true);
                     } catch (e) {
                         setFbType('error');
-                        setFbMsg('ERROR AL GUARDAR ESTADÍSTICAS.');
+                        setFbMsg('Hubo un error al guardar las estadísticas.');
                         setFbVisible(true);
                     }
                 }}
+            />
+
+            <SurveyModal
+                visible={showSurveyModal}
+                onClose={() => setShowSurveyModal(false)}
+                onSave={handleSaveSurvey}
+                isDark={isDark}
+            />
+
+            <EliteActionModal
+                visible={showCancelModal}
+                onClose={() => setShowCancelModal(false)}
+                onConfirm={confirmCancel}
+                title="¿Cancelar Reserva?"
+                message="Esta acción no se puede deshacer. ¿Estás seguro de que deseas cancelar tu turno?"
+                confirmText="SÍ, CANCELAR"
+                icon={<Trash2 color="#ef4444" size={40} />}
+                isDark={isDark}
+                danger
+            />
+
+            <EliteActionModal
+                visible={showCheckInModal}
+                onClose={() => setShowCheckInModal(false)}
+                onConfirm={confirmCheckIn}
+                title="Confirmar Llegada"
+                message="¿Confirmas que ya te encuentras en el recinto para iniciar tu partido?"
+                confirmText="SÍ, INGRESAR"
+                icon={<ShieldCheck color={COLORS.accent} size={40} />}
+                isDark={isDark}
             />
         </View>
     );
@@ -336,61 +436,94 @@ const TabButton = ({ label, active, onPress, isDark }: any) => (
     </TouchableOpacity>
 );
 
-const BookingEliteCard = ({ booking, isDark, onView, onMaps, onCheckIn, onCheckOut }: any) => {
+const BookingEliteCard = ({ booking, isDark, onView, onMaps, onCheckIn, onCheckOut, onStats, onCancel }: any) => {
     const C = isDark ? COLORS.dark : COLORS.light;
     const sportInfo = getSportInfo(booking.sport || '');
     const status = getStatusInfo(booking, C);
     const dateInfo = getFormattedDate(booking.date);
+    const isConfirmed = booking.status === 'confirmed';
+    const isActive = booking.status === 'active';
+    const isCompleted = booking.status === 'completed' || booking.status === 'past';
+    const isCancelled = booking.status === 'cancelled';
 
     return (
-        <TouchableOpacity onPress={onView} activeOpacity={0.8} style={{ marginHorizontal: 30, marginBottom: 25, backgroundColor: C.card, borderRadius: 30, padding: 25, borderWidth: 1, borderColor: C.border, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 15 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={{ width: 45, height: 45, borderRadius: 12, backgroundColor: sportInfo.color + '15', alignItems: 'center', justifyContent: 'center' }}>
-                        <sportInfo.icon color={sportInfo.color} size={22} />
+        <View style={{ marginHorizontal: 25, marginBottom: 25, backgroundColor: C.card, borderRadius: 35, borderWidth: 1, borderColor: C.border, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 20, overflow: 'hidden' }}>
+            <View style={{ padding: 25 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                        <View style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: sportInfo.color + '15', alignItems: 'center', justifyContent: 'center' }}>
+                            <sportInfo.icon color={sportInfo.color} size={24} />
+                        </View>
+                        <View>
+                            <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{booking.tenantName}</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                                <MapPinned color={C.sub} size={10} />
+                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '800', textTransform: 'uppercase' }}>{booking.courtName}</Text>
+                            </View>
+                        </View>
                     </View>
-                    <View style={{ marginLeft: 15 }}>
-                        <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase' }}>{booking.tenantName}</Text>
-                        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1 }}>{booking.sport} • {booking.courtName}</Text>
-                    </View>
-                </View>
-                <View style={{ backgroundColor: status.color + '15', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 }}>
-                    <Text style={{ color: status.color, fontSize: 9, fontWeight: '900' }}>{status.label}</Text>
-                </View>
-            </View>
-
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 20, borderTopWidth: 1, borderTopColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }}>
-                <View style={{ gap: 4 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Calendar color={C.sub} size={12} />
-                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '800', marginLeft: 8 }}>{dateInfo.full}</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Clock color={C.sub} size={12} />
-                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '800', marginLeft: 8 }}>{booking.startTime} hrs</Text>
+                    <View style={{ backgroundColor: status.color + '15', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, borderWidth: 1, borderColor: status.color + '20' }}>
+                        <Text style={{ color: status.color, fontSize: 9, fontWeight: '900', letterSpacing: 0.5 }}>{status.label}</Text>
                     </View>
                 </View>
-                
-                <View style={{ flexDirection: 'row', gap: 10 }}>
-                    {booking.status === 'confirmed' && !booking.checkIn && (
-                        <TouchableOpacity onPress={onCheckIn} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: '#10b98115', alignItems: 'center', justifyContent: 'center' }}>
-                            <ShieldCheck color="#10b981" size={20} />
+                <View style={{ flexDirection: 'row', gap: 15, marginBottom: 20 }}>
+                    <View style={{ flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#F8FAFC', padding: 15, borderRadius: 20, gap: 4 }}>
+                        <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>FECHA Y HORA</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <CalendarDays color={COLORS.accent} size={14} />
+                            <Text style={{ color: C.text, fontSize: 12, fontWeight: '800' }}>{dateInfo.full}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <Timer color={COLORS.accent} size={14} />
+                            <Text style={{ color: C.text, fontSize: 12, fontWeight: '800' }}>{booking.startTime} HRS</Text>
+                        </View>
+                    </View>
+                    <View style={{ flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#F8FAFC', padding: 15, borderRadius: 20, gap: 4 }}>
+                        <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>PAGO Y VALOR</Text>
+                        <Text style={{ color: C.text, fontSize: 16, fontWeight: '900' }}>${(booking.totalPrice || booking.price || 0).toLocaleString('es-CL')}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: booking.paymentStatus === 'paid' ? COLORS.accent : '#f59e0b' }} />
+                            <Text style={{ color: booking.paymentStatus === 'paid' ? COLORS.accent : '#f59e0b', fontSize: 9, fontWeight: '900', textTransform: 'uppercase' }}>
+                                {booking.paymentStatus === 'paid' ? 'PAGADO' : 'PENDIENTE'}
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+                <View style={{ flexDirection: 'row', gap: 8, borderTopWidth: 1, borderTopColor: C.border, paddingTop: 15 }}>
+                    {isConfirmed && !booking.checkIn && (
+                        <TouchableOpacity onPress={onCheckIn} style={{ flex: 2, height: 50, borderRadius: 15, backgroundColor: COLORS.accent, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, shadowColor: COLORS.accent, shadowOpacity: 0.2, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } }}>
+                            <ShieldCheck color="white" size={18} />
+                            <Text style={{ color: 'white', fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>INGRESAR</Text>
                         </TouchableOpacity>
                     )}
-                    {booking.status === 'active' && !booking.checkOut && (
-                        <TouchableOpacity onPress={onCheckOut} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: '#f59e0b15', alignItems: 'center', justifyContent: 'center' }}>
-                            <CheckCircle2 color="#f59e0b" size={20} />
+                    {isActive && !booking.checkOut && (
+                        <TouchableOpacity onPress={onCheckOut} style={{ flex: 2, height: 50, borderRadius: 15, backgroundColor: '#f59e0b', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, shadowColor: '#f59e0b', shadowOpacity: 0.2, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } }}>
+                            <CheckCircle2 color="white" size={18} />
+                            <Text style={{ color: 'white', fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>CHECK-OUT</Text>
                         </TouchableOpacity>
                     )}
-                    <TouchableOpacity onPress={onMaps} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: COLORS.maps + '15', alignItems: 'center', justifyContent: 'center' }}>
-                        <MapPin color={COLORS.maps} size={20} />
+                    {booking.checkOut && (
+                        <TouchableOpacity onPress={() => onStats && onStats(booking)} style={{ flex: 2, height: 50, borderRadius: 15, backgroundColor: COLORS.accent + '15', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                            <Activity color={COLORS.accent} size={18} />
+                            <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>STATS</Text>
+                        </TouchableOpacity>
+                    )}
+                    <TouchableOpacity onPress={onMaps} style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: COLORS.maps + '10', alignItems: 'center', justifyContent: 'center' }}>
+                        <Navigation color={COLORS.maps} size={20} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={onView} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: COLORS.accent + '15', alignItems: 'center', justifyContent: 'center' }}>
-                        <Ticket color={COLORS.accent} size={20} />
-                    </TouchableOpacity>
+                    {!isCompleted && !isCancelled && !isActive && (
+                        <TouchableOpacity onPress={onCancel} style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: '#ef444410', alignItems: 'center', justifyContent: 'center' }}>
+                            <XCircle color="#ef4444" size={20} />
+                        </TouchableOpacity>
+                    )}
+                    {(!isConfirmed || booking.checkIn) && (
+                        <TouchableOpacity onPress={onView} style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: C.sub + '10', alignItems: 'center', justifyContent: 'center' }}>
+                            <Ticket color={C.sub} size={20} />
+                        </TouchableOpacity>
+                    )}
                 </View>
             </View>
-        </TouchableOpacity>
+        </View>
     );
 };
 
@@ -407,11 +540,36 @@ const FeedbackModal = ({ visible, type, message, onClose, isDark }: any) => {
                     <View style={{ width: 70, height: 70, borderRadius: 35, backgroundColor: (type === 'error' ? '#ef444422' : '#10b98122'), alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
                         {type === 'error' ? <XCircle color="#ef4444" size={35} /> : <CheckCircle2 color="#10b981" size={35} />}
                     </View>
-                    <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>{type === 'error' ? 'Error' : 'Éxito'}</Text>
+                    <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>{type === 'error' ? 'Oops' : '¡Éxito!'}</Text>
                     <Text style={{ color: C.sub, fontSize: 13, fontWeight: '600', textAlign: 'center', marginBottom: 25 }}>{message}</Text>
                     <TouchableOpacity onPress={onClose} style={{ backgroundColor: (type === 'error' ? '#ef4444' : '#10b981'), paddingVertical: 15, borderRadius: 15, width: '100%', alignItems: 'center' }}>
                         <Text style={{ color: 'white', fontWeight: '900' }}>ENTENDIDO</Text>
                     </TouchableOpacity>
+                </View>
+            </View>
+        </Modal>
+    );
+};
+
+const EliteActionModal = ({ visible, onClose, onConfirm, title, message, confirmText, icon, isDark, danger }: any) => {
+    const C = isDark ? COLORS.dark : COLORS.light;
+    return (
+        <Modal visible={visible} transparent animationType="fade">
+            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
+                <View style={{ backgroundColor: C.card, borderRadius: 35, padding: 30, alignItems: 'center', width: '100%', borderWidth: 1, borderColor: C.border }}>
+                    <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: (danger ? '#ef4444' : COLORS.accent) + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+                        {icon}
+                    </View>
+                    <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>{title}</Text>
+                    <Text style={{ color: C.sub, fontSize: 13, fontWeight: '600', textAlign: 'center', marginBottom: 30, lineHeight: 20 }}>{message}</Text>
+                    <View style={{ flexDirection: 'row', gap: 10, width: '100%' }}>
+                        <TouchableOpacity onPress={onClose} style={{ flex: 1, height: 55, borderRadius: 15, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={{ color: C.text, fontWeight: '900', fontSize: 12 }}>VOLVER</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={onConfirm} style={{ flex: 1, height: 55, borderRadius: 15, backgroundColor: danger ? '#ef4444' : COLORS.accent, alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 12 }}>{confirmText}</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
         </Modal>
@@ -451,7 +609,6 @@ const MatchStatsModal = ({ visible, booking, onClose, isDark, onSave }: any) => 
                     })
                 );
                 setTeamMembers(membersData);
-                // Dividir automáticamente los miembros entre Equipo A y Equipo B (Mitad y Mitad)
                 const mid = Math.ceil(membersData.length / 2);
                 setPlayersA(membersData.slice(0, mid));
                 setPlayersB(membersData.slice(mid));
@@ -489,7 +646,6 @@ const MatchStatsModal = ({ visible, booking, onClose, isDark, onSave }: any) => 
         let winner: 'teamA' | 'teamB' | 'draw' = 'draw';
         if (scoreA > scoreB) winner = 'teamA';
         else if (scoreB > scoreA) winner = 'teamB';
-
         onSave({
             bookingId: booking.id,
             teamA: { score: scoreA, players: playersA },
@@ -508,7 +664,6 @@ const MatchStatsModal = ({ visible, booking, onClose, isDark, onSave }: any) => 
                             <X color={C.text} size={24} />
                         </TouchableOpacity>
                     </View>
-
                     {loading ? (
                         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                             <ActivityIndicator color={COLORS.accent} size="large" />
@@ -516,52 +671,48 @@ const MatchStatsModal = ({ visible, booking, onClose, isDark, onSave }: any) => 
                         </View>
                     ) : (
                         <ScrollView showsVerticalScrollIndicator={false}>
-                        {/* SCOREBOARD DNA */}
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', backgroundColor: C.card, borderRadius: 30, padding: 30, borderWidth: 1, borderColor: C.border, marginBottom: 30 }}>
-                            <View style={{ alignItems: 'center' }}>
-                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', marginBottom: 10 }}>EQUIPO A</Text>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                                    <TouchableOpacity onPress={() => setScoreA(Math.max(0, scoreA - 1))}><Minus color={COLORS.accent} size={20} /></TouchableOpacity>
-                                    <Text style={{ color: C.text, fontSize: 48, fontWeight: '900' }}>{scoreA}</Text>
-                                    <TouchableOpacity onPress={() => setScoreA(scoreA + 1)}><Plus color={COLORS.accent} size={20} /></TouchableOpacity>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', backgroundColor: C.card, borderRadius: 30, padding: 30, borderWidth: 1, borderColor: C.border, marginBottom: 30 }}>
+                                <View style={{ alignItems: 'center' }}>
+                                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', marginBottom: 10 }}>EQUIPO A</Text>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                                        <TouchableOpacity onPress={() => setScoreA(Math.max(0, scoreA - 1))}><Minus color={COLORS.accent} size={20} /></TouchableOpacity>
+                                        <Text style={{ color: C.text, fontSize: 48, fontWeight: '900' }}>{scoreA}</Text>
+                                        <TouchableOpacity onPress={() => setScoreA(scoreA + 1)}><Plus color={COLORS.accent} size={20} /></TouchableOpacity>
+                                    </View>
+                                </View>
+                                <Text style={{ color: C.sub, fontSize: 24, fontWeight: '900' }}>VS</Text>
+                                <View style={{ alignItems: 'center' }}>
+                                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', marginBottom: 10 }}>EQUIPO B</Text>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                                        <TouchableOpacity onPress={() => setScoreB(Math.max(0, scoreB - 1))}><Minus color="#f59e0b" size={20} /></TouchableOpacity>
+                                        <Text style={{ color: C.text, fontSize: 48, fontWeight: '900' }}>{scoreB}</Text>
+                                        <TouchableOpacity onPress={() => setScoreB(scoreB + 1)}><Plus color="#f59e0b" size={20} /></TouchableOpacity>
+                                    </View>
                                 </View>
                             </View>
-                            <Text style={{ color: C.sub, fontSize: 24, fontWeight: '900' }}>VS</Text>
-                            <View style={{ alignItems: 'center' }}>
-                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', marginBottom: 10 }}>EQUIPO B</Text>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                                    <TouchableOpacity onPress={() => setScoreB(Math.max(0, scoreB - 1))}><Minus color="#f59e0b" size={20} /></TouchableOpacity>
-                                    <Text style={{ color: C.text, fontSize: 48, fontWeight: '900' }}>{scoreB}</Text>
-                                    <TouchableOpacity onPress={() => setScoreB(scoreB + 1)}><Plus color="#f59e0b" size={20} /></TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-
-                        <MatchTeamSection 
-                            label="EQUIPO A" 
-                            players={playersA} 
-                            allMembers={teamMembers.filter(m => !playersA.find(p => p.userId === m.userId) && !playersB.find(p => p.userId === m.userId))}
-                            onAdd={(p: any) => addPlayer(p, 'A')}
-                            onRemove={(id: string) => removePlayer(id, 'A')}
-                            onUpdateStat={(id: string, field: any, delta: number) => updateStat(id, 'A', field, delta)}
-                            isDark={isDark}
-                            color={COLORS.accent}
-                        />
-
-                        <MatchTeamSection 
-                            label="EQUIPO B" 
-                            players={playersB} 
-                            allMembers={teamMembers.filter(m => !playersA.find(p => p.userId === m.userId) && !playersB.find(p => p.userId === m.userId))}
-                            onAdd={(p: any) => addPlayer(p, 'B')}
-                            onRemove={(id: string) => removePlayer(id, 'B')}
-                            onUpdateStat={(id: string, field: any, delta: number) => updateStat(id, 'B', field, delta)}
-                            isDark={isDark}
-                            color="#f59e0b"
-                        />
-
-                        <TouchableOpacity onPress={handleSave} style={{ backgroundColor: COLORS.accent, height: 70, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginTop: 30, marginBottom: 50 }}>
-                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 16 }}>GUARDAR RESULTADOS Y ACTUALIZAR ELO</Text>
-                        </TouchableOpacity>
+                            <MatchTeamSection
+                                label="EQUIPO A"
+                                players={playersA}
+                                allMembers={teamMembers.filter(m => !playersA.find(p => p.userId === m.userId) && !playersB.find(p => p.userId === m.userId))}
+                                onAdd={(p: any) => addPlayer(p, 'A')}
+                                onRemove={(id: string) => removePlayer(id, 'A')}
+                                onUpdateStat={(id: string, field: any, delta: number) => updateStat(id, 'A', field, delta)}
+                                isDark={isDark}
+                                color={COLORS.accent}
+                            />
+                            <MatchTeamSection
+                                label="EQUIPO B"
+                                players={playersB}
+                                allMembers={teamMembers.filter(m => !playersA.find(p => p.userId === m.userId) && !playersB.find(p => p.userId === m.userId))}
+                                onAdd={(p: any) => addPlayer(p, 'B')}
+                                onRemove={(id: string) => removePlayer(id, 'B')}
+                                onUpdateStat={(id: string, field: any, delta: number) => updateStat(id, 'B', field, delta)}
+                                isDark={isDark}
+                                color="#f59e0b"
+                            />
+                            <TouchableOpacity onPress={handleSave} style={{ backgroundColor: COLORS.accent, height: 70, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginTop: 30, marginBottom: 50 }}>
+                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 16 }}>GUARDAR RESULTADOS</Text>
+                            </TouchableOpacity>
                         </ScrollView>
                     )}
                 </View>
@@ -573,7 +724,6 @@ const MatchStatsModal = ({ visible, booking, onClose, isDark, onSave }: any) => 
 const MatchTeamSection = ({ label, players, allMembers, onAdd, onRemove, onUpdateStat, isDark, color }: any) => {
     const C = isDark ? COLORS.dark : COLORS.light;
     const [showPicker, setShowPicker] = useState(false);
-
     return (
         <View style={{ marginBottom: 30 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
@@ -583,16 +733,11 @@ const MatchTeamSection = ({ label, players, allMembers, onAdd, onRemove, onUpdat
                     <Text style={{ color: C.text, fontSize: 10, fontWeight: '800' }}>AGREGAR JUGADOR</Text>
                 </TouchableOpacity>
             </View>
-
             <View style={{ backgroundColor: C.card, borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
-                {players.length === 0 && (
-                    <Text style={{ color: C.sub, fontSize: 11, textAlign: 'center', padding: 20 }}>No hay jugadores asignados</Text>
-                )}
+                {players.length === 0 && <Text style={{ color: C.sub, fontSize: 11, textAlign: 'center', padding: 20 }}>No hay jugadores asignados</Text>}
                 {players.map((p: any) => (
                     <View key={p.userId} style={{ padding: 20, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: C.border }}>
-                        <View style={{ flex: 1 }}>
-                            <Text style={{ color: C.text, fontSize: 14, fontWeight: '800' }}>{p.name}</Text>
-                        </View>
+                        <View style={{ flex: 1 }}><Text style={{ color: C.text, fontSize: 14, fontWeight: '800' }}>{p.name}</Text></View>
                         <View style={{ flexDirection: 'row', gap: 15, alignItems: 'center' }}>
                             <View style={{ alignItems: 'center' }}>
                                 <Text style={{ color: C.sub, fontSize: 8, fontWeight: '800' }}>GOLES</Text>
@@ -610,14 +755,11 @@ const MatchTeamSection = ({ label, players, allMembers, onAdd, onRemove, onUpdat
                                     <TouchableOpacity onPress={() => onUpdateStat(p.userId, 'assists', 1)}><Plus color={C.text} size={14} /></TouchableOpacity>
                                 </View>
                             </View>
-                            <TouchableOpacity onPress={() => onRemove(p.userId)}>
-                                <X color="#ef4444" size={18} />
-                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => onRemove(p.userId)}><X color="#ef4444" size={18} /></TouchableOpacity>
                         </View>
                     </View>
                 ))}
             </View>
-
             {showPicker && (
                 <Modal visible={true} transparent animationType="fade">
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', padding: 30 }}>
@@ -631,13 +773,44 @@ const MatchTeamSection = ({ label, players, allMembers, onAdd, onRemove, onUpdat
                                 ))}
                                 {allMembers.length === 0 && <Text style={{ color: C.sub, textAlign: 'center' }}>No hay más miembros</Text>}
                             </ScrollView>
-                            <TouchableOpacity onPress={() => setShowPicker(false)} style={{ marginTop: 20, padding: 15, alignItems: 'center' }}>
-                                <Text style={{ color: '#ef4444', fontWeight: '900' }}>CANCELAR</Text>
-                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => setShowPicker(false)} style={{ marginTop: 20, padding: 15, alignItems: 'center' }}><Text style={{ color: '#ef4444', fontWeight: '900' }}>CANCELAR</Text></TouchableOpacity>
                         </View>
                     </View>
                 </Modal>
             )}
         </View>
+    );
+};
+
+const SurveyModal = ({ visible, onClose, onSave, isDark }: any) => {
+    const C = isDark ? COLORS.dark : COLORS.light;
+    const [rating, setRating] = useState(5);
+    const [feedback, setFeedback] = useState('');
+    return (
+        <Modal visible={visible} animationType="slide" transparent>
+            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', padding: 25 }}>
+                <View style={{ backgroundColor: C.bg, borderRadius: 35, padding: 30, borderWidth: 1, borderColor: C.border }}>
+                    <View style={{ alignItems: 'center', marginBottom: 25 }}>
+                        <View style={{ width: 60, height: 60, borderRadius: 20, backgroundColor: COLORS.accent + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 15 }}>
+                            <Star color={COLORS.accent} size={30} fill={COLORS.accent} />
+                        </View>
+                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', textTransform: 'uppercase' }}>Tu Experiencia</Text>
+                        <Text style={{ color: C.sub, fontSize: 12, fontWeight: '600', textAlign: 'center', marginTop: 5 }}>¿Qué te pareció el recinto y el servicio hoy?</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 30 }}>
+                        {[1, 2, 3, 4, 5].map((s) => (
+                            <TouchableOpacity key={s} onPress={() => setRating(s)}>
+                                <Star size={35} color={rating >= s ? '#f59e0b' : C.sub} fill={rating >= s ? '#f59e0b' : 'transparent'} strokeWidth={2} />
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                    <TextInput value={feedback} onChangeText={setFeedback} placeholder="Comentarios adicionales (opcional)..." placeholderTextColor={C.sub} multiline style={{ backgroundColor: C.card, borderRadius: 20, padding: 20, color: C.text, fontSize: 14, height: 100, textAlignVertical: 'top', borderWidth: 1, borderColor: C.border, marginBottom: 25 }} />
+                    <View style={{ flexDirection: 'row', gap: 10 }}>
+                        <TouchableOpacity onPress={onClose} style={{ flex: 1, height: 60, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: C.card, borderWidth: 1, borderColor: C.border }}><Text style={{ color: C.sub, fontWeight: '900' }}>CANCELAR</Text></TouchableOpacity>
+                        <TouchableOpacity onPress={() => onSave(rating, feedback)} style={{ flex: 2, height: 60, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.accent }}><Text style={{ color: 'white', fontWeight: '900' }}>FINALIZAR PARTIDO</Text></TouchableOpacity>
+                    </View>
+                </View>
+            </View>
+        </Modal>
     );
 };

@@ -1,9 +1,10 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { db, auth } from '@/services/firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import { db, auth, storage } from '@/services/firebase';
+import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential, updateProfile } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import {
   UserCircleIcon, EnvelopeIcon, PhoneIcon, BuildingOfficeIcon,
@@ -170,7 +171,24 @@ export default function ProfilePage() {
     try {
       const croppedImage = await getCroppedImg(imageToCrop, croppedAreaPixels);
       if (croppedImage) {
+        // 1. Actualizar Firestore (users)
         await updateDoc(doc(db, "users", user.uid), { photoURL: croppedImage });
+
+        // 2. Actualizar Firestore (staff) - si existe
+        try {
+            const staffRef = collection(db, 'staff');
+            const q = query(staffRef, where('uid', '==', user.uid));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                await updateDoc(doc(db, 'staff', snap.docs[0].id), { photoURL: croppedImage });
+            }
+        } catch (e) { console.error("Error updating staff photo on web:", e); }
+
+        // 3. Actualizar Firebase Auth Profile
+        try {
+            await updateProfile(user, { photoURL: croppedImage });
+        } catch (e) { console.error("Auth update failed (base64 too long):", e); }
+
         setProfile({ ...profile, photoURL: croppedImage });
         addToast("Foto de perfil actualizada", 'success');
         setShowCropper(false);

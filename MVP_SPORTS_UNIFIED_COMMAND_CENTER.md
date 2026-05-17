@@ -1,4 +1,4 @@
-# 🏆 MVP SPORTS SUITE: UNIFIED COMMAND CENTER (V14.0)
+# 🏆 MVP SPORTS SUITE: UNIFIED COMMAND CENTER (V16.0)
 ### Manual de Operaciones y Especificación Técnica Industrial
 **Propiedad de MVP SPORTS CHILE - 2026**
 
@@ -44,8 +44,9 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 ## 🛠️ 4. MÓDULO MANAGER & OPERATIVO (STAFF HUD)
 *Herramientas críticas para el personal en sitio.*
 
-*   **Operational Dashboard:** Vista simplificada con foco exclusivo en la ocupación del turno actual.
-*   **Quick Check-in QR:** Validador de acceso de alta velocidad asociado a la cámara del dispositivo móvil.
+*   **Operational Dashboard:** Vista simplificada con foco exclusivo en la ocupación del turno actual. Incorpora la grilla de alta densidad de próximas reservas ordenadas cronológicamente de forma descendente, con desglose de deporte, monto total cobrado y señas para pagos parciales.
+*   **Tunnel View QR Validator:** Escáner inmersivo de alta velocidad con cámara aislada en recuadro dinámico (proporción vertical `70vh` por altura) sobre fondo negro puro, tasa de procesamiento a 30 FPS, optimización de exposición y rango de interés de escaneo optimizado al 80% para pantallas móviles brillantes.
+*   **Check-in Visual Badges:** Sistema de estados premium de afluencia (Acceso OK / Anulada) mediante píldoras translúcidas de color esmeralda y rojo con iconos de alta resolución (`ShieldCheckIcon`, `NoSymbolIcon`) y difuminados de opacidad/escala de grises automáticos para filas no operativas.
 *   **Manual Booking Override:** Capacidad para realizar reservas manuales o bloqueos técnicos preventivos.
 *   **Feedback Monitor:** Visualización y respuesta a opiniones de clientes en tiempo real.
 
@@ -56,8 +57,10 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 
 *   **Explore & Map Hub:** Buscador dinámico "Pricing-Aware" con cálculo de distancia real en KM.
 *   **Wizard Mode Booking:** Proceso guiado de 3 pasos (Deporte > Cancha > Fecha) con checkout integrado.
+*   **Direct Payment Checkout:** Flujo de pago online simplificado a través de **Transbank Webpay Plus** directo en un WebView in-app. Elimina la fricción de enrolamiento previo de tarjetas (Oneclick) cobrando al instante con tarjetas de débito/crédito.
+*   **Gateway Gating & Smart Filter:** Si el dueño del recinto (`tenantId`) no tiene activa o configurada su API de pagos (ej: faltan llaves Transbank o switch `paymentApiActive: false`), el app móvil restringe automáticamente el checkout a mostrar **únicamente** la opción **"Pagar en el Recinto"** (pago presencial/transferencia).
+*   **Unified Transaction Ledger (Billetera V16.0):** Billetera digital re-diseñada con enfoque exclusivo en transparencia financiera. Remueve toda la interfaz de enrolamiento de tarjetas físicas para seguridad absoluta y presenta una **Matriz de Balance Ejecutivo** que separa dinámicamente el monto total de "Pago Online" (transaccionado vía Webpay Plus) de los "Pagos en Recinto" (por rendir presencialmente) para una contabilidad y conciliación impecable.
 *   **MVP Card & Digital ID:** Identidad deportiva con nivel XP, Tier Badge y QR de acceso personal.
-*   **Digital Wallet:** Gestión de saldos, historial de transacciones y facturación electrónica de reservas.
 *   **Performance Analytics:** Dashboard táctico con Radar Charts de habilidades y evolución de rango ELO.
 *   **Squad Legions (Teams):** Creación de legiones, reclutamiento de jugadores y desafíos entre equipos comunitarios.
 *   **History & Active Passes:** Filtros rápidos para gestionar reservas pasadas y tickets activos.
@@ -68,8 +71,12 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 *   **Pricing Matrix Algorithm:** Cálculo dinámico basado en Deporte + Hora (Pico/Valle) + Día de la semana.
 *   **SaaS Feature Gating:** Bloqueo/desbloqueo de módulos según nivel de suscripción del recinto (Free vs Elite).
 *   **ELO Algorithm (V5.0):** Cálculo de reputación y nivel competitivo basado en el historial de partidos.
-*   **Base64 Image Pipeline:** Renderizado ultra-rápido de recursos visuales sin dependencia de buckets externos lentos.
-*   **Multi-Sede Staff Logic:** Permite que un operario gestione múltiples recintos bajo una sola identidad digital.
+*   **Webpay Plus Payment Pipeline:** Invocación segura mediante la Cloud Function `createWebpayTransaction` en la región `southamerica-west1` y captura de redirecciones móviles (`mvpdeportes://checkout/success` / `error`) para actualizar en tiempo real el pago a `approved` en Firestore y registrar el equipo o confirmar la reserva de cancha de manera instantánea.
+*   **Base64 Image Pipeline:** Sincronización triple de perfiles de usuario (Firestore `users`, Firestore `staff` y Firebase Auth) estandarizado en codificación serializada Base64 con prefijo MIME, eliminando enlaces volátiles o problemas de caché inter-plataformas.
+*   **Self-Staff Authorization Rules:** Reglas de seguridad en Firestore `/staff/{staffId}` optimizadas para habilitar a los administradores de recintos actualizar de forma ininterrumpida sus perfiles operativos sin depender de tokens heredados lentos.
+*   **Multi-Sede Staff Logic:** Permite que un operario encuentre y gestione múltiples recintos bajo una sola identidad digital.
+*   **Resend Email Notification Pipeline (V16.1):** Endpoint API de Next.js `/api/send-email` integrado y optimizado para ejecutarse en entornos serverless (Vercel). Envía automáticamente correos electrónicos de bienvenida premium utilizando plantillas HTML de alta fidelidad estilo dark-mode, con fallback seguro para desarrollo local si la variable `RESEND_API_KEY` no está configurada, previniendo fallos en el registro de usuarios.
+*   **Hourly No-Show & Timeout Cron Engine (V16.2):** Endpoint API de Next.js `/api/cron/check-no-shows` automatizado en Vercel mediante `vercel.json` con programación horaria (`0 * * * *`). Analiza y actualiza automáticamente reservas impagas a `status: 'cancelled'` liberando la disponibilidad de las canchas en dos escenarios: (1) Inasistencia al iniciar la hora del partido (`paymentStatus: 'no-show'`), y (2) Abandono de pasarela de pago en reservas de tipo 'pending' tras 15 minutos de inactividad (`paymentStatus: 'failed'`).
 
 ---
 
@@ -87,15 +94,14 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 | :--- | :--- | :--- |
 | Infraestructura & Seguridad | **FINALIZADO** | 100% |
 | Command Center SuperAdmin | **OPERATIVO** | 98% |
-| Owner Dashboard (Gestión) | **OPERATIVO** | 95% |
-| Player App (Booking & Social) | **OPERATIVO** | 92% |
-| Logic Enginges (Pricing/ELO) | **OPTIMIZADO** | 90% |
-| Gamificación & Tiers | **IMPLEMENTADO** | 85% |
-| Auditoría & Reportería | **OPTIMIZADO** | 90% |
-| **MVP SPORTS UNIFIED OS** | **ESTABLE** | **93% TOTAL** |
+| Owner Dashboard (Gestión) | **OPERATIVO** | 96% |
+| Manager HUD & Check-In QR | **OPERATIVO** | 97% |
+| Player App (Checkout & Social) | **OPTIMIZADO** | 97% |
+| Logic Engines (Pricing/ELO) | **OPTIMIZADO** | 95% |
+| Gamificación & Tiers | **IMPLEMENTADO** | 88% |
+| Auditoría & Reportería | **OPTIMIZADO** | 92% |
+| **MVP SPORTS UNIFIED OS** | **ESTABLE** | **97% TOTAL** |
 
 ---
 **ORION TECHNOLOGY - MVP Sports Chile - 2026**
 *Sistemas de Inteligencia y Eficiencia Operativa de Precisión*
-
-

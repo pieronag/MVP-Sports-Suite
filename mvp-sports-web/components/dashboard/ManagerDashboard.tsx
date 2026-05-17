@@ -38,6 +38,9 @@ interface Booking {
     status: string;
     paymentStatus: string;
     price: number;
+    totalPrice?: number;
+    deposit?: number;
+    sport?: string;
 }
 
 interface CourtStatus {
@@ -64,6 +67,7 @@ export default function ManagerDashboard() {
         todayCount: 0,
         activeNow: 0,
         revenueToday: 0,
+        pendingRevenue: 0,
         occupancyRate: 0,
         avgTicket: 0
     });
@@ -161,20 +165,38 @@ export default function ManagerDashboard() {
                     return court;
                 });
 
-                const revenue = todayDocs.reduce((acc, curr) => acc + (Number(curr.price) || 0), 0);
-                const totalHoursBooked = todayDocs.reduce((acc, curr) => acc + (curr.duration || 60) / 60, 0);
+                const revenue = todayDocs.reduce((acc, curr) => {
+                    if (curr.status === 'cancelled') return acc;
+                    if (curr.paymentStatus === 'paid') return acc + (Number(curr.totalPrice || curr.price) || 0);
+                    if (curr.paymentStatus === 'partial') return acc + (Number(curr.deposit) || 0);
+                    return acc;
+                }, 0);
+
+                const pending = todayDocs.reduce((acc, curr) => {
+                    if (curr.status === 'cancelled' || curr.paymentStatus === 'paid') return acc;
+                    const total = Number(curr.totalPrice || curr.price) || 0;
+                    if (curr.paymentStatus === 'pending') return acc + total;
+                    if (curr.paymentStatus === 'partial') return acc + (total - (Number(curr.deposit) || 0));
+                    return acc;
+                }, 0);
+
+                const totalHoursBooked = todayDocs.reduce((acc, curr) => acc + (curr.status !== 'cancelled' ? (curr.duration || 60) / 60 : 0), 0);
                 const totalCapacityHours = Math.max(1, courtsList.length * 12);
                 const occupancy = Math.round((totalHoursBooked / totalCapacityHours) * 100);
 
                 setStats({
-                    todayCount: todayDocs.length,
+                    todayCount: todayDocs.filter(b => b.status !== 'cancelled').length,
                     activeNow: activeNowCount,
                     revenueToday: revenue,
+                    pendingRevenue: pending,
                     occupancyRate: occupancy,
-                    avgTicket: todayDocs.length > 0 ? Math.round(revenue / todayDocs.length) : 0
+                    avgTicket: todayDocs.filter(b => b.status !== 'cancelled' && b.paymentStatus !== 'pending').length > 0 
+                        ? Math.round(revenue / todayDocs.filter(b => b.status !== 'cancelled' && b.paymentStatus !== 'pending').length) 
+                        : 0
                 });
                 setCourtStatuses(updatedCourtStatus);
                 setNextBookings(todayDocs.filter(b => {
+                    if (b.status === 'cancelled') return false;
                     const h = parseInt(b.startTime.split(':')[0]) || 0;
                     const end = new Date(startOfDay.getTime());
                     end.setHours(h + 1, 0, 0);
@@ -182,7 +204,7 @@ export default function ManagerDashboard() {
                 }).sort((a,b) => {
                     const hourA = parseInt(a.startTime.split(':')[0]) || 0;
                     const hourB = parseInt(b.startTime.split(':')[0]) || 0;
-                    return hourA - hourB;
+                    return hourB - hourA;
                 }).slice(0, 5));
                 setLoading(false);
             }, (err) => {
@@ -261,10 +283,11 @@ export default function ManagerDashboard() {
             </div>
 
             {/* KPI GRID - COMPACT DNA */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 <TarjetaKpi label="Reservas Hoy" value={stats.todayCount} sub="Reservas" icon={<TicketIcon />} />
                 <TarjetaKpi label="En Uso" value={stats.activeNow} sub="Ocupación" icon={<UserGroupIcon />} />
                 <TarjetaKpi label="Caja Hoy" value={formatMoney(stats.revenueToday)} sub="Venta" icon={<CurrencyDollarIcon />} brillo />
+                <TarjetaKpi label="Pendiente Cobro" value={formatMoney(stats.pendingRevenue)} sub="Por Cobrar" icon={<ExclamationCircleIcon />} className="border-amber-500/20" />
                 <TarjetaKpi label="Ocupación" value={`${stats.occupancyRate}%`} sub="Rendimiento" icon={<Squares2X2Icon />} />
                 <TarjetaKpi label="Ticket Prom." value={formatMoney(stats.avgTicket)} sub="Promedio" icon={<SparklesIcon />} />
             </div>
@@ -324,9 +347,9 @@ export default function ManagerDashboard() {
                                 <thead>
                                     <tr className="bg-slate-50/30 dark:bg-white/[0.01] text-[8px] font-black text-slate-400 uppercase tracking-wider">
                                         <th className="px-6 py-4">Fecha / Hora</th>
-                                        <th className="px-6 py-4">Recinto / Campo</th>
-                                        <th className="px-6 py-4">Cliente / Arriendo</th>
-                                        <th className="px-6 py-4 text-right">Monto</th>
+                                        <th className="px-6 py-4">Recinto / Deporte</th>
+                                        <th className="px-6 py-4">Cliente / Campo</th>
+                                        <th className="px-6 py-4 text-right">Valor Total</th>
                                         <th className="px-6 py-4 text-right">Estado</th>
                                     </tr>
                                 </thead>
@@ -341,15 +364,27 @@ export default function ManagerDashboard() {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
-                                                    <span className="font-black text-slate-900 dark:text-white uppercase text-[9px] tracking-tighter">{selectedTenantName}</span>
+                                                    <span className="font-black text-slate-900 dark:text-white uppercase text-[9px] tracking-tighter truncate max-w-[120px]">{selectedTenantName}</span>
+                                                    <span className="text-[7px] font-black text-emerald-500 uppercase tracking-widest">{b.sport || 'MULTICANCHA'}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex flex-col">
+                                                    <span className="font-black text-slate-900 dark:text-white uppercase text-[9px]">{b.clientName}</span>
                                                     <span className="text-[7px] font-bold text-slate-400 uppercase">{b.courtName}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 font-black text-slate-900 dark:text-white uppercase text-[9px]">{b.clientName}</td>
-                                            <td className="px-6 py-4 text-right font-black text-slate-900 dark:text-white text-xs">{formatMoney(b.price || 0)}</td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex flex-col items-end">
+                                                    <span className="font-black text-slate-900 dark:text-white text-xs">{formatMoney(b.totalPrice || b.price || 0)}</span>
+                                                    {b.deposit && b.paymentStatus === 'partial' && (
+                                                        <span className="text-[7px] font-bold text-amber-500 uppercase">Seña: {formatMoney(b.deposit)}</span>
+                                                    )}
+                                                </div>
+                                            </td>
                                             <td className="px-6 py-4 text-right">
                                                 <span className={`px-2.5 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest ${b.paymentStatus === 'paid' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-amber-500 text-white shadow-lg shadow-amber-500/20'}`}>
-                                                    {b.paymentStatus === 'paid' ? 'PAGADO' : 'PENDIENTE'}
+                                                    {b.paymentStatus === 'paid' ? 'PAGADO' : b.paymentStatus === 'partial' ? 'PARCIAL' : 'PENDIENTE'}
                                                 </span>
                                             </td>
                                         </tr>

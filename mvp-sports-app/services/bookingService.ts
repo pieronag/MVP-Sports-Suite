@@ -17,7 +17,7 @@ export interface Booking {
     duration?: number; // hours (web usa 1)
     price?: number; // web usa price + totalPrice
     totalPrice: number;
-    status: 'confirmed' | 'cancelled' | 'active' | 'completed' | 'past' | 'pending';
+    status: 'pending' | 'confirmed' | 'cancelled' | 'active' | 'completed' | 'past';
     paymentStatus: 'paid' | 'pending' | 'partial';
     source: 'mobile_app' | 'manual_dashboard';
     ownerId?: string;
@@ -28,7 +28,10 @@ export interface Booking {
     checkInTime?: Timestamp;
     checkOut?: boolean;
     checkOutTime?: Timestamp;
+    rating?: number;
+    feedback?: string;
     teamId?: string;
+    deposit?: number;
 }
 
 export const bookingService = {
@@ -95,13 +98,17 @@ export const bookingService = {
         try {
             const bookingsRef = collection(db, 'bookings');
 
-            // Add server timestamps
-            const newBooking = {
+            // Add server timestamps and clean undefined
+            const newBooking = JSON.parse(JSON.stringify({
                 ...bookingData,
                 createdAt: Timestamp.now(),
-            };
+            }, (k, v) => v === undefined ? null : v)); // Firestore prefers null or missing, but JSON.stringify/parse with null is safer than undefined
 
-            const docRef = await addDoc(bookingsRef, newBooking);
+            // Actually, better to just delete undefined keys
+            const cleanData = { ...bookingData, createdAt: Timestamp.now() };
+            Object.keys(cleanData).forEach(key => (cleanData as any)[key] === undefined && delete (cleanData as any)[key]);
+
+            const docRef = await addDoc(bookingsRef, cleanData);
             return docRef.id;
         } catch (error) {
             console.error('Error creating booking:', error);
@@ -129,7 +136,9 @@ export const bookingService = {
 
     async updateBooking(bookingId: string, data: Partial<Booking>): Promise<void> {
         const ref = doc(db, 'bookings', bookingId);
-        await updateDoc(ref, data as any);
+        const cleanData = { ...data };
+        Object.keys(cleanData).forEach(key => (cleanData as any)[key] === undefined && delete (cleanData as any)[key]);
+        await updateDoc(ref, cleanData as any);
     },
 
     async cancelBooking(params: { bookingId: string; cancelledBy: string }) {
@@ -144,7 +153,7 @@ export const bookingService = {
     async setPaymentStatus(params: { bookingId: string; paymentStatus: Booking['paymentStatus'] }) {
         await bookingService.updateBooking(params.bookingId, {
             paymentStatus: params.paymentStatus,
-            status: params.paymentStatus === 'paid' ? 'confirmed' : 'pending',
+            status: 'confirmed',
             paymentUpdatedAt: Timestamp.now() as any,
         } as any);
     },

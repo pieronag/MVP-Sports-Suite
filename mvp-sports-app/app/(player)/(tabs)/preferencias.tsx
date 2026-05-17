@@ -47,6 +47,39 @@ const SPORT_POSITIONS: Record<string, string[]> = {
     'Voleibol': ['Armador', 'Atacante', 'Central', 'Líbero']
 };
 
+const formatBirthDate = (text: string) => {
+    let clean = text.replace(/\D/g, '');
+    clean = clean.slice(0, 8);
+    if (clean.length <= 2) return clean;
+    if (clean.length <= 4) return `${clean.slice(0, 2)}/${clean.slice(2)}`;
+    return `${clean.slice(0, 2)}/${clean.slice(2, 4)}/${clean.slice(4)}`;
+};
+
+const validateAge = (birthDateStr: string) => {
+    if (!birthDateStr) return false;
+    const parts = birthDateStr.split('/');
+    if (parts.length !== 3) return false;
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const year = parseInt(parts[2], 10);
+    
+    if (isNaN(day) || isNaN(month) || isNaN(year)) return false;
+    if (day < 1 || day > 31 || month < 0 || month > 11 || year < 1900 || year > new Date().getFullYear()) {
+        return false;
+    }
+    
+    const birthDate = new Date(year, month, day);
+    const today = new Date();
+    
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age >= 18;
+};
+
 export default function SettingsScreen() {
     const scrollViewRef = useRef<ScrollView>(null);
     const router = useRouter();
@@ -190,6 +223,16 @@ export default function SettingsScreen() {
             return;
         }
 
+        if (!formData.birthDate) {
+            showFeedback('error', 'La Fecha de Nacimiento es obligatoria para verificar tu edad.');
+            return;
+        }
+
+        if (!validateAge(formData.birthDate)) {
+            showFeedback('error', 'Restricción de Edad: Debes ser mayor de edad (18+ años) para poder utilizar la aplicación.');
+            return;
+        }
+
         setSaving(true);
         try {
             await updateDoc(doc(db, 'users', user.uid), {
@@ -252,7 +295,7 @@ export default function SettingsScreen() {
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadPrefs(); }} tintColor={COLORS.accent} />}
             >
                 {/* AVISO PERFIL INCOMPLETO */}
-                {(!formData.displayName || !formData.phone || !formData.rut || !formData.mainSport) && (
+                {(!formData.displayName || !formData.phone || !formData.rut || !formData.mainSport || !formData.birthDate || !validateAge(formData.birthDate)) && (
                     <View style={{ margin: 30, marginBottom: 10, padding: 25, backgroundColor: isDark ? '#ef444411' : '#fef2f2', borderRadius: 25, borderWidth: 1, borderColor: '#ef444444' }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
                             <AlertCircle color="#ef4444" size={20} />
@@ -265,6 +308,7 @@ export default function SettingsScreen() {
                             {!formData.displayName && <Badge label="Nombre" />}
                             {!formData.phone && <Badge label="Teléfono" />}
                             {!formData.rut && <Badge label="RUT" />}
+                            {(!formData.birthDate || !validateAge(formData.birthDate)) && <Badge label="F. Nacimiento (18+)" />}
                             {!formData.mainSport && <Badge label="Deporte" />}
                         </View>
                     </View>
@@ -319,6 +363,18 @@ export default function SettingsScreen() {
                         autoCorrect={false}
                         autoComplete="off"
                         keyboardType="numeric"
+                    />
+                    <Separator isDark={isDark} />
+                    <RefinedRow 
+                        icon={Calendar} 
+                        color="#ec4899" 
+                        label="Fecha de Nacimiento (DD/MM/YYYY)" 
+                        value={formData.birthDate} 
+                        onChange={(t: string) => setFormData(f => ({ ...f, birthDate: formatBirthDate(t) }))} 
+                        isDark={isDark}
+                        keyboardType="number-pad"
+                        maxLength={10}
+                        error={formData.birthDate && formData.birthDate.length === 10 && !validateAge(formData.birthDate)}
                     />
                 </View>
 
@@ -525,9 +581,9 @@ const RefinedSelectRow = ({ icon: Icon, color, label, value, options, onSelect, 
                 <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: color, alignItems: 'center', justifyContent: 'center' }}>
                     <Icon color="white" size={20} />
                 </View>
-                <View style={{ marginLeft: 20, flex: 1 }}>
+                <View style={{ marginLeft: 15, flex: 1 }}>
                     <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', textTransform: 'uppercase' }}>{label}</Text>
-                    <Text style={{ color: disabled ? C.sub : C.text, fontSize: 18, fontWeight: '800' }}>{disabled ? 'Elige deporte primero...' : (value || '---')}</Text>
+                    <Text style={{ color: disabled ? C.sub : C.text, fontSize: 22, fontWeight: '900' }}>{disabled ? 'Elige deporte primero...' : (value || '---')}</Text>
                 </View>
                 {!disabled && <ChevronRight color="#10b981" size={20} />}
             </TouchableOpacity>
