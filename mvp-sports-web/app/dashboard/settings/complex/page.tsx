@@ -141,9 +141,18 @@ export default function TenantSettingsPage() {
         setSaving(true);
         setTerminalLines(prev => [...prev, { text: `> Ejecutando guardado de configuración maestra...`, type: 'command' }]);
         try {
-            await updateDoc(doc(db, "tenants", selectedTenantId), { ...formData });
+            const isMpGloballyDisabled = globalSettings && globalSettings.paymentGateways && globalSettings.paymentGateways.mercadoPago === false;
+            const isTbGloballyDisabled = globalSettings && globalSettings.paymentGateways && globalSettings.paymentGateways.webpay === false;
+
+            const updatedData = { 
+                ...formData,
+                isMercadopagoActive: isMpGloballyDisabled ? false : formData.isMercadopagoActive,
+                isTransbankActive: isTbGloballyDisabled ? false : formData.isTransbankActive
+            };
+
+            await updateDoc(doc(db, "tenants", selectedTenantId), updatedData);
             setNotification({ msg: "Configuración actualizada con éxito", type: 'success' });
-            setTenants(prev => prev.map(t => t.id === selectedTenantId ? { ...t, ...formData } : t));
+            setTenants(prev => prev.map(t => t.id === selectedTenantId ? { ...t, ...updatedData } : t));
             setTimeout(() => setTerminalLines(prev => [...prev, { text: `[SISTEMA] Sincronización con Firestore exitosa (200 OK).`, type: 'success' }]), 600);
         } catch (error) {
             setNotification({ msg: "Error al guardar en base de datos", type: 'error' });
@@ -190,6 +199,15 @@ export default function TenantSettingsPage() {
         await new Promise(r => setTimeout(r, 400));
         setTerminalLines(prev => [...prev, { text: `> Exited con código ${success ? '0 (Éxito)' : '1 (Error)'}`, type: success ? 'success' : 'error' }]);
     };
+
+    const currentTenant = tenants.find(t => t.id === selectedTenantId);
+    const isApiLocked = currentTenant && currentTenant.features && currentTenant.features.api === false;
+
+    const isMpGloballyDisabled = globalSettings && globalSettings.paymentGateways && globalSettings.paymentGateways.mercadoPago === false;
+    const isTbGloballyDisabled = globalSettings && globalSettings.paymentGateways && globalSettings.paymentGateways.webpay === false;
+
+    const isMpActive = formData.isMercadopagoActive && !isMpGloballyDisabled;
+    const isTbActive = formData.isTransbankActive && !isTbGloballyDisabled;
 
     return (
         <div className="w-full space-y-8 pb-12 text-left relative animate-fadeIn">
@@ -304,19 +322,41 @@ export default function TenantSettingsPage() {
 
                             {/* CASILLA 4: INTEGRACIONES FINANCIERAS */}
                             <div className="md:col-span-2 space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+                                    {isApiLocked && (
+                                        <div className="absolute inset-0 bg-white/70 dark:bg-[#0B0F19]/80 backdrop-blur-md z-40 rounded-[2.5rem] flex flex-col items-center justify-center p-6 text-center border border-slate-200 dark:border-white/10 shadow-2xl">
+                                            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-4">
+                                                <KeyIcon className="w-6 h-6 stroke-[1.5]" />
+                                            </div>
+                                            <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-[0.2em] mb-2">Integraciones de API bloqueadas</h4>
+                                            <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase max-w-sm leading-relaxed mb-6">
+                                                Requiere plan <span className="text-amber-500 font-black">ELITE</span> para configurar pasarelas de pago externas (MercadoPago / Transbank) y facturación SII automatizada.
+                                            </p>
+                                            <a 
+                                                href="/dashboard/billing-subscription" 
+                                                className="px-8 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white dark:text-slate-950 font-black text-[9px] uppercase tracking-[0.2em] rounded-xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-amber-500/20 border border-amber-400/20"
+                                            >
+                                                MEJORAR PLAN A ELITE
+                                            </a>
+                                        </div>
+                                    )}
                                     {/* MP CARD */}
-                                    <PanelGlass className={`p-6 border-none shadow-xl transition-all ${formData.isMercadopagoActive ? 'shadow-blue-500/5 bg-blue-500/[0.01]' : 'opacity-60 grayscale'}`}>
+                                    <PanelGlass className={`p-6 border-none shadow-xl transition-all ${isMpGloballyDisabled ? 'opacity-40 grayscale' : isMpActive ? 'shadow-blue-500/5 bg-blue-500/[0.01]' : 'opacity-60 grayscale'}`}>
                                         <div className="flex items-center justify-between mb-6">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
                                                     <CreditCardIcon className="w-6 h-6" />
                                                 </div>
-                                                <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest">MercadoPago</h4>
+                                                <div>
+                                                    <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest leading-none">MercadoPago</h4>
+                                                    {isMpGloballyDisabled && (
+                                                        <p className="text-[7px] font-black text-red-500 uppercase tracking-widest mt-1">Desactivado por Plataforma</p>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <ToggleMini enabled={formData.isMercadopagoActive} onChange={() => setFormData({ ...formData, isMercadopagoActive: !formData.isMercadopagoActive })} color="bg-blue-500 shadow-blue-500/20" />
+                                            <ToggleMini enabled={isMpActive} onChange={() => setFormData({ ...formData, isMercadopagoActive: !formData.isMercadopagoActive })} disabled={isMpGloballyDisabled} color="bg-blue-500 shadow-blue-500/20" />
                                         </div>
-                                        {formData.isMercadopagoActive && (
+                                        {isMpActive && (
                                             <div className="space-y-4 animate-fadeIn">
                                                 <InputMini label="Public Key" value={formData.mercadopagoPublicKey} onChange={(e: any) => setFormData({ ...formData, mercadopagoPublicKey: e.target.value })} icon={<KeyIcon className="w-4 h-4 text-blue-500" />} />
                                                 <InputMini label="Access Token" type="password" value={formData.mercadopagoAccessToken} onChange={(e: any) => setFormData({ ...formData, mercadopagoAccessToken: e.target.value })} icon={<ShieldCheckIcon className="w-4 h-4 text-blue-500" />} />
@@ -326,17 +366,22 @@ export default function TenantSettingsPage() {
                                     </PanelGlass>
 
                                     {/* TRANSBANK CARD */}
-                                    <PanelGlass className={`p-6 border-none shadow-xl transition-all ${formData.isTransbankActive ? 'shadow-pink-500/5 bg-pink-500/[0.01]' : 'opacity-60 grayscale'}`}>
+                                    <PanelGlass className={`p-6 border-none shadow-xl transition-all ${isTbGloballyDisabled ? 'opacity-40 grayscale' : isTbActive ? 'shadow-pink-500/5 bg-pink-500/[0.01]' : 'opacity-60 grayscale'}`}>
                                         <div className="flex items-center justify-between mb-6">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-xl bg-pink-500/10 flex items-center justify-center text-pink-500">
                                                     <BuildingStorefrontIcon className="w-6 h-6" />
                                                 </div>
-                                                <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest">Transbank</h4>
+                                                <div>
+                                                    <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest leading-none">Transbank</h4>
+                                                    {isTbGloballyDisabled && (
+                                                        <p className="text-[7px] font-black text-red-500 uppercase tracking-widest mt-1">Desactivado por Plataforma</p>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <ToggleMini enabled={formData.isTransbankActive} onChange={() => setFormData({ ...formData, isTransbankActive: !formData.isTransbankActive })} color="bg-pink-500 shadow-pink-500/20" />
+                                            <ToggleMini enabled={isTbActive} onChange={() => setFormData({ ...formData, isTransbankActive: !formData.isTransbankActive })} disabled={isTbGloballyDisabled} color="bg-pink-500 shadow-pink-500/20" />
                                         </div>
-                                        {formData.isTransbankActive && (
+                                        {isTbActive && (
                                             <div className="space-y-4 animate-fadeIn">
                                                 <InputMini label="Commerce Code" value={formData.transbankCommerceCode} onChange={(e: any) => setFormData({ ...formData, transbankCommerceCode: e.target.value })} icon={<KeyIcon className="w-4 h-4 text-pink-500" />} />
                                                 <InputMini label="API Key" type="password" value={formData.transbankApiKey} onChange={(e: any) => setFormData({ ...formData, transbankApiKey: e.target.value })} icon={<ShieldCheckIcon className="w-4 h-4 text-pink-500" />} />
@@ -541,12 +586,13 @@ function HeaderSeccion({ titulo, desc }: any) {
     );
 }
 
-function ToggleMini({ enabled, onChange, color = 'bg-emerald-500 shadow-emerald-500/20' }: any) {
+function ToggleMini({ enabled, onChange, color = 'bg-emerald-500 shadow-emerald-500/20', disabled = false }: any) {
     return (
         <button 
             type="button" 
-            onClick={onChange} 
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 shadow-inner ${enabled ? color + ' shadow-lg' : 'bg-slate-200 dark:bg-white/10'}`}
+            onClick={disabled ? undefined : onChange} 
+            disabled={disabled}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 shadow-inner ${disabled ? 'bg-slate-100 dark:bg-white/5 opacity-40 cursor-not-allowed' : enabled ? color + ' shadow-lg' : 'bg-slate-200 dark:bg-white/10'}`}
         >
             <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-xl transition-all ${enabled ? 'translate-x-6' : 'translate-x-1'}`} />
         </button>

@@ -130,6 +130,7 @@ export default function Page() {
 
                 // Sincronizar con Firestore si el valor almacenado es diferente
                 if (data.rating !== realRating || data.totalFeedbacks !== totalFeedbacks) {
+                    const tenantRef = doc(db, "tenants", tenantId);
                     updateDoc(tenantRef, { rating: realRating, totalFeedbacks: totalFeedbacks }).catch(e => console.error(e));
                 }
 
@@ -327,10 +328,11 @@ export default function Page() {
                     <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
                     <input type="text" placeholder="BUSCAR RECINTO..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-white/5 border border-transparent focus:border-emerald-500/30 rounded-xl text-[10px] font-black uppercase outline-none text-black dark:text-white transition-all shadow-sm" />
                 </div>
-                <div className="flex bg-slate-50 dark:bg-white/5 p-1 rounded-xl border border-slate-100 dark:border-white/10">
+                <div className="flex items-center gap-2 bg-slate-50 dark:bg-white/5 p-1 rounded-xl border border-slate-100 dark:border-white/10 w-full md:w-auto overflow-x-auto no-scrollbar">
                     {["Todos", "Suspendidos"].map((f) => (
-                        <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-lg transition-all ${filter === f ? "bg-white dark:bg-emerald-500 text-black shadow-sm" : "text-slate-400 hover:text-black dark:hover:text-white"}`}>{f.toUpperCase()}</button>
+                        <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-lg transition-all whitespace-nowrap ${filter === f ? "bg-white dark:bg-emerald-500 text-black shadow-sm" : "text-slate-400 hover:text-black dark:hover:text-white"}`}>{f.toUpperCase()}</button>
                     ))}
+                    <BotonAccion icon={<ArrowPathIcon className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />} onClick={fetchInitialData} />
                 </div>
             </PanelGlass>
 

@@ -34,7 +34,7 @@ const FEATURE_LABELS: Record<string, { label: string, icon: any, color: string }
 
 const FEATURE_ORDER = ['seo', 'topPosition', 'ads', 'analytics', 'marketing', 'support', 'api', 'multiRecinto'];
 
-interface Plan { id: string; name: string; price: number; commission: number; features: { [key: string]: boolean }; }
+interface Plan { id: string; name: string; price: number; commission: number; priorityScore: number; features: { [key: string]: boolean }; }
 interface Tenant { id: string; name: string; planId: string; plan?: string; ownerId: string; nextBillingDate?: any; pendingPlanId?: string | null; pendingPlanName?: string | null; scheduledChangeDate?: any; billingCycle?: 'monthly' | 'annual'; }
 
 export default function BillingPage() {
@@ -59,12 +59,25 @@ export default function BillingPage() {
             setLoading(true);
             try {
                 const globalSnap = await getDoc(doc(db, "settings", "global"));
+                let loadedPlans: Plan[] = [];
                 if (globalSnap.exists()) {
                     const data = globalSnap.data();
-                    if (data.plans) setPlans(data.plans.sort((a: Plan, b: Plan) => a.price - b.price));
+                    if (data.plans) {
+                        loadedPlans = data.plans.sort((a: Plan, b: Plan) => a.price - b.price);
+                        setPlans(loadedPlans);
+                    }
                 }
                 const snapTenants = await getDocs(query(collection(db, "tenants"), where("ownerId", "==", user.uid)));
-                const tenantsList = snapTenants.docs.map(d => ({ id: d.id, ...d.data(), planId: d.data().planId || 'free' } as Tenant));
+                const tenantsList = snapTenants.docs.map(d => {
+                    const tenantData = d.data();
+                    const rawPlan = (tenantData.planId || tenantData.plan || 'free').toString();
+                    const matchedPlan = loadedPlans.find(p => p.id.toLowerCase() === rawPlan.toLowerCase() || p.name.toLowerCase() === rawPlan.toLowerCase());
+                    return { 
+                        id: d.id, 
+                        ...tenantData, 
+                        planId: matchedPlan ? matchedPlan.id : 'free' 
+                    } as Tenant;
+                });
                 
                 // --- CHEQUEO DE CAMBIOS PROGRAMADOS ---
                 const now = new Date();
@@ -73,6 +86,7 @@ export default function BillingPage() {
                         const scheduledDate = t.scheduledChangeDate.toDate();
                         if (now >= scheduledDate) {
                             // La fecha ya pasó, ejecutar el cambio
+                            const selectedPlan = loadedPlans.find(p => p.id === t.pendingPlanId);
                             const updateData = {
                                 planId: t.pendingPlanId,
                                 plan: t.pendingPlanName,
@@ -81,7 +95,10 @@ export default function BillingPage() {
                                 pendingPlanPrice: null,
                                 pendingBillingCycle: null,
                                 scheduledChangeDate: null,
-                                lastPlanChange: Timestamp.fromDate(now)
+                                lastPlanChange: Timestamp.fromDate(now),
+                                commission: selectedPlan ? selectedPlan.commission : 5.0,
+                                priorityScore: selectedPlan ? selectedPlan.priorityScore : 10,
+                                features: selectedPlan ? selectedPlan.features : { seo: true, analytics: true }
                             };
                             await updateDoc(doc(db, "tenants", t.id), updateData);
                             return { ...t, ...updateData, plan: updateData.plan ?? undefined } as Tenant;

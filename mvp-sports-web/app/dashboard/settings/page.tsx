@@ -30,9 +30,10 @@ const DEFAULT_SETTINGS: SettingsData = {
     platformName: 'MVP Sports Suite', supportEmail: 'central@mvpsports.cl', maintenanceMode: false, primaryColor: '#10b981',
     corporateData: { rut: '76.123.456-7', razonSocial: 'MVP SPORTS CHILE SpA', direccion: 'Av. Las Condes 1234', giro: 'Servicios Tecnológicos', representante: 'Director General', emailFacturacion: 'admin@mvp.cl' },
     plans: [
-        { id: 'inicial', name: 'Plan Inicial', price: 0, commission: 5.0, priorityScore: 10, features: { seo: true, topPosition: false, ads: false, analytics: false, marketing: false, support: false, api: false, multiRecinto: false } },
-        { id: 'pro', name: 'Plan Pro', price: 49990, commission: 3.5, priorityScore: 50, features: { seo: true, topPosition: true, ads: true, analytics: true, marketing: false, support: true, api: true, multiRecinto: false } },
-        { id: 'elite', name: 'Plan Elite', price: 99990, commission: 2.0, priorityScore: 100, features: { seo: true, topPosition: true, ads: true, analytics: true, marketing: true, support: true, api: true, multiRecinto: true } }
+        { id: 'free', name: 'Plan Free', price: 0, commission: 8.0, priorityScore: 10, features: { seo: true, topPosition: false, ads: false, analytics: true, marketing: false, support: false, api: false, multiRecinto: false } },
+        { id: 'basico', name: 'Plan Básico', price: 29990, commission: 7.0, priorityScore: 30, features: { seo: true, topPosition: false, ads: true, analytics: true, marketing: false, support: false, api: false, multiRecinto: false } },
+        { id: 'pro', name: 'Plan Pro', price: 59990, commission: 6.0, priorityScore: 60, features: { seo: true, topPosition: true, ads: true, analytics: true, marketing: false, support: true, api: false, multiRecinto: false } },
+        { id: 'elite', name: 'Plan Elite', price: 99990, commission: 5.0, priorityScore: 100, features: { seo: true, topPosition: true, ads: true, analytics: true, marketing: true, support: true, api: true, multiRecinto: true } }
     ],
     paymentGateways: { mercadoPago: true, webpay: true },
     legal: { terms: 'Términos...', privacy: 'Privacidad...' },
@@ -109,7 +110,13 @@ export default function SettingsPage() {
             const batch = writeBatch(db);
             tSnap.docs.forEach(d => {
                 const p = settings.plans.find(pl => pl.id.toLowerCase() === d.data().plan?.toLowerCase());
-                if (p) batch.update(d.ref, { commission: p.commission, priorityScore: p.priorityScore, siiEnabled: settings.sii.enabled, availableGateways: settings.paymentGateways });
+                if (p) batch.update(d.ref, { 
+                    commission: p.commission, 
+                    priorityScore: p.priorityScore, 
+                    features: p.features, // <-- Propagate active features of the plan dynamically!
+                    siiEnabled: settings.sii.enabled, 
+                    availableGateways: settings.paymentGateways 
+                });
             });
             await batch.commit();
             await createAuditLog("NÚCLEO_UPDATE", "Sincronización masiva de parámetros", "high");

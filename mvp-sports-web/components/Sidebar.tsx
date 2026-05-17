@@ -4,6 +4,9 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { useState, useEffect } from "react";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { db } from "../services/firebase";
+import { LockClosedIcon } from "@heroicons/react/24/solid";
 // --- ICONOS HEROICONS ---
 import {
     ChartPieIcon,
@@ -35,6 +38,19 @@ export default function Sidebar() {
     const pathname = usePathname();
     const { role, user, firestoreUser } = useAuth();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [activeTenant, setActiveTenant] = useState<any>(null);
+
+    // Cargar recintos para validar plan y características
+    useEffect(() => {
+        if (!user?.uid || role !== 'owner') return;
+        const q = query(collection(db, "tenants"), where("ownerId", "==", user.uid));
+        const unsubscribe = onSnapshot(q, (snap) => {
+            if (!snap.empty) {
+                setActiveTenant(snap.docs[0].data());
+            }
+        });
+        return () => unsubscribe();
+    }, [user, role]);
 
     const finalName = firestoreUser?.fullName || firestoreUser?.displayName || user?.displayName || user?.email?.split('@')[0] || 'Usuario';
     const finalPhoto = firestoreUser?.photoURL || user?.photoURL;
@@ -137,7 +153,7 @@ export default function Sidebar() {
                             <NavItem href="/dashboard/finance" active={pathname?.includes("/finance")} icon={<CurrencyDollarIcon />} onClick={() => setMobileOpen(false)}>Control Financiero</NavItem>
                             <NavItem href="/dashboard/staff" active={pathname?.includes("/staff")} icon={<BriefcaseIcon />} onClick={() => setMobileOpen(false)}>Operadores de Staff</NavItem>
                             <NavItem href="/dashboard/billing-subscription" active={pathname?.includes("/billing-subscription")} icon={<CreditCardIcon />} onClick={() => setMobileOpen(false)}>Licencia MVP Sports</NavItem>
-                            <NavItem href="/dashboard/marketing/coupons" active={pathname?.includes("/marketing/coupons")} icon={<TagIcon />} onClick={() => setMobileOpen(false)}>Marketing y Cupones</NavItem>
+                            <NavItem href="/dashboard/marketing/coupons" active={pathname?.includes("/marketing/coupons")} icon={<TagIcon />} onClick={() => setMobileOpen(false)} locked={activeTenant && activeTenant.features && activeTenant.features.marketing === false}>Marketing y Cupones</NavItem>
                         </MenuGroup>
                         <MenuGroup title="Configuración de Sede">
                             <NavItem href="/dashboard/settings/complex" active={pathname?.includes("/settings/complex")} icon={<AdjustmentsVerticalIcon />} onClick={() => setMobileOpen(false)}>Perfil Comercial</NavItem>
@@ -239,13 +255,24 @@ function MenuGroup({ title, children }: { title: string, children: React.ReactNo
     )
 }
 
-function NavItem({ children, active, href, icon, onClick }: { children: React.ReactNode, active?: boolean, href: string, icon: React.ReactNode, onClick?: () => void }) {
+function NavItem({ children, active, href, icon, onClick, locked }: { children: React.ReactNode, active?: boolean, href: string, icon: React.ReactNode, onClick?: () => void, locked?: boolean }) {
     return (
-        <Link href={href} onClick={onClick} className={`relative flex items-center gap-2.5 w-full px-3.5 py-1.5 text-[13px] font-medium transition-all duration-200 group rounded-xl ${active ? 'text-emerald-700 bg-emerald-50 dark:bg-transparent dark:text-[#4ADE80]' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5'}`}>
-            {active && <div className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-emerald-600 dark:bg-[#4ADE80] dark:shadow-[0_0_10px_#4ADE80]" />}
-            {active && <div className="hidden dark:block absolute inset-0 bg-gradient-to-r from-[#4ADE80]/10 to-transparent pointer-events-none rounded-xl" />}
-            <span className={`w-5 h-5 shrink-0 transition-transform duration-300 group-hover:scale-110 ${active ? 'dark:drop-shadow-[0_0_6px_rgba(74,222,128,0.6)]' : ''}`}>{icon}</span>
-            <span className="relative z-10 tracking-tight">{children}</span>
+        <Link 
+            href={locked ? "/dashboard/billing-subscription" : href} 
+            onClick={onClick} 
+            className={`relative flex items-center gap-2.5 w-full px-3.5 py-1.5 text-[13px] font-medium transition-all duration-200 group rounded-xl ${
+                locked 
+                ? 'text-slate-400 dark:text-slate-600 opacity-60 hover:bg-slate-50 dark:hover:bg-white/[0.02]' 
+                : active 
+                ? 'text-emerald-700 bg-emerald-50 dark:bg-transparent dark:text-[#4ADE80]' 
+                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5'
+            }`}
+        >
+            {active && !locked && <div className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-emerald-600 dark:bg-[#4ADE80] dark:shadow-[0_0_10px_#4ADE80]" />}
+            {active && !locked && <div className="hidden dark:block absolute inset-0 bg-gradient-to-r from-[#4ADE80]/10 to-transparent pointer-events-none rounded-xl" />}
+            <span className={`w-5 h-5 shrink-0 transition-transform duration-300 group-hover:scale-110 ${active && !locked ? 'dark:drop-shadow-[0_0_6px_rgba(74,222,128,0.6)]' : ''}`}>{icon}</span>
+            <span className="relative z-10 tracking-tight flex-1 text-left">{children}</span>
+            {locked && <span className="text-amber-500 shrink-0"><LockClosedIcon className="w-3.5 h-3.5" /></span>}
         </Link>
     );
 }

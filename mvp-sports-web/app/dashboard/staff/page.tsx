@@ -181,12 +181,34 @@ export default function StaffPage() {
         if (!formData.fullName || !formData.email) return notify("Faltan datos", "error");
         setIsSaving(true);
         try {
-            let staffPayload: any = { fullName: formData.fullName, rut: formData.rut, jobTitle: formData.jobTitle, email: formData.email, phone: formData.phone, role: 'manager', status: formData.status, tenantIds: formData.tenantIds };
+            let staffPayload: any = { 
+                fullName: formData.fullName, 
+                rut: formData.rut, 
+                jobTitle: formData.jobTitle, 
+                email: formData.email, 
+                phone: formData.phone, 
+                role: 'manager', 
+                status: formData.status, 
+                tenantIds: formData.tenantIds,
+                tenantId: formData.tenantIds[0] || ""
+            };
             if (editingId) {
                 await updateDoc(doc(db, "staff", editingId), staffPayload);
                 const staffSnap = await getDoc(doc(db, "staff", editingId));
                 if (staffSnap.exists() && staffSnap.data().uid) {
-                    await updateDoc(doc(db, "users", staffSnap.data().uid), { fullName: formData.fullName, rut: formData.rut, jobTitle: formData.jobTitle, phone: formData.phone, status: formData.status, tenantIds: formData.tenantIds });
+                    try {
+                        await updateDoc(doc(db, "users", staffSnap.data().uid), { 
+                            fullName: formData.fullName, 
+                            rut: formData.rut, 
+                            jobTitle: formData.jobTitle, 
+                            phone: formData.phone, 
+                            status: formData.status, 
+                            tenantIds: formData.tenantIds,
+                            tenantId: formData.tenantIds[0] || ""
+                        });
+                    } catch (userErr) {
+                        console.error("Error updating user document:", userErr);
+                    }
                 }
                 notify("Actualizado con éxito", "success");
             } else {
@@ -197,7 +219,19 @@ export default function StaffPage() {
                     const userCredential = await createUserWithEmailAndPassword(secondaryAuth, formData.email, formData.password);
                     const newUid = userCredential.user.uid;
                     await signOut(secondaryAuth);
-                    await setDoc(doc(db, "users", newUid), { uid: newUid, email: formData.email, fullName: formData.fullName, rut: formData.rut, jobTitle: formData.jobTitle, phone: formData.phone, role: 'manager', tenantIds: formData.tenantIds, status: 'active', createdAt: new Date() });
+                    await setDoc(doc(db, "users", newUid), { 
+                        uid: newUid, 
+                        email: formData.email, 
+                        fullName: formData.fullName, 
+                        rut: formData.rut, 
+                        jobTitle: formData.jobTitle, 
+                        phone: formData.phone, 
+                        role: 'manager', 
+                        tenantIds: formData.tenantIds, 
+                        tenantId: formData.tenantIds[0] || "",
+                        status: 'active', 
+                        createdAt: new Date() 
+                    });
                     await addDoc(collection(db, "staff"), { ...staffPayload, uid: newUid, createdAt: new Date() });
                     notify("Creado con éxito", "success");
                 } catch (err: any) { notify(err.message, "error"); setIsSaving(false); return; }

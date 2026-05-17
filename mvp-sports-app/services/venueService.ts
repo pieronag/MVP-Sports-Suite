@@ -25,6 +25,17 @@ export interface Tenant {
     amenities?: string[];
     services?: string[];
     codigo?: string; 
+    priorityScore?: number;
+    features?: {
+        seo?: boolean;
+        topPosition?: boolean;
+        ads?: boolean;
+        analytics?: boolean;
+        marketing?: boolean;
+        support?: boolean;
+        api?: boolean;
+        multiRecinto?: boolean;
+    };
 }
 
 export interface Court {
@@ -68,8 +79,23 @@ const processTenantData = (id: string, raw: any): Tenant => {
         imageUrl: finalImageUrl,
         rating: data.rating !== undefined ? data.rating : 0,
         coordinates: coords,
-        address: raw.coordinates?.fullAddress || raw.address || 'Ubicación no disponible'
+        address: raw.coordinates?.fullAddress || raw.address || 'Ubicación no disponible',
+        priorityScore: raw.priorityScore !== undefined ? raw.priorityScore : 10,
+        features: raw.features || { seo: true, topPosition: false, ads: false, analytics: true }
     } as Tenant;
+};
+
+const sortTenantsByPriority = (list: Tenant[]): Tenant[] => {
+    return list.sort((a, b) => {
+        const aTop = a.features?.topPosition ? 1 : 0;
+        const bTop = b.features?.topPosition ? 1 : 0;
+        if (aTop !== bTop) {
+            return bTop - aTop; // 1 (true) va antes de 0 (false)
+        }
+        const aScore = a.priorityScore ?? 10;
+        const bScore = b.priorityScore ?? 10;
+        return bScore - aScore; // Mayor score primero
+    });
 };
 
 export const venueService = {
@@ -77,7 +103,8 @@ export const venueService = {
         try {
             const tenantsRef = collection(db, 'tenants');
             const querySnapshot = await getDocs(tenantsRef);
-            return querySnapshot.docs.map(doc => processTenantData(doc.id, doc.data()));
+            const list = querySnapshot.docs.map(doc => processTenantData(doc.id, doc.data()));
+            return sortTenantsByPriority(list);
         } catch (error) {
             console.error("Error fetching tenants:", error);
             throw error;
@@ -113,7 +140,7 @@ export const venueService = {
             });
 
             await Promise.all(promises);
-            return tenants;
+            return sortTenantsByPriority(tenants);
         } catch (error) {
             console.error('Error fetching tenants by ids:', error);
             return [];
@@ -172,7 +199,7 @@ export const venueService = {
             });
 
             await Promise.all(promises);
-            return tenants;
+            return sortTenantsByPriority(tenants);
         } catch (error) {
             console.error(`Error fetching venues for ${sport}:`, error);
             throw error;

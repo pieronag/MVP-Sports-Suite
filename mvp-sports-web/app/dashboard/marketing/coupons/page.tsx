@@ -3,7 +3,17 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
 import { collection, query, where, getDocs, addDoc, Timestamp } from 'firebase/firestore';
-import { TagIcon, PlusIcon, XMarkIcon, CheckCircleIcon, ArrowPathIcon, ExclamationTriangleIcon, PercentBadgeIcon, CalendarDaysIcon, EllipsisHorizontalCircleIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { TagIcon, PlusIcon, XMarkIcon, CheckCircleIcon, ArrowPathIcon, ExclamationTriangleIcon, PercentBadgeIcon, CalendarDaysIcon, EllipsisHorizontalCircleIcon, PencilSquareIcon, TrashIcon, SparklesIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
+
+function HeaderSeccion({ titulo, desc }: any) {
+    return (
+        <div className="border-l-4 border-pink-500 pl-4 space-y-1">
+            <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 dark:text-white leading-none">{titulo}</h3>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{desc}</p>
+        </div>
+    );
+}
 
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
@@ -36,6 +46,8 @@ export default function CouponsPage() {
     const { user } = useAuth();
     const [coupons, setCoupons] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [tenants, setTenants] = useState<any[]>([]);
+    const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [notification, setNotification] = useState<{ msg: string, type: 'success' | 'error' } | null>(null);
     const [saving, setSaving] = useState(false);
@@ -43,6 +55,8 @@ export default function CouponsPage() {
     const [confirmData, setConfirmData] = useState<{ isOpen: boolean, title: string, message: string, action: () => void, isDestructive: boolean }>({ 
         isOpen: false, title: '', message: '', action: () => { }, isDestructive: false 
     });
+
+    const activeTenant = tenants.find(t => t.id === selectedTenantId) || null;
 
     const [formData, setFormData] = useState({ code: '', discount: 10, limit: 100, validFrom: '', validUntil: '', minimumPurchase: 0, description: '' });
 
@@ -52,6 +66,40 @@ export default function CouponsPage() {
         try {
             const snap = await getDocs(query(collection(db, "coupons"), where("ownerId", "==", user.uid)));
             setCoupons(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+
+            // Cargar planes globales de settings/global para verificar las features reales de cada plan
+            const { doc, getDoc } = await import('firebase/firestore');
+            const globalSnap = await getDoc(doc(db, "settings", "global"));
+            let loadedPlans: any[] = [];
+            if (globalSnap.exists()) {
+                const data = globalSnap.data();
+                if (data.plans) {
+                    loadedPlans = data.plans;
+                }
+            }
+
+            // Cargar todos los recintos asociados del dueño para el filtro
+            const snapTenants = await getDocs(query(collection(db, "tenants"), where("ownerId", "==", user.uid)));
+            const tenantsList = snapTenants.docs.map(d => {
+                const tenantData = d.data();
+                const rawPlan = (tenantData.planId || tenantData.plan || 'free').toString();
+                const matchedPlan = loadedPlans.find(p => p.id.toLowerCase() === rawPlan.toLowerCase() || p.name.toLowerCase() === rawPlan.toLowerCase());
+                
+                // Si existe el plan, extraemos sus features reales. De lo contrario, usamos las que vengan en el recinto o un valor por defecto.
+                const features = matchedPlan ? matchedPlan.features : (tenantData.features || { marketing: false });
+
+                return {
+                    id: d.id,
+                    ...tenantData,
+                    planId: matchedPlan ? matchedPlan.id : 'free',
+                    features
+                };
+            });
+
+            setTenants(tenantsList);
+            if (tenantsList.length > 0) {
+                setSelectedTenantId(prev => prev || tenantsList[0].id);
+            }
         } catch (e) { console.error(e); } finally { setLoading(false); }
     };
 
@@ -87,6 +135,7 @@ export default function CouponsPage() {
         try {
             const payload = {
                 ownerId: user.uid,
+                tenantId: selectedTenantId,
                 code: formData.code.toUpperCase().replace(/\s+/g, ''),
                 discount: Number(formData.discount),
                 limit: Number(formData.limit),
@@ -129,8 +178,12 @@ export default function CouponsPage() {
         });
     };
 
+    const activePlanId = (activeTenant?.planId || activeTenant?.plan || 'free').toString().toLowerCase();
+    const isMarketingLocked = activeTenant && (activePlanId === 'free' || activePlanId === 'gratis');
+    const filteredCoupons = coupons.filter(c => c.tenantId === selectedTenantId || (!c.tenantId && tenants.length > 0 && selectedTenantId === tenants[0].id));
+
     return (
-        <div className="w-full space-y-5 pb-10 text-left relative">
+        <div className="w-full space-y-5 pb-10 text-left relative animate-fadeIn">
             {notification && <Toast message={notification.msg} type={notification.type} onClose={() => setNotification(null)} />}
             
             <ConfirmModal 
@@ -142,81 +195,158 @@ export default function CouponsPage() {
                 isDestructive={confirmData.isDestructive} 
             />
 
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-8 relative z-10">
+            {/* HEADER CON FILTRO DE RECINTOS */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/5">
                 <div>
                     <div className="flex items-center gap-2 mb-0.5">
                         <span className="w-6 h-[2px] bg-pink-500 rounded-full"></span>
                         <p className="text-[9px] font-black text-pink-600 dark:text-pink-400 tracking-[0.2em] uppercase">Estrategia de Fidelización</p>
                     </div>
-                    <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase leading-none tracking-tighter">Mis <span className="text-pink-500">Cupones</span></h1>
+                    <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase leading-none tracking-tight">Mis <span className="text-pink-500">Beneficios</span></h1>
                 </div>
-                
-                <div className="flex items-center gap-2 p-1.5 rounded-xl">
-                    <button 
-                        onClick={() => handleOpenModal()} 
-                        className="px-6 py-2.5 bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 font-black text-[9px] uppercase tracking-[0.2em] rounded-xl transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-emerald-500/20 flex items-center gap-2 border border-emerald-400/20 dark:border-white/10"
-                    >
-                        <PlusIcon className="w-4 h-4" /> NUEVO BENEFICIO
-                    </button>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div className="flex flex-col gap-1">
+                        <label className="text-[7px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Filtrar Recinto</label>
+                        <select 
+                            value={selectedTenantId || ''} 
+                            onChange={(e) => setSelectedTenantId(e.target.value)}
+                            className="px-5 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[9px] font-black uppercase tracking-wider rounded-xl focus:ring-1 focus:ring-pink-500 outline-none text-slate-700 dark:text-slate-200"
+                        >
+                            {tenants.map(t => {
+                                const pId = (t.planId || t.plan || 'free').toString().toLowerCase();
+                                const isLocked = pId === 'free' || pId === 'gratis';
+                                return (
+                                    <option key={t.id} value={t.id} className="dark:bg-[#0B0F19]">
+                                        {t.name} {isLocked ? '🔒 [BLOQUEADO]' : ''}
+                                    </option>
+                                );
+                            })}
+                        </select>
+                    </div>
+
+                    <div className="flex items-end h-full mt-auto">
+                        <button 
+                            onClick={() => handleOpenModal()} 
+                            disabled={isMarketingLocked || tenants.length === 0}
+                            className={`w-full sm:w-auto px-6 py-2.5 bg-slate-900 dark:bg-pink-500 text-white dark:text-slate-950 font-black text-[9px] uppercase tracking-widest rounded-xl transition-all shadow-xl flex items-center justify-center gap-2 border dark:border-pink-400/20 ${isMarketingLocked || tenants.length === 0 ? 'opacity-40 cursor-not-allowed shadow-none' : 'hover:scale-[1.02] active:scale-95 shadow-pink-500/20'}`}
+                        >
+                            <PlusIcon className="w-4 h-4" /> NUEVO BENEFICIO
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-5 rounded-xl border border-slate-100 dark:bg-[#0B0F19] dark:border-white/5 bg-white shadow-sm">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Emitidos</p>
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-white leading-none tracking-tighter">{coupons.length}</h3>
-                </div>
-                <div className="p-5 rounded-xl border border-pink-100 bg-pink-500/[0.03] dark:bg-pink-500/5 shadow-sm">
-                    <p className="text-[10px] font-black text-pink-500 uppercase tracking-widest mb-2">Activos</p>
-                    <h3 className="text-2xl font-black text-pink-500 leading-none tracking-tighter">{coupons.filter(c => c.status === 'active').length}</h3>
-                </div>
-                <div className="p-5 rounded-xl border border-slate-100 dark:bg-[#0B0F19] dark:border-white/5 bg-white shadow-sm">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Usos Totales</p>
-                    <h3 className="text-2xl font-black text-emerald-500 leading-none tracking-tighter">{coupons.reduce((acc, c) => acc + (c.uses || 0), 0)}</h3>
-                </div>
-                <div className="p-5 rounded-xl border border-slate-100 dark:bg-[#0B0F19] dark:border-white/5 bg-white shadow-sm">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Revenue Atribuido</p>
-                    <h3 className="text-2xl font-black text-emerald-500 leading-none tracking-tighter">${coupons.reduce((acc, c) => acc + ((c.uses || 0) * (c.minimumPurchase || 0)), 0).toLocaleString()}</h3>
-                </div>
-            </div>
-
-            {loading ? <div className="text-center py-20 text-[10px] font-bold text-slate-400 uppercase tracking-widest animate-pulse">Cargando beneficios...</div> : coupons.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-slate-400 opacity-60 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-2xl">
-                    <TagIcon className="w-12 h-12 mb-3 stroke-1" />
-                    <p className="text-[10px] font-bold uppercase">Sin cupones registrados</p>
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                    {coupons.map(c => (
-                        <div key={c.id} className="bg-white dark:bg-[#0B0F19] rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm hover:border-pink-500/30 transition-all flex flex-col group overflow-hidden">
-                            <div className="p-6 flex-1 flex flex-col">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-500/10 text-pink-600 flex items-center justify-center border border-pink-100 dark:border-pink-500/20"><PercentBadgeIcon className="w-5 h-5" /></div>
-                                    <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${c.status === 'active' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>{c.status === 'active' ? 'VIGENTE' : 'CADUCADO'}</span>
-                                </div>
-                                <h3 className="font-black text-slate-900 dark:text-white text-lg tracking-widest uppercase mb-1">{c.code}</h3>
-                                <p className="text-[10px] font-black text-pink-500 uppercase mb-3">{c.discount}% DESCUENTO</p>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase mb-6 line-clamp-2">{c.description || 'Sin descripción.'}</p>
-                                <div className="mt-auto space-y-2 pt-4 border-t border-slate-100 dark:border-white/5 text-[9px] font-bold uppercase text-slate-500">
-                                    <div className="flex justify-between"><span>Vence</span><span className="text-slate-900 dark:text-white">{c.validUntil ? new Date(c.validUntil).toLocaleDateString() : '---'}</span></div>
-                                    <div className="flex justify-between"><span>Mínimo</span><span className="text-emerald-600">${Number(c.minimumPurchase).toLocaleString()}</span></div>
-                                    <div className="flex justify-between mb-1"><span>Uso</span><span>{c.uses} / {c.limit}</span></div>
-                                    <div className="w-full bg-slate-100 dark:bg-white/5 h-1 rounded-full overflow-hidden"><div className="bg-pink-500 h-full" style={{ width: `${Math.min((c.uses / c.limit) * 100, 100)}%` }}></div></div>
-                                </div>
+            {/* CONTENEDOR DE CONTENIDO CON SOPORTE DE CANDADO */}
+            <div className="flex flex-col gap-5">
+                {isMarketingLocked ? (
+                    <div className="w-full bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/5 rounded-2xl p-8 text-center relative overflow-hidden shadow-xl animate-fadeIn flex flex-col items-center justify-center min-h-[250px]">
+                        {/* Glow circular flotante premium de fondo */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-pink-500/5 blur-[80px] pointer-events-none z-0"></div>
+                        
+                        <div className="space-y-3 mb-6 z-10 max-w-md">
+                            <div className="flex items-center justify-center gap-2">
+                                <span className="w-6 h-[2px] bg-pink-500 rounded-full"></span>
+                                <p className="text-[9px] font-black text-pink-600 dark:text-pink-400 tracking-[0.25em] uppercase">Plan de Pago Requerido</p>
+                                <span className="w-6 h-[2px] bg-pink-500 rounded-full"></span>
                             </div>
-                            
-                            <div className="p-3 bg-slate-50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5 flex gap-2">
-                                <button onClick={() => handleOpenModal(c)} className="flex-1 py-2.5 flex items-center justify-center bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
-                                    <PencilSquareIcon className="w-4 h-4" />
-                                </button>
-                                <button onClick={() => handleDelete(c.id)} className="flex-1 py-2.5 flex items-center justify-center bg-white dark:bg-white/5 rounded-xl border border-red-100 dark:border-white/10 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all">
-                                    <TrashIcon className="w-4 h-4" />
-                                </button>
-                            </div>
+                            <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">
+                                HERRAMIENTAS DE <span className="bg-gradient-to-r from-pink-500 via-rose-500 to-amber-500 bg-clip-text text-transparent">MARKETING & CUPONES</span>
+                            </h2>
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase max-w-sm mx-auto leading-relaxed">
+                                Fideliza a tus jugadores, crea códigos de descuento personalizados y aumenta las reservas de tus canchas. Módulo habilitado a partir del plan Básico.
+                            </p>
                         </div>
-                    ))}
-                </div>
-            )}
+
+                        <a 
+                            href="/dashboard/billing-subscription" 
+                            className="relative group px-8 py-3.5 overflow-hidden rounded-xl bg-gradient-to-r from-pink-500 via-rose-500 to-amber-500 font-black text-[9px] uppercase tracking-[0.2em] text-slate-950 transition-all hover:scale-[1.03] active:scale-95 shadow-xl shadow-pink-500/10 flex items-center justify-center gap-2 border border-white/20 z-10"
+                        >
+                            <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-amber-400 via-rose-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <SparklesIcon className="w-4 h-4 text-slate-950" />
+                            <span className="relative z-10 font-black">MEJORAR PLAN</span>
+                        </a>
+                    </div>
+                ) : (
+                    <>
+                        <HeaderSeccion 
+                            titulo={activeTenant ? `Métricas de Campañas para ${activeTenant.name}` : "Estadísticas del Recinto"} 
+                            desc="Monitorea el rendimiento de tus códigos promocionales." 
+                        />
+
+                        {/* TARJETAS DE ESTADÍSTICAS */}
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                            <TarjetaKpi 
+                                titulo="Total Emitidos" 
+                                valor={filteredCoupons.length.toString()} 
+                                sub="CUPONES EMITIDOS" 
+                                icono={<TagIcon />} 
+                            />
+                            <TarjetaKpi 
+                                titulo="Activos" 
+                                valor={filteredCoupons.filter((c: any) => c.status === 'active').length.toString()} 
+                                sub="CAMPAÑAS VIGENTES" 
+                                icono={<PercentBadgeIcon />} 
+                                brillo 
+                            />
+                            <TarjetaKpi 
+                                titulo="Usos Totales" 
+                                valor={filteredCoupons.reduce((acc: number, c: any) => acc + (c.uses || 0), 0).toString()} 
+                                sub="REDENCIONES" 
+                                icono={<CheckCircleIcon />} 
+                            />
+                            <TarjetaKpi 
+                                titulo="Revenue Atribuido" 
+                                valor={`$${filteredCoupons.reduce((acc: number, c: any) => acc + ((c.uses || 0) * (c.minimumPurchase || 0)), 0).toLocaleString()}`} 
+                                sub="VENTA ESTIMADA" 
+                                icono={<SparklesIcon />} 
+                                brillo 
+                            />
+                        </div>
+
+                        {/* LISTADO DE CUPONES */}
+                        {loading ? (
+                            <div className="text-center py-20 text-[9px] font-bold text-slate-400 uppercase tracking-widest animate-pulse">Cargando beneficios...</div>
+                        ) : filteredCoupons.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-20 text-slate-400 opacity-60 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-2xl">
+                                <TagIcon className="w-12 h-12 mb-3 stroke-1" />
+                                <p className="text-[9px] font-bold uppercase">Sin cupones registrados en este recinto</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                                {filteredCoupons.map((c: any) => (
+                                    <div key={c.id} className="bg-white dark:bg-[#0B0F19] rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm hover:border-pink-500/30 transition-all flex flex-col group overflow-hidden">
+                                        <div className="p-6 flex-1 flex flex-col">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div className="w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-500/10 text-pink-600 flex items-center justify-center border border-pink-100 dark:border-pink-500/20"><PercentBadgeIcon className="w-5 h-5" /></div>
+                                                <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${c.status === 'active' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>{c.status === 'active' ? 'VIGENTE' : 'CADUCADO'}</span>
+                                            </div>
+                                            <h3 className="font-black text-slate-900 dark:text-white text-lg tracking-widest uppercase mb-1">{c.code}</h3>
+                                            <p className="text-[10px] font-black text-pink-500 uppercase mb-3">{c.discount}% DESCUENTO</p>
+                                            <p className="text-[10px] text-slate-400 font-bold uppercase mb-6 line-clamp-2">{c.description || 'Sin descripción.'}</p>
+                                            <div className="mt-auto space-y-2 pt-4 border-t border-slate-100 dark:border-white/5 text-[9px] font-bold uppercase text-slate-500">
+                                                <div className="flex justify-between"><span>Vence</span><span className="text-slate-900 dark:text-white">{c.validUntil ? new Date(c.validUntil).toLocaleDateString() : '---'}</span></div>
+                                                <div className="flex justify-between"><span>Mínimo</span><span className="text-emerald-600">${Number(c.minimumPurchase).toLocaleString()}</span></div>
+                                                <div className="flex justify-between mb-1"><span>Uso</span><span>{c.uses} / {c.limit}</span></div>
+                                                <div className="w-full bg-slate-100 dark:bg-white/5 h-1 rounded-full overflow-hidden"><div className="bg-pink-500 h-full" style={{ width: `${Math.min((c.uses / c.limit) * 100, 100)}%` }}></div></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="p-3 bg-slate-50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5 flex gap-2">
+                                            <button onClick={() => handleOpenModal(c)} className="flex-1 py-2.5 flex items-center justify-center bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
+                                                <PencilSquareIcon className="w-4 h-4" />
+                                            </button>
+                                            <button onClick={() => handleDelete(c.id)} className="flex-1 py-2.5 flex items-center justify-center bg-white dark:bg-white/5 rounded-xl border border-red-100 dark:border-white/10 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all">
+                                                <TrashIcon className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
 
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setIsModalOpen(false)}>

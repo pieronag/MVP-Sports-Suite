@@ -1,13 +1,17 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StatusBar, StyleSheet, ActivityIndicator, Dimensions, RefreshControl, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { QrCode, CheckCircle2, Clock, Calendar, Building2, TrendingUp, DollarSign, ChevronRight, Zap, Target, ShieldCheck, ArrowUpRight, XCircle } from 'lucide-react-native';
+import { QrCode, CheckCircle2, Clock, Calendar, Building2, TrendingUp, DollarSign, ChevronRight, Zap, Target, ShieldCheck, ArrowUpRight, XCircle, ChevronDown } from 'lucide-react-native';
 import { useAuth } from '../../store/useAuth';
 import { bookingService, Booking } from '../../services/bookingService';
 import { venueService, Tenant } from '../../services/venueService';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Modal } from 'react-native';
+import { db } from '../../services/firebase';
+import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const COLORS = {
     light: {
@@ -40,15 +44,71 @@ export default function ManagerDashboard() {
     const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [activeTab, setActiveTab] = useState<'pending' | 'completed' | 'cancelled'>('pending');
+    const [isSelectOpen, setIsSelectOpen] = useState(false);
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [pendingTenant, setPendingTenant] = useState<Tenant | null>(null);
+
+    useEffect(() => {
+        const loadSavedTenant = async () => {
+            const uid = profile?.uid || (profile as any)?.id;
+            if (!uid) return;
+            try {
+                const saved = await AsyncStorage.getItem('mvp-active-tenant-id');
+                
+                // Buscar documento en la colección staff
+                const staffQuery = query(
+                    collection(db, "staff"), 
+                    where("uid", "==", uid),
+                    where("status", "==", "active")
+                );
+                const staffSnap = await getDocs(staffQuery);
+                let tenantIds: string[] = [];
+                if (!staffSnap.empty) {
+                    const staffData = staffSnap.docs[0].data();
+                    tenantIds = staffData.tenantIds || (staffData.tenantId ? [staffData.tenantId] : []);
+                } else {
+                    tenantIds = profile?.tenantIds || [];
+                }
+
+                if (saved && tenantIds.includes(saved)) {
+                    setSelectedTenantId(saved);
+                }
+            } catch (err) {
+                console.error("Error loading persisted tenant:", err);
+            }
+        };
+        loadSavedTenant();
+    }, [profile?.uid, profile?.tenantIds]);
 
     const fetchData = useCallback(async () => {
-        const tenantIds = profile?.tenantIds || [];
-        if (!tenantIds.length) {
+        const uid = profile?.uid || (profile as any)?.id;
+        if (!uid) {
             setLoading(false);
             return;
         }
         
         try {
+            // Buscar documento activo en colección staff
+            const staffQuery = query(
+                collection(db, "staff"), 
+                where("uid", "==", uid),
+                where("status", "==", "active")
+            );
+            const staffSnap = await getDocs(staffQuery);
+            let tenantIds: string[] = [];
+            if (!staffSnap.empty) {
+                const staffData = staffSnap.docs[0].data();
+                tenantIds = staffData.tenantIds || (staffData.tenantId ? [staffData.tenantId] : []);
+            } else {
+                tenantIds = profile?.tenantIds || ((profile as any)?.tenantId ? [(profile as any).tenantId] : []);
+            }
+
+            if (!tenantIds.length) {
+                setVenues([]);
+                setLoading(false);
+                return;
+            }
+            
             const list = await venueService.getVenuesByIds(tenantIds);
             setVenues(list);
             
@@ -57,17 +117,69 @@ export default function ManagerDashboard() {
 
             const today = new Date();
             const b = await bookingService.getBookingsByTenantForDate(currentTenantId, today);
-            setBookings(b);
+            
+            // Auto check-in local / no-show validation on loaded bookings
+            const nowChileStr = new Date().toLocaleString("en-US", { timeZone: "America/Santiago" });
+            const nowChile = new Date(nowChileStr);
+
+            const verifiedBookings = await Promise.all(b.map(async (booking) => {
+                if (
+                    booking.status !== 'cancelled' && 
+                    booking.paymentStatus === 'pending' && 
+                    booking.date && 
+                    booking.startTime
+                ) {
+                    let bookingDate: Date;
+                    if ((booking.date as any).toDate) {
+                        bookingDate = (booking.date as any).toDate();
+                    } else {
+                        bookingDate = new Date(booking.date as any);
+                    }
+                    
+                    const bookingDateChileStr = bookingDate.toLocaleString("en-US", { timeZone: "America/Santiago" });
+                    const startDateTime = new Date(bookingDateChileStr);
+                    
+                    if (nowChile >= startDateTime) {
+                        try {
+                            const bookingRef = doc(db, 'bookings', booking.id as string);
+                            await updateDoc(bookingRef, {
+                                status: 'cancelled',
+                                paymentStatus: 'no-show',
+                                notes: 'Cancelación automática por inasistencia sin pago (No-Show).',
+                                updatedAt: new Date()
+                            });
+                            return {
+                                ...booking,
+                                status: 'cancelled' as const,
+                                paymentStatus: 'no-show' as any,
+                                notes: 'Cancelación automática por inasistencia sin pago (No-Show).'
+                            };
+                        } catch (e) {
+                            console.error("No-show update error:", e);
+                        }
+                    }
+                }
+                return booking;
+            }));
+
+            setBookings(verifiedBookings);
         } catch (error) {
             console.error("Dashboard Load Error:", error);
         } finally {
             setLoading(false);
             setRefreshing(false);
         }
-    }, [profile?.tenantIds, selectedTenantId]);
+    }, [profile?.uid, profile?.tenantIds, selectedTenantId]);
 
     useEffect(() => {
         fetchData();
+
+        // Configurar intervalo para actualizar y verificar no-shows automáticamente cada 15 minutos (900,000 ms)
+        const interval = setInterval(() => {
+            fetchData();
+        }, 900000);
+
+        return () => clearInterval(interval);
     }, [fetchData]);
 
     const onRefresh = () => {
@@ -135,6 +247,115 @@ export default function ManagerDashboard() {
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.accent} />
                 }
             >
+                {/* SELECTBOX DE RECINTO ACTIVO */}
+                {venues.length > 0 && (
+                    <View style={{ paddingHorizontal: 30, paddingTop: 10, paddingBottom: 5, zIndex: 1000, position: 'relative' }}>
+                        <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 8 }}>
+                            Recinto de Trabajo Activo
+                        </Text>
+                        <TouchableOpacity
+                            onPress={() => {
+                                if (venues.length > 1) {
+                                    setIsSelectOpen(prev => !prev);
+                                }
+                            }}
+                            activeOpacity={venues.length > 1 ? 0.8 : 1}
+                            style={{
+                                paddingHorizontal: 20,
+                                paddingVertical: 14,
+                                borderRadius: 20,
+                                backgroundColor: C.card,
+                                borderWidth: 1,
+                                borderColor: C.border,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                shadowColor: '#000',
+                                shadowOpacity: isDark ? 0.2 : 0.03,
+                                shadowRadius: 10,
+                                shadowOffset: { width: 0, height: 4 }
+                            }}
+                        >
+                            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                                <Building2 size={16} color={COLORS.accent} style={{ marginRight: 10 }} />
+                                <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', textTransform: 'uppercase', flex: 1 }} numberOfLines={1}>
+                                    {venues.find(v => v.id === selectedTenantId)?.name || venues[0].name}
+                                </Text>
+                            </View>
+                            {venues.length > 1 && (
+                                <ChevronDown 
+                                    size={16} 
+                                    color={C.sub} 
+                                    style={{ transform: [{ rotate: isSelectOpen ? '180deg' : '0deg' }] }}
+                                />
+                            )}
+                        </TouchableOpacity>
+
+                        {/* LISTA DESPLEGABLE INLINE ABSOLUTA */}
+                        {isSelectOpen && venues.length > 1 && (
+                            <View style={{
+                                position: 'absolute',
+                                top: 75,
+                                left: 30,
+                                right: 30,
+                                backgroundColor: C.card,
+                                borderRadius: 20,
+                                borderWidth: 1,
+                                borderColor: C.border,
+                                shadowColor: '#000',
+                                shadowOpacity: 0.15,
+                                shadowRadius: 15,
+                                shadowOffset: { width: 0, height: 10 },
+                                zIndex: 2000,
+                                paddingVertical: 8,
+                                overflow: 'hidden'
+                            }}>
+                                <ScrollView style={{ maxHeight: 220 }} showsVerticalScrollIndicator={false}>
+                                    {venues.map((v, idx, arr) => {
+                                        const isSelected = selectedTenantId === v.id;
+                                        return (
+                                            <View key={v.id}>
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        if (!isSelected) {
+                                                            setPendingTenant(v);
+                                                            setIsConfirmOpen(true);
+                                                        } else {
+                                                            setIsSelectOpen(false);
+                                                        }
+                                                    }}
+                                                    activeOpacity={0.7}
+                                                    style={{ 
+                                                        flexDirection: 'row', 
+                                                        alignItems: 'center', 
+                                                        justifyContent: 'space-between', 
+                                                        paddingVertical: 14,
+                                                        paddingHorizontal: 20,
+                                                        backgroundColor: isSelected ? (isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)') : 'transparent'
+                                                    }}
+                                                >
+                                                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                                                        <Building2 size={14} color={isSelected ? COLORS.accent : C.sub} style={{ marginRight: 10 }} />
+                                                        <Text style={{ color: isSelected ? COLORS.accent : C.text, fontSize: 12, fontWeight: '900', textTransform: 'uppercase', flex: 1 }} numberOfLines={1}>
+                                                            {v.name}
+                                                        </Text>
+                                                    </View>
+                                                    {isSelected && (
+                                                        <CheckCircle2 color={COLORS.accent} size={14} />
+                                                    )}
+                                                </TouchableOpacity>
+                                                {idx < arr.length - 1 && (
+                                                    <View style={{ height: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }} />
+                                                )}
+                                            </View>
+                                        );
+                                    })}
+                                </ScrollView>
+                            </View>
+                        )}
+                    </View>
+                )}
+
                 {/* RESUMEN BANNER */}
                 <View style={{ padding: 30, paddingBottom: 10 }}>
                     <View style={{ backgroundColor: C.card, borderRadius: 35, padding: 30, borderWidth: 1, borderColor: C.border, shadowColor: '#000', shadowOpacity: isDark ? 0.3 : 0.05, shadowRadius: 15 }}>
@@ -219,6 +440,19 @@ export default function ManagerDashboard() {
                                         <Zap size={10} color={b.status === 'cancelled' ? COLORS.error : COLORS.accent} style={{ marginRight: 4 }} />
                                         <Text style={{ color: b.status === 'cancelled' ? COLORS.error : COLORS.accent, fontSize: 10, fontWeight: '800', textTransform: 'uppercase' }}>{b.sport || 'Pádel'}</Text>
                                     </View>
+                                    {b.status === 'cancelled' && (
+                                        <View style={{ marginTop: 6, paddingHorizontal: 8, paddingVertical: 3, backgroundColor: COLORS.error + '12', borderRadius: 8, alignSelf: 'flex-start' }}>
+                                            <Text style={{ color: COLORS.error, fontSize: 8, fontWeight: '900', textTransform: 'uppercase' }}>
+                                                {(b as any).paymentStatus === 'no-show' 
+                                                    ? 'Cancelado por No-Show' 
+                                                    : ((b as any).notes && ((b as any).notes.toLowerCase().includes('no-show') || (b as any).notes.toLowerCase().includes('inasistencia'))
+                                                        ? 'Cancelado por No-Show'
+                                                        : 'Cancelado por Jugador'
+                                                    )
+                                                }
+                                            </Text>
+                                        </View>
+                                    )}
                                 </View>
                                 <View style={{ alignItems: 'flex-end' }}>
                                     <View style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, backgroundColor: b.status === 'cancelled' ? COLORS.error + '15' : (b.paymentStatus === 'paid' ? COLORS.accent + '22' : '#f59e0b22') }}>
@@ -231,7 +465,88 @@ export default function ManagerDashboard() {
                     ))}
                 </View>
 
-            </ScrollView>
+             </ScrollView>
+
+            {/* MODAL DE CONFIRMACIÓN DE CAMBIO DE RECINTO */}
+            <Modal visible={isConfirmOpen} animationType="fade" transparent>
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 40 }}>
+                    <View style={{ 
+                        backgroundColor: C.card, 
+                        borderRadius: 30, 
+                        padding: 30, 
+                        width: '100%', 
+                        borderWidth: 1, 
+                        borderColor: C.border,
+                        alignItems: 'center',
+                        shadowColor: '#000',
+                        shadowOpacity: 0.25,
+                        shadowRadius: 20,
+                        shadowOffset: { width: 0, height: 10 }
+                    }}>
+                        <View style={{ width: 60, height: 60, borderRadius: 20, backgroundColor: COLORS.accent + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+                            <Building2 color={COLORS.accent} size={28} />
+                        </View>
+
+                        <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'center', marginBottom: 10 }}>
+                            ¿Cambiar de Recinto?
+                        </Text>
+                        
+                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', lineHeight: 20, marginBottom: 25 }}>
+                            Estás a punto de cambiar al recinto {"\n"}
+                            <Text style={{ color: C.text, fontWeight: '900' }}>"{pendingTenant?.name}"</Text>.{"\n"}
+                            Se actualizarán de inmediato todas las estadísticas del día, balances e ingresos del nuevo recinto.
+                        </Text>
+
+                        <View style={{ flexDirection: 'row', gap: 12, width: '100%' }}>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setIsConfirmOpen(false);
+                                    setPendingTenant(null);
+                                }}
+                                activeOpacity={0.8}
+                                style={{
+                                    flex: 1,
+                                    paddingVertical: 14,
+                                    borderRadius: 18,
+                                    borderWidth: 1,
+                                    borderColor: C.border,
+                                    backgroundColor: 'transparent',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <Text style={{ color: C.sub, fontSize: 12, fontWeight: '900', textTransform: 'uppercase' }}>Cancelar</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={async () => {
+                                    if (pendingTenant) {
+                                        setSelectedTenantId(pendingTenant.id);
+                                        setLoading(true);
+                                        setIsConfirmOpen(false);
+                                        setIsSelectOpen(false);
+                                        try {
+                                            await AsyncStorage.setItem('mvp-active-tenant-id', pendingTenant.id);
+                                        } catch (e) {}
+                                        setPendingTenant(null);
+                                    }
+                                }}
+                                activeOpacity={0.8}
+                                style={{
+                                    flex: 1,
+                                    paddingVertical: 14,
+                                    borderRadius: 18,
+                                    backgroundColor: COLORS.accent,
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <Text style={{ color: 'white', fontSize: 12, fontWeight: '900', textTransform: 'uppercase' }}>Confirmar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }

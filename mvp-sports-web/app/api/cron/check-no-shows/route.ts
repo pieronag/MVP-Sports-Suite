@@ -9,7 +9,8 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const now = new Date();
+    const nowChileStr = new Date().toLocaleString("en-US", { timeZone: "America/Santiago" });
+    const now = new Date(nowChileStr);
     const bookingsRef = adminDb.collection('bookings');
     
     // Obtener reservas activas/pendientes que aún no están pagadas
@@ -46,12 +47,11 @@ export async function GET(request: Request) {
           bookingDate = new Date(bData.date);
         }
         
-        const [hours, minutes] = bData.startTime.split(':').map(Number);
-        const startDateTime = new Date(bookingDate);
-        startDateTime.setHours(hours, minutes, 0, 0);
+        const bookingDateChileStr = bookingDate.toLocaleString("en-US", { timeZone: "America/Santiago" });
+        const startDateTime = new Date(bookingDateChileStr);
 
-        // Si la hora de inicio de la reserva ya pasó en el tiempo real
-        if (now > startDateTime) {
+        // Si la hora de inicio de la reserva ya pasó en el tiempo real en Chile
+        if (now >= startDateTime) {
           isNoShow = true;
         }
       }

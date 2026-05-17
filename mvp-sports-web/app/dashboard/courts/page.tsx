@@ -53,6 +53,7 @@ interface Venue {
     schedule: WeeklySchedule;
     pricing: SportPricing;
     realCourtCount?: number;
+    features?: any;
 }
 
 interface Court {
@@ -205,6 +206,13 @@ export default function CourtsPage() {
                 venuesList.push({ id: docTenant.id, ...venueData, realCourtCount: snapCourts.size });
             }));
             setVenues(venuesList);
+            if (venuesList.length > 0) {
+                const firstVenue = venuesList[0];
+                const hasMultiRecinto = firstVenue.features?.multiRecinto;
+                if (hasMultiRecinto === false) {
+                    setSelectedVenue(firstVenue);
+                }
+            }
         } catch (error) {
             showToast("Error al cargar recintos", "error");
         } finally {
@@ -509,12 +517,14 @@ export default function CourtsPage() {
                 
                 <div className="relative p-6 lg:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                     <div className="flex items-center gap-6">
-                        <button 
-                            onClick={() => setSelectedVenue(null)} 
-                            className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 rounded-xl transition-all active:scale-95 hover:bg-slate-100 dark:hover:bg-white/10 shadow-sm border border-slate-200 dark:border-white/5 text-slate-400 group"
-                        >
-                            <ArrowLeftIcon className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                        </button>
+                        {(!selectedVenue.features || selectedVenue.features.multiRecinto !== false) && (
+                            <button 
+                                onClick={() => setSelectedVenue(null)} 
+                                className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 rounded-xl transition-all active:scale-95 hover:bg-slate-100 dark:hover:bg-white/10 shadow-sm border border-slate-200 dark:border-white/5 text-slate-400 group"
+                            >
+                                <ArrowLeftIcon className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                            </button>
+                        )}
                         <div>
                             <div className="flex items-center gap-2 mb-1.5">
                                 <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[8px] font-black uppercase tracking-[0.2em] border border-emerald-500/20">

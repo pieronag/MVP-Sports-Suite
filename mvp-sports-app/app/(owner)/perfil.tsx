@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
     View, Text, TouchableOpacity, ScrollView, StatusBar, 
-    StyleSheet, ActivityIndicator, Image, Dimensions, Modal 
+    StyleSheet, ActivityIndicator, Image, Dimensions, Modal, Switch, Alert 
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { 
@@ -212,16 +212,22 @@ export default function ProfileScreen() {
                 {/* AJUSTES */}
                 <SectionLabel label="Preferencias" />
                 <View style={{ marginHorizontal: 30, backgroundColor: C.card, borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
-                    <TouchableOpacity onPress={toggleTheme} style={{ height: 75, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25 }}>
+                    <View style={{ height: 75, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25 }}>
                         <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}>
-                            {isDark ? <Sun color={COLORS.accent} size={20} /> : <Moon color="#1e293b" size={20} />}
+                            {isDark ? <Moon color={COLORS.accent} size={20} /> : <Sun color="#facc15" size={20} />}
                         </View>
-                        <Text style={{ color: C.text, fontSize: 14, fontWeight: '800', textTransform: 'uppercase', marginLeft: 15, flex: 1 }}>{isDark ? 'Modo Claro' : 'Modo Oscuro'}</Text>
-                        <ChevronRight color={C.border} size={18} />
-                    </TouchableOpacity>
+                        <Text style={{ color: C.text, fontSize: 14, fontWeight: '800', textTransform: 'uppercase', marginLeft: 15, flex: 1 }}>Modo Oscuro</Text>
+                        <Switch
+                            value={isDark}
+                            onValueChange={toggleTheme}
+                            trackColor={{ false: isDark ? '#1e293b' : '#cbd5e1', true: COLORS.accent }}
+                            thumbColor={isDark ? '#ffffff' : '#f8fafc'}
+                            ios_backgroundColor={isDark ? '#1e293b' : '#cbd5e1'}
+                        />
+                    </View>
                 </View>
 
-                <Text style={{ textAlign: 'center', color: C.sub, fontSize: 8, fontWeight: '700', marginTop: 40 }}>STAFF IDENTITY v1.2 • MVP SPORTS</Text>
+                <Text style={{ textAlign: 'center', color: C.sub, fontSize: 8, fontWeight: '700', marginTop: 40 }}> MVP SPORTS CHILE • 2026</Text>
             </ScrollView>
 
             {loading && (

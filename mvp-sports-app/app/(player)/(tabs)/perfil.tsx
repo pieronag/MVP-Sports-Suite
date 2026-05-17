@@ -19,7 +19,7 @@ import { userService } from '../../../services/userService';
 import { UserProfile } from '../../../types/user';
 import * as ImagePicker from 'expo-image-picker';
 import { db } from '../../../services/firebase';
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { teamService, Team } from '../../../services/teamService';
 import { gamificationService, GamificationSettings } from '../../../services/gamificationService';
 
@@ -63,7 +63,10 @@ export default function PerfilScreen() {
     const [capturedUri, setCapturedUri] = useState<string | null>(null);
     const [showCardModal, setShowCardModal] = useState(false);
     const [showBadgeGlossary, setShowBadgeGlossary] = useState(false);
-    const [badgeConfigs, setBadgeConfigs] = useState<Record<string, { bronze: number; silver: number; gold: number }>>({}); 
+    const [badgeConfigs, setBadgeConfigs] = useState<Record<string, { bronze: number; silver: number; gold: number }>>({});
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [loadingDelete, setLoadingDelete] = useState(false);
 
     const loadData = async (isRefreshing = false) => {
         if (!user) return;
@@ -154,6 +157,34 @@ export default function PerfilScreen() {
         }
     };
 
+    const handleDeleteAccount = async () => {
+        if (!user) return;
+        setLoadingDelete(true);
+        try {
+            // 1. Eliminar documento del usuario en Firestore
+            const userDocRef = doc(db, 'users', user.uid);
+            await deleteDoc(userDocRef);
+
+            // 2. Eliminar el usuario de Firebase Auth
+            await user.delete();
+
+            setShowDeleteModal(false);
+            Alert.alert("Cuenta Eliminada", "Tu perfil y credenciales de acceso han sido eliminados de forma definitiva. Tus reservas se han mantenido para registros administrativos.");
+        } catch (err: any) {
+            console.error("Error deleting user account:", err);
+            if (err.code === 'auth/requires-recent-login') {
+                Alert.alert(
+                    "Seguridad Activa",
+                    "Por motivos de seguridad, debes cerrar sesión e iniciar sesión nuevamente para renovar tu sesión antes de poder eliminar tu perfil definitivamente."
+                );
+            } else {
+                Alert.alert("Error de Sistema", "No se pudo borrar la cuenta. Por favor reintenta en unos instantes.");
+            }
+        } finally {
+            setLoadingDelete(false);
+        }
+    };
+
     const xp = profile?.xp || 0;
     const tierList = ['bronce', 'plata', 'oro', 'platino', 'diamante', 'elite', 'leyenda'];
     const tierInfo = gamification ? gamificationService.calculateTier(xp, gamification) : { name: 'Bronce', index: 0 };
@@ -170,7 +201,7 @@ export default function PerfilScreen() {
         if (!profile) return 0;
         const savedBadges = (profile as any)?.badges as any[] || [];
         if (savedBadges.length > 0) return savedBadges.filter(b => b.tier !== null).length;
-        
+
         const stats = profile.stats || {};
         const config = badgeConfigs || {};
         let count = 0;
@@ -179,7 +210,7 @@ export default function PerfilScreen() {
             'captaincy', 'comeback', 'precision', 'clutch', 'tournaments', 'invictus',
             'rivalry', 'morning_player', 'night_player', 'loyal', 'weekend_warrior', 'stamina', 'social'
         ];
-        
+
         allBadgeIds.forEach(id => {
             const val = (stats as any)[id] || 0;
             const c = (config as any)[id] || { bronze: 5 };
@@ -299,11 +330,11 @@ export default function PerfilScreen() {
                         const savedBadges = (profile as any)?.badges as any[] | undefined;
                         const stats = profile?.stats || { played: 0, won: 0, lost: 0, goals: 0 };
                         const rawData = profile as any;
-                        const createdAt = rawData?.createdAt?.seconds 
-                            ? new Date(rawData.createdAt.seconds * 1000) 
+                        const createdAt = rawData?.createdAt?.seconds
+                            ? new Date(rawData.createdAt.seconds * 1000)
                             : new Date();
                         const daysActive = Math.max(1, (new Date().getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
-                        
+
                         const BADGE_INFO: Record<string, { name: string; icon: any }> = {
                             scorer: { name: 'Artillero', icon: Target },
                             playmaker: { name: 'Maestro', icon: Zap },
@@ -393,11 +424,11 @@ export default function PerfilScreen() {
                                 {earnedBadges.length > 0 ? (
                                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
                                         {earnedBadges.map((b, i) => (
-                                            <View key={b.id} style={{ 
-                                                width: (width - 130) / 3, 
+                                            <View key={b.id} style={{
+                                                width: (width - 130) / 3,
                                                 backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#f8fafc',
-                                                borderRadius: 18, 
-                                                padding: 10, 
+                                                borderRadius: 18,
+                                                padding: 10,
                                                 alignItems: 'center',
                                                 borderWidth: 2,
                                                 borderColor: tierColors[b.tier!] + '40'
@@ -418,17 +449,25 @@ export default function PerfilScreen() {
                                         <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Juega más para desbloquear insignias</Text>
                                     </View>
                                 )}
-                                
+
                                 {/* Solo mostramos las ganadas en el perfil por solicitud del usuario */}
                             </View>
                         );
                     })()}
                 </View>
 
-                <TouchableOpacity onPress={signOut} style={{ marginHorizontal: 30, marginTop: 40, height: 60, borderRadius: 20, backgroundColor: isDark ? COLORS.error : '#fef2f2', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
-                    <LogOut color={isDark ? 'white' : COLORS.error} size={20} />
-                    <Text style={{ color: isDark ? 'white' : COLORS.error, fontWeight: '900', fontSize: 12, textTransform: 'uppercase', marginLeft: 10 }}>Cerrar Sesión</Text>
-                </TouchableOpacity>
+                {/* ACCIONES DE SESIÓN Y SEGURIDAD */}
+                <View style={{ marginHorizontal: 30, marginTop: 40, gap: 15 }}>
+                    <TouchableOpacity onPress={() => setShowLogoutModal(true)} style={{ height: 60, borderRadius: 20, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', borderWidth: 1, borderColor: C.border }}>
+                        <LogOut color={C.text} size={20} />
+                        <Text style={{ color: C.text, fontWeight: '900', fontSize: 12, textTransform: 'uppercase', marginLeft: 10 }}>Cerrar Sesión</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => setShowDeleteModal(true)} style={{ height: 60, borderRadius: 20, backgroundColor: isDark ? 'rgba(244,63,94,0.1)' : '#fdf2f2', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', borderWidth: 1, borderColor: COLORS.error + '40' }}>
+                        <Shield color={COLORS.error} size={20} />
+                        <Text style={{ color: COLORS.error, fontWeight: '900', fontSize: 12, textTransform: 'uppercase', marginLeft: 10 }}>Eliminar Cuenta Definitivamente</Text>
+                    </TouchableOpacity>
+                </View>
 
                 <Text style={{ textAlign: 'center', color: C.sub, fontSize: 8, fontWeight: '700', marginTop: 40 }}> MVP SPORTS CHILE • 2026</Text>
             </ScrollView>
@@ -595,11 +634,11 @@ export default function PerfilScreen() {
                             {(() => {
                                 const stats = profile?.stats || { played: 0, won: 0, lost: 0, goals: 0 };
                                 const rawData = profile as any;
-                                const createdAt = rawData?.createdAt?.seconds 
-                                    ? new Date(rawData.createdAt.seconds * 1000) 
+                                const createdAt = rawData?.createdAt?.seconds
+                                    ? new Date(rawData.createdAt.seconds * 1000)
                                     : new Date();
                                 const daysActive = Math.max(1, (new Date().getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
-                                
+
                                 const statsMap: Record<string, number> = {
                                     scorer: (stats as any).goals || 0, playmaker: (stats as any).assists || 0,
                                     defender: (stats as any).clean_sheets || 0, wins: (stats as any).won || 0,
@@ -639,106 +678,162 @@ export default function PerfilScreen() {
                                 ].map(b => {
                                     const config = badgeConfigs[b.id] || { bronze: 5, silver: 15, gold: 30 };
                                     const val = statsMap[b.id] || 0;
-                                    
+
                                     // Determinar tier y progreso para el sort
                                     let tierScore = 0; // 0: Locked, 1: Bronze, 2: Silver, 3: Gold
                                     let nextThreshold = config.bronze;
                                     if (val >= config.gold) { tierScore = 3; nextThreshold = config.gold; }
                                     else if (val >= config.silver) { tierScore = 2; nextThreshold = config.gold; }
                                     else if (val >= config.bronze) { tierScore = 1; nextThreshold = config.silver; }
-                                    
+
                                     const progressPct = Math.min(1, val / nextThreshold);
                                     return { ...b, tierScore, progressPct, val, config };
                                 })
-                                .sort((a, b) => {
-                                    // Primero por tier (Oro > Plata > Bronce > Bloqueada)
-                                    if (b.tierScore !== a.tierScore) return b.tierScore - a.tierScore;
-                                    // Segundo por porcentaje de progreso
-                                    return b.progressPct - a.progressPct;
-                                })
-                                .map((b, i) => {
-                                    const { config, val: currentVal } = b;
-                                    
-                                    // Calcular visuales
-                                    let nextThreshold = config.bronze;
-                                    let currentTierLabel = "BLOQUEADA";
-                                    let nextTierLabel = "BRONCE";
-                                    let progressColor = COLORS.accent;
+                                    .sort((a, b) => {
+                                        // Primero por tier (Oro > Plata > Bronce > Bloqueada)
+                                        if (b.tierScore !== a.tierScore) return b.tierScore - a.tierScore;
+                                        // Segundo por porcentaje de progreso
+                                        return b.progressPct - a.progressPct;
+                                    })
+                                    .map((b, i) => {
+                                        const { config, val: currentVal } = b;
 
-                                    if (currentVal >= config.gold) {
-                                        nextThreshold = config.gold;
-                                        currentTierLabel = "ORO";
-                                        nextTierLabel = "MÁXIMO";
-                                        progressColor = '#fbbf24';
-                                    } else if (currentVal >= config.silver) {
-                                        nextThreshold = config.gold;
-                                        currentTierLabel = "PLATA";
-                                        nextTierLabel = "ORO";
-                                        progressColor = '#94a3b8';
-                                    } else if (currentVal >= config.bronze) {
-                                        nextThreshold = config.silver;
-                                        currentTierLabel = "BRONCE";
-                                        nextTierLabel = "PLATA";
-                                        progressColor = '#b45309';
-                                    }
+                                        // Calcular visuales
+                                        let nextThreshold = config.bronze;
+                                        let currentTierLabel = "BLOQUEADA";
+                                        let nextTierLabel = "BRONCE";
+                                        let progressColor = COLORS.accent;
 
-                                    const progress = Math.min(1, currentVal / nextThreshold);
+                                        if (currentVal >= config.gold) {
+                                            nextThreshold = config.gold;
+                                            currentTierLabel = "ORO";
+                                            nextTierLabel = "MÁXIMO";
+                                            progressColor = '#fbbf24';
+                                        } else if (currentVal >= config.silver) {
+                                            nextThreshold = config.gold;
+                                            currentTierLabel = "PLATA";
+                                            nextTierLabel = "ORO";
+                                            progressColor = '#94a3b8';
+                                        } else if (currentVal >= config.bronze) {
+                                            nextThreshold = config.silver;
+                                            currentTierLabel = "BRONCE";
+                                            nextTierLabel = "PLATA";
+                                            progressColor = '#b45309';
+                                        }
 
-                                    return (
-                                        <View key={i} style={{ backgroundColor: C.card, borderRadius: 30, padding: 25, marginBottom: 15, borderWidth: 1, borderColor: C.border }}>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
-                                                {/* CONTENEDOR ICONO */}
-                                                <View style={{ width: 65, height: 65, borderRadius: 22, backgroundColor: progressColor + '10', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: progressColor + '20' }}>
-                                                    <b.icon color={progressColor} size={30} strokeWidth={2.5} />
-                                                </View>
+                                        const progress = Math.min(1, currentVal / nextThreshold);
 
-                                                {/* INFO Y TÍTULO */}
-                                                <View style={{ flex: 1 }}>
-                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                                        <View style={{ flex: 1 }}>
-                                                            <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{b.name}</Text>
-                                                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '600', marginTop: 2, lineHeight: 14 }}>{b.desc}</Text>
-                                                        </View>
-                                                        <View style={{ backgroundColor: progressColor, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, marginLeft: 10 }}>
-                                                            <Text style={{ color: 'white', fontSize: 8, fontWeight: '900' }}>{currentTierLabel}</Text>
-                                                        </View>
+                                        return (
+                                            <View key={i} style={{ backgroundColor: C.card, borderRadius: 30, padding: 25, marginBottom: 15, borderWidth: 1, borderColor: C.border }}>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
+                                                    {/* CONTENEDOR ICONO */}
+                                                    <View style={{ width: 65, height: 65, borderRadius: 22, backgroundColor: progressColor + '10', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: progressColor + '20' }}>
+                                                        <b.icon color={progressColor} size={30} strokeWidth={2.5} />
                                                     </View>
 
-                                                    {/* BARRA DE PROGRESO INTEGRADA */}
-                                                    <View style={{ marginTop: 15 }}>
-                                                        <View style={{ height: 10, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: 5, overflow: 'hidden' }}>
-                                                            <View style={{ height: '100%', width: `${progress * 100}%`, backgroundColor: progressColor, borderRadius: 5 }} />
-                                                        </View>
-                                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
-                                                            <Text style={{ color: C.text, fontSize: 9, fontWeight: '900' }}>{currentVal} {b.unit}</Text>
-                                                            <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900' }}>{Math.floor(progress * 100)}% COMPLETADO</Text>
-                                                        </View>
-                                                    </View>
-                                                </View>
-                                            </View>
-
-                                            {/* FOOTER DE HITOS (MILESTONES) */}
-                                            <View style={{ flexDirection: 'row', marginTop: 20, paddingTop: 15, borderTopWidth: 1, borderTopColor: C.border, gap: 15 }}>
-                                                {['bronze', 'silver', 'gold'].map((t: any) => {
-                                                    const milestoneColors: any = { bronze: '#b45309', silver: '#94a3b8', gold: '#fbbf24' };
-                                                    const milestoneNames: any = { bronze: 'BRONCE', silver: 'PLATA', gold: 'ORO' };
-                                                    const isActive = currentVal >= (config as any)[t];
-                                                    return (
-                                                        <View key={t} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, opacity: isActive ? 1 : 0.2 }}>
-                                                            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: milestoneColors[t] }} />
-                                                            <View>
-                                                                <Text style={{ color: C.text, fontSize: 9, fontWeight: '900' }}>{milestoneNames[t]}</Text>
-                                                                <Text style={{ color: C.sub, fontSize: 9, fontWeight: '800' }}>{(config as any)[t]} {b.unit}</Text>
+                                                    {/* INFO Y TÍTULO */}
+                                                    <View style={{ flex: 1 }}>
+                                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                                            <View style={{ flex: 1 }}>
+                                                                <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{b.name}</Text>
+                                                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '600', marginTop: 2, lineHeight: 14 }}>{b.desc}</Text>
+                                                            </View>
+                                                            <View style={{ backgroundColor: progressColor, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, marginLeft: 10 }}>
+                                                                <Text style={{ color: 'white', fontSize: 8, fontWeight: '900' }}>{currentTierLabel}</Text>
                                                             </View>
                                                         </View>
-                                                    );
-                                                })}
+
+                                                        {/* BARRA DE PROGRESO INTEGRADA */}
+                                                        <View style={{ marginTop: 15 }}>
+                                                            <View style={{ height: 10, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: 5, overflow: 'hidden' }}>
+                                                                <View style={{ height: '100%', width: `${progress * 100}%`, backgroundColor: progressColor, borderRadius: 5 }} />
+                                                            </View>
+                                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
+                                                                <Text style={{ color: C.text, fontSize: 9, fontWeight: '900' }}>{currentVal} {b.unit}</Text>
+                                                                <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900' }}>{Math.floor(progress * 100)}% COMPLETADO</Text>
+                                                            </View>
+                                                        </View>
+                                                    </View>
+                                                </View>
+
+                                                {/* FOOTER DE HITOS (MILESTONES) */}
+                                                <View style={{ flexDirection: 'row', marginTop: 20, paddingTop: 15, borderTopWidth: 1, borderTopColor: C.border, gap: 15 }}>
+                                                    {['bronze', 'silver', 'gold'].map((t: any) => {
+                                                        const milestoneColors: any = { bronze: '#b45309', silver: '#94a3b8', gold: '#fbbf24' };
+                                                        const milestoneNames: any = { bronze: 'BRONCE', silver: 'PLATA', gold: 'ORO' };
+                                                        const isActive = currentVal >= (config as any)[t];
+                                                        return (
+                                                            <View key={t} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, opacity: isActive ? 1 : 0.2 }}>
+                                                                <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: milestoneColors[t] }} />
+                                                                <View>
+                                                                    <Text style={{ color: C.text, fontSize: 9, fontWeight: '900' }}>{milestoneNames[t]}</Text>
+                                                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '800' }}>{(config as any)[t]} {b.unit}</Text>
+                                                                </View>
+                                                            </View>
+                                                        );
+                                                    })}
+                                                </View>
                                             </View>
-                                        </View>
-                                    );
-                                });
+                                        );
+                                    });
                             })()}
                         </ScrollView>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* MODAL DE CONFIRMACIÓN DE CERRAR SESIÓN */}
+            <Modal visible={showLogoutModal} transparent animationType="fade">
+                <View style={{ flex: 1, backgroundColor: 'rgba(2, 6, 23, 0.95)', alignItems: 'center', justifyContent: 'center', padding: 30 }}>
+                    <View style={{ backgroundColor: C.card, width: '100%', padding: 40, borderRadius: 40, alignItems: 'center', borderWidth: 1, borderColor: C.border }}>
+                        <View style={{ width: 80, height: 80, borderRadius: 30, backgroundColor: COLORS.accent + '22', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
+                            <LogOut color={COLORS.accent} size={40} />
+                        </View>
+                        <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', textAlign: 'center', marginBottom: 15, textTransform: 'uppercase', letterSpacing: -0.5 }}>¿Cerrar Sesión?</Text>
+                        <Text style={{ color: C.sub, fontSize: 14, fontWeight: '700', textAlign: 'center', marginBottom: 35, lineHeight: 20 }}>Tendrás que ingresar nuevamente con tu correo y contraseña para reservar canchas y ver tu ELO competitivo.</Text>
+
+                        <View style={{ flexDirection: 'row', gap: 15, width: '100%' }}>
+                            <TouchableOpacity onPress={() => setShowLogoutModal(false)} style={{ flex: 1, height: 60, borderRadius: 20, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
+                                <Text style={{ color: C.text, fontWeight: '900', textTransform: 'uppercase' }}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => { setShowLogoutModal(false); signOut(); }} style={{ flex: 1, height: 60, borderRadius: 20, backgroundColor: COLORS.accent, alignItems: 'center', justifyContent: 'center' }}>
+                                <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase' }}>Cerrar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* MODAL DE CONFIRMACIÓN DE ELIMINAR CUENTA */}
+            <Modal visible={showDeleteModal} transparent animationType="slide">
+                <View style={{ flex: 1, backgroundColor: 'rgba(2, 6, 23, 0.98)', alignItems: 'center', justifyContent: 'center', padding: 30 }}>
+                    <View style={{ backgroundColor: C.card, width: '100%', padding: 40, borderRadius: 40, alignItems: 'center', borderWidth: 2, borderColor: COLORS.error + '40' }}>
+                        <View style={{ width: 80, height: 80, borderRadius: 30, backgroundColor: COLORS.error + '22', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
+                            <AlertCircle color={COLORS.error} size={40} />
+                        </View>
+                        <Text style={{ color: COLORS.error, fontSize: 22, fontWeight: '900', textAlign: 'center', marginBottom: 15, textTransform: 'uppercase', letterSpacing: -0.5 }}>¿ELIMINAR TU CUENTA?</Text>
+                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '800', textAlign: 'center', marginBottom: 25, lineHeight: 20 }}>
+                            Esta acción es <Text style={{ color: COLORS.error }}>completamente irreversible</Text>. Se eliminarán de forma definitiva tus credenciales de acceso y perfil:
+                        </Text>
+
+                        <View style={{ width: '100%', backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#f8fafc', padding: 20, borderRadius: 20, marginBottom: 35, gap: 10, borderWidth: 1, borderColor: C.border }}>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>• Ficha de Jugador Topps Now 2026.</Text>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>• Credenciales de acceso de Firebase Auth.</Text>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>• Tus reservas e historial se conservarán de forma anónima para registros de los recintos.</Text>
+                        </View>
+
+                        <View style={{ flexDirection: 'row', gap: 15, width: '100%' }}>
+                            <TouchableOpacity onPress={() => setShowDeleteModal(false)} style={{ flex: 1, height: 60, borderRadius: 20, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
+                                <Text style={{ color: C.text, fontWeight: '900', textTransform: 'uppercase' }}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={handleDeleteAccount} disabled={loadingDelete} style={{ flex: 1, height: 60, borderRadius: 20, backgroundColor: COLORS.error, alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+                                {loadingDelete ? (
+                                    <ActivityIndicator color="white" />
+                                ) : (
+                                    <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase' }}>Eliminar</Text>
+                                )}
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </Modal>

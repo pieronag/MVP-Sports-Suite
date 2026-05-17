@@ -44,10 +44,10 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+      allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin() || isManager());
       match /{subcollection=**} {
         allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
-        allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+        allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin() || isManager());
       }
     }
 
