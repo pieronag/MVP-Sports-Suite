@@ -8,7 +8,7 @@ Este documento detalla la arquitectura técnica de la aplicación móvil de **MV
 La App de jugadores es un ecosistema de rendimiento deportivo que integra reserva, análisis táctico y economía interna.
 
 ### 1. Sistema de Billetera y Economía MVP (`/checkout`, `/billetera`)
-*   **Orquestación de Pagos Multi-Vía**: Integración de **Mercado Pago**, tarjetas de crédito/débito y la **MVP Wallet**.
+*   **Orquestación de Pagos Multi-Vía**: Integración de **Transbank Webpay Plus**, tarjetas de crédito/débito y la **MVP Wallet** o pagos presenciales locales.
 *   **Decisión Automática de Pago**: Algoritmo que detecta fondos insuficientes en la billetera y redirige el flujo hacia otros métodos de pago para asegurar la reserva.
 *   **Gestión de Saldo**: Carga inmediata de créditos y seguimiento de transacciones en tiempo real.
 *   **Cupones Dinámicos en Checkout**: Interfaz para aplicación de códigos promocionales con validación de reglas de negocio (mínimo de compra, vigencia).

@@ -88,4 +88,4 @@ El sistema es una plataforma **Multi-Tenant SaaS** diseñada para la gestión in
 ---
 
 *Documento generado por Antigravity AI para Piero - MVP Sports Chile.*
-*Última actualización: 30 de Marzo, 2026*
+*Última actualización: 18 de Mayo, 2026*

@@ -56,5 +56,5 @@ Este documento detalla todas las funcionalidades del ecosistema **MVP Sports Sui
 
 ---
 
-*Última actualización: 20 de Marzo, 2026*
+*Última actualización: 18 de Mayo, 2026*
 *Desarrollado para MVP Sports Chile.*
