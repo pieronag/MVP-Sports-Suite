@@ -76,17 +76,25 @@ export const userService = {
         try {
             const docRef = doc(db, 'settings', 'global');
             const snap = await getDoc(docRef);
-            if (snap.exists() && snap.data()?.gamification) {
-                return snap.data().gamification as GamificationSettings;
-            }
-            return {
+            const data = snap.exists() ? snap.data() || {} : {};
+            const gamification = data.gamification || {
                 xpPerCheckin: 50,
                 xpPerMatch: 100,
                 xpPerWin: 150,
                 xpPerMvp: 200,
+                xpPerGoal: 25,
+                xpPerAssist: 15,
+                xpPerLoss: 50,
                 xpPerNoShow: 150,
-                tiers: { bronze: 0, silver: 1000, gold: 5000, platinum: 8000, diamond: 12000, elite: 18000, legend: 25000 }
+                tiers: { bronze: 0, silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 }
             };
+            return {
+                ...gamification,
+                sportsOverrides: data.sportsOverrides || gamification.sportsOverrides || {},
+                badges: data.badges || gamification.badges || {},
+                badgeXpValues: data.badgeXpValues || gamification.badgeXpValues || { bronze: 50, silver: 150, gold: 500 },
+                tiers: gamification.tiers || data.tiers || { bronze: 0, silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 }
+            } as any;
         } catch (error) {
             console.error('Error fetching gamification settings:', error);
             throw error;
@@ -238,7 +246,7 @@ export const userService = {
             
             // 2. Calcular XP basado en los stats existentes en Firebase (Performance) + Reservas (Base)
             let calculatedXp = 0;
-            const mainSportKey = ((profile as any).mainSport || 'Fútbol').toLowerCase();
+            const mainSportKey = ((profile as any).mainSport || 'Fútbol').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             const defaultOverrides = { 
                 winXP: settings.xpPerWin !== undefined ? settings.xpPerWin : 150, 
                 lossXP: settings.xpPerLoss !== undefined ? settings.xpPerLoss : 50, 
@@ -252,6 +260,7 @@ export const userService = {
                 ...((settings as any).sportsOverrides?.[mainSportKey] || {})
             };
 
+            const statsPlayed = Number(existingStats.played || 0);
             const statsWins = Number(existingStats.won || existingStats.wins || 0);
             const statsLosses = Number(existingStats.lost || 0);
             const statsGoals = Number(existingStats.goals || existingStats.scorer || 0);
@@ -265,8 +274,8 @@ export const userService = {
             if (overrides.countAssists) calculatedXp += statsAssists * overrides.assistXP;
             calculatedXp += statsMVPs * (settings.xpPerMvp !== undefined ? settings.xpPerMvp : 200);
 
-            // XP por Reserva, Check-in y No-show (Solo para el que reserva)
-            calculatedXp += matchesReservedAndPlayed * (settings.xpPerMatch !== undefined ? settings.xpPerMatch : 100);
+            // XP por Juego (Partidos Jugados) + Check-in y No-show (Solo para el que reserva)
+            calculatedXp += statsPlayed * (settings.xpPerMatch !== undefined ? settings.xpPerMatch : 100);
             calculatedXp += totalCheckins * (settings.xpPerCheckin !== undefined ? settings.xpPerCheckin : 50);
             calculatedXp -= totalNoShows * (settings.xpPerNoShow !== undefined ? settings.xpPerNoShow : 150);
 
@@ -356,7 +365,7 @@ export const userService = {
             if (settings.tiers) {
                 const t = settings.tiers;
                 if (calculatedXp >= t.legend) projectedTier = 'LEYENDA';
-                else if (calculatedXp >= t.elite) projectedTier = 'ELITE';
+                else if (calculatedXp >= t.elite) projectedTier = 'ÉLITE';
                 else if (calculatedXp >= t.diamond) projectedTier = 'DIAMANTE';
                 else if (calculatedXp >= t.platinum) projectedTier = 'PLATINO';
                 else if (calculatedXp >= t.gold) projectedTier = 'ORO';
@@ -390,7 +399,8 @@ export const userService = {
                     longest_win_streak: statsMap.invictus,
                     loyal: statsMap.loyal
                 } as any,
-                lastELOUpdate: new Date().toISOString()
+                lastELOUpdate: new Date().toISOString(),
+                lastBulkSync: new Date().toISOString()
             } as any);
 
         } catch (error) {

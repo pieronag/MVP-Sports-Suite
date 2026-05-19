@@ -333,9 +333,10 @@ export default function Page() {
             xpPerNoShow: 150,
             tiers: { bronze: 0, silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 }
           };
-          const badgeConfigs = gamification.badges || settingsData.badges || {};
-          const BADGE_XP = gamification.badgeXpValues || { bronze: 50, silver: 150, gold: 500 };
-          const maxXP = gamification.tiers?.legend || 25000;
+          const badgeConfigs = settingsData.badges || gamification.badges || {};
+          const BADGE_XP = settingsData.badgeXpValues || gamification.badgeXpValues || { bronze: 50, silver: 150, gold: 500 };
+          const tiers = settingsData.tiers || gamification.tiers || { bronze: 0, silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 };
+          const maxXP = tiers.legend || 25000;
           const batch = users.map(async (user) => {
             const existingStats = user.raw?.stats || {};
             // 1. Obtener bookings solo donde el usuario es el que reserva (para checkin, noshow, partido jugado base)
@@ -370,7 +371,7 @@ export default function Page() {
 
             // 2. Calcular XP basado en los stats existentes en Firebase (Performance) + Reservas (Base)
             let calculatedXp = 0;
-            const mainSportKey = (user.raw?.mainSport || 'Fútbol').toLowerCase();
+            const mainSportKey = (user.raw?.mainSport || 'Fútbol').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             const defaultOverrides = { 
               winXP: gamification.xpPerWin !== undefined ? gamification.xpPerWin : 150, 
               lossXP: gamification.xpPerLoss !== undefined ? gamification.xpPerLoss : 50, 
@@ -379,11 +380,13 @@ export default function Page() {
               goalXP: gamification.xpPerGoal !== undefined ? gamification.xpPerGoal : 25,
               assistXP: gamification.xpPerAssist !== undefined ? gamification.xpPerAssist : 15
             };
+            const sportsOverrides = settingsData.sportsOverrides || gamification.sportsOverrides || {};
             const overrides = {
               ...defaultOverrides,
-              ...(gamification.sportsOverrides?.[mainSportKey] || {})
+              ...(sportsOverrides[mainSportKey] || {})
             };
 
+            const statsPlayed = Number(existingStats.played || 0);
             const statsWins = Number(existingStats.won || existingStats.wins || 0);
             const statsLosses = Number(existingStats.lost || 0);
             const statsGoals = Number(existingStats.goals || existingStats.scorer || 0);
@@ -397,8 +400,8 @@ export default function Page() {
             if (overrides.countAssists) calculatedXp += statsAssists * overrides.assistXP;
             calculatedXp += statsMVPs * (gamification.xpPerMvp !== undefined ? gamification.xpPerMvp : 200);
 
-            // XP por Reserva, Check-in y No-show (Solo para el que reserva)
-            calculatedXp += matchesReservedAndPlayed * (gamification.xpPerMatch !== undefined ? gamification.xpPerMatch : 100);
+            // XP por Juego (Partidos Jugados) + Check-in y No-show (Solo para el que reserva)
+            calculatedXp += statsPlayed * (gamification.xpPerMatch !== undefined ? gamification.xpPerMatch : 100);
             calculatedXp += totalCheckins * (gamification.xpPerCheckin !== undefined ? gamification.xpPerCheckin : 50);
             calculatedXp -= totalNoShows * (gamification.xpPerNoShow !== undefined ? gamification.xpPerNoShow : 150);
 
@@ -464,8 +467,8 @@ export default function Page() {
             calculatedXp += badgeXpBonus;
 
             let projectedTier = 'BRONCE';
-            if (gamification.tiers) {
-              const t = gamification.tiers;
+            if (tiers) {
+              const t = tiers;
               if (calculatedXp >= t.legend) projectedTier = 'LEYENDA';
               else if (calculatedXp >= t.elite) projectedTier = 'ÉLITE';
               else if (calculatedXp >= t.diamond) projectedTier = 'DIAMANTE';

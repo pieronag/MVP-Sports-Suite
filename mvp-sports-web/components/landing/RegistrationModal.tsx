@@ -158,13 +158,22 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
     try {
       // 1. Obtener Configuración Global
       const settingsSnap = await getDoc(doc(db, 'settings', 'global'));
-      const gamification = settingsSnap.exists() ? settingsSnap.data().gamification : {
-        xpPerMatch: 100, xpPerWin: 150, xpPerLoss: 50,
-        tiers: { silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 }
+      const settingsData = settingsSnap.exists() ? settingsSnap.data() || {} : {};
+      const gamification = settingsData.gamification || {
+        xpPerCheckin: 50,
+        xpPerMatch: 100,
+        xpPerWin: 150,
+        xpPerMvp: 200,
+        xpPerGoal: 25,
+        xpPerAssist: 15,
+        xpPerLoss: 50,
+        xpPerNoShow: 150,
+        tiers: { bronze: 0, silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 }
       };
-      const maxXP = gamification.tiers?.legend || 25000;
-      const badgeConfigs = gamification.badges || {};
-      const BADGE_XP = gamification.badgeXpValues || { bronze: 50, silver: 150, gold: 500 };
+      const tiers = settingsData.tiers || gamification.tiers || { bronze: 0, silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 };
+      const maxXP = tiers.legend || 25000;
+      const badgeConfigs = settingsData.badges || gamification.badges || {};
+      const BADGE_XP = settingsData.badgeXpValues || gamification.badgeXpValues || { bronze: 50, silver: 150, gold: 500 };
 
       // 2. Buscar Bookings SOLO como creador/reserva para checkins/noshows
       const q1 = query(collection(db, "bookings"), where("userId", "==", userId));
@@ -265,8 +274,8 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
 
       // 3. Determinar Tier y OVR
       let projectedTier = 'BRONCE';
-      if (gamification.tiers) {
-        const t = gamification.tiers;
+      if (tiers) {
+        const t = tiers;
         if (calculatedXp >= t.legend) projectedTier = 'LEYENDA';
         else if (calculatedXp >= t.elite) projectedTier = 'ÉLITE';
         else if (calculatedXp >= t.diamond) projectedTier = 'DIAMANTE';
@@ -285,13 +294,13 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
         tier: projectedTier,
         badges: earnedBadges,
         stats: {
-          played: 0,
+          played: matchesReservedAndPlayed,
           won: statsWins,
           lost: statsLosses,
           goals: statsGoals,
           assists: statsAssists,
           clean_sheets: 0,
-          mvps: statsMVPs,
+          mvp: statsMVPs,
           sports_played: 1,
           minutes_played: 0,
           longest_win_streak: 0,
@@ -300,7 +309,8 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
           night_matches: 0,
           loyal: Math.floor(daysActive / 30)
         },
-        lastELOUpdate: new Date().toISOString()
+        lastELOUpdate: new Date().toISOString(),
+        lastBulkSync: new Date().toISOString()
       }, { merge: true });
 
     } catch (err) {

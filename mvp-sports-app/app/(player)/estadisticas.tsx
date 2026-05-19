@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StatusBar, ActivityIndicator, RefreshControl, BackHandler, Dimensions, StyleSheet, Image, Modal, TextInput } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StatusBar, ActivityIndicator, RefreshControl, BackHandler, Dimensions, StyleSheet, Image, Modal, TextInput, Alert } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { 
     ChevronLeft, Trophy, Target, Activity, Zap, Shield, 
@@ -81,6 +81,7 @@ export default function EstadisticasScreen() {
     // Estados para Registro de Estadísticas de Partido Interno
     const [selectedMatch, setSelectedMatch] = useState<any | null>(null);
     const [showStatsModal, setShowStatsModal] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [userTeams, setUserTeams] = useState<any[]>([]);
     const [selectedTeamId, setSelectedTeamId] = useState<string>('');
     const [teamMembers, setTeamMembers] = useState<any[]>([]);
@@ -107,6 +108,7 @@ export default function EstadisticasScreen() {
         setWinnerTeamInput(match ? (match.winnerTeam || 'A') : 'A');
         setTeamAssignments(match ? (match.teamAssignments || {}) : {});
         setTeamMembers([]);
+        setShowConfirmModal(false);
         setShowStatsModal(true);
 
         if (user?.uid) {
@@ -170,11 +172,16 @@ export default function EstadisticasScreen() {
         }
     };
 
-    const handleSaveMatchStats = async () => {
+    const handleSaveMatchStats = () => {
         if (!selectedTeamId) {
-            alert("Selecciona un equipo primero.");
+            Alert.alert("Seleccionar Equipo", "Por favor, selecciona una plantilla o equipo primero.");
             return;
         }
+        setShowConfirmModal(true);
+    };
+
+    const executeSaveMatchStats = async () => {
+        setShowConfirmModal(false);
         setSavingStats(true);
         try {
             const computedNames: Record<string, string> = {};
@@ -278,7 +285,7 @@ export default function EstadisticasScreen() {
             await loadData(true);
         } catch (error) {
             console.error("Error saving match statistics:", error);
-            alert("No se pudieron guardar las estadísticas. Intenta de nuevo.");
+            Alert.alert("Error", "No se pudieron guardar las estadísticas. Intenta de nuevo.");
         } finally {
             setSavingStats(false);
         }
@@ -490,7 +497,8 @@ export default function EstadisticasScreen() {
                              b.paymentStatus === 'no-show' || 
                              b.noShow === true || 
                              (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
-            return isCompleted || b.status === 'cancelled' || isNoShow;
+            const isCancelledByPlayer = b.status === 'cancelled' && b.cancelledBy;
+            return (isCompleted || isNoShow || b.status === 'cancelled') && !isCancelledByPlayer;
         }).map(b => {
             const dateObj = b.date?.seconds ? new Date(b.date.seconds * 1000) : (b.date?.toDate ? b.date.toDate() : new Date());
             const bStats = b as any;
@@ -807,10 +815,8 @@ export default function EstadisticasScreen() {
                                         const teamBStats = Object.entries(b.teamStats || {}).filter(([uid, g]: any) => b.teamAssignments?.[uid] === 'B' && g > 0);
 
                                         return (
-                                            <TouchableOpacity 
+                                            <View 
                                                 key={i} 
-                                                onPress={() => handleOpenStatsModal(b)}
-                                                activeOpacity={0.9}
                                                 style={{ 
                                                     backgroundColor: C.card, 
                                                     borderRadius: 35, 
@@ -888,7 +894,7 @@ export default function EstadisticasScreen() {
                                                         </View>
                                                     )}
                                                 </View>
-                                            </TouchableOpacity>
+                                            </View>
                                         );
                                     }
 
@@ -931,24 +937,43 @@ export default function EstadisticasScreen() {
                                                     </View>
 
                                                     {b.displayStatus === 'completed' && (
-                                                        <TouchableOpacity 
-                                                            onPress={() => handleOpenStatsModal(b)}
-                                                            activeOpacity={0.8}
-                                                            style={{ 
-                                                                marginTop: 15, 
-                                                                backgroundColor: accent + '15', 
-                                                                paddingVertical: 10, 
-                                                                paddingHorizontal: 15,
-                                                                borderRadius: 14, 
-                                                                alignItems: 'center', 
-                                                                borderWidth: 1, 
-                                                                borderColor: accent + '35' 
-                                                            }}
-                                                        >
-                                                            <Text style={{ color: accent, fontSize: 10, fontWeight: '900', letterSpacing: 0.8 }}>
-                                                                {b.teamStats ? 'EDITAR ESTADÍSTICAS' : 'REGISTRAR RESULTADO / GOLES'}
-                                                            </Text>
-                                                        </TouchableOpacity>
+                                                        b.teamStats ? (
+                                                            <View 
+                                                                style={{ 
+                                                                    marginTop: 15, 
+                                                                    backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#F8FAFC', 
+                                                                    paddingVertical: 10, 
+                                                                    paddingHorizontal: 15,
+                                                                    borderRadius: 14, 
+                                                                    alignItems: 'center', 
+                                                                    borderWidth: 1, 
+                                                                    borderColor: C.border 
+                                                                }}
+                                                            >
+                                                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', letterSpacing: 0.8 }}>
+                                                                    ESTADÍSTICAS REGISTRADAS
+                                                                </Text>
+                                                            </View>
+                                                        ) : (
+                                                            <TouchableOpacity 
+                                                                onPress={() => handleOpenStatsModal(b)}
+                                                                activeOpacity={0.8}
+                                                                style={{ 
+                                                                    marginTop: 15, 
+                                                                    backgroundColor: accent + '15', 
+                                                                    paddingVertical: 10, 
+                                                                    paddingHorizontal: 15,
+                                                                    borderRadius: 14, 
+                                                                    alignItems: 'center', 
+                                                                    borderWidth: 1, 
+                                                                    borderColor: accent + '35' 
+                                                                }}
+                                                            >
+                                                                <Text style={{ color: accent, fontSize: 10, fontWeight: '900', letterSpacing: 0.8 }}>
+                                                                    REGISTRAR RESULTADO / GOLES
+                                                                </Text>
+                                                            </TouchableOpacity>
+                                                        )
                                                     )}
                                                 </View>
                                                 <View style={{ alignItems: 'flex-end', marginLeft: 15 }}>
@@ -1039,7 +1064,7 @@ export default function EstadisticasScreen() {
                                             </Text>
                                         </View>
                                         <Text style={{ color: C.sub, fontSize: 11, fontWeight: '600' }}>
-                                            {selectedMatch.time || (selectedMatch.date ? new Date(selectedMatch.date.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '19:00')}
+                                            {selectedMatch.startTime || selectedMatch.time || (selectedMatch.date ? new Date(selectedMatch.date.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '19:00')}
                                         </Text>
                                     </View>
                                 </View>
@@ -1350,6 +1375,54 @@ export default function EstadisticasScreen() {
                                 <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 }}>Guardar Partido Interno</Text>
                             )}
                         </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* MODAL DE CONFIRMACIÓN DE GUARDADO */}
+            <Modal visible={showConfirmModal} transparent animationType="fade">
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center', padding: 25 }}>
+                    <View style={{ 
+                        width: '100%', 
+                        maxWidth: 340, 
+                        backgroundColor: C.card, 
+                        borderRadius: 30, 
+                        padding: 30, 
+                        borderWidth: 1, 
+                        borderColor: C.border,
+                        alignItems: 'center',
+                        shadowColor: '#000',
+                        shadowOpacity: 0.25,
+                        shadowRadius: 15,
+                        elevation: 10
+                    }}>
+                        <View style={{ width: 60, height: 60, borderRadius: 20, backgroundColor: '#ef444415', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+                            <AlertCircle color="#ef4444" size={32} />
+                        </View>
+
+                        <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', marginBottom: 12 }}>
+                            ¿Confirmar Registro?
+                        </Text>
+
+                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', lineHeight: 20, marginBottom: 25 }}>
+                            Una vez guardada la información de este partido, no se podrá modificar. Por favor, asegúrate de que todos los datos sean correctos.
+                        </Text>
+
+                        <View style={{ width: '100%', gap: 10 }}>
+                            <TouchableOpacity 
+                                onPress={executeSaveMatchStats}
+                                style={{ height: 50, backgroundColor: accent, borderRadius: 15, alignItems: 'center', justifyContent: 'center' }}
+                            >
+                                <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>Confirmar y Guardar</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity 
+                                onPress={() => setShowConfirmModal(false)}
+                                style={{ height: 50, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', borderRadius: 15, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}
+                            >
+                                <Text style={{ color: C.text, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>Cancelar</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </Modal>
