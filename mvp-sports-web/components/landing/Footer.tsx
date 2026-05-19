@@ -2,7 +2,12 @@
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Footer() {
+interface FooterProps {
+  onTermsClick?: () => void;
+  onPrivacyClick?: () => void;
+}
+
+export default function Footer({ onTermsClick, onPrivacyClick }: FooterProps) {
   return (
     <footer className="bg-slate-950 py-16 border-t border-white/5">
       <div className="container mx-auto px-6">
@@ -31,8 +36,30 @@ export default function Footer() {
 
             {/* TERMINOS Y CONDICIONES */}
             <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-slate-600">
-              <Link href="/terms" className="hover:text-[#00df82] transition-colors">Términos y Condiciones</Link>
-              <Link href="/privacy" className="hover:text-[#00df82] transition-colors">Política de Privacidad</Link>
+              <Link 
+                href="/terms" 
+                onClick={(e) => {
+                  if (onTermsClick) {
+                    e.preventDefault();
+                    onTermsClick();
+                  }
+                }}
+                className="hover:text-[#00df82] transition-colors"
+              >
+                Términos y Condiciones
+              </Link>
+              <Link 
+                href="/privacy" 
+                onClick={(e) => {
+                  if (onPrivacyClick) {
+                    e.preventDefault();
+                    onPrivacyClick();
+                  }
+                }}
+                className="hover:text-[#00df82] transition-colors"
+              >
+                Política de Privacidad
+              </Link>
             </div>
           </div>
 
