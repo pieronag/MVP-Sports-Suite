@@ -8,7 +8,11 @@ export const emailService = {
    * a través de la Cloud Function unificada, con fallback al SDK nativo de Firebase
    * en caso de fallo, depuración o falta de conexión.
    */
-  async sendAuthEmail(email: string, type: 'verify' | 'reset', displayName?: string): Promise<{ success: boolean; method: 'custom' | 'fallback' }> {
+  async sendAuthEmail(
+    email: string,
+    type: 'verify' | 'reset',
+    displayName?: string
+  ): Promise<{ success: boolean; method: 'custom' | 'fallback' }> {
     const cleanEmail = email.trim().toLowerCase();
     
     try {

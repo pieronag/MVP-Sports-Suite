@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StatusBar, KeyboardAvoidingView, Platform, ScrollView, Image, ActivityIndicator, BackHandler, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StatusBar, KeyboardAvoidingView, Platform, ScrollView, Image, ActivityIndicator, BackHandler, Modal, Linking } from 'react-native';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut, sendPasswordResetEmail } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../services/firebase';
@@ -21,6 +21,9 @@ export default function AuthScreen() {
     const [name, setName] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [showRecoverModal, setShowRecoverModal] = useState(false);
+    const [recoverEmail, setRecoverEmail] = useState('');
+    const [recoverLoading, setRecoverLoading] = useState(false);
     const [modalConfig, setModalConfig] = useState<{
         visible: boolean;
         title: string;
@@ -56,6 +59,18 @@ export default function AuthScreen() {
             onSecondaryAction: onSecondary,
             secondaryActionLabel: secondaryLabel
         });
+    };
+
+    const openMailClient = async () => {
+        try {
+            if (Platform.OS === 'ios') {
+                await Linking.openURL('message:');
+            } else {
+                await Linking.openURL('mailto:');
+            }
+        } catch (e) {
+            Linking.openURL('https://mail.google.com');
+        }
     };
     
     useEffect(() => {
@@ -130,10 +145,22 @@ export default function AuthScreen() {
                     return;
                 }
 
-                // REDIRECCIÓN PROACTIVA POR ROL
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                 // REDIRECCIÓN PROACTIVA POR ROL
+                const userDocRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userDocRef);
                 if (userDoc.exists()) {
                     const data = userDoc.data();
+                    
+                    // Si el correo ya está verificado pero no estaba registrado en Firestore,
+                    // guardamos el estado.
+                    if (!data.emailVerified) {
+                        try {
+                            await setDoc(userDocRef, { emailVerified: true }, { merge: true });
+                        } catch (emailErr) {
+                            console.error('Error al registrar verificación completa:', emailErr);
+                        }
+                    }
+
                     if (data.role === 'manager') {
                         router.replace('/(owner)');
                     } else {
@@ -173,7 +200,18 @@ export default function AuthScreen() {
                         setConfirmPassword('');
                         setName('');
                     },
-                    'Entendido'
+                    'Entendido',
+                    async () => {
+                        await signOut(auth);
+                        setIsLogin(true);
+                        setEmail('');
+                        setConfirmEmail('');
+                        setPassword('');
+                        setConfirmPassword('');
+                        setName('');
+                        openMailClient();
+                    },
+                    'Abrir Correo'
                 );
             }
         } catch (error: any) {
@@ -187,19 +225,32 @@ export default function AuthScreen() {
         }
     };
 
-    const handleForgotPassword = async () => {
-        if (!email.includes('@')) {
-            showAlert('Restablecer Contraseña', 'Por favor ingresa un correo electrónico válido en el campo superior.', 'error');
+    const handleForgotPassword = async (targetEmail: string) => {
+        const cleanEmail = targetEmail.trim();
+        if (!cleanEmail.includes('@')) {
+            showAlert('Restablecer Contraseña', 'Por favor ingresa un correo electrónico válido.', 'error');
             return;
         }
         
+        setRecoverLoading(true);
         try {
-            await emailService.sendAuthEmail(email.trim(), 'reset');
-            showAlert('Éxito', `Se ha enviado un enlace para restablecer tu contraseña a ${email.trim()}.`, 'success');
+            await emailService.sendAuthEmail(cleanEmail, 'reset');
+            setShowRecoverModal(false);
+            showAlert(
+                'Correo Enviado',
+                `Se ha enviado un enlace para restablecer tu contraseña a ${cleanEmail}. Revisa tu bandeja de entrada o Spam.`,
+                'success',
+                () => {},
+                'Cerrar',
+                openMailClient,
+                'Abrir Correo'
+            );
         } catch (err: any) {
             let message = 'No se pudo enviar el correo de restablecimiento.';
             if (err.code === 'auth/user-not-found') message = 'No existe una cuenta registrada con este correo.';
             showAlert('Error', message, 'error');
+        } finally {
+            setRecoverLoading(false);
         }
     };
 
@@ -311,7 +362,10 @@ export default function AuthScreen() {
 
                         {isLogin && (
                             <TouchableOpacity 
-                                onPress={handleForgotPassword}
+                                onPress={() => {
+                                    setRecoverEmail(email);
+                                    setShowRecoverModal(true);
+                                }}
                                 className="mt-1"
                             >
                                 <Text className="text-emerald-500 font-bold text-xs text-right mr-1">
@@ -463,6 +517,78 @@ export default function AuthScreen() {
                                     </Text>
                                 </TouchableOpacity>
                             )}
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* Modal de Recuperar Contraseña */}
+            <Modal
+                transparent
+                visible={showRecoverModal}
+                animationType="slide"
+                onRequestClose={() => setShowRecoverModal(false)}
+            >
+                <View className="flex-1 bg-black/75 justify-center px-6">
+                    <View className="w-full bg-white dark:bg-[#0f172a] rounded-[2.5rem] p-8 border border-slate-100 dark:border-white/10 shadow-2xl">
+                        {/* Header Close Button */}
+                        <TouchableOpacity
+                            onPress={() => setShowRecoverModal(false)}
+                            className="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 items-center justify-center"
+                        >
+                            <X size={16} color={isDark ? '#94a3b8' : '#64748b'} />
+                        </TouchableOpacity>
+
+                        {/* Title & Description */}
+                        <Text className="text-2xl font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tight">
+                            Recuperar Contraseña
+                        </Text>
+                        <Text className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                            Ingresa tu dirección de correo registrado para recibir un enlace seguro de restablecimiento de contraseña.
+                        </Text>
+
+                        {/* Input Field */}
+                        <View className="mb-6">
+                            <Text className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2 ml-1">Email Corporativo</Text>
+                            <View className="flex-row items-center bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/10 h-16 rounded-2xl px-5">
+                                <Mail size={20} color="#10b981" />
+                                <TextInput
+                                    placeholder="usuario@mvpsports.com"
+                                    placeholderTextColor="#64748b"
+                                    className="flex-1 ml-4 text-slate-900 dark:text-white font-semibold text-base"
+                                    autoCapitalize="none"
+                                    keyboardType="email-address"
+                                    value={recoverEmail}
+                                    onChangeText={setRecoverEmail}
+                                />
+                            </View>
+                        </View>
+
+                        {/* Buttons / Actions */}
+                        <View className="gap-y-3">
+                            <TouchableOpacity
+                                onPress={() => handleForgotPassword(recoverEmail)}
+                                disabled={recoverLoading}
+                                activeOpacity={0.9}
+                                className="bg-emerald-500 h-16 rounded-2xl items-center justify-center shadow-lg shadow-emerald-500/20"
+                            >
+                                {recoverLoading ? (
+                                    <ActivityIndicator color="white" />
+                                ) : (
+                                    <Text className="text-white font-black text-base uppercase tracking-widest">
+                                        Enviar Enlace
+                                    </Text>
+                                )}
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                onPress={() => setShowRecoverModal(false)}
+                                className="bg-slate-100 dark:bg-white/5 h-16 rounded-2xl items-center justify-center border border-slate-200 dark:border-white/10"
+                            >
+                                <Text className="text-slate-700 dark:text-slate-300 font-bold text-sm uppercase tracking-wider">
+                                    Cancelar
+                                </Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>

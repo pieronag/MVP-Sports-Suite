@@ -779,19 +779,19 @@ export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (reque
       actionLink = await adminAuth.generateEmailVerificationLink(cleanEmail, actionCodeSettings);
       subject = "Verifica tu correo electrónico - MVP Sports";
       title = "Activa tu Cuenta";
-      description = `Hola, ${name}. Gracias por unirte a MVP Sports. Para activar tu cuenta y poder iniciar sesión en la aplicación, haz clic en el botón de abajo:`;
+      description = `Hola, ${name}. Gracias por unirte a MVP Sports. Para activar tu cuenta y poder iniciar sesión en la aplicación móvil y el panel de control, haz clic en el botón de abajo:`;
       buttonText = "Verificar Cuenta";
     } else if (type === "reset") {
       actionLink = await adminAuth.generatePasswordResetLink(cleanEmail, actionCodeSettings);
       subject = "Restablece tu contraseña - MVP Sports";
       title = "Restablece tu Contraseña";
-      description = `Hola, ${name}. Recibimos una solicitud para restablecer tu contraseña. Si no fuiste tú, puedes ignorar este correo. De lo contrario, haz clic en el siguiente botón para continuar:`;
+      description = `Hola, ${name}. Hemos recibido una solicitud para restablecer tu contraseña. Si no realizaste esta solicitud, puedes ignorar este correo. De lo contrario, haz clic en el siguiente botón para continuar:`;
       buttonText = "Restablecer Contraseña";
     } else {
-      throw new HttpsError("invalid-argument", "Tipo de correo inválido. Debe ser 'verify' o 'reset'.");
+      throw new HttpsError("invalid-argument", "Tipo de correo inválido.");
     }
 
-    // Plantilla HTML Premium
+    // Plantilla HTML Premium con Logo Oficial
     const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -826,16 +826,12 @@ export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (reque
       text-align: center;
       border-bottom: 2px solid #10b981;
     }
-    .logo {
-      font-size: 26px;
-      font-weight: 900;
-      color: #f8fafc;
-      letter-spacing: -1.5px;
-      text-transform: uppercase;
-      margin: 0;
-    }
-    .logo span {
-      color: #10b981;
+    .logo-img {
+      height: 55px;
+      max-width: 220px;
+      object-fit: contain;
+      margin: 0 auto;
+      display: block;
     }
     .content {
       padding: 40px 35px;
@@ -893,7 +889,7 @@ export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (reque
   <div class="wrapper">
     <div class="container">
       <div class="header">
-        <h2 class="logo">MVP <span>SPORTS</span></h2>
+        <img src="https://mvp-sports-chile.firebaseapp.com/Logo.png" alt="MVP Sports" class="logo-img" />
       </div>
       <div class="content">
         <h1>${title}</h1>
