@@ -4,7 +4,7 @@ import {
     XMarkIcon, ExclamationCircleIcon, ArrowPathIcon, CheckCircleIcon 
 } from '@heroicons/react/24/outline';
 import { 
-    collection, query, where, getDocs, doc, getDoc, addDoc, Timestamp 
+    collection, query, where, getDocs, doc, getDoc, addDoc, Timestamp, setDoc 
 } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 
@@ -171,7 +171,14 @@ export default function ManualBookingModal({ isOpen, onClose, tenantId, onSucces
             
             const selectedCourt = courts.find(c => c.id === formData.courtId);
 
-            await addDoc(collection(db, "bookings"), {
+            // Generate 6-digit custom alphanumeric ID
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let bookingId = '';
+            for (let i = 0; i < 6; i++) {
+                bookingId += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+
+            await setDoc(doc(db, "bookings", bookingId), {
                 tenantId,
                 courtId: formData.courtId,
                 courtName: selectedCourt?.name || 'Cancha',

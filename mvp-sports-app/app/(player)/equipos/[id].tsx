@@ -13,13 +13,13 @@ import {
     X, Clock, Info, Zap, Activity, CheckCircle2, AlertCircle, Copy,
     Camera, Star
 } from 'lucide-react-native';
-import { useAuth } from '../../../../store/useAuth';
+import { useAuth } from '../../../store/useAuth';
 import { LinearGradient } from 'expo-linear-gradient';
-import { db } from '../../../../services/firebase';
+import { db } from '../../../services/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import { userService } from '../../../../services/userService';
-import { teamService } from '../../../../services/teamService';
-import { bookingService, Booking } from '../../../../services/bookingService';
+import { userService } from '../../../services/userService';
+import { teamService } from '../../../services/teamService';
+import { bookingService, Booking } from '../../../services/bookingService';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -311,21 +311,33 @@ export default function TeamDetailsScreen() {
 
                 {/* STATS ELITE GRID */}
                 <View style={{ flexDirection: 'row', paddingHorizontal: 25, gap: 12, marginTop: -35, zIndex: 10 }}>
-                    <View style={{ flex: 1, backgroundColor: C.card, borderRadius: 28, padding: 20, borderWidth: 1, borderColor: C.border, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 }}>
+                    <View style={{ flex: 1, backgroundColor: C.card, borderRadius: 28, padding: 16, borderWidth: 1, borderColor: C.border, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 }}>
                         <Users color={COLORS.accent} size={24} />
-                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', marginTop: 10 }}>{teamInfo?.members?.length || 1}</Text>
-                        <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 }}>MIEMBROS</Text>
+                        <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', marginTop: 8 }} numberOfLines={1}>{teamInfo?.members?.length || 1}</Text>
+                        <Text style={{ color: C.sub, fontSize: 7, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 2 }}>MIEMBROS</Text>
                     </View>
-                    <View style={{ flex: 1, backgroundColor: C.card, borderRadius: 28, padding: 20, borderWidth: 1, borderColor: C.border, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 }}>
-                        <TrendingUp color={COLORS.success} size={24} />
-                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', marginTop: 10 }}>{teamInfo?.winRate || 0}%</Text>
-                        <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 }}>WIN RATE</Text>
+                    <View style={{ flex: 1, backgroundColor: C.card, borderRadius: 28, padding: 16, borderWidth: 1, borderColor: C.border, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 }}>
+                        <Trophy color="#f59e0b" size={24} />
+                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', marginTop: 12, textTransform: 'uppercase' }} numberOfLines={1}>
+                            {teamInfo?.sport ? (teamInfo.sport === 'basketball' ? 'BASKET' : teamInfo.sport.toUpperCase()) : 'GENERAL'}
+                        </Text>
+                        <Text style={{ color: C.sub, fontSize: 7, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 4 }}>DEPORTE</Text>
                     </View>
-                    <View style={{ flex: 1, backgroundColor: C.card, borderRadius: 28, padding: 20, borderWidth: 1, borderColor: C.border, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 }}>
-                        <Star color="#f59e0b" size={24} />
-                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', marginTop: 10 }}>{teamInfo?.rating || '5.0'}</Text>
-                        <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 }}>VALORACIÓN</Text>
-                    </View>
+                    <TouchableOpacity 
+                        onPress={() => {
+                            if (teamInfo?.inviteCode) {
+                                Clipboard.setStringAsync(teamInfo.inviteCode);
+                                showFeedback('success', '¡Código copiado al portapapeles!');
+                            }
+                        }}
+                        style={{ flex: 1, backgroundColor: C.card, borderRadius: 28, padding: 16, borderWidth: 1, borderColor: C.border, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 }}
+                    >
+                        <Copy color={COLORS.success} size={22} />
+                        <Text style={{ color: COLORS.success, fontSize: 16, fontWeight: '900', marginTop: 10, letterSpacing: 1 }} numberOfLines={1}>
+                            {teamInfo?.inviteCode || '----'}
+                        </Text>
+                        <Text style={{ color: C.sub, fontSize: 7, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 4 }}>CÓDIGO</Text>
+                    </TouchableOpacity>
                 </View>
 
                 {/* ROSTER ELITE LIST */}

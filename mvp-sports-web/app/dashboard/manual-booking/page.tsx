@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
-import { collection, query, where, getDocs, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, setDoc, Timestamp } from 'firebase/firestore';
 import { PencilSquareIcon, CheckCircleIcon, UsersIcon, MapPinIcon, CalendarDaysIcon, ClockIcon, BuildingOfficeIcon, UserCircleIcon, PhoneIcon, ArrowPathIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
@@ -65,7 +65,13 @@ export default function ManualBookingPage() {
                 setSaving(false);
                 return;
             }
-            await addDoc(collection(db, "bookings"), { tenantId: formData.tenantId, courtId: formData.courtId, clientName: formData.clientName.toUpperCase(), clientPhone: formData.clientPhone, date: formData.date, time: formData.time, datetime: Timestamp.fromDate(bookingDate), paymentStatus: formData.paymentStatus, status: 'confirmed', type: 'manual', createdAt: Timestamp.now(), createdBy: user?.uid });
+            // Generate 6-digit custom alphanumeric ID
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let bookingId = '';
+            for (let i = 0; i < 6; i++) {
+                bookingId += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            await setDoc(doc(db, "bookings", bookingId), { tenantId: formData.tenantId, courtId: formData.courtId, clientName: formData.clientName.toUpperCase(), clientPhone: formData.clientPhone, date: formData.date, time: formData.time, datetime: Timestamp.fromDate(bookingDate), paymentStatus: formData.paymentStatus, status: 'confirmed', type: 'manual', createdAt: Timestamp.now(), createdBy: user?.uid });
             setNotification({ msg: "Reserva Confirmada", type: 'success' });
             setFormData(prev => ({ ...prev, date: '', time: '', clientName: '', clientPhone: '', paymentStatus: 'pending' }));
         } catch (e) { setNotification({ msg: "Error al crear", type: 'error' }); } finally { setSaving(false); }

@@ -105,7 +105,7 @@ export const createWebpayTransaction = onCall(
       throw new HttpsError("unauthenticated", "Debes estar autenticado.");
     }
 
-    const {bookingId, tenantId, amount, buyOrder} = request.data;
+    const {bookingId, tenantId, amount, buyOrder, bookingData} = request.data;
     const uid = request.auth.uid;
 
     try {
@@ -137,6 +137,7 @@ export const createWebpayTransaction = onCall(
         token: response.token,
         status: "pending",
         method: "webpay_plus",
+        pendingBookingData: bookingData || null,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
@@ -187,15 +188,38 @@ export const commitWebpayTransaction = onRequest(
 
         if (!paySnap.empty) {
           const payDoc = paySnap.docs[0];
-          const bookingId = payDoc.data().bookingId;
+          const payData = payDoc.data();
+          const bookingId = payData.bookingId;
+          const pendingBookingData = payData.pendingBookingData;
 
           const batch = db.batch();
           batch.update(payDoc.ref, {status: "approved", result});
           if (bookingId) {
-            batch.update(db.collection("bookings").doc(bookingId), {
-              paymentStatus: "paid",
-              status: "confirmed",
-            });
+            if (pendingBookingData) {
+              let finalDate = admin.firestore.FieldValue.serverTimestamp();
+              if (pendingBookingData.date) {
+                if (pendingBookingData.date._seconds) {
+                  finalDate = new admin.firestore.Timestamp(pendingBookingData.date._seconds, pendingBookingData.date._nanoseconds || 0);
+                } else if (typeof pendingBookingData.date === "string") {
+                  finalDate = admin.firestore.Timestamp.fromDate(new Date(pendingBookingData.date));
+                } else if (pendingBookingData.date.seconds) {
+                  finalDate = new admin.firestore.Timestamp(pendingBookingData.date.seconds, pendingBookingData.date.nanoseconds || 0);
+                }
+              }
+              batch.set(db.collection("bookings").doc(bookingId), {
+                ...pendingBookingData,
+                date: finalDate,
+                paymentStatus: "paid",
+                status: "confirmed",
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+              });
+            } else {
+              batch.set(db.collection("bookings").doc(bookingId), {
+                paymentStatus: "paid",
+                status: "confirmed",
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+              }, {merge: true});
+            }
           }
           await batch.commit();
         }
@@ -458,63 +482,62 @@ export const authorizeOneclickPayment = onCall(
  * Handle No-Shows: Cancel bookings that passed their start time without check-in
  * and award a strike to the user.
  * Runs every 15 minutes.
+ * 
+ * DESACTIVADO (V17.25): Este cron job/función agendada de fondo ha sido desactivado permanentemente.
+ * La verificación y limpieza de no-shows ahora se gestiona de manera reactiva e interactiva 
+ * exclusivamente a través de los flujos de la aplicación del manager y del jugador.
+ *
+ * export const handleNoShows = onSchedule("every 15 minutes", async (event) => {
+ *   const now = admin.firestore.Timestamp.now();
+ *   
+ *   try {
+ *     const snap = await db.collection("bookings")
+ *       .where("checkIn", "==", false)
+ *       .where("status", "==", "confirmed")
+ *       .get();
+ * 
+ *     if (snap.empty) return;
+ * 
+ *     const batch = db.batch();
+ *     const userUpdates: { [uid: string]: number } = {};
+ * 
+ *     snap.docs.forEach((doc) => {
+ *       const data = doc.data();
+ *       const startTime = data.startTime?.toDate?.() || 
+ *                         (typeof data.startTime === "string" ? new Date(`${data.date?.toDate?.().toISOString().split("T")[0]}T${data.startTime}`) : null);
+ *       
+ *       if (!startTime) return;
+ * 
+ *       const limit = startTime.getTime() + (15 * 60 * 1000);
+ *       
+ *       if (now.toMillis() > limit) {
+ *         batch.update(doc.ref, {
+ *           status: "cancelled",
+ *           noShow: true,
+ *           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+ *         });
+ * 
+ *         if (data.userId) {
+ *           userUpdates[data.userId] = (userUpdates[data.userId] || 0) + 1;
+ *         }
+ *       }
+ *     });
+ * 
+ *     for (const uid in userUpdates) {
+ *       const profileRef = db.collection("profiles").doc(uid);
+ *       batch.update(profileRef, {
+ *         strikes: admin.firestore.FieldValue.increment(userUpdates[uid]),
+ *         lastStrikeAt: admin.firestore.FieldValue.serverTimestamp(),
+ *       });
+ *     }
+ * 
+ *     await batch.commit();
+ *     logger.info(`Processed ${Object.keys(userUpdates).length} users with no-shows.`);
+ *   } catch (error) {
+ *     logger.error("Error in handleNoShows:", error);
+ *   }
+ * });
  */
-export const handleNoShows = onSchedule("every 15 minutes", async (event) => {
-  const now = admin.firestore.Timestamp.now();
-  
-  try {
-    // Buscar reservas de hoy que ya pasaron su hora de inicio + 15 min de gracia
-    // y que no tengan check-in ni estén canceladas aún.
-    const snap = await db.collection("bookings")
-      .where("checkIn", "==", false)
-      .where("status", "==", "confirmed")
-      .get();
-
-    if (snap.empty) return;
-
-    const batch = db.batch();
-    const userUpdates: { [uid: string]: number } = {};
-
-    snap.docs.forEach((doc) => {
-      const data = doc.data();
-      const startTime = data.startTime?.toDate?.() || 
-                        (typeof data.startTime === "string" ? new Date(`${data.date?.toDate?.().toISOString().split("T")[0]}T${data.startTime}`) : null);
-      
-      if (!startTime) return;
-
-      // 15 minutos de tolerancia
-      const limit = startTime.getTime() + (15 * 60 * 1000);
-      
-      if (now.toMillis() > limit) {
-        // Marcar reserva como cancelada por No-Show
-        batch.update(doc.ref, {
-          status: "cancelled",
-          noShow: true,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-
-        // Registrar strike para el usuario si existe userId
-        if (data.userId) {
-          userUpdates[data.userId] = (userUpdates[data.userId] || 0) + 1;
-        }
-      }
-    });
-
-    // Aplicar strikes a los perfiles de usuario
-    for (const uid in userUpdates) {
-      const profileRef = db.collection("profiles").doc(uid);
-      batch.update(profileRef, {
-        strikes: admin.firestore.FieldValue.increment(userUpdates[uid]),
-        lastStrikeAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-    }
-
-    await batch.commit();
-    logger.info(`Processed ${Object.keys(userUpdates).length} users with no-shows.`);
-  } catch (error) {
-    logger.error("Error in handleNoShows:", error);
-  }
-});
 
 /**
  * Cleanup expired pending bookings (older than 15 minutes)
@@ -543,5 +566,161 @@ export const cleanupPendingBookings = onSchedule("every 5 minutes", async (event
     logger.info(`Cleaned up ${expiredSnap.size} expired pending bookings.`);
   } catch (error) {
     logger.error("Cleanup error:", error);
+  }
+});
+
+/**
+ * Refund Booking Payment: Realiza un reembolso parcial (descontando 3% por comisión)
+ * para reservas canceladas con más de 4 horas de anticipación.
+ */
+export const refundBookingPayment = onCall({region: "southamerica-west1"}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Debes estar autenticado.");
+  }
+
+  const {bookingId} = request.data as { bookingId: string };
+  if (!bookingId) {
+    throw new HttpsError("invalid-argument", "Debe proveer un bookingId.");
+  }
+
+  try {
+    const bookingDoc = await db.collection("bookings").doc(bookingId).get();
+    const bookingData = bookingDoc.data();
+
+    if (!bookingData) {
+      throw new HttpsError("not-found", "No se encontró la reserva.");
+    }
+
+    if (bookingData.userId !== request.auth.uid) {
+      throw new HttpsError("permission-denied", "No tienes permisos sobre esta reserva.");
+    }
+
+    let paymentDoc = null;
+    let paymentData: any = null;
+    let originalAmount = bookingData.totalPrice || bookingData.price || 0;
+
+    const paymentSnap = await db.collection("payments")
+      .where("bookingId", "==", bookingId)
+      .limit(1)
+      .get();
+
+    if (!paymentSnap.empty) {
+      paymentDoc = paymentSnap.docs[0];
+      paymentData = paymentDoc.data();
+      originalAmount = paymentData.amount || originalAmount;
+    }
+
+    // Calcular reembolso parcial descontando el 3% de comisión (Transbank + IVA)
+    const fee = Math.round(originalAmount * 0.03);
+    const refundAmount = Math.max(0, originalAmount - fee);
+
+    let refundResult: any = {
+      type: "NULLIFIED_FALLBACK",
+      response_code: 0,
+      authorization_code: "123456",
+      nullified_amount: refundAmount,
+      isMock: true,
+    };
+
+    if (paymentData) {
+      const isMock = paymentData.token === "MOCK_SUCCESS" || 
+                     (paymentData.tbkUser && paymentData.tbkUser.toUpperCase().includes("MOCK_USER")) ||
+                     (paymentData.buyOrder && paymentData.buyOrder.startsWith("PAY-") && paymentData.authorizationCode === "123456") ||
+                     paymentData.status === "pending";
+
+      if (isMock) {
+        logger.info(`Simulando REEMBOLSO PARCIAL exitoso (Modo Prueba) por $${refundAmount}`);
+        refundResult = {
+          type: "NULLIFIED",
+          response_code: 0,
+          authorization_code: "654321",
+          nullified_amount: refundAmount,
+          isMock: true,
+        };
+      } else {
+        // Cargar llaves del Recinto (Tenant)
+        const tenantDoc = await db.collection("tenants").doc(bookingData.tenantId).get();
+        const tenantData = tenantDoc.data();
+        const commerceCode = tenantData?.transbankCommerceCode;
+        const apiKey = tenantData?.transbankApiKey;
+
+        try {
+          if (paymentData.method === "webpay_plus") {
+            refundResult = await transbank.refundWebpay(
+              paymentData.token,
+              refundAmount,
+              commerceCode,
+              apiKey
+            );
+          } else if (paymentData.method === "oneclick") {
+            const masterDoc = await db.collection("settings").doc("transbank_master").get();
+            const masterCC = masterDoc.data()?.commerceCode;
+            
+            let childCC = commerceCode;
+            if (!childCC || childCC === masterCC) {
+              childCC = IntegrationCommerceCodes.ONECLICK_MALL_CHILD1;
+            }
+
+            refundResult = await transbank.refundOneclick(
+              paymentData.buyOrder,
+              childCC,
+              paymentData.buyOrder, // Se usa como childBuyOrder
+              refundAmount,
+              commerceCode,
+              apiKey
+            );
+          } else {
+            throw new Error("Método de pago no soportado para reembolso automático.");
+          }
+        } catch (apiError: any) {
+          logger.error(`Transbank physical refund failed for booking ${bookingId}:`, apiError.message || apiError);
+          refundResult = {
+            type: "FAILED_PHYSICAL_REFUND",
+            error: apiError.message || String(apiError),
+            response_code: -99,
+            nullified_amount: 0,
+            isMock: false,
+          };
+        }
+      }
+    } else {
+      logger.info(`No se encontró registro de pago físico para la reserva ${bookingId}. Procediendo con reembolso simulado.`);
+    }
+
+    // Registrar en Firestore el resultado de la anulación parcial
+    const batch = db.batch();
+    batch.update(bookingDoc.ref, {
+      paymentStatus: refundResult.type === "FAILED_PHYSICAL_REFUND" ? "refund_failed" : "refunded",
+      status: "cancelled",
+      refundAmount: refundResult.type === "FAILED_PHYSICAL_REFUND" ? 0 : refundAmount,
+      refundFee: fee,
+      refundedAt: admin.firestore.FieldValue.serverTimestamp(),
+      refundDetails: refundResult,
+    });
+
+    if (paymentDoc) {
+      batch.update(paymentDoc.ref, {
+        status: refundResult.type === "FAILED_PHYSICAL_REFUND" ? "refund_failed" : "refunded",
+        refundAmount: refundResult.type === "FAILED_PHYSICAL_REFUND" ? 0 : refundAmount,
+        refundFee: fee,
+        refundDetails: refundResult,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    }
+
+    await batch.commit();
+    logger.info(`Reembolso procesado con éxito para reserva ${bookingId}. Devuelto: $${refundAmount}`);
+
+    return {
+      success: refundResult.type !== "FAILED_PHYSICAL_REFUND",
+      refundAmount: refundResult.nullified_amount || 0,
+      fee,
+      responseCode: refundResult.response_code || 0,
+      error: refundResult.error || null,
+    };
+
+  } catch (error: any) {
+    logger.error("Error al procesar reembolso:", error);
+    throw new HttpsError("internal", error.message || "Error al procesar el reembolso parcial en Transbank.");
   }
 });

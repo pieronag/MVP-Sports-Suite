@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tabs } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import { Home, MapPin, User, CalendarRange } from 'lucide-react-native';
 import { View, Platform } from 'react-native';
 import { useAuth } from '../../../store/useAuth';
@@ -14,6 +14,7 @@ const THEME = {
 export default function TabsLayout() {
     const { theme } = useAuth();
     const isDark = theme === 'dark';
+    const router = useRouter();
 
     const C = {
         bg: isDark ? '#0F172A' : '#FFFFFF',
@@ -26,6 +27,7 @@ export default function TabsLayout() {
             screenOptions={{
                 headerShown: false,
                 tabBarStyle: {
+                    display: 'none',
                     backgroundColor: C.bg,
                     borderTopWidth: 1,
                     borderTopColor: C.border,
@@ -74,7 +76,7 @@ export default function TabsLayout() {
 
             {/* MAPA */}
             <Tabs.Screen
-                name="mapa"
+                name="mapa_tab"
                 options={{
                     tabBarIcon: ({ focused, color }) => (
                         <View style={{
@@ -96,11 +98,17 @@ export default function TabsLayout() {
                         </View>
                     ),
                 }}
+                listeners={{
+                    tabPress: (e) => {
+                        e.preventDefault();
+                        router.push('/(player)/mapa');
+                    },
+                }}
             />
 
             {/* RESERVAS */}
             <Tabs.Screen
-                name="reservas"
+                name="reservas_tab"
                 options={{
                     tabBarIcon: ({ focused, color }) => (
                         <View style={{
@@ -122,11 +130,17 @@ export default function TabsLayout() {
                         </View>
                     ),
                 }}
+                listeners={{
+                    tabPress: (e) => {
+                        e.preventDefault();
+                        router.push('/(player)/reservas');
+                    },
+                }}
             />
 
             {/* PERFIL */}
             <Tabs.Screen
-                name="perfil"
+                name="perfil_tab"
                 options={{
                     tabBarIcon: ({ focused, color }) => (
                         <View style={{
@@ -148,16 +162,13 @@ export default function TabsLayout() {
                         </View>
                     ),
                 }}
+                listeners={{
+                    tabPress: (e) => {
+                        e.preventDefault();
+                        router.push('/(player)/perfil');
+                    },
+                }}
             />
-
-            {/* RUTAS OCULTAS DEL MENÚ INFERIOR */}
-            <Tabs.Screen name="torneos/index" options={{ href: null }} />
-            <Tabs.Screen name="clubes/explore" options={{ href: null }} />
-            <Tabs.Screen name="billetera" options={{ href: null }} />
-            <Tabs.Screen name="equipos/explore" options={{ href: null }} />
-            <Tabs.Screen name="equipos/[id]" options={{ href: null, tabBarStyle: { display: 'none' } }} />
-            <Tabs.Screen name="equipos/chat" options={{ href: null, tabBarStyle: { display: 'none' } }} />
-            <Tabs.Screen name="preferencias" options={{ href: null, tabBarStyle: { display: 'none' } }} />
         </Tabs>
     );
 }

@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { bookingSchema } from './schemas';
 
@@ -18,7 +18,7 @@ export interface Booking {
     price?: number; // web usa price + totalPrice
     totalPrice: number;
     status: 'pending' | 'confirmed' | 'cancelled' | 'active' | 'completed' | 'past' | 'no-show';
-    paymentStatus: 'paid' | 'pending' | 'partial' | 'no-show';
+    paymentStatus: 'paid' | 'pending' | 'partial' | 'no-show' | 'refunded' | 'refund_failed';
     source: 'mobile_app' | 'manual_dashboard';
     ownerId?: string;
     createdAt?: Timestamp;
@@ -35,6 +35,7 @@ export interface Booking {
     cancelledBy?: string;
     noShow?: boolean;
     notes?: string;
+    paymentMethod?: string;
 }
 
 export const bookingService = {
@@ -146,20 +147,19 @@ export const bookingService = {
      */
     async createBooking(bookingData: Booking): Promise<string> {
         try {
-            const bookingsRef = collection(db, 'bookings');
+            // Generate standard 6-digit alphanumeric code (excluding confusing characters)
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let bookingId = '';
+            for (let i = 0; i < 6; i++) {
+                bookingId += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
 
-            // Add server timestamps and clean undefined
-            const newBooking = JSON.parse(JSON.stringify({
-                ...bookingData,
-                createdAt: Timestamp.now(),
-            }, (k, v) => v === undefined ? null : v)); // Firestore prefers null or missing, but JSON.stringify/parse with null is safer than undefined
-
-            // Actually, better to just delete undefined keys
             const cleanData = { ...bookingData, createdAt: Timestamp.now() };
             Object.keys(cleanData).forEach(key => (cleanData as any)[key] === undefined && delete (cleanData as any)[key]);
 
-            const docRef = await addDoc(bookingsRef, cleanData);
-            return docRef.id;
+            const docRef = doc(db, 'bookings', bookingId);
+            await setDoc(docRef, cleanData);
+            return bookingId;
         } catch (error) {
             console.error('Error creating booking:', error);
             throw new Error('No se pudo crear la reserva.');

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
-import { collection, query, where, getDocs, Timestamp, addDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, Timestamp, doc, setDoc } from 'firebase/firestore';
 import {
     CalendarDaysIcon, ClockIcon, BuildingStorefrontIcon,
     ChevronDownIcon, PlusIcon, XCircleIcon,
@@ -267,7 +267,13 @@ export default function MasterCalendar() {
         try {
             const selectedCourt = modalCourts.find(c => c.id === newRes.courtId);
             const end = new Date(bookingDate.getTime() + parseFloat(newRes.duration) * 3600000);
-            await addDoc(collection(db, "bookings"), { tenantId: newRes.tenantId, tenantName: venues.find(v => v.id === newRes.tenantId)?.name, courtId: newRes.courtId, courtName: selectedCourt?.name || 'Cancha', sport: selectedCourt?.sport || 'General', clientName: newRes.clientName, clientPhone: newRes.clientPhone, date: Timestamp.fromDate(bookingDate), startTime: newRes.startTime, endTime: `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`, duration: parseFloat(newRes.duration), price: Number(newRes.price), totalPrice: Number(newRes.price), deposit: Number(newRes.deposit), remainingBalance: Number(newRes.price) - Number(newRes.deposit), status: 'confirmed', paymentStatus: newRes.paymentStatus, paymentMethod: newRes.paymentMethod, notes: newRes.notes, source: 'manual_dashboard', ownerId: user.uid, createdAt: Timestamp.now(), createdBy: user.displayName || user.email });
+            // Generate 6-digit custom alphanumeric ID
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let bookingId = '';
+            for (let i = 0; i < 6; i++) {
+                bookingId += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            await setDoc(doc(db, "bookings", bookingId), { tenantId: newRes.tenantId, tenantName: venues.find(v => v.id === newRes.tenantId)?.name, courtId: newRes.courtId, courtName: selectedCourt?.name || 'Cancha', sport: selectedCourt?.sport || 'General', clientName: newRes.clientName, clientPhone: newRes.clientPhone, date: Timestamp.fromDate(bookingDate), startTime: newRes.startTime, endTime: `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`, duration: parseFloat(newRes.duration), price: Number(newRes.price), totalPrice: Number(newRes.price), deposit: Number(newRes.deposit), remainingBalance: Number(newRes.price) - Number(newRes.deposit), status: 'confirmed', paymentStatus: newRes.paymentStatus, paymentMethod: newRes.paymentMethod, notes: newRes.notes, source: 'manual_dashboard', ownerId: user.uid, createdAt: Timestamp.now(), createdBy: user.displayName || user.email });
             setIsAddModalOpen(false);
             if (newRes.date === selectedDate && newRes.tenantId === selectedVenueId) loadDashboardData();
         } catch (e) { 
@@ -360,7 +366,7 @@ export default function MasterCalendar() {
                                         <div key={b.id} onClick={() => setSelectedBooking(b)} className={`absolute z-10 p-2 mx-1 rounded-xl border-l-4 shadow-sm cursor-pointer flex flex-col justify-between overflow-hidden transition-all ${getCardStyle(b.paymentStatus, b.status)}`} style={{ top: (b.extractedHour - calendarConfig.startHour) * HOUR_HEIGHT + 2, height: HOUR_HEIGHT - 4, left: cIndex * COLUMN_WIDTH, width: COLUMN_WIDTH - 8 }}>
                                             <div className="flex justify-between items-start">
                                                 <div>
-                                                    <p className="text-[8px] font-bold opacity-40 uppercase mb-0.5">#{b.id.slice(-4)}</p>
+                                                    <p className="text-[8px] font-bold opacity-40 uppercase mb-0.5">#{b.id.toUpperCase()}</p>
                                                     <h5 className="text-[10px] font-black leading-tight uppercase truncate">{b.clientName || 'S/N'}</h5>
                                                 </div>
                                                 {b.paymentStatus !== 'paid' && b.status !== 'cancelled' && (

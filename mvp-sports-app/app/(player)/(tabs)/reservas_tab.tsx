@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
     View, Text, ScrollView, TouchableOpacity, RefreshControl,
     StatusBar, ActivityIndicator, Dimensions, StyleSheet,
-    BackHandler, Modal, Linking, Platform, TextInput
+    BackHandler, Modal, Linking, Platform, TextInput, Share, Alert
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import {
@@ -19,8 +19,9 @@ import { bookingService, Booking } from '../../../services/bookingService';
 import { venueService, Tenant } from '../../../services/venueService';
 import { teamService, Team } from '../../../services/teamService';
 import { tournamentService } from '../../../services/tournamentService';
-import { db } from '../../../services/firebase';
+import { db, functions } from '../../../services/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { httpsCallable } from 'firebase/functions';
 
 const getSantiagoDateTime = (date: Date) => {
     try {
@@ -103,6 +104,13 @@ const getSportInfo = (sportName: string) => {
     return SPORT_CONFIG['default'];
 };
 
+const LargeDetailRow = ({ label, value, C, highlightColor }: any) => (
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 2 }}>
+        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</Text>
+        <Text style={{ color: highlightColor || C.text, fontSize: 11, fontWeight: '900' }}>{value}</Text>
+    </View>
+);
+
 const getFormattedDate = (date: any) => {
     try {
         if (!date) return { day: '--', month: '---', full: '-- --- ----' };
@@ -127,6 +135,8 @@ const getStatusInfo = (booking: Booking | null, C: any) => {
 
     if (isNoShow) return { label: 'CANCELADO POR INASISTENCIA', color: COLORS.error };
     if (booking.status === 'cancelled') {
+        if ((booking.paymentStatus as any) === 'refund_failed') return { label: 'DEVOLUCIÓN FALLIDA', color: COLORS.error };
+        if ((booking.paymentStatus as any) === 'refunded') return { label: 'DEVOLUCIÓN', color: '#10b981' };
         if (booking.cancelledBy) return { label: 'CANCELADO POR JUGADOR', color: COLORS.error };
         return { label: 'ANULADO', color: COLORS.error };
     }
@@ -152,6 +162,12 @@ export default function MisReservasScreen() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [activeTab, setActiveTab] = useState<'activas' | 'historial'>('activas');
+    const [historyLimit, setHistoryLimit] = useState(10);
+
+    useEffect(() => {
+        setHistoryLimit(10);
+    }, [activeTab]);
+
     const [showTicket, setShowTicket] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
@@ -181,6 +197,7 @@ export default function MisReservasScreen() {
 
             const verifiedBookings = await Promise.all(all.map(async (booking) => {
                 if (
+                    booking.userId === user?.uid &&
                     booking.status !== 'cancelled' && 
                     booking.status !== 'completed' &&
                     booking.checkIn !== true && 
@@ -198,17 +215,20 @@ export default function MisReservasScreen() {
                     
                     if (nowChile >= startDateTime) {
                         try {
+                            const isPrePaid = booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial';
+                            const targetPaymentStatus = isPrePaid ? booking.paymentStatus : 'no-show';
+
                             const bookingRef = doc(db, 'bookings', booking.id as string);
                             await updateDoc(bookingRef, {
-                                status: 'no-show',
-                                paymentStatus: 'no-show',
+                                status: 'cancelled',
+                                paymentStatus: targetPaymentStatus,
                                 notes: 'Cancelación automática por inasistencia sin check-in (No-Show).',
                                 updatedAt: new Date()
                             });
                             return {
                                 ...booking,
-                                status: 'no-show' as any,
-                                paymentStatus: 'no-show' as any,
+                                status: 'cancelled' as any,
+                                paymentStatus: targetPaymentStatus as any,
                                 notes: 'Cancelación automática por inasistencia sin check-in (No-Show).'
                             };
                         } catch (e) {
@@ -297,26 +317,115 @@ export default function MisReservasScreen() {
 
     const confirmCancel = async () => {
         if (!bookingToCancel) return;
+        
+        const targetBooking = bookings.find(b => b.id === bookingToCancel);
+        const isPaid = targetBooking?.paymentStatus === 'paid' || targetBooking?.paymentStatus === 'partial';
+        
+        let isLessThan4Hours = false;
+        if (targetBooking?.date && targetBooking?.startTime) {
+            const nowChile = getSantiagoDateTime(new Date());
+            let bookingDate: Date;
+            if ((targetBooking.date as any).toDate) {
+                bookingDate = (targetBooking.date as any).toDate();
+            } else {
+                bookingDate = new Date(targetBooking.date as any);
+            }
+            const startDateTime = getBookingDateTimeChile(bookingDate, targetBooking.startTime);
+            const diffMs = startDateTime.getTime() - nowChile.getTime();
+            const diffHours = diffMs / (1000 * 60 * 60);
+            isLessThan4Hours = diffHours < 4;
+        }
+
         try {
-            await bookingService.cancelBooking({ bookingId: bookingToCancel, cancelledBy: user?.displayName || user?.email || 'User' });
-            loadData();
-            setShowCancelModal(false);
-            setFbType('success');
-            setFbMsg('Tu reserva ha sido cancelada correctamente.');
-            setFbVisible(true);
+            if (isPaid && !isLessThan4Hours) {
+                // LLAMAR A LA CLOUD FUNCTION DE REEMBOLSO PARCIAL AUTOMÁTICO
+                const refundFn = httpsCallable(functions, 'refundBookingPayment');
+                const res = await refundFn({ bookingId: bookingToCancel });
+                
+                const resultData = res.data as { success: boolean; refundAmount: number; fee: number; error?: string };
+                
+                loadData();
+                setShowCancelModal(false);
+                setFbType('success');
+                if (resultData.success) {
+                    setFbMsg(`¡Cancelado y Reembolsado! Se procesó un reembolso parcial de $${resultData.refundAmount.toLocaleString('es-CL')} (comisión del 3% retenida: $${resultData.fee.toLocaleString('es-CL')}).`);
+                } else {
+                    setFbMsg(`Reserva cancelada con éxito para liberar la cancha. Sin embargo, hubo un error al procesar el reembolso automático y debes contactar directamente al dueño del recinto para solicitar tu devolución.`);
+                }
+                setFbVisible(true);
+            } else {
+                // Cancelación regular sin reembolso (o impaga / menor a 4 horas)
+                await bookingService.cancelBooking({ bookingId: bookingToCancel, cancelledBy: user?.displayName || user?.email || 'User' });
+                loadData();
+                setShowCancelModal(false);
+                setFbType('success');
+                setFbMsg(isPaid 
+                    ? 'Reserva cancelada de última hora. De acuerdo con las políticas, el monto pagado no admite devolución.'
+                    : 'Tu reserva ha sido cancelada correctamente.');
+                setFbVisible(true);
+            }
         } catch (e) {
+            console.error("Error al cancelar:", e);
             setFbType('error');
             setFbMsg('Hubo un problema al cancelar. Contacta al soporte.');
             setFbVisible(true);
         }
     };
 
+    const cancelModalInfo = useMemo(() => {
+        if (!bookingToCancel) return { title: '¿Cancelar Reserva?', message: 'Esta acción no se puede deshacer. ¿Estás seguro?', danger: true };
+        
+        const targetBooking = bookings.find(b => b.id === bookingToCancel);
+        if (!targetBooking) return { title: '¿Cancelar Reserva?', message: 'Esta acción no se puede deshacer. ¿Estás seguro?', danger: true };
+        
+        const nowChile = getSantiagoDateTime(new Date());
+        let bookingDate: Date;
+        if ((targetBooking.date as any).toDate) {
+            bookingDate = (targetBooking.date as any).toDate();
+        } else {
+            bookingDate = new Date(targetBooking.date as any);
+        }
+        
+        const startDateTime = getBookingDateTimeChile(bookingDate, targetBooking.startTime);
+        const diffMs = startDateTime.getTime() - nowChile.getTime();
+        const diffHours = diffMs / (1000 * 60 * 60);
+        const isLessThan4Hours = diffHours < 4;
+        const isPaid = targetBooking.paymentStatus === 'paid' || targetBooking.paymentStatus === 'partial';
+
+        if (isLessThan4Hours) {
+            if (isPaid) {
+                return {
+                    title: '⚠️ Penalización por Cancelación',
+                    message: '¡ATENCIÓN! Estás cancelando con menos de 4 horas de anticipación. Debido a las políticas de seguridad del recinto, el monto pagado online NO será devuelto. ¿Deseas continuar de todas formas?',
+                    danger: true
+                };
+            } else {
+                return {
+                    title: '⚠️ Cancelación de Última Hora',
+                    message: 'Estás cancelando con menos de 4 horas de anticipación. Tu cupo podría quedar vacío. ¿Estás seguro de que deseas cancelar?',
+                    danger: true
+                };
+            }
+        } else {
+            if (isPaid) {
+                return {
+                    title: '🔄 Confirmar Devolución',
+                    message: 'Tu reserva se encuentra en el período de cancelación permitido (más de 4 horas). Se gestionará la devolución o abono de tu dinero pagado online de manera automática. ¿Confirmas la cancelación y devolución de dinero?',
+                    danger: false
+                };
+            } else {
+                return {
+                    title: '¿Confirmar Cancelación?',
+                    message: 'Esta acción no se puede deshacer. ¿Estás seguro de que deseas cancelar tu turno?',
+                    danger: true
+                };
+            }
+        }
+    }, [bookingToCancel, bookings]);
+
     useFocusEffect(
         React.useCallback(() => {
             loadData();
-            const backAction = () => { router.back(); return true; };
-            const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-            return () => backHandler.remove();
         }, [user])
     );
 
@@ -342,6 +451,11 @@ export default function MisReservasScreen() {
             }
         });
     }, [bookings, activeTab]);
+
+    const paginatedList = useMemo(() => {
+        if (activeTab === 'activas') return displayList;
+        return displayList.slice(0, historyLimit);
+    }, [displayList, activeTab, historyLimit]);
 
     const handleOpenMaps = (booking: Booking) => {
         const venue = venues[booking.tenantId];
@@ -388,13 +502,13 @@ export default function MisReservasScreen() {
             >
                 <SectionLabel label={activeTab === 'activas' ? "Próximos Partidos" : "Partidos Finalizados"} />
 
-                {displayList.length === 0 ? (
+                {paginatedList.length === 0 ? (
                     <View style={{ padding: 60, alignItems: 'center', justifyContent: 'center' }}>
                         <CalendarDays color={C.sub} size={64} strokeWidth={1} />
                         <Text style={{ color: C.sub, fontSize: 12, fontWeight: '800', marginTop: 20, textAlign: 'center' }}>No hay partidos para mostrar</Text>
                     </View>
                 ) : (
-                    displayList.map((b) => (
+                    paginatedList.map((b) => (
                         <BookingEliteCard
                             key={b.id}
                             booking={b}
@@ -411,55 +525,172 @@ export default function MisReservasScreen() {
                         />
                     ))
                 )}
+
+                {activeTab === 'historial' && displayList.length > historyLimit && (
+                    <TouchableOpacity 
+                        onPress={() => setHistoryLimit(prev => prev + 10)}
+                        style={{ 
+                            marginHorizontal: 30, 
+                            marginTop: 10,
+                            marginBottom: 30,
+                            height: 55, 
+                            borderRadius: 20, 
+                            backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', 
+                            borderWidth: 1, 
+                            borderColor: C.border, 
+                            alignItems: 'center', 
+                            justifyContent: 'center',
+                            flexDirection: 'row',
+                            gap: 8
+                        }}
+                        activeOpacity={0.7}
+                    >
+                        <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>Cargar más reservas</Text>
+                    </TouchableOpacity>
+                )}
             </ScrollView>
 
             <Modal visible={showTicket} animationType="slide" transparent={true}>
-                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', padding: 30 }}>
-                    <View style={{ backgroundColor: C.card, borderRadius: 40, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
-                        <View style={{ padding: 30, borderBottomWidth: 2, borderBottomColor: isDark ? 'rgba(255,255,255,0.1)' : '#F8FAFC', borderStyle: 'dashed' }}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                                <View style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: modalSportInfo.color + '15', alignItems: 'center', justifyContent: 'center' }}>
-                                    <modalSportInfo.icon color={modalSportInfo.color} size={24} />
-                                </View>
-                                <TouchableOpacity onPress={() => setShowTicket(false)} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
-                                    <X color={C.text} size={20} />
+                {selectedBooking?.paymentStatus === 'refund_failed' ? (
+                    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', padding: 20 }}>
+                        <View style={{ backgroundColor: C.card, borderRadius: 30, borderWidth: 1, borderColor: C.border, overflow: 'hidden' }}>
+                            {/* HEADER */}
+                            <View style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Devolución Pendiente</Text>
+                                <TouchableOpacity onPress={() => setShowTicket(false)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
+                                    <X color={C.text} size={18} />
                                 </TouchableOpacity>
                             </View>
-                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 5 }}>RECINTO</Text>
-                            <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', marginBottom: 20 }}>{selectedBooking?.tenantName}</Text>
-                            <View style={{ flexDirection: 'row', gap: 30 }}>
-                                <View>
-                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>CANCHA</Text>
-                                    <Text style={{ color: C.text, fontSize: 14, fontWeight: '800' }}>{selectedBooking?.courtName}</Text>
+
+                            {/* BODY */}
+                            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 25 }}>
+                                <View style={{ alignItems: 'center', marginVertical: 10 }}>
+                                    <Text style={{ color: '#ef4444', fontSize: 10, fontWeight: '900', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 6 }}>
+                                        Reversa Automática Fallida
+                                    </Text>
+                                    <Text style={{ color: C.text, fontSize: 28, fontWeight: '900', letterSpacing: -1 }}>
+                                        ${Number(selectedBooking?.totalPrice || selectedBooking?.price || 0).toLocaleString('es-CL')}
+                                    </Text>
+                                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '800', textAlign: 'center', marginTop: 4 }}>
+                                        Monto Pendiente de Devolución
+                                    </Text>
                                 </View>
-                                <View>
-                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>ESTADO</Text>
-                                    <Text style={{ color: modalStatus.color, fontSize: 14, fontWeight: '800' }}>{modalStatus.label}</Text>
+
+                                <View style={{ gap: 12, borderTopWidth: 1, borderTopColor: C.border, paddingTop: 20, marginVertical: 15 }}>
+                                    <LargeDetailRow label="Jugador" value={selectedBooking?.clientName || '—'} C={C} />
+                                    <LargeDetailRow label="Recinto" value={selectedBooking?.tenantName || '—'} C={C} />
+                                    <LargeDetailRow label="Cancha" value={selectedBooking?.courtName || '—'} C={C} />
+                                    <LargeDetailRow label="Deporte" value={(selectedBooking?.sport || '—').toUpperCase()} C={C} />
+                                    <LargeDetailRow label="Fecha Partido" value={getFormattedDate(selectedBooking?.date).full} C={C} />
+                                    <LargeDetailRow label="Horario" value={`${selectedBooking?.startTime} HRS`} C={C} />
+                                    <LargeDetailRow label="Método Pago" value="Online (Webpay Plus)" C={C} />
+                                    <LargeDetailRow label="Estado Reclamación" value="Manual Pendiente" highlightColor="#ef4444" C={C} />
+                                    <View style={{ height: 1, backgroundColor: C.border, marginVertical: 4 }} />
+                                    <LargeDetailRow label="ID Reserva" value={selectedBooking?.id} C={C} />
+                                    <LargeDetailRow label="Código Validación" value={`MVP-REFUND-${selectedBooking?.id?.substring(0, 8).toUpperCase() || '—'}`} highlightColor="#ef4444" C={C} />
                                 </View>
-                            </View>
+
+                                <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#F8FAFC', padding: 20, borderRadius: 20, borderWidth: 1, borderColor: C.border, gap: 8, marginBottom: 15 }}>
+                                    <Text style={{ color: '#ef4444', fontSize: 10, fontWeight: '900', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                                        Instrucciones para Devolución
+                                    </Text>
+                                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '600', lineHeight: 14 }}>
+                                        Debido a una desconexión temporal con la pasarela de pagos de Transbank, el sistema automático no pudo reversar tu dinero. Presenta este comprobante de validación digital directamente al administrador o dueño del recinto deportivo para solicitar tu transferencia manual por el monto total indicado arriba.
+                                    </Text>
+                                </View>
+
+                                <TouchableOpacity
+                                    onPress={async () => {
+                                        if (!selectedBooking) return;
+                                        const displayD = getFormattedDate(selectedBooking.date).full;
+                                        const shareText = `*COMPROBANTE DE DEVOLUCIÓN DE PAGO - MVP SPORTS*\n\n` +
+                                            `Estimado Administrador de *${selectedBooking.tenantName}*,\n\n` +
+                                            `Presento el ticket oficial de solicitud de reembolso debido a una reversa automática fallida de Transbank. A continuación se detallan los datos de la transacción para su validación manual:\n\n` +
+                                            `• *Código de Validación:* MVP-REFUND-${selectedBooking.id?.substring(0, 8).toUpperCase()}\n` +
+                                            `• *ID de Reserva:* ${selectedBooking.id}\n` +
+                                            `• *Jugador:* ${selectedBooking.clientName}\n` +
+                                            `• *Cancha:* ${selectedBooking.courtName}\n` +
+                                            `• *Fecha/Hora Reserva:* ${displayD} a las ${selectedBooking.startTime} HRS\n` +
+                                            `• *Monto a Reembolsar:* $${Number(selectedBooking.totalPrice || selectedBooking.price || 0).toLocaleString('es-CL')} CLP\n` +
+                                            `• *Estado:* Devolución Pendiente por Transferencia Manual\n\n` +
+                                            `Por favor, procese la devolución de forma manual a la brevedad. ¡Muchas gracias!`;
+                                        try {
+                                            await Share.share({
+                                                message: shareText,
+                                                title: 'Comprobante de Devolución'
+                                            });
+                                        } catch (error) {
+                                            Alert.alert('Error', 'No se pudo compartir el comprobante.');
+                                        }
+                                    }}
+                                    style={{ 
+                                        height: 55, 
+                                        borderRadius: 18, 
+                                        backgroundColor: '#25D366', 
+                                        flexDirection: 'row', 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center', 
+                                        shadowColor: '#25D366', 
+                                        shadowOpacity: 0.2, 
+                                        shadowRadius: 10, 
+                                        elevation: 5,
+                                        marginTop: 15
+                                    }}
+                                >
+                                    <Share2 color="white" size={16} style={{ marginRight: 8 }} />
+                                    <Text style={{ color: 'white', fontWeight: '900', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.5 }}>COMPARTIR COMPROBANTE</Text>
+                                </TouchableOpacity>
+                            </ScrollView>
                         </View>
-                        <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', padding: 40, alignItems: 'center' }}>
-                            <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 25, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10 }}>
-                                {selectedBooking?.id && <QRCode value={selectedBooking.id} size={150} color="#0F172A" backgroundColor="white" />}
-                            </View>
-                            <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 4, marginTop: 25 }}>ID: {(selectedBooking?.id as string)?.slice(-8).toUpperCase()}</Text>
-                        </View>
-                        <View style={{ padding: 30 }}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <View style={{ gap: 8 }}>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <Calendar color={modalSportInfo.color} size={14} />
-                                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', marginLeft: 10 }}>{getFormattedDate(selectedBooking?.date).full}</Text>
+                    </View>
+                ) : (
+                    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', padding: 30 }}>
+                        <View style={{ backgroundColor: C.card, borderRadius: 40, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
+                            <View style={{ padding: 30, borderBottomWidth: 2, borderBottomColor: isDark ? 'rgba(255,255,255,0.1)' : '#F8FAFC', borderStyle: 'dashed' }}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                                    <View style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: modalSportInfo.color + '15', alignItems: 'center', justifyContent: 'center' }}>
+                                        <modalSportInfo.icon color={modalSportInfo.color} size={24} />
                                     </View>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                        <Clock color={modalSportInfo.color} size={14} />
-                                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', marginLeft: 10 }}>{selectedBooking?.startTime} HRS</Text>
+                                    <TouchableOpacity onPress={() => setShowTicket(false)} style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
+                                        <X color={C.text} size={20} />
+                                    </TouchableOpacity>
+                                </View>
+                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 5 }}>RECINTO</Text>
+                                <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', marginBottom: 20 }}>{selectedBooking?.tenantName}</Text>
+                                <View style={{ flexDirection: 'row', gap: 30 }}>
+                                    <View>
+                                        <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>CANCHA</Text>
+                                        <Text style={{ color: C.text, fontSize: 14, fontWeight: '800' }}>{selectedBooking?.courtName}</Text>
+                                    </View>
+                                    <View>
+                                        <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>ESTADO</Text>
+                                        <Text style={{ color: modalStatus.color, fontSize: 14, fontWeight: '800' }}>{modalStatus.label}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                            <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', padding: 40, alignItems: 'center' }}>
+                                <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 25, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10 }}>
+                                    {selectedBooking?.id && <QRCode value={selectedBooking.id} size={150} color="#0F172A" backgroundColor="white" />}
+                                </View>
+                                <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 4, marginTop: 25 }}>ID: {(selectedBooking?.id as string)?.slice(-8).toUpperCase()}</Text>
+                            </View>
+                            <View style={{ padding: 30 }}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <View style={{ gap: 8 }}>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            <Calendar color={modalSportInfo.color} size={14} />
+                                            <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', marginLeft: 10 }}>{getFormattedDate(selectedBooking?.date).full}</Text>
+                                        </View>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            <Clock color={modalSportInfo.color} size={14} />
+                                            <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', marginLeft: 10 }}>{selectedBooking?.startTime} HRS</Text>
+                                        </View>
                                     </View>
                                 </View>
                             </View>
                         </View>
                     </View>
-                </View>
+                )}
             </Modal>
 
             <FeedbackModal visible={fbVisible} type={fbType} message={fbMsg} onClose={() => setFbVisible(false)} isDark={isDark} />
@@ -495,12 +726,12 @@ export default function MisReservasScreen() {
                 visible={showCancelModal}
                 onClose={() => setShowCancelModal(false)}
                 onConfirm={confirmCancel}
-                title="¿Cancelar Reserva?"
-                message="Esta acción no se puede deshacer. ¿Estás seguro de que deseas cancelar tu turno?"
+                title={cancelModalInfo.title}
+                message={cancelModalInfo.message}
                 confirmText="SÍ, CANCELAR"
-                icon={<Trash2 color="#ef4444" size={40} />}
+                icon={<Trash2 color={cancelModalInfo.danger ? "#ef4444" : "#f59e0b"} size={40} />}
                 isDark={isDark}
-                danger
+                danger={cancelModalInfo.danger}
             />
 
             <EliteActionModal
@@ -569,9 +800,19 @@ const BookingEliteCard = ({ booking, isDark, onView, onMaps, onCheckIn, onCheckO
                         <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>PAGO Y VALOR</Text>
                         <Text style={{ color: C.text, fontSize: 16, fontWeight: '900' }}>${(booking.totalPrice || booking.price || 0).toLocaleString('es-CL')}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: booking.paymentStatus === 'paid' ? COLORS.accent : '#f59e0b' }} />
-                            <Text style={{ color: booking.paymentStatus === 'paid' ? COLORS.accent : '#f59e0b', fontSize: 9, fontWeight: '900', textTransform: 'uppercase' }}>
-                                {booking.paymentStatus === 'paid' ? 'PAGADO' : 'PENDIENTE'}
+                            <View style={{ 
+                                width: 6, 
+                                height: 6, 
+                                borderRadius: 3, 
+                                backgroundColor: booking.paymentStatus === 'refunded' ? '#10b981' : (booking.paymentStatus === 'refund_failed' ? '#ef4444' : (booking.paymentStatus === 'paid' ? COLORS.accent : '#f59e0b')) 
+                            }} />
+                            <Text style={{ 
+                                color: booking.paymentStatus === 'refunded' ? '#10b981' : (booking.paymentStatus === 'refund_failed' ? '#ef4444' : (booking.paymentStatus === 'paid' ? COLORS.accent : '#f59e0b')), 
+                                fontSize: 9, 
+                                fontWeight: '900', 
+                                textTransform: 'uppercase' 
+                            }}>
+                                {booking.paymentStatus === 'refunded' ? 'DEVOLUCIÓN' : (booking.paymentStatus === 'refund_failed' ? 'DEVOLUCIÓN FALLIDA' : (booking.paymentStatus === 'paid' ? 'PAGADO' : 'PENDIENTE'))}
                             </Text>
                         </View>
                     </View>
@@ -598,14 +839,38 @@ const BookingEliteCard = ({ booking, isDark, onView, onMaps, onCheckIn, onCheckO
                     <TouchableOpacity onPress={onMaps} style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: COLORS.maps + '10', alignItems: 'center', justifyContent: 'center' }}>
                         <Navigation color={COLORS.maps} size={20} />
                     </TouchableOpacity>
-                    {!isCompleted && !isCancelled && !isActive && (
+                    {!isCompleted && !isCancelled && !isActive && !booking.checkIn && (
                         <TouchableOpacity onPress={onCancel} style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: '#ef444410', alignItems: 'center', justifyContent: 'center' }}>
                             <XCircle color="#ef4444" size={20} />
                         </TouchableOpacity>
                     )}
-                    {(!isConfirmed || booking.checkIn) && (
-                        <TouchableOpacity onPress={onView} style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: C.sub + '10', alignItems: 'center', justifyContent: 'center' }}>
-                            <Ticket color={C.sub} size={20} />
+                    {(!isConfirmed || booking.checkIn || booking.paymentStatus === 'refund_failed') && (
+                        <TouchableOpacity 
+                            onPress={onView} 
+                            style={{ 
+                                flex: booking.paymentStatus === 'refund_failed' ? 2 : undefined, 
+                                width: booking.paymentStatus === 'refund_failed' ? undefined : 50, 
+                                height: 50, 
+                                borderRadius: 15, 
+                                backgroundColor: booking.paymentStatus === 'refund_failed' ? '#ef4444' : C.sub + '10', 
+                                flexDirection: booking.paymentStatus === 'refund_failed' ? 'row' : undefined, 
+                                alignItems: 'center', 
+                                justifyContent: 'center', 
+                                gap: 8,
+                                shadowColor: booking.paymentStatus === 'refund_failed' ? '#ef4444' : undefined,
+                                shadowOpacity: booking.paymentStatus === 'refund_failed' ? 0.2 : undefined,
+                                shadowRadius: booking.paymentStatus === 'refund_failed' ? 10 : undefined,
+                                shadowOffset: booking.paymentStatus === 'refund_failed' ? { width: 0, height: 4 } : undefined
+                            }}
+                        >
+                            {booking.paymentStatus === 'refund_failed' ? (
+                                <>
+                                    <Receipt color="white" size={18} />
+                                    <Text style={{ color: 'white', fontSize: 10, fontWeight: '900', textTransform: 'uppercase' }}>Solicitar Devolución</Text>
+                                </>
+                            ) : (
+                                <Ticket color={C.sub} size={20} />
+                            )}
                         </TouchableOpacity>
                     )}
                 </View>

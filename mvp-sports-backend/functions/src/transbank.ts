@@ -106,4 +106,26 @@ export const transbank = {
     ];
     return await tx.authorize(username, tbkUser, buyOrder, details);
   },
+
+  refundWebpay: async (
+      token: string,
+      amount: number,
+      commerceCode?: string,
+      apiKey?: string,
+  ) => {
+    const tx = new WebpayPlus.Transaction(getOptions(commerceCode, apiKey));
+    return await tx.refund(token, amount);
+  },
+
+  refundOneclick: async (
+      buyOrder: string,
+      childCommerceCode: string,
+      childBuyOrder: string,
+      amount: number,
+      commerceCode?: string,
+      apiKey?: string,
+  ) => {
+    const tx = new Oneclick.MallTransaction(getOneclickOptions(commerceCode, apiKey));
+    return await tx.refund(buyOrder, childCommerceCode, childBuyOrder, amount);
+  },
 };

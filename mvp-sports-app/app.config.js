@@ -3,7 +3,7 @@ export default ({ config }) => ({
   "expo": {
     "name": "MVP Sports Chile",
     "slug": "mvp-sports-app",
-    "version": "1.0.0",
+    "version": "1.18.6",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "mvpdeportes",
@@ -16,6 +16,7 @@ export default ({ config }) => ({
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mvp.deportes",
+      "buildNumber": "186",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Esta app usa tu ubicación para encontrar canchas deportivas cercanas",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Esta app necesita acceso continuo a tu ubicación para notificarte sobre reservas cercanas",
@@ -29,9 +30,10 @@ export default ({ config }) => ({
     },
     "android": {
       "package": "com.mvp.deportes",
+      "versionCode": 186,
       "adaptiveIcon": {
         "backgroundColor": "#0F172A",
-        "foregroundImage": "./assets/images/icon.png"
+        "foregroundImage": "./assets/images/adaptive-icon.png"
       },
       "permissions": [
         "ACCESS_FINE_LOCATION",
@@ -75,6 +77,9 @@ export default ({ config }) => ({
       "@react-native-community/datetimepicker"
     ],
     "extra": {
+      "eas": {
+        "projectId": "9190ee5c-d6b5-49e4-b455-3e1e533d4eef"
+      },
       "firebase": {
         "apiKey": process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
         "authDomain": process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,

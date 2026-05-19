@@ -154,8 +154,7 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
 
   const prevStep = () => { setStep(s => s - 1); setError(""); };
 
-  const recalculateUserELO = async (userId: string, email: string) => { return; };
-  const oldRecalculateUserELO = async (userId: string, email: string) => {
+  const recalculateUserELO = async (userId: string, email: string) => {
     try {
       // 1. Obtener Configuración Global
       const settingsSnap = await getDoc(doc(db, 'settings', 'global'));
@@ -167,168 +166,68 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
       const badgeConfigs = gamification.badges || {};
       const BADGE_XP = gamification.badgeXpValues || { bronze: 50, silver: 150, gold: 500 };
 
-      // 2. Buscar Bookings (por si ya tiene historial con ese email)
+      // 2. Buscar Bookings SOLO como creador/reserva para checkins/noshows
       const q1 = query(collection(db, "bookings"), where("userId", "==", userId));
-      const q2 = query(collection(db, "bookings"), where("playerId", "==", userId));
       const q3 = query(collection(db, "bookings"), where("createdBy", "==", email));
 
-      const [snap1, snap2, snap3] = await Promise.all([getDocs(q1), getDocs(q2), getDocs(q3)]);
+      const [snap1, snap3] = await Promise.all([getDocs(q1), getDocs(q3)]);
       const allDocsMap = new Map();
-      [snap1, snap2, snap3].forEach(snap => snap.docs.forEach((d: any) => { if (!allDocsMap.has(d.id)) allDocsMap.set(d.id, d.data()); }));
+      [snap1, snap3].forEach(snap => snap.docs.forEach((d: any) => { if (!allDocsMap.has(d.id)) allDocsMap.set(d.id, d.data()); }));
 
-      // Filtrar completed/confirmed/no-show para XP
-      const validDocs = Array.from(allDocsMap.values())
-        .filter((b: any) => {
+      let totalCheckins = 0;
+      let totalNoShows = 0;
+      let matchesReservedAndPlayed = 0;
+
+      Array.from(allDocsMap.values()).forEach(b => {
           const s = b.status;
           const isNoShow = s === 'no-show' || 
                            b.paymentStatus === 'no-show' || 
                            b.noShow === true || 
                            (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
-          return s === 'completed' || s === 'confirmed' || b.checkOut === true || isNoShow;
-        })
-        .sort((a: any, b: any) => {
-          const dateA = a.date?.seconds || 0;
-          const dateB = b.date?.seconds || 0;
-          return dateA - dateB;
-        });
+          
+          if (isNoShow) {
+              totalNoShows++;
+          } else if (s === 'completed' || s === 'confirmed' || b.checkOut === true) {
+              matchesReservedAndPlayed++;
+              if (b.checkIn) totalCheckins++;
+          }
+      });
 
-      let totalGoals = 0, totalAssists = 0, totalWins = 0, totalPlayed = validDocs.length, totalMVPs = 0, totalCleanSheets = 0, totalMinutes = 0;
-      let weekendMatches = 0, morningMatches = 0, nightMatches = 0;
-      let currentStreak = 0, maxStreak = 0;
-      const uniqueSports = new Set<string>();
       let calculatedXp = 0;
 
-      validDocs.forEach((b: any) => {
-        const isNoShow = b.status === 'no-show' || 
-                         b.paymentStatus === 'no-show' || 
-                         b.noShow === true || 
-                         (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
-        if (isNoShow) {
-            calculatedXp -= (gamification.xpPerNoShow || 50);
-            return;
-        }
+      // Al ser registro nuevo, performance stats son 0
+      const statsWins = 0, statsLosses = 0, statsGoals = 0, statsAssists = 0, statsMVPs = 0;
 
-        const isW = b.isWin === true;
-        
-        // Estadísticas básicas
-        totalGoals += (b.goals || 0); 
-        totalAssists += (b.assists || 0);
-        if (isW) {
-          totalWins++;
-          currentStreak++;
-          if (currentStreak > maxStreak) maxStreak = currentStreak;
-        } else {
-          currentStreak = 0;
-        }
-        
-        if (b.isMVP) totalMVPs++;
-        if (b.isCleanSheet) totalCleanSheets++;
-        totalMinutes += (b.durationMinutes || 60);
-        
-        const sportKey = (b.sport || 'Fútbol').toLowerCase();
-        uniqueSports.add(sportKey);
+      // XP por Reserva, Check-in y No-show (Solo para el que reserva)
+      calculatedXp += matchesReservedAndPlayed * (gamification.xpPerMatch !== undefined ? gamification.xpPerMatch : 100);
+      calculatedXp += totalCheckins * (gamification.xpPerCheckin !== undefined ? gamification.xpPerCheckin : 50);
+      calculatedXp -= totalNoShows * (gamification.xpPerNoShow !== undefined ? gamification.xpPerNoShow : 150);
 
-        // Análisis de Tiempo y Fecha
-        if (b.date) {
-          const dateObj = b.date.toDate ? b.date.toDate() : (b.date.seconds ? new Date(b.date.seconds * 1000) : new Date(b.date));
-          const day = dateObj.getDay(); // 0=Dom, 6=Sab
-          if (day === 0 || day === 6) weekendMatches++;
-        }
-
-        if (b.startTime) {
-          const hour = typeof b.startTime === 'string' ? parseInt(b.startTime.split(':')[0]) : (b.startTime.toDate ? b.startTime.toDate().getHours() : 12);
-          if (hour < 12) morningMatches++;
-          else if (hour >= 18) nightMatches++;
-        }
-
-        // XP Calculation
-        const defaultOverrides = { 
-          winXP: gamification.xpPerWin || 150, 
-          lossXP: gamification.xpPerLoss || 50, 
-          countGoals: true, 
-          countAssists: true,
-          goalXP: gamification.xpPerGoal || 25,
-          assistXP: gamification.xpPerSpread || gamification.xpPerAssist || 15
-        };
-        const overrides = {
-          ...defaultOverrides,
-          ...(gamification.sportsOverrides?.[sportKey] || {})
-        };
-
-        calculatedXp += (gamification.xpPerMatch || 100);
-        if (b.checkIn) calculatedXp += (gamification.xpPerCheckin || 50);
-
-        const isL = b.isWin === false;
-        if (isW) calculatedXp += overrides.winXP; 
-        else if (isL) calculatedXp -= overrides.lossXP;
-
-        if (overrides.countGoals) calculatedXp += (b.goals || 0) * (overrides.goalXP !== undefined ? overrides.goalXP : 25);
-        if (overrides.countAssists) calculatedXp += (b.assists || 0) * (overrides.assistXP !== undefined ? overrides.assistXP : 15);
-        if (b.isMVP) calculatedXp += (gamification.xpPerMvp || 200);
-      });
+      calculatedXp = Math.max(0, calculatedXp);
 
       // === CALCULAR BADGES Y SU XP BONUS ===
       const daysActive = 1; // Registro inicial
       const statsMap: Record<string, number> = {
-        scorer: totalGoals,
-        goals: totalGoals,
-
-        playmaker: totalAssists,
-        assists: totalAssists,
-
-        defender: totalCleanSheets,
-        clean_sheets: totalCleanSheets,
-
-        wins: totalWins,
-        won: totalWins,
-
-        mvp: totalMVPs,
-        mvps: totalMVPs,
-
-        experience: totalPlayed,
-        played: totalPlayed,
-
-        multi_sport: uniqueSports.size,
-        sports_played: uniqueSports.size,
-
-        captaincy: 0,
-        captain_matches: 0,
-
-        comeback: 0,
-        comebacks: 0,
-
-        precision: 0,
-        precision_matches: 0,
-
-        clutch: 0,
-        clutch_goals: 0,
-
-        tournaments: 0,
-        tournaments_played: 0,
-
-        invictus: maxStreak,
-        longest_win_streak: maxStreak,
-
-        rivalry: 0,
-        rivalries_won: 0,
-
-        morning_player: morningMatches,
-        morning_matches: morningMatches,
-
-        night_player: nightMatches,
-        night_matches: nightMatches,
-
-        loyal: Math.floor(daysActive / 30),
-        loyalty: Math.floor(daysActive / 30),
-
-        weekend_warrior: weekendMatches,
-        weekend_matches: weekendMatches,
-
-        stamina: totalMinutes,
-        minutes_played: totalMinutes,
-
-        social: 0,
-        invited_players: 0
+        scorer: statsGoals, goals: statsGoals,
+        playmaker: statsAssists, assists: statsAssists,
+        defender: 0, clean_sheets: 0,
+        wins: statsWins, won: statsWins,
+        mvp: statsMVPs, mvps: statsMVPs,
+        experience: 0, played: 0,
+        multi_sport: 1, sports_played: 1,
+        captaincy: 0, captain_matches: 0,
+        comeback: 0, comebacks: 0,
+        precision: 0, precision_matches: 0,
+        clutch: 0, clutch_goals: 0,
+        tournaments: 0, tournaments_played: 0,
+        invictus: 0, longest_win_streak: 0,
+        rivalry: 0, rivalries_won: 0,
+        morning_player: 0, morning_matches: 0,
+        night_player: 0, night_matches: 0,
+        loyal: Math.floor(daysActive / 30), loyalty: Math.floor(daysActive / 30),
+        weekend_warrior: 0, weekend_matches: 0,
+        stamina: 0, minutes_played: 0,
+        social: 0, invited_players: 0
       };
 
       const earnedBadges: any[] = [];
@@ -386,19 +285,19 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
         tier: projectedTier,
         badges: earnedBadges,
         stats: {
-          played: totalPlayed,
-          won: totalWins,
-          lost: Math.max(0, totalPlayed - totalWins),
-          goals: totalGoals,
-          assists: totalAssists,
-          clean_sheets: totalCleanSheets,
-          mvps: totalMVPs,
-          sports_played: uniqueSports.size,
-          minutes_played: totalMinutes,
-          longest_win_streak: maxStreak,
-          weekend_matches: weekendMatches,
-          morning_matches: morningMatches,
-          night_matches: nightMatches,
+          played: 0,
+          won: statsWins,
+          lost: statsLosses,
+          goals: statsGoals,
+          assists: statsAssists,
+          clean_sheets: 0,
+          mvps: statsMVPs,
+          sports_played: 1,
+          minutes_played: 0,
+          longest_win_streak: 0,
+          weekend_matches: 0,
+          morning_matches: 0,
+          night_matches: 0,
           loyal: Math.floor(daysActive / 30)
         },
         lastELOUpdate: new Date().toISOString()
@@ -419,6 +318,15 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
       const user = userCredential.user;
       await updateProfile(user, { displayName: formData.displayName });
 
+      // Formatear fecha de YYYY-MM-DD a DD/MM/AAAA para compatibilidad total de la Suite
+      let formattedBirthDate = formData.birthDate;
+      if (formData.birthDate && formData.birthDate.includes("-")) {
+        const parts = formData.birthDate.split("-");
+        if (parts.length === 3 && parts[0].length === 4) {
+          formattedBirthDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+      }
+
       // Guardar perfil base con estadísticas e insignias vacías por defecto
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
@@ -435,7 +343,7 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
         gender: formData.gender,
         favTime: formData.favTime,
         frequency: formData.frequency,
-        birthDate: formData.birthDate,
+        birthDate: formattedBirthDate,
         role: "player",
         createdAt: new Date().toISOString(),
         xp: 0,
@@ -462,6 +370,13 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
           loyal: 0
         }
       });
+
+      // Importar historial de reservas y calcular ELO inicial de inmediato
+      try {
+        await recalculateUserELO(user.uid, formData.email);
+      } catch (recalcErr) {
+        console.error("Error al calcular el ELO inicial:", recalcErr);
+      }
 
       // Enviar correo electrónico confirmando el registro de manera asíncrona
       try {

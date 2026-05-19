@@ -49,6 +49,7 @@ export default function ProfileScreen() {
     const [managedVenues, setManagedVenues] = useState<Tenant[]>([]);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [successMsg, setSuccessMsg] = useState('');
+    const [showSignOutModal, setShowSignOutModal] = useState(false);
 
     useEffect(() => {
         const fetchStaffAndProfile = async () => {
@@ -129,7 +130,12 @@ export default function ProfileScreen() {
         }
     };
 
-    const handleSignOut = async () => {
+    const handleSignOut = () => {
+        setShowSignOutModal(true);
+    };
+
+    const confirmSignOut = async () => {
+        setShowSignOutModal(false);
         signOut();
     };
 
@@ -142,10 +148,8 @@ export default function ProfileScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={COLORS.accent} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase' }}>Perfil Staff</Text>
-                <TouchableOpacity onPress={handleSignOut} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: isDark ? COLORS.error + '22' : '#fef2f2', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: isDark ? COLORS.error + '44' : '#fee2e2' }}>
-                    <LogOut color={COLORS.error} size={20} />
-                </TouchableOpacity>
+                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase' }}>Perfil Administrador</Text>
+                <View style={{ width: 44 }} />
             </View>
 
             <ScrollView 
@@ -227,6 +231,26 @@ export default function ProfileScreen() {
                     </View>
                 </View>
 
+                {/* BOTÓN CERRAR SESIÓN EN EL FONDO */}
+                <TouchableOpacity 
+                    onPress={handleSignOut}
+                    style={{ 
+                        marginHorizontal: 30, 
+                        marginTop: 35, 
+                        height: 65, 
+                        borderRadius: 22, 
+                        backgroundColor: isDark ? COLORS.error + '11' : '#fef2f2', 
+                        flexDirection: 'row', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        borderWidth: 1, 
+                        borderColor: isDark ? COLORS.error + '33' : '#fee2e2' 
+                    }}
+                >
+                    <LogOut color={COLORS.error} size={20} style={{ marginRight: 10 }} />
+                    <Text style={{ color: COLORS.error, fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Cerrar Sesión Activa</Text>
+                </TouchableOpacity>
+
                 <Text style={{ textAlign: 'center', color: C.sub, fontSize: 8, fontWeight: '700', marginTop: 40 }}> MVP SPORTS CHILE • 2026</Text>
             </ScrollView>
 
@@ -257,6 +281,39 @@ export default function ProfileScreen() {
                         >
                             <Text style={{ color: 'white', fontWeight: '900', fontSize: 14, textTransform: 'uppercase' }}>Continuar</Text>
                         </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* MODAL DE CONFIRMACIÓN DE CERRAR SESIÓN */}
+            <Modal
+                visible={showSignOutModal}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowSignOutModal(false)}
+            >
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center', padding: 30 }}>
+                    <View style={{ backgroundColor: C.card, borderRadius: 30, padding: 35, width: '100%', alignItems: 'center', borderWidth: 1, borderColor: C.border }}>
+                        <View style={{ width: 80, height: 80, borderRadius: 30, backgroundColor: COLORS.error + '22', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
+                            <LogOut color={COLORS.error} size={36} />
+                        </View>
+                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', marginBottom: 10 }}>¿Cerrar Sesión?</Text>
+                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', textTransform: 'uppercase', marginBottom: 30 }}>¿Estás seguro de que deseas salir del panel de administración?</Text>
+                        
+                        <View style={{ flexDirection: 'row', gap: 15, width: '100%' }}>
+                            <TouchableOpacity 
+                                onPress={() => setShowSignOutModal(false)}
+                                style={{ flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', paddingVertical: 18, borderRadius: 18, alignItems: 'center', borderWidth: 1, borderColor: C.border }}
+                            >
+                                <Text style={{ color: C.text, fontWeight: '900', fontSize: 12, textTransform: 'uppercase' }}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                                onPress={confirmSignOut}
+                                style={{ flex: 1, backgroundColor: COLORS.error, paddingVertical: 18, borderRadius: 18, alignItems: 'center', shadowColor: COLORS.error, shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.3, shadowRadius: 20 }}
+                            >
+                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 12, textTransform: 'uppercase' }}>Sí, Salir</Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
             </Modal>

@@ -353,7 +353,7 @@ export default function FeedbackPage() {
                                         <div className="mt-3 flex flex-wrap gap-1.5">
                                             <div className="bg-slate-50 dark:bg-white/5 px-2 py-1 rounded-lg border border-slate-100 dark:border-white/5 flex items-center gap-1.5">
                                                 <span className="text-[7px] font-black text-slate-400 uppercase">ID</span>
-                                                <span className="text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase">#{review.bookingId.slice(-4).toUpperCase()}</span>
+                                                <span className="text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase">#{review.bookingId.toUpperCase()}</span>
                                             </div>
                                             {review.sport && (
                                                 <div className="bg-slate-50 dark:bg-white/5 px-2 py-1 rounded-lg border border-slate-100 dark:border-white/5 flex items-center gap-1.5">

@@ -9,10 +9,10 @@ import {
     Trophy, MapPinned
 } from 'lucide-react-native';
 import { Image } from 'expo-image';
-import { useAuth } from '../../../../store/useAuth';
-import { venueService, Tenant } from '../../../../services/venueService';
+import { useAuth } from '../../../store/useAuth';
+import { venueService, Tenant } from '../../../services/venueService';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useUserLocation } from '../../../../src/features/player/hooks/useDashboardData';
+import { useUserLocation } from '../../../src/features/player/hooks/useDashboardData';
 
 const { width } = Dimensions.get('window');
 
@@ -79,9 +79,6 @@ export default function ExploreClubesScreen() {
     useFocusEffect(
         React.useCallback(() => {
             loadData();
-            const backAction = () => { router.back(); return true; };
-            const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-            return () => backHandler.remove();
         }, [])
     );
 

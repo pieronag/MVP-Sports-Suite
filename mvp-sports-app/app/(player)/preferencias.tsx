@@ -12,8 +12,8 @@ import {
     ChevronRight, Sparkles, Activity, Award, Mail, 
     Smartphone, MapPin, AtSign, Cpu, Globe, CheckCircle2, AlertCircle
 } from 'lucide-react-native';
-import { useAuth } from '../../../store/useAuth';
-import { db } from '../../../services/firebase';
+import { useAuth } from '../../store/useAuth';
+import { db } from '../../services/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -97,6 +97,10 @@ export default function SettingsScreen() {
     const [modalMsg, setModalMsg] = useState('');
     const [isRUTFocused, setIsRUTFocused] = useState(false);
 
+    // UNSAVED CHANGES ALERT STATE
+    const [initialData, setInitialData] = useState<any>(null);
+    const [showUnsavedModal, setShowUnsavedModal] = useState(false);
+
     const [formData, setFormData] = useState({
         displayName: '',
         phone: '',
@@ -123,7 +127,7 @@ export default function SettingsScreen() {
             const userDoc = await getDoc(doc(db, 'users', user.uid));
             if (userDoc.exists()) {
                 const data = userDoc.data();
-                setFormData({
+                const loaded = {
                     displayName: data.displayName || '',
                     phone: data.phone || '',
                     bio: data.bio || '',
@@ -141,7 +145,9 @@ export default function SettingsScreen() {
                     favTime: data.favTime || '',
                     frequency: data.frequency || '',
                     intensity: data.intensity || ''
-                });
+                };
+                setFormData(loaded);
+                setInitialData(loaded);
             }
         } catch (error) {
             console.error(error);
@@ -151,10 +157,51 @@ export default function SettingsScreen() {
         }
     };
 
+    const formDataRef = useRef(formData);
+    const initialDataRef = useRef(initialData);
+
+    useEffect(() => {
+        formDataRef.current = formData;
+    }, [formData]);
+
+    useEffect(() => {
+        initialDataRef.current = initialData;
+    }, [initialData]);
+
+    const checkUnsavedChanges = () => {
+        const currentData = formDataRef.current;
+        const baseData = initialDataRef.current;
+        if (!baseData) return false;
+
+        const keys = Object.keys(currentData) as Array<keyof typeof formData>;
+        for (const key of keys) {
+            if (key === 'favSports') {
+                const arr1 = currentData.favSports || [];
+                const arr2 = baseData.favSports || [];
+                if (arr1.length !== arr2.length) return true;
+                if (arr1.some((val, idx) => val !== arr2[idx])) return true;
+            } else {
+                if (currentData[key] !== baseData[key]) return true;
+            }
+        }
+        return false;
+    };
+
+    const handleBack = () => {
+        if (checkUnsavedChanges()) {
+            setShowUnsavedModal(true);
+        } else {
+            router.back();
+        }
+    };
+
     useFocusEffect(
         React.useCallback(() => {
             loadPrefs();
-            const backAction = () => { router.back(); return true; };
+            const backAction = () => {
+                handleBack();
+                return true;
+            };
             const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
             return () => backHandler.remove();
         }, [user])
@@ -240,12 +287,13 @@ export default function SettingsScreen() {
                 updatedAt: new Date().toISOString()
             });
             await useAuth.getState().reloadProfile();
+            setInitialData(formData); // Sincronizar datos iniciales con los guardados para evitar alerta al salir
             showFeedback('success', '¡Excelente! Tus cambios se han sincronizado correctamente.');
             
             // Redirigir al inicio después de un breve momento para que vea el mensaje
             setTimeout(() => {
                 setModalVisible(false);
-                router.back();
+                router.replace('/(player)/(tabs)/');
             }, 1500);
         } catch (error) {
             showFeedback('error', 'Ocurrió un problema al intentar guardar tus ajustes.');
@@ -279,7 +327,7 @@ export default function SettingsScreen() {
             
             {/* CABECERA */}
             <View style={{ paddingTop: 60, paddingBottom: 20, paddingHorizontal: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: C.border }}>
-                <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
+                <TouchableOpacity onPress={handleBack} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={COLORS.accent} size={24} />
                 </TouchableOpacity>
                 <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase' }}>Preferencias</Text>
@@ -319,7 +367,7 @@ export default function SettingsScreen() {
                     <View style={{ backgroundColor: C.card, borderRadius: 30, padding: 25, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: C.border }}>
                         <View style={{ width: 65, height: 65, borderRadius: 20, backgroundColor: COLORS.accent + '11', overflow: 'hidden', borderWidth: 2, borderColor: COLORS.accent }}>
                             <Image 
-                                source={profile?.photoURL ? { uri: profile.photoURL } : require('../../../assets/images/mascot.png')} 
+                                source={profile?.photoURL ? { uri: profile.photoURL } : require('../../assets/images/mascot.jpg')} 
                                 style={{ width: '100%', height: '100%' }} 
                             />
                         </View>
@@ -406,27 +454,6 @@ export default function SettingsScreen() {
                     <RefinedToggleRow icon={Moon} color="#1e293b" label="Modo Oscuro" value={isDark} onValueChange={toggleTheme} isDark={isDark} />
                 </View>
 
-                {/* CERRAR SESIÓN */}
-                <TouchableOpacity 
-                    onPress={signOut} 
-                    style={{ 
-                        marginHorizontal: 30, 
-                        marginTop: 40, 
-                        height: 60, 
-                        borderRadius: 20, 
-                        backgroundColor: isDark ? '#f43f5e' : '#fef2f2', 
-                        borderWidth: isDark ? 0 : 1, 
-                        borderColor: '#fee2e2', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        flexDirection: 'row' 
-                    }}
-                >
-                    <LogOut color={isDark ? 'white' : '#f43f5e'} size={20} />
-                    <Text style={{ color: isDark ? 'white' : '#f43f5e', fontWeight: '900', fontSize: 12, textTransform: 'uppercase', marginLeft: 10 }}>Cerrar Sesión</Text>
-                </TouchableOpacity>
-
-                <Text style={{ textAlign: 'center', color: C.sub, fontSize: 8, fontWeight: '700', marginTop: 40 }}>MVP SPORTS • v2.6.5</Text>
             </ScrollView>
 
             {/* BARRA ACCESORIO TECLADO (K) */}
@@ -480,11 +507,76 @@ export default function SettingsScreen() {
                 onClose={() => {
                     setModalVisible(false);
                     if (modalType === 'success') {
-                        router.back();
+                        router.replace('/(player)/(tabs)/');
                     }
                 }} 
                 isDark={isDark}
             />
+
+            {/* UNSAVED CHANGES ALERT MODAL */}
+            <Modal visible={showUnsavedModal} transparent animationType="fade">
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
+                    <View style={{ backgroundColor: C.card, borderRadius: 35, padding: 30, alignItems: 'center', width: '100%', borderWidth: 1, borderColor: C.border }}>
+                        <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.accent + '11', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+                            <AlertCircle color={COLORS.accent} size={40} />
+                        </View>
+                        <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>
+                            ¿Guardar tus cambios?
+                        </Text>
+                        <Text style={{ color: C.sub, fontSize: 14, fontWeight: '600', textAlign: 'center', marginBottom: 30, lineHeight: 20 }}>
+                            Has realizado modificaciones en tu perfil. ¿Deseas guardarlas antes de salir?
+                        </Text>
+                        
+                        <View style={{ width: '100%', gap: 12 }}>
+                            <TouchableOpacity 
+                                onPress={() => {
+                                    setShowUnsavedModal(false);
+                                    handleSave();
+                                }} 
+                                style={{ 
+                                    backgroundColor: COLORS.accent, 
+                                    paddingVertical: 15, 
+                                    borderRadius: 20, 
+                                    width: '100%', 
+                                    alignItems: 'center' 
+                                }}
+                            >
+                                <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Guardar y Salir</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity 
+                                onPress={() => {
+                                    setShowUnsavedModal(false);
+                                    setFormData(initialData);
+                                    router.back();
+                                }} 
+                                style={{ 
+                                    backgroundColor: isDark ? '#f43f5e22' : '#fef2f2',
+                                    borderWidth: 1,
+                                    borderColor: '#fee2e2',
+                                    paddingVertical: 15, 
+                                    borderRadius: 20, 
+                                    width: '100%', 
+                                    alignItems: 'center' 
+                                }}
+                            >
+                                <Text style={{ color: '#f43f5e', fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Descartar Cambios</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity 
+                                onPress={() => setShowUnsavedModal(false)} 
+                                style={{ 
+                                    paddingVertical: 12, 
+                                    width: '100%', 
+                                    alignItems: 'center' 
+                                }}
+                            >
+                                <Text style={{ color: C.sub, fontWeight: '800', textTransform: 'uppercase', fontSize: 12, letterSpacing: 1 }}>Seguir Editando</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }

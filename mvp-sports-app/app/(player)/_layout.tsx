@@ -21,16 +21,17 @@ export default function PlayerLayout() {
         // o hubo un error de carga. En cualquier caso, debemos ir a preferencias.
         const isPreferencias = segments.includes('preferencias');
         
-        const isComplete = profile && 
-            profile.displayName?.trim() && 
-            profile.phone?.trim() && 
-            profile.rut?.trim() && 
-            profile.mainSport?.trim();
+        const p = profile as any;
+        const isComplete = p && 
+            p.displayName?.trim() && 
+            p.phone?.trim() && 
+            p.rut?.trim() && 
+            p.mainSport?.trim();
 
         if (!isComplete && !isPreferencias) {
             // Usar setImmediate o un pequeño timeout para asegurar que el stack esté listo
             const timer = setTimeout(() => {
-                router.replace('/(player)/(tabs)/preferencias');
+                router.replace('/(player)/preferencias');
             }, 100);
             return () => clearTimeout(timer);
         }
@@ -60,13 +61,26 @@ export default function PlayerLayout() {
         <Stack
             screenOptions={{
                 headerShown: false,
-                animation: 'fade_from_bottom'
+                animation: 'slide_from_right',
+                contentStyle: { backgroundColor: theme === 'dark' ? '#020617' : '#F8FAFC' }
             }}
         >
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="estadisticas" options={{ presentation: 'card' }} />
             <Stack.Screen name="reporte" options={{ presentation: 'card' }} />
-            <Stack.Screen name="clubes/[id]" />
+            <Stack.Screen name="billetera" options={{ presentation: 'card' }} />
+            <Stack.Screen name="preferencias" options={{ presentation: 'card' }} />
+            <Stack.Screen name="torneos" options={{ presentation: 'card' }} />
+            <Stack.Screen name="clubes/explore" options={{ presentation: 'card' }} />
+            <Stack.Screen name="clubes/[id]" options={{ presentation: 'card' }} />
+            <Stack.Screen name="checkout" options={{ presentation: 'card' }} />
+            <Stack.Screen name="ticket" options={{ presentation: 'card', gestureEnabled: false }} />
+            <Stack.Screen name="equipos/[id]" options={{ presentation: 'card' }} />
+            <Stack.Screen name="equipos/explore" options={{ presentation: 'card' }} />
+            <Stack.Screen name="equipos/chat" options={{ presentation: 'card' }} />
+            <Stack.Screen name="mapa" options={{ presentation: 'card' }} />
+            <Stack.Screen name="reservas" options={{ presentation: 'card' }} />
+            <Stack.Screen name="perfil" options={{ presentation: 'card' }} />
         </Stack>
     );
 }

@@ -287,12 +287,13 @@ export default function UserProfileModal({ user, isOpen, onClose }: UserProfileM
                             </div>
                         </div>
                         {/* Stats Grid */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                             {[
                                 { label: 'Partidos', val: stats.played, color: 'text-slate-600 dark:text-slate-300', icon: <UserGroupIcon /> },
                                 { label: 'Ganados', val: stats.won, color: 'text-emerald-500', icon: <TrophyIcon /> },
                                 { label: 'Perdidos', val: stats.lost, color: 'text-rose-400', icon: <HandRaisedIcon /> },
                                 { label: 'Goles', val: stats.goals, color: 'text-amber-500', icon: <FireIcon /> },
+                                { label: 'Asistencias', val: stats.assists || 0, color: 'text-teal-500', icon: <SparklesIcon /> },
                             ].map((s, i) => (
                                 <div key={i} className="group relative p-4 rounded-2xl border border-slate-50 dark:border-white/5 bg-white dark:bg-[#0B0F19] shadow-sm">
                                     <div className="relative z-10 flex flex-col items-center">

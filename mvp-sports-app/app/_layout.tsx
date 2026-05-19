@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Slot, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { View, Platform } from 'react-native';
 import { useAuth } from '../store/useAuth';
 import '../global.css';
@@ -77,7 +77,15 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
         <View className="flex-1 bg-white dark:bg-[#020617]">
-          <Slot />
+          <Stack screenOptions={{ 
+            headerShown: false, 
+            animation: 'slide_from_right',
+            contentStyle: { backgroundColor: theme === 'dark' ? '#020617' : '#F8FAFC' }
+          }}>
+            <Stack.Screen name="(auth)/login" />
+            <Stack.Screen name="(player)" />
+            <Stack.Screen name="(owner)" />
+          </Stack>
         </View>
       </SafeAreaProvider>
     </QueryClientProvider>

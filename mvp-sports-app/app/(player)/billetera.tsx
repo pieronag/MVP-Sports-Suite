@@ -7,8 +7,8 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import {
     ChevronLeft, ShieldCheck, Clock, Receipt, CheckCircle2, CreditCard, Landmark, MapPin
 } from 'lucide-react-native';
-import { useAuth } from '../../../store/useAuth';
-import { bookingService, Booking } from '../../../services/bookingService';
+import { useAuth } from '../../store/useAuth';
+import { bookingService, Booking } from '../../services/bookingService';
 
 const { width } = Dimensions.get('window');
 
@@ -73,8 +73,8 @@ export default function BilleteraScreen() {
             });
 
             filteredBookings.sort((a, b) => {
-                const dateA = (a.date as any)?.toMillis ? (a.date as any).toMillis() : new Date(a.date).getTime();
-                const dateB = (b.date as any)?.toMillis ? (b.date as any).toMillis() : new Date(b.date).getTime();
+                const dateA = (a.date as any)?.toMillis ? (a.date as any).toMillis() : new Date(a.date as any).getTime();
+                const dateB = (b.date as any)?.toMillis ? (b.date as any).toMillis() : new Date(b.date as any).getTime();
                 return dateB - dateA;
             });
             setBookings(filteredBookings.slice(0, 20));
@@ -89,9 +89,6 @@ export default function BilleteraScreen() {
     useFocusEffect(
         React.useCallback(() => {
             loadData();
-            const backAction = () => { router.back(); return true; };
-            const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-            return () => backHandler.remove();
         }, [user])
     );
 
@@ -197,7 +194,7 @@ export default function BilleteraScreen() {
                             // Formato de fecha
                             let dateStr = 'Reciente';
                             if (match.date) {
-                                const t = (match.date as any)?.seconds ? (match.date as any).seconds * 1000 : new Date(match.date).getTime();
+                                const t = (match.date as any)?.seconds ? (match.date as any).seconds * 1000 : new Date(match.date as any).getTime();
                                 dateStr = new Date(t).toLocaleDateString('es-CL', { day: 'numeric', month: 'short' });
                             }
 

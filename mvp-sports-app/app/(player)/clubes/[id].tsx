@@ -107,6 +107,7 @@ export default function VenueDetailsScreen() {
     const [refreshing, setRefreshing] = useState(false);
     const [isCreatingBooking, setIsCreatingBooking] = useState(false);
     const [reviews, setReviews] = useState<any[]>([]);
+    const [visibleReviewsCount, setVisibleReviewsCount] = useState(3);
 
     const fetchData = useCallback(async () => {
         if (!id) return;
@@ -133,13 +134,24 @@ export default function VenueDetailsScreen() {
         }
     }, [id]);
 
+    const handleBack = useCallback(() => {
+        if (bookingStep > 1) {
+            setBookingStep(prev => prev - 1);
+        } else {
+            router.back();
+        }
+    }, [bookingStep, router]);
+
     useFocusEffect(
         React.useCallback(() => {
             fetchData();
-            const backAction = () => { router.back(); return true; };
+            const backAction = () => {
+                handleBack();
+                return true;
+            };
             const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
             return () => backHandler.remove();
-        }, [fetchData])
+        }, [fetchData, handleBack])
     );
 
     useEffect(() => {
@@ -253,28 +265,8 @@ export default function VenueDetailsScreen() {
             const court = courts.find(c => c.id === selectedCourtId);
             const sportInfo = getSportInfo(selectedSport || '');
             const priceNum = venue?.pricing?.[selectedSport!]?.[selectedTime!] || venue?.pricing?.[selectedSport!]?.default || court?.price || 18000;
-            
-            // 1. CREAR PRERESERVA PENDIENTE PARA BLOQUEAR EL HORARIO
-            const dateParts = selectedDate.split('-');
-            const bookingDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]), 12, 0, 0);
 
-            const bookingId = await bookingService.createBooking({
-                userId: user.uid,
-                clientName: profile?.displayName || 'Jugador MVP',
-                tenantId: id as string,
-                tenantName: venue?.name || 'Recinto',
-                courtId: selectedCourtId!,
-                courtName: court?.name || 'Cancha',
-                date: Timestamp.fromDate(bookingDate) as any,
-                startTime: selectedTime!,
-                endTime: selectedTime!, // Podría calcularse sumando duración
-                totalPrice: Number(priceNum),
-                paymentStatus: 'pending',
-                status: 'pending',
-                sport: selectedSport!,
-                source: 'mobile_app'
-            });
-
+            // Redirigir directamente al checkout con los parámetros de reserva, SIN crear el documento en Firestore aún
             router.push({
                 pathname: '/(player)/checkout',
                 params: {
@@ -286,13 +278,12 @@ export default function VenueDetailsScreen() {
                     date: selectedDate,
                     startTime: selectedTime!,
                     sport: selectedSport!,
-                    sportColor: sportInfo.color,
-                    bookingId: bookingId // PASAR ID CREADO
+                    sportColor: sportInfo.color
                 }
             });
         } catch (error) {
-            console.error('Error creating pre-booking:', error);
-            Alert.alert('Error', 'No se pudo iniciar la reserva. Intenta de nuevo.');
+            console.error('Error initiating checkout:', error);
+            Alert.alert('Error', 'No se pudo iniciar el proceso de reserva. Intenta de nuevo.');
         } finally {
             setIsCreatingBooking(false);
         }
@@ -321,7 +312,7 @@ export default function VenueDetailsScreen() {
                     />
                     <LinearGradient colors={['rgba(0,0,0,0.3)', 'transparent']} style={StyleSheet.absoluteFill} />
 
-                    <TouchableOpacity onPress={() => router.back()} style={{ position: 'absolute', top: 50, left: 25, width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
+                    <TouchableOpacity onPress={handleBack} style={{ position: 'absolute', top: 50, left: 25, width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
                         <ChevronLeft color="white" size={24} />
                     </TouchableOpacity>
                 </View>
@@ -513,7 +504,7 @@ export default function VenueDetailsScreen() {
                             </View>
                         ) : (
                             <View style={{ gap: 15 }}>
-                                {reviews.map((rev) => (
+                                {reviews.slice(0, visibleReviewsCount).map((rev) => (
                                         <View key={rev.id} style={{ backgroundColor: C.card, borderRadius: 25, padding: 20, borderWidth: 1, borderColor: C.border }}>
                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                                                 <View style={{ flex: 1, marginRight: 10 }}>
@@ -535,6 +526,29 @@ export default function VenueDetailsScreen() {
                                             </Text>
                                         </View>
                                 ))}
+
+                                {reviews.length > visibleReviewsCount && (
+                                    <TouchableOpacity
+                                        onPress={() => setVisibleReviewsCount(prev => prev + 3)}
+                                        activeOpacity={0.8}
+                                        style={{
+                                            backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#FFFFFF',
+                                            height: 55,
+                                            borderRadius: 20,
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            marginTop: 5,
+                                            borderWidth: 1,
+                                            borderColor: C.border,
+                                            shadowColor: '#000',
+                                            shadowOpacity: isDark ? 0.2 : 0.02,
+                                            shadowRadius: 5,
+                                            elevation: 1
+                                        }}
+                                    >
+                                        <Text style={{ color: accent, fontSize: 12, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 }}>Cargar 3 opiniones más</Text>
+                                    </TouchableOpacity>
+                                )}
                             </View>
                         )}
                     </View>

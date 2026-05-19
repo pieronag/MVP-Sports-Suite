@@ -101,9 +101,6 @@ export default function PerfilScreen() {
     useFocusEffect(
         React.useCallback(() => {
             loadData();
-            const backAction = () => { router.back(); return true; };
-            const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-            return () => backHandler.remove();
         }, [user])
     );
 
@@ -196,7 +193,7 @@ export default function PerfilScreen() {
     const displayName = profile?.displayName || 'Jugador';
 
     // Image source logic
-    const imageSource = photoURL ? { uri: photoURL } : require('../../../assets/images/mascot.png');
+    const imageSource = photoURL ? { uri: photoURL } : require('../../../assets/images/mascot.jpg');
 
     // Cálculo de insignias ganadas para la ficha (sincronizado con el sistema real)
     const earnedBadgesCount = (() => {
@@ -591,7 +588,7 @@ export default function PerfilScreen() {
                     />
 
                     {/* Top Left: Zoomed Logo (Scaled & Aligned) */}
-                    <View style={{ position: 'absolute', top: 75, left: 20, width: 180, height: 120, overflow: 'hidden' }}>
+                    <View style={{ position: 'absolute', top: 40, left: 20, width: 180, height: 120, overflow: 'hidden' }}>
                         <Image
                             source={require('../../../assets/images/Logo.png')}
                             style={{ width: '130%', height: '130%', position: 'absolute', top: '-15%', left: '-15%' }}
@@ -608,14 +605,11 @@ export default function PerfilScreen() {
                             <Text style={{ color: '#06b6d4', fontSize: 14, fontWeight: '900', letterSpacing: 5 }}>VALORACIÓN</Text>
                             <Text style={{ color: '#06b6d4', fontSize: 14, fontWeight: '900', letterSpacing: 5 }}>GENERAL</Text>
                         </View>
-                        <View style={{ marginTop: 20, backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
-                            <Text style={{ color: 'white', fontSize: 12, fontWeight: '900' }}>INSIGNIAS: {earnedBadgesCount}</Text>
-                        </View>
                     </View>
 
                     {/* PLAYER POSITION VERTICAL */}
-                    <View style={{ position: 'absolute', left: -40, top: '45%', transform: [{ rotate: '-90deg' }] }}>
-                        <Text style={{ color: 'white', fontSize: 70, fontWeight: '900', opacity: 0.5, letterSpacing: 10 }}>{profile?.position || 'JUGADOR'}</Text>
+                    <View style={{ position: 'absolute', left: -240, top: '35%', transform: [{ rotate: '-90deg' }] }}>
+                        <Text style={{ color: 'white', fontSize: 140, fontWeight: '900', opacity: 0.5, letterSpacing: 2 }}>{(profile?.position || 'JUGADOR').toUpperCase()}</Text>
                     </View>
 
                     {/* Bottom Section: TOPPS NOW STYLE NAMEPLATE */}

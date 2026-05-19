@@ -120,7 +120,7 @@ export default function PlayerDashboard() {
                             <View style={{ position: 'relative' }}>
                                 <View style={{ width: 100, height: 100, borderRadius: 32, overflow: 'hidden', borderWidth: 4, borderColor: isDark ? '#1E293B' : '#FFFFFF', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 15 }}>
                                     <Image 
-                                        source={profile?.photoURL ? { uri: profile.photoURL } : require('../../../assets/images/mascot.png')} 
+                                        source={profile?.photoURL ? { uri: profile.photoURL } : require('../../../assets/images/mascot.jpg')} 
                                         style={{ width: '100%', height: '100%' }} 
                                     />
                                 </View>
@@ -159,17 +159,17 @@ export default function PlayerDashboard() {
                     </View>
 
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                        <QuickIcon bit={<CalendarRange size={24} />} label="Reservas" color="#3b82f6" route="/(player)/(tabs)/reservas" C={C} isDark={isDark} />
-                        <QuickIcon bit={<MapPin size={24} />} label="Mapa" color="#10b981" route="/(player)/(tabs)/mapa" C={C} isDark={isDark} />
-                        <QuickIcon bit={<Trophy size={24} />} label="Torneos" color="#f43f5e" route="/(player)/(tabs)/torneos" C={C} isDark={isDark} />
+                        <QuickIcon bit={<CalendarRange size={24} />} label="Reservas" color="#3b82f6" route="/(player)/reservas" C={C} isDark={isDark} />
+                        <QuickIcon bit={<MapPin size={24} />} label="Mapa" color="#10b981" route="/(player)/mapa" C={C} isDark={isDark} />
+                        <QuickIcon bit={<Trophy size={24} />} label="Torneos" color="#f43f5e" route="/(player)/torneos" C={C} isDark={isDark} />
                         <QuickIcon bit={<GraduationCap size={24} />} label="Academias" color="#8b5cf6" route="/(player)/reporte" C={C} isDark={isDark} />
-                        <QuickIcon bit={<Wallet size={24} />} label="Billetera" color="#14b8a6" route="/(player)/(tabs)/billetera" C={C} isDark={isDark} />
+                        <QuickIcon bit={<Wallet size={24} />} label="Billetera" color="#14b8a6" route="/(player)/billetera" C={C} isDark={isDark} />
 
-                        <QuickIcon bit={<Building2 size={24} />} label="Recintos" color="#f59e0b" route="/(player)/(tabs)/clubes/explore" C={C} isDark={isDark} />
-                        <QuickIcon bit={<Users size={24} />} label="Equipos" color="#f97316" route="/(player)/(tabs)/equipos/explore" C={C} isDark={isDark} />
+                        <QuickIcon bit={<Building2 size={24} />} label="Recintos" color="#f59e0b" route="/(player)/clubes/explore" C={C} isDark={isDark} />
+                        <QuickIcon bit={<Users size={24} />} label="Equipos" color="#f97316" route="/(player)/equipos/explore" C={C} isDark={isDark} />
                         <QuickIcon bit={<BarChart3 size={24} />} label="Estadísticas" color="#f97316" route="/(player)/estadisticas" C={C} isDark={isDark} />
-                        <QuickIcon bit={<User size={24} />} label="Perfil" color="#8b5cf6" route="/(player)/(tabs)/perfil" C={C} isDark={isDark} />
-                        <QuickIcon bit={<Settings size={24} />} label="Ajustes" color="#64748b" route="/(player)/(tabs)/preferencias" C={C} isDark={isDark} />
+                        <QuickIcon bit={<User size={24} />} label="Perfil" color="#8b5cf6" route="/(player)/perfil" C={C} isDark={isDark} />
+                        <QuickIcon bit={<Settings size={24} />} label="Ajustes" color="#64748b" route="/(player)/preferencias" C={C} isDark={isDark} />
                     </View>
                 </View>
 
@@ -191,7 +191,7 @@ export default function PlayerDashboard() {
                                 <View style={{ marginLeft: 25, flex: 1 }}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                                         <Sparkles color="rgba(255,255,255,0.7)" size={14} />
-                                        <Text style={{ color: 'rgba(255,255,255,0.7)', fontWeight: '900', fontSize: 9, letterSpacing: 1.5, marginLeft: 8 }}>FICHA MVP 2026</Text>
+                                        <Text style={{ color: 'rgba(255,255,255,0.7)', fontWeight: '900', fontSize: 9, letterSpacing: 1.5, marginLeft: 8 }}>CARTA MVP 2026</Text>
                                     </View>
                                     <Text style={{ color: 'white', fontSize: 22, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Tu Valoración</Text>
                                     <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: '700', marginTop: 4 }}>Consulta tu rendimiento oficial.</Text>

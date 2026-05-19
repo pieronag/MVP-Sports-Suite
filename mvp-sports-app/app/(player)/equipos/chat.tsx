@@ -8,9 +8,9 @@ import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import {
     ChevronLeft, Send, User, Shield, MessageCircle, Users, Smile
 } from 'lucide-react-native';
-import { useAuth } from '../../../../store/useAuth';
-import { chatService, ChatMessage } from '../../../../services/chatService';
-import { teamService } from '../../../../services/teamService';
+import { useAuth } from '../../../store/useAuth';
+import { chatService, ChatMessage } from '../../../services/chatService';
+import { teamService } from '../../../services/teamService';
 
 const { width } = Dimensions.get('window');
 
@@ -62,12 +62,8 @@ export default function ChatEquiposScreen() {
                 }
             );
 
-            const backAction = () => { router.back(); return true; };
-            const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-
             return () => {
                 unsubscribe();
-                backHandler.remove();
             };
         }, [teamId])
     );

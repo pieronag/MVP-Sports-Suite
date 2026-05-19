@@ -323,17 +323,24 @@ export default function Page() {
           const settingsSnap = await getDoc(doc(db, 'settings', 'global'));
           const settingsData = settingsSnap.exists() ? settingsSnap.data() || {} : {};
           const gamification = settingsData.gamification || {
-            xpPerMatch: 100, xpPerWin: 150, xpPerLoss: 50,
-            tiers: { silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 }
+            xpPerCheckin: 50,
+            xpPerMatch: 100,
+            xpPerWin: 150,
+            xpPerMvp: 200,
+            xpPerGoal: 25,
+            xpPerAssist: 15,
+            xpPerLoss: 50,
+            xpPerNoShow: 150,
+            tiers: { bronze: 0, silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 }
           };
           const badgeConfigs = gamification.badges || settingsData.badges || {};
           const BADGE_XP = gamification.badgeXpValues || { bronze: 50, silver: 150, gold: 500 };
           const maxXP = gamification.tiers?.legend || 25000;
           const batch = users.map(async (user) => {
-            // Buscar por userId, playerId y createdBy — deduplicar
+            const existingStats = user.raw?.stats || {};
+            // 1. Obtener bookings solo donde el usuario es el que reserva (para checkin, noshow, partido jugado base)
             const queries = [
-              getDocs(query(collection(db, "bookings"), where("userId", "==", user.id))).catch(() => ({ docs: [] as any[] })),
-              getDocs(query(collection(db, "bookings"), where("playerId", "==", user.id))).catch(() => ({ docs: [] as any[] })),
+              getDocs(query(collection(db, "bookings"), where("userId", "==", user.id))).catch(() => ({ docs: [] as any[] }))
             ];
             if (user.email && user.email !== '---') {
               queries.push(getDocs(query(collection(db, "bookings"), where("createdBy", "==", user.email))).catch(() => ({ docs: [] as any[] })));
@@ -341,163 +348,85 @@ export default function Page() {
             const snaps = await Promise.all(queries);
             const allDocsMap = new Map<string, any>();
             snaps.forEach(snap => { snap.docs.forEach((d: any) => { if (!allDocsMap.has(d.id)) allDocsMap.set(d.id, d); }); });
-            
-            // Filtrar solo completed/confirmed/no-show para XP
-            const validDocs = Array.from(allDocsMap.values())
-              .filter(d => {
-                const bData = d.data();
-                const s = bData.status;
+            let totalCheckins = 0;
+            let totalNoShows = 0;
+            let matchesReservedAndPlayed = 0;
+
+            Array.from(allDocsMap.values()).forEach(d => {
+                const b = d.data();
+                const s = b.status;
                 const isNoShow = s === 'no-show' || 
-                                 bData.paymentStatus === 'no-show' || 
-                                 bData.noShow === true || 
-                                 (bData.notes && (bData.notes.toLowerCase().includes('no-show') || bData.notes.toLowerCase().includes('inasistencia')));
-                return s === 'completed' || s === 'confirmed' || bData.checkOut === true || isNoShow;
-              })
-              .sort((a, b) => {
-                const dateA = a.data().date?.seconds || 0;
-                const dateB = b.data().date?.seconds || 0;
-                return dateA - dateB;
-              });
-
-            let totalGoals = 0, totalAssists = 0, totalWins = 0, totalPlayed = validDocs.length, totalMVPs = 0, totalCleanSheets = 0, totalMinutes = 0;
-            let weekendMatches = 0, morningMatches = 0, nightMatches = 0;
-            let currentStreak = 0, maxStreak = 0;
-            const uniqueSports = new Set<string>();
-            let calculatedXp = 0;
-
-            validDocs.forEach(d => {
-              const b = d.data();
-              const isNoShow = b.status === 'no-show' || 
-                               b.paymentStatus === 'no-show' || 
-                               b.noShow === true || 
-                               (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
-              if (isNoShow) {
-                  calculatedXp -= (gamification.xpPerNoShow || 50);
-                  return;
-              }
-
-              const isW = (b.winnerTeam && b.winnerTeam === user.raw?.teamId) || b.isWin === true;
-              
-              // Estadísticas básicas
-              totalGoals += (b.goals || 0); 
-              totalAssists += (b.assists || 0);
-              if (isW) {
-                totalWins++;
-                currentStreak++;
-                if (currentStreak > maxStreak) maxStreak = currentStreak;
-              } else {
-                currentStreak = 0;
-              }
-              
-              if (b.isMVP) totalMVPs++;
-              if (b.isCleanSheet) totalCleanSheets++;
-              totalMinutes += (b.durationMinutes || 60);
-              
-              const sportKey = (b.sport || 'Fútbol').toLowerCase();
-              uniqueSports.add(sportKey);
-
-              // Análisis de Tiempo y Fecha
-              if (b.date) {
-                const dateObj = b.date.toDate ? b.date.toDate() : new Date(b.date.seconds * 1000);
-                const day = dateObj.getDay(); // 0=Dom, 6=Sab
-                if (day === 0 || day === 6) weekendMatches++;
-              }
-
-              if (b.startTime) {
-                const hour = parseInt(b.startTime.split(':')[0]);
-                if (hour < 12) morningMatches++;
-                else if (hour >= 18) nightMatches++;
-              }
-
-              // XP Calculation
-              const defaultOverrides = { 
-                winXP: gamification.xpPerWin || 150, 
-                lossXP: gamification.xpPerLoss || 50, 
-                countGoals: true, 
-                countAssists: true,
-                goalXP: gamification.xpPerGoal || 25,
-                assistXP: gamification.xpPerAssist || 15
-              };
-              const overrides = {
-                ...defaultOverrides,
-                ...(gamification.sportsOverrides?.[sportKey] || {})
-              };
-
-              calculatedXp += (gamification.xpPerMatch || 100);
-              if (b.checkIn) calculatedXp += (gamification.xpPerCheckin || 50);
-
-              const isL = b.isWin === false;
-              if (isW) calculatedXp += overrides.winXP; 
-              else if (isL) calculatedXp -= overrides.lossXP;
-
-              if (overrides.countGoals) calculatedXp += (b.goals || 0) * (overrides.goalXP !== undefined ? overrides.goalXP : 25);
-              if (overrides.countAssists) calculatedXp += (b.assists || 0) * (overrides.assistXP !== undefined ? overrides.assistXP : 15);
-              if (b.isMVP) calculatedXp += (gamification.xpPerMvp || 200);
+                                 b.paymentStatus === 'no-show' || 
+                                 b.noShow === true || 
+                                 (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
+                
+                if (isNoShow) {
+                    totalNoShows++;
+                } else if (s === 'completed' || s === 'confirmed' || b.checkOut === true) {
+                    matchesReservedAndPlayed++;
+                    if (b.checkIn) totalCheckins++;
+                }
             });
+
+            // 2. Calcular XP basado en los stats existentes en Firebase (Performance) + Reservas (Base)
+            let calculatedXp = 0;
+            const mainSportKey = (user.raw?.mainSport || 'Fútbol').toLowerCase();
+            const defaultOverrides = { 
+              winXP: gamification.xpPerWin !== undefined ? gamification.xpPerWin : 150, 
+              lossXP: gamification.xpPerLoss !== undefined ? gamification.xpPerLoss : 50, 
+              countGoals: true, 
+              countAssists: true,
+              goalXP: gamification.xpPerGoal !== undefined ? gamification.xpPerGoal : 25,
+              assistXP: gamification.xpPerAssist !== undefined ? gamification.xpPerAssist : 15
+            };
+            const overrides = {
+              ...defaultOverrides,
+              ...(gamification.sportsOverrides?.[mainSportKey] || {})
+            };
+
+            const statsWins = Number(existingStats.won || existingStats.wins || 0);
+            const statsLosses = Number(existingStats.lost || 0);
+            const statsGoals = Number(existingStats.goals || existingStats.scorer || 0);
+            const statsAssists = Number(existingStats.assists || existingStats.playmaker || 0);
+            const statsMVPs = Number(existingStats.mvps || existingStats.mvp || 0);
+
+            // XP por Performance (Ingresado por Modal de Estadísticas)
+            calculatedXp += statsWins * overrides.winXP;
+            calculatedXp -= statsLosses * overrides.lossXP;
+            if (overrides.countGoals) calculatedXp += statsGoals * overrides.goalXP;
+            if (overrides.countAssists) calculatedXp += statsAssists * overrides.assistXP;
+            calculatedXp += statsMVPs * (gamification.xpPerMvp !== undefined ? gamification.xpPerMvp : 200);
+
+            // XP por Reserva, Check-in y No-show (Solo para el que reserva)
+            calculatedXp += matchesReservedAndPlayed * (gamification.xpPerMatch !== undefined ? gamification.xpPerMatch : 100);
+            calculatedXp += totalCheckins * (gamification.xpPerCheckin !== undefined ? gamification.xpPerCheckin : 50);
+            calculatedXp -= totalNoShows * (gamification.xpPerNoShow !== undefined ? gamification.xpPerNoShow : 150);
+
+            calculatedXp = Math.max(0, calculatedXp);
 
             // === CALCULAR BADGES Y SU XP BONUS ===
             const daysActive = Math.max(1, (new Date().getTime() - user.rawJoined.getTime()) / (1000 * 60 * 60 * 24));
-            const existingStats = user.raw?.stats || {};
             const statsMap: Record<string, number> = {
-              scorer: Math.max(Number(existingStats.goals || 0), totalGoals),
-              goals: Math.max(Number(existingStats.goals || 0), totalGoals),
-
-              playmaker: Math.max(Number(existingStats.assists || 0), totalAssists),
-              assists: Math.max(Number(existingStats.assists || 0), totalAssists),
-
-              defender: Math.max(Number(existingStats.clean_sheets || 0), totalCleanSheets),
-              clean_sheets: Math.max(Number(existingStats.clean_sheets || 0), totalCleanSheets),
-
-              wins: Math.max(Number(existingStats.won || 0), totalWins),
-              won: Math.max(Number(existingStats.won || 0), totalWins),
-
-              mvp: Math.max(Number(existingStats.mvp || existingStats.mvps || 0), totalMVPs),
-              mvps: Math.max(Number(existingStats.mvp || existingStats.mvps || 0), totalMVPs),
-
-              experience: Math.max(Number(existingStats.played || 0), totalPlayed),
-              played: Math.max(Number(existingStats.played || 0), totalPlayed),
-
-              multi_sport: Math.max(Number(existingStats.sports_played || 1), uniqueSports.size),
-              sports_played: Math.max(Number(existingStats.sports_played || 1), uniqueSports.size),
-
-              captaincy: Number(existingStats.captain_matches || 0),
-              captain_matches: Number(existingStats.captain_matches || 0),
-
-              comeback: Number(existingStats.comebacks || 0),
-              comebacks: Number(existingStats.comebacks || 0),
-
-              precision: Number(existingStats.precision_matches || 0),
-              precision_matches: Number(existingStats.precision_matches || 0),
-
-              clutch: Number(existingStats.clutch_goals || 0),
-              clutch_goals: Number(existingStats.clutch_goals || 0),
-
-              tournaments: Number(existingStats.tournaments_played || 0),
-              tournaments_played: Number(existingStats.tournaments_played || 0),
-
-              invictus: Math.max(Number(existingStats.longest_win_streak || 0), maxStreak),
-              longest_win_streak: Math.max(Number(existingStats.longest_win_streak || 0), maxStreak),
-
-              rivalry: Number(existingStats.rivalries_won || 0),
-              rivalries_won: Number(existingStats.rivalries_won || 0),
-
-              morning_player: Math.max(Number(existingStats.morning_matches || 0), morningMatches),
-              morning_matches: Math.max(Number(existingStats.morning_matches || 0), morningMatches),
-
-              night_player: Math.max(Number(existingStats.night_matches || 0), nightMatches),
-              night_matches: Math.max(Number(existingStats.night_matches || 0), nightMatches),
-
-              loyal: Math.max(Number(existingStats.loyal || 0), Math.floor(daysActive / 30)),
-              loyalty: Math.max(Number(existingStats.loyal || 0), Math.floor(daysActive / 30)),
-
-              weekend_warrior: Math.max(Number(existingStats.weekend_matches || 0), weekendMatches),
-              weekend_matches: Math.max(Number(existingStats.weekend_matches || 0), weekendMatches),
-
-              stamina: Math.max(Number(existingStats.minutes_played || 0), totalMinutes),
-              minutes_played: Math.max(Number(existingStats.minutes_played || 0), totalMinutes),
-
-              social: Number(existingStats.invited_players || 0),
-              invited_players: Number(existingStats.invited_players || 0)
+              scorer: statsGoals, goals: statsGoals,
+              playmaker: statsAssists, assists: statsAssists,
+              defender: Number(existingStats.clean_sheets || existingStats.defender || 0), clean_sheets: Number(existingStats.clean_sheets || existingStats.defender || 0),
+              wins: statsWins, won: statsWins,
+              mvp: statsMVPs, mvps: statsMVPs,
+              experience: Number(existingStats.played || existingStats.experience || 0), played: Number(existingStats.played || existingStats.experience || 0),
+              multi_sport: Number(existingStats.sports_played || existingStats.multi_sport || 1), sports_played: Number(existingStats.sports_played || existingStats.multi_sport || 1),
+              captaincy: Number(existingStats.captain_matches || existingStats.captaincy || 0), captain_matches: Number(existingStats.captain_matches || existingStats.captaincy || 0),
+              comeback: Number(existingStats.comebacks || existingStats.comeback || 0), comebacks: Number(existingStats.comebacks || existingStats.comeback || 0),
+              precision: Number(existingStats.precision_matches || existingStats.precision || 0), precision_matches: Number(existingStats.precision_matches || existingStats.precision || 0),
+              clutch: Number(existingStats.clutch_goals || existingStats.clutch || 0), clutch_goals: Number(existingStats.clutch_goals || existingStats.clutch || 0),
+              tournaments: Number(existingStats.tournaments_played || existingStats.tournaments || 0), tournaments_played: Number(existingStats.tournaments_played || existingStats.tournaments || 0),
+              invictus: Number(existingStats.longest_win_streak || existingStats.invictus || 0), longest_win_streak: Number(existingStats.longest_win_streak || existingStats.invictus || 0),
+              rivalry: Number(existingStats.rivalries_won || existingStats.rivalry || 0), rivalries_won: Number(existingStats.rivalries_won || existingStats.rivalry || 0),
+              morning_player: Number(existingStats.morning_matches || existingStats.morning_player || 0), morning_matches: Number(existingStats.morning_matches || existingStats.morning_player || 0),
+              night_player: Number(existingStats.night_matches || existingStats.night_player || 0), night_matches: Number(existingStats.night_matches || existingStats.night_player || 0),
+              loyal: Math.max(Number(existingStats.loyal || existingStats.loyalty || 0), Math.floor(daysActive / 30)), loyalty: Math.max(Number(existingStats.loyal || existingStats.loyalty || 0), Math.floor(daysActive / 30)),
+              weekend_warrior: Number(existingStats.weekend_matches || existingStats.weekend_warrior || 0), weekend_matches: Number(existingStats.weekend_matches || existingStats.weekend_warrior || 0),
+              stamina: Number(existingStats.minutes_played || existingStats.stamina || 0), minutes_played: Number(existingStats.minutes_played || existingStats.stamina || 0),
+              social: Number(existingStats.invited_players || existingStats.social || 0), invited_players: Number(existingStats.invited_players || existingStats.social || 0)
             };
 
             const earnedBadges: any[] = [];

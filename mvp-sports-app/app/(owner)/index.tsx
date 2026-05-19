@@ -158,14 +158,59 @@ export default function ManagerDashboard() {
             const currentTenantId = selectedTenantId || list[0].id;
             if (!selectedTenantId) setSelectedTenantId(currentTenantId);
 
-            const today = new Date();
-            const b = await bookingService.getBookingsByTenantForDate(currentTenantId, today);
-            
-            // Auto check-in local / no-show validation on loaded bookings
             const nowChile = getSantiagoDateTime(new Date());
+            const today = new Date(nowChile);
+            if (nowChile.getHours() < 6) {
+                today.setDate(today.getDate() - 1);
+            }
 
-            const verifiedBookings = await Promise.all(b.map(async (booking) => {
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            const [b1, b2] = await Promise.all([
+                bookingService.getBookingsByTenantForDate(currentTenantId, today),
+                bookingService.getBookingsByTenantForDate(currentTenantId, tomorrow)
+            ]);
+
+            const combined = [...b1, ...b2];
+            const uniqueMap = new Map<string, Booking>();
+            combined.forEach(bk => {
+                if (bk.id) uniqueMap.set(bk.id, bk);
+            });
+
+            const getBookingOperationalDateStr = (booking: Booking) => {
+                let bookingDate: Date;
+                if ((booking.date as any).toDate) {
+                    bookingDate = (booking.date as any).toDate();
+                } else {
+                    bookingDate = new Date(booking.date as any);
+                }
+                const [hours] = (booking.startTime || "00:00").split(':').map(Number);
+                const opDate = new Date(bookingDate);
+                if (hours < 6) {
+                    opDate.setDate(opDate.getDate() - 1);
+                }
+                const y = opDate.getFullYear();
+                const m = (opDate.getMonth() + 1).toString().padStart(2, '0');
+                const d = opDate.getDate().toString().padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            };
+
+            const targetOpDateStr = (() => {
+                const y = today.getFullYear();
+                const m = (today.getMonth() + 1).toString().padStart(2, '0');
+                const d = today.getDate().toString().padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            })();
+
+            const operationalBookings = Array.from(uniqueMap.values()).filter(booking => {
+                return getBookingOperationalDateStr(booking) === targetOpDateStr;
+            });
+
+            // Auto check-in local / no-show validation on loaded bookings
+            const verifiedBookings = await Promise.all(operationalBookings.map(async (booking) => {
                 if (
+                    booking.tenantId === currentTenantId &&
                     booking.status !== 'cancelled' && 
                     booking.status !== 'completed' &&
                     booking.checkIn !== true && 
@@ -183,17 +228,20 @@ export default function ManagerDashboard() {
                     
                     if (nowChile >= startDateTime) {
                         try {
+                            const isPrePaid = booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial';
+                            const targetPaymentStatus = isPrePaid ? booking.paymentStatus : 'no-show';
+
                             const bookingRef = doc(db, 'bookings', booking.id as string);
                             await updateDoc(bookingRef, {
                                 status: 'cancelled',
-                                paymentStatus: 'no-show',
+                                paymentStatus: targetPaymentStatus,
                                 notes: 'Cancelación automática por inasistencia sin check-in (No-Show).',
                                 updatedAt: new Date()
                             });
                             return {
                                 ...booking,
                                 status: 'cancelled' as const,
-                                paymentStatus: 'no-show' as any,
+                                paymentStatus: targetPaymentStatus as any,
                                 notes: 'Cancelación automática por inasistencia sin check-in (No-Show).'
                             };
                         } catch (e) {
@@ -275,7 +323,7 @@ export default function ManagerDashboard() {
                     style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}
                 >
                     <Image 
-                        source={profile?.photoURL ? { uri: profile.photoURL } : require('../../assets/images/mascot.png')} 
+                        source={profile?.photoURL ? { uri: profile.photoURL } : require('../../assets/images/mascot.jpg')} 
                         style={{ width: 40, height: 40, borderRadius: 12 }} 
                     />
                 </TouchableOpacity>

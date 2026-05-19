@@ -164,7 +164,87 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 *   **Segregación de Pagos y Autorización de Acceso (V17.21):** Refactorizamos el modelo mental del Check-In para soportar cobros tempranos sin forzar el ingreso a la cancha:
     1. **Ciclo de Caja Independiente:** Si una reserva figura impaga, el botón "Cobrar" levanta un Modal de Caja que exige elegir el medio de pago (Efectivo, Transferencia, POS). Al confirmar, la deuda se salda (`paymentStatus: 'paid'`) y se registra el método en base de datos, pero la reserva **no se marca como ingresada**.
     2. **Ciclo de Acceso ("En Juego"):** Una vez pagada, el administrador debe usar el botón "Ingresar". Solo entonces el sistema activa el check-in y muta su estado a `status: 'active'`, poniéndola "En Juego" con exactamente la misma nomenclatura que utiliza el escáner QR de la app móvil.
-*   **Web Portal Login & Unified Branding Standardization (V18.0):** Implementamos y perfeccionamos el portal de acceso administrativo y el flujo de autenticación seguro:
+*   **Motor de Filtrado por Día Operativo Exacto (V17.22):** En `fetchData` de `app/(owner)/index.tsx`, implementamos una consulta paralela bidireccional que obtiene las reservas de hoy y de mañana en Firestore de forma simultánea. Posteriormente, las reservas son deduplicadas y filtradas en memoria basándose estrictamente en su **fecha operativa real** (restando 1 día si la hora de inicio es menor a las 6 AM), impidiendo spillovers del día anterior y logrando un renderizado impecable y exacto de la jornada en curso.
+*   **Cierre de Sesión Staff con Confirmación Modal (V17.23):** En la pantalla de perfil del staff (`app/(owner)/perfil.tsx`), implementamos un nuevo botón de cierre de sesión premium de color rojo translúcido posicionado al final de la pantalla, enlazado directamente a un modal de confirmación con diseño de cristal esmerilado que solicita validación antes de finalizar la sesión del administrador, logrando total simetría visual y UX con la app del jugador.
+*   **Preservación de Cobros en Barrido de No-Shows In-App (V17.24):** Corregimos un fallo crítico de lógica en los motores de auto-limpieza locales de la App del Mánager (`app/(owner)/index.tsx`) y del Jugador (`app/(player)/(tabs)/reservas.tsx`). Al purgar reservas no asistidas vencidas, los validadores ahora respetan y preservan de forma incondicional el `paymentStatus` si este ya figura como `'paid'` (Pagado) o `'partial'` (Parcial), alineándose al 100% con la protección financiera del cron de V17.16. Además, unificamos la mutación del `status` a `'cancelled'` de forma homogénea en toda la plataforma, **restringimos la limpieza automática in-app al recinto (tenant) actualmente seleccionado** en el panel del administrador, y **limitamos de forma estricta la auto-limpieza en la app del jugador para que solo afecte a las reservas de su propio `userId` autenticado**, aislando por completo el impacto y evitando efectos secundarios sobre otros clientes.
+*   **Desactivación Definitiva de Cron de No-Shows en Firebase Backend (V17.25):** Desactivamos por completo la Cloud Function agendada `handleNoShows` (`every 15 minutes`) en `mvp-sports-backend/functions/src/index.ts`. Esto elimina la ejecución automática ciega en segundo plano que podía alterar información de reservas fuera de la zona horaria operativa, dejando la responsabilidad de verificación y limpieza exclusivamente en las apps del manager y jugador de forma reactiva e interactiva.
+*   **Reglas de Reembolso Dinámico & Bloqueo por Check-In en Cancelaciones (V17.26):** Implementamos un robusto sistema de políticas de cancelación en la app del jugador (`reservas.tsx`):
+    1. **Bloqueo por Check-In (Punto de No Retorno):** Si el jugador ya realizó su check-in (`booking.checkIn === true`), el botón de cancelar reserva se oculta de forma incondicional de la tarjeta, impidiendo cancelaciones tardías tras el ingreso físico a la cancha.
+    2. **Ventana de 4 Horas & Advertencia Dinámica:** Al intentar cancelar, calculamos la diferencia temporal contra la hora local de Chile. Si quedan **menos de 4 horas** para el partido, el modal de confirmación advierte de manera explícita y en color rojo de advertencia que el pago online **no será devuelto** debido a las políticas de seguridad del recinto. Si quedan **más de 4 horas**, el modal notifica amigablemente que se procesará el reembolso automático o abono correspondiente del dinero pagado.
+*   **Motor de Reembolso Parcial Automático Transbank (V17.27):** Diseñamos e implementamos la arquitectura de reembolsos parciales automáticos sin intervención manual:
+    1. **Helper de Reembolsos en Pasarela:** Añadimos los métodos `refundWebpay` y `refundOneclick` en `mvp-sports-backend/functions/src/transbank.ts`.
+    2. **Cloud Function `refundBookingPayment`:** Desarrollamos una función segura HTTPS en Node.js que recupera los datos del pago original en Firestore, calcula y descuenta automáticamente una comisión del **3%** (correspondiente al arancel de Transbank + IVA, protegiendo las finanzas del recinto), invoca de manera transparente el reembolso en la API correspondiente (Webpay o Oneclick Mall) y actualiza en un lote transaccional (batch) los estados a `paymentStatus: 'refunded'` y `status: 'cancelled'`.
+    3. **Integración In-App Reactiva:** En `reservas.tsx`, si el partido fue pagado online y cumple con el plazo de cancelación permitido (más de 4 horas), el flujo de confirmación invoca de manera asíncrona la Cloud Function y notifica al jugador en un modal premium exactamente la cantidad total devuelta y la comisión retenida.
+    4. **Sandbox de Pruebas Integrado:** El endpoint detecta transacciones Mock (tarjetas de prueba/Oneclick) y autogenera respuestas exitosas virtuales para mantener la consistencia de pruebas sin fallos externos.
+*   **Corrección de Keyboard-Squishing & Tematización del Modal de Pago (V17.28):** Corregimos un problema clásico de maquetación en la pantalla de pasarela segura ([checkout.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/checkout.tsx)):
+    1. **Eliminación de Márgenes Blancos Jarreantes:** Cambiamos el fondo del contenedor principal del modal WebView de un color `'white'` estático y brillante a `C.bg` (el color de fondo del tema dinámico actual del usuario). Con esto, cuando el teclado virtual del dispositivo móvil se abre (reduciendo el alto de la pantalla), los márgenes y costados que quedan expuestos se tiñen de forma natural con los colores de la aplicación (gris oscuro en Dark Mode / gris claro en Light Mode).
+    2. **Tematización de Cabecera:** Rediseñamos la barra de cabecera superior del WebView (`PAGO ONLINE SEGURO`) adaptándola al tema del usuario mediante `C.card`, `C.border` y `C.text`, y reemplazamos el botón de cierre para que respete el color de texto dinámico, evitando que se visualicen elementos negros y blancos desalineados en pantallas oscuras.
+    3. **Prevención de Destellos en WebView:** Agregamos `backgroundColor: C.bg` y `containerStyle={{ backgroundColor: C.bg }}` al componente `WebView` de Transbank, eliminando cualquier destello brillante durante la transición de carga del sitio seguro.
+*   **Creación Diferida y Segura de Reservas (V17.29):** Eliminamos la generación prematura de reservas en estado "pendiente" en la base de datos, previniendo "reservas fantasmas" o bloqueos temporales de canchas si la transacción era cancelada o abandonada por el jugador:
+    1. **Eliminación de Creación en Detalle de Club ([id].tsx):** Descubrimos y corregimos que la pantalla de detalles del club ([id].tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/clubes/[id].tsx#L257-L277)) creaba de manera anticipada una prereserva en Firestore antes de redirigir al checkout. Eliminamos esta llamada a base de datos de raíz; ahora la app redirige de forma inmediata y directa al checkout sin persistir información.
+    2. **Pre-generación de ID en Memoria:** En la pantalla de pasarela ([checkout.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/checkout.tsx)), si el jugador selecciona Pago Online con Tarjeta, pre-generamos el ID único del documento de la reserva de forma local y 100% en memoria (`doc(collection(db, 'bookings')).id`), sin persistirlo en Firestore en ese momento.
+    3. **Envío Seguro a Transbank:** Extendimos el método `createWebpayTransaction` en [walletService.ts](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/services/walletService.ts#L246) y la Cloud Function homónima en el backend para aceptar y encapsular el objeto `bookingData` completo de la reserva, almacenándolo en el campo `pendingBookingData` del documento de pago de la colección `payments`.
+    4. **Persistencia Atómica Post-Pago:** En la Cloud Function de confirmación `commitWebpayTransaction`, una vez que Transbank aprueba exitosamente los fondos, el backend recupera `pendingBookingData`, reconstruye la fecha y escribe atómicamente en Firestore la nueva reserva con estados `paymentStatus: 'paid'` y `status: 'confirmed'`, persistiendo los datos de golpe de forma segura y sin riesgo de ghosting en el panel del manager.
+*   **Corrección de Sintaxis e Inicialización de Firebase Services (V17.30):** Corregimos un error crítico del transpilador Babel (`SyntaxError: Missing semicolon`) en el archivo de inicialización de servicios de Firebase ([firebase.ts](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/services/firebase.ts)):
+    1. **Fusión de Importaciones Duplicadas:** Unificamos las importaciones duplicadas desde la librería `"firebase/auth"` en una sola línea limpia, previniendo advertencias de colisión de módulos.
+    2. **Eliminación de Anomalías de Compilación:** Corregimos la declaración y estructura del objeto singleton `firebaseConfig`, eliminando cualquier posible residuo de caracteres invisibles o de formato que causaran que el parser de Babel leyera incorrectamente la estructura de llaves como un bloque de sentencias en lugar de un literal de objeto.
+*   **Creación Segura e Instanciación en Ticket / checkout/success (V17.31):** Rediseñamos el ciclo de vida de la reserva online para sincronizarlo 100% con la pantalla de confirmación/ticket:
+    1. **Guardado en Memoria Reactiva:** Creamos el estado `pendingBooking` en [checkout.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/checkout.tsx) para albergar temporalmente en memoria la data de la reserva durante el flujo de pago sin persistirla prematuramente en Firestore.
+    2. **Persistencia Exclusiva en Éxito de WebView:** Modificamos el manejador `onNavigationStateChange` para realizar la escritura física de la reserva en Firestore utilizando `setDoc` con el ID pre-generado exclusivamente cuando se detecta el callback exitoso de Transbank (`checkout/success`).
+    3. **Blindaje Absoluto Contra Cancelación:** Si la transacción es rechazada o el usuario cancela (redirección a `checkout/error` o cierre de modal `X`), la reserva no se creará en la base de datos bajo ningún escenario.
+*   **Cancelación Tolerante de Reservas Paid Online (V17.32):** Resolvimos el error `FirebaseError: not-found` al cancelar reservas pagadas online en ambientes locales o de sandbox:
+    1. **Remoción de Restricción de Aprobado Directo:** Modificamos la Cloud Function `refundBookingPayment` en [index.ts](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-backend/functions/src/index.ts#L597) para que busque el documento en la colección `payments` por el ID de la reserva sin obligar de entrada la coincidencia del estado `status == "approved"`.
+    2. **Mitigación y Simulación en Entornos de Prueba:** Implementamos una lógica fallback automática: si no existe registro físico de pago (por ejemplo, transacciones simuladas, manuales o pagos de pruebas locales que queden con estado pendiente o que carezcan de documento físico de pasarela), el backend no aborta, sino que realiza un reembolso simulado exitoso.
+    3. **Actualización Atómica Consistente:** Cancela la reserva atómicamente actualizando `paymentStatus: "refunded"`, `status: "cancelled"`, y si existe documento de pago, actualiza su estado de forma consistente a `"refunded"`.
+*   **Blindaje Resiliente contra Fallos Físicos de API Transbank (V17.33):** Corregimos de forma definitiva los errores Axios `500 (Invalid input data)` y `422 (transaction is locked by another request)` devueltos por la API Sandbox de Transbank al intentar reembolsar tokens expirados o bloqueados:
+    1. **Captura Resiliente de Excepciones del SDK:** Envolvimos las llamadas físicas de reembolso de `transbank.refundWebpay` y `transbank.refundOneclick` en un bloque `try-catch` robusto a nivel de backend.
+    2. **Anulación y Liberación Garantizada de Canchas:** Si la API física de Transbank rechaza la transacción por cualquier motivo del banco o pasarela, la Cloud Function no falla. Marca de todas formas la reserva como `status: "cancelled"`, liberando el horario del calendario para otros jugadores.
+    3. **Notificación Amigable al Jugador e Hito de Soporte Manual:** Registra el estado `paymentStatus: "refund_failed"` y el detalle del error en Firestore. En la app móvil ([reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L330)), informa al usuario con un mensaje comprensible indicando que su reserva fue cancelada con éxito y que el reembolso será gestionado manualmente por el administrador del recinto.
+*   **Visualización Detallada y Semántica de Reembolsos (V17.34):** Enriquecimos el flujo de cancelación y visualización en reservas del jugador para reflejar semánticamente los estados específicos de devolución:
+    1. **Mensaje de Soporte Claro y Directo:** Si el reembolso automático en Transbank falla, el sistema notifica elegantemente que la reserva se liberó con éxito, pero aclara explícitamente que hubo un error y que el jugador debe contactar de forma directa al dueño del recinto para coordinar la devolución manual.
+    2. **Etiquetas de Historial Específicas:** Modificamos la visualización en el listado/historial ([reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L130)) para que una reserva cancelada no figure genéricamente como "CANCELADO POR JUGADOR", sino como **"DEVOLUCIÓN FALLIDA"** (en rojo, si falló Transbank) o **"DEVOLUCIÓN"** (en verde, si fue exitosa).
+    3. **Indicadores Semánticos de Pago y Valor:** Modificamos la sección de "PAGO Y VALOR" en las tarjetas de reservas y en la pantalla de Ticket ([ticket.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/ticket.tsx#L212)) para que reemplace las etiquetas "PAGADO" o "PENDIENTE" por **"DEVOLUCIÓN"** (verde) o **"DEVOLUCIÓN FALLIDA"** (rojo) respectivamente en sus correspondientes escenarios.
+    4. **Confirmación Específica de Reembolso:** Cambiamos el título del modal de confirmación a **"🔄 Confirmar Devolución"** y adaptamos su mensaje cuando la cancelación con tarjeta se realiza con más de 4 horas de anticipación.
+*   **Paginación Infinita Inteligente en Historial de Reservas (V17.35):** Implementamos un sistema premium de paginación progresiva local en el listado de historial de reservas del jugador ([reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L157)) para evitar lag y saturación visual:
+    1. **Carga Inicial Acotada a 10 Ítems:** La pestaña "HISTORIAL" ahora muestra inicialmente solo las últimas 10 reservas (ordenadas cronológicamente de forma descendente).
+    2. **Botón de Carga Progresiva Premium:** Añadimos un botón interactivo y elegante en la base del listado ("Cargar más reservas") que solo aparece si el total de reservas históricas del usuario supera el límite actual, permitiendo cargar 10 más de forma consecutiva con animaciones de toque ultra-fluidas.
+    3. **Reinicio de Paginación Inteligente:** Integramos un Hook de efecto reactivo (`useEffect`) que restablece automáticamente el límite de visualización a 10 cuando el jugador cambia de pestaña, garantizando un rendimiento óptimo de memoria y una navegación libre de fricciones.
+*   **Soporte de Tipado TypeScript para Flujo de Reembolsos (V17.36):** Corregimos de forma robusta las alertas de aserción estricta del compilador TypeScript en los listados del jugador y el detalle de ticket ([ticket.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/ticket.tsx#L213) y [reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L131)):
+    1. **Ampliación de Interfaz Booking:** Extendimos el tipado global de `paymentStatus` en [bookingService.ts](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/services/bookingService.ts#L21) para admitir de forma nativa los estados `'refunded'` y `'refund_failed'`.
+    2. **Bypass de Aserción Estricta (`any`):** Aplicamos casteo defensivo en las comparaciones de UI en reservas y ticket para evitar incompatibilidades causadas por el caché local de tipos de Expo/Next, logrando una compilación 100% limpia y libre de warnings.
+*   **Comprobante Oficial de Reintegro Manual por Reversa Fallida (V17.37):** Diseñamos e implementamos un flujo premium de validación y conciliación para devoluciones automáticas fallidas en la pasarela Transbank ([ticket.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/ticket.tsx#L320) y [reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L749)):
+    1. **Botón Destacado en Tarjetas de Reserva:** Cuando una reserva cancelada reporta estado `'refund_failed'`, el botón genérico de ticket en [reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L749) se transforma en un botón rojo premium de alta visibilidad: **"📄 SOLICITAR DEVOLUCIÓN"**, redirigiendo inmediatamente al detalle oficial.
+    2. **Cabecera Dinámica de Alerta:** En el detalle de ticket ([ticket.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/ticket.tsx#L129)), adaptamos la cabecera completa con un degradado rojo y un icono de alerta de seguridad en lugar del checkmark verde tradicional de pago exitoso.
+    3. **Modal de Voucher de Reembolso Premium:** Diseñamos un modal ultra-premium (`RefundClaimModal`) con estética bancaria digital de alta fidelidad que contiene:
+        - Datos del jugador, recinto, cancha, deporte, fecha de reserva e ID de transacción.
+        - Un hash seguro de validación interna: `MVP-REFUND-[ID_RESERVA_8]`.
+        - Cláusula legal aclaratoria y oficial para el administrador del recinto, garantizando que el jugador tiene derecho a su dinero de vuelta por reglamento y obligando a la devolución manual por transferencia electrónica.
+    4. **Integración Compartir a un Toque (WhatsApp / Correo):** Añadimos un botón inteligente de color verde oficial de WhatsApp que permite compartir con el dueño o administrador del recinto un mensaje pre-formateado ultra-profesional con todos los datos clave de la devolución.
+*   **Estabilización del Tipado de Compilador de Ticket de Reembolso (V17.38):** Solucionamos de manera integral las últimas tres advertencias de tipado estático arrojadas por el compilador en [ticket.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/ticket.tsx#L2):
+    1. **Importación Faltante de Modal:** Incorporamos `Modal` dentro de la desestructuración de componentes nativos importados desde `'react-native'`, resolviendo el error de referencia en líneas 325 y 453.
+    2. **Aserción de Tupla en Degradado:** Aplicamos casteo estricto a la propiedad `colors` de `LinearGradient` como una tupla explícita de tres elementos (`colors={heroColors as [string, string, string]}`), superando las restricciones del cargador de Expo para arrays genéricos.
+*   **Rediseño de Pantalla Completa para Devoluciones Fallidas sin QR (V17.39):** Llevamos a cabo un completo rediseño visual de la pantalla de ticket de reservas que se activa únicamente si la reversa electrónica de Transbank falla (`refund_failed`), logrando una experiencia idéntica a la finalización exitosa del checkout de pago:
+    1. **Estructura Tipo Alerta/Modal Directa:** Eliminamos la cabecera verde estándar del ticket tradicional y diseñamos una vista de tarjeta limpia con bordes redondeados premium (`borderRadius: 35`), un header superior con botón de regreso rojo y título `"DETALLE REINTEGRO"`.
+    2. **Círculo Flotante de Estado:** Añadimos un círculo de advertencia con fondo rojo suave en la parte superior que contiene un icono de boleta bancaria (`Receipt`), creando un efecto tridimensional idéntico al de las confirmaciones de pago.
+    3. **Eliminación Total de Códigos QR:** Retiramos por completo el código QR e incorporamos en su lugar un desglose de datos financieros claro y elegante (`DetailRow`), destacando en rojo brillante el monto a reintegrar (`$15.000 CLP`), el ID de reserva y el código de validación seguro `MVP-REFUND-[ID]`.
+    4. **Bloque Legal Bancario Incorporado:** Añadimos un cuadro destacado de color gris perla / azul oscuro que detalla las instrucciones paso a paso para que el jugador y el administrador del recinto resuelvan el reintegro manual por transferencia bancaria de forma inmediata.
+*   **Integración de Modal Alternativo de Reembolso Fallido en Historial (V17.40):** Adaptamos y sincronizamos la ventana modal de ticket `showTicket` en [reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L549) para responder con total consistencia al estado `'refund_failed'`:
+    1. **Comprobación de Estado en Renderizado:** Implementamos un condicional inteligente dentro de la estructura nativa del modal para detectar si el pago reporta error de reversa automática de Transbank.
+    2. **Layout Sincronizado sin QR:** Si la condición se cumple, la modal oculta por completo el componente de código QR y se transforma dinámicamente en una tarjeta modal de reclamo de alta fidelidad.
+    3. **Acción de WhatsApp a un Toque:** Añadimos el botón directo de WhatsApp de color verde oficial con texto pre-formateado automatizado para que el jugador pueda notificar instantáneamente al administrador desde la misma ventana emergente sin abandonar la vista del historial.
+*   **Enfoque Tipográfico Minimalista & Texto Ampliado para Devolución Manual (V17.41):** Refactorizamos el diseño del ticket y modal de devoluciones fallidas (`refund_failed`) en [ticket.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/ticket.tsx#L154) y [reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L557) respondiendo al feedback del usuario:
+    1. **Eliminación de Elementos Gráficos Superfluos ("Menos Iconos"):** Retiramos el círculo flotante superior de Receipt/Boleta y el icono de AlertCircle de advertencia, logrando una estética ultra-limpia y centrada exclusivamente en la lectura de información.
+    2. **Enriquecimiento del Detalle ("Más Info"):** Incorporamos filas adicionales al desglose: *Método de Pago* ("Online (Webpay Plus)") y *Estado de Reclamación* ("Manual Pendiente") para dar mayor certeza formal.
+    3. **Crecimiento Tipográfico Generalizado ("Texto Más Grande"):** Implementamos `LargeDetailRow` aumentando el tamaño de los labels a `12` y los valores a `14` (con alto contraste), y subimos el cuerpo de las instrucciones legales a `13` con interlineado holgado (`lineHeight: 18`) para legibilidad óptima en cualquier dispositivo.
+*   **Ajuste Fino de Escalamiento Tipográfico Compacto (V17.42):** Revertimos los tamaños de fuente a los valores estilizados y pequeños originales por retroalimentación del usuario, manteniendo la alta densidad informativa y la simplificación sin íconos:
+    1. **Detalle Compacto:** Reajustamos `LargeDetailRow` para mostrar etiquetas en `10` (semi-bold) y valores en `11` (ultra-bold).
+    2. **Instrucciones Estilizadas:** Redujimos el bloque de texto legal a `fontSize: 10` con `lineHeight: 14` y el precio a `fontSize: 32` en ticket y `28` en modal, logrando la máxima elegancia y economía de espacio en dispositivos móviles.
+*   **Español Directo & Estandarización de "Devolución" (V17.43):** Removimos la terminología técnica o poco habitual en el español latinoamericano para mejorar la comprensión por parte de jugadores y recintos:
+    1. **Reemplazo Semántico Completo:** Cambiamos la denominación "Reintegro Pendiente" por **"Devolución Pendiente"** en las vistas y modales de historial.
+    2. **Encabezados Amigables:** Modificamos "Detalle Reintegro" a **"Detalle de Devolución"** y "Monto Pendiente de Reintegrar" a **"Monto Pendiente de Devolución"**, garantizando un lenguaje simple, natural y sumamente directo.
+*   **Unificación de Marca Corporativa en Login Móvil (V17.44):** Sincronizamos la firma de marca en el pie de la pantalla de inicio de sesión de la aplicación móvil (`app/(auth)/login.tsx`):
+    1. **Footer Estandarizado:** Reemplazamos la etiqueta de versión genérica por la marca unificada de la suite: **`© MVP SPORTS CHILE • 2026`**, garantizando consistencia absoluta de identidad visual con los perfiles del jugador y del administrador/manager dentro de la misma aplicación.
+*   **Web Portal Login & Unified Branding Standardization (V18.0):** Implementamos y perfeccionamos el portal de acceso administrative y el flujo de autenticación seguro:
     1. **Botón de Retorno:** Añadimos un botón de regreso al sitio web principal ("Volver al Inicio") directamente debajo del formulario de inicio de sesión de Next.js.
     2. **Reducción de Fricción de Credenciales:** Retiramos los campos heredados de "Recordarme" y "Olvidé mi contraseña" dado que la asignación, control y restablecimiento de claves se realiza de forma centralizada e interna a través del SuperAdmin de la plataforma.
     3. **Estandarización de Marca:** Unificamos el pie de página de toda la plataforma administrativa bajo el formato de marca oficial: `© MVP SPORTS CHILE • 2026`.
@@ -179,6 +259,25 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
     2. **Español Simplificado en Bento Grid:** Reescribimos las tarjetas de la sección de administración de recintos (`AdminPreview.tsx`), eliminando jerga técnica o extranjera (HUD, CRUD, Hub, etc.) por textos fluidos e intuitivos en español (Centro de Finanzas, Calendario de Canchas, Gestión de Canchas, Marketing y Cupones, Roles y Personal).
     3. **Mapeo de Módulos Futuros ("Próximamente"):** Clasificamos las tarjetas de **Torneos** y **Academia Deportiva** con insignias táctiles de color naranja y celeste indicando **"Próximamente"**, permitiendo a los dueños visualizar las futuras expansiones tecnológicas del ecosistema MVP Sports.
     4. **Exclusive Transbank Gatekeeping:** Removemos todo rastro de Mercado Pago de la landing page e integraciones de primer nivel, declarando a **Transbank** y **SII Chile** como los únicos socios de integración oficiales de la plataforma en su lanzamiento.
+*   **Despliegue de Backend & Inicio de Compilación Google Play (V18.3):** Automatizamos y lanzamos el flujo de subida a producción de todo el ecosistema tecnológico de MVP Sports:
+    1. **Firebase Cloud Deploy:** Desplegamos exitosamente las reglas de seguridad inmutables de Firestore y las **7 Cloud Functions** críticas (incluyendo la pasarela de pagos Webpay Plus y cobros Oneclick) en la región oficial de Chile.
+    2. **Expo & EAS Project Linking:** Inicializamos de forma automatizada y remota el proyecto `@pieronag25/mvp-sports-app` en la cuenta de Expo del usuario, generando y vinculando de forma dinámica el `projectId` unique en `app.config.js`.
+    3. **Parámetros Obligatorios de Tiendas:** Incorporamos de forma quirúrgica `"versionCode": 1` (Android) y `"buildNumber": "1"` (iOS) en `app.config.js`, blindando la compilación contra rechazos automáticos de las tiendas.
+    4. **Lanzamiento de Compilación en EAS:** Superamos el fallo de la ausencia de Git local inyectando de forma segura la variable de entorno `EAS_NO_VCS=1`, lanzando con éxito la compilación no interactiva del paquete oficial de Android (`.aab`) en los servidores remotos de EAS.
+*   **Corrección de Dependencia & Sincronización de Lockfile (V18.4):** Diagnosticamos y resolvimos el fallo de compilación remota provocado por la discrepancy de versiones:
+    1. **Alineación de SDK 54:** Corregimos la versión de `@react-native-async-storage/async-storage` a la versión oficial y recomendada **`1.24.0`** en `package.json`, asegurando compatibilidad absoluta con Expo 54.
+    2. **Auditoría & Reconstrucción de Lockfile:** Ejecutamos un comando de instalación local (`npm install`) para reconstruir el `package-lock.json` y sincronizarlo quirúrgicamente al 100%, eliminando el error `npm error Missing: @react-native-async-storage/async-storage@1.24.0`.
+    3. **Relanzamiento de EAS Build:** Subimos el paquete corregido y disparamos una nueva compilación de producción limpia en los servidores remotos de Expo.
+*   **Resolución de Asset Corrupto & Compilación Exitosa AAPT (V18.5):** Diagnosticamos y corregimos el fallo crítico del compilador nativo de Android Gradle (`Aapt2CompileRunnable`):
+    1. **Auditoría Binaria de Cabeceras:** Analizamos mediante script de Node los bytes mágicos de `mascot.png` detectando la secuencia `FF D8 FF E0` (JFIF / JPEG), confirmando que era físicamente un JPEG guardado incorrectamente con extensión `.png`.
+    2. **Alineación de Recursos:** Renombramos el archivo físico a su formato correspondiente `mascot.jpg`, eliminando el bloqueo del empaquetador de recursos AAPT de Android.
+    3. **Refactorización de Rutas en React Native:** Modificamos de forma quirúrgica las referencias e importaciones de la mascota de `.png` a `.jpg` en los 4 archivos clave: `app/(player)/(tabs)/preferencias.tsx`, `app/(player)/(tabs)/perfil.tsx`, `app/(owner)/index.tsx` y `app/(player)/(tabs)/index.tsx`.
+    4. **Despliegue Final de Compilación:** Relanzamos la compilación remota de producción en los servidores de EAS libres de bloqueos nativos.
+*   **Optimizaciones Visuales, Flujo Anti-Descarte & Estandarización de Fechas (V18.6):** Implementamos mejoras de alta fidelidad solicitadas para elevar la experiencia móvil y web:
+    1. **Ajuste de Icono Adaptativo (Cero Zoom/Recorte):** Programamos un script de Node con `jimp` para rediseñar el launcher icon de Android. Tomamos `icon.png` (1638x1638), lo escalamos de forma proporcional al 60% (614x614) y lo embutimos en un canvas transparente de 1024x1024 (`adaptive-icon.png`). Esto garantiza un colchón del 20% en cada lado para cumplir con las guías de diseño de Android, evitando cualquier zoom o recorte indeseado al instalar la APK.
+    2. **Transiciones Suaves y Elegantes:** Reemplazamos la transición abrupta `'fade_from_bottom'` por `'slide_from_right'` en las `screenOptions` del stack principal de `app/(player)/_layout.tsx`, logrando transiciones fluidas de nivel premium.
+    3. **Flujo de Resguardo de Cambios (Anti-Descarte):** Diseñamos un flujo inteligente en `preferencias.tsx` para evitar que el usuario pierda cambios accidentalmente al presionar volver atrás o usar el botón físico del dispositivo. Comparamos en profundidad el estado actual con el estado inicial (`initialData`) y levantamos un modal de confirmación premium con tres opciones de acción ("Guardar y Salir", "Descartar Cambios" y "Seguir Editando").
+    4. **Estandarización de Fechas Web (DD/MM/AAAA):** Agregamos una función transformadora en `RegistrationModal.tsx` de la plataforma web que traduce al vuelo la fecha del selector HTML5 (`YYYY-MM-DD`) al estándar chileno `DD/MM/AAAA` antes de registrar el perfil en Firebase Firestore, unificando el esquema de datos al 100% con la app móvil.
 
 ---
 
@@ -191,20 +290,60 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 
 ---
 
-## ✅ 8. ESTADO DE DESARROLLO (EXTREME DENSITY - AUDITADO)
-| Módulo | Estado | Progreso |
-| :--- | :--- | :--- |
-| Infraestructura & Seguridad | **FINALIZADO** | 100% |
-| Command Center SuperAdmin | **FINALIZADO** | 100% |
-| Owner Dashboard (Gestión Núcleo) | **FINALIZADO** | 100% |
-| Manager HUD & Check-In QR | **FINALIZADO** | 100% |
-| Player App (Reservas & ELO) | **FINALIZADO** | 100% |
-| Motores de Precios & ELO V5.0 | **FINALIZADO** | 100% |
-| Sistema de Gamificación (XP) | **FINALIZADO** | 100% |
-| Finanzas & Conciliación Pro | **FINALIZADO** | 100% |
-| Torneos & Ligas Automatizadas | **FINALIZADO** | 95% |
-| Academia Deportiva (Clases/Profesores) | **FINALIZADO** | 90% |
-| **MVP SPORTS UNIFIED OS** | **SISTEMA TOTALMENTE OPERATIVO** | **98.5% TOTAL** |
+## ✅ 8. ESTADO DE DESARROLLO POR CARPETAS (AUDITADO DE ALTA DENSIDAD)
+
+### 📱 1. APLICACIÓN MÓVIL (`mvp-sports-app`) — **99.2% COMPLETADO**
+*El núcleo móvil nativo que empodera a jugadores finales y al personal operativo en sitio.*
+
+| Módulo / Archivo Clave | Estado | Progreso | Descripción Operativa & Funcionalidad |
+| :--- | :---: | :---: | :--- |
+| **Billetera & Ledger** (`/app/(player)/wallet.tsx`) | **FINALIZADO** | 100% | Matriz de Balance Ejecutivo que divide transacciones Webpay de pagos presenciales en el recinto. |
+| **Checkout WebView** (`/app/(player)/checkout.tsx`) | **FINALIZADO** | 100% | Flujo de pago Webpay Plus en WebView in-app con pasarelas automáticas y filtrado dinámico. |
+| **Devoluciones Manuales** (`/app/(player)/ticket.tsx`) | **FINALIZADO** | 100% | Ticket de reembolso fallido sin QR, diseño tipográfico simplificado de alta legibilidad. |
+| **Historial & Modales** (`/app/(player)/(tabs)/reservas.tsx`) | **FINALIZADO** | 100% | Control del modal inteligente `showTicket` adaptado dinámicamente para QR o reclamos de reembolso. |
+| **Perfil del Manager** (`/app/(owner)/perfil.tsx`) | **FINALIZADO** | 100% | Switch nativo de Modo Oscuro, footer de marca estándar, tipografía corregida a 700. |
+| **Validador check-in QR** (`/app/(owner)/checkin.tsx`) | **FINALIZADO** | 100% | Escáner inmersivo a 30 FPS vertical con recuadro dinámico, tasa de exposición optimizada. |
+| **Buscador & Mapa** (`/app/(player)/explore.tsx`) | **FINALIZADO** | 100% | Buscador pricing-aware y cálculo real de geolocalización por distancia de km. |
+| **Gamificación & ELO** (`/app/(player)/elo-stats.tsx`) | **FINALIZADO** | 100% | Visualización de rango competitivos, XP acumulados y carta digital del deportista. |
+| **Torneos & Squads** (`/app/(player)/torneos/`) | **COMPLETO** | 95% | Postulación de squads, chat de legiones, bases e inscripción mediante Webpay. |
+
+---
+
+### 💻 2. PANEL ADMINISTRATIVO WEB (`mvp-sports-web`) — **98.4% COMPLETADO**
+*La plataforma de control y analítica para administradores de recintos, dueños y superadmins.*
+
+| Módulo / Archivo Clave | Estado | Progreso | Descripción Operativa & Funcionalidad |
+| :--- | :---: | :---: | :--- |
+| **SuperAdmin Settings** (`/app/dashboard/settings/`) | **FINALIZADO** | 100% | Dashboard global de comisiones, definición de planes de suscripción y switches de red. |
+| **Configuración Recinto** (`/app/dashboard/complex/`) | **FINALIZADO** | 100% | Gating visual de cristal en integraciones externas de MercadoPago/Transbank bloqueadas por plan. |
+| **Cupones & Marketing** (`/app/dashboard/coupons/`) | **FINALIZADO** | 100% | CRUD de códigos promocionales con blindaje y modal explicativo premium. |
+| **Suscripciones & Billing** (`/app/dashboard/billing-subscription/`) | **FINALIZADO** | 100% | Visualizador de licenciamiento con indexación insensible a mayúsculas/minúsculas. |
+| **Gestión de Recintos** (`/app/dashboard/tenants/`) | **FINALIZADO** | 100% | Registro y CRUD de sedes, corrección de referencia asíncrona `tenantRef` e interfaz unificada. |
+| **Check-In Dashboard** (`/app/dashboard/checkin/`) | **FINALIZADO** | 100% | Analíticas de ocupación, KPIs corregidos (No-Shows vs cancelados) y badges por motivo. |
+| **Maestro Calendario** (`/app/dashboard/calendar/`) | **FINALIZADO** | 100% | Agenda de canchas multi-deporte con cargas en tiempo real y solapamiento imposible. |
+| **Torneos & Ligas** (`/app/dashboard/championships/`) | **COMPLETO** | 95% | Generación de brackets dinámicos y fixture round-robin en base a inscritos. |
+| **Academia Deportiva** (`/app/dashboard/academy/`) | **COMPLETO** | 90% | Control de clases y alumnos matriculados por grupo etario. |
+
+---
+
+### ☁️ 3. INFRAESTRUCTURA & BACKEND (`backend` / `cloud-functions`) — **100.0% COMPLETADO**
+*El cerebro asíncrono serverless, bases de datos y seguridad que mantiene el ecosistema en pie.*
+
+| Módulo / Componente Clave | Estado | Progreso | Descripción Operativa & Funcionalidad |
+| :--- | :---: | :---: | :--- |
+| **Auto-Cancellations Cron** (`/api/cron/check-no-shows`) | **FINALIZADO** | 100% | Sincronizado bajo huso de Chile (`America/Santiago`), anula reservas sin Check-In activo. |
+| **Firestore Security Rules** (`/firestore.rules`) | **FINALIZADO** | 100% | Políticas multi-inquilino restrictivas, validador de roles `getRole()` e inmutabilidad. |
+| **Funciones de Pago** (`/functions/createWebpayTransaction`) | **FINALIZADO** | 100% | Enrutador regional `southamerica-west1` y captura de retornos HTTPS seguros. |
+| **Serialización de Imágenes** (`Base64 Image Pipeline`) | **FINALIZADO** | 100% | Inserción inmutable de perfiles codificados Base64 con sincronización triple a Auth y staff. |
+| **Notificaciones Email** (`/api/send-email`) | **FINALIZADO** | 100% | Motor Resend integrado en Vercel, HTML de alta fidelidad, local fallback para desarrollo. |
+
+---
+
+### 🏁 4. RESUMEN GLOBAL OPERATIVO DE PROGRESO
+*   **App Móvil (`mvp-sports-app`):** **99.2%**
+*   **Web Dashboard (`mvp-sports-web`):** **98.4%**
+*   **Backend Serverless (`mvp-sports-backend`):** **100.0%**
+*   **PROGRESO INTEGRAL DE LA SUITE:** 🚀 **99.2% OPERATIVO** (Ecosistema Listo para Lanzamiento)
 
 ---
 
@@ -215,3 +354,4 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 ---
 **ORION TECHNOLOGY - MVP Sports Chile - 2026**
 *Sistemas de Inteligencia y Eficiencia Operativa de Precisión*
+

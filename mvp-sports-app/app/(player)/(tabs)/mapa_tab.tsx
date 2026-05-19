@@ -107,13 +107,7 @@ export default function MapaBusquedaScreen() {
         }
     }, [locationData]);
 
-    useFocusEffect(
-        React.useCallback(() => {
-            const backAction = () => { router.back(); return true; };
-            const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-            return () => backHandler.remove();
-        }, [])
-    );
+
 
     useEffect(() => {
         if (rawVenues) {

@@ -12,11 +12,11 @@ import {
     LayoutGrid, CreditCard, ShieldCheck, Star,
     Compass, Target, Dribbble, Medal, X, CheckCircle2, XCircle, ChevronRight
 } from 'lucide-react-native';
-import { useAuth } from '../../../../store/useAuth';
+import { useAuth } from '../../store/useAuth';
 import { LinearGradient } from 'expo-linear-gradient';
-import { tournamentService, Tournament } from '../../../../services/tournamentService';
-import { teamService, Team } from '../../../../services/teamService';
-import { venueService } from '../../../../services/venueService';
+import { tournamentService, Tournament } from '../../services/tournamentService';
+import { teamService, Team } from '../../services/teamService';
+import { venueService } from '../../services/venueService';
 
 const { width, height } = Dimensions.get('window');
 
@@ -120,9 +120,6 @@ export default function TorneosScreen() {
     useFocusEffect(
         React.useCallback(() => {
             fetchTournaments();
-            const backAction = () => { router.back(); return true; };
-            const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-            return () => backHandler.remove();
         }, [user])
     );
 
@@ -227,6 +224,29 @@ export default function TorneosScreen() {
 
     return (
         <View style={{ flex: 1, backgroundColor: C.bg }}>
+            {/* PRÓXIMAMENTE MODAL OVERLAY */}
+            <Modal visible={true} transparent={false} animationType="fade">
+                <View style={{ flex: 1, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center', padding: 30 }}>
+                    <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+                    <View style={{ width: 140, height: 140, borderRadius: 50, backgroundColor: accent + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 35, borderWidth: 2, borderColor: accent + '30' }}>
+                        <Trophy color={accent} size={64} strokeWidth={1.5} />
+                    </View>
+                    <Text style={{ color: C.text, fontSize: 32, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', letterSpacing: -1, marginBottom: 15 }}>Torneos MVP</Text>
+                    <View style={{ backgroundColor: accent, paddingHorizontal: 15, paddingVertical: 6, borderRadius: 10, marginBottom: 25 }}>
+                        <Text style={{ color: 'white', fontSize: 10, fontWeight: '900', letterSpacing: 2, textTransform: 'uppercase' }}>Próximamente</Text>
+                    </View>
+                    <Text style={{ color: C.sub, fontSize: 14, fontWeight: '700', textAlign: 'center', lineHeight: 22, maxWidth: 300, marginBottom: 45 }}>
+                        Estamos preparando las ligas y copas más competitivas con premios exclusivos y seguimiento de estadísticas en tiempo real. ¡Prepárate para la gloria!
+                    </Text>
+                    <TouchableOpacity
+                        onPress={() => router.back()}
+                        style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', height: 65, width: '100%', borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}
+                    >
+                        <Text style={{ color: C.text, fontWeight: '900', fontSize: 13, textTransform: 'uppercase', letterSpacing: 1 }}>Volver</Text>
+                    </TouchableOpacity>
+                </View>
+            </Modal>
+
             <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={C.card} />
 
             {/* HEADER */}

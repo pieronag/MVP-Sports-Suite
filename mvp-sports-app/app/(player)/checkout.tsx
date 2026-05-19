@@ -69,6 +69,7 @@ export default function CheckoutScreen() {
     const [loadingTenant, setLoadingTenant] = useState(true);
     const [webpayData, setWebpayData] = useState<any>(null);
     const [isNewBookingCreated, setIsNewBookingCreated] = useState(false);
+    const [pendingBooking, setPendingBooking] = useState<any>(null);
 
     // Parámetros dinámicos (pueden ser de Reserva o de Torneo)
     const { 
@@ -119,13 +120,6 @@ export default function CheckoutScreen() {
                 setUserTeams(filtered);
             });
         }
-
-        const backAction = () => {
-            router.back();
-            return true;
-        };
-        const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-        return () => backHandler.remove();
     }, [user]);
 
     const handleConfirm = async () => {
@@ -218,24 +212,30 @@ export default function CheckoutScreen() {
                 let finalBookingId = bookingId as string;
 
                 if (paymentMethod === 'card') {
-                    // RESERVA PAGO ONLINE: CREAMOS PRIMERO LA RESERVA EN ESTADO PENDIENTE
-                    bookingData.paymentStatus = 'pending';
-                    bookingData.paymentMethod = 'card';
-                    if (finalBookingId) {
-                        await bookingService.updateBooking(finalBookingId, bookingData);
-                        setIsNewBookingCreated(false);
-                    } else {
-                        finalBookingId = await bookingService.createBooking(bookingData);
+                    // RESERVA PAGO ONLINE: No se crea el documento en Firestore antes de que el pago esté confirmado.
+                    // Generamos un ID de documento único localmente en memoria
+                    if (!finalBookingId) {
+                        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                        let generatedId = '';
+                        for (let i = 0; i < 6; i++) {
+                            generatedId += chars.charAt(Math.floor(Math.random() * chars.length));
+                        }
+                        finalBookingId = generatedId;
                         setIsNewBookingCreated(true);
+                    } else {
+                        setIsNewBookingCreated(false);
                     }
 
-                    // AHORA LLAMAMOS AL SISTEMA EXTERNO PARA INICIAR EL PAGO
+                    setPendingBooking(bookingData);
+
+                    // AHORA LLAMAMOS AL SISTEMA EXTERNO PARA INICIAR EL PAGO, PASANDO EL bookingData COMPLETO
                     const buyOrder = `ORD-${Date.now()}`;
                     const webpayRes = await walletService.createWebpayTransaction(
                         finalBookingId,
                         tenantId as string,
                         priceNum,
-                        buyOrder
+                        buyOrder,
+                        bookingData // Enviamos la data completa para crear la reserva solo al confirmarse el pago
                     );
 
                     setWebpayData({
@@ -513,9 +513,9 @@ export default function CheckoutScreen() {
                     }
                 }}
             >
-                <View style={{ flex: 1, backgroundColor: 'white' }}>
-                    <View style={{ paddingTop: 60, paddingBottom: 20, paddingHorizontal: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: '#f1f5f9' }}>
-                        <Text style={{ fontSize: 18, fontWeight: '900' }}>PAGO ONLINE SEGURO</Text>
+                <View style={{ flex: 1, backgroundColor: C.bg }}>
+                    <View style={{ paddingTop: 60, paddingBottom: 20, paddingHorizontal: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: C.card }}>
+                        <Text style={{ fontSize: 18, fontWeight: '900', color: C.text, letterSpacing: -0.5 }}>PAGO ONLINE SEGURO</Text>
                         <TouchableOpacity onPress={async () => {
                             setShowWebView(false);
                             if (webpayData?.bookingId && !isTournament && isNewBookingCreated) {
@@ -526,7 +526,7 @@ export default function CheckoutScreen() {
                                 }
                             }
                         }}>
-                            <X color="black" size={24} />
+                            <X color={C.text} size={24} />
                         </TouchableOpacity>
                     </View>
                     {webpayData && (
@@ -569,6 +569,20 @@ export default function CheckoutScreen() {
                                             setProcessing(false);
                                         }
                                     } else {
+                                        // CREAR LA RESERVA AHORA EN FIRESTORE EN EL CLIENTE COMO CAPA DE SEGURIDAD
+                                        try {
+                                            const { doc: fsDoc, setDoc: fsSetDoc, serverTimestamp: fsServerTimestamp } = require('firebase/firestore');
+                                            const finalData = {
+                                                ...pendingBooking,
+                                                paymentStatus: 'paid',
+                                                status: 'confirmed',
+                                                updatedAt: fsServerTimestamp()
+                                            };
+                                            await fsSetDoc(fsDoc(db, 'bookings', webpayData.bookingId), finalData);
+                                        } catch (err) {
+                                            console.error("Error creating booking in success callback:", err);
+                                        }
+
                                         setCustomAlert({
                                             visible: true,
                                             title: '¡RESERVA CONFIRMADA!',
@@ -607,7 +621,8 @@ export default function CheckoutScreen() {
                                     });
                                 }
                             }}
-                            style={{ flex: 1 }}
+                            style={{ flex: 1, backgroundColor: C.bg }}
+                            containerStyle={{ backgroundColor: C.bg }}
                         />
                     )}
                 </View>

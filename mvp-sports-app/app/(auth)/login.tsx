@@ -220,8 +220,8 @@ export default function AuthScreen() {
                         </TouchableOpacity>
                     </View>
 
-                    <Text className="mt-12 text-center text-[10px] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-[0.4em]">
-                        MVP Sports Premium v1.0.0
+                    <Text className="mt-12 text-center text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-[0.4em]">
+                         MVP SPORTS CHILE • 2026
                     </Text>
                 </ScrollView>
             </KeyboardAvoidingView>

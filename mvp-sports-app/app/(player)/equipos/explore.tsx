@@ -9,9 +9,9 @@ import {
     ChevronLeft, Plus, Search, Users, User, Shield, ChevronRight, 
     Compass, ArrowRight, X, Trophy, Zap, UserPlus, CheckCircle2, AlertCircle
 } from 'lucide-react-native';
-import { useAuth } from '../../../../store/useAuth';
+import { useAuth } from '../../../store/useAuth';
 import { LinearGradient } from 'expo-linear-gradient';
-import { teamService, Team } from '../../../../services/teamService';
+import { teamService, Team } from '../../../services/teamService';
 
 const { width } = Dimensions.get('window');
 
@@ -88,9 +88,6 @@ export default function EquiposExploreScreen() {
     useFocusEffect(
         React.useCallback(() => {
             fetchTeams();
-            const backAction = () => { router.back(); return true; };
-            const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
-            return () => backHandler.remove();
         }, [user])
     );
 
