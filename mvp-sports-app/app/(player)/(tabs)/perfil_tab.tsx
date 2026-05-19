@@ -311,7 +311,7 @@ export default function PerfilScreen() {
                 <View style={{ padding: 30, alignItems: 'center' }}>
                     <View style={{ position: 'relative' }}>
                         <View style={{ width: 130, height: 130, borderRadius: 45, backgroundColor: COLORS.accent + '11', overflow: 'hidden', borderWidth: 4, borderColor: COLORS.accent }}>
-                            {uploading ? <ActivityIndicator style={{ flex: 1 }} color={COLORS.accent} /> : <Image source={{ uri: photoURL }} style={{ width: '100%', height: '100%' }} />}
+                            {uploading ? <ActivityIndicator style={{ flex: 1 }} color={COLORS.accent} /> : <Image source={imageSource} style={{ width: '100%', height: '100%' }} />}
                         </View>
                         <TouchableOpacity onPress={handlePickImage} style={{ position: 'absolute', bottom: -5, right: -5, width: 44, height: 44, borderRadius: 18, backgroundColor: COLORS.accent, alignItems: 'center', justifyContent: 'center', borderWidth: 5, borderColor: C.bg }}>
                             <Camera color="white" size={20} />

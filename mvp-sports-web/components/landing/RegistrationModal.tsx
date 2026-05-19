@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { XMarkIcon, CheckCircleIcon, ArrowRightIcon, ArrowLeftIcon, ExclamationCircleIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { auth, db } from "../../services/firebase";
-import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile, signOut, sendEmailVerification } from "firebase/auth";
 import { doc, setDoc, getDoc, getDocs, collection, query, where } from "firebase/firestore";
 
 const SPORT_POSITIONS: Record<string, string[]> = {
@@ -338,6 +338,9 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
       const user = userCredential.user;
       await updateProfile(user, { displayName: formData.displayName });
 
+      // Enviar correo electrónico de verificación de Firebase Auth
+      await sendEmailVerification(user);
+
       // Formatear fecha de YYYY-MM-DD a DD/MM/AAAA para compatibilidad total de la Suite
       let formattedBirthDate = formData.birthDate;
       if (formData.birthDate && formData.birthDate.includes("-")) {
@@ -569,7 +572,9 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
             <CheckCircleIcon className="w-16 h-16 text-[#00df82] mx-auto animate-bounce" />
             <div className="space-y-2">
               <h2 className="text-2xl font-black text-white font-heading">¡CUENTA CREADA!</h2>
-              <p className="text-xs text-slate-400 max-w-[250px] mx-auto">Tu perfil ha sido registrado con éxito.</p>
+              <p className="text-xs text-slate-400 max-w-[320px] mx-auto">
+                Te hemos enviado un correo de verificación. Por favor, confirma tu cuenta haciendo clic en el enlace del correo antes de iniciar sesión.
+              </p>
             </div>
           </div>
         )}
