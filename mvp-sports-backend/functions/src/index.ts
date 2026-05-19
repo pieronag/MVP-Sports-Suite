@@ -763,7 +763,7 @@ export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (reque
 
     // 3. Configurar redirección post-acción
     const actionCodeSettings = {
-      url: "https://mvp-sports-chile.firebaseapp.com",
+      url: "https://mvpsports.cl",
       handleCodeInApp: false,
     };
 
@@ -889,7 +889,7 @@ export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (reque
   <div class="wrapper">
     <div class="container">
       <div class="header">
-        <img src="https://mvp-sports-chile.firebaseapp.com/Logo.png" alt="MVP Sports" class="logo-img" />
+        <img src="https://mvpsports.cl/Logo.png" alt="MVP Sports" class="logo-img" />
       </div>
       <div class="content">
         <h1>${title}</h1>

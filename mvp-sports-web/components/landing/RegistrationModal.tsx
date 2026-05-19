@@ -52,6 +52,7 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   // Resetear estado al abrir el modal
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
       setError("");
       setShowPassword(false);
       setShowConfirmPassword(false);
+      setAcceptTerms(false);
       // Opcional: Limpiar formulario al abrir
       setFormData({
         displayName: "", email: "", confirmEmail: "", phone: "", rut: "", password: "", confirmPassword: "",
@@ -121,7 +123,8 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
         return (
           formData.favTime &&
           formData.frequency &&
-          formData.birthDate
+          formData.birthDate &&
+          acceptTerms
         );
       default:
         return false;
@@ -526,6 +529,28 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
               <Select label="Horario" name="favTime" value={formData.favTime} onChange={handleInputChange} options={['Mañana', 'Tarde', 'Noche']} />
               <Select label="Frecuencia" name="frequency" value={formData.frequency} onChange={handleInputChange} options={['De vez en cuando', '1-2 veces por semana', 'Casi todos los días']} />
               <Input label="Nacimiento" name="birthDate" value={formData.birthDate} onChange={handleInputChange} type="date" />
+              
+              {/* Checkbox de Términos y Condiciones */}
+              <div className="col-span-1 sm:col-span-2 mt-4 flex items-start gap-2.5">
+                <input
+                  type="checkbox"
+                  id="acceptTerms"
+                  checked={acceptTerms}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                  className="mt-1 accent-[#00df82] rounded border-white/10 bg-white/5 text-[#00df82] focus:ring-[#00df82] h-4 w-4 cursor-pointer"
+                />
+                <label htmlFor="acceptTerms" className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-relaxed cursor-pointer select-none">
+                  Acepto los{" "}
+                  <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-white underline hover:text-[#00df82] transition-colors">
+                    Términos y Condiciones
+                  </a>{" "}
+                  y la{" "}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-white underline hover:text-[#00df82] transition-colors">
+                    Política de Privacidad
+                  </a>{" "}
+                  de MVP Sports Chile.
+                </label>
+              </div>
             </div>
           </div>
         );

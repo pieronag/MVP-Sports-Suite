@@ -268,7 +268,18 @@ export default function LoginPage() {
                 </button>
             </form>
 
-            <p className="text-center text-[9px] mt-8 font-bold tracking-widest uppercase text-slate-400 dark:text-slate-600">
+            <p className="text-center text-[9px] mt-6 font-semibold text-slate-400 dark:text-slate-500 leading-normal uppercase tracking-wider">
+              Al ingresar, aceptas nuestros{" "}
+              <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-slate-700 dark:text-slate-300 underline hover:text-blue-600 dark:hover:text-mvp-volt transition-colors">
+                Términos y Condiciones
+              </a>{" "}
+              y la{" "}
+              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-slate-700 dark:text-slate-300 underline hover:text-blue-600 dark:hover:text-mvp-volt transition-colors">
+                Política de Privacidad
+              </a>.
+            </p>
+
+            <p className="text-center text-[9px] mt-4 font-bold tracking-widest uppercase text-slate-400 dark:text-slate-600">
                 MVP SPORTS CHILE • 2026
             </p>
         </div>

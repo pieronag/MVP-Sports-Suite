@@ -104,6 +104,7 @@ export default function SettingsScreen() {
 
     // PASSWORD MODAL STATE
     const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [showSignOutModal, setShowSignOutModal] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -534,6 +535,27 @@ export default function SettingsScreen() {
                     </TouchableOpacity>
                 </View>
 
+                {/* BOTÓN CERRAR SESIÓN */}
+                <TouchableOpacity 
+                    onPress={() => setShowSignOutModal(true)}
+                    style={{ 
+                        marginHorizontal: 30, 
+                        marginTop: 35, 
+                        height: 65, 
+                        borderRadius: 22, 
+                        backgroundColor: isDark ? '#f43f5e11' : '#fef2f2', 
+                        flexDirection: 'row', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        borderWidth: 1, 
+                        borderColor: isDark ? '#f43f5e33' : '#fee2e2' 
+                    }}
+                >
+                    <LogOut color="#f43f5e" size={20} style={{ marginRight: 10 }} />
+                    <Text style={{ color: '#f43f5e', fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Cerrar Sesión Activa</Text>
+                </TouchableOpacity>
+
+                <Text style={{ textAlign: 'center', color: C.sub, fontSize: 8, fontWeight: '700', marginTop: 40 }}>© MVP SPORTS CHILE • 2026</Text>
             </ScrollView>
 
             {/* BARRA ACCESORIO TECLADO (K) */}
@@ -774,6 +796,42 @@ export default function SettingsScreen() {
                                 }}
                             >
                                 <Text style={{ color: C.sub, fontWeight: '800', textTransform: 'uppercase', fontSize: 12, letterSpacing: 1 }}>Seguir Editando</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* MODAL DE CONFIRMACIÓN DE CERRAR SESIÓN */}
+            <Modal
+                visible={showSignOutModal}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowSignOutModal(false)}
+            >
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center', padding: 30 }}>
+                    <View style={{ backgroundColor: C.card, borderRadius: 30, padding: 35, width: '100%', alignItems: 'center', borderWidth: 1, borderColor: C.border }}>
+                        <View style={{ width: 80, height: 80, borderRadius: 30, backgroundColor: '#f43f5e22', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
+                            <LogOut color="#f43f5e" size={36} />
+                        </View>
+                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', marginBottom: 10 }}>¿Cerrar Sesión?</Text>
+                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', textTransform: 'uppercase', marginBottom: 30 }}>¿Estás seguro de que deseas salir de tu cuenta?</Text>
+                        
+                        <View style={{ flexDirection: 'row', gap: 15, width: '100%' }}>
+                            <TouchableOpacity 
+                                onPress={() => setShowSignOutModal(false)}
+                                style={{ flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', paddingVertical: 18, borderRadius: 18, alignItems: 'center', borderWidth: 1, borderColor: C.border }}
+                            >
+                                <Text style={{ color: C.text, fontWeight: '900', fontSize: 12, textTransform: 'uppercase' }}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity 
+                                onPress={() => {
+                                    setShowSignOutModal(false);
+                                    signOut();
+                                }}
+                                style={{ flex: 1, backgroundColor: '#f43f5e', paddingVertical: 18, borderRadius: 18, alignItems: 'center', shadowColor: '#f43f5e', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.3, shadowRadius: 20 }}
+                            >
+                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 12, textTransform: 'uppercase' }}>Sí, Salir</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

@@ -1,6 +1,12 @@
-# 🏆 MVP SPORTS SUITE: UNIFIED COMMAND CENTER (V16.0)
+# 🏆 MVP SPORTS SUITE: UNIFIED COMMAND CENTER (V19.2)
 ### Manual de Operaciones y Especificación Técnica Industrial
 **Propiedad de MVP SPORTS CHILE - 2026**
+
+---
+
+### 📂 ESTRUCTURA GENERAL DE DOCUMENTOS LEGALES (RAÍZ)
+*   **Términos y Condiciones:** [TERMINOS_Y_CONDICIONES.md](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/TERMINOS_Y_CONDICIONES.md) — Define las reglas operativas, comisiones (10%), políticas de cancelación (2 horas) y uso de billetera virtual.
+*   **Políticas de Privacidad:** [POLITICA_DE_PRIVACIDAD.md](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/POLITICA_DE_PRIVACIDAD.md) — Normas de protección de datos bajo la Ley N° 19.628 de Chile, detallando almacenamiento y derechos ARCO.
 
 ---
 
@@ -269,15 +275,30 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
     2. **Auditoría & Reconstrucción de Lockfile:** Ejecutamos un comando de instalación local (`npm install`) para reconstruir el `package-lock.json` y sincronizarlo quirúrgicamente al 100%, eliminando el error `npm error Missing: @react-native-async-storage/async-storage@1.24.0`.
     3. **Relanzamiento de EAS Build:** Subimos el paquete corregido y disparamos una nueva compilación de producción limpia en los servidores remotos de Expo.
 *   **Resolución de Asset Corrupto & Compilación Exitosa AAPT (V18.5):** Diagnosticamos y corregimos el fallo crítico del compilador nativo de Android Gradle (`Aapt2CompileRunnable`):
-    1. **Auditoría Binaria de Cabeceras:** Analizamos mediante script de Node los bytes mágicos de `mascot.png` detectando la secuencia `FF D8 FF E0` (JFIF / JPEG), confirmando que era físicamente un JPEG guardado incorrectamente con extensión `.png`.
-    2. **Alineación de Recursos:** Renombramos el archivo físico a su formato correspondiente `mascot.jpg`, eliminando el bloqueo del empaquetador de recursos AAPT de Android.
-    3. **Refactorización de Rutas en React Native:** Modificamos de forma quirúrgica las referencias e importaciones de la mascota de `.png` a `.jpg` en los 4 archivos clave: `app/(player)/(tabs)/preferencias.tsx`, `app/(player)/(tabs)/perfil.tsx`, `app/(owner)/index.tsx` y `app/(player)/(tabs)/index.tsx`.
-    4. **Despliegue Final de Compilación:** Relanzamos la compilación remota de producción en los servidores de EAS libres de bloqueos nativos.
+*   **Auditoría Binaria de Cabeceras:** Analizamos mediante script de Node los bytes mágicos de `mascot.png` detectando la secuencia `FF D8 FF E0` (JFIF / JPEG), confirmando que era físicamente un JPEG guardado incorrectamente con extensión `.png`.
+*   **Alineación de Recursos:** Renombramos el archivo físico a su formato correspondiente `mascot.jpg`, eliminando el bloqueo del empaquetador de recursos AAPT de Android.
+*   **Refactorización de Rutas en React Native:** Modificamos de forma quirúrgica las referencias e importaciones de la mascota de `.png` a `.jpg` en los 4 archivos clave: `app/(player)/(tabs)/preferencias.tsx`, `app/(player)/(tabs)/perfil.tsx`, `app/(owner)/index.tsx` y `app/(player)/(tabs)/index.tsx`.
+*   **Despliegue Final de Compilación:** Relanzamos la compilación remota de producción en los servidores de EAS libres de bloqueos nativos.
 *   **Optimizaciones Visuales, Flujo Anti-Descarte & Estandarización de Fechas (V18.6):** Implementamos mejoras de alta fidelidad solicitadas para elevar la experiencia móvil y web:
     1. **Ajuste de Icono Adaptativo (Cero Zoom/Recorte):** Programamos un script de Node con `jimp` para rediseñar el launcher icon de Android. Tomamos `icon.png` (1638x1638), lo escalamos de forma proporcional al 60% (614x614) y lo embutimos en un canvas transparente de 1024x1024 (`adaptive-icon.png`). Esto garantiza un colchón del 20% en cada lado para cumplir con las guías de diseño de Android, evitando cualquier zoom o recorte indeseado al instalar la APK.
     2. **Transiciones Suaves y Elegantes:** Reemplazamos la transición abrupta `'fade_from_bottom'` por `'slide_from_right'` en las `screenOptions` del stack principal de `app/(player)/_layout.tsx`, logrando transiciones fluidas de nivel premium.
     3. **Flujo de Resguardo de Cambios (Anti-Descarte):** Diseñamos un flujo inteligente en `preferencias.tsx` para evitar que el usuario pierda cambios accidentalmente al presionar volver atrás o usar el botón físico del dispositivo. Comparamos en profundidad el estado actual con el estado inicial (`initialData`) y levantamos un modal de confirmación premium con tres opciones de acción ("Guardar y Salir", "Descartar Cambios" y "Seguir Editando").
     4. **Estandarización de Fechas Web (DD/MM/AAAA):** Agregamos una función transformadora en `RegistrationModal.tsx` de la plataforma web que traduce al vuelo la fecha del selector HTML5 (`YYYY-MM-DD`) al estándar chileno `DD/MM/AAAA` antes de registrar el perfil en Firebase Firestore, unificando el esquema de datos al 100% con la app móvil.
+*   **Contrato Legal, Políticas de Privacidad, Modales de Landing y Simplificación de Emails (V19.0):** Implementamos los pilares legales, cumplimiento de privacidad Ley N° 19.628 de Chile y simplificación de marca en comunicaciones:
+    1. **Archivos Markdown de Raíz:** Creamos `TERMINOS_Y_CONDICIONES.md` y `POLITICA_DE_PRIVACIDAD.md` en la raíz del proyecto para control e inmutabilidad legal.
+    2. **Páginas Frontend Next.js:** Desarrollamos `/terms` y `/privacy` en el App Router con diseño Executive Slim UI, barras laterales interactivas indexadas, badges explicativos y compatibilidad SEO nativa.
+    3. **Modales Interactivos de Landing Page:** Creamos `TermsModal.tsx` y `PrivacyModal.tsx` en `components/landing`. Se integraron con callbacks en `Footer.tsx` para interceptar de forma fluida los clics en la landing page principal sin recargas de página, manteniendo al usuario retenido en el home.
+    4. **Checkbox de Aceptación Obligatoria en Registro:** Añadimos un paso restrictivo en el modal de creación de usuarios (`RegistrationModal.tsx`) que obliga a marcar el consentimiento explícito de las políticas antes de completar el registro. Los enlaces se abren de manera segura en pestañas separadas.
+    5. **Disclaimer Legal en Login:** Añadimos un aviso formal en `app/login/page.tsx` indicando que al iniciar sesión el usuario acepta las políticas de MVP Sports Suite.
+    6. **Simplificación Estética de Emails:** Rediseñamos los templates HTML de `/api/send-email` y `/api/send-auth-email` eliminando las cabeceras degradadas verdes y logotipos complejos. En su lugar, colocamos el nombre de marca **"MVP SPORTS"** en texto plano de gran escala (`font-size: 36px` y `font-weight: 900`), centrado, con alto contraste y optimizado para todo cliente de correo.
+*   **Cierre de Sesión en Preferencias y Estabilidad TypeScript (V19.1):** Mejoramos el flujo de cierre de sesión en la aplicación móvil y corregimos la estabilidad del compilador:
+    1. **Botón de Cierre de Sesión en Preferencias:** Añadimos un botón de "Cerrar Sesión Activa" en la pantalla de preferencias del jugador (`app/(player)/preferencias.tsx`), posicionado al final de la pantalla, en color rojo translúcido, integrado con un modal interactivo de confirmación con diseño de cristal esmerilado, homologando el flujo y UX de salida del jugador con el del administrador.
+    2. **Estabilidad de Tipado Firebase:** Corregimos en `services/firebase.ts` la importación de `getReactNativePersistence` directamente desde `"firebase/auth"` mediante directiva `@ts-ignore`, resolviendo la incompatibilidad de tipado estático sin romper la resolución del empaquetador Metro de React Native en tiempo de compilación/ejecución.
+    3. **Depuración de Entorno de Tipos (`tsconfig.json`):** Excluimos explícitamente el directorio `scratch/` de la compilación de TypeScript para evitar que scripts temporales/depurativos interfieran en la validación estática del código de producción de la app.
+*   **Contratos de Términos y Privacidad en el Login Móvil y Aceptación en Registro (V19.2):** Extendimos la cobertura legal del ecosistema al flujo de acceso móvil del jugador:
+    1. **Disclaimer en Pie del Login:** Agregamos enlaces interactivos a los Términos y Condiciones y la Política de Privacidad en la parte inferior de la pantalla de login/registro de la aplicación móvil utilizando `Linking`.
+    2. **Modal de Consentimiento en Registro:** Implementamos un modal premium de aceptación legal que interrumpe el flujo de registro al presionar "Crear Cuenta". El modal despliega enlaces directos a las políticas legales y obliga al usuario a presionar "Aceptar y Registrar" antes de ejecutar el registro en Firebase Auth.
+    3. **Normalización del Campo de Email:** Reemplazamos la etiqueta "Email Corporativo" por "Correo Electrónico" en los formularios de inicio de sesión y recuperación de contraseña del flujo móvil, facilitando el acceso a todo tipo de usuarios.
 
 ---
 
@@ -309,7 +330,7 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 
 ---
 
-### 💻 2. PANEL ADMINISTRATIVO WEB (`mvp-sports-web`) — **98.4% COMPLETADO**
+### 💻 2. PANEL ADMINISTRATIVO WEB (`mvp-sports-web`) — **99.2% COMPLETADO**
 *La plataforma de control y analítica para administradores de recintos, dueños y superadmins.*
 
 | Módulo / Archivo Clave | Estado | Progreso | Descripción Operativa & Funcionalidad |
@@ -321,6 +342,8 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 | **Gestión de Recintos** (`/app/dashboard/tenants/`) | **FINALIZADO** | 100% | Registro y CRUD de sedes, corrección de referencia asíncrona `tenantRef` e interfaz unificada. |
 | **Check-In Dashboard** (`/app/dashboard/checkin/`) | **FINALIZADO** | 100% | Analíticas de ocupación, KPIs corregidos (No-Shows vs cancelados) y badges por motivo. |
 | **Maestro Calendario** (`/app/dashboard/calendar/`) | **FINALIZADO** | 100% | Agenda de canchas multi-deporte con cargas en tiempo real y solapamiento imposible. |
+| **Términos y Privacidad (Páginas)** | **FINALIZADO** | 100% | Páginas públicas `/terms` y `/privacy` con navegación por índice lateral, badges y diseño glassmorphic. |
+| **Modales de Términos (Landing)** | **FINALIZADO** | 100% | Modales emergentes `TermsModal` y `PrivacyModal` integrados en el Footer de la landing page con interceptor de enlaces. |
 | **Torneos & Ligas** (`/app/dashboard/championships/`) | **COMPLETO** | 95% | Generación de brackets dinámicos y fixture round-robin en base a inscritos. |
 | **Academia Deportiva** (`/app/dashboard/academy/`) | **COMPLETO** | 90% | Control de clases y alumnos matriculados por grupo etario. |
 
@@ -335,15 +358,15 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 | **Firestore Security Rules** (`/firestore.rules`) | **FINALIZADO** | 100% | Políticas multi-inquilino restrictivas, validador de roles `getRole()` e inmutabilidad. |
 | **Funciones de Pago** (`/functions/createWebpayTransaction`) | **FINALIZADO** | 100% | Enrutador regional `southamerica-west1` y captura de retornos HTTPS seguros. |
 | **Serialización de Imágenes** (`Base64 Image Pipeline`) | **FINALIZADO** | 100% | Inserción inmutable de perfiles codificados Base64 con sincronización triple a Auth y staff. |
-| **Notificaciones Email** (`/api/send-email`) | **FINALIZADO** | 100% | Motor Resend integrado en Vercel, HTML de alta fidelidad, local fallback para desarrollo. |
+| **Notificaciones Email** (`/api/send-email`) | **FINALIZADO** | 100% | Motor Resend integrado en Vercel, HTML simplificado con título minimalista a gran escala. |
 
 ---
 
 ### 🏁 4. RESUMEN GLOBAL OPERATIVO DE PROGRESO
 *   **App Móvil (`mvp-sports-app`):** **99.2%**
-*   **Web Dashboard (`mvp-sports-web`):** **98.4%**
+*   **Web Dashboard (`mvp-sports-web`):** **99.2%**
 *   **Backend Serverless (`mvp-sports-backend`):** **100.0%**
-*   **PROGRESO INTEGRAL DE LA SUITE:** 🚀 **99.2% OPERATIVO** (Ecosistema Listo para Lanzamiento)
+*   **PROGRESO INTEGRAL DE LA SUITE:** 🚀 **99.5% OPERATIVO** (Ecosistema Listo para Lanzamiento)
 
 ---
 

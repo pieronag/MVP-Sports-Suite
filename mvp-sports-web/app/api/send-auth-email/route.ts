@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     // Action Code Settings can be passed if we want to redirect to app or dashboard
     const actionCodeSettings = {
       // The URL to redirect to after verification / reset is completed
-      url: 'https://mvp-sports-chile.firebaseapp.com',
+      url: 'https://mvpsports.cl',
       handleCodeInApp: false
     };
 
@@ -78,23 +78,6 @@ export async function POST(request: Request) {
       border-radius: 28px;
       overflow: hidden;
       box-shadow: 0 20px 50px rgba(0,0,0,0.6);
-    }
-    .header {
-      background: linear-gradient(135deg, #0f172a, #064e3b);
-      padding: 40px 30px;
-      text-align: center;
-      border-bottom: 2px solid #10b981;
-    }
-    .logo {
-      font-size: 26px;
-      font-weight: 900;
-      color: #f8fafc;
-      letter-spacing: -1.5px;
-      text-transform: uppercase;
-      margin: 0;
-    }
-    .logo span {
-      color: #10b981;
     }
     .content {
       padding: 40px 35px;
@@ -151,8 +134,8 @@ export async function POST(request: Request) {
 <body>
   <div class="wrapper">
     <div class="container">
-      <div class="header">
-        <h2 class="logo">MVP <span>SPORTS</span></h2>
+      <div style="padding: 40px 40px 10px 40px; text-align: center;">
+        <h1 style="font-size: 36px; font-weight: 900; color: #ffffff; letter-spacing: -1.5px; margin: 0; text-transform: uppercase;">MVP SPORTS</h1>
       </div>
       <div class="content">
         <h1>${title}</h1>

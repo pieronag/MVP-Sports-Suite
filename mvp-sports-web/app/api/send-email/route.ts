@@ -39,23 +39,6 @@ export async function POST(request: Request) {
       overflow: hidden;
       box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     }
-    .header {
-      background: linear-gradient(135deg, #0f172a, #064e3b);
-      padding: 40px;
-      text-align: center;
-      border-bottom: 2px solid #10b981;
-    }
-    .logo {
-      font-size: 28px;
-      font-weight: 900;
-      color: #f8fafc;
-      letter-spacing: -1.5px;
-      text-transform: uppercase;
-      margin: 0;
-    }
-    .logo span {
-      color: #10b981;
-    }
     .content {
       padding: 40px;
     }
@@ -130,8 +113,8 @@ export async function POST(request: Request) {
 <body>
   <div class="wrapper">
     <div class="container">
-      <div class="header">
-        <h2 class="logo">MVP <span>SPORTS</span></h2>
+      <div style="padding: 40px 40px 10px 40px; text-align: center;">
+        <h1 style="font-size: 36px; font-weight: 900; color: #ffffff; letter-spacing: -1.5px; margin: 0; text-transform: uppercase;">MVP SPORTS</h1>
       </div>
       <div class="content">
         <h1>¡Bienvenido a la Élite, ${name}!</h1>
