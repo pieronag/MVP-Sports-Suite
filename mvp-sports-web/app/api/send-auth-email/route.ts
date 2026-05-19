@@ -174,7 +174,19 @@ export async function POST(request: Request) {
 </html>
 `;
 
-    const resendApiKey = process.env.RESEND_API_KEY;
+    // Fetch email settings from Firestore
+    let dbSettings: any = {};
+    try {
+      const settingsDoc = await adminDb.collection('settings').doc('email').get();
+      if (settingsDoc.exists) {
+        dbSettings = settingsDoc.data() || {};
+      }
+    } catch (err) {
+      console.warn('Error fetching email settings from firestore:', err);
+    }
+
+    const resendApiKey = dbSettings.resendApiKey || process.env.RESEND_API_KEY;
+    const fromEmail = dbSettings.fromEmail || process.env.RESEND_FROM_EMAIL || 'MVP Sports <noreply@mvpsports.cl>';
 
     if (!resendApiKey) {
       console.warn('RESEND_API_KEY is not set. Simulating custom email dispatch (Mock Mode).');
@@ -194,7 +206,7 @@ export async function POST(request: Request) {
         'Authorization': `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        from: 'MVP Sports <onboarding@resend.dev>',
+        from: fromEmail,
         to: [email],
         subject: subject,
         html: htmlContent,

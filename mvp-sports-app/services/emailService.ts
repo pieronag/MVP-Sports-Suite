@@ -1,42 +1,36 @@
-import { auth } from './firebase';
+import { auth, functions } from './firebase';
+import { httpsCallable } from 'firebase/functions';
 import { sendEmailVerification, sendPasswordResetEmail } from 'firebase/auth';
-
-const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL || 'https://mvp-sports-chile.vercel.app';
 
 export const emailService = {
   /**
    * Envía un correo electrónico personalizado (activación o restablecimiento)
-   * a través del backend unificado de Next.js, con fallback al SDK local de Firebase
-   * en caso de fallo o configuración incompleta.
+   * a través de la Cloud Function unificada, con fallback al SDK nativo de Firebase
+   * en caso de fallo, depuración o falta de conexión.
    */
   async sendAuthEmail(email: string, type: 'verify' | 'reset', displayName?: string): Promise<{ success: boolean; method: 'custom' | 'fallback' }> {
     const cleanEmail = email.trim().toLowerCase();
     
     try {
-      console.log(`[EmailService] Intentando enviar correo de tipo: ${type} a ${cleanEmail} usando API personalizada...`);
+      console.log(`[EmailService] Intentando enviar correo de tipo: ${type} a ${cleanEmail} usando Cloud Function...`);
       
-      const response = await fetch(`${WEB_URL}/api/send-auth-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: cleanEmail,
-          type,
-          name: displayName
-        }),
+      const sendEmailFn = httpsCallable(functions, 'sendAuthEmail');
+      const response = await sendEmailFn({
+        email: cleanEmail,
+        type,
+        name: displayName
       });
 
-      const data = await response.json();
+      const data = response.data as any;
       
-      if (response.ok && data.success) {
-        console.log(`[EmailService] Correo enviado exitosamente vía API personalizada. Método: ${data.actionLink ? 'Mock (Log)' : 'Resend'}`);
+      if (data && data.success) {
+        console.log(`[EmailService] Correo enviado exitosamente vía Cloud Function. Método: ${data.method}`);
         return { success: true, method: 'custom' };
       } else {
-        throw new Error(data.error || 'Respuesta no exitosa del servidor.');
+        throw new Error((data && data.error) || 'Respuesta no exitosa de la Cloud Function.');
       }
     } catch (error: any) {
-      console.warn('[EmailService] API personalizada falló, aplicando fallback a Firebase Auth nativo:', error.message || error);
+      console.warn('[EmailService] La Cloud Function falló o no está desplegada. Aplicando fallback a Firebase Auth nativo:', error.message || error);
       
       // Fallback a los correos nativos de Firebase Auth
       if (type === 'verify') {
