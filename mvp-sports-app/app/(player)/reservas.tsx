@@ -175,8 +175,7 @@ export default function MisReservasScreen() {
     const [fbVisible, setFbVisible] = useState(false);
     const [fbType, setFbType] = useState<'success' | 'error'>('success');
     const [fbMsg, setFbMsg] = useState('');
-    const [showStatsModal, setShowStatsModal] = useState(false);
-    const [statsBooking, setStatsBooking] = useState<Booking | null>(null);
+
 
     const [showSurveyModal, setShowSurveyModal] = useState(false);
     const [surveyBooking, setSurveyBooking] = useState<Booking | null>(null);
@@ -518,10 +517,7 @@ export default function MisReservasScreen() {
                             onMaps={() => handleOpenMaps(b)}
                             onCheckIn={() => b.id && handleCheckIn(b)}
                             onCheckOut={() => handleCheckOut(b)}
-                            onStats={(booking: any) => {
-                                setStatsBooking(booking);
-                                setShowStatsModal(true);
-                            }}
+                            onStats={() => {}}
                             onCancel={() => b.id && handleCancel(b.id)}
                         />
                     ))
@@ -696,25 +692,7 @@ export default function MisReservasScreen() {
 
             <FeedbackModal visible={fbVisible} type={fbType} message={fbMsg} onClose={() => setFbVisible(false)} isDark={isDark} />
 
-            <MatchStatsModal
-                visible={showStatsModal}
-                booking={statsBooking}
-                onClose={() => setShowStatsModal(false)}
-                isDark={isDark}
-                onSave={async (stats: any) => {
-                    try {
-                        await bookingService.saveMatchStats(stats);
-                        setShowStatsModal(false);
-                        setFbType('success');
-                        setFbMsg('¡Estadísticas guardadas con éxito!');
-                        setFbVisible(true);
-                    } catch (e) {
-                        setFbType('error');
-                        setFbMsg('Hubo un error al guardar las estadísticas.');
-                        setFbVisible(true);
-                    }
-                }}
-            />
+
 
             <SurveyModal
                 visible={showSurveyModal}
@@ -831,12 +809,7 @@ const BookingEliteCard = ({ booking, isDark, onView, onMaps, onCheckIn, onCheckO
                             <Text style={{ color: 'white', fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>CHECK-OUT</Text>
                         </TouchableOpacity>
                     )}
-                    {booking.checkOut && (
-                        <TouchableOpacity onPress={() => onStats && onStats(booking)} style={{ flex: 2, height: 50, borderRadius: 15, backgroundColor: COLORS.accent + '15', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                            <Activity color={COLORS.accent} size={18} />
-                            <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>STATS</Text>
-                        </TouchableOpacity>
-                    )}
+
                     <TouchableOpacity onPress={onMaps} style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: COLORS.maps + '10', alignItems: 'center', justifyContent: 'center' }}>
                         <Navigation color={COLORS.maps} size={20} />
                     </TouchableOpacity>
@@ -929,211 +902,7 @@ const EliteActionModal = ({ visible, onClose, onConfirm, title, message, confirm
     );
 };
 
-const MatchStatsModal = ({ visible, booking, onClose, isDark, onSave }: any) => {
-    const C = isDark ? COLORS.dark : COLORS.light;
-    const [scoreA, setScoreA] = useState(0);
-    const [scoreB, setScoreB] = useState(0);
-    const [playersA, setPlayersA] = useState<any[]>([]);
-    const [playersB, setPlayersB] = useState<any[]>([]);
-    const [teamMembers, setTeamMembers] = useState<any[]>([]);
-    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (visible) {
-            setScoreA(0);
-            setScoreB(0);
-            setPlayersA([]);
-            setPlayersB([]);
-            if (booking?.teamId) {
-                fetchTeamMembers();
-            }
-        }
-    }, [visible, booking]);
-
-    const fetchTeamMembers = async () => {
-        setLoading(true);
-        try {
-            const team = await teamService.getTeamById(booking.teamId);
-            if (team && team.members) {
-                const membersData = await Promise.all(
-                    team.members.map(async (uid: string) => {
-                        const pDoc = await getDoc(doc(db, 'profiles', uid));
-                        return { userId: uid, name: pDoc.exists() ? pDoc.data().displayName : 'Jugador', goals: 0, assists: 0 };
-                    })
-                );
-                setTeamMembers(membersData);
-                const mid = Math.ceil(membersData.length / 2);
-                setPlayersA(membersData.slice(0, mid));
-                setPlayersB(membersData.slice(mid));
-            }
-        } catch (e) { console.error(e); }
-        setLoading(false);
-    };
-
-    const addPlayer = (player: any, team: 'A' | 'B') => {
-        if (team === 'A') {
-            setPlayersA([...playersA, { ...player }]);
-        } else {
-            setPlayersB([...playersB, { ...player }]);
-        }
-    };
-
-    const removePlayer = (userId: string, team: 'A' | 'B') => {
-        if (team === 'A') {
-            setPlayersA(playersA.filter(p => p.userId !== userId));
-        } else {
-            setPlayersB(playersB.filter(p => p.userId !== userId));
-        }
-    };
-
-    const updateStat = (userId: string, team: 'A' | 'B', field: 'goals' | 'assists', delta: number) => {
-        const list = team === 'A' ? [...playersA] : [...playersB];
-        const idx = list.findIndex(p => p.userId === userId);
-        if (idx !== -1) {
-            list[idx][field] = Math.max(0, list[idx][field] + delta);
-            team === 'A' ? setPlayersA(list) : setPlayersB(list);
-        }
-    };
-
-    const handleSave = () => {
-        let winner: 'teamA' | 'teamB' | 'draw' = 'draw';
-        if (scoreA > scoreB) winner = 'teamA';
-        else if (scoreB > scoreA) winner = 'teamB';
-        onSave({
-            bookingId: booking.id,
-            teamA: { score: scoreA, players: playersA },
-            teamB: { score: scoreB, players: playersB },
-            winner
-        });
-    };
-
-    return (
-        <Modal visible={visible} animationType="slide" transparent>
-            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)' }}>
-                <View style={{ flex: 1, marginTop: 100, backgroundColor: C.bg, borderTopLeftRadius: 40, borderTopRightRadius: 40, padding: 30 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
-                        <Text style={{ color: C.text, fontSize: 24, fontWeight: '900' }}>RESULTADOS</Text>
-                        <TouchableOpacity onPress={onClose} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center' }}>
-                            <X color={C.text} size={24} />
-                        </TouchableOpacity>
-                    </View>
-                    {loading ? (
-                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                            <ActivityIndicator color={COLORS.accent} size="large" />
-                            <Text style={{ color: C.sub, marginTop: 20, fontWeight: '700' }}>CARGANDO JUGADORES...</Text>
-                        </View>
-                    ) : (
-                        <ScrollView showsVerticalScrollIndicator={false}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', backgroundColor: C.card, borderRadius: 30, padding: 30, borderWidth: 1, borderColor: C.border, marginBottom: 30 }}>
-                                <View style={{ alignItems: 'center' }}>
-                                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', marginBottom: 10 }}>EQUIPO A</Text>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                                        <TouchableOpacity onPress={() => setScoreA(Math.max(0, scoreA - 1))}><Minus color={COLORS.accent} size={20} /></TouchableOpacity>
-                                        <Text style={{ color: C.text, fontSize: 48, fontWeight: '900' }}>{scoreA}</Text>
-                                        <TouchableOpacity onPress={() => setScoreA(scoreA + 1)}><Plus color={COLORS.accent} size={20} /></TouchableOpacity>
-                                    </View>
-                                </View>
-                                <Text style={{ color: C.sub, fontSize: 24, fontWeight: '900' }}>VS</Text>
-                                <View style={{ alignItems: 'center' }}>
-                                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', marginBottom: 10 }}>EQUIPO B</Text>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                                        <TouchableOpacity onPress={() => setScoreB(Math.max(0, scoreB - 1))}><Minus color="#f59e0b" size={20} /></TouchableOpacity>
-                                        <Text style={{ color: C.text, fontSize: 48, fontWeight: '900' }}>{scoreB}</Text>
-                                        <TouchableOpacity onPress={() => setScoreB(scoreB + 1)}><Plus color="#f59e0b" size={20} /></TouchableOpacity>
-                                    </View>
-                                </View>
-                            </View>
-                            <MatchTeamSection
-                                label="EQUIPO A"
-                                players={playersA}
-                                allMembers={teamMembers.filter(m => !playersA.find(p => p.userId === m.userId) && !playersB.find(p => p.userId === m.userId))}
-                                onAdd={(p: any) => addPlayer(p, 'A')}
-                                onRemove={(id: string) => removePlayer(id, 'A')}
-                                onUpdateStat={(id: string, field: any, delta: number) => updateStat(id, 'A', field, delta)}
-                                isDark={isDark}
-                                color={COLORS.accent}
-                            />
-                            <MatchTeamSection
-                                label="EQUIPO B"
-                                players={playersB}
-                                allMembers={teamMembers.filter(m => !playersA.find(p => p.userId === m.userId) && !playersB.find(p => p.userId === m.userId))}
-                                onAdd={(p: any) => addPlayer(p, 'B')}
-                                onRemove={(id: string) => removePlayer(id, 'B')}
-                                onUpdateStat={(id: string, field: any, delta: number) => updateStat(id, 'B', field, delta)}
-                                isDark={isDark}
-                                color="#f59e0b"
-                            />
-                            <TouchableOpacity onPress={handleSave} style={{ backgroundColor: COLORS.accent, height: 70, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginTop: 30, marginBottom: 50 }}>
-                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 16 }}>GUARDAR RESULTADOS</Text>
-                            </TouchableOpacity>
-                        </ScrollView>
-                    )}
-                </View>
-            </View>
-        </Modal>
-    );
-};
-
-const MatchTeamSection = ({ label, players, allMembers, onAdd, onRemove, onUpdateStat, isDark, color }: any) => {
-    const C = isDark ? COLORS.dark : COLORS.light;
-    const [showPicker, setShowPicker] = useState(false);
-    return (
-        <View style={{ marginBottom: 30 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
-                <Text style={{ color: color, fontSize: 12, fontWeight: '900', letterSpacing: 1 }}>{label}</Text>
-                <TouchableOpacity onPress={() => setShowPicker(true)} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-                    <Plus color={color} size={16} />
-                    <Text style={{ color: C.text, fontSize: 10, fontWeight: '800' }}>AGREGAR JUGADOR</Text>
-                </TouchableOpacity>
-            </View>
-            <View style={{ backgroundColor: C.card, borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
-                {players.length === 0 && <Text style={{ color: C.sub, fontSize: 11, textAlign: 'center', padding: 20 }}>No hay jugadores asignados</Text>}
-                {players.map((p: any) => (
-                    <View key={p.userId} style={{ padding: 20, flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: C.border }}>
-                        <View style={{ flex: 1 }}><Text style={{ color: C.text, fontSize: 14, fontWeight: '800' }}>{p.name}</Text></View>
-                        <View style={{ flexDirection: 'row', gap: 15, alignItems: 'center' }}>
-                            <View style={{ alignItems: 'center' }}>
-                                <Text style={{ color: C.sub, fontSize: 8, fontWeight: '800' }}>GOLES</Text>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                                    <TouchableOpacity onPress={() => onUpdateStat(p.userId, 'goals', -1)}><Minus color={C.sub} size={14} /></TouchableOpacity>
-                                    <Text style={{ color: C.text, fontWeight: '900' }}>{p.goals}</Text>
-                                    <TouchableOpacity onPress={() => onUpdateStat(p.userId, 'goals', 1)}><Plus color={C.text} size={14} /></TouchableOpacity>
-                                </View>
-                            </View>
-                            <View style={{ alignItems: 'center' }}>
-                                <Text style={{ color: C.sub, fontSize: 8, fontWeight: '800' }}>ASIST.</Text>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                                    <TouchableOpacity onPress={() => onUpdateStat(p.userId, 'assists', -1)}><Minus color={C.sub} size={14} /></TouchableOpacity>
-                                    <Text style={{ color: C.text, fontWeight: '900' }}>{p.assists}</Text>
-                                    <TouchableOpacity onPress={() => onUpdateStat(p.userId, 'assists', 1)}><Plus color={C.text} size={14} /></TouchableOpacity>
-                                </View>
-                            </View>
-                            <TouchableOpacity onPress={() => onRemove(p.userId)}><X color="#ef4444" size={18} /></TouchableOpacity>
-                        </View>
-                    </View>
-                ))}
-            </View>
-            {showPicker && (
-                <Modal visible={true} transparent animationType="fade">
-                    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', padding: 30 }}>
-                        <View style={{ backgroundColor: C.card, borderRadius: 30, padding: 20, maxHeight: 400 }}>
-                            <Text style={{ color: C.text, fontWeight: '900', marginBottom: 20, textAlign: 'center' }}>SELECCIONAR JUGADOR</Text>
-                            <ScrollView>
-                                {allMembers.map((m: any) => (
-                                    <TouchableOpacity key={m.userId} onPress={() => { onAdd(m); setShowPicker(false); }} style={{ padding: 15, borderBottomWidth: 1, borderBottomColor: C.border }}>
-                                        <Text style={{ color: C.text, fontWeight: '700' }}>{m.name}</Text>
-                                    </TouchableOpacity>
-                                ))}
-                                {allMembers.length === 0 && <Text style={{ color: C.sub, textAlign: 'center' }}>No hay más miembros</Text>}
-                            </ScrollView>
-                            <TouchableOpacity onPress={() => setShowPicker(false)} style={{ marginTop: 20, padding: 15, alignItems: 'center' }}><Text style={{ color: '#ef4444', fontWeight: '900' }}>CANCELAR</Text></TouchableOpacity>
-                        </View>
-                    </View>
-                </Modal>
-            )}
-        </View>
-    );
-};
 
 const SurveyModal = ({ visible, onClose, onSave, isDark }: any) => {
     const C = isDark ? COLORS.dark : COLORS.light;
