@@ -103,7 +103,12 @@ export const venueService = {
         try {
             const tenantsRef = collection(db, 'tenants');
             const querySnapshot = await getDocs(tenantsRef);
-            const list = querySnapshot.docs.map(doc => processTenantData(doc.id, doc.data()));
+            const list = querySnapshot.docs
+                .filter(doc => {
+                    const s = (doc.data().status || '').toLowerCase();
+                    return s !== 'suspended' && s !== 'suspendido' && s !== 'inactive';
+                })
+                .map(doc => processTenantData(doc.id, doc.data()));
             return sortTenantsByPriority(list);
         } catch (error) {
             console.error("Error fetching tenants:", error);
@@ -194,7 +199,10 @@ export const venueService = {
                 const qTenants = query(tenantsRef, where(documentId(), 'in', chunk));
                 const snap = await getDocs(qTenants);
                 snap.docs.forEach(doc => {
-                    tenants.push(processTenantData(doc.id, doc.data()));
+                    const s = (doc.data().status || '').toLowerCase();
+                    if (s !== 'suspended' && s !== 'suspendido' && s !== 'inactive') {
+                        tenants.push(processTenantData(doc.id, doc.data()));
+                    }
                 });
             });
 

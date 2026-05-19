@@ -83,7 +83,7 @@ export default function Page() {
 
   const [filter, setFilter] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
 
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -507,13 +507,14 @@ export default function Page() {
   };
 
   const filteredUsers = useMemo(() => {
-    return users.filter(u => {
+    const list = users.filter(u => {
       const matchesSearch = u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase());
       if (!matchesSearch) return false;
       if (filter === 'Todos') return true;
       if (filter === 'Suspendidos') return u.status === 'Suspendido';
       return true;
     });
+    return list.slice(0, 25);
   }, [users, searchTerm, filter]);
 
   const getOvrColor = (tier: string) => {
