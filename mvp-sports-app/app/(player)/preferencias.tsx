@@ -7,14 +7,15 @@ import {
 import { useRouter, useFocusEffect } from 'expo-router';
 import {
     ChevronLeft, Save, User, Phone,
-    Zap, Bell, Moon, Sun, Lock, LogOut, Target,
+    Zap, Bell, Moon, Sun, Lock, LogOut, Target, Eye, EyeOff,
     ShieldCheck, Calendar, Ruler, Weight, 
     ChevronRight, Sparkles, Activity, Award, Mail, 
-    Smartphone, MapPin, AtSign, Cpu, Globe, CheckCircle2, AlertCircle
+    Smartphone, MapPin, AtSign, Cpu, Globe, CheckCircle2, AlertCircle, XCircle
 } from 'lucide-react-native';
 import { useAuth } from '../../store/useAuth';
-import { db } from '../../services/firebase';
+import { auth, db } from '../../services/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -100,6 +101,17 @@ export default function SettingsScreen() {
     // UNSAVED CHANGES ALERT STATE
     const [initialData, setInitialData] = useState<any>(null);
     const [showUnsavedModal, setShowUnsavedModal] = useState(false);
+
+    // PASSWORD MODAL STATE
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmNewPassword, setConfirmNewPassword] = useState('');
+    const [passwordLoading, setPasswordLoading] = useState(false);
+    const [onFeedbackClose, setOnFeedbackClose] = useState<(() => void) | null>(null);
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const [formData, setFormData] = useState({
         displayName: '',
@@ -302,10 +314,66 @@ export default function SettingsScreen() {
         }
     };
 
-    const showFeedback = (type: 'success' | 'error', msg: string) => {
+    const showFeedback = (type: 'success' | 'error', msg: string, onCloseAction?: () => void) => {
         setModalType(type);
         setModalMsg(msg);
+        setOnFeedbackClose(() => onCloseAction || null);
         setModalVisible(true);
+    };
+
+    const handleChangePassword = async () => {
+        if (!currentPassword || !newPassword || !confirmNewPassword) {
+            showFeedback('error', 'Por favor, completa todos los campos.');
+            return;
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            showFeedback('error', 'La nueva contraseña y su confirmación no coinciden.');
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            showFeedback('error', 'La nueva contraseña debe tener al menos 6 caracteres.');
+            return;
+        }
+
+        setPasswordLoading(true);
+        try {
+            const currentUser = auth.currentUser;
+            if (!currentUser || !currentUser.email) {
+                showFeedback('error', 'No se pudo obtener el usuario actual.');
+                return;
+            }
+
+            // Re-authenticate user
+            const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
+            await reauthenticateWithCredential(currentUser, credential);
+
+            // Update password
+            await updatePassword(currentUser, newPassword);
+
+            setShowPasswordModal(false);
+            setCurrentPassword('');
+            setNewPassword('');
+            setConfirmNewPassword('');
+            
+            showFeedback('success', '¡Tu contraseña ha sido cambiada correctamente!', () => {
+                // Stay on preferences screen
+            });
+        } catch (error: any) {
+            console.error(error);
+            let errMsg = 'Ocurrió un error al cambiar la contraseña.';
+            if (error.code === 'auth/wrong-password') {
+                errMsg = 'La contraseña actual ingresada es incorrecta.';
+            } else if (error.code === 'auth/weak-password') {
+                errMsg = 'La nueva contraseña es muy débil (debe tener al menos 6 caracteres).';
+            } else if (error.code === 'auth/user-mismatch' || error.code === 'auth/invalid-credential') {
+                errMsg = 'La contraseña actual ingresada no es válida.';
+            }
+            showFeedback('error', errMsg);
+        } finally {
+            setPasswordLoading(false);
+        }
     };
 
     const getAvailablePositions = () => {
@@ -454,6 +522,18 @@ export default function SettingsScreen() {
                     <RefinedToggleRow icon={Moon} color="#1e293b" label="Modo Oscuro" value={isDark} onValueChange={toggleTheme} isDark={isDark} />
                 </View>
 
+                {/* SEGURIDAD */}
+                <SectionLabel label="Seguridad" />
+                <View style={{ marginHorizontal: 30, backgroundColor: C.card, borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
+                    <TouchableOpacity onPress={() => setShowPasswordModal(true)} style={{ height: 80, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25 }}>
+                        <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: '#f43f5e', alignItems: 'center', justifyContent: 'center' }}>
+                            <Lock color="white" size={20} />
+                        </View>
+                        <Text style={{ color: C.text, fontSize: 17, fontWeight: '800', textTransform: 'uppercase', marginLeft: 20, flex: 1 }}>Cambiar Contraseña</Text>
+                        <ChevronRight color="#10b981" size={20} />
+                    </TouchableOpacity>
+                </View>
+
             </ScrollView>
 
             {/* BARRA ACCESORIO TECLADO (K) */}
@@ -506,12 +586,134 @@ export default function SettingsScreen() {
                 message={modalMsg} 
                 onClose={() => {
                     setModalVisible(false);
-                    if (modalType === 'success') {
+                    if (onFeedbackClose) {
+                        onFeedbackClose();
+                    } else if (modalType === 'success') {
                         router.replace('/(player)/(tabs)/');
                     }
                 }} 
                 isDark={isDark}
             />
+
+            {/* MODAL CAMBIAR CONTRASEÑA */}
+            <Modal visible={showPasswordModal} transparent animationType="slide">
+                <KeyboardAvoidingView 
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+                    style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', padding: 25 }}
+                >
+                    <View style={{ backgroundColor: C.bg, borderRadius: 35, padding: 30, borderWidth: 1, borderColor: C.border }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 }}>
+                            <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase' }}>Cambiar Contraseña</Text>
+                            <TouchableOpacity 
+                                onPress={() => {
+                                    setShowPasswordModal(false);
+                                    setCurrentPassword('');
+                                    setNewPassword('');
+                                    setConfirmNewPassword('');
+                                    setShowCurrentPassword(false);
+                                    setShowNewPassword(false);
+                                    setShowConfirmPassword(false);
+                                }} 
+                                style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}
+                            >
+                                <XCircle color={C.text} size={18} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', marginBottom: 8 }}>Contraseña Actual</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, borderRadius: 15, borderWidth: 1, borderColor: C.border, marginBottom: 20 }}>
+                            <TextInput
+                                secureTextEntry={!showCurrentPassword}
+                                value={currentPassword}
+                                onChangeText={setCurrentPassword}
+                                placeholder="••••••••"
+                                placeholderTextColor={C.sub + '80'}
+                                style={{ 
+                                    flex: 1,
+                                    color: C.text, 
+                                    padding: 15, 
+                                    fontSize: 16, 
+                                    fontWeight: '700', 
+                                }}
+                            />
+                            <TouchableOpacity onPress={() => setShowCurrentPassword(!showCurrentPassword)} style={{ paddingHorizontal: 15 }}>
+                                {showCurrentPassword ? <EyeOff color={C.sub} size={20} /> : <Eye color={C.sub} size={20} />}
+                            </TouchableOpacity>
+                        </View>
+
+                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', marginBottom: 8 }}>Nueva Contraseña</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, borderRadius: 15, borderWidth: 1, borderColor: C.border, marginBottom: 20 }}>
+                            <TextInput
+                                secureTextEntry={!showNewPassword}
+                                value={newPassword}
+                                onChangeText={setNewPassword}
+                                placeholder="••••••••"
+                                placeholderTextColor={C.sub + '80'}
+                                style={{ 
+                                    flex: 1,
+                                    color: C.text, 
+                                    padding: 15, 
+                                    fontSize: 16, 
+                                    fontWeight: '700', 
+                                }}
+                            />
+                            <TouchableOpacity onPress={() => setShowNewPassword(!showNewPassword)} style={{ paddingHorizontal: 15 }}>
+                                {showNewPassword ? <EyeOff color={C.sub} size={20} /> : <Eye color={C.sub} size={20} />}
+                            </TouchableOpacity>
+                        </View>
+
+                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', marginBottom: 8 }}>Confirmar Nueva Contraseña</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, borderRadius: 15, borderWidth: 1, borderColor: C.border, marginBottom: 30 }}>
+                            <TextInput
+                                secureTextEntry={!showConfirmPassword}
+                                value={confirmNewPassword}
+                                onChangeText={setConfirmNewPassword}
+                                placeholder="••••••••"
+                                placeholderTextColor={C.sub + '80'}
+                                style={{ 
+                                    flex: 1,
+                                    color: C.text, 
+                                    padding: 15, 
+                                    fontSize: 16, 
+                                    fontWeight: '700', 
+                                }}
+                            />
+                            <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)} style={{ paddingHorizontal: 15 }}>
+                                {showConfirmPassword ? <EyeOff color={C.sub} size={20} /> : <Eye color={C.sub} size={20} />}
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={{ flexDirection: 'row', gap: 15 }}>
+                            <TouchableOpacity 
+                                onPress={() => {
+                                    setShowPasswordModal(false);
+                                    setCurrentPassword('');
+                                    setNewPassword('');
+                                    setConfirmNewPassword('');
+                                    setShowCurrentPassword(false);
+                                    setShowNewPassword(false);
+                                    setShowConfirmPassword(false);
+                                }} 
+                                style={{ flex: 1, backgroundColor: isDark ? '#1e293b' : '#e2e8f0', height: 60, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}
+                            >
+                                <Text style={{ color: C.text, fontWeight: '900', textTransform: 'uppercase', fontSize: 12 }}>Cancelar</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity 
+                                onPress={handleChangePassword} 
+                                disabled={passwordLoading}
+                                style={{ flex: 2, backgroundColor: COLORS.accent, height: 60, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}
+                            >
+                                {passwordLoading ? (
+                                    <ActivityIndicator color="white" />
+                                ) : (
+                                    <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase', fontSize: 12 }}>Actualizar</Text>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </KeyboardAvoidingView>
+            </Modal>
 
             {/* UNSAVED CHANGES ALERT MODAL */}
             <Modal visible={showUnsavedModal} transparent animationType="fade">

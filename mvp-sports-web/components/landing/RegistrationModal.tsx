@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { XMarkIcon, CheckCircleIcon, ArrowRightIcon, ArrowLeftIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon, CheckCircleIcon, ArrowRightIcon, ArrowLeftIcon, ExclamationCircleIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { auth, db } from "../../services/firebase";
 import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
 import { doc, setDoc, getDoc, getDocs, collection, query, where } from "firebase/firestore";
@@ -31,9 +31,11 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
   const [formData, setFormData] = useState({
     displayName: "",
     email: "",
+    confirmEmail: "",
     phone: "",
     rut: "",
     password: "",
+    confirmPassword: "",
     mainSport: "",
     position: "",
     dominantFoot: "",
@@ -48,6 +50,8 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Resetear estado al abrir el modal
   useEffect(() => {
@@ -55,9 +59,11 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
       setStep(1);
       setSuccess(false);
       setError("");
+      setShowPassword(false);
+      setShowConfirmPassword(false);
       // Opcional: Limpiar formulario al abrir
       setFormData({
-        displayName: "", email: "", phone: "", rut: "", password: "",
+        displayName: "", email: "", confirmEmail: "", phone: "", rut: "", password: "", confirmPassword: "",
         mainSport: "", position: "", dominantFoot: "", height: "", weight: "",
         favTime: "", frequency: "", city: "", birthDate: "", gender: ""
       });
@@ -95,9 +101,11 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
         return (
           formData.displayName.trim().length > 3 &&
           formData.email.includes("@") &&
+          formData.email === formData.confirmEmail &&
           validatePhone(formData.phone) &&
           validateRut(formData.rut) &&
           formData.password.length >= 6 &&
+          formData.password === formData.confirmPassword &&
           formData.city.trim().length > 2
         );
       case 2:
@@ -321,6 +329,8 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isStepValid()) { setError("Faltan datos obligatorios."); return; }
+    if (formData.email !== formData.confirmEmail) { setError("Los correos electrónicos ingresados no coinciden."); return; }
+    if (formData.password !== formData.confirmPassword) { setError("Las contraseñas ingresadas no coinciden."); return; }
     setLoading(true);
     setError("");
     try {
@@ -434,6 +444,51 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
                 )}
               </div>
               <Input label="Email" name="email" value={formData.email} onChange={handleInputChange} placeholder="usuario@email.com" type="email" />
+              <Input label="Confirmar Email" name="confirmEmail" value={formData.confirmEmail} onChange={handleInputChange} placeholder="usuario@email.com" type="email" />
+              
+              <div className="relative text-left">
+                <Input 
+                  label="Password" 
+                  name="password" 
+                  value={formData.password} 
+                  onChange={handleInputChange} 
+                  placeholder="••••••••" 
+                  type={showPassword ? "text" : "password"} 
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-[26px] text-slate-400 hover:text-white transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeSlashIcon className="w-4 h-4" />
+                  ) : (
+                    <EyeIcon className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+
+              <div className="relative text-left">
+                <Input 
+                  label="Confirmar Password" 
+                  name="confirmPassword" 
+                  value={formData.confirmPassword} 
+                  onChange={handleInputChange} 
+                  placeholder="••••••••" 
+                  type={showConfirmPassword ? "text" : "password"} 
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-[26px] text-slate-400 hover:text-white transition-colors"
+                >
+                  {showConfirmPassword ? (
+                    <EyeSlashIcon className="w-4 h-4" />
+                  ) : (
+                    <EyeIcon className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
               <div className="relative">
                 <Input label="Teléfono" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+56 9 ..." maxLength={15} />
                 {formData.phone.length > 7 && (
@@ -442,7 +497,6 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
                   </div>
                 )}
               </div>
-              <Input label="Password" name="password" value={formData.password} onChange={handleInputChange} placeholder="••••••••" type="password" />
               <Input label="Ciudad" name="city" value={formData.city} onChange={handleInputChange} placeholder="Santiago" />
             </div>
           </div>

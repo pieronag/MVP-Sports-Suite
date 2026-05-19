@@ -14,7 +14,9 @@ export default function AuthScreen() {
 
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
+    const [confirmEmail, setConfirmEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [name, setName] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -38,8 +40,16 @@ export default function AuthScreen() {
             Alert.alert('Error', 'Ingresa un correo electrónico válido.');
             return false;
         }
+        if (!isLogin && email.toLowerCase().trim() !== confirmEmail.toLowerCase().trim()) {
+            Alert.alert('Error', 'Los correos electrónicos ingresados no coinciden.');
+            return false;
+        }
         if (password.length < 6) {
             Alert.alert('Error', 'La contraseña debe tener al menos 6 caracteres.');
+            return false;
+        }
+        if (!isLogin && password !== confirmPassword) {
+            Alert.alert('Error', 'Las contraseñas ingresadas no coinciden.');
             return false;
         }
         if (!isLogin && name.trim().length < 3) {
@@ -166,6 +176,24 @@ export default function AuthScreen() {
                             </View>
                         </View>
 
+                        {!isLogin && (
+                            <View>
+                                <Text className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2 ml-1">Confirmar Email</Text>
+                                <View className="flex-row items-center bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/10 h-16 rounded-2xl px-5">
+                                    <Mail size={20} color="#10b981" />
+                                    <TextInput
+                                        placeholder="usuario@mvpsports.com"
+                                        placeholderTextColor="#64748b"
+                                        className="flex-1 ml-4 text-slate-900 dark:text-white font-semibold text-base"
+                                        autoCapitalize="none"
+                                        keyboardType="email-address"
+                                        value={confirmEmail}
+                                        onChangeText={setConfirmEmail}
+                                    />
+                                </View>
+                            </View>
+                        )}
+
                         <View>
                             <Text className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2 ml-1">Contraseña</Text>
                             <View className="flex-row items-center bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/10 h-16 rounded-2xl px-5">
@@ -183,6 +211,26 @@ export default function AuthScreen() {
                                 </TouchableOpacity>
                             </View>
                         </View>
+
+                        {!isLogin && (
+                            <View>
+                                <Text className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2 ml-1">Confirmar Contraseña</Text>
+                                <View className="flex-row items-center bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/10 h-16 rounded-2xl px-5">
+                                    <Lock size={20} color="#10b981" />
+                                    <TextInput
+                                        placeholder="••••••••"
+                                        placeholderTextColor="#64748b"
+                                        className="flex-1 ml-4 text-slate-900 dark:text-white font-semibold text-base"
+                                        secureTextEntry={!showPassword}
+                                        value={confirmPassword}
+                                        onChangeText={setConfirmPassword}
+                                    />
+                                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                                        {showPassword ? <EyeOff size={20} color="#64748b" /> : <Eye size={20} color="#64748b" />}
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        )}
 
                         <TouchableOpacity
                             onPress={handleAuth}
@@ -208,7 +256,11 @@ export default function AuthScreen() {
                     {/* Footer Nav */}
                     <View className="mt-10 items-center">
                         <TouchableOpacity
-                            onPress={() => setIsLogin(!isLogin)}
+                            onPress={() => {
+                                setIsLogin(!isLogin);
+                                setConfirmEmail('');
+                                setConfirmPassword('');
+                            }}
                             className="flex-row items-center py-3 px-6 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-100 dark:border-white/10"
                         >
                             <Text className="text-slate-500 dark:text-slate-400 font-bold text-sm">
