@@ -4,6 +4,12 @@ export default ({ config }) => ({
     "name": "MVP Sports Chile",
     "slug": "mvp-sports-app",
     "version": "1.18.6",
+    "updates": {
+      "url": "https://u.expo.dev/9190ee5c-d6b5-49e4-b455-3e1e533d4eef"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "mvpdeportes",
