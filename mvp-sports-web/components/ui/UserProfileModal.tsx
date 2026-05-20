@@ -63,6 +63,8 @@ export default function UserProfileModal({ user, isOpen, onClose }: UserProfileM
     const stats = user.stats || { played: 0, won: 0, lost: 0, goals: 0 };
     const efficiency = user.efficiency || 0;
     const joinedStr = user.joined || '---';
+    const mainSport = user.mainSport || user.raw?.mainSport || '';
+    const position = user.position || user.raw?.position || '';
 
     // Rango y Experiencia
     const xp = user.xp || 0;
@@ -271,6 +273,16 @@ export default function UserProfileModal({ user, isOpen, onClose }: UserProfileM
                                     <span className="px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 shadow-sm font-mono">
                                         {xp.toLocaleString()} XP
                                     </span>
+                                    {mainSport && (
+                                        <span className="px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 shadow-sm">
+                                            {mainSport.toUpperCase()}
+                                        </span>
+                                    )}
+                                    {position && (
+                                        <span className="px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest bg-cyan-500/10 text-cyan-500 border border-cyan-500/20 shadow-sm">
+                                            {position.toUpperCase()}
+                                        </span>
+                                    )}
                                 </div>
                                 <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tighter leading-none mb-2 uppercase">
                                     {name}

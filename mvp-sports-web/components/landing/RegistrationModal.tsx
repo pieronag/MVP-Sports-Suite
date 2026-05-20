@@ -569,14 +569,14 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl">
-      <div className="relative w-full max-w-xl bg-slate-900/50 border border-white/10 rounded-[2.5rem] shadow-[0_0_150px_rgba(0,0,0,0.7)] overflow-hidden">
-        <div className="absolute top-0 left-0 h-1 bg-[#00df82] transition-all duration-700" style={{ width: `${(step / 3) * 100}%` }} />
-        <button onClick={onClose} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white transition-colors z-20 bg-white/5 rounded-full">
+      <div className="relative w-full max-w-xl max-h-[90vh] flex flex-col bg-slate-900/50 border border-white/10 rounded-[2.5rem] shadow-[0_0_150px_rgba(0,0,0,0.7)] overflow-hidden">
+        <div className="absolute top-0 left-0 h-1 bg-[#00df82] transition-all duration-700 z-30" style={{ width: `${(step / 3) * 100}%` }} />
+        <button onClick={onClose} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white transition-colors z-30 bg-white/5 rounded-full">
           <XMarkIcon className="w-4 h-4" />
         </button>
 
         {!success ? (
-          <div className="p-8 sm:p-10">
+          <div className="p-8 sm:p-10 overflow-y-auto flex-1 custom-scrollbar">
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-6 h-6 rounded-md bg-[#00df82] flex items-center justify-center text-slate-950 font-black text-[10px]">{step}</div>

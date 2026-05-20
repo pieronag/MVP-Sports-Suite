@@ -54,6 +54,8 @@ interface User {
   strikes?: number;
   lastStrikeAt?: any;
   raw?: any;
+  mainSport?: string;
+  position?: string;
 }
 
 interface Toast {
@@ -82,6 +84,7 @@ export default function Page() {
   const [gamificationConfig, setGamificationConfig] = useState<any>(null);
 
   const [filter, setFilter] = useState('Todos');
+  const [sportFilter, setSportFilter] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
 
@@ -283,6 +286,8 @@ export default function Page() {
             projections, 
             badges: earnedBadges, 
             strikes: data.strikes || 0,
+            mainSport: data.mainSport || "Fútbol",
+            position: data.position || "Jugador",
             raw: data
           });
         } catch (innerError) {
@@ -513,12 +518,24 @@ export default function Page() {
     const list = users.filter(u => {
       const matchesSearch = u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase());
       if (!matchesSearch) return false;
-      if (filter === 'Todos') return true;
-      if (filter === 'Suspendidos') return u.status === 'Suspendido';
+      
+      if (filter === 'Suspendidos' && u.status !== 'Suspendido') return false;
+      if (sportFilter !== 'Todos' && u.mainSport !== sportFilter) return false;
+      
       return true;
     });
     return list.slice(0, 25);
-  }, [users, searchTerm, filter]);
+  }, [users, searchTerm, filter, sportFilter]);
+
+  const uniqueSports = useMemo(() => {
+    const sports = new Set<string>();
+    users.forEach(u => {
+      if (u.mainSport) {
+        sports.add(u.mainSport);
+      }
+    });
+    return ['Todos', ...Array.from(sports)];
+  }, [users]);
 
   const getOvrColor = (tier: string) => {
     const t = tier.toUpperCase();
@@ -577,7 +594,11 @@ export default function Page() {
               {["Todos", "Suspendidos"].map((f) => (
                 <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-lg transition-all whitespace-nowrap ${filter === f ? "bg-white dark:bg-emerald-500 text-black shadow-sm" : "text-slate-400 hover:text-black dark:hover:text-white"}`}>{f.toUpperCase()}</button>
               ))}
-              <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10 mx-1 hidden md:block"></div>
+              <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10 mx-1"></div>
+              {uniqueSports.map((s) => (
+                <button key={s} onClick={() => setSportFilter(s)} className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-lg transition-all whitespace-nowrap ${sportFilter === s ? "bg-white dark:bg-emerald-500 text-black shadow-sm" : "text-slate-400 hover:text-black dark:hover:text-white"}`}>{s.toUpperCase()}</button>
+              ))}
+              <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10 mx-1"></div>
               <div className="flex items-center gap-0.5">
                 <button
                   onClick={() => setViewMode('grid')}
@@ -634,9 +655,11 @@ export default function Page() {
                                 {user.photoURL ? <img src={user.photoURL} className="w-full h-full object-cover" /> : user.name.charAt(0)}
                               </div>
                               <div className="min-w-0">
-                                <div className="flex items-center gap-1.5">
+                                <div className="flex items-center gap-1.5 flex-wrap">
                                   <span className="font-black text-[11px] text-slate-900 dark:text-white uppercase truncate leading-none">{user.name}</span>
                                   {user.role === 'Capitán' && <span className="px-1.5 py-0.5 bg-amber-500 text-black rounded text-[6px] font-black uppercase tracking-tighter">CAP</span>}
+                                  {user.mainSport && <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded text-[6px] font-black uppercase tracking-tighter">{user.mainSport}</span>}
+                                  {user.position && <span className="px-1.5 py-0.5 bg-cyan-500/10 text-cyan-500 dark:text-cyan-400 rounded text-[6px] font-black uppercase tracking-tighter">{user.position}</span>}
                                 </div>
                                 <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase truncate block mt-1">{user.email}</span>
                               </div>
@@ -750,9 +773,11 @@ export default function Page() {
                     </div>
 
                     <h3 className="font-black text-slate-900 dark:text-white text-base uppercase truncate leading-tight group-hover:text-emerald-500 transition-colors mb-1">{user.name}</h3>
-                    <div className="flex items-center gap-2 mb-5">
-                      <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter truncate max-w-[150px]">{user.email}</p>
+                    <div className="flex flex-wrap items-center gap-2 mb-5">
+                      <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter truncate max-w-[120px]">{user.email}</p>
                       {user.role === 'Capitán' && <span className="px-1.5 py-0.5 bg-amber-500 text-black rounded-lg text-[7px] font-black uppercase">Capitán</span>}
+                      {user.mainSport && <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-lg text-[7px] font-black uppercase">{user.mainSport}</span>}
+                      {user.position && <span className="px-1.5 py-0.5 bg-cyan-500/10 text-cyan-500 dark:text-cyan-400 rounded-lg text-[7px] font-black uppercase">{user.position}</span>}
                       {(user.strikes || 0) > 0 && (
                         <span className="px-1.5 py-0.5 bg-rose-500 text-white rounded-lg text-[7px] font-black uppercase flex items-center gap-1">
                           <NoSymbolIcon className="w-2.5 h-2.5" />
