@@ -18,6 +18,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendStatus, setResendStatus] = useState("");
 
   useEffect(() => setMounted(true), []);
 
@@ -29,10 +31,39 @@ export default function LoginPage() {
     }
   }, [user, router]);
 
+  const handleResendVerification = async () => {
+    if (!email) return;
+    setResending(true);
+    setResendStatus("");
+    try {
+      const res = await fetch('/api/send-auth-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          type: 'verify',
+        }),
+      });
+      if (res.ok) {
+        setResendStatus("Enlace enviado con éxito. Revisa tu bandeja de entrada.");
+      } else {
+        setResendStatus("No se pudo enviar el correo. Por favor, inténtalo más tarde.");
+      }
+    } catch (err) {
+      console.error(err);
+      setResendStatus("Error de conexión.");
+    } finally {
+      setResending(false);
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setResendStatus("");
 
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -213,13 +244,30 @@ export default function LoginPage() {
 
 
                 {error && (
-                    <div className="p-2.5 rounded-lg flex items-center gap-2 animate-shake
-                                    bg-red-50 border border-red-200 text-red-600
-                                    dark:bg-red-900/20 dark:border-red-500/30 dark:text-red-400">
-                        <svg className="h-3 w-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                        <span className="text-[10px] font-bold">{error}</span>
+                    <div className="flex flex-col gap-2">
+                        <div className="p-2.5 rounded-lg flex items-center gap-2 animate-shake
+                                        bg-red-50 border border-red-200 text-red-600
+                                        dark:bg-red-900/20 dark:border-red-500/30 dark:text-red-400">
+                            <svg className="h-3 w-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <span className="text-[10px] font-bold">{error}</span>
+                        </div>
+                        {error.includes("verifica tu correo") && (
+                            <button
+                                type="button"
+                                onClick={handleResendVerification}
+                                disabled={resending}
+                                className="text-left text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-mvp-volt hover:underline disabled:opacity-50"
+                            >
+                                {resending ? "Reenviando..." : "Reenviar enlace de activación"}
+                            </button>
+                        )}
+                        {resendStatus && (
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide">
+                                {resendStatus}
+                            </span>
+                        )}
                     </div>
                 )}
 

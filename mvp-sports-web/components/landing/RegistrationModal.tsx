@@ -341,8 +341,22 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
       const user = userCredential.user;
       await updateProfile(user, { displayName: formData.displayName });
 
-      // Enviar correo electrónico de verificación de Firebase Auth
-      await sendEmailVerification(user);
+      // Enviar correo electrónico de verificación personalizado a través de nuestra API
+      try {
+        await fetch('/api/send-auth-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email.trim(),
+            type: 'verify',
+            name: formData.displayName,
+          }),
+        });
+      } catch (emailErr) {
+        console.error('Error al enviar correo de verificación:', emailErr);
+      }
 
       // Formatear fecha de YYYY-MM-DD a DD/MM/AAAA para compatibilidad total de la Suite
       let formattedBirthDate = formData.birthDate;
