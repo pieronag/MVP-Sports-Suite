@@ -2,8 +2,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { auth } from "../../services/firebase"; 
+import { auth, functions } from "../../services/firebase"; 
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { httpsCallable } from "firebase/functions";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext"; // Importamos AuthContext
 
@@ -36,24 +37,15 @@ export default function LoginPage() {
     setResending(true);
     setResendStatus("");
     try {
-      const res = await fetch('/api/send-auth-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email.trim(),
-          type: 'verify',
-        }),
+      const sendAuthEmailFn = httpsCallable(functions, 'sendAuthEmail');
+      await sendAuthEmailFn({
+        email: email.trim(),
+        type: 'verify',
       });
-      if (res.ok) {
-        setResendStatus("Enlace enviado con éxito. Revisa tu bandeja de entrada.");
-      } else {
-        setResendStatus("No se pudo enviar el correo. Por favor, inténtalo más tarde.");
-      }
+      setResendStatus("Enlace enviado con éxito. Revisa tu bandeja de entrada.");
     } catch (err) {
       console.error(err);
-      setResendStatus("Error de conexión.");
+      setResendStatus("No se pudo enviar el correo. Por favor, inténtalo más tarde.");
     } finally {
       setResending(false);
     }

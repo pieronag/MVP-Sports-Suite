@@ -1,9 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { XMarkIcon, CheckCircleIcon, ArrowRightIcon, ArrowLeftIcon, ExclamationCircleIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import { auth, db } from "../../services/firebase";
-import { createUserWithEmailAndPassword, updateProfile, signOut, sendEmailVerification } from "firebase/auth";
+import { auth, db, functions } from "../../services/firebase";
+import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
 import { doc, setDoc, getDoc, getDocs, collection, query, where } from "firebase/firestore";
+import { httpsCallable } from "firebase/functions";
 
 const SPORT_POSITIONS: Record<string, string[]> = {
   'Fútbol': ['Arquero', 'Defensa', 'Lateral', 'Volante', 'Delantero'],
@@ -341,18 +342,13 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
       const user = userCredential.user;
       await updateProfile(user, { displayName: formData.displayName });
 
-      // Enviar correo electrónico de verificación personalizado a través de nuestra API
+      // Enviar correo de verificación utilizando la Cloud Function directa sendAuthEmail
       try {
-        await fetch('/api/send-auth-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: formData.email.trim(),
-            type: 'verify',
-            name: formData.displayName,
-          }),
+        const sendAuthEmailFn = httpsCallable(functions, 'sendAuthEmail');
+        await sendAuthEmailFn({
+          email: formData.email.trim(),
+          type: 'verify',
+          name: formData.displayName,
         });
       } catch (emailErr) {
         console.error('Error al enviar correo de verificación:', emailErr);

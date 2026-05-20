@@ -497,8 +497,10 @@ export default function EstadisticasScreen() {
                              b.paymentStatus === 'no-show' || 
                              b.noShow === true || 
                              (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
-            const isCancelledByPlayer = b.status === 'cancelled' && b.cancelledBy;
-            return (isCompleted || isNoShow || b.status === 'cancelled') && !isCancelledByPlayer;
+            if (b.status === 'cancelled' && !isNoShow) {
+                return false;
+            }
+            return isCompleted || isNoShow;
         }).map(b => {
             const dateObj = b.date?.seconds ? new Date(b.date.seconds * 1000) : (b.date?.toDate ? b.date.toDate() : new Date());
             const bStats = b as any;
@@ -572,8 +574,26 @@ export default function EstadisticasScreen() {
             const performance = [];
             if (bStats.goals > 0) performance.push({ text: `${bStats.goals} GOLES`, icon: Target, color: '#ef4444' });
             if (bStats.isMVP) performance.push({ text: 'MVP', icon: Star, color: '#f59e0b' });
+            if (b.checkIn) performance.push({ text: 'CHECK-IN', icon: ShieldCheck, color: '#10b981' });
+            if (isNoShow) performance.push({ text: 'NO-SHOW', icon: AlertCircle, color: '#ef4444' });
 
             return { ...b, dateObj, displayStatus, resultText, resultType, matchXP, performance, formattedTime: b.startTime || '--:--' };
+        });
+
+        let checkinsCount = 0;
+        let noshowsCount = 0;
+        let partidosTotales = 0;
+
+        matchesList.forEach(m => {
+            if (m.displayStatus === 'completed') {
+                partidosTotales++;
+            }
+            if (m.checkIn) {
+                checkinsCount++;
+            }
+            if (m.displayStatus === 'no-show') {
+                noshowsCount++;
+            }
         });
 
         const bitacora = [
@@ -583,7 +603,8 @@ export default function EstadisticasScreen() {
 
         return { 
             nivel: userProfile?.ovr || 0,
-            puntosTotales, progreso, rangoActual, siguienteRango, bitacora 
+            puntosTotales, progreso, rangoActual, siguienteRango, bitacora,
+            checkinsCount, noshowsCount, partidosTotales
         };
     }, [bookings, profile, gamification]);
 

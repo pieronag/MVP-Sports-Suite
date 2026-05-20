@@ -63,9 +63,6 @@ export default function PerfilScreen() {
     const [showCardModal, setShowCardModal] = useState(false);
     const [showBadgeGlossary, setShowBadgeGlossary] = useState(false);
     const [badgeConfigs, setBadgeConfigs] = useState<Record<string, { bronze: number; silver: number; gold: number }>>({});
-    const [showLogoutModal, setShowLogoutModal] = useState(false);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [loadingDelete, setLoadingDelete] = useState(false);
 
     const loadData = async (isRefreshing = false) => {
         if (!user) return;
@@ -155,34 +152,6 @@ export default function PerfilScreen() {
             setShowSuccessModal(true);
         } catch (error) {
             await Sharing.shareAsync(capturedUri);
-        }
-    };
-
-    const handleDeleteAccount = async () => {
-        if (!user) return;
-        setLoadingDelete(true);
-        try {
-            // 1. Eliminar documento del usuario en Firestore
-            const userDocRef = doc(db, 'users', user.uid);
-            await deleteDoc(userDocRef);
-
-            // 2. Eliminar el usuario de Firebase Auth
-            await user.delete();
-
-            setShowDeleteModal(false);
-            Alert.alert("Cuenta Eliminada", "Tu perfil y credenciales de acceso han sido eliminados de forma definitiva. Tus reservas se han mantenido para registros administrativos.");
-        } catch (err: any) {
-            console.error("Error deleting user account:", err);
-            if (err.code === 'auth/requires-recent-login') {
-                Alert.alert(
-                    "Seguridad Activa",
-                    "Por motivos de seguridad, debes cerrar sesión e iniciar sesión nuevamente para renovar tu sesión antes de poder eliminar tu perfil definitivamente."
-                );
-            } else {
-                Alert.alert("Error de Sistema", "No se pudo borrar la cuenta. Por favor reintenta en unos instantes.");
-            }
-        } finally {
-            setLoadingDelete(false);
         }
     };
 
@@ -556,20 +525,6 @@ export default function PerfilScreen() {
                     })()}
                 </View>
 
-                {/* ACCIONES DE SESIÓN Y SEGURIDAD */}
-                <View style={{ marginHorizontal: 30, marginTop: 40, gap: 15 }}>
-                    <TouchableOpacity onPress={() => setShowLogoutModal(true)} style={{ height: 60, borderRadius: 20, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', borderWidth: 1, borderColor: C.border }}>
-                        <LogOut color={C.text} size={20} />
-                        <Text style={{ color: C.text, fontWeight: '900', fontSize: 12, textTransform: 'uppercase', marginLeft: 10 }}>Cerrar Sesión</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => setShowDeleteModal(true)} style={{ height: 60, borderRadius: 20, backgroundColor: isDark ? 'rgba(244,63,94,0.1)' : '#fdf2f2', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', borderWidth: 1, borderColor: COLORS.error + '40' }}>
-                        <Shield color={COLORS.error} size={20} />
-                        <Text style={{ color: COLORS.error, fontWeight: '900', fontSize: 12, textTransform: 'uppercase', marginLeft: 10 }}>Eliminar Cuenta Definitivamente</Text>
-                    </TouchableOpacity>
-                </View>
-
-                <Text style={{ textAlign: 'center', color: C.sub, fontSize: 8, fontWeight: '700', marginTop: 40 }}> MVP SPORTS CHILE • 2026</Text>
             </ScrollView>
 
             {/* ═══ VISTA DE CAPTURA PLAYER CARD (ESTILO TOPPS NOW 2026 - ELONGATED) ═══ */}
@@ -590,7 +545,7 @@ export default function PerfilScreen() {
                     />
 
                     {/* Top Left: Zoomed Logo (Scaled & Aligned) */}
-                    <View style={{ position: 'absolute', top: 40, left: 20, width: 180, height: 120, overflow: 'hidden' }}>
+                    <View style={{ position: 'absolute', top: 60, left: 25, width: 180, height: 120, overflow: 'hidden' }}>
                         <Image
                             source={require('../../assets/images/Logo.png')}
                             style={{ width: '130%', height: '130%', position: 'absolute', top: '-15%', left: '-15%' }}
@@ -610,8 +565,8 @@ export default function PerfilScreen() {
                     </View>
 
                     {/* PLAYER POSITION VERTICAL */}
-                    <View style={{ position: 'absolute', left: -240, top: '35%', transform: [{ rotate: '-90deg' }] }}>
-                        <Text style={{ color: 'white', fontSize: 140, fontWeight: '900', opacity: 0.5, letterSpacing: 2 }}>{(profile?.position || 'JUGADOR').toUpperCase()}</Text>
+                    <View style={{ position: 'absolute', left: -500, top: '42%', width: 1200, transform: [{ rotate: '-90deg' }] }}>
+                        <Text style={{ color: 'white', fontSize: 140, fontWeight: '900', opacity: 0.5, letterSpacing: 2, textAlign: 'center' }}>{(profile?.position || 'JUGADOR').toUpperCase()}</Text>
                     </View>
 
                     {/* Bottom Section: TOPPS NOW STYLE NAMEPLATE */}
@@ -653,8 +608,8 @@ export default function PerfilScreen() {
                             borderTopColor: '#06b6d4',
                             zIndex: 10
                         }}>
-                            <Text style={{ color: 'white', fontSize: 22, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 4 }}>
-                                NIVEL {tierInfo.name} • TEMPORADA 2026
+                            <Text numberOfLines={1} adjustsFontSizeToFit style={{ color: 'white', fontSize: 22, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 4 }}>
+                                {profile?.mainSport ? `${profile.mainSport} • ` : ''}NIVEL {tierInfo.name} • 2026
                             </Text>
                         </View>
 
@@ -953,62 +908,6 @@ export default function PerfilScreen() {
                                      });
                             })()}
                         </ScrollView>
-                    </View>
-                </View>
-            </Modal>
-
-            {/* MODAL DE CONFIRMACIÓN DE CERRAR SESIÓN */}
-            <Modal visible={showLogoutModal} transparent animationType="fade">
-                <View style={{ flex: 1, backgroundColor: 'rgba(2, 6, 23, 0.95)', alignItems: 'center', justifyContent: 'center', padding: 30 }}>
-                    <View style={{ backgroundColor: C.card, width: '100%', padding: 40, borderRadius: 40, alignItems: 'center', borderWidth: 1, borderColor: C.border }}>
-                        <View style={{ width: 80, height: 80, borderRadius: 30, backgroundColor: COLORS.accent + '22', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
-                            <LogOut color={COLORS.accent} size={40} />
-                        </View>
-                        <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', textAlign: 'center', marginBottom: 15, textTransform: 'uppercase', letterSpacing: -0.5 }}>¿Cerrar Sesión?</Text>
-                        <Text style={{ color: C.sub, fontSize: 14, fontWeight: '700', textAlign: 'center', marginBottom: 35, lineHeight: 20 }}>Tendrás que ingresar nuevamente con tu correo y contraseña para reservar canchas y ver tu ELO competitivo.</Text>
-
-                        <View style={{ flexDirection: 'row', gap: 15, width: '100%' }}>
-                            <TouchableOpacity onPress={() => setShowLogoutModal(false)} style={{ flex: 1, height: 60, borderRadius: 20, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
-                                <Text style={{ color: C.text, fontWeight: '900', textTransform: 'uppercase' }}>Cancelar</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { setShowLogoutModal(false); signOut(); }} style={{ flex: 1, height: 60, borderRadius: 20, backgroundColor: COLORS.accent, alignItems: 'center', justifyContent: 'center' }}>
-                                <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase' }}>Cerrar</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
-
-            {/* MODAL DE CONFIRMACIÓN DE ELIMINAR CUENTA */}
-            <Modal visible={showDeleteModal} transparent animationType="slide">
-                <View style={{ flex: 1, backgroundColor: 'rgba(2, 6, 23, 0.98)', alignItems: 'center', justifyContent: 'center', padding: 30 }}>
-                    <View style={{ backgroundColor: C.card, width: '100%', padding: 40, borderRadius: 40, alignItems: 'center', borderWidth: 2, borderColor: COLORS.error + '40' }}>
-                        <View style={{ width: 80, height: 80, borderRadius: 30, backgroundColor: COLORS.error + '22', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
-                            <AlertCircle color={COLORS.error} size={40} />
-                        </View>
-                        <Text style={{ color: COLORS.error, fontSize: 22, fontWeight: '900', textAlign: 'center', marginBottom: 15, textTransform: 'uppercase', letterSpacing: -0.5 }}>¿ELIMINAR TU CUENTA?</Text>
-                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '800', textAlign: 'center', marginBottom: 25, lineHeight: 20 }}>
-                            Esta acción es <Text style={{ color: COLORS.error }}>completamente irreversible</Text>. Se eliminarán de forma definitiva tus credenciales de acceso y perfil:
-                        </Text>
-
-                        <View style={{ width: '100%', backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#f8fafc', padding: 20, borderRadius: 20, marginBottom: 35, gap: 10, borderWidth: 1, borderColor: C.border }}>
-                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>• Carta de Jugador Topps Now 2026.</Text>
-                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>• Credenciales de acceso de Firebase Auth.</Text>
-                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>• Tus reservas e historial se conservarán de forma anónima para registros de los recintos.</Text>
-                        </View>
-
-                        <View style={{ flexDirection: 'row', gap: 15, width: '100%' }}>
-                            <TouchableOpacity onPress={() => setShowDeleteModal(false)} style={{ flex: 1, height: 60, borderRadius: 20, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
-                                <Text style={{ color: C.text, fontWeight: '900', textTransform: 'uppercase' }}>Cancelar</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={handleDeleteAccount} disabled={loadingDelete} style={{ flex: 1, height: 60, borderRadius: 20, backgroundColor: COLORS.error, alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
-                                {loadingDelete ? (
-                                    <ActivityIndicator color="white" />
-                                ) : (
-                                    <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase' }}>Eliminar</Text>
-                                )}
-                            </TouchableOpacity>
-                        </View>
                     </View>
                 </View>
             </Modal>

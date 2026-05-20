@@ -44,5 +44,6 @@ export interface UserProfile {
     teamName?: string;
     xp?: number;
     position?: string;
+    mainSport?: string;
 }
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
     View, Text, ScrollView, TouchableOpacity, TextInput, Image,
     ActivityIndicator, StatusBar, Switch, StyleSheet, Modal,
-    RefreshControl, BackHandler, Dimensions, Platform, KeyboardAvoidingView, Keyboard
+    RefreshControl, BackHandler, Dimensions, Platform, KeyboardAvoidingView, Keyboard, Alert
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import {
@@ -10,11 +10,11 @@ import {
     Zap, Bell, Moon, Sun, Lock, LogOut, Target, Eye, EyeOff,
     ShieldCheck, Calendar, Ruler, Weight, 
     ChevronRight, Sparkles, Activity, Award, Mail, 
-    Smartphone, MapPin, AtSign, Cpu, Globe, CheckCircle2, AlertCircle, XCircle
+    Smartphone, MapPin, AtSign, Cpu, Globe, CheckCircle2, AlertCircle, XCircle, Shield
 } from 'lucide-react-native';
 import { useAuth } from '../../store/useAuth';
 import { auth, db } from '../../services/firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -105,6 +105,8 @@ export default function SettingsScreen() {
     // PASSWORD MODAL STATE
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [showSignOutModal, setShowSignOutModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [loadingDelete, setLoadingDelete] = useState(false);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -377,6 +379,34 @@ export default function SettingsScreen() {
         }
     };
 
+    const handleDeleteAccount = async () => {
+        if (!user) return;
+        setLoadingDelete(true);
+        try {
+            // 1. Eliminar documento del usuario en Firestore
+            const userDocRef = doc(db, 'users', user.uid);
+            await deleteDoc(userDocRef);
+
+            // 2. Eliminar el usuario de Firebase Auth
+            await user.delete();
+
+            setShowDeleteModal(false);
+            Alert.alert("Cuenta Eliminada", "Tu perfil y credenciales de acceso han sido eliminados de forma definitiva. Tus reservas se han mantenido para registros administrativos.");
+        } catch (err: any) {
+            console.error("Error deleting user account:", err);
+            if (err.code === 'auth/requires-recent-login') {
+                Alert.alert(
+                    "Seguridad Activa",
+                    "Por motivos de seguridad, debes cerrar sesión e iniciar sesión nuevamente para renovar tu sesión antes de poder eliminar tu perfil definitivamente."
+                );
+            } else {
+                Alert.alert("Error de Sistema", "No se pudo borrar la cuenta. Por favor reintenta en unos instantes.");
+            }
+        } finally {
+            setLoadingDelete(false);
+        }
+    };
+
     const getAvailablePositions = () => {
         if (!formData.mainSport) return [];
         return SPORT_POSITIONS[formData.mainSport] || [];
@@ -535,25 +565,42 @@ export default function SettingsScreen() {
                     </TouchableOpacity>
                 </View>
 
-                {/* BOTÓN CERRAR SESIÓN */}
-                <TouchableOpacity 
-                    onPress={() => setShowSignOutModal(true)}
-                    style={{ 
-                        marginHorizontal: 30, 
-                        marginTop: 35, 
-                        height: 65, 
-                        borderRadius: 22, 
-                        backgroundColor: isDark ? '#f43f5e11' : '#fef2f2', 
-                        flexDirection: 'row', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        borderWidth: 1, 
-                        borderColor: isDark ? '#f43f5e33' : '#fee2e2' 
-                    }}
-                >
-                    <LogOut color="#f43f5e" size={20} style={{ marginRight: 10 }} />
-                    <Text style={{ color: '#f43f5e', fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Cerrar Sesión Activa</Text>
-                </TouchableOpacity>
+                {/* ACCIONES DE SESIÓN Y SEGURIDAD */}
+                <View style={{ marginHorizontal: 30, marginTop: 35, gap: 15 }}>
+                    <TouchableOpacity 
+                        onPress={() => setShowSignOutModal(true)}
+                        style={{ 
+                            height: 65, 
+                            borderRadius: 22, 
+                            backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', 
+                            flexDirection: 'row', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            borderWidth: 1, 
+                            borderColor: C.border 
+                        }}
+                    >
+                        <LogOut color={C.text} size={20} style={{ marginRight: 10 }} />
+                        <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Cerrar Sesión Activa</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity 
+                        onPress={() => setShowDeleteModal(true)}
+                        style={{ 
+                            height: 65, 
+                            borderRadius: 22, 
+                            backgroundColor: isDark ? '#f43f5e11' : '#fef2f2', 
+                            flexDirection: 'row', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            borderWidth: 1, 
+                            borderColor: isDark ? '#f43f5e33' : '#fee2e2' 
+                        }}
+                    >
+                        <Shield color="#f43f5e" size={20} style={{ marginRight: 10 }} />
+                        <Text style={{ color: '#f43f5e', fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Eliminar Cuenta Definitivamente</Text>
+                    </TouchableOpacity>
+                </View>
 
                 <Text style={{ textAlign: 'center', color: C.sub, fontSize: 8, fontWeight: '700', marginTop: 40 }}>© MVP SPORTS CHILE • 2026</Text>
             </ScrollView>
@@ -832,6 +879,40 @@ export default function SettingsScreen() {
                                 style={{ flex: 1, backgroundColor: '#f43f5e', paddingVertical: 18, borderRadius: 18, alignItems: 'center', shadowColor: '#f43f5e', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.3, shadowRadius: 20 }}
                             >
                                 <Text style={{ color: 'white', fontWeight: '900', fontSize: 12, textTransform: 'uppercase' }}>Sí, Salir</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* MODAL DE CONFIRMACIÓN DE ELIMINAR CUENTA */}
+            <Modal visible={showDeleteModal} transparent animationType="slide">
+                <View style={{ flex: 1, backgroundColor: 'rgba(2, 6, 23, 0.98)', alignItems: 'center', justifyContent: 'center', padding: 30 }}>
+                    <View style={{ backgroundColor: C.card, width: '100%', padding: 40, borderRadius: 40, alignItems: 'center', borderWidth: 2, borderColor: '#f43f5e40' }}>
+                        <View style={{ width: 80, height: 80, borderRadius: 30, backgroundColor: '#f43f5e22', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
+                            <AlertCircle color="#f43f5e" size={40} />
+                        </View>
+                        <Text style={{ color: '#f43f5e', fontSize: 22, fontWeight: '900', textAlign: 'center', marginBottom: 15, textTransform: 'uppercase', letterSpacing: -0.5 }}>¿ELIMINAR TU CUENTA?</Text>
+                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '800', textAlign: 'center', marginBottom: 25, lineHeight: 20 }}>
+                            Esta acción es <Text style={{ color: '#f43f5e' }}>completamente irreversible</Text>. Se eliminarán de forma definitiva tus credenciales de acceso y perfil:
+                        </Text>
+
+                        <View style={{ width: '100%', backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#f8fafc', padding: 20, borderRadius: 20, marginBottom: 35, gap: 10, borderWidth: 1, borderColor: C.border }}>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>• Ficha de Jugador Topps Now 2026.</Text>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>• Credenciales de acceso de Firebase Auth.</Text>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>• Tus reservas e historial se conservarán de forma anónima para registros de los recintos.</Text>
+                        </View>
+
+                        <View style={{ flexDirection: 'row', gap: 15, width: '100%' }}>
+                            <TouchableOpacity onPress={() => setShowDeleteModal(false)} style={{ flex: 1, height: 60, borderRadius: 20, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
+                                <Text style={{ color: C.text, fontWeight: '900', textTransform: 'uppercase' }}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={handleDeleteAccount} disabled={loadingDelete} style={{ flex: 1, height: 60, borderRadius: 20, backgroundColor: '#f43f5e', alignItems: 'center', justifyContent: 'center', flexDirection: 'row' }}>
+                                {loadingDelete ? (
+                                    <ActivityIndicator color="white" />
+                                ) : (
+                                    <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase' }}>Eliminar</Text>
+                                )}
                             </TouchableOpacity>
                         </View>
                     </View>
