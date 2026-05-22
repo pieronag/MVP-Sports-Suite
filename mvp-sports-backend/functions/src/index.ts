@@ -606,8 +606,20 @@ export const refundBookingPayment = onCall({region: "southamerica-west1"}, async
 
     if (!paymentSnap.empty) {
       paymentDoc = paymentSnap.docs[0];
-      paymentData = paymentDoc.data();
-      originalAmount = paymentData.amount || originalAmount;
+      
+      // Bloqueo por idempotencia
+      await db.runTransaction(async (transaction) => {
+        const pDoc: any = await transaction.get(paymentDoc!.ref);
+        if (pDoc.data()?.isRefundProcessing) {
+          throw new HttpsError("aborted", "El reembolso ya está en proceso. Por favor, espere.");
+        }
+        // Marcar como en proceso
+        transaction.update(paymentDoc!.ref, { isRefundProcessing: true });
+      });
+
+      const refreshedDoc = await paymentDoc.ref.get();
+      paymentData = refreshedDoc.data();
+      originalAmount = paymentData?.amount || originalAmount;
     }
 
     // Calcular reembolso parcial descontando el 3% de comisión (Transbank + IVA)
@@ -704,6 +716,7 @@ export const refundBookingPayment = onCall({region: "southamerica-west1"}, async
         refundAmount: refundResult.type === "FAILED_PHYSICAL_REFUND" ? 0 : refundAmount,
         refundFee: fee,
         refundDetails: refundResult,
+        isRefundProcessing: false,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
     }

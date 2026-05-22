@@ -14,6 +14,7 @@ import {
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import QRCode from 'react-native-qrcode-svg';
+import { FlashList } from '@shopify/flash-list';
 import BottomMenu from '../../components/BottomMenu';
 import { useAuth } from '../../store/useAuth';
 import { bookingService, Booking } from '../../services/bookingService';
@@ -495,22 +496,22 @@ export default function MisReservasScreen() {
                 <TabButton label="HISTORIAL" active={activeTab === 'historial'} onPress={() => setActiveTab('historial')} isDark={isDark} />
             </View>
 
-            <ScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={{ paddingBottom: 120 }}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(true); }} tintColor={COLORS.accent} />}
-            >
-                <SectionLabel label={activeTab === 'activas' ? "Próximos Partidos" : "Partidos Finalizados"} />
-
-                {paginatedList.length === 0 ? (
-                    <View style={{ padding: 60, alignItems: 'center', justifyContent: 'center' }}>
-                        <CalendarDays color={C.sub} size={64} strokeWidth={1} />
-                        <Text style={{ color: C.sub, fontSize: 12, fontWeight: '800', marginTop: 20, textAlign: 'center' }}>No hay partidos para mostrar</Text>
-                    </View>
-                ) : (
-                    paginatedList.map((b) => (
+            <View style={{ flex: 1 }}>
+                <FlashList
+                    data={paginatedList}
+                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(true); }} tintColor={COLORS.accent} />}
+                    contentContainerStyle={{ paddingBottom: 120 }}
+                    ListHeaderComponent={() => (
+                        <SectionLabel label={activeTab === 'activas' ? "Próximos Partidos" : "Partidos Finalizados"} />
+                    )}
+                    ListEmptyComponent={() => (
+                        <View style={{ padding: 60, alignItems: 'center', justifyContent: 'center' }}>
+                            <CalendarDays color={C.sub} size={64} strokeWidth={1} />
+                            <Text style={{ color: C.sub, fontSize: 12, fontWeight: '800', marginTop: 20, textAlign: 'center' }}>No hay partidos para mostrar</Text>
+                        </View>
+                    )}
+                    renderItem={({ item: b }) => (
                         <BookingEliteCard
-                            key={b.id}
                             booking={b}
                             isDark={isDark}
                             onView={() => { setSelectedBooking(b); setShowTicket(true); }}
@@ -520,32 +521,33 @@ export default function MisReservasScreen() {
                             onStats={() => {}}
                             onCancel={() => b.id && handleCancel(b.id)}
                         />
-                    ))
-                )}
-
-                {activeTab === 'historial' && displayList.length > historyLimit && (
-                    <TouchableOpacity 
-                        onPress={() => setHistoryLimit(prev => prev + 10)}
-                        style={{ 
-                            marginHorizontal: 30, 
-                            marginTop: 10,
-                            marginBottom: 30,
-                            height: 55, 
-                            borderRadius: 20, 
-                            backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', 
-                            borderWidth: 1, 
-                            borderColor: C.border, 
-                            alignItems: 'center', 
-                            justifyContent: 'center',
-                            flexDirection: 'row',
-                            gap: 8
-                        }}
-                        activeOpacity={0.7}
-                    >
-                        <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>Cargar más reservas</Text>
-                    </TouchableOpacity>
-                )}
-            </ScrollView>
+                    )}
+                    ListFooterComponent={() => (
+                        activeTab === 'historial' && displayList.length > historyLimit ? (
+                            <TouchableOpacity 
+                                onPress={() => setHistoryLimit(prev => prev + 10)}
+                                style={{ 
+                                    marginHorizontal: 30, 
+                                    marginTop: 10,
+                                    marginBottom: 30,
+                                    height: 55, 
+                                    borderRadius: 20, 
+                                    backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', 
+                                    borderWidth: 1, 
+                                    borderColor: C.border, 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center',
+                                    flexDirection: 'row',
+                                    gap: 8
+                                }}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>Cargar más reservas</Text>
+                            </TouchableOpacity>
+                        ) : null
+                    )}
+                />
+            </View>
 
             <Modal visible={showTicket} animationType="slide" transparent={true}>
                 {selectedBooking?.paymentStatus === 'refund_failed' ? (

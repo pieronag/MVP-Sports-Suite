@@ -2,7 +2,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 // @ts-ignore
 import { getAuth, initializeAuth, Auth, getReactNativePersistence } from "firebase/auth";
 import { Platform } from "react-native";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore, persistentLocalCache } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getFunctions } from "firebase/functions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -35,7 +35,9 @@ const initializeFirebaseAuth = (): Auth => {
 };
 
 const auth = initializeFirebaseAuth();
-const db = getFirestore(app);
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache()
+});
 const storage = getStorage(app);
 const functions = getFunctions(app, "southamerica-west1");
 

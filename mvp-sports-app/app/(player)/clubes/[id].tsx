@@ -18,6 +18,7 @@ import { venueService, Court, Tenant } from '../../../services/venueService';
 import { bookingService } from '../../../services/bookingService';
 import { Timestamp } from 'firebase/firestore';
 import { useUserLocation } from '../../../src/features/player/hooks/useDashboardData';
+import { FlashList } from '@shopify/flash-list';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -301,9 +302,12 @@ export default function VenueDetailsScreen() {
         <View style={{ flex: 1, backgroundColor: C.bg }}>
             <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
-            <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 150 }}>
-
-                {/* HERO SECTION */}
+            <FlashList
+                data={reviews.slice(0, visibleReviewsCount)}
+                contentContainerStyle={{ paddingBottom: 150 }}
+                ListHeaderComponent={() => (
+                    <>
+                        {/* HERO SECTION */}
                 <View style={{ width: SCREEN_WIDTH, aspectRatio: 1.6, backgroundColor: isDark ? '#0F172A' : '#F8FAFC' }}>
                     <Image
                         source={{ uri: venue?.imageUrl || 'https://images.unsplash.com/photo-1595435064215-68d148332009' }}
@@ -489,45 +493,52 @@ export default function VenueDetailsScreen() {
                     )}
 
                     {/* SECCIÓN DE OPINIONES */}
-                    <View style={{ marginTop: 40, paddingHorizontal: 30 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                    <View style={{ marginTop: 40, paddingHorizontal: 30, marginBottom: 20 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Text style={{ color: C.text, fontSize: 22, fontWeight: '900' }}>Opiniones de Jugadores</Text>
                             <View style={{ backgroundColor: accent + '10', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 }}>
                                 <Text style={{ color: accent, fontWeight: '900', fontSize: 12 }}>{reviews.length}</Text>
                             </View>
                         </View>
-
-                        {reviews.length === 0 ? (
-                            <View style={{ backgroundColor: C.card, borderRadius: 25, padding: 30, alignItems: 'center', borderWidth: 1, borderColor: C.border, borderStyle: 'dashed' }}>
-                                <Info color={C.sub} size={30} strokeWidth={1.5} />
-                                <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', marginTop: 15, textAlign: 'center' }}>Aún no hay valoraciones para este recinto. ¡Sé el primero en jugar y calificar!</Text>
+                    </View>
+                    </View>
+                    </>
+                )}
+                renderItem={({ item: rev }: any) => (
+                    <View style={{ paddingHorizontal: 30, paddingBottom: 15 }}>
+                        <View style={{ backgroundColor: C.card, borderRadius: 25, padding: 20, borderWidth: 1, borderColor: C.border }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                                <View style={{ flex: 1, marginRight: 10 }}>
+                                    <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', textTransform: 'uppercase' }} numberOfLines={1}>
+                                        {typeof rev.userName === 'string' ? rev.userName : (rev.userName?.userName || 'Jugador MVP')}
+                                    </Text>
+                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '800' }}>
+                                        {rev.date?.toDate ? rev.date.toDate().toLocaleDateString('es-CL', { day: '2-digit', month: 'short' }) : 'Reciente'} • {typeof rev.sport === 'string' ? rev.sport : 'General'}
+                                    </Text>
+                                </View>
+                                <View style={{ flexDirection: 'row', gap: 2 }}>
+                                    {[1, 2, 3, 4, 5].map(s => (
+                                        <Star key={s} size={10} color={s <= rev.rating ? '#f59e0b' : C.sub} fill={s <= rev.rating ? '#f59e0b' : 'transparent'} />
+                                    ))}
+                                </View>
                             </View>
-                        ) : (
-                            <View style={{ gap: 15 }}>
-                                {reviews.slice(0, visibleReviewsCount).map((rev) => (
-                                        <View key={rev.id} style={{ backgroundColor: C.card, borderRadius: 25, padding: 20, borderWidth: 1, borderColor: C.border }}>
-                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                                                <View style={{ flex: 1, marginRight: 10 }}>
-                                                    <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', textTransform: 'uppercase' }} numberOfLines={1}>
-                                                        {typeof rev.userName === 'string' ? rev.userName : (rev.userName?.userName || 'Jugador MVP')}
-                                                    </Text>
-                                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '800' }}>
-                                                        {rev.date?.toDate ? rev.date.toDate().toLocaleDateString('es-CL', { day: '2-digit', month: 'short' }) : 'Reciente'} • {typeof rev.sport === 'string' ? rev.sport : 'General'}
-                                                    </Text>
-                                                </View>
-                                                <View style={{ flexDirection: 'row', gap: 2 }}>
-                                                    {[1, 2, 3, 4, 5].map(s => (
-                                                        <Star key={s} size={10} color={s <= rev.rating ? '#f59e0b' : C.sub} fill={s <= rev.rating ? '#f59e0b' : 'transparent'} />
-                                                    ))}
-                                                </View>
-                                            </View>
-                                            <Text style={{ color: C.text, fontSize: 12, fontWeight: '600', lineHeight: 18, fontStyle: 'italic', opacity: 0.8 }}>
-                                                "{typeof rev.comment === 'string' ? rev.comment : 'Sin comentario'}"
-                                            </Text>
-                                        </View>
-                                ))}
-
-                                {reviews.length > visibleReviewsCount && (
+                            <Text style={{ color: C.text, fontSize: 12, fontWeight: '600', lineHeight: 18, fontStyle: 'italic', opacity: 0.8 }}>
+                                "{typeof rev.comment === 'string' ? rev.comment : 'Sin comentario'}"
+                            </Text>
+                        </View>
+                    </View>
+                )}
+                ListEmptyComponent={() => (
+                    <View style={{ paddingHorizontal: 30 }}>
+                        <View style={{ backgroundColor: C.card, borderRadius: 25, padding: 30, alignItems: 'center', borderWidth: 1, borderColor: C.border, borderStyle: 'dashed' }}>
+                            <Info color={C.sub} size={30} strokeWidth={1.5} />
+                            <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', marginTop: 15, textAlign: 'center' }}>Aún no hay valoraciones para este recinto. ¡Sé el primero en jugar y calificar!</Text>
+                        </View>
+                    </View>
+                )}
+                ListFooterComponent={() => (
+                    reviews.length > visibleReviewsCount ? (
+                        <View style={{ paddingHorizontal: 30 }}>
                                     <TouchableOpacity
                                         onPress={() => setVisibleReviewsCount(prev => prev + 3)}
                                         activeOpacity={0.8}
@@ -548,12 +559,10 @@ export default function VenueDetailsScreen() {
                                     >
                                         <Text style={{ color: accent, fontSize: 12, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 }}>Cargar 3 opiniones más</Text>
                                     </TouchableOpacity>
-                                )}
-                            </View>
-                        )}
-                    </View>
-                </View>
-            </ScrollView>
+                        </View>
+                    ) : null
+                )}
+            />
         </View>
     );
 }

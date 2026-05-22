@@ -4,6 +4,7 @@ import {
     Dimensions, Animated, Easing, ActivityIndicator, ScrollView, Modal, Image
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import { useNetInfo } from '@react-native-community/netinfo';
 import { useRouter } from 'expo-router';
 import { 
     X, ScanLine, RefreshCcw, User, AlertTriangle,
@@ -40,6 +41,8 @@ export default function ScannerScreen() {
     const { theme, profile } = useAuth();
     const isDark = theme === 'dark';
     const C = isDark ? COLORS.dark : COLORS.light;
+    const netInfo = useNetInfo();
+    const isOffline = netInfo.isConnected === false;
     
     const [permission, requestPermission] = useCameraPermissions();
     const [scanned, setScanned] = useState(false);
@@ -171,7 +174,15 @@ export default function ScannerScreen() {
                         <TouchableOpacity onPress={() => router.back()} style={styles.headerBtn}>
                             <ChevronLeft color={COLORS.accent} size={24} />
                         </TouchableOpacity>
-                        <Text style={styles.headerTitle}>Validar Ticket</Text>
+                        <View style={{ alignItems: 'center' }}>
+                            <Text style={styles.headerTitle}>Validar Ticket</Text>
+                            {isOffline && (
+                                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4, backgroundColor: COLORS.error + '40', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 }}>
+                                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.error, marginRight: 4 }} />
+                                    <Text style={{ color: '#fff', fontSize: 8, fontWeight: '900', textTransform: 'uppercase' }}>Operando Local</Text>
+                                </View>
+                            )}
+                        </View>
                         <View style={{ width: 44 }} />
                     </View>
                 </View>

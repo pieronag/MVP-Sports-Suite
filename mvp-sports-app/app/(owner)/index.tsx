@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Modal } from 'react-native';
 import { db } from '../../services/firebase';
 import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { useNetInfo } from '@react-native-community/netinfo';
 
 const { width, height } = Dimensions.get('window');
 const getSantiagoDateTime = (date: Date) => {
@@ -78,6 +79,8 @@ export default function ManagerDashboard() {
     const { profile, theme } = useAuth();
     const isDark = theme === 'dark';
     const C = isDark ? COLORS.dark : COLORS.light;
+    const netInfo = useNetInfo();
+    const isOffline = netInfo.isConnected === false;
 
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -318,15 +321,32 @@ export default function ManagerDashboard() {
                     <Text style={{ color: COLORS.accent, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2 }}>Operativo</Text>
                     <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', textTransform: 'uppercase' }}>Dashboard</Text>
                 </View>
-                <TouchableOpacity 
-                    onPress={() => router.push('/(owner)/perfil')}
-                    style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}
-                >
-                    <Image 
-                        source={profile?.photoURL ? { uri: profile.photoURL } : require('../../assets/images/mascot.jpg')} 
-                        style={{ width: 40, height: 40, borderRadius: 12 }} 
-                    />
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                    <View style={{ 
+                        flexDirection: 'row', 
+                        alignItems: 'center', 
+                        backgroundColor: isOffline ? COLORS.error + '15' : COLORS.accent + '15', 
+                        paddingHorizontal: 12, 
+                        paddingVertical: 6, 
+                        borderRadius: 20,
+                        borderWidth: 1,
+                        borderColor: isOffline ? COLORS.error + '40' : COLORS.accent + '40'
+                    }}>
+                        <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: isOffline ? COLORS.error : COLORS.accent, marginRight: 6 }} />
+                        <Text style={{ color: isOffline ? COLORS.error : COLORS.accent, fontSize: 10, fontWeight: '900', textTransform: 'uppercase' }}>
+                            {isOffline ? 'Operando Local' : 'En Línea'}
+                        </Text>
+                    </View>
+                    <TouchableOpacity 
+                        onPress={() => router.push('/(owner)/perfil')}
+                        style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}
+                    >
+                        <Image 
+                            source={profile?.photoURL ? { uri: profile.photoURL } : require('../../assets/images/mascot.jpg')} 
+                            style={{ width: 40, height: 40, borderRadius: 12 }} 
+                        />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <ScrollView 

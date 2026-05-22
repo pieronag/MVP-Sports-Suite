@@ -300,8 +300,8 @@ export default function SettingsScreen() {
         try {
             await userService.updateUserProfile(user.uid, {
                 ...formData,
-                updatedAt: new Date().toISOString() as any
-            });
+                updatedAt: new Date().toISOString()
+            } as any);
             await useAuth.getState().reloadProfile();
             setInitialData(formData); // Sincronizar datos iniciales con los guardados para evitar alerta al salir
             showFeedback('success', '¡Excelente! Tus cambios se han sincronizado correctamente.');
