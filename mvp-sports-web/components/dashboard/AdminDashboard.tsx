@@ -472,22 +472,71 @@ export default function AdminDashboard() {
                                             </td>
                                             <td className="px-6 py-5 text-center">
                                                 {(() => {
-                                                    const isOnline = b.paymentMethod === 'card' || (!b.paymentMethod && b.source === 'mobile_app' && b.paymentStatus === 'paid');
+                                                    const method = (b.paymentMethod || '').toLowerCase();
+                                                    const source = (b.source || '').toLowerCase();
+                                                    let label = 'Sin Info';
+                                                    let style = 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400';
+                                                    
+                                                    if (method === 'card' || method === 'webpay' || method === 'oneclick') {
+                                                        label = method === 'oneclick' ? 'Oneclick' : 'Webpay';
+                                                        style = 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400';
+                                                    } else if (method === 'cash' || method === 'efectivo') {
+                                                        label = 'Efectivo';
+                                                        style = 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400';
+                                                    } else if (method === 'transfer' || method === 'transferencia') {
+                                                        label = 'Transferencia';
+                                                        style = 'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400';
+                                                    } else if (source === 'mobile_app' && b.paymentStatus === 'paid') {
+                                                        label = 'Online App';
+                                                        style = 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400';
+                                                    } else if (source === 'manual' || source === 'web_dashboard') {
+                                                        label = 'Manual';
+                                                        style = 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400';
+                                                    }
+                                                    
                                                     return (
-                                                        <span className={`text-[8px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider ${isOnline ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400'}`}>
-                                                            {isOnline ? 'Online' : 'Recinto'}
+                                                        <span className={`text-[8px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider ${style}`}>
+                                                            {label}
                                                         </span>
                                                     );
                                                 })()}
                                             </td>
                                             <td className="px-6 py-5 text-center">
-                                                <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 font-mono">{formatCLP(b.totalPrice || b.price || 0)}</span>
+                                                <div className="flex flex-col items-center gap-1">
+                                                    <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 font-mono">{formatCLP(b.totalPrice || b.price || 0)}</span>
+                                                    {b.deposit && b.paymentStatus === 'partial' && (
+                                                        <span className="text-[7px] font-bold text-amber-500 uppercase">Seña: {formatCLP(b.deposit)}</span>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="px-6 py-5 text-right">
-                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[8px] font-black uppercase tracking-widest shadow-sm ${b.status === 'confirmed' ? 'bg-emerald-50 border-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400' : 'bg-amber-50 border-amber-100 text-amber-600 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400'}`}>
-                                                    <div className={`w-1.5 h-1.5 rounded-full ${b.status === 'confirmed' ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
-                                                    {b.status === 'confirmed' ? 'Confirmado' : 'Pendiente'}
-                                                </span>
+                                                {(() => {
+                                                    const ps = (b.paymentStatus || 'pending').toLowerCase();
+                                                    let statusLabel = 'Pendiente';
+                                                    let statusStyle = 'bg-amber-50 border-amber-100 text-amber-600 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400';
+                                                    let dotColor = 'bg-amber-500';
+
+                                                    if (ps === 'paid') {
+                                                        statusLabel = 'Pagado';
+                                                        statusStyle = 'bg-emerald-50 border-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400';
+                                                        dotColor = 'bg-emerald-500';
+                                                    } else if (ps === 'partial') {
+                                                        statusLabel = 'Parcial';
+                                                        statusStyle = 'bg-sky-50 border-sky-100 text-sky-600 dark:bg-sky-500/10 dark:border-sky-500/20 dark:text-sky-400';
+                                                        dotColor = 'bg-sky-500';
+                                                    } else if (ps === 'refunded') {
+                                                        statusLabel = 'Reembolsado';
+                                                        statusStyle = 'bg-rose-50 border-rose-100 text-rose-600 dark:bg-rose-500/10 dark:border-rose-500/20 dark:text-rose-400';
+                                                        dotColor = 'bg-rose-500';
+                                                    }
+
+                                                    return (
+                                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[8px] font-black uppercase tracking-widest shadow-sm ${statusStyle}`}>
+                                                            <div className={`w-1.5 h-1.5 rounded-full ${dotColor}`}></div>
+                                                            {statusLabel}
+                                                        </span>
+                                                    );
+                                                })()}
                                             </td>
                                         </tr>
 
