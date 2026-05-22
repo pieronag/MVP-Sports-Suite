@@ -375,8 +375,12 @@ export default function OwnerDashboard() {
                                         </div>
                                         <div className="text-right shrink-0">
                                             <p className="text-[10px] font-black text-slate-900 dark:text-white leading-none mb-1.5 font-mono">{formatCLP(b.totalPrice)}</p>
-                                            <span className={`text-[7px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${b.checkIn ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400'}`}>
-                                                {b.checkIn ? 'OK' : 'WAIT'}
+                                            <span className={`text-[7px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
+                                                b.paymentStatus === 'paid' ? 'bg-emerald-500 text-white' : 
+                                                b.paymentStatus === 'partial' ? 'bg-sky-500 text-white' : 
+                                                'bg-amber-500 text-white'
+                                            }`}>
+                                                {b.paymentStatus === 'paid' ? 'PAGADO' : b.paymentStatus === 'partial' ? 'PARCIAL' : 'PENDIENTE'}
                                             </span>
                                         </div>
                                     </div>

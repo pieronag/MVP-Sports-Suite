@@ -159,13 +159,18 @@ export default function MetricsPage() {
                 const days = Math.floor((diff % 10080) / 1440);
                 relativeTime = days > 0 ? `${weeks}SEM ${days}D` : `${weeks} SEM`;
             }
-            // Detectar método de pago: card = Online, cash/transfer/sin campo = Recinto
-            let method = 'venue';
-            if (b.paymentMethod === 'card') method = 'card';
-            else if (b.paymentMethod === 'cash' || b.paymentMethod === 'transfer') method = 'venue';
-            else if (b.source === 'mobile_app' && b.paymentStatus === 'paid') method = 'card';
-            else if (b.source === 'manual_manager') method = 'venue';
-            return { id: b.id, bookingId: b.transactionId || `#RES-${b.id.slice(0, 4)}`, venue: b.tenantName || '---', amount: p, fee: b.commissionFee || (p * (commissionRate / 100)), time: relativeTime, method };
+            // Detectar método de pago real
+            const rawMethod = (b.paymentMethod || '').toLowerCase();
+            const rawSource = (b.source || '').toLowerCase();
+            let method = 'unknown';
+            let methodLabel = 'Sin Info';
+            if (rawMethod === 'card' || rawMethod === 'webpay') { method = 'webpay'; methodLabel = 'Webpay'; }
+            else if (rawMethod === 'oneclick') { method = 'oneclick'; methodLabel = 'Oneclick'; }
+            else if (rawMethod === 'cash' || rawMethod === 'efectivo') { method = 'cash'; methodLabel = 'Efectivo'; }
+            else if (rawMethod === 'transfer' || rawMethod === 'transferencia') { method = 'transfer'; methodLabel = 'Transferencia'; }
+            else if (rawSource === 'mobile_app' && b.paymentStatus === 'paid') { method = 'online'; methodLabel = 'Online App'; }
+            else if (rawSource === 'manual' || rawSource === 'web_dashboard' || rawSource === 'manual_manager' || rawSource === 'manual_dashboard') { method = 'manual'; methodLabel = 'Manual'; }
+            return { id: b.id, bookingId: b.transactionId || `#RES-${b.id.slice(0, 4)}`, venue: b.tenantName || '---', amount: p, fee: b.commissionFee || (p * (commissionRate / 100)), time: relativeTime, method, methodLabel, paymentStatus: b.paymentStatus || 'pending' };
         }));
 
         const currentComm = isCurrentMonth ? (estimatedCommission || monthlyCommissions) : monthlyCommissions;
@@ -281,8 +286,8 @@ export default function MetricsPage() {
                                         <td className="px-6 py-4 text-right font-black text-slate-400">{formatCLP(tx.amount)}</td>
                                         <td className="px-6 py-4 text-right font-black text-emerald-600">{formatCLP(tx.fee)}</td>
                                         <td className="px-6 py-4 text-center">
-                                            <span className={`text-[8px] font-black px-2 py-0.5 rounded-md uppercase ${tx.method === 'card' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400'}`}>
-                                                {tx.method === 'card' ? 'Online' : 'Recinto'}
+                                            <span className={`text-[8px] font-black px-2 py-0.5 rounded-md uppercase ${tx.method === 'webpay' || tx.method === 'oneclick' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : tx.method === 'cash' ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400' : tx.method === 'transfer' ? 'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400' : tx.method === 'online' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400'}`}>
+                                                {tx.methodLabel}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right text-slate-400 uppercase font-medium text-[9px]">{tx.time}</td>

@@ -254,7 +254,7 @@ export default function FinancePage() {
                 t.clientName.toUpperCase(),
                 `${sport.toUpperCase()} - ${court.toUpperCase()}`,
                 formatCLP(t.amount),
-                (t.paymentStatus === 'paid' || t.type === 'torneo') ? 'PAGADO' : 'PENDIENTE'
+                (t.paymentStatus === 'paid' || t.type === 'torneo') ? 'PAGADO' : t.paymentStatus === 'partial' ? 'PARCIAL' : t.paymentStatus === 'refunded' ? 'REEMBOLSADO' : 'PENDIENTE'
             ];
         });
 
@@ -441,13 +441,18 @@ export default function FinancePage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex justify-center">
-                                                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase ${
-                                                    t.paymentStatus === 'paid' || t.type === 'torneo'
-                                                    ? 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/10'
-                                                    : 'text-amber-500 bg-amber-500/10 border border-amber-500/10'
-                                                }`}>
-                                                    {(t.paymentStatus === 'paid' || t.type === 'torneo') ? 'Pagado' : 'Pendiente'}
-                                                </div>
+                                                {(() => {
+                                                    const ps = (t.paymentStatus || 'pending').toLowerCase();
+                                                    if (t.type === 'torneo' || ps === 'paid') {
+                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 border border-emerald-500/10"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Pagado</div>;
+                                                    } else if (ps === 'partial') {
+                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase text-sky-500 bg-sky-500/10 border border-sky-500/10"><div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>Parcial</div>;
+                                                    } else if (ps === 'refunded') {
+                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase text-rose-500 bg-rose-500/10 border border-rose-500/10"><div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div>Reembolsado</div>;
+                                                    } else {
+                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase text-amber-500 bg-amber-500/10 border border-amber-500/10"><div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>Pendiente</div>;
+                                                    }
+                                                })()}
                                             </div>
                                         </td>
                                     </tr>
