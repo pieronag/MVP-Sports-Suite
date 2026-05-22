@@ -13,6 +13,8 @@ import {
 import { doc, getDoc, updateDoc, collection, query, where, getDocs, addDoc, serverTimestamp, writeBatch, setDoc, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { PanelGlass, TarjetaKpi, BotonAccion } from '@/components/ui/DashboardWidgets';
+import { useAuth } from '@/context/AuthContext';
+import { auditService } from '@/services/auditService';
 
 // --- INTERFACES ---
 interface SettingsData {
@@ -64,16 +66,20 @@ function HeaderSeccion({ titulo, desc }: any) {
 }
 
 export default function SettingsPage() {
+    const { user, role: userRole, firestoreUser } = useAuth();
     const [activeTab, setActiveTab] = useState('plans');
     const [settings, setSettings] = useState<SettingsData>(DEFAULT_SETTINGS);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [adminTeam, setAdminTeam] = useState<AdminUser[]>([]);
-    const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
     const [isExecuting, setIsExecuting] = useState(false);
     const [promoEmail, setPromoEmail] = useState('');
     const [realStats, setRealStats] = useState({ totalRevenue: 0, eliteCount: 0, proCount: 0, totalTenants: 0 });
     const [modal, setModal] = useState<ModalConfig>({ show: false, title: '', message: '', type: 'confirm' });
+
+    const actorName = firestoreUser?.fullName || user?.displayName || user?.email || 'Admin Sistema';
+    const actorRole = userRole || 'superadmin';
+    const actorEmail = user?.email || 'admin@mvpsports.cl';
 
     const showModal = (config: Partial<ModalConfig>) => setModal({ show: true, title: config.title || 'Atención', message: config.message || '', type: config.type || 'confirm', onConfirm: config.onConfirm, onCancel: () => setModal(prev => ({ ...prev, show: false })) });
 
@@ -84,8 +90,6 @@ export default function SettingsPage() {
                 if (snap.exists()) setSettings({ ...DEFAULT_SETTINGS, ...snap.data() } as SettingsData);
                 const teamSnap = await getDocs(query(collection(db, 'users'), where('role', 'in', ['admin', 'superadmin'])));
                 setAdminTeam(teamSnap.docs.map(d => ({ uid: d.id, ...d.data() } as AdminUser)));
-                const logsSnap = await getDocs(query(collection(db, 'audit_logs'), orderBy('timestamp', 'desc'), limit(15)));
-                setAuditLogs(logsSnap.docs.map(d => ({ id: d.id, ...d.data() } as AuditLog)));
                 const tSnap = await getDocs(collection(db, 'tenants'));
                 const tenants = tSnap.docs.map(d => d.data());
                 setRealStats({ totalRevenue: tenants.reduce((acc, t) => acc + (t.mrr || 0), 0), eliteCount: tenants.filter(t => t.plan?.toLowerCase() === 'elite').length, proCount: tenants.filter(t => t.plan?.toLowerCase() === 'pro').length, totalTenants: tenants.length });
@@ -93,14 +97,6 @@ export default function SettingsPage() {
         };
         fetchData();
     }, []);
-
-    const createAuditLog = async (action: string, details: string, priority: AuditLog['priority']) => {
-        try {
-            const logData = { action, details, priority, adminName: "SUPER_ADMIN", timestamp: serverTimestamp() };
-            await addDoc(collection(db, 'audit_logs'), logData);
-            setAuditLogs(prev => [{ id: Math.random().toString(), ...logData, timestamp: { toDate: () => new Date() } } as any, ...prev].slice(0, 15));
-        } catch (e) { console.error(e); }
-    };
 
     const handleSave = async () => {
         setSaving(true);
@@ -119,10 +115,31 @@ export default function SettingsPage() {
                 });
             });
             await batch.commit();
-            await createAuditLog("NÚCLEO_UPDATE", "Sincronización masiva de parámetros", "high");
+            await auditService.logAuditEvent({
+                action: 'NÚCLEO_UPDATE',
+                module: 'CONFIGURACIONES',
+                details: 'Sincronización masiva de parámetros globales y planes de negocio',
+                severity: 'HIGH',
+                status: 'SUCCESS',
+                actor: actorName,
+                role: actorRole,
+                email: actorEmail
+            });
             showModal({ title: "Núcleo Sincronizado", message: "Configuración propagada exitosamente.", type: 'success' });
             setTimeout(() => setModal(prev => ({ ...prev, show: false })), 2000);
-        } catch (e) { showModal({ title: "Falla Crítica", message: "Error al propagar cambios.", type: 'danger' }); } finally { setSaving(false); }
+        } catch (e) {
+            await auditService.logAuditEvent({
+                action: 'NÚCLEO_UPDATE',
+                module: 'CONFIGURACIONES',
+                details: 'Falla al propagar configuraciones masivas del sistema',
+                severity: 'HIGH',
+                status: 'FAILED',
+                actor: actorName,
+                role: actorRole,
+                email: actorEmail
+            });
+            showModal({ title: "Falla Crítica", message: "Error al propagar cambios.", type: 'danger' });
+        } finally { setSaving(false); }
     };
 
     const promoteUser = async () => {
@@ -132,23 +149,93 @@ export default function SettingsPage() {
             const snap = await getDocs(query(collection(db, 'users'), where('email', '==', promoEmail)));
             if (snap.empty) return showModal({ title: "Error", message: "Usuario no existe", type: 'danger' });
             await updateDoc(snap.docs[0].ref, { role: 'superadmin' });
-            await createAuditLog("ELEVACIÓN_RANGO", `SuperAdmin asignado a ${promoEmail}`, "critical");
+            await auditService.logAuditEvent({
+                action: 'ELEVACIÓN_RANGO',
+                module: 'STAFF',
+                details: `SuperAdmin asignado a ${promoEmail}`,
+                severity: 'CRITICAL',
+                status: 'SUCCESS',
+                actor: actorName,
+                role: actorRole,
+                email: actorEmail
+            });
             showModal({ title: "Rango Elevado", message: "Privilegios asignados correctamente.", type: 'success' });
             setPromoEmail('');
-        } catch (e) { showModal({ title: "Error", message: "Falla en transacción", type: 'danger' }); } finally { setSaving(false); }
+        } catch (e) {
+            await auditService.logAuditEvent({
+                action: 'ELEVACIÓN_RANGO',
+                module: 'STAFF',
+                details: `Fallo al elevar privilegios de SuperAdmin para ${promoEmail}`,
+                severity: 'CRITICAL',
+                status: 'FAILED',
+                actor: actorName,
+                role: actorRole,
+                email: actorEmail
+            });
+            showModal({ title: "Error", message: "Falla en transacción", type: 'danger' });
+        } finally { setSaving(false); }
     };
 
     const runBackup = async () => {
         showModal({ title: "Snapshot", message: "¿Generar respaldo estructural?", onConfirm: async () => {
             setModal(prev => ({ ...prev, show: false })); setIsExecuting(true);
-            try { await new Promise(r => setTimeout(r, 1000)); await createAuditLog("SISTEMA_BACKUP", "Snapshot estructural generado", "medium"); showModal({ title: "Finalizado", message: "Backup almacenado.", type: 'success' }); } finally { setIsExecuting(false); }
+            try {
+                await new Promise(r => setTimeout(r, 1000));
+                await auditService.logAuditEvent({
+                    action: 'SISTEMA_BACKUP',
+                    module: 'SISTEMA',
+                    details: 'Snapshot estructural generado y almacenado en la nube',
+                    severity: 'MEDIUM',
+                    status: 'SUCCESS',
+                    actor: actorName,
+                    role: actorRole,
+                    email: actorEmail
+                });
+                showModal({ title: "Finalizado", message: "Backup almacenado.", type: 'success' });
+            } catch (e) {
+                await auditService.logAuditEvent({
+                    action: 'SISTEMA_BACKUP',
+                    module: 'SISTEMA',
+                    details: 'Fallo al generar snapshot estructural de respaldo',
+                    severity: 'MEDIUM',
+                    status: 'FAILED',
+                    actor: actorName,
+                    role: actorRole,
+                    email: actorEmail
+                });
+                showModal({ title: "Error", message: "Error al generar backup", type: 'danger' });
+            } finally { setIsExecuting(false); }
         }});
     };
 
     const wipeData = async () => {
         showModal({ title: "Purga Nuclear", message: "¿Estás seguro de purgar todos los datos del sistema?", type: 'danger', onConfirm: async () => {
             setModal(prev => ({ ...prev, show: false })); setIsExecuting(true);
-            try { await createAuditLog("SYSTEM_WIPE", "Reinicio nuclear ejecutado", "critical"); showModal({ title: "Reset", message: "Sistema purgado.", type: 'success', onConfirm: () => window.location.reload() }); } finally { setIsExecuting(false); }
+            try {
+                await auditService.logAuditEvent({
+                    action: 'SYSTEM_WIPE',
+                    module: 'SISTEMA',
+                    details: 'Reinicio nuclear de base de datos ejecutado',
+                    severity: 'CRITICAL',
+                    status: 'SUCCESS',
+                    actor: actorName,
+                    role: actorRole,
+                    email: actorEmail
+                });
+                showModal({ title: "Reset", message: "Sistema purgado.", type: 'success', onConfirm: () => window.location.reload() });
+            } catch (e) {
+                await auditService.logAuditEvent({
+                    action: 'SYSTEM_WIPE',
+                    module: 'SISTEMA',
+                    details: 'Fallo al ejecutar reinicio nuclear del sistema',
+                    severity: 'CRITICAL',
+                    status: 'FAILED',
+                    actor: actorName,
+                    role: actorRole,
+                    email: actorEmail
+                });
+                showModal({ title: "Error", message: "Error al realizar purga nuclear", type: 'danger' });
+            } finally { setIsExecuting(false); }
         }});
     };
 
@@ -437,31 +524,7 @@ export default function SettingsPage() {
                     </div>
                 )}
 
-                {activeTab === 'audit' && (
-                    <div className="space-y-10 animate-fadeIn">
-                        <HeaderSeccion titulo="Monitor Estructural" desc="Feed de seguridad y operaciones críticas en tiempo real." />
-                        <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 no-scrollbar">
-                            {auditLogs.map(log => (
-                                <div key={log.id} className="flex items-start gap-6 p-6 bg-white dark:bg-white/5 rounded-[2.5rem] border-l-8 transition-all group hover:shadow-lg shadow-slate-100/50 dark:shadow-none" style={{ borderLeftColor: log.priority === 'critical' ? '#ef4444' : log.priority === 'high' ? '#f59e0b' : '#64748b' }}>
-                                    <div className={`p-3 rounded-2xl mt-1 shadow-sm ${log.priority === 'critical' ? 'bg-red-500 text-white' : log.priority === 'high' ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-600'}`}>
-                                        <SignalIcon className="w-5 h-5" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <h5 className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-tighter">{log.action}</h5>
-                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{log.timestamp?.toDate ? new Date(log.timestamp.toDate()).toLocaleString('es-CL', { hour: '2-digit', minute: '2-digit' }) : 'Recién'}</span>
-                                        </div>
-                                        <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase leading-relaxed mb-3">{log.details}</p>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
-                                            <p className="text-[9px] font-black text-emerald-500 uppercase">Actor: {log.adminName}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
+
 
                 {activeTab === 'system' && (
                     <div className="space-y-10 animate-fadeIn">

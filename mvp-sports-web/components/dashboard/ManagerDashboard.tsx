@@ -84,7 +84,7 @@ export default function ManagerDashboard() {
         const fetchVenues = async () => {
             if (!user?.uid) return;
             try {
-                const tenantIds = firestoreUser?.tenantIds || [];
+                const tenantIds = firestoreUser?.tenantIds || (firestoreUser?.tenantId ? [firestoreUser.tenantId] : []);
                 if (tenantIds.length > 0) {
                     const chunkArray = (arr: any[], size: number) =>
                         Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
@@ -98,17 +98,27 @@ export default function ManagerDashboard() {
                     const results = await Promise.all(promises);
                     const list = results.flat();
                     setMyVenues(list);
-                    if (list.length > 0 && !selectedTenantId) {
-                        setSelectedTenantId(list[0].id);
-                        setSelectedTenantName(list[0].name);
+                    if (list.length > 0) {
+                        if (!selectedTenantId) {
+                            setSelectedTenantId(list[0].id);
+                            setSelectedTenantName(list[0].name);
+                        }
+                    } else {
+                        setErrorMsg("Sin recintos asignados.");
+                        setLoading(false);
                     }
                 } else {
                     setErrorMsg("Sin recintos asignados.");
+                    setLoading(false);
                 }
-            } catch (error) { console.error("Error venues:", error); }
+            } catch (error) { 
+                console.error("Error venues:", error); 
+                setErrorMsg("Error al cargar recintos.");
+                setLoading(false);
+            }
         };
         fetchVenues();
-    }, [user, firestoreUser]);
+    }, [user, firestoreUser, selectedTenantId]);
 
     useEffect(() => {
         if (!selectedTenantId) return;
@@ -227,6 +237,24 @@ export default function ManagerDashboard() {
         const date = ts instanceof Timestamp ? ts.toDate() : ts;
         return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
     };
+    if (loading && myVenues.length === 0) {
+        return (
+            <div className="h-96 flex flex-col items-center justify-center text-slate-400 gap-2">
+                <ArrowPathIcon className="w-6 h-6 animate-spin text-emerald-500" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Escaneando Datos del Recinto...</span>
+            </div>
+        );
+    }
+
+    if (errorMsg) {
+        return (
+            <div className="h-96 flex flex-col items-center justify-center text-slate-400 gap-2 text-center p-6 bg-slate-50 dark:bg-white/5 rounded-[2rem] border border-dashed border-slate-200 dark:border-white/10">
+                <ExclamationCircleIcon className="w-8 h-8 text-amber-500 animate-pulse" />
+                <h3 className="text-sm font-black uppercase text-slate-900 dark:text-white mt-2">Acceso Limitado</h3>
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{errorMsg}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full space-y-5 pb-10 text-left relative animate-fadeIn">

@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
 import { collection, query, where, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { PanelGlass } from '@/components/ui/DashboardWidgets';
+import { auditService } from '@/services/auditService';
 import {
     AdjustmentsVerticalIcon, DocumentCheckIcon, MapPinIcon, CheckCircleIcon,
     ExclamationTriangleIcon, ArrowPathIcon, BuildingOfficeIcon, SparklesIcon,
@@ -24,7 +25,7 @@ const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 
 };
 
 export default function TenantSettingsPage() {
-    const { user } = useAuth();
+    const { user, role: userRole, firestoreUser } = useAuth();
     const [tenants, setTenants] = useState<any[]>([]);
     const [selectedTenantId, setSelectedTenantId] = useState<string>('');
     const [loading, setLoading] = useState(true);
@@ -165,6 +166,12 @@ export default function TenantSettingsPage() {
         if (!selectedTenantId) return;
         setSaving(true);
         setTerminalLines(prev => [...prev, { text: `> Ejecutando guardado de configuración maestra...`, type: 'command' }]);
+        
+        const actorName = firestoreUser?.fullName || user?.displayName || user?.email || 'Administrador de Complejo';
+        const actorRole = userRole || 'owner';
+        const actorEmail = user?.email || 'owner@mvpsports.cl';
+        const tenantName = tenants.find(t => t.id === selectedTenantId)?.name || 'Recinto';
+
         try {
             const isMpGloballyDisabled = globalSettings && globalSettings.paymentGateways && globalSettings.paymentGateways.mercadoPago === false;
             const isTbGloballyDisabled = globalSettings && globalSettings.paymentGateways && globalSettings.paymentGateways.webpay === false;
@@ -177,10 +184,32 @@ export default function TenantSettingsPage() {
             };
 
             await updateDoc(doc(db, "tenants", selectedTenantId), updatedData);
+            
+            await auditService.logAuditEvent({
+                action: 'MODIFICACION_CONFIGURACION_COMPLEJO',
+                module: 'CONFIGURACIONES',
+                details: `Se actualizó la configuración operativa y comercial del recinto: ${tenantName} (ID: ${selectedTenantId})`,
+                severity: 'MEDIUM',
+                status: 'SUCCESS',
+                actor: actorName,
+                role: actorRole,
+                email: actorEmail
+            });
+
             setNotification({ msg: "Configuración actualizada con éxito", type: 'success' });
             setTenants(prev => prev.map(t => t.id === selectedTenantId ? { ...t, ...updatedData } : t));
             setTimeout(() => setTerminalLines(prev => [...prev, { text: `[SISTEMA] Sincronización con Firestore exitosa (200 OK).`, type: 'success' }]), 600);
         } catch (error) {
+            await auditService.logAuditEvent({
+                action: 'MODIFICACION_CONFIGURACION_COMPLEJO',
+                module: 'CONFIGURACIONES',
+                details: `Fallo al actualizar la configuración del recinto: ${tenantName} (ID: ${selectedTenantId})`,
+                severity: 'MEDIUM',
+                status: 'FAILED',
+                actor: actorName,
+                role: actorRole,
+                email: actorEmail
+            });
             setNotification({ msg: "Error al guardar en base de datos", type: 'error' });
             setTerminalLines(prev => [...prev, { text: `[SISTEMA] Fallo en escritura a Firestore (500 Error).`, type: 'error' }]);
         } finally {

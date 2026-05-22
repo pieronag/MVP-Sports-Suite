@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
+import { auditService } from '@/services/auditService';
 import { collection, query, where, getDocs, Timestamp, doc, setDoc } from 'firebase/firestore';
 import {
     CalendarDaysIcon, ClockIcon, BuildingStorefrontIcon,
@@ -115,7 +116,7 @@ export default function MasterCalendar() {
             try {
                 let list: Venue[] = [];
                 if (role === 'manager' || role === 'staff') {
-                    const tenantIds = firestoreUser?.tenantIds || [];
+                    const tenantIds = firestoreUser?.tenantIds || (firestoreUser?.tenantId ? [firestoreUser.tenantId] : []);
                     if (tenantIds.length > 0) {
                         const chunkArray = (arr: any[], size: number) => Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
                         const promises = chunkArray(tenantIds, 10).map(async (chunk) => {
@@ -276,7 +277,21 @@ export default function MasterCalendar() {
             await setDoc(doc(db, "bookings", bookingId), { tenantId: newRes.tenantId, tenantName: venues.find(v => v.id === newRes.tenantId)?.name, courtId: newRes.courtId, courtName: selectedCourt?.name || 'Cancha', sport: selectedCourt?.sport || 'General', clientName: newRes.clientName, clientPhone: newRes.clientPhone, date: Timestamp.fromDate(bookingDate), startTime: newRes.startTime, endTime: `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`, duration: parseFloat(newRes.duration), price: Number(newRes.price), totalPrice: Number(newRes.price), deposit: Number(newRes.deposit), remainingBalance: Number(newRes.price) - Number(newRes.deposit), status: 'confirmed', paymentStatus: newRes.paymentStatus, paymentMethod: newRes.paymentMethod, notes: newRes.notes, source: 'manual_dashboard', ownerId: user.uid, createdAt: Timestamp.now(), createdBy: user.displayName || user.email });
             setIsAddModalOpen(false);
             if (newRes.date === selectedDate && newRes.tenantId === selectedVenueId) loadDashboardData();
-        } catch (e) { 
+            await auditService.logAuditEvent({
+                action: 'RESERVA_CREAR_MANUAL',
+                module: 'Operación/Agenda',
+                details: `Reserva manual creada exitosamente. Código: ${bookingId} para ${newRes.clientName} (${newRes.date} ${newRes.startTime})`,
+                severity: 'LOW',
+                status: 'SUCCESS'
+            });
+        } catch (e: any) { 
+            await auditService.logAuditEvent({
+                action: 'RESERVA_CREAR_MANUAL',
+                module: 'Operación/Agenda',
+                details: `Falla al registrar reserva manual para ${newRes.clientName}: ${e.message || e}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
             setConfirmData({
                 isOpen: true,
                 title: "Error al Guardar",

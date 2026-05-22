@@ -9,10 +9,13 @@ import {
   CurrencyDollarIcon,
   CodeBracketIcon,
   UserCircleIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  WrenchIcon
 } from '@heroicons/react/24/outline';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/services/firebase';
+import { useAuth } from '@/context/AuthContext';
+import { auditService } from '@/services/auditService';
 import { PanelGlass, TarjetaKpi, BotonAccion } from '@/components/ui/DashboardWidgets';
 
 // Interface
@@ -22,6 +25,8 @@ interface Ticket {
   desc: string;
   tenant: string;
   user: string; // ID del usuario que reportó
+  userEmail?: string;
+  userName?: string;
   category: string;
   priority: string;
   status: string;
@@ -29,13 +34,30 @@ interface Ticket {
   createdRaw: Date;
   created: string; // Formateada
   sla: number; // 0-100
+  // Nuevos campos
+  response?: string;
+  repliedAt?: any;
+  repliedBy?: string;
+  stepsToReproduce?: string;
+  screen?: string;
+  userAgent?: string;
+  browser?: string;
+  os?: string;
 }
 
 export default function Page() {
+  const { user, firestoreUser, role } = useAuth();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [filter, setFilter] = useState('Abiertos');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+
+  // Estados para la gestión
+  const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [adminResponse, setAdminResponse] = useState('');
+  const [ticketStatus, setTicketStatus] = useState('Abierto');
+  const [saving, setSaving] = useState(false);
 
   // --- HELPER: TIEMPO RELATIVO ---
   const getRelativeTime = (date: Date) => {
@@ -67,13 +89,23 @@ export default function Page() {
           desc: data.description || "Sin descripción",
           tenant: data.tenantName || "Desconocido",
           user: data.userId || "Anonimo",
+          userEmail: data.userEmail || "",
+          userName: data.userName || "",
           category: data.category || "Support",
           priority: data.priority || "Media",
           status: data.status || "Abierto",
-          assignee: "Soporte N1", // Simulado (podría venir de 'users')
+          assignee: data.repliedBy || "Soporte N1",
           createdRaw: createdDate,
           created: getRelativeTime(createdDate),
-          sla: data.sla || 0
+          sla: data.sla || 0,
+          response: data.response || "",
+          repliedAt: data.repliedAt || null,
+          repliedBy: data.repliedBy || "",
+          stepsToReproduce: data.stepsToReproduce || "No especificados",
+          screen: data.screen || "No especificada",
+          userAgent: data.userAgent || "",
+          browser: data.browser || "",
+          os: data.os || ""
         };
       });
 
@@ -88,6 +120,52 @@ export default function Page() {
   useEffect(() => {
     fetchTickets();
   }, []);
+
+  // Abrir Modal de Gestión
+  const handleOpenManageModal = (ticket: Ticket) => {
+    setSelectedTicket(ticket);
+    setAdminResponse(ticket.response || '');
+    setTicketStatus(ticket.status || 'Abierto');
+    setModalOpen(true);
+  };
+
+  // Guardar Cambios del Ticket
+  const handleSaveManagement = async () => {
+    if (!selectedTicket) return;
+    setSaving(true);
+    try {
+      const docRef = doc(db, "reports", selectedTicket.id);
+      const operatorName = firestoreUser?.fullName || firestoreUser?.displayName || user?.displayName || user?.email?.split('@')[0] || 'Soporte MVP';
+      
+      await updateDoc(docRef, {
+        status: ticketStatus,
+        response: adminResponse.trim(),
+        repliedAt: serverTimestamp(),
+        repliedBy: operatorName
+      });
+
+      // Registrar auditoría
+      await auditService.logAuditEvent({
+        action: 'REPORTE_INCIDENCIA_GESTIONADO',
+        module: 'Soporte Técnico',
+        details: `Ticket N° ${selectedTicket.id} gestionado por ${operatorName}. Estado: "${ticketStatus}". Respuesta: "${adminResponse.trim().slice(0, 60)}..."`,
+        severity: selectedTicket.priority === 'Crítica' ? 'HIGH' : 'LOW',
+        status: 'SUCCESS',
+        actor: operatorName,
+        role: role || 'admin',
+        email: user?.email || 'anonimo@mvpsports.cl'
+      });
+
+      setModalOpen(false);
+      setSelectedTicket(null);
+      fetchTickets();
+    } catch (err) {
+      console.error("Error al gestionar el reporte:", err);
+      alert("Error al guardar cambios: " + (err as any).message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   // --- 2. FILTROS ---
   const filteredTickets = tickets.filter(t => {
@@ -141,7 +219,7 @@ export default function Page() {
   };
 
   return (
-    <div className="w-full space-y-4 pb-12 font-sans transition-all duration-300">
+    <div className="w-full space-y-4 pb-12 font-sans transition-all duration-300 text-left">
 
       <div className="space-y-5">
         {/* CABECERA ADN FINANCE STYLE */}
@@ -244,7 +322,12 @@ export default function Page() {
                     <ClockIcon className="w-4 h-4 text-slate-400" />
                     <span className="text-[10px] text-slate-400 font-bold uppercase">{t.created}</span>
                   </div>
-                  <button className="px-5 py-2 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 shadow-xl">Gestionar</button>
+                  <button 
+                    onClick={() => handleOpenManageModal(t)}
+                    className="px-5 py-2 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 shadow-xl"
+                  >
+                    Gestionar
+                  </button>
                 </div>
               </div>
             </div>
@@ -347,7 +430,10 @@ export default function Page() {
 
                     {/* 8. ACCIONES */}
                     <td className="px-4 py-3 text-right align-top">
-                      <button className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400 text-[10px] font-bold uppercase transition-all shadow-sm">
+                      <button 
+                        onClick={() => handleOpenManageModal(t)}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400 text-[10px] font-bold uppercase transition-all shadow-sm"
+                      >
                         Gestionar
                       </button>
                     </td>
@@ -365,6 +451,205 @@ export default function Page() {
           </table>
         </div>
       </div>
+
+      {/* MODAL DE GESTIÓN */}
+      {modalOpen && selectedTicket && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-[#0B0F19] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-2xl overflow-hidden animate-fadeIn text-left">
+            
+            {/* Cabecera del Modal */}
+            <div className="flex items-center justify-between px-6 py-4 bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400">
+                  <WrenchIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase leading-none">Gestionar Ticket</h3>
+                  <p className="text-[10px] font-mono text-slate-400 mt-1 uppercase font-bold tracking-widest">
+                    ID: #{selectedTicket.id.toUpperCase()}
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-white text-xs uppercase font-black"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Contenido del Modal */}
+            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+              
+              {/* Información del Reportante y Recinto */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 dark:bg-white/[0.02] p-4 rounded-xl border border-slate-100 dark:border-white/5">
+                <div className="space-y-2">
+                  <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400 font-bold">Información del Cliente</h4>
+                  <div className="text-[11px] space-y-1">
+                    <p className="text-slate-800 dark:text-slate-200 font-bold">
+                      <span className="text-slate-400 uppercase font-semibold">Usuario:</span> {selectedTicket.userName || 'No especificado'}
+                    </p>
+                    <p className="text-slate-800 dark:text-slate-200 font-bold">
+                      <span className="text-slate-400 uppercase font-semibold">Email:</span> {selectedTicket.userEmail || 'No especificado'}
+                    </p>
+                    <p className="text-slate-800 dark:text-slate-200 font-bold">
+                      <span className="text-slate-400 uppercase font-semibold">ID Usuario:</span> <span className="font-mono">{selectedTicket.user}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400 font-bold">Recinto & SLA</h4>
+                  <div className="text-[11px] space-y-1">
+                    <p className="text-slate-800 dark:text-slate-200 font-bold">
+                      <span className="text-slate-400 uppercase font-semibold">Complejo:</span> {selectedTicket.tenant}
+                    </p>
+                    <p className="text-slate-800 dark:text-slate-200 font-bold">
+                      <span className="text-slate-400 uppercase font-semibold">Enviado:</span> {selectedTicket.createdRaw.toLocaleString('es-CL', { timeZone: 'America/Santiago' })}
+                    </p>
+                    <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-slate-200">
+                      <span className="text-slate-400 uppercase font-semibold">SLA Restante:</span> 
+                      <span className={`${selectedTicket.status === 'Resuelto' ? 'text-emerald-500' : selectedTicket.sla > 90 ? 'text-red-500' : 'text-blue-500'}`}>
+                        {selectedTicket.status === 'Resuelto' ? '100% (Resuelto)' : `${100 - selectedTicket.sla}%`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Asunto y Descripción de la Incidencia */}
+              <div className="space-y-3">
+                <div>
+                  <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Asunto</h4>
+                  <p className="text-sm font-black text-slate-800 dark:text-white uppercase">
+                    {selectedTicket.subject}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Descripción del Problema</h4>
+                    <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3.5 text-xs text-slate-700 dark:text-slate-300 font-medium whitespace-pre-line leading-relaxed max-h-32 overflow-y-auto">
+                      {selectedTicket.desc}
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Pasos para Reproducir</h4>
+                    <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3.5 text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-pre-line leading-relaxed max-h-32 overflow-y-auto">
+                      {selectedTicket.stepsToReproduce}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Detalle Técnico */}
+              <div className="space-y-2">
+                <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400">Detalles del Entorno Técnico</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+                  <div className="bg-slate-50 dark:bg-[#0E1322] p-2.5 rounded-lg border border-slate-200 dark:border-white/5 text-center">
+                    <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Sistema Operativo</p>
+                    <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase">{selectedTicket.os || 'Desconocido'}</p>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-[#0E1322] p-2.5 rounded-lg border border-slate-200 dark:border-white/5 text-center">
+                    <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Navegador Web</p>
+                    <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase truncate" title={selectedTicket.browser}>{selectedTicket.browser || 'Desconocido'}</p>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-[#0E1322] p-2.5 rounded-lg border border-slate-200 dark:border-white/5 text-center">
+                    <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Módulo / Pantalla</p>
+                    <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase truncate" title={selectedTicket.screen}>{selectedTicket.screen || 'No especificada'}</p>
+                  </div>
+                  <div className="bg-slate-50 dark:bg-[#0E1322] p-2.5 rounded-lg border border-slate-200 dark:border-white/5 text-center">
+                    <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Tipo de Cliente</p>
+                    <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase">Web Console</p>
+                  </div>
+                </div>
+                {selectedTicket.userAgent && (
+                  <div className="p-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg text-[9px] font-mono text-slate-400 dark:text-slate-500 break-all select-all">
+                    UserAgent: {selectedTicket.userAgent}
+                  </div>
+                )}
+              </div>
+
+              {/* Formulario de Gestión */}
+              <div className="space-y-4 border-t border-slate-100 dark:border-white/5 pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                  <div className="md:col-span-1">
+                    <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Estado del Ticket</label>
+                    <select
+                      value={ticketStatus}
+                      onChange={(e) => setTicketStatus(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-bold outline-none text-slate-800 dark:text-white focus:border-emerald-500/50 transition-all font-bold"
+                    >
+                      <option value="Abierto">Abierto</option>
+                      <option value="En Proceso">En Proceso</option>
+                      <option value="Resuelto">Resuelto</option>
+                    </select>
+                  </div>
+
+                  {selectedTicket.repliedBy && (
+                    <div className="md:col-span-2 text-right">
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Última Gestión</p>
+                      <p className="text-[11px] font-bold text-emerald-500 mt-1 uppercase">
+                        Por: {selectedTicket.repliedBy}
+                      </p>
+                      {selectedTicket.repliedAt && (
+                        <p className="text-[8px] text-slate-400 dark:text-slate-500 font-mono mt-0.5">
+                          {new Date(selectedTicket.repliedAt.seconds * 1000).toLocaleString('es-CL', { timeZone: 'America/Santiago' })}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2 font-bold">
+                    Respuesta Oficial / Solución para el Usuario
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={adminResponse}
+                    onChange={(e) => setAdminResponse(e.target.value)}
+                    placeholder="ESCRIBE LA RESPUESTA U OFICIO DE SOPORTE QUE SE MOSTRARÁ AL CLIENTE..."
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-bold outline-none text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 transition-all"
+                    required
+                  />
+                </div>
+              </div>
+
+            </div>
+
+            {/* Acciones del Modal */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 bg-slate-50 dark:bg-white/5 border-t border-slate-100 dark:border-white/5">
+              <button
+                onClick={() => setModalOpen(false)}
+                disabled={saving}
+                className="px-5 py-2.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveManagement}
+                disabled={saving || !adminResponse.trim()}
+                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] uppercase rounded-xl tracking-wider transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+              >
+                {saving ? (
+                  <>
+                    <ArrowPathIcon className="w-3.5 h-3.5 animate-spin" />
+                    Guardando Cambios...
+                  </>
+                ) : (
+                  <>
+                    <WrenchIcon className="w-3.5 h-3.5" />
+                    Aplicar Resolución
+                  </>
+                )}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

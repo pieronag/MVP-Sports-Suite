@@ -31,7 +31,8 @@ import {
     DocumentTextIcon,
     SparklesIcon,
     Bars3Icon,
-    XMarkIcon
+    XMarkIcon,
+    ExclamationCircleIcon
 } from '@heroicons/react/24/outline';
 
 export default function Sidebar() {
@@ -157,6 +158,7 @@ export default function Sidebar() {
                         </MenuGroup>
                         <MenuGroup title="Configuración de Sede">
                             <NavItem href="/dashboard/settings/complex" active={pathname?.includes("/settings/complex")} icon={<AdjustmentsVerticalIcon />} onClick={() => setMobileOpen(false)}>Perfil Comercial</NavItem>
+                            <NavItem href="/dashboard/audit" active={pathname?.includes("/audit")} icon={<FingerPrintIcon />} onClick={() => setMobileOpen(false)}>Bitácora de Sistema</NavItem>
                         </MenuGroup>
 
                     </>
@@ -168,8 +170,17 @@ export default function Sidebar() {
                             <NavItem href="/dashboard/calendar" active={pathname?.includes("/calendar")} icon={<CalendarDaysIcon />} onClick={() => setMobileOpen(false)}>Control de Canchas</NavItem>
                             <NavItem href="/dashboard/checkin" active={pathname?.includes("/checkin")} icon={<ClipboardDocumentCheckIcon />} onClick={() => setMobileOpen(false)}>Validación de Accesos</NavItem>
                         </MenuGroup>
+                        <MenuGroup title="Seguridad">
+                            <NavItem href="/dashboard/audit" active={pathname?.includes("/audit")} icon={<FingerPrintIcon />} onClick={() => setMobileOpen(false)}>Bitácora de Sistema</NavItem>
+                        </MenuGroup>
                     </>
                 )}
+
+                <MenuGroup title="Soporte">
+                    <NavItem href="/dashboard/report-issue" active={pathname === "/dashboard/report-issue"} icon={<ExclamationCircleIcon />} onClick={() => setMobileOpen(false)}>
+                        Reportar un Problema
+                    </NavItem>
+                </MenuGroup>
 
             </nav>
 

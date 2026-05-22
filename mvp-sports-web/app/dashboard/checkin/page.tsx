@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
+import { auditService } from '@/services/auditService';
 import { collection, query, where, getDocs, getDoc, orderBy, doc, updateDoc, Timestamp } from 'firebase/firestore';
 import {
     MagnifyingGlassIcon,
@@ -114,7 +115,7 @@ export default function CheckInPage() {
             try {
                 let list: { id: string, name: string }[] = [];
                 if (role === 'manager' || role === 'staff') {
-                    const tenantIds = firestoreUser?.tenantIds || [];
+                    const tenantIds = firestoreUser?.tenantIds || (firestoreUser?.tenantId ? [firestoreUser.tenantId] : []);
                     if (tenantIds.length > 0) {
                         const chunkArray = (arr: any[], size: number) =>
                             Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
@@ -426,6 +427,14 @@ export default function CheckInPage() {
                 await updateDoc(doc(db, "bookings", booking.id), updateData);
                 setBookings(prev => prev.map(b => b.id === booking.id ? { ...b, paymentStatus: 'paid', paymentMethod: selectedPaymentMethod, remainingBalance: 0 } : b));
                 
+                await auditService.logAuditEvent({
+                    action: 'RESERVA_PAGO',
+                    module: 'Acceso/CheckIn',
+                    details: `Registro de pago exitoso para la reserva ${booking.id} (${booking.clientName}) de la cancha ${booking.courtName}. Método: ${selectedPaymentMethod}.`,
+                    severity: 'LOW',
+                    status: 'SUCCESS'
+                });
+
                 setStatusModal({ isOpen: true, title: "Pago Registrado", message: `El pago de ${booking.clientName} ha sido procesado exitosamente.`, type: 'info' });
             } else {
                 updateData.checkIn = true;
@@ -435,6 +444,14 @@ export default function CheckInPage() {
                 await updateDoc(doc(db, "bookings", booking.id), updateData);
                 setBookings(prev => prev.map(b => b.id === booking.id ? { ...b, checkIn: true, status: 'active' } : b));
                 
+                await auditService.logAuditEvent({
+                    action: 'RESERVA_CHECKIN',
+                    module: 'Acceso/CheckIn',
+                    details: `Ingreso registrado para la reserva ${booking.id} (${booking.clientName}) de la cancha ${booking.courtName}.`,
+                    severity: 'LOW',
+                    status: 'SUCCESS'
+                });
+
                 setStatusModal({ isOpen: true, title: "Ingreso Exitoso", message: `El ingreso de ${booking.clientName} ha sido registrado correctamente y la reserva está en juego.`, type: 'info' });
             }
 
@@ -442,6 +459,15 @@ export default function CheckInPage() {
             setSelectedBookingForConfirm(null);
         } catch (error: any) {
             console.error("Error confirming check-in:", error);
+            const isPay = confirmActionType === 'pay';
+            await auditService.logAuditEvent({
+                action: isPay ? 'RESERVA_PAGO' : 'RESERVA_CHECKIN',
+                module: 'Acceso/CheckIn',
+                details: `Falla al procesar ${isPay ? 'pago' : 'ingreso'} para la reserva ${booking.id} (${booking.clientName}). Error: ${error.message || error}`,
+                severity: 'MEDIUM',
+                status: 'FAILED'
+            });
+
             const errorMsg = error?.code === 'permission-denied'
                 ? "Permiso denegado. Tu cuenta no tiene privilegios para modificar esta reserva."
                 : "Hubo un error al procesar el ingreso. Reintenta.";
@@ -464,6 +490,14 @@ export default function CheckInPage() {
             // 1. Actualizar Reserva
             await updateDoc(doc(db, "bookings", booking.id), batchData);
 
+            await auditService.logAuditEvent({
+                action: 'RESERVA_NOSHOW',
+                module: 'Acceso/CheckIn',
+                details: `Reserva ${booking.id} de ${booking.clientName} marcada como No-Show.`,
+                severity: 'MEDIUM',
+                status: 'SUCCESS'
+            });
+
             // 2. Aplicar Strike al Usuario si existe
             if (booking.userId) {
                 const userRef = doc(db, 'users', booking.userId);
@@ -472,6 +506,14 @@ export default function CheckInPage() {
                     await updateDoc(userRef, {
                         strikes: (userSnap.data().strikes || 0) + 1,
                         lastStrikeAt: Timestamp.now()
+                    });
+
+                    await auditService.logAuditEvent({
+                        action: 'JUGADOR_STRIKE',
+                        module: 'Acceso/CheckIn',
+                        details: `Strike aplicado al usuario ${booking.userId} por inasistencia (No-Show) a la reserva ${booking.id}.`,
+                        severity: 'HIGH',
+                        status: 'SUCCESS'
                     });
                 }
             }
@@ -486,8 +528,16 @@ export default function CheckInPage() {
                 message: `Se ha cancelado la reserva y aplicado un strike a ${booking.clientName}.`,
                 type: 'info'
             });
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error in handleNoShow:", error);
+            await auditService.logAuditEvent({
+                action: 'RESERVA_NOSHOW',
+                module: 'Acceso/CheckIn',
+                details: `Falla al registrar No-Show para la reserva ${booking.id} (${booking.clientName}). Error: ${error.message || error}`,
+                severity: 'HIGH',
+                status: 'FAILED'
+            });
+
             setStatusModal({ isOpen: true, title: "Falla de Sistema", message: "No se pudo registrar el No-Show.", type: 'error' });
         } finally {
             setProcessingId(null);

@@ -162,7 +162,7 @@ export default function PlayerDashboard() {
                         <QuickIcon bit={<CalendarRange size={24} />} label="Reservas" color="#3b82f6" route="/(player)/reservas" C={C} isDark={isDark} />
                         <QuickIcon bit={<MapPin size={24} />} label="Mapa" color="#10b981" route="/(player)/mapa" C={C} isDark={isDark} />
                         <QuickIcon bit={<Trophy size={24} />} label="Torneos" color="#f43f5e" route="/(player)/torneos" C={C} isDark={isDark} />
-                        <QuickIcon bit={<GraduationCap size={24} />} label="Academias" color="#8b5cf6" route="/(player)/reporte" C={C} isDark={isDark} />
+                        <QuickIcon bit={<GraduationCap size={24} />} label="Academias" color="#8b5cf6" route="/(player)/academias" C={C} isDark={isDark} />
                         <QuickIcon bit={<Wallet size={24} />} label="Billetera" color="#14b8a6" route="/(player)/billetera" C={C} isDark={isDark} />
 
                         <QuickIcon bit={<Building2 size={24} />} label="Recintos" color="#f59e0b" route="/(player)/clubes/explore" C={C} isDark={isDark} />

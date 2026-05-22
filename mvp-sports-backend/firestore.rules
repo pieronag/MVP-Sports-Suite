@@ -211,6 +211,7 @@ service cloud.firestore {
     match /reports/{reportId} {
       allow read: if isManager() || isSuperAdmin();
       allow create: if isAuthenticated();
+      allow update: if isManager() || isSuperAdmin();
       allow delete: if isSuperAdmin();
     }
 
@@ -220,7 +221,7 @@ service cloud.firestore {
     }
 
     match /audit/{id} {
-      allow read: if isSuperAdmin();
+      allow read: if isManager() || isSuperAdmin();
       allow write: if isAuthenticated(); 
     }
   }

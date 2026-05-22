@@ -48,7 +48,7 @@ export default function PrivacyPage() {
       <Navbar onRegisterClick={() => setIsRegisterOpen(true)} />
 
       {/* HEADER HERO */}
-      <section className="relative overflow-hidden pt-32 pb-20 border-b border-white/5 bg-gradient-to-b from-slate-900 to-slate-950">
+      <section className="relative overflow-hidden pt-48 pb-20 border-b border-white/5 bg-gradient-to-b from-slate-900 to-slate-950">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full pointer-events-none">
           <div className="absolute top-12 left-1/4 w-[350px] h-[350px] bg-cyan-500/10 blur-[120px] rounded-full" />
           <div className="absolute top-20 right-1/4 w-[250px] h-[250px] bg-[#00df82]/10 blur-[100px] rounded-full" />

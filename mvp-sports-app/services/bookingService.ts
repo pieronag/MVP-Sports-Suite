@@ -1,6 +1,7 @@
 import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { bookingSchema } from './schemas';
+import { auditService } from './auditService';
 
 export interface Booking {
     id?: string;
@@ -159,9 +160,25 @@ export const bookingService = {
 
             const docRef = doc(db, 'bookings', bookingId);
             await setDoc(docRef, cleanData);
+
+            await auditService.logAuditEvent({
+                action: 'RESERVA_CREAR_MOVIL',
+                module: 'Reservas/Móvil',
+                details: `Reserva creada exitosamente desde app móvil. Código: ${bookingId}, Cancha: ${bookingData.courtName || bookingData.courtId}, Recinto ID: ${bookingData.tenantId}. Total: ${bookingData.totalPrice}.`,
+                severity: 'LOW',
+                status: 'SUCCESS'
+            });
+
             return bookingId;
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error creating booking:', error);
+            await auditService.logAuditEvent({
+                action: 'RESERVA_CREAR_MOVIL',
+                module: 'Reservas/Móvil',
+                details: `Falla al crear reserva desde app móvil. Cancha: ${bookingData.courtName || bookingData.courtId}. Error: ${error.message || error}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
             throw new Error('No se pudo crear la reserva.');
         }
     },
@@ -192,12 +209,31 @@ export const bookingService = {
     },
 
     async cancelBooking(params: { bookingId: string; cancelledBy: string }) {
-        await bookingService.updateBooking(params.bookingId, {
-            status: 'cancelled',
-            // campos extra compatibles con web (no rompe si no existen en schema)
-            cancelledAt: Timestamp.now() as any,
-            cancelledBy: params.cancelledBy as any,
-        } as any);
+        try {
+            await bookingService.updateBooking(params.bookingId, {
+                status: 'cancelled',
+                // campos extra compatibles con web (no rompe si no existen en schema)
+                cancelledAt: Timestamp.now() as any,
+                cancelledBy: params.cancelledBy as any,
+            } as any);
+
+            await auditService.logAuditEvent({
+                action: 'RESERVA_CANCELAR',
+                module: 'Reservas/Móvil',
+                details: `Reserva ${params.bookingId} cancelada por ${params.cancelledBy}.`,
+                severity: 'MEDIUM',
+                status: 'SUCCESS'
+            });
+        } catch (error: any) {
+            await auditService.logAuditEvent({
+                action: 'RESERVA_CANCELAR',
+                module: 'Reservas/Móvil',
+                details: `Falla al cancelar reserva ${params.bookingId} por ${params.cancelledBy}. Error: ${error.message || error}`,
+                severity: 'MEDIUM',
+                status: 'FAILED'
+            });
+            throw error;
+        }
     },
 
     async setPaymentStatus(params: { bookingId: string; paymentStatus: Booking['paymentStatus'] }) {
@@ -302,70 +338,128 @@ export const bookingService = {
     },
 
     async checkIn(bookingId: string) {
-        const ref = doc(db, 'bookings', bookingId);
-        await updateDoc(ref, { 
-            checkIn: true, 
-            checkInTime: Timestamp.now(),
-            status: 'active'
-        });
+        try {
+            const ref = doc(db, 'bookings', bookingId);
+            await updateDoc(ref, { 
+                checkIn: true, 
+                checkInTime: Timestamp.now(),
+                status: 'active'
+            });
+
+            await auditService.logAuditEvent({
+                action: 'RESERVA_CHECKIN_MOVIL',
+                module: 'Reservas/Móvil',
+                details: `Check-in móvil registrado para la reserva ${bookingId}.`,
+                severity: 'LOW',
+                status: 'SUCCESS'
+            });
+        } catch (error: any) {
+            await auditService.logAuditEvent({
+                action: 'RESERVA_CHECKIN_MOVIL',
+                module: 'Reservas/Móvil',
+                details: `Falla al realizar check-in móvil para la reserva ${bookingId}. Error: ${error.message || error}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
+            throw error;
+        }
     },
 
     async checkOut(bookingId: string, surveyData?: { rating?: number; feedback?: string }) {
-        const ref = doc(db, 'bookings', bookingId);
-        const updateData: any = { 
-            checkOut: true, 
-            checkOutTime: Timestamp.now(),
-            status: 'completed'
-        };
-        if (surveyData) {
-            if (surveyData.rating !== undefined) updateData.rating = surveyData.rating;
-            if (surveyData.feedback !== undefined) updateData.feedback = surveyData.feedback;
+        try {
+            const ref = doc(db, 'bookings', bookingId);
+            const updateData: any = { 
+                checkOut: true, 
+                checkOutTime: Timestamp.now(),
+                status: 'completed'
+            };
+            if (surveyData) {
+                if (surveyData.rating !== undefined) updateData.rating = surveyData.rating;
+                if (surveyData.feedback !== undefined) updateData.feedback = surveyData.feedback;
+            }
+            await updateDoc(ref, updateData);
+
+            await auditService.logAuditEvent({
+                action: 'RESERVA_CHECKOUT_MOVIL',
+                module: 'Reservas/Móvil',
+                details: `Check-out móvil registrado para la reserva ${bookingId}.${surveyData ? ` Valoración: ${surveyData.rating}, Feedback: ${surveyData.feedback}` : ''}`,
+                severity: 'LOW',
+                status: 'SUCCESS'
+            });
+        } catch (error: any) {
+            await auditService.logAuditEvent({
+                action: 'RESERVA_CHECKOUT_MOVIL',
+                module: 'Reservas/Móvil',
+                details: `Falla al realizar check-out móvil para la reserva ${bookingId}. Error: ${error.message || error}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
+            throw error;
         }
-        await updateDoc(ref, updateData);
     },
 
     async saveMatchStats(stats: any) {
-        const statsRef = collection(db, 'match_stats');
-        await addDoc(statsRef, {
-            ...stats,
-            createdAt: Timestamp.now()
-        });
+        try {
+            const statsRef = collection(db, 'match_stats');
+            const res = await addDoc(statsRef, {
+                ...stats,
+                createdAt: Timestamp.now()
+            });
 
-        // Lógica de Gamificación (XP/Puntos)
-        const players = [...stats.teamA.players, ...stats.teamB.players];
-        const winner = stats.winner;
+            // Lógica de Gamificación (XP/Puntos)
+            const players = [...stats.teamA.players, ...stats.teamB.players];
+            const winner = stats.winner;
 
-        for (const p of players) {
-            const playerRef = doc(db, 'profiles', p.userId);
-            const playerSnap = await getDoc(playerRef);
-            if (playerSnap.exists()) {
-                const currentData = playerSnap.data();
-                let xpChange = 50; // XP base por jugar
-                let pointsChange = 10; // Puntos base
+            for (const p of players) {
+                const playerRef = doc(db, 'profiles', p.userId);
+                const playerSnap = await getDoc(playerRef);
+                if (playerSnap.exists()) {
+                    const currentData = playerSnap.data();
+                    let xpChange = 50; // XP base por jugar
+                    let pointsChange = 10; // Puntos base
 
-                // Bonus por ganar / Penalización por perder
-                const isWinner = (winner === 'teamA' && stats.teamA.players.find((x: any) => x.userId === p.userId)) || 
-                                 (winner === 'teamB' && stats.teamB.players.find((x: any) => x.userId === p.userId));
-                
-                if (isWinner) {
-                    xpChange += 100;
-                    pointsChange += 20;
-                } else if (winner !== 'draw') {
-                    xpChange += 20;
-                    pointsChange -= 15; // Se pierden puntos por perder
+                    // Bonus por ganar / Penalización por perder
+                    const isWinner = (winner === 'teamA' && stats.teamA.players.find((x: any) => x.userId === p.userId)) || 
+                                     (winner === 'teamB' && stats.teamB.players.find((x: any) => x.userId === p.userId));
+                    
+                    if (isWinner) {
+                        xpChange += 100;
+                        pointsChange += 20;
+                    } else if (winner !== 'draw') {
+                        xpChange += 20;
+                        pointsChange -= 15; // Se pierden puntos por perder
+                    }
+
+                    // Goles y asistencias
+                    xpChange += (p.goals * 30) + (p.assists * 20);
+
+                    await updateDoc(playerRef, {
+                        'stats.xp': (currentData.stats?.xp || 0) + xpChange,
+                        'stats.points': (currentData.stats?.points || 0) + pointsChange,
+                        'stats.goals': (currentData.stats?.goals || 0) + p.goals,
+                        'stats.assists': (currentData.stats?.assists || 0) + p.assists,
+                        'stats.matchesPlayed': (currentData.stats?.matchesPlayed || 0) + 1
+                    });
                 }
-
-                // Goles y asistencias
-                xpChange += (p.goals * 30) + (p.assists * 20);
-
-                await updateDoc(playerRef, {
-                    'stats.xp': (currentData.stats?.xp || 0) + xpChange,
-                    'stats.points': (currentData.stats?.points || 0) + pointsChange,
-                    'stats.goals': (currentData.stats?.goals || 0) + p.goals,
-                    'stats.assists': (currentData.stats?.assists || 0) + p.assists,
-                    'stats.matchesPlayed': (currentData.stats?.matchesPlayed || 0) + 1
-                });
             }
+
+            await auditService.logAuditEvent({
+                action: 'PARTIDO_ESTADISTICAS',
+                module: 'Partidos/Móvil',
+                details: `Estadísticas de partido registradas (ID stats: ${res.id}). Ganador: ${stats.winner}, Equipos: ${stats.teamA.name || 'A'} vs ${stats.teamB.name || 'B'}.`,
+                severity: 'LOW',
+                status: 'SUCCESS'
+            });
+        } catch (error: any) {
+            console.error('Error in saveMatchStats:', error);
+            await auditService.logAuditEvent({
+                action: 'PARTIDO_ESTADISTICAS',
+                module: 'Partidos/Móvil',
+                details: `Falla al guardar estadísticas de partido. Error: ${error.message || error}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
+            throw error;
         }
     }
 };

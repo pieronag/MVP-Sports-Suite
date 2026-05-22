@@ -2,9 +2,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { auth, functions } from "../../services/firebase"; 
+import { auth, functions, db } from "../../services/firebase"; 
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
+import { doc, getDoc } from "firebase/firestore";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext"; // Importamos AuthContext
 
@@ -61,7 +62,21 @@ export default function LoginPage() {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        if (!user.emailVerified) {
+        // Consultar el rol del usuario en Firestore para ver si está exento de verificación de correo
+        let userRole = null;
+        try {
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists()) {
+                userRole = userDoc.data().role;
+            }
+        } catch (dbErr) {
+            console.error("Error al obtener rol del usuario durante login:", dbErr);
+        }
+
+        const exemptRoles = ["manager", "owner", "admin", "superadmin"];
+        const isExempt = userRole && exemptRoles.includes(userRole);
+
+        if (!user.emailVerified && !isExempt) {
             setError("Por favor, verifica tu correo antes de ingresar. Te enviamos un enlace de activación.");
             await auth.signOut();
             setLoading(false);

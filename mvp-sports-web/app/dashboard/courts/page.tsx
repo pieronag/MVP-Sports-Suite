@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
+import { auditService } from '@/services/auditService';
 import { collection, query, where, getDocs, doc, updateDoc, addDoc, deleteDoc, Timestamp } from 'firebase/firestore';
 import {
     BuildingStorefrontIcon, ClockIcon, CurrencyDollarIcon, MapPinIcon, PlusIcon,
@@ -181,7 +182,7 @@ export default function CourtsPage() {
         try {
             let snapTenantsDocs: any[] = [];
             if (role === 'manager' || role === 'staff') {
-                const tenantIds = firestoreUser?.tenantIds || [];
+                const tenantIds = firestoreUser?.tenantIds || (firestoreUser?.tenantId ? [firestoreUser.tenantId] : []);
                 if (tenantIds.length > 0) {
                     const chunkArray = (arr: any[], size: number) =>
                         Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
@@ -273,7 +274,24 @@ export default function CourtsPage() {
                 setSelectedVenue({ ...selectedVenue, imageURL: compressedBase64 });
                 setVenues(prev => prev.map(v => v.id === selectedVenue.id ? { ...v, imageURL: compressedBase64 } : v));
                 showToast("Portada actualizada", 'success');
-            } catch (error) { showToast("Error al procesar", 'error'); } finally { setVenueImageLoading(false); }
+                
+                await auditService.logAuditEvent({
+                    action: 'RECINTO_IMAGEN',
+                    module: 'Infraestructura/Canchas',
+                    details: `Actualización de imagen de portada para el recinto ${selectedVenue.name} (${selectedVenue.id}).`,
+                    severity: 'LOW',
+                    status: 'SUCCESS'
+                });
+            } catch (error: any) { 
+                showToast("Error al procesar", 'error'); 
+                await auditService.logAuditEvent({
+                    action: 'RECINTO_IMAGEN',
+                    module: 'Infraestructura/Canchas',
+                    details: `Falla al actualizar imagen de portada para el recinto ${selectedVenue.name} (${selectedVenue.id}). Error: ${error.message || error}`,
+                    severity: 'LOW',
+                    status: 'FAILED'
+                });
+            } finally { setVenueImageLoading(false); }
         }
     };
 
@@ -376,7 +394,24 @@ export default function CourtsPage() {
             setSelectedVenue({ ...selectedVenue, ...updateData });
             setVenues(prev => prev.map(v => v.id === selectedVenue.id ? { ...v, ...updateData } : v));
             showToast("Infraestructura sincronizada", 'success');
-        } catch (error) { showToast("Error al sincronizar", 'error'); }
+
+            await auditService.logAuditEvent({
+                action: 'RECINTO_EDITAR',
+                module: 'Infraestructura/Canchas',
+                details: `Modificación de la configuración del recinto ${selectedVenue.name} (${selectedVenue.id}) incluyendo matriz horaria y tarifas de deportes: ${selectedSports.join(', ')}.`,
+                severity: 'LOW',
+                status: 'SUCCESS'
+            });
+        } catch (error: any) { 
+            showToast("Error al sincronizar", 'error'); 
+            await auditService.logAuditEvent({
+                action: 'RECINTO_EDITAR',
+                module: 'Infraestructura/Canchas',
+                details: `Falla al sincronizar configuración del recinto ${selectedVenue.name} (${selectedVenue.id}). Error: ${error.message || error}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
+        }
     };
 
     const handleOpenCreate = () => { setEditingCourtId(null); setCourtForm({ name: '', sport: '', surface: '', features: [] }); setIsCourtModalOpen(true); };
@@ -393,16 +428,43 @@ export default function CourtsPage() {
                 await updateDoc(doc(db, "courts", editingCourtId), courtData);
                 setCourts(prev => prev.map(c => c.id === editingCourtId ? { ...c, ...courtData } : c));
                 showToast("Cancha actualizada", 'success');
+
+                await auditService.logAuditEvent({
+                    action: 'CANCHA_EDITAR',
+                    module: 'Infraestructura/Canchas',
+                    details: `Modificación de la cancha ${courtForm.name} (${editingCourtId}) del recinto ${selectedVenue.name}. Deporte: ${courtForm.sport}, Superficie: ${courtForm.surface}.`,
+                    severity: 'LOW',
+                    status: 'SUCCESS'
+                });
             } else {
                 const res = await addDoc(collection(db, "courts"), { ...courtData, createdAt: new Date() });
                 setCourts(prev => [...prev, { id: res.id, ...courtData } as Court]);
                 setVenues(prev => prev.map(v => v.id === selectedVenue.id ? { ...v, realCourtCount: (v.realCourtCount || 0) + 1 } : v));
                 showToast("Cancha integrada", 'success');
+
+                await auditService.logAuditEvent({
+                    action: 'CANCHA_CREAR',
+                    module: 'Infraestructura/Canchas',
+                    details: `Creación de la cancha ${courtForm.name} (${res.id}) en el recinto ${selectedVenue.name}. Deporte: ${courtForm.sport}, Superficie: ${courtForm.surface}.`,
+                    severity: 'LOW',
+                    status: 'SUCCESS'
+                });
             }
             setIsCourtModalOpen(false);
-        } catch (error) { showToast("Error al integrar", 'error'); }
+        } catch (error: any) { 
+            showToast("Error al integrar", 'error'); 
+            const isEdit = !!editingCourtId;
+            await auditService.logAuditEvent({
+                action: isEdit ? 'CANCHA_EDITAR' : 'CANCHA_CREAR',
+                module: 'Infraestructura/Canchas',
+                details: `Falla al ${isEdit ? 'editar' : 'crear'} cancha ${courtForm.name} en el recinto ${selectedVenue.name}. Error: ${error.message || error}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
+        }
     };
     const handleDeleteCourt = async (courtId: string) => {
+        const courtToDelete = courts.find(c => c.id === courtId);
         setConfirmData({
             isOpen: true,
             title: "Eliminar Activo",
@@ -414,7 +476,24 @@ export default function CourtsPage() {
                     setCourts(courts.filter(c => c.id !== courtId));
                     setVenues(prev => prev.map(v => v.id === selectedVenue?.id ? { ...v, realCourtCount: Math.max(0, (v.realCourtCount || 0) - 1) } : v));
                     showToast("Cancha eliminada", 'success');
-                } catch (e) { showToast("Error al eliminar", 'error'); }
+
+                    await auditService.logAuditEvent({
+                        action: 'CANCHA_ELIMINAR',
+                        module: 'Infraestructura/Canchas',
+                        details: `Cancha ${courtToDelete?.name || ''} (${courtId}) eliminada del recinto ${selectedVenue?.name}.`,
+                        severity: 'MEDIUM',
+                        status: 'SUCCESS'
+                    });
+                } catch (e: any) { 
+                    showToast("Error al eliminar", 'error'); 
+                    await auditService.logAuditEvent({
+                        action: 'CANCHA_ELIMINAR',
+                        module: 'Infraestructura/Canchas',
+                        details: `Falla al eliminar cancha ${courtToDelete?.name || ''} (${courtId}). Error: ${e.message || e}`,
+                        severity: 'MEDIUM',
+                        status: 'FAILED'
+                    });
+                }
                 setConfirmData(prev => ({ ...prev, isOpen: false }));
             }
         });
@@ -455,19 +534,56 @@ export default function CourtsPage() {
     const executeMaintenanceUpdate = async () => {
         if (!maintenanceCourt) return;
         try {
-            const mData = { status: 'maintenance', maintenanceUntil: maintenanceForm.type === 'hours' ? new Date(`${maintenanceForm.date}T${maintenanceForm.endTime}`) : new Date(`${maintenanceForm.endDate}T23:59:59`), maintenanceStart: maintenanceForm.type === 'hours' ? new Date(`${maintenanceForm.date}T${maintenanceForm.startTime}`) : new Date(`${maintenanceForm.date}T00:00:00`) };
+            const start = maintenanceForm.type === 'hours' ? new Date(`${maintenanceForm.date}T${maintenanceForm.startTime}`) : new Date(`${maintenanceForm.date}T00:00:00`);
+            const end = maintenanceForm.type === 'hours' ? new Date(`${maintenanceForm.date}T${maintenanceForm.endTime}`) : new Date(`${maintenanceForm.endDate}T23:59:59`);
+            const mData = { status: 'maintenance', maintenanceUntil: end, maintenanceStart: start };
             await updateDoc(doc(db, "courts", maintenanceCourt.id), mData);
             setCourts(prev => prev.map(c => c.id === maintenanceCourt.id ? { ...c, ...mData } : c));
             showToast("Mantenimiento activado", 'success');
             setIsMaintenanceModalOpen(false);
-        } catch (e) { showToast("Error", 'error'); }
+
+            await auditService.logAuditEvent({
+                action: 'CANCHA_MANTENIMIENTO_INICIAR',
+                module: 'Infraestructura/Canchas',
+                details: `Mantenimiento iniciado para la cancha ${maintenanceCourt.name} (${maintenanceCourt.id}) desde ${start.toLocaleString()} hasta ${end.toLocaleString()}.`,
+                severity: 'LOW',
+                status: 'SUCCESS'
+            });
+        } catch (e: any) { 
+            showToast("Error", 'error'); 
+            await auditService.logAuditEvent({
+                action: 'CANCHA_MANTENIMIENTO_INICIAR',
+                module: 'Infraestructura/Canchas',
+                details: `Falla al iniciar mantenimiento para la cancha ${maintenanceCourt.name} (${maintenanceCourt.id}). Error: ${e.message || e}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
+        }
     };
     const handleRestoreCourt = async (courtId: string) => {
+        const courtToRestore = courts.find(c => c.id === courtId);
         try {
             await updateDoc(doc(db, "courts", courtId), { status: 'active', maintenanceUntil: null, maintenanceStart: null });
             setCourts(prev => prev.map(c => c.id === courtId ? { ...c, status: 'active', maintenanceUntil: null } : c));
             showToast("Cancha restaurada", 'success');
-        } catch (e) { showToast("Falla técnica", 'error'); }
+
+            await auditService.logAuditEvent({
+                action: 'CANCHA_MANTENIMIENTO_FINALIZAR',
+                module: 'Infraestructura/Canchas',
+                details: `Mantenimiento finalizado y cancha ${courtToRestore?.name || ''} (${courtId}) restaurada a estado activo.`,
+                severity: 'LOW',
+                status: 'SUCCESS'
+            });
+        } catch (e: any) { 
+            showToast("Falla técnica", 'error'); 
+            await auditService.logAuditEvent({
+                action: 'CANCHA_MANTENIMIENTO_FINALIZAR',
+                module: 'Infraestructura/Canchas',
+                details: `Falla al finalizar mantenimiento para la cancha ${courtToRestore?.name || ''} (${courtId}). Error: ${e.message || e}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
+        }
     };
 
     const filteredCourts = courts.filter(c => filterSport === 'Todos' ? true : c.sport === filterSport);

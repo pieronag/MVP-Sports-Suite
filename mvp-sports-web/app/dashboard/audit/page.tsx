@@ -91,22 +91,29 @@ export default function Page() {
       l.actor.toLowerCase().includes(searchTerm.toLowerCase());
     if (!matchesSearch) return false;
     if (filter === 'Todos') return true;
-    if (filter === 'Críticos') return l.severity === 'critical';
-    if (filter === 'Fallidos') return l.status === 'Failed' || l.status === 'Blocked';
+    if (filter === 'Críticos') return l.severity.toLowerCase() === 'critical' || l.severity.toLowerCase() === 'high';
+    if (filter === 'Fallidos') return ['failed', 'blocked', 'warning'].includes(l.status.toLowerCase());
     return true;
   });
 
   const getSeverityStyle = (s: string) => {
-    switch (s) {
-      case 'critical': return 'bg-red-500 text-white border-red-600 shadow-lg shadow-red-500/20';
-      case 'warning': return 'bg-amber-500 text-white border-amber-600 shadow-lg shadow-amber-500/20';
-      default: return 'bg-emerald-500 text-slate-900 border-emerald-600 font-black';
+    const severity = s.toLowerCase();
+    switch (severity) {
+      case 'critical':
+      case 'high':
+        return 'bg-red-500 text-white border-red-600 shadow-lg shadow-red-500/20';
+      case 'warning':
+      case 'medium':
+        return 'bg-amber-500 text-white border-amber-600 shadow-lg shadow-amber-500/20';
+      default:
+        return 'bg-emerald-500 text-slate-900 border-emerald-600 font-black';
     }
   };
 
   const getStatusColor = (s: string) => {
-    if (s === 'Success') return 'text-emerald-500';
-    if (s === 'Blocked') return 'text-purple-500';
+    const status = s.toLowerCase();
+    if (status === 'success') return 'text-emerald-500';
+    if (status === 'blocked') return 'text-purple-500';
     return 'text-red-500';
   };
 
@@ -159,7 +166,7 @@ export default function Page() {
         />
         <TarjetaKpi 
           label="CRÍTICOS" 
-          value={logs.filter(l => l.severity === 'critical').length.toString()} 
+          value={logs.filter(l => l.severity.toLowerCase() === 'critical' || l.severity.toLowerCase() === 'high').length.toString()} 
           sub="REVISIÓN REQUERIDA"
           icon={<ExclamationTriangleIcon />}
         />
@@ -217,7 +224,7 @@ export default function Page() {
             <tbody className="divide-y divide-slate-100 dark:divide-white/5 font-mono">
               {filteredLogs.length > 0 ? (
                 filteredLogs.map((log) => (
-                  <tr key={log.id} className={`group hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors ${log.severity === 'critical' ? 'bg-red-500/5' : ''}`}>
+                  <tr key={log.id} className={`group hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors ${log.severity.toLowerCase() === 'critical' || log.severity.toLowerCase() === 'high' ? 'bg-red-500/5' : ''}`}>
                     <td className="px-6 py-5">
                       <div className="flex flex-col">
                         <span className="text-[10px] font-black text-slate-800 dark:text-white uppercase">{log.date}</span>
@@ -249,8 +256,8 @@ export default function Page() {
                     </td>
                     <td className="px-6 py-5 text-right">
                       <div className="flex flex-col items-end gap-1">
-                        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[8px] font-black uppercase tracking-widest ${log.status === 'Success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
-                          <div className={`w-1.5 h-1.5 rounded-full ${log.status === 'Success' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`}></div>
+                        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-[8px] font-black uppercase tracking-widest ${log.status.toLowerCase() === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 'bg-red-500/10 border-red-500/20 text-red-500'}`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${log.status.toLowerCase() === 'success' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]'}`}></div>
                           {log.status}
                         </div>
                       </div>

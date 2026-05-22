@@ -1,7 +1,8 @@
-import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { db, storage } from './firebase';
 import { UserProfile } from '../types/user';
+import { auditService } from './auditService';
 
 export interface GamificationSettings {
     xpPerCheckin: number;
@@ -155,8 +156,54 @@ export const userService = {
         try {
             const userRef = doc(db, 'users', uid);
             await updateDoc(userRef, data as any);
-        } catch (error) {
-            console.error('Error updating user profile:', error);
+
+            const internalFields = ['xp', 'ovr', 'tier', 'badges', 'badgeXpBonus', 'stats', 'lastELOUpdate', 'lastBulkSync'];
+            const isManualEdit = Object.keys(data).some(key => !internalFields.includes(key));
+
+            if (isManualEdit) {
+                await auditService.logAuditEvent({
+                    action: 'PERFIL_EDITAR',
+                    module: 'Perfil/Móvil',
+                    details: `Perfil de usuario ${uid} actualizado manualmente. Campos: ${Object.keys(data).join(', ')}.`,
+                    severity: 'LOW',
+                    status: 'SUCCESS'
+                });
+            }
+        } catch (error: any) {
+            await auditService.logAuditEvent({
+                action: 'PERFIL_EDITAR',
+                module: 'Perfil/Móvil',
+                details: `Falla al actualizar perfil del usuario ${uid}. Error: ${error.message || error}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
+            throw error;
+        }
+    },
+
+    /**
+     * Deletes user profile document and logs audit event
+     */
+    async deleteAccount(uid: string): Promise<void> {
+        try {
+            const userRef = doc(db, 'users', uid);
+            await deleteDoc(userRef);
+
+            await auditService.logAuditEvent({
+                action: 'CUENTA_ELIMINAR',
+                module: 'Perfil/Móvil',
+                details: `Cuenta del usuario ${uid} eliminada del sistema de forma definitiva.`,
+                severity: 'HIGH',
+                status: 'SUCCESS'
+            });
+        } catch (error: any) {
+            await auditService.logAuditEvent({
+                action: 'CUENTA_ELIMINAR',
+                module: 'Perfil/Móvil',
+                details: `Falla al eliminar cuenta del usuario ${uid}. Error: ${error.message || error}`,
+                severity: 'HIGH',
+                status: 'FAILED'
+            });
             throw error;
         }
     },

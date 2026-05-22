@@ -217,10 +217,13 @@ export default function AdminDashboard() {
         // Top Tenants por Booking Revenue (Filtrado por periodo)
         const tRev: any = {};
         filteredBookings.forEach(b => {
-            const name = b.tenantName || tenantsMap[b.tenantId] || 'Desconocido';
-            tRev[name] = (tRev[name] || 0) + (Number(b.totalPrice || b.price || 0));
+            const tid = b.tenantId || 'desconocido';
+            tRev[tid] = (tRev[tid] || 0) + (Number(b.totalPrice || b.price || 0));
         });
-        setTopTenants(Object.keys(tRev).map(k => ({ name: k, value: tRev[k] })).sort((a,b) => b.value - a.value).slice(0, 5));
+        setTopTenants(Object.keys(tRev).map(tid => {
+            const name = tenantsMap[tid] || filteredBookings.find(b => b.tenantId === tid)?.tenantName || 'Recinto Externo';
+            return { name, value: tRev[tid] };
+        }).sort((a,b) => b.value - a.value).slice(0, 5));
 
         setRecentBookings(filteredBookings.slice(0, 8));
         const usageDensity = kpis.tenants > 0 ? filteredBookings.length / kpis.tenants : 0;
@@ -229,7 +232,10 @@ export default function AdminDashboard() {
             const tid = b.tenantId || 'desconocido';
             bookingsByTenant[tid] = (bookingsByTenant[tid] || 0) + 1;
         });
-        setTopOccupancy(Object.keys(bookingsByTenant).map(tid => ({ name: tenantsMap[tid] || tid, value: bookingsByTenant[tid] })).sort((a, b) => b.value - a.value).slice(0, 5));
+        setTopOccupancy(Object.keys(bookingsByTenant).map(tid => {
+            const name = tenantsMap[tid] || filteredBookings.find(b => b.tenantId === tid)?.tenantName || 'Recinto Externo';
+            return { name, value: bookingsByTenant[tid] };
+        }).sort((a, b) => b.value - a.value).slice(0, 5));
         
         setKpis(prev => ({
             ...prev,
@@ -287,41 +293,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* KPI GRID - COMPACT DNA */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <TarjetaKpi 
-                    label={isHistorical ? "GENERADO TOTAL" : "GENERADO MES"}
-                    value={formatCLP(kpis.revenue)} 
-                    sub={isHistorical ? "DESDE EL ORIGEN" : `${kpis.mrrGrowth > 0 ? '+' : ''}${kpis.mrrGrowth.toFixed(1)}% vs anterior`}
-                    icon={<BoltIcon />}
-                    brillo
-                />
-                <TarjetaKpi 
-                    label={isHistorical ? "RESERVAS TOTALES" : "RESERVAS MES"} 
-                    value={recentBookings.length >= 8 ? (isHistorical ? rawBookings.filter(b => b.status === 'confirmed' || b.status === 'completed').length : rawBookings.filter(b => {
-                        const d = b.date?.toDate ? b.date.toDate() : new Date(b.date);
-                        const [year, month] = selectedMonth.split('-').map(Number);
-                        return d.getMonth() === (month - 1) && d.getFullYear() === year && (b.status === 'confirmed' || b.status === 'completed');
-                    }).length).toString() : recentBookings.length.toString()} 
-                    sub="CONFIRMADAS"
-                    icon={<CalendarDaysIcon />}
-                />
-                <TarjetaKpi 
-                    label="VALOR CLIENTE (LTV)" 
-                    value={formatCLP(kpis.ltv)} 
-                    sub="PROMEDIO GLOBAL"
-                    icon={<SparklesIcon />}
-                />
-                <TarjetaKpi 
-                    label="TICKET PROMEDIO" 
-                    value={formatCLP(kpis.revenue > 0 ? kpis.revenue / (isHistorical ? rawBookings.filter(b => b.status === 'confirmed' || b.status === 'completed').length : rawBookings.filter(b => {
-                        const d = b.date?.toDate ? b.date.toDate() : new Date(b.date);
-                        const [year, month] = selectedMonth.split('-').map(Number);
-                        return d.getMonth() === (month - 1) && d.getFullYear() === year && (b.status === 'confirmed' || b.status === 'completed');
-                    }).length || 1) : 0)} 
-                    sub="POR RESERVA"
-                    icon={<ReceiptPercentIcon />}
-                />
-            </div>
+            <AdminKpiSection kpis={kpis} formatCLP={formatCLP} />
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
                 {/* GRAFICO Y SECCIONES IZQUIERDAS */}
@@ -495,7 +467,7 @@ export default function AdminDashboard() {
                                             <td className="px-6 py-5">
                                                 <div className="flex items-center gap-2.5">
                                                     <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]"></div>
-                                                    <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase truncate max-w-[180px]">{b.tenantName || 'Recinto Externo'}</span>
+                                                    <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase truncate max-w-[180px]">{tenantsMap[b.tenantId] || b.tenantName || 'Recinto Externo'}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5 text-center">

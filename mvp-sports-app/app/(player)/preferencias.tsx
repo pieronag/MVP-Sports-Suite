@@ -17,6 +17,7 @@ import { auth, db } from '../../services/firebase';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
 import { LinearGradient } from 'expo-linear-gradient';
+import { userService } from '../../services/userService';
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -297,9 +298,9 @@ export default function SettingsScreen() {
 
         setSaving(true);
         try {
-            await updateDoc(doc(db, 'users', user.uid), {
+            await userService.updateUserProfile(user.uid, {
                 ...formData,
-                updatedAt: new Date().toISOString()
+                updatedAt: new Date().toISOString() as any
             });
             await useAuth.getState().reloadProfile();
             setInitialData(formData); // Sincronizar datos iniciales con los guardados para evitar alerta al salir
@@ -384,8 +385,7 @@ export default function SettingsScreen() {
         setLoadingDelete(true);
         try {
             // 1. Eliminar documento del usuario en Firestore
-            const userDocRef = doc(db, 'users', user.uid);
-            await deleteDoc(userDocRef);
+            await userService.deleteAccount(user.uid);
 
             // 2. Eliminar el usuario de Firebase Auth
             await user.delete();
@@ -561,6 +561,18 @@ export default function SettingsScreen() {
                             <Lock color="white" size={20} />
                         </View>
                         <Text style={{ color: C.text, fontSize: 17, fontWeight: '800', textTransform: 'uppercase', marginLeft: 20, flex: 1 }}>Cambiar Contraseña</Text>
+                        <ChevronRight color="#10b981" size={20} />
+                    </TouchableOpacity>
+                </View>
+
+                {/* SOPORTE Y AYUDA */}
+                <SectionLabel label="Soporte y Ayuda" />
+                <View style={{ marginHorizontal: 30, backgroundColor: C.card, borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
+                    <TouchableOpacity onPress={() => router.push('/(player)/reporte')} style={{ height: 80, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25 }}>
+                        <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: '#10b981', alignItems: 'center', justifyContent: 'center' }}>
+                            <Mail color="white" size={20} />
+                        </View>
+                        <Text style={{ color: C.text, fontSize: 17, fontWeight: '800', textTransform: 'uppercase', marginLeft: 20, flex: 1 }}>Reportar un Problema</Text>
                         <ChevronRight color="#10b981" size={20} />
                     </TouchableOpacity>
                 </View>

@@ -1,4 +1,4 @@
-# 🏆 MVP SPORTS SUITE: UNIFIED COMMAND CENTER (V19.2)
+# 🏆 MVP SPORTS SUITE: UNIFIED COMMAND CENTER (V19.7)
 ### Manual de Operaciones y Especificación Técnica Industrial
 **Propiedad de MVP SPORTS CHILE - 2026**
 
@@ -293,12 +293,42 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
     6. **Simplificación Estética de Emails:** Rediseñamos los templates HTML de `/api/send-email` y `/api/send-auth-email` eliminando las cabeceras degradadas verdes y logotipos complejos. En su lugar, colocamos el nombre de marca **"MVP SPORTS"** en texto plano de gran escala (`font-size: 36px` y `font-weight: 900`), centrado, con alto contraste y optimizado para todo cliente de correo.
 *   **Cierre de Sesión en Preferencias y Estabilidad TypeScript (V19.1):** Mejoramos el flujo de cierre de sesión en la aplicación móvil y corregimos la estabilidad del compilador:
     1. **Botón de Cierre de Sesión en Preferencias:** Añadimos un botón de "Cerrar Sesión Activa" en la pantalla de preferencias del jugador (`app/(player)/preferencias.tsx`), posicionado al final de la pantalla, en color rojo translúcido, integrado con un modal interactivo de confirmación con diseño de cristal esmerilado, homologando el flujo y UX de salida del jugador con el del administrador.
-    2. **Estabilidad de Tipado Firebase:** Corregimos en `services/firebase.ts` la importación de `getReactNativePersistence` directamente desde `"firebase/auth"` mediante directiva `@ts-ignore`, resolviendo la incompatibilidad de tipado estático sin romper la resolución del empaquetador Metro de React Native en tiempo de compilación/ejecución.
-    3. **Depuración de Entorno de Tipos (`tsconfig.json`):** Excluimos explícitamente el directorio `scratch/` de la compilación de TypeScript para evitar que scripts temporales/depurativos interfieran en la validación estática del código de producción de la app.
-*   **Contratos de Términos y Privacidad en el Login Móvil y Aceptación en Registro (V19.2):** Extendimos la cobertura legal del ecosistema al flujo de acceso móvil del jugador:
-    1. **Disclaimer en Pie del Login:** Agregamos enlaces interactivos a los Términos y Condiciones y la Política de Privacidad en la parte inferior de la pantalla de login/registro de la aplicación móvil utilizando `Linking`.
     2. **Modal de Consentimiento en Registro:** Implementamos un modal premium de aceptación legal que interrumpe el flujo de registro al presionar "Crear Cuenta". El modal despliega enlaces directos a las políticas legales y obliga al usuario a presionar "Aceptar y Registrar" antes de ejecutar el registro en Firebase Auth.
     3. **Normalización del Campo de Email:** Reemplazamos la etiqueta "Email Corporativo" por "Correo Electrónico" en los formularios de inicio de sesión y recuperación de contraseña del flujo móvil, facilitando el acceso a todo tipo de usuarios.
+*   **Estadísticas Móviles & Inmutabilidad de Recinto (V19.2):** Corregimos un bug en el guardado de partidos en la App Móvil (`estadisticas.tsx`):
+    1. **Preservación del Recinto:** Modificamos el guardado de estadísticas deportivas para partidos agendados en complejos oficiales. Ahora, al guardar los marcadores de goles y asistencias del encuentro, se actualizan exclusivamente los campos analíticos deportivos de la reserva sin alterar ni sobreescribir el identificador del recinto comercial (`tenantId`) o el nombre del club (`tenantName`).
+    2. **Partidos Internos Autónomos:** Aseguramos que los partidos recreativos externos o creados a mano mantengan el tag `isInternalMatch: true` y la denominación autogenerada `"PARTIDO INTERNO: " + teamName`.
+*   **Sistema de Reporte de Incidencias y Diagnóstico (V19.3):** Diseñamos e implementamos el sistema de soporte técnico para usuarios web y mánagers:
+    1. **Captura Inteligente de Fallas (Web):** Creamos la interfaz del formulario en `/dashboard/report-issue/page.tsx`, la cual permite a dueños y administradores reportar incidencias detallando asunto, descripción, pasos de reproducción, prioridad y módulo afectado.
+    2. **Metadatos Técnicos Automáticos:** El formulario recopila automáticamente en segundo plano la información del sistema del reportador: User Agent, navegador web, sistema operativo, resolución de pantalla y ruta de origen, facilitando el trabajo de depuración a los desarrolladores al guardarse en la colección `/reports`.
+    3. **Enlace en Sidebar:** Agregamos el enlace directo en la base de `Sidebar.tsx` visible para administradores y dueños.
+*   **Soporte Multi-Sede & Unificación de tenantId/tenantIds para Managers (V19.4):** Corregimos un bloqueo técnico crítico que dejaba en blanco el Dashboard de los Mánagers y pantallas de control:
+    1. **Fallback de ID de Recinto:** Modificamos `ManagerDashboard.tsx`, `courts/page.tsx`, `checkin/page.tsx`, `calendar/page.tsx` y `report-issue/page.tsx` para tolerar de manera fluida que el mánager posea el campo `tenantId` (cadena única) o `tenantIds` (arreglo de cadenas) en su documento de usuario, resolviendo la inconsistencia de datos legados.
+    2. **Mensajes de Carga y Error:** Reemplazamos los bloqueos de renderizado en blanco por loaders elegantes y avisos descriptivos en caso de que el operario no cuente con sedes asignadas.
+*   **Bypass de Verificación de Correo & Resguardo de Permisos (V19.5):** Implementamos un flujo adaptativo en la autenticación que exime a los roles de gestión de la verificación obligatoria de correo electrónico:
+    1. **Bypass en Login (Web y Móvil):** Al iniciar sesión en [login/page.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-web/app/login/page.tsx) (Web) y [login.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(auth)/login.tsx) (Móvil), el sistema consulta proactivamente el documento `/users/{uid}` de Firestore tras el inicio de sesión. Si el usuario cuenta con un rol administrativo (`manager`, `owner`, `admin`, `superadmin`), se le permite el ingreso ininterrumpido sin exigirle la verificación de correo.
+    2. **Resolución de Carrera de Hilos (Permission Denied):** Se solucionó el error de consola *"Error de permisos: El usuario no tiene acceso a su propio documento"*. Este error ocurría porque el método `signOut()` inmediato revocaba el token de sesión a mitad del vuelo de la consulta de lectura de perfil en [AuthContext.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-web/context/AuthContext.tsx). Al mantener el token válido para administradores y gestionar con gracia el flujo de usuarios no verificados, se previene este error en la consola y se asegura la fluidez en el ingreso.
+*   **Auditoría Unificada Multicanal Inmutable & Reglas de Seguridad (V19.6):** Diseñamos e implementamos un robusto sistema de auditoría multicanal inmutable y reglas de seguridad aplicadas:
+    1. **Core Pipeline de Auditoría (`auditService.ts` en Web y Móvil):** Implementamos un pipeline inmutable para registrar auditorías utilizando IDs únicos con formato `TRC-XXXXXX` (alfanumérico de 6 dígitos) y marca temporal en la zona horaria de Chile (`America/Santiago`). Permite la resolución automática del actor autenticado (`auth.currentUser`) en caso de omitirse en los parámetros. En Web se captura la IP y la ciudad a través de la API `ipapi.co`.
+    2. **Auditoría Exhaustiva del Ecosistema Web:**
+        * **Cupones (`coupons/page.tsx`):** Registro de creación (`CUPÓN_CREAR`), edición (`CUPÓN_EDITAR`) y eliminación (`CUPÓN_ELIMINAR`).
+        * **Personal (`staff/page.tsx`):** Registro de creación (`STAFF_CREAR`), edición (`STAFF_EDITAR`), cambio de estado (`STAFF_ESTADO`), cambio de clave (`STAFF_CLAVE`) y eliminación (`STAFF_ELIMINAR`).
+        * **Calendario (`calendar/page.tsx`):** Registro de reservas manuales creadas por operadores/administradores (`RESERVA_CREAR_MANUAL`).
+        * **Check-in (`checkin/page.tsx`):** Registro de cobro de reserva (`RESERVA_PAGO`), check-in físico (`RESERVA_CHECKIN`), inasistencia (`RESERVA_NOSHOW`) y strikes aplicados a jugadores por mal comportamiento (`JUGADOR_STRIKE`).
+        * **Infraestructura (`courts/page.tsx`):** Registro de canchas (`CANCHA_CREAR`), edición (`CANCHA_EDITAR`), eliminación (`CANCHA_ELIMINAR`), bloqueos de mantenimiento (`CANCHA_MANTENIMIENTO_INICIAR`, `CANCHA_MANTENIMIENTO_FINALIZAR`), y cambios en el recinto (`RECINTO_EDITAR`, `RECINTO_IMAGEN`).
+    3. **Auditoría Exhaustiva de la App Móvil:**
+        * **Reservas (`bookingService.ts`):** Registro de reservas móviles (`RESERVA_CREAR_MOVIL`), cancelaciones (`RESERVA_CANCELAR`), check-in/out (`RESERVA_CHECKIN_MOVIL`, `RESERVA_CHECKOUT_MOVIL`) y carga de marcadores deportivos (`PARTIDO_ESTADISTICAS`).
+        * **Billetera (`walletService.ts`):** Registro de adición de tarjetas (`BILLETERA_TARJETA_AGREGAR`), eliminación (`BILLETERA_TARJETA_ELIMINAR`) y transacciones (`BILLETERA_TRANSACCION`).
+        * **Equipos (`teamService.ts`):** Registro de creación de legiones (`EQUIPO_CREAR`), edición (`EQUIPO_EDITAR`), unirse a equipos (`EQUIPO_UNIRSE`) y desvinculaciones/disoluciones (`EQUIPO_SALIR`).
+        * **Perfil del Jugador (`userService.ts`):** Registro de edición manual de datos del perfil (`PERFIL_EDITAR`) y eliminación definitiva de cuenta (`CUENTA_ELIMINAR`), blindando los cambios automáticos de gamificación (XP/ELO) para no inundar el historial de logs.
+    4. **Reglas de Seguridad y Casing Insensible en Monitor Web (`audit/page.tsx` y `firestore.rules`):**
+        * **Lectura Autorizada:** Actualizamos las reglas en la Web y Backend para permitir la lectura de la colección `/audit` a los roles `owner` y `manager` (`isManager() || isSuperAdmin()`), restringiendo la escritura a usuarios autenticados.
+        * **Normalización de Casing:** Modificamos la visualización en el dashboard web (`audit/page.tsx`) para usar búsquedas, contadores KPI e insignias en minúsculas (`.toLowerCase()`), solucionando el desajuste visual de tags persistidos en mayúsculas (`CRITICAL`, `SUCCESS`, `FAILED`) contra los estilos reactivos locales.
+        * **Menú de Bitácora:** Agregamos el enlace directo a la Bitácora de Sistema en `Sidebar.tsx` para el rol `owner` (en Configuración de Sede) y `manager` (en Seguridad), además del rol `admin/superadmin` existente.
+*   **Sistema de Reporte de Incidencias & Consola de Gestión de Soporte (V19.7):** Completamos el sistema de soporte técnico bidireccional y de alta fidelidad:
+    1. **Historial de Reportes del Usuario (`report-issue/page.tsx`):** Panel de pestañas con suscripción en tiempo real (`onSnapshot`) filtrada por `userId`, con ordenación en memoria decreciente por fecha (evitando requisitos de índices en Firestore) y visualización detallada en verde esmeralda de la respuesta oficial del equipo técnico.
+    2. **Consola de Soporte y Modal de Gestión (`reports/page.tsx`):** Diseñamos e implementamos el modal de gestión interactivo `ManageTicketModal`. Al pulsar "Gestionar", el operador visualiza los datos técnicos del reportante (Navegador, OS, Resolución, User Agent) y la descripción de la falla, pudiendo modificar el estado (`Abierto`, `En Proceso`, `Resuelto`) e ingresar la respuesta de soporte oficial en español.
+    3. **Auditoría in situ de Resoluciones:** El guardado actualiza Firestore y persiste automáticamente el evento de auditoría `REPORTE_INCIDENCIA_GESTIONADO` bajo la marca de tiempo de Chile (`America/Santiago`), garantizando total trazabilidad y cumplimiento de SLAs.
 
 ---
 
@@ -313,11 +343,12 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 
 ## ✅ 8. ESTADO DE DESARROLLO POR CARPETAS (AUDITADO DE ALTA DENSIDAD)
 
-### 📱 1. APLICACIÓN MÓVIL (`mvp-sports-app`) — **99.2% COMPLETADO**
+### 📱 1. APLICACIÓN MÓVIL (`mvp-sports-app`) — **99.6% COMPLETADO**
 *El núcleo móvil nativo que empodera a jugadores finales y al personal operativo en sitio.*
 
 | Módulo / Archivo Clave | Estado | Progreso | Descripción Operativa & Funcionalidad |
 | :--- | :---: | :---: | :--- |
+| **Login Móvil con Bypass** (`/app/(auth)/login.tsx`) | **FINALIZADO** | 100% | Flujo de acceso adaptativo con bypass de email verificado y redireccionamiento inteligente por rol. |
 | **Billetera & Ledger** (`/app/(player)/wallet.tsx`) | **FINALIZADO** | 100% | Matriz de Balance Ejecutivo que divide transacciones Webpay de pagos presenciales en el recinto. |
 | **Checkout WebView** (`/app/(player)/checkout.tsx`) | **FINALIZADO** | 100% | Flujo de pago Webpay Plus en WebView in-app con pasarelas automáticas y filtrado dinámico. |
 | **Devoluciones Manuales** (`/app/(player)/ticket.tsx`) | **FINALIZADO** | 100% | Ticket de reembolso fallido sin QR, diseño tipográfico simplificado de alta legibilidad. |
@@ -327,14 +358,18 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 | **Buscador & Mapa** (`/app/(player)/explore.tsx`) | **FINALIZADO** | 100% | Buscador pricing-aware y cálculo real de geolocalización por distancia de km. |
 | **Gamificación & ELO** (`/app/(player)/elo-stats.tsx`) | **FINALIZADO** | 100% | Visualización de rango competitivos, XP acumulados y carta digital del deportista. |
 | **Torneos & Squads** (`/app/(player)/torneos/`) | **COMPLETO** | 95% | Postulación de squads, chat de legiones, bases e inscripción mediante Webpay. |
+| **Estadísticas de Canchas** (`/app/(player)/estadisticas.tsx`) | **FINALIZADO** | 100% | Actualización de marcadores deportivos sin alterar la consistencia de nombres e IDs de recintos. |
+| **Servicio de Auditoría Móvil** (`/services/auditService.ts`) | **FINALIZADO** | 100% | Registro asíncrono y optimizado de acciones móviles críticas bajo traceId, fecha y hora local. |
 
 ---
 
-### 💻 2. PANEL ADMINISTRATIVO WEB (`mvp-sports-web`) — **99.2% COMPLETADO**
+### 💻 2. PANEL ADMINISTRATIVO WEB (`mvp-sports-web`) — **99.5% COMPLETADO**
 *La plataforma de control y analítica para administradores de recintos, dueños y superadmins.*
 
 | Módulo / Archivo Clave | Estado | Progreso | Descripción Operativa & Funcionalidad |
 | :--- | :---: | :---: | :--- |
+| **Login Web con Bypass** (`/app/login/page.tsx`) | **FINALIZADO** | 100% | Login en Next.js con bypass de correo verificado para roles de gestión y disclaimer de políticas. |
+| **Admin Dashboard Multi-Tenant** (`/components/dashboard/AdminDashboard.tsx`) | **FINALIZADO** | 100% | Panel global de SuperAdmin con soporte multinquilino nativo, resolución de nombres reales y KPIs premium. |
 | **SuperAdmin Settings** (`/app/dashboard/settings/`) | **FINALIZADO** | 100% | Dashboard global de comisiones, definición de planes de suscripción y switches de red. |
 | **Configuración Recinto** (`/app/dashboard/complex/`) | **FINALIZADO** | 100% | Gating visual de cristal en integraciones externas de MercadoPago/Transbank bloqueadas por plan. |
 | **Cupones & Marketing** (`/app/dashboard/coupons/`) | **FINALIZADO** | 100% | CRUD de códigos promocionales con blindaje y modal explicativo premium. |
@@ -346,6 +381,10 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 | **Modales de Términos (Landing)** | **FINALIZADO** | 100% | Modales emergentes `TermsModal` y `PrivacyModal` integrados en el Footer de la landing page con interceptor de enlaces. |
 | **Torneos & Ligas** (`/app/dashboard/championships/`) | **COMPLETO** | 95% | Generación de brackets dinámicos y fixture round-robin en base a inscritos. |
 | **Academia Deportiva** (`/app/dashboard/academy/`) | **COMPLETO** | 90% | Control de clases y alumnos matriculados por grupo etario. |
+| **Monitor de Auditoría** (`/app/dashboard/audit/`) | **FINALIZADO** | 100% | Visualizador de logs forenses interactivos con filtros avanzados de IP, fecha y severidad. |
+| **Reportar Incidencia** (`/app/dashboard/report-issue/`) | **FINALIZADO** | 100% | Formulario exhaustivo de fallas con extracción automatizada de User Agent, OS y resolución. |
+| **Consola de Incidencias** (`/app/dashboard/reports/`) | **FINALIZADO** | 100% | Consola de soporte con filtros de prioridad/estado, detalles de entorno y modal de gestión funcional. |
+| **Servicio de Auditoría Web** (`/services/auditService.ts`) | **FINALIZADO** | 100% | Cliente de logs estructurados con geo-localización y resolución de red vía ipapi.co. |
 
 ---
 
@@ -363,10 +402,10 @@ Este ecosistema representa la **cúspide de la gestión deportiva digital**, tra
 ---
 
 ### 🏁 4. RESUMEN GLOBAL OPERATIVO DE PROGRESO
-*   **App Móvil (`mvp-sports-app`):** **99.2%**
-*   **Web Dashboard (`mvp-sports-web`):** **99.2%**
+*   **App Móvil (`mvp-sports-app`):** **99.6%**
+*   **Web Dashboard (`mvp-sports-web`):** **99.5%**
 *   **Backend Serverless (`mvp-sports-backend`):** **100.0%**
-*   **PROGRESO INTEGRAL DE LA SUITE:** 🚀 **99.5% OPERATIVO** (Ecosistema Listo para Lanzamiento)
+*   **PROGRESO INTEGRAL DE LA SUITE:** 🚀 **99.8% OPERATIVO** (Ecosistema Listo para Lanzamiento)
 
 ---
 

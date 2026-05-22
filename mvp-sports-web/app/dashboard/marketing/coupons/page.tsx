@@ -5,6 +5,7 @@ import { db } from '@/services/firebase';
 import { collection, query, where, getDocs, addDoc, Timestamp } from 'firebase/firestore';
 import { TagIcon, PlusIcon, XMarkIcon, CheckCircleIcon, ArrowPathIcon, ExclamationTriangleIcon, PercentBadgeIcon, CalendarDaysIcon, EllipsisHorizontalCircleIcon, PencilSquareIcon, TrashIcon, SparklesIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
+import { auditService } from '@/services/auditService';
 
 function HeaderSeccion({ titulo, desc }: any) {
     return (
@@ -151,13 +152,36 @@ export default function CouponsPage() {
                 const { doc, updateDoc } = await import('firebase/firestore');
                 await updateDoc(doc(db, "coupons", editingId), payload);
                 setNotification({ msg: "Cupón actualizado", type: 'success' });
+                await auditService.logAuditEvent({
+                    action: 'CUPÓN_EDITAR',
+                    module: 'Marketing/Cupones',
+                    details: `Edición del cupón con código: ${payload.code}`,
+                    severity: 'LOW',
+                    status: 'SUCCESS'
+                });
             } else {
                 await addDoc(collection(db, "coupons"), { ...payload, uses: 0, createdAt: Timestamp.now() });
                 setNotification({ msg: "Cupón creado", type: 'success' });
+                await auditService.logAuditEvent({
+                    action: 'CUPÓN_CREAR',
+                    module: 'Marketing/Cupones',
+                    details: `Creación del cupón con código: ${payload.code}`,
+                    severity: 'LOW',
+                    status: 'SUCCESS'
+                });
             }
             setIsModalOpen(false);
             fetchData();
-        } catch (e) { setNotification({ msg: "Error al procesar", type: 'error' }); } finally { setSaving(false); }
+        } catch (e: any) { 
+            setNotification({ msg: "Error al procesar", type: 'error' }); 
+            await auditService.logAuditEvent({
+                action: editingId ? 'CUPÓN_EDITAR' : 'CUPÓN_CREAR',
+                module: 'Marketing/Cupones',
+                details: `Falla al guardar cupón: ${e.message || e}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
+        } finally { setSaving(false); }
     };
 
     const handleDelete = async (id: string) => {
@@ -172,7 +196,23 @@ export default function CouponsPage() {
                     await deleteDoc(doc(db, "coupons", id));
                     setNotification({ msg: "Cupón eliminado", type: 'success' });
                     fetchData();
-                } catch (e) { setNotification({ msg: "Error al eliminar", type: 'error' }); }
+                    await auditService.logAuditEvent({
+                        action: 'CUPÓN_ELIMINAR',
+                        module: 'Marketing/Cupones',
+                        details: `Eliminación del cupón con ID: ${id}`,
+                        severity: 'MEDIUM',
+                        status: 'SUCCESS'
+                    });
+                } catch (e: any) { 
+                    setNotification({ msg: "Error al eliminar", type: 'error' }); 
+                    await auditService.logAuditEvent({
+                        action: 'CUPÓN_ELIMINAR',
+                        module: 'Marketing/Cupones',
+                        details: `Falla al eliminar cupón con ID ${id}: ${e.message || e}`,
+                        severity: 'MEDIUM',
+                        status: 'FAILED'
+                    });
+                }
                 setConfirmData(prev => ({ ...prev, isOpen: false }));
             }
         });

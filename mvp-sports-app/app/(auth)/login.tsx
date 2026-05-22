@@ -133,7 +133,21 @@ export default function AuthScreen() {
                 const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
                 const user = userCredential.user;
 
-                if (!user.emailVerified) {
+                // REDIRECCIÓN PROACTIVA POR ROL
+                const userDocRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userDocRef);
+                let userRole = null;
+                let data = null;
+
+                if (userDoc.exists()) {
+                    data = userDoc.data();
+                    userRole = data.role;
+                }
+
+                const exemptRoles = ["manager", "owner", "admin", "superadmin"];
+                const isExempt = userRole && exemptRoles.includes(userRole);
+
+                if (!user.emailVerified && !isExempt) {
                     showAlert(
                         'Correo no verificado',
                         'Por favor verifica tu correo electrónico para activar tu cuenta. ¿Deseas recibir otro correo de verificación?',
@@ -158,12 +172,7 @@ export default function AuthScreen() {
                     return;
                 }
 
-                 // REDIRECCIÓN PROACTIVA POR ROL
-                const userDocRef = doc(db, 'users', user.uid);
-                const userDoc = await getDoc(userDocRef);
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    
+                if (userDoc.exists() && data) {
                     // Si el correo ya está verificado pero no estaba registrado en Firestore,
                     // guardamos el estado.
                     if (!data.emailVerified) {

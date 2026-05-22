@@ -1,6 +1,7 @@
 import { collection, doc, addDoc, getDocs, deleteDoc, updateDoc, Timestamp, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import { auditService } from './auditService';
 
 export interface PaymentCard {
     id?: string;
@@ -127,9 +128,25 @@ export const walletService = {
             };
 
             const docRef = await addDoc(cardsRef, newCard);
+
+            await auditService.logAuditEvent({
+                action: 'BILLETERA_TARJETA_AGREGAR',
+                module: 'Billetera/Móvil',
+                details: `Tarjeta ${brand} finalizada en ${last4} agregada exitosamente para el usuario ${userId}. ID tarjeta: ${docRef.id}.`,
+                severity: 'LOW',
+                status: 'SUCCESS'
+            });
+
             return { success: true, cardId: docRef.id };
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error adding card:', error);
+            await auditService.logAuditEvent({
+                action: 'BILLETERA_TARJETA_AGREGAR',
+                module: 'Billetera/Móvil',
+                details: `Falla al agregar tarjeta para el usuario ${userId}. Error: ${error.message || error}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
             return { success: false, error: 'No se pudo vincular la tarjeta. Intenta de nuevo.' };
         }
     },
@@ -152,7 +169,26 @@ export const walletService = {
      * Delete a card
      */
     async deleteCard(userId: string, cardId: string): Promise<void> {
-        await deleteDoc(doc(db, 'users', userId, 'cards', cardId));
+        try {
+            await deleteDoc(doc(db, 'users', userId, 'cards', cardId));
+
+            await auditService.logAuditEvent({
+                action: 'BILLETERA_TARJETA_ELIMINAR',
+                module: 'Billetera/Móvil',
+                details: `Tarjeta ${cardId} eliminada para el usuario ${userId}.`,
+                severity: 'LOW',
+                status: 'SUCCESS'
+            });
+        } catch (error: any) {
+            await auditService.logAuditEvent({
+                action: 'BILLETERA_TARJETA_ELIMINAR',
+                module: 'Billetera/Móvil',
+                details: `Falla al eliminar tarjeta ${cardId} para el usuario ${userId}. Error: ${error.message || error}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
+            throw error;
+        }
     },
 
     /**
@@ -203,9 +239,24 @@ export const walletService = {
                 createdAt: Timestamp.now()
             });
 
+            await auditService.logAuditEvent({
+                action: 'BILLETERA_TRANSACCION',
+                module: 'Billetera/Móvil',
+                details: `Carga de saldo exitosa para el usuario ${userId} por un monto de $${amount} CLP vía ${method}.`,
+                severity: 'LOW',
+                status: 'SUCCESS'
+            });
+
             return { success: true };
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error adding funds:', error);
+            await auditService.logAuditEvent({
+                action: 'BILLETERA_TRANSACCION',
+                module: 'Billetera/Móvil',
+                details: `Falla al cargar saldo para el usuario ${userId} por un monto de $${amount} CLP. Error: ${error.message || error}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
             return { success: false, error: 'Error al cargar fondos. Intenta de nuevo.' };
         }
     },
@@ -275,8 +326,34 @@ export const walletService = {
         try {
             const result = await authFn({ amount, bookingId, tenantId, cardId });
             const data = result.data as any;
+
+            if (data.success) {
+                await auditService.logAuditEvent({
+                    action: 'BILLETERA_TRANSACCION',
+                    module: 'Billetera/Móvil',
+                    details: `Pago autorizado con Oneclick exitosamente. Usuario: ${userId}, Monto: $${amount} CLP, Reserva: ${bookingId}, Recinto: ${tenantId}.`,
+                    severity: 'LOW',
+                    status: 'SUCCESS'
+                });
+            } else {
+                await auditService.logAuditEvent({
+                    action: 'BILLETERA_TRANSACCION',
+                    module: 'Billetera/Móvil',
+                    details: `Falla en autorización de pago con Oneclick para el usuario ${userId}. Monto: $${amount} CLP, Reserva: ${bookingId}.`,
+                    severity: 'LOW',
+                    status: 'WARNING'
+                });
+            }
+
             return { success: data.success };
         } catch (error: any) {
+            await auditService.logAuditEvent({
+                action: 'BILLETERA_TRANSACCION',
+                module: 'Billetera/Móvil',
+                details: `Falla técnica al autorizar pago Oneclick para el usuario ${userId}. Reserva: ${bookingId}. Error: ${error.message || error}`,
+                severity: 'LOW',
+                status: 'FAILED'
+            });
             return { success: false, error: error.message };
         }
     }

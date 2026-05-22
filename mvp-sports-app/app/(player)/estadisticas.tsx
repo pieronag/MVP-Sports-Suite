@@ -12,6 +12,7 @@ import { useAuth } from '../../store/useAuth';
 import { bookingService, Booking } from '../../services/bookingService';
 import { teamService } from '../../services/teamService';
 import { userService } from '../../services/userService';
+import { auditService } from '../../services/auditService';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
@@ -250,9 +251,7 @@ export default function EstadisticasScreen() {
                 scoreA,
                 scoreB,
                 winnerTeam: winnerTeamInput,
-                isWin,
-                isInternalMatch: true,
-                tenantName: `PARTIDO INTERNO: ${teamName}`
+                isWin
             };
 
             if (selectedMatch?.id) {
@@ -263,7 +262,9 @@ export default function EstadisticasScreen() {
                         ...matchData,
                         userId: user.uid,
                         status: 'completed',
-                        date: new Date()
+                        date: new Date(),
+                        isInternalMatch: true,
+                        tenantName: `PARTIDO INTERNO: ${teamName}`
                     });
                 }
             }
@@ -279,6 +280,19 @@ export default function EstadisticasScreen() {
                     user.uid,
                     activeUserOutcome
                 );
+
+                // Registrar auditoría de guardado de estadísticas
+                const userProfile = profile as any;
+                await auditService.logAuditEvent({
+                    action: 'REGISTRO_ESTADISTICAS',
+                    module: 'Estadísticas Jugador',
+                    details: `Registro de resultado de partido: ${scoreA} - ${scoreB} en equipo "${teamName}". IdPartido: ${selectedMatch?.id || 'Nuevo Partido Interno'}`,
+                    severity: 'LOW',
+                    status: 'SUCCESS',
+                    actor: userProfile?.displayName || user?.displayName || user?.email || 'Jugador',
+                    role: useAuth.getState().role || 'player',
+                    email: user?.email || 'anonimo@mvpsports.cl'
+                });
             }
 
             setShowStatsModal(false);

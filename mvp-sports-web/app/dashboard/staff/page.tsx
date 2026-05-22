@@ -6,6 +6,7 @@ import { updateStaffPassword } from './actions';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { collection, query, where, getDocs, addDoc, updateDoc, doc, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
+import { auditService } from '@/services/auditService';
 import {
     UserGroupIcon, BuildingStorefrontIcon, PlusIcon,
     MagnifyingGlassIcon, PhoneIcon, EnvelopeIcon,
@@ -211,6 +212,13 @@ export default function StaffPage() {
                     }
                 }
                 notify("Actualizado con éxito", "success");
+                await auditService.logAuditEvent({
+                    action: 'STAFF_EDITAR',
+                    module: 'Administración/Personal',
+                    details: `Edición de datos del personal: ${formData.fullName} (${formData.email})`,
+                    severity: 'MEDIUM',
+                    status: 'SUCCESS'
+                });
             } else {
                 const secondaryAppName = "secondaryAppForUserCreation";
                 let secondaryApp = getApps().find(app => app.name === secondaryAppName) || initializeApp(getApp().options, secondaryAppName);
@@ -234,11 +242,38 @@ export default function StaffPage() {
                     });
                     await addDoc(collection(db, "staff"), { ...staffPayload, uid: newUid, createdAt: new Date() });
                     notify("Creado con éxito", "success");
-                } catch (err: any) { notify(err.message, "error"); setIsSaving(false); return; }
+                    await auditService.logAuditEvent({
+                        action: 'STAFF_CREAR',
+                        module: 'Administración/Personal',
+                        details: `Creación de nuevo miembro de staff: ${formData.fullName} (${formData.email})`,
+                        severity: 'MEDIUM',
+                        status: 'SUCCESS'
+                    });
+                } catch (err: any) { 
+                    notify(err.message, "error"); 
+                    setIsSaving(false); 
+                    await auditService.logAuditEvent({
+                        action: 'STAFF_CREAR',
+                        module: 'Administración/Personal',
+                        details: `Falla al crear autenticación de staff ${formData.fullName}: ${err.message || err}`,
+                        severity: 'MEDIUM',
+                        status: 'FAILED'
+                    });
+                    return; 
+                }
             }
             await refetchAllStaff();
             setIsModalOpen(false);
-        } catch (e) { notify("Error al guardar", "error"); } finally { setIsSaving(false); }
+        } catch (e: any) { 
+            notify("Error al guardar", "error"); 
+            await auditService.logAuditEvent({
+                action: editingId ? 'STAFF_EDITAR' : 'STAFF_CREAR',
+                module: 'Administración/Personal',
+                details: `Falla al guardar staff en base de datos: ${e.message || e}`,
+                severity: 'MEDIUM',
+                status: 'FAILED'
+            });
+        } finally { setIsSaving(false); }
     };
 
     const requestToggleStatus = (member: StaffMember) => {
@@ -254,13 +289,30 @@ export default function StaffPage() {
                     if (member.uid) await updateDoc(doc(db, "users", member.uid), { status: newStatus });
                     setStaffList(prev => prev.map(s => s.id === member.id ? { ...s, status: newStatus } : s));
                     notify("Estado actualizado", "success");
-                } catch (e) { notify("Error al cambiar estado", "error"); }
+                    await auditService.logAuditEvent({
+                        action: 'STAFF_ESTADO',
+                        module: 'Administración/Personal',
+                        details: `Cambio de estado del personal ${member.fullName} a: ${newStatus}`,
+                        severity: 'HIGH',
+                        status: 'SUCCESS'
+                    });
+                } catch (e: any) { 
+                    notify("Error al cambiar estado", "error"); 
+                    await auditService.logAuditEvent({
+                        action: 'STAFF_ESTADO',
+                        module: 'Administración/Personal',
+                        details: `Falla al cambiar estado de ${member.fullName} a ${newStatus}: ${e.message || e}`,
+                        severity: 'HIGH',
+                        status: 'FAILED'
+                    });
+                }
                 setConfirmData(prev => ({ ...prev, isOpen: false }));
             }
         });
     };
 
     const requestDelete = (id: string, uid?: string) => {
+        const member = staffList.find(s => s.id === id);
         setConfirmData({
             isOpen: true,
             title: "Eliminar Registro",
@@ -272,7 +324,23 @@ export default function StaffPage() {
                     if (uid) await deleteDoc(doc(db, "users", uid));
                     setStaffList(prev => prev.filter(s => s.id !== id));
                     notify("Eliminado", "success");
-                } catch (e) { notify("Error al eliminar", "error"); }
+                    await auditService.logAuditEvent({
+                        action: 'STAFF_ELIMINAR',
+                        module: 'Administración/Personal',
+                        details: `Eliminación definitiva del personal: ${member ? member.fullName : id}`,
+                        severity: 'HIGH',
+                        status: 'SUCCESS'
+                    });
+                } catch (e: any) { 
+                    notify("Error al eliminar", "error"); 
+                    await auditService.logAuditEvent({
+                        action: 'STAFF_ELIMINAR',
+                        module: 'Administración/Personal',
+                        details: `Falla al eliminar personal ${member ? member.fullName : id}: ${e.message || e}`,
+                        severity: 'HIGH',
+                        status: 'FAILED'
+                    });
+                }
                 setConfirmData(prev => ({ ...prev, isOpen: false }));
             }
         });
@@ -281,8 +349,27 @@ export default function StaffPage() {
     const handleUpdatePassword = async (newPassword: string) => {
         if (!passwordModal.member?.uid) return;
         const res = await updateStaffPassword(passwordModal.member.uid, newPassword);
-        if (res.success) { notify("Clave actualizada", "success"); setPasswordModal({ isOpen: false, member: null }); }
-        else notify(res.error || "Error", "error");
+        if (res.success) { 
+            notify("Clave actualizada", "success"); 
+            setPasswordModal({ isOpen: false, member: null }); 
+            await auditService.logAuditEvent({
+                action: 'STAFF_CLAVE',
+                module: 'Administración/Personal',
+                details: `Cambio de contraseña del personal: ${passwordModal.member.fullName}`,
+                severity: 'HIGH',
+                status: 'SUCCESS'
+            });
+        }
+        else {
+            notify(res.error || "Error", "error");
+            await auditService.logAuditEvent({
+                action: 'STAFF_CLAVE',
+                module: 'Administración/Personal',
+                details: `Falla al actualizar contraseña del personal ${passwordModal.member.fullName}: ${res.error}`,
+                severity: 'HIGH',
+                status: 'FAILED'
+            });
+        }
     };
 
     const filteredStaff = staffList.filter(s => s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) && (filterVenueId === 'ALL' || (s.tenantIds && s.tenantIds.includes(filterVenueId))));
