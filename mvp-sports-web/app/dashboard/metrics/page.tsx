@@ -162,14 +162,25 @@ export default function MetricsPage() {
             // Detectar método de pago real
             const rawMethod = (b.paymentMethod || '').toLowerCase();
             const rawSource = (b.source || '').toLowerCase();
+            
+            // Lógica unificada de No-Show (idéntica a la App)
+            const isNoShow = b.status === 'no-show' || 
+                             b.paymentStatus === 'no-show' || 
+                             (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
+
             let method = 'unknown';
             let methodLabel = 'Sin Info';
-            if (rawMethod === 'card' || rawMethod === 'webpay') { method = 'webpay'; methodLabel = 'Webpay'; }
+
+            if (isNoShow) {
+                method = 'noshow';
+                methodLabel = 'No-Show';
+            } else if (rawMethod === 'card' || rawMethod === 'webpay') { method = 'webpay'; methodLabel = 'Webpay'; }
             else if (rawMethod === 'oneclick') { method = 'oneclick'; methodLabel = 'Oneclick'; }
             else if (rawMethod === 'cash' || rawMethod === 'efectivo') { method = 'cash'; methodLabel = 'Efectivo'; }
             else if (rawMethod === 'transfer' || rawMethod === 'transferencia') { method = 'transfer'; methodLabel = 'Transferencia'; }
             else if (rawSource === 'mobile_app' && b.paymentStatus === 'paid') { method = 'online'; methodLabel = 'Online App'; }
             else if (rawSource === 'manual' || rawSource === 'web_dashboard' || rawSource === 'manual_manager' || rawSource === 'manual_dashboard') { method = 'manual'; methodLabel = 'Manual'; }
+            
             return { id: b.id, bookingId: b.transactionId || `#RES-${b.id.slice(0, 4)}`, venue: b.tenantName || '---', amount: p, fee: b.commissionFee || (p * (commissionRate / 100)), time: relativeTime, method, methodLabel, paymentStatus: b.paymentStatus || 'pending' };
         }));
 
@@ -286,7 +297,7 @@ export default function MetricsPage() {
                                         <td className="px-6 py-4 text-right font-black text-slate-400">{formatCLP(tx.amount)}</td>
                                         <td className="px-6 py-4 text-right font-black text-emerald-600">{formatCLP(tx.fee)}</td>
                                         <td className="px-6 py-4 text-center">
-                                            <span className={`text-[8px] font-black px-2 py-0.5 rounded-md uppercase ${tx.method === 'webpay' || tx.method === 'oneclick' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : tx.method === 'cash' ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400' : tx.method === 'transfer' ? 'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400' : tx.method === 'online' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400'}`}>
+                                            <span className={`text-[8px] font-black px-2 py-0.5 rounded-md uppercase ${tx.method === 'noshow' ? 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400' : tx.method === 'webpay' || tx.method === 'oneclick' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : tx.method === 'cash' ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400' : tx.method === 'transfer' ? 'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400' : tx.method === 'online' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400'}`}>
                                                 {tx.methodLabel}
                                             </span>
                                         </td>

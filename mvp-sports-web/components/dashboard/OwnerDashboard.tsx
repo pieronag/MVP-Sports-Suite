@@ -375,13 +375,26 @@ export default function OwnerDashboard() {
                                         </div>
                                         <div className="text-right shrink-0">
                                             <p className="text-[10px] font-black text-slate-900 dark:text-white leading-none mb-1.5 font-mono">{formatCLP(b.totalPrice)}</p>
-                                            <span className={`text-[7px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
-                                                b.paymentStatus === 'paid' ? 'bg-emerald-500 text-white' : 
-                                                b.paymentStatus === 'partial' ? 'bg-sky-500 text-white' : 
-                                                'bg-amber-500 text-white'
-                                            }`}>
-                                                {b.paymentStatus === 'paid' ? 'PAGADO' : b.paymentStatus === 'partial' ? 'PARCIAL' : 'PENDIENTE'}
-                                            </span>
+                                            {(() => {
+                                                const isNoShow = b.status === 'no-show' || 
+                                                                 b.paymentStatus === 'no-show' || 
+                                                                 ((b as any).notes && ((b as any).notes.toLowerCase().includes('no-show') || (b as any).notes.toLowerCase().includes('inasistencia')));
+                                                
+                                                const ps = isNoShow ? 'no-show' : (b.paymentStatus || 'pending').toLowerCase();
+                                                
+                                                let style = 'bg-amber-500 text-white';
+                                                let label = 'PENDIENTE';
+                                                
+                                                if (ps === 'paid') { style = 'bg-emerald-500 text-white'; label = 'PAGADO'; }
+                                                else if (ps === 'partial') { style = 'bg-sky-500 text-white'; label = 'PARCIAL'; }
+                                                else if (ps === 'no-show') { style = 'bg-red-500 text-white'; label = 'NO-SHOW'; }
+                                                
+                                                return (
+                                                    <span className={`text-[7px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${style}`}>
+                                                        {label}
+                                                    </span>
+                                                );
+                                            })()}
                                         </div>
                                     </div>
                                 </div>

@@ -474,10 +474,18 @@ export default function AdminDashboard() {
                                                 {(() => {
                                                     const method = (b.paymentMethod || '').toLowerCase();
                                                     const source = (b.source || '').toLowerCase();
+                                                    
+                                                    const isNoShow = b.status === 'no-show' || 
+                                                                     b.paymentStatus === 'no-show' || 
+                                                                     (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
+                                                    
                                                     let label = 'Sin Info';
                                                     let style = 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400';
                                                     
-                                                    if (method === 'card' || method === 'webpay' || method === 'oneclick') {
+                                                    if (isNoShow) {
+                                                        label = 'No-Show';
+                                                        style = 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400';
+                                                    } else if (method === 'card' || method === 'webpay' || method === 'oneclick') {
                                                         label = method === 'oneclick' ? 'Oneclick' : 'Webpay';
                                                         style = 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400';
                                                     } else if (method === 'cash' || method === 'efectivo') {
@@ -511,7 +519,12 @@ export default function AdminDashboard() {
                                             </td>
                                             <td className="px-6 py-5 text-right">
                                                 {(() => {
-                                                    const ps = (b.paymentStatus || 'pending').toLowerCase();
+                                                    const isNoShow = b.status === 'no-show' || 
+                                                                     b.paymentStatus === 'no-show' || 
+                                                                     (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
+                                                    
+                                                    const ps = isNoShow ? 'no-show' : (b.paymentStatus || 'pending').toLowerCase();
+                                                    
                                                     let statusLabel = 'Pendiente';
                                                     let statusStyle = 'bg-amber-50 border-amber-100 text-amber-600 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400';
                                                     let dotColor = 'bg-amber-500';
@@ -528,6 +541,10 @@ export default function AdminDashboard() {
                                                         statusLabel = 'Reembolsado';
                                                         statusStyle = 'bg-rose-50 border-rose-100 text-rose-600 dark:bg-rose-500/10 dark:border-rose-500/20 dark:text-rose-400';
                                                         dotColor = 'bg-rose-500';
+                                                    } else if (ps === 'no-show') {
+                                                        statusLabel = 'No-Show';
+                                                        statusStyle = 'bg-red-50 border-red-100 text-red-600 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400';
+                                                        dotColor = 'bg-red-500';
                                                     }
 
                                                     return (

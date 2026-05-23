@@ -70,6 +70,7 @@ export default function CheckoutScreen() {
     const [webpayData, setWebpayData] = useState<any>(null);
     const [isNewBookingCreated, setIsNewBookingCreated] = useState(false);
     const [pendingBooking, setPendingBooking] = useState<any>(null);
+    const [hasCashNoShow, setHasCashNoShow] = useState(false);
 
     // Parámetros dinámicos (pueden ser de Reserva o de Torneo)
     const { 
@@ -108,10 +109,10 @@ export default function CheckoutScreen() {
 
     // Si la API del recinto no está configurada, forzar pago en recinto
     useEffect(() => {
-        if (!loadingTenant && !isPaymentApiActive) {
+        if (!loadingTenant && !isPaymentApiActive && !hasCashNoShow) {
             setPaymentMethod('venue');
         }
-    }, [loadingTenant, isPaymentApiActive]);
+    }, [loadingTenant, isPaymentApiActive, hasCashNoShow]);
 
     useEffect(() => {
         if (user) {
@@ -122,8 +123,29 @@ export default function CheckoutScreen() {
         }
     }, [user]);
 
+    useEffect(() => {
+        if (user?.uid) {
+            bookingService.checkUserHasCashNoShow(user.uid).then(banned => {
+                setHasCashNoShow(banned);
+                if (banned) {
+                    setPaymentMethod('card');
+                }
+            });
+        }
+    }, [user?.uid]);
+
     const handleConfirm = async () => {
         if (!user) return;
+
+        if (hasCashNoShow && !isPaymentApiActive) {
+            setCustomAlert({
+                visible: true,
+                title: 'RESERVA NO PERMITIDA',
+                message: 'ESTE RECINTO SÓLO ACEPTA PAGO EN EFECTIVO. DEBIDO A TUS INASISTENCIAS PREVIAS (NO-SHOW), TU OPCIÓN DE PAGO EN RECINTO ESTÁ DESHABILITADA.',
+                type: 'error'
+            });
+            return;
+        }
 
         setProcessing(true);
         try {
@@ -402,25 +424,37 @@ export default function CheckoutScreen() {
 
                 {/* MÉTODO DE PAGO */}
                 <SectionLabel label="Método de Pago" />
+
+                {hasCashNoShow && (
+                    <View style={{ marginHorizontal: 30, marginBottom: 15, backgroundColor: '#ef444415', padding: 15, borderRadius: 15, borderWidth: 1, borderColor: '#ef444430', flexDirection: 'row', alignItems: 'center' }}>
+                        <XCircle color="#ef4444" size={20} />
+                        <Text style={{ flex: 1, marginLeft: 10, color: '#ef4444', fontSize: 10, fontWeight: '900', textTransform: 'uppercase', lineHeight: 14 }}>
+                            Opción de pago en recinto deshabilitada debido a inasistencias previas. Sólo pago online.
+                        </Text>
+                    </View>
+                )}
+
                 <View style={{ marginHorizontal: 30, gap: 12 }}>
                     {/* OPCIÓN 1: PAGO EN RECINTO */}
-                    <TouchableOpacity 
-                        onPress={() => setPaymentMethod('venue')}
-                        style={{ 
-                            backgroundColor: C.card, borderRadius: 25, padding: 20, 
-                            borderWidth: 2, borderColor: paymentMethod === 'venue' ? activeColor : C.border,
-                            flexDirection: 'row', alignItems: 'center'
-                        }}
-                    >
-                        <View style={{ width: 45, height: 45, borderRadius: 12, backgroundColor: paymentMethod === 'venue' ? activeColor + '15' : C.bg, alignItems: 'center', justifyContent: 'center' }}>
-                            <MapPin color={paymentMethod === 'venue' ? activeColor : C.sub} size={22} />
-                        </View>
-                        <View style={{ marginLeft: 15, flex: 1 }}>
-                            <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase' }}>Pagar en el Recinto</Text>
-                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700' }}>PAGA AL LLEGAR (EFECTIVO/TRANSF)</Text>
-                        </View>
-                        {paymentMethod === 'venue' && <CheckCircle2 color={activeColor} size={20} />}
-                    </TouchableOpacity>
+                    {!hasCashNoShow && (
+                        <TouchableOpacity 
+                            onPress={() => setPaymentMethod('venue')}
+                            style={{ 
+                                backgroundColor: C.card, borderRadius: 25, padding: 20, 
+                                borderWidth: 2, borderColor: paymentMethod === 'venue' ? activeColor : C.border,
+                                flexDirection: 'row', alignItems: 'center'
+                            }}
+                        >
+                            <View style={{ width: 45, height: 45, borderRadius: 12, backgroundColor: paymentMethod === 'venue' ? activeColor + '15' : C.bg, alignItems: 'center', justifyContent: 'center' }}>
+                                <MapPin color={paymentMethod === 'venue' ? activeColor : C.sub} size={22} />
+                            </View>
+                            <View style={{ marginLeft: 15, flex: 1 }}>
+                                <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase' }}>Pagar en el Recinto</Text>
+                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700' }}>PAGA AL LLEGAR (EFECTIVO/TRANSF)</Text>
+                            </View>
+                            {paymentMethod === 'venue' && <CheckCircle2 color={activeColor} size={20} />}
+                        </TouchableOpacity>
+                    )}
 
                     {/* OPCIÓN 2: PAGO ONLINE DIRECTO (Con llave de configuración) */}
                     {isPaymentApiActive && (

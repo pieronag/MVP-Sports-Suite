@@ -41,6 +41,7 @@ interface Booking {
     totalPrice?: number;
     deposit?: number;
     sport?: string;
+    notes?: string;
 }
 
 interface CourtStatus {
@@ -411,9 +412,26 @@ export default function ManagerDashboard() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <span className={`px-2.5 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest ${b.paymentStatus === 'paid' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-amber-500 text-white shadow-lg shadow-amber-500/20'}`}>
-                                                    {b.paymentStatus === 'paid' ? 'PAGADO' : b.paymentStatus === 'partial' ? 'PARCIAL' : 'PENDIENTE'}
-                                                </span>
+                                                {(() => {
+                                                    const isNoShow = b.status === 'no-show' || 
+                                                                     b.paymentStatus === 'no-show' || 
+                                                                     (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
+                                                    const ps = isNoShow ? 'no-show' : (b.paymentStatus || 'pending').toLowerCase();
+                                                    
+                                                    let style = 'bg-amber-500 text-white shadow-lg shadow-amber-500/20';
+                                                    let label = 'PENDIENTE';
+                                                    
+                                                    if (ps === 'paid') { style = 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'; label = 'PAGADO'; }
+                                                    else if (ps === 'partial') { style = 'bg-sky-500 text-white shadow-lg shadow-sky-500/20'; label = 'PARCIAL'; }
+                                                    else if (ps === 'no-show') { style = 'bg-red-500 text-white shadow-lg shadow-red-500/20'; label = 'NO-SHOW'; }
+                                                    else if (ps === 'refunded') { style = 'bg-rose-500 text-white shadow-lg shadow-rose-500/20'; label = 'REEMBOLSADO'; }
+                                                    
+                                                    return (
+                                                        <span className={`px-2.5 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest ${style}`}>
+                                                            {label}
+                                                        </span>
+                                                    );
+                                                })()}
                                             </td>
                                         </tr>
                                     )) : (

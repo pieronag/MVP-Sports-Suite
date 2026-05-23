@@ -321,6 +321,36 @@ export const bookingService = {
             return [];
         }
     },
+
+    /**
+     * Revisa si el usuario tiene al menos un No-Show histórico con pago en recinto (cash)
+     */
+    async checkUserHasCashNoShow(userId: string): Promise<boolean> {
+        try {
+            const bookingsRef = collection(db, 'bookings');
+            const q = query(bookingsRef, where('userId', '==', userId));
+            const snap = await getDocs(q);
+            
+            for (const docSnap of snap.docs) {
+                const b = docSnap.data();
+                
+                const isNoShow = b.status === 'no-show' || 
+                                 b.paymentStatus === 'no-show' || 
+                                 b.noShow === true ||
+                                 (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
+                
+                const isCash = b.paymentMethod === 'cash' || b.paymentMethod === 'venue';
+                
+                if (isNoShow && isCash) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (error) {
+            console.error('Error checking user cash no-show:', error);
+            return false; // Por defecto permitir en caso de error de red para no bloquear legítimos
+        }
+    },
     async getVenueBookings(tenantId: string): Promise<Booking[]> {
         try {
             const bookingsRef = collection(db, 'bookings');

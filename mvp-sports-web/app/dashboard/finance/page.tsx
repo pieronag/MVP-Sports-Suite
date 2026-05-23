@@ -105,6 +105,11 @@ export default function FinancePage() {
         const unsubBookings = onSnapshot(qBookings, async (bSnap) => {
             const allBookings: Transaction[] = bSnap.docs.map(doc => {
                 const data = doc.data();
+                
+                const isNoShow = data.status === 'no-show' || 
+                                 data.paymentStatus === 'no-show' || 
+                                 (data.notes && (data.notes.toLowerCase().includes('no-show') || data.notes.toLowerCase().includes('inasistencia')));
+                
                 return {
                     id: doc.id,
                     type: 'reserva',
@@ -114,7 +119,7 @@ export default function FinancePage() {
                     details: `${data.courtName || 'Cancha'} - ${data.startTime || '--:--'}`,
                     status: data.status,
                     venueName: myVenues.find(v => v.id === data.tenantId)?.name || 'Recinto',
-                    paymentStatus: data.paymentStatus || 'pending'
+                    paymentStatus: isNoShow ? 'no-show' : (data.paymentStatus || 'pending')
                 };
             });
 
@@ -254,7 +259,7 @@ export default function FinancePage() {
                 t.clientName.toUpperCase(),
                 `${sport.toUpperCase()} - ${court.toUpperCase()}`,
                 formatCLP(t.amount),
-                (t.paymentStatus === 'paid' || t.type === 'torneo') ? 'PAGADO' : t.paymentStatus === 'partial' ? 'PARCIAL' : t.paymentStatus === 'refunded' ? 'REEMBOLSADO' : 'PENDIENTE'
+                (t.paymentStatus === 'paid' || t.type === 'torneo') ? 'PAGADO' : t.paymentStatus === 'partial' ? 'PARCIAL' : t.paymentStatus === 'refunded' ? 'REEMBOLSADO' : t.paymentStatus === 'no-show' ? 'NO-SHOW' : 'PENDIENTE'
             ];
         });
 
@@ -449,6 +454,8 @@ export default function FinancePage() {
                                                         return <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase text-sky-500 bg-sky-500/10 border border-sky-500/10"><div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>Parcial</div>;
                                                     } else if (ps === 'refunded') {
                                                         return <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase text-rose-500 bg-rose-500/10 border border-rose-500/10"><div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div>Reembolsado</div>;
+                                                    } else if (ps === 'no-show') {
+                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase text-red-500 bg-red-500/10 border border-red-500/10"><div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>No-Show</div>;
                                                     } else {
                                                         return <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase text-amber-500 bg-amber-500/10 border border-amber-500/10"><div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>Pendiente</div>;
                                                     }
