@@ -11,7 +11,8 @@ import {
     CalendarDaysIcon, PhoneIcon, CreditCardIcon, BanknotesIcon, CommandLineIcon,
     ShieldCheckIcon, Cog6ToothIcon, BriefcaseIcon, AtSymbolIcon, UserGroupIcon,
     KeyIcon, ClockIcon, ScaleIcon, ChatBubbleBottomCenterTextIcon, GlobeAltIcon,
-    IdentificationIcon, StarIcon, MapIcon, FireIcon, BuildingStorefrontIcon
+    IdentificationIcon, StarIcon, MapIcon, FireIcon, BuildingStorefrontIcon,
+    PhotoIcon, CloudArrowUpIcon, TrashIcon, XMarkIcon
 } from '@heroicons/react/24/outline';
 
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {

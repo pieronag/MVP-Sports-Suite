@@ -36,6 +36,7 @@ export interface Tenant {
         api?: boolean;
         multiRecinto?: boolean;
     };
+    gallery?: string[];
 }
 
 export interface Court {
@@ -81,7 +82,8 @@ const processTenantData = (id: string, raw: any): Tenant => {
         coordinates: coords,
         address: raw.coordinates?.fullAddress || raw.address || 'Ubicación no disponible',
         priorityScore: raw.priorityScore !== undefined ? raw.priorityScore : 10,
-        features: raw.features || { seo: true, topPosition: false, ads: false, analytics: true }
+        features: raw.features || { seo: true, topPosition: false, ads: false, analytics: true },
+        gallery: Array.isArray(raw.gallery) ? raw.gallery : []
     } as Tenant;
 };
 

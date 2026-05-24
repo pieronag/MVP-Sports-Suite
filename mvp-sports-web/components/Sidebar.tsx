@@ -146,7 +146,7 @@ export default function Sidebar() {
                         </MenuGroup>
                         <MenuGroup title="Gestión Deportiva">
                             <NavItem href="/dashboard/calendar" active={pathname?.includes("/calendar")} icon={<CalendarDaysIcon />} onClick={() => setMobileOpen(false)}>Agenda Inteligente</NavItem>
-                            <NavItem href="/dashboard/championships" active={pathname?.includes("/championships")} icon={<TrophyIcon />} onClick={() => setMobileOpen(false)}>Ligas y Torneos</NavItem>
+                            <NavItem href="/dashboard/tournaments" active={pathname?.includes("/tournaments")} icon={<TrophyIcon />} onClick={() => setMobileOpen(false)}>Ligas y Torneos</NavItem>
                             <NavItem href="/dashboard/academy" active={pathname?.includes("/academy")} icon={<AcademicCapIcon />} onClick={() => setMobileOpen(false)}>Academias Deportivas</NavItem>
                             <NavItem href="/dashboard/courts" active={pathname?.includes("/courts")} icon={<MapIcon />} onClick={() => setMobileOpen(false)}>Infraestructura</NavItem>
                         </MenuGroup>

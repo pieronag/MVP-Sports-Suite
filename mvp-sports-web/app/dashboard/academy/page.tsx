@@ -47,7 +47,7 @@ export default function AcademyPage() {
     const INITIAL_FORM_STATE = {
         name: '', instructor: '', ageGroup: 'libre', price: '', 
         maxStudents: 20, startDate: '', endDate: '', startTime: '', 
-        endTime: '', daysOfWeek: [] as string[], description: ''
+        endTime: '', daysOfWeek: [] as string[], description: '', alertDays: 3
     };
     const [formData, setFormData] = useState(INITIAL_FORM_STATE);
 
@@ -82,6 +82,7 @@ export default function AcademyPage() {
                 ownerId: user.uid,
                 price: Number(formData.price),
                 maxStudents: Number(formData.maxStudents),
+                alertDays: Number(formData.alertDays),
             };
 
             if (isEditing) {
@@ -249,9 +250,10 @@ export default function AcademyPage() {
                                         <InputGroupPremium label="H. Inicio" type="time" value={formData.startTime} onChange={(e: any) => setFormData({ ...formData, startTime: e.target.value })} />
                                         <InputGroupPremium label="H. Fin" type="time" value={formData.endTime} onChange={(e: any) => setFormData({ ...formData, endTime: e.target.value })} />
                                     </div>
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                         <InputGroupPremium label="Mensualidad ($)" type="number" value={formData.price} onChange={(e: any) => setFormData({ ...formData, price: e.target.value })} icon={<CurrencyDollarIcon className="w-4 h-4" />} />
                                         <InputGroupPremium label="Cap. Alumnos" type="number" value={formData.maxStudents} onChange={(e: any) => setFormData({ ...formData, maxStudents: e.target.value })} icon={<UserGroupIcon className="w-4 h-4" />} />
+                                        <InputGroupPremium label="Días de Alerta" type="number" value={formData.alertDays} onChange={(e: any) => setFormData({ ...formData, alertDays: e.target.value })} icon={<ClockIcon className="w-4 h-4" />} placeholder="Ej: 3" />
                                     </div>
                                 </div>
 

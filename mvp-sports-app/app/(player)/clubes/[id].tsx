@@ -309,12 +309,34 @@ export default function VenueDetailsScreen() {
                     <>
                         {/* HERO SECTION */}
                 <View style={{ width: SCREEN_WIDTH, aspectRatio: 1.6, backgroundColor: isDark ? '#0F172A' : '#F8FAFC' }}>
-                    <Image
-                        source={{ uri: venue?.imageUrl || 'https://images.unsplash.com/photo-1595435064215-68d148332009' }}
-                        style={StyleSheet.absoluteFill}
-                        contentFit="cover"
-                    />
-                    <LinearGradient colors={['rgba(0,0,0,0.3)', 'transparent']} style={StyleSheet.absoluteFill} />
+                    {venue?.gallery && venue.gallery.length > 0 ? (
+                        <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} style={StyleSheet.absoluteFill}>
+                            {venue.gallery.map((img: string, idx: number) => (
+                                <View key={idx} style={{ width: SCREEN_WIDTH, height: '100%' }}>
+                                    <Image source={{ uri: img }} style={StyleSheet.absoluteFill} contentFit="cover" />
+                                    <LinearGradient colors={['rgba(0,0,0,0.4)', 'transparent', 'rgba(0,0,0,0.4)']} style={StyleSheet.absoluteFill} />
+                                </View>
+                            ))}
+                        </ScrollView>
+                    ) : (
+                        <>
+                            <Image
+                                source={{ uri: venue?.imageUrl || 'https://images.unsplash.com/photo-1595435064215-68d148332009' }}
+                                style={StyleSheet.absoluteFill}
+                                contentFit="cover"
+                            />
+                            <LinearGradient colors={['rgba(0,0,0,0.3)', 'transparent']} style={StyleSheet.absoluteFill} />
+                        </>
+                    )}
+
+                    {/* Pagination indicators for gallery */}
+                    {venue?.gallery && venue.gallery.length > 1 && (
+                        <View style={{ position: 'absolute', bottom: 20, width: '100%', flexDirection: 'row', justifyContent: 'center', gap: 6 }}>
+                            {venue.gallery.map((_: string, idx: number) => (
+                                <View key={idx} style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.5)' }} />
+                            ))}
+                        </View>
+                    )}
 
                     <TouchableOpacity onPress={handleBack} style={{ position: 'absolute', top: 50, left: 25, width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
                         <ChevronLeft color="white" size={24} />

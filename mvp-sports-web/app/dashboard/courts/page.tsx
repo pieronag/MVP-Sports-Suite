@@ -55,6 +55,7 @@ interface Venue {
     pricing: SportPricing;
     realCourtCount?: number;
     features?: any;
+    gallery?: string[];
 }
 
 interface Court {
@@ -292,6 +293,40 @@ export default function CourtsPage() {
                     status: 'FAILED'
                 });
             } finally { setVenueImageLoading(false); }
+        }
+    };
+
+    const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0 && selectedVenue) {
+            const currentGallery = selectedVenue.gallery || [];
+            if (currentGallery.length >= 6) {
+                showToast("Máximo 6 fotos permitidas", 'error');
+                return;
+            }
+            try {
+                const base64 = await compressImage(e.target.files[0]);
+                const newGallery = [...currentGallery, base64];
+                await updateDoc(doc(db, "tenants", selectedVenue.id), { gallery: newGallery });
+                setSelectedVenue({ ...selectedVenue, gallery: newGallery });
+                setVenues(prev => prev.map(v => v.id === selectedVenue.id ? { ...v, gallery: newGallery } : v));
+                showToast("Foto añadida a galería", 'success');
+            } catch (error) {
+                showToast("Error al subir foto", 'error');
+            }
+        }
+    };
+
+    const handleRemoveGalleryImage = async (index: number) => {
+        if (!selectedVenue) return;
+        const currentGallery = selectedVenue.gallery || [];
+        const newGallery = currentGallery.filter((_, i) => i !== index);
+        try {
+            await updateDoc(doc(db, "tenants", selectedVenue.id), { gallery: newGallery });
+            setSelectedVenue({ ...selectedVenue, gallery: newGallery });
+            setVenues(prev => prev.map(v => v.id === selectedVenue.id ? { ...v, gallery: newGallery } : v));
+            showToast("Foto eliminada", 'success');
+        } catch (error) {
+            showToast("Error al eliminar foto", 'error');
         }
     };
 
@@ -726,6 +761,29 @@ export default function CourtsPage() {
                                     {venueImageLoading && <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center"><ArrowPathIcon className="w-8 h-8 text-white animate-spin" /></div>}
                                 </div>
                                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleVenueImageUpload} />
+                            </PanelGlass>
+
+                            <PanelGlass className="p-8 rounded-xl overflow-hidden group">
+                                <HeaderSeccion titulo="Galería Fotográfica" desc="Imágenes del Recinto para App Móvil (Max 6)" icon={PhotoIcon} />
+                                <div className="grid grid-cols-2 gap-4">
+                                    {(selectedVenue.gallery || []).map((img, idx) => (
+                                        <div key={idx} className="relative aspect-video rounded-xl overflow-hidden group border border-slate-100 dark:border-white/5 shadow-md">
+                                            <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <button onClick={() => handleRemoveGalleryImage(idx)} className="p-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors shadow-lg">
+                                                    <TrashIcon className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {(selectedVenue.gallery || []).length < 6 && (
+                                        <div className="relative aspect-video rounded-xl border-2 border-dashed border-slate-200 dark:border-white/10 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-white/5 transition-all group">
+                                            <PhotoIcon className="w-6 h-6 text-slate-300 dark:text-white/20 group-hover:text-emerald-500 transition-colors" />
+                                            <span className="text-[8px] font-black uppercase text-slate-400">Añadir Foto</span>
+                                            <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleGalleryUpload} />
+                                        </div>
+                                    )}
+                                </div>
                             </PanelGlass>
 
                             <PanelGlass className="p-8 rounded-xl">

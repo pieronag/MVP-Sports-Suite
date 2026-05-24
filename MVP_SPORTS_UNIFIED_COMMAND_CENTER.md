@@ -5,418 +5,120 @@
 ---
 
 ### 📂 ESTRUCTURA GENERAL DE DOCUMENTOS LEGALES (RAÍZ)
-*   **Términos y Condiciones:** [TERMINOS_Y_CONDICIONES.md](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/TERMINOS_Y_CONDICIONES.md) — Define las reglas operativas, comisiones (10%), políticas de cancelación (2 horas) y uso de billetera virtual.
-*   **Políticas de Privacidad:** [POLITICA_DE_PRIVACIDAD.md](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/POLITICA_DE_PRIVACIDAD.md) — Normas de protección de datos bajo la Ley N° 19.628 de Chile, detallando almacenamiento y derechos ARCO.
+*   **Términos y Condiciones:** [TERMINOS_Y_CONDICIONES.md](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/TERMINOS_Y_CONDICIONES.md) — Reglas operativas, comisiones y políticas de uso.
+*   **Políticas de Privacidad:** [POLITICA_DE_PRIVACIDAD.md](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/POLITICA_DE_PRIVACIDAD.md) — Protección de datos bajo la Ley N° 19.628 de Chile.
 
 ---
 
 ## 🏗️ 1. FILOSOFÍA DE INGENIERÍA: EXTREME ELITE™
-Este ecosistema representa la **cúspide de la gestión deportiva digital**, transformando complejos deportivos en centros operativos de alto rendimiento. Bajo la arquitectura **Multi-Tenant SaaS**, el sistema elimina la fricción operativa mediante interfaces de alta densidad (**Executive Slim UI**), motores de precios dinámicos y una infraestructura móvil de baja latencia impulsada por Expo y React Native.
-
-### 🎨 Principios de Diseño Industrial:
-*   **Executive Slim UI:** Grillas de alta densidad para supervisión operativa rápida sin fatiga cognitiva.
-*   **Zero-Friction Booking:** Flujos progresivos con lógica de auto-selección inteligente de deportes.
-*   **High-Contrast Platinum:** Paleta de colores optimizada para entornos profesionales (Negro Puro, Platinum Gray y Azure Blue).
-*   **Real-Time Synchronization:** Motor de base de datos proactivo con 0 sobre-reservas garantizadas.
+Bajo la arquitectura **Multi-Tenant SaaS**, el sistema elimina la fricción operativa mediante interfaces de alta densidad (**Executive Slim UI**), motores de precios dinámicos y una infraestructura móvil de baja latencia impulsada por Expo y React Native.
 
 ---
 
-## 🏬 2. MÓDULO SUPER-ADMIN & CONTROL GLOBAL (ELITE COMMAND)
+## 💻 2. MÓDULO SUPER-ADMIN & CONTROL GLOBAL (ELITE COMMAND)
 *El nivel de acceso más alto para la gestión del ecosistema completo.*
-
-*   **Global Sales Intel:** Visualización de GMV total y gestión de comisiones del 8% automatizadas.
-*   **Tenant Operations Center:** Dashboard de control para el alta y baja de recintos deportivos (Tenants).
-*   **Global User Statistics:** Analytics de población de jugadores, rankings globales y mapas de calor por ubicación.
-*   **System Audit Log:** Historial técnico de cambios inmutables por usuario para seguridad forense.
-*   **Gamification Engine Config:** Central de mando para definir niveles de XP, reglas de tiers y recompensas globales.
-*   **Billing & SaaS Ledger:** Gestión de facturación por servicios SaaS y estados de suscripción de recintos.
-
----
+*   **Global Sales Intel:** Visualización de GMV total y gestión de comisiones.
+*   **Tenant Operations Center:** Alta y baja de recintos deportivos (Tenants).
+*   **System Audit Log:** Historial técnico de cambios inmutables.
+*   **Billing & SaaS Ledger:** Gestión de facturación por servicios SaaS.
 
 ## 🏟️ 3. MÓDULO DUEÑO DE RECINTO (OWNER DASHBOARD)
 *Gestión táctica y financiera para propietarios de complejos deportivos.*
-
-*   **Agenda & Master Calendar:** Control absoluto de bloques horarios por cancha con filtros por deporte.
-*   **Financial Hub Pro:** Métricas de ocupación, ingresos diarios y deudores en una sola vista HUD.
-*   **Tournament Motor:** Creación y gestión de ligas, torneos de eliminación directa y fases de grupos.
-*   **Sports Academy:** Gestión de clases, escuelas deportivas, listas de alumnos y profesores.
-*   **Asset Management:** CRUD de canchas con especificaciones técnicas (Superficie FIFA, Iluminación LED, Outdoor).
-*   **Marketing & Coupons:** Generación de códigos promocionales dinámicos con límites de uso y fechas de expiración.
-*   **Staff Permissions Matrix:** Gestión de empleados con asignación de roles (Manager/Operador) y accesos específicos.
-*   **Public Profile Customizer:** Gestión de imágenes (Base64), geolocalización real y servicios del recinto (Duchas, WiFi, Parking).
-
----
+*   **Agenda & Master Calendar:** Control absoluto de bloques horarios por cancha.
+*   **Financial Hub Pro:** Métricas de ocupación e ingresos diarios.
+*   **Marketing & Coupons:** Códigos promocionales dinámicos (V18.0).
+*   **Staff Permissions Matrix:** Gestión de roles y permisos.
 
 ## 🛠️ 4. MÓDULO MANAGER & OPERATIVO (STAFF HUD)
 *Herramientas críticas para el personal en sitio.*
-
-*   **Operational Dashboard:** Vista simplificada con foco exclusivo en la ocupación del turno actual. Incorpora la grilla de alta densidad de próximas reservas ordenadas cronológicamente de forma descendente, con desglose de deporte, monto total cobrado y señas para pagos parciales.
-*   **Tunnel View QR Validator:** Escáner inmersivo de alta velocidad con cámara aislada en recuadro dinámico (proporción vertical `70vh` por altura) sobre fondo negro puro, tasa de procesamiento a 30 FPS, optimización de exposición y rango de interés de escaneo optimizado al 80% para pantallas móviles brillantes.
-*   **Check-in Visual Badges:** Sistema de estados premium de afluencia (Acceso OK / Anulada) mediante píldoras translúcidas de color esmeralda y rojo con iconos de alta resolución (`ShieldCheckIcon`, `NoSymbolIcon`) y difuminados de opacidad/escala de grises automáticos para filas no operativas.
-*   **Manual Booking Override:** Capacidad para realizar reservas manuales o bloqueos técnicos preventivos.
-*   **Feedback Monitor:** Visualización y respuesta a opiniones de clientes en tiempo real.
-
----
+*   **Operational Dashboard:** Vista simplificada para ocupación en tiempo real.
+*   **Tunnel View QR Validator:** Escáner inmersivo de alta velocidad (30 FPS).
+*   **Manual Booking Override:** Capacidad para bloqueos técnicos o manuales.
 
 ## 📱 5. MOBILE APP EXPERIENCE (ELITE PLAYER)
-*La interfaz maestra para el usuario final diseñada para máxima conversión.*
-
-*   **Explore & Map Hub:** Buscador dinámico "Pricing-Aware" con cálculo de distancia real en KM.
-*   **Wizard Mode Booking:** Proceso guiado de 3 pasos (Deporte > Cancha > Fecha) con checkout integrado.
-*   **Direct Payment Checkout:** Flujo de pago online simplificado a través de **Transbank Webpay Plus** directo en un WebView in-app. Elimina la fricción de enrolamiento previo de tarjetas (Oneclick) cobrando al instante con tarjetas de débito/crédito.
-*   **Gateway Gating & Smart Filter:** Si el dueño del recinto (`tenantId`) no tiene activa o configurada su API de pagos (ej: faltan llaves Transbank o switch `paymentApiActive: false`), el app móvil restringe automáticamente el checkout a mostrar **únicamente** la opción **"Pagar en el Recinto"** (pago presencial/transferencia).
-*   **Unified Transaction Ledger (Billetera V16.0):** Billetera digital re-diseñada con enfoque exclusivo en transparencia financiera. Remueve toda la interfaz de enrolamiento de tarjetas físicas para seguridad absoluta y presenta una **Matriz de Balance Ejecutivo** que separa dinámicamente el monto total de "Pago Online" (transaccionado vía Webpay Plus) de los "Pagos en Recinto" (por rendir presencialmente) para una contabilidad y conciliación impecable.
-*   **MVP Card & Digital ID:** Identidad deportiva con nivel XP, Tier Badge y QR de acceso personal.
-*   **Performance Analytics:** Dashboard táctico con Radar Charts de habilidades y evolución de rango ELO.
-*   **Squad Legions (Teams):** Creación de legiones, reclutamiento de jugadores y desafíos entre equipos comunitarios.
-*   **History & Active Passes:** Filtros rápidos para gestionar reservas pasadas y tickets activos.
+*La interfaz maestra para el usuario final.*
+*   **Explore & Map Hub:** Buscador dinámico con geolocalización.
+*   **Direct Payment Checkout:** Transbank Webpay Plus integrado.
+*   **Unified Transaction Ledger:** Billetera digital y transparencia financiera.
+*   **Performance Analytics & ELO:** Radar Charts y topes anti-fraude V18.1.
 
 ---
 
-## ⚙️ 6. AVANCED TECHNICAL ENGINES (CORE LOGIC)
-*   **Pricing Matrix Algorithm:** Cálculo dinámico basado en Deporte + Hora (Pico/Valle) + Día de la semana.
-*   **SaaS Feature Gating:** Bloqueo/desbloqueo de módulos según nivel de suscripción del recinto (Free vs Elite).
-*   **ELO Algorithm (V5.0):** Cálculo de reputación y nivel competitivo basado en el historial de partidos.
-*   **Webpay Plus Payment Pipeline:** Invocación segura mediante la Cloud Function `createWebpayTransaction` en la región `southamerica-west1` y captura de redirecciones móviles (`mvpdeportes://checkout/success` / `error`) para actualizar en tiempo real el pago a `approved` en Firestore y registrar el equipo o confirmar la reserva de cancha de manera instantánea.
-*   **Base64 Image Pipeline:** Sincronización triple de perfiles de usuario (Firestore `users`, Firestore `staff` y Firebase Auth) estandarizado en codificación serializada Base64 con prefijo MIME, eliminando enlaces volátiles o problemas de caché inter-plataformas.
-*   **Self-Staff Authorization Rules:** Reglas de seguridad en Firestore `/staff/{staffId}` optimizadas para habilitar a los administradores de recintos actualizar de forma ininterrumpida sus perfiles operativos sin depender de tokens heredados lentos.
-*   **Multi-Sede Staff Logic:** Permite que un operario encuentre y gestione múltiples recintos bajo una sola identidad digital.
-*   **Resend Email Notification Pipeline (V16.1):** Endpoint API de Next.js `/api/send-email` integrado y optimizado para ejecutarse en entornos serverless (Vercel). Envía automáticamente correos electrónicos de bienvenida premium utilizando plantillas HTML de alta fidelidad estilo dark-mode, con fallback seguro para desarrollo local si la variable `RESEND_API_KEY` no está configurada, previniendo fallos en el registro de usuarios.
-*   **Zero-Dependency Serverless Architecture Refactor (V16.2):** Se eliminó el motor de cron jobs y endpoints de fondo (`/api/cron/check-no-shows` y `vercel.json`). Esta decisión optimiza el consumo de recursos serverless y simplifica la arquitectura al delegar la gestión del ciclo de vida de las reservas en la lógica autolimpiable del frontend de checkout (`checkout.tsx`) y en el control interactivo manual del calendario maestro del administrador (`calendar/page.tsx`), garantizando un funcionamiento fluido con cero dependencias externas.
-*   **Player Account Control & Deletion Engine (V16.3):** Botones y modales interactivos de confirmación integrados en `perfil.tsx`. El botón "Cerrar Sesión" ahora activa un modal de validación táctil con advertencias y detalles de sesión, mientras que el botón "Eliminar Cuenta Definitivamente" despliega un modal de alta visibilidad (rojo peligro) que detalla de forma exhaustiva que se eliminarán las credenciales de Firebase Auth y el documento `/users/{uid}`, mientras que las reservas e historial de juego se conservarán de forma anónima para análisis contable y de auditoría de los dueños de recintos. Ejecuta de forma nativa la baja con control de reautenticación segura (`auth/requires-recent-login`).
-*   **Tenant Load Reference Error Fix & Refresh (V16.4):** Se corrigió un error de referencia crítico (`ReferenceError: tenantRef is not defined`) en la página de administración de recintos web (`app/dashboard/tenants/page.tsx`). Al calcular y de-duplicar las valoraciones reales de cada complejo deportivo para sincronizarlas con Firestore, el código intentaba actualizar el documento utilizando la referencia `tenantRef` sin haberla declarado previamente, rompiendo la promesa asíncrona de carga global y dejando la sección web de recintos en blanco. Se declaró correctamente `tenantRef` utilizando `doc(db, "tenants", tenantId)` resolviendo el bloqueo de renderizado en el Dashboard. Adicionalmente, se unificó la barra de herramientas y filtros implementando exactamente el mismo diseño premium y el componente reutilizable `BotonAccion` de la sección de *Usuarios*, garantizando una consistencia visual de primer nivel a lo largo de toda la suite administrativa.
-*   **Case-Insensitive Plan Mapping & Billing Fix (V16.5):** Se resolvió una inconsistencia crítica de planes en la pantalla de *Billing & Subscription* (`app/dashboard/billing-subscription/page.tsx`). Anteriormente, al cargar el listado de recintos vinculados al usuario, el código dependía estrictamente del campo `planId` de Firestore (el cual era inexistente en registros creados manualmente o legados, que solo almacenaban el valor en el campo `plan: "Elite"`). Al no haber coincidencia exacta de ID, el sistema aplicaba por defecto el plan `Básico` o `free` en la interfaz. Implementamos una búsqueda insensible a mayúsculas/minúsculas (`.toLowerCase()`) que compara el valor dinámico de `planId` o `plan` con la ID y el Nombre de los planes oficiales cargados globalmente, garantizando que el plan correcto (ej. `"Elite"`) se asigne y renderice de manera impecable en pantalla sin alterar los datos del documento de origen.
-*   **SaaS Feature Gating & Transitive Plan Propagation (V17.0):** Implementamos un motor de restricción y limitación de características premium a nivel de SaaS basado en el plan contratado por cada recinto (Free, Básico, Pro, Elite). Las modificaciones y propagaciones consisten en:
-    1. **Sincronización Transitiva en Cambios de Núcleo:** Actualizamos la función `handleSave` en el dashboard de administración global (`app/dashboard/settings/page.tsx`) para copiar de forma transitiva y dinámica el mapa de características (`features`) de cada plan directamente a todos los documentos de recintos en Firestore en el momento que un superadmin modifique o actualice los parámetros de planes de la plataforma.
-    2. **Estructura Oficial de Planes:** Actualizamos la definición `DEFAULT_SETTINGS` para reflejar la matriz de 4 planes reales de MVP Sports con sus respectivos precios, comisiones, puntuaciones de prioridad y mapas de features (Free a 8%, Básico a 7%, Pro a 6%, Elite a 5%).
-    3. **Bloqueo Inteligente de Marketing & Cupones:** Enlazamos el estado en tiempo real del recinto en el `Sidebar` para mostrar un candado dorado de "Upgrade" al lado de *Marketing y Cupones* si no cuenta con el feature activo (redirigiendo a la pantalla de licenciamiento). De forma complementaria, blindamos el acceso directo en `coupons/page.tsx` inyectando un protector visual premium completo con diseño de cristal esmerilado que destaca las ventajas de los cupones e impulsa a mejorar el plan a Elite.
-    4. **Integración Limitada de APIs y SII:** En la pantalla de Configuración del Recinto (`complex/page.tsx`), inyectamos un blindaje táctil-visual en el grid de integraciones externas (MercadoPago, Transbank y SII Facturación Electrónica), cubriendo dichos módulos con un overlay de cristal y un llamado a la acción para actualizar a Elite si el recinto no posee el permiso `api` activo.
-    5. **Gestión de Sedes Únicas:** Optimizamos el flujo en `courts/page.tsx` para recintos con plan restrictivo de sede única (`multiRecinto: false`). Si el dueño tiene desactivada esta opción, el sistema selecciona automáticamente su única sede deportiva omitiendo la pantalla de selección inicial y oculta de forma permanente el botón de retroceso de cabecera, logrando un anclaje impecable y seguro a su único recinto.
-*   **Platform-Level Payment Gateway Disabling & Override (V17.1):** Añadimos un canal de validación cruzada y restricción absoluta para pasarelas de pago externas:
-    1. **Sincronización en Configuración de Recinto:** En la pantalla `complex/page.tsx`, integramos la comprobación de los estados globales de pasarelas de pago (`globalSettings.paymentGateways`). Si el superadmin desactiva MercadoPago o Transbank en la configuración global, las correspondientes tarjetas de pasarelas en la sección del dueño son forzadas a estado desactivado visualmente (`opacity-40 grayscale`) y se bloquea completamente su manipulación agregando un mensaje descriptivo de advertencia: *"Desactivado por Plataforma"*.
-    2. **Propagación Absoluta a Firestore:** Blindamos la función de guardado `handleSave` en el panel de recinto para sobrescribir y forzar las banderas `isMercadopagoActive` y `isTransbankActive` en `false` si el superadmin las ha inhabilitado globalmente, previniendo cualquier guardado inconsistente en la base de datos de Firestore.
-    3. **Compatibilidad Estricta de Tipos TypeScript:** Corregimos dos errores de compilación (`tsconfig.json`) en la suite: agregamos `priorityScore` al tipo `Plan` in `billing-subscription/page.tsx` y agregamos la importación correcta de `SparklesIcon` en `coupons/page.tsx`, logrando compilar el 100% de la aplicación web con cero advertencias y cero errores de TypeScript.
-*   **Manager Profile Dark Mode Switch & Unified Branding (V17.2):** Implementamos el modo oscuro táctil en el perfil del manager y solucionamos incompatibilidades críticas de Expo:
-    1. **Switch Nativo de Modo Oscuro:** En el perfil del manager (`app/(owner)/perfil.tsx`), reemplazamos el antiguo botón estático por un componente `Switch` nativo de React Native con colores armónicos y optimizados para la marca, permitiendo alternar la visualización entre modo claro y oscuro de manera inmediata.
-    2. **Estandarización de Footer:** Unificamos la marca corporativa del pie de página en el perfil del manager para coincidir exactamente con el del jugador final: ` MVP SPORTS CHILE • 2026`.
-    3. **Corrección Typográfica Mobile:** Corregimos los valores incorrectos de `fontWeight: '750'` a `"700"` en el perfil del jugador (`app/(player)/(tabs)/perfil.tsx`), que bloqueaban el motor de renderizado de React Native e impedían la compilación de la app.
-*   **Double-Layer No-Show Engine & Real-Time Local Time Sync (V17.3):** Blindamos el motor de cancelaciones automáticas sincronizando el backend y el frontend con la hora local de Chile:
-    1. **Sincronización de Servidor en Zona Horaria Local:** Modificamos la API serverless `/api/cron/check-no-shows` para calcular tanto la hora actual (`now`) como las horas de reserva basándose explícitamente en el huso de Santiago de Chile (`America/Santiago`), previniendo desajustes UTC (de hasta 4 horas de diferencia) que posponían la ejecución del cron.
-    2. **Validador Proactivo In-App:** Diseñamos un cargador inteligente en el panel del mánager (`app/(owner)/index.tsx`) que ejecuta una validación de No-Show local sobre las reservas cargadas tan pronto se carga el panel o se refresca la pantalla, actualizando Firestore al instante.
-    3. **Intervalo Programado de Segundo Plano:** Programamos un temporizador cíclico que activa el verificador automáticamente cada 15 minutos en la app móvil mientras el mánager está en el panel, operando en perfecta consonancia con el cron job de Vercel.
-    4. **Diferenciación Visual del Motivo de Cancelación:** Introdujimos badges inteligentes en la grilla del mánager para reservas anuladas, leyendo el estado transaccional para distinguir de forma visual y transparente si una reserva finalizó como `CANCELADO POR NO-SHOW` (inasistencia impaga) o `CANCELADO POR JUGADOR` (anulación voluntaria).
-*   **Precision Timezone Mappings & Double-Modal Manual Workflows (V17.4):** Perfeccionamos el control operativo manual y la precisión matemática del No-Show:
-    1. **Combinación Precisa de Fecha y Hora:** Corregimos la comparación temporal en el backend cron (`route.ts`), reservas del jugador (`reservas.tsx`) y panel del mánager (`index.tsx`). Ahora se parsea y combina explícitamente la fecha (`booking.date`) con las horas y minutos exactos del partido (`booking.startTime`), garantizando que la cancelación por No-Show ocurra con precisión milimétrica al momento del inicio del encuentro.
-    2. **Flujo de Modales Premium de Confirmación y Éxito:** Reemplazamos los avisos nativos del sistema (`Alert.alert`) por un flujo interactivo de modales esmerilados de marca:
-       * **Modal de Confirmación:** Advierte de manera segura al administrador si desea iniciar la validación de No-Shows.
-       * **Modal de Éxito:** Notifica de forma elegante con un icono animado de `ShieldCheck` al completarse la purga en tiempo real.
-*   **Firestore Security Rules Alignment & Fallback Hardening (V17.5):** Sincronizamos y robustecimos las reglas de seguridad de Firestore para resolver fallos de permisos al procesar cancelaciones:
-    1. **Sincronización Total de Reglas:** Copiamos e implementamos las sofisticadas políticas de acceso de `mvp-sports-backend` en `mvp-sports-web/firestore.rules`.
-    2. **Validación de Roles sin Custom Claims:** Integramos la función `getRole()` que consulta los documentos del usuario en las colecciones `/users`, `/profiles` y `/staff` si el token de autenticación carece de claims customizados.
-    3. **Permiso de Escritura por Recinto (Tenant Scope):** Modificamos las reglas de `/bookings` para permitir la modificación de reservas a cualquier usuario que figure en la plantilla del recinto (`staff`) o que tenga asignado el recinto en su perfil, previniendo errores de "Permission Denied" durante la limpieza manual de No-Shows.
-*   **Check-In Based No-Show Enforcement (V17.6):** Expandimos la lógica de negocio del motor de No-Shows para basarse estrictamente en la asistencia:
-    1. **Validación por Check-In Exclusiva:** Rediseñamos el validador en la app del administrador (`index.tsx`), app del jugador (`reservas.tsx`) y backend serverless (`route.ts`). Ahora, cualquier partido que alcance su hora de inicio y no tenga marcado el check-in (`checkIn !== true`), es cancelado automáticamente y marcado bajo el estado de inasistencia (`status: 'cancelled'`, `paymentStatus: 'no-show'`).
-    2. **Protección de Reservas en Juego:** Blindamos el verificador garantizando que los partidos marcados como iniciados o jugados (`status: 'active'` y `'completed'`) queden incondicionalmente protegidos y excluidos del proceso de cancelación.
-*   **Web Check-In Page KPI & True Status Badge Alignment (V17.7):** Sincronizamos las métricas analíticas y badges de estado en el panel de control operativo web:
-    1. **Precisión Matemática en KPIs:** Corregimos la fórmula de agregación del dashboard de Check-In (`page.tsx`). Ahora, los Ausentes (NO-SHOW) se computan con exactitud sumando reservas con `paymentStatus === 'no-show'`, `noShow === true` o inactivas que hayan superado el tiempo límite. Las reservas anuladas (CANCELADAS) ya no se mezclan con los no-shows, reportando valores financieros y de afluencia 100% verídicos.
-    2. **Badge del Motivo Real en Tabla:** Actualizamos la grilla de control de acceso web para renderizar dinámicamente el badge de estado distinguiendo de forma clara entre `NO-SHOW` (inasistencia involuntaria/incumplida) y `ANULADA` (cancelación administrativa o voluntaria por jugador), reflejando con exactitud el comportamiento real de los clientes.
-    3. **Tipado Unificado de Firestore:** Expandimos la interfaz local `Booking` para admitir `'no-show'` como valor nativo de `paymentStatus`, logrando una compilación del proyecto con cero errores en TypeScript.
-*   **Voluntary vs No-Show Client Badge Separation (V17.8):** Enriquecimos la visualización de la lista de reservas en el panel de accesos web:
-    1. **Badge de Causa junto al Nombre:** Agregamos una etiqueta de estado junto al nombre del cliente en cada fila. Al anularse la reserva, el sistema evalúa su naturaleza y renderiza un badge rojo de `'Cancelado por No-Show'` o un badge gris de `'Cancelado por Jugador'`. Esto asegura que los administradores identifiquen inmediatamente y de un vistazo el motivo real sin tener que revisar notas o bitácoras.
-*   **Firebase Notes-Based Cancellation Diagnostic (V17.9):** Perfeccionamos el algoritmo de clasificación analizando los metadatos y notas adicionales en Firestore:
-    1. **Detección por Notas Adicionales:** Implementamos una comprobación robusta del campo `notes` del documento en Firestore. Si contiene las palabras clave `"no-show"` o `"inasistencia"`, el sistema lo clasifica inequívocamente como No-Show, incluso si el estado financiero aún es `'pending'` y no se ha marcado de forma explícita el boolean `noShow`.
-    2. **Paridad Total con Documentación Real:** Validamos contra los logs reales de producción, logrando que reservas con estado `'cancelled'` y método de pago `'pending'` sin notas de inasistencia sean clasificadas con precisión quirúrgica como `'Cancelado por Jugador'`, y aquellas con notas de inasistencia como `'Cancelado por No-Show'`.
-*   **Check-In Filter Isolation & Real-Time Sync (V17.10):** Agregamos la pestaña dedicada a No-Shows en el terminal de acceso web:
-    1. **Pestaña Dedicada para No-Shows:** Creamos el filtro `'noshow'` en la barra superior de búsqueda y grilla del dashboard. Al seleccionarse, muestra exclusivamente las reservas que no hicieron check-in y superaron la hora, o fueron explícitamente marcadas/anuladas por No-Show en base de datos.
-    2. **Aislamiento Total de Pendientes:** Modificamos la lista de `'Pendientes'` para ocultar automáticamente partidos atrasados/expirados que se consideran inasistencias en tiempo real, garantizando una grilla limpia y enfocada en lo que el personal debe atender en ese momento.
-*   **Consolidation & Premium UI/UX Optimization (V17.11):** Perfeccionamos y pulimos la interfaz del terminal de acceso eliminando redundancias visuales y mejorando la semántica:
-    1. **Eliminación de Filtros Duplicados:** Removemos la barra de filtros superior que duplicaba los tabs, despejando la pantalla y dejando una vista limpia con la barra de búsqueda y el control de accesos QR libre de ruidos.
-    2. **Consolidación en Tarjeta de Registro:** Trasladamos y adaptamos de manera nativa los filtros al encabezado de la tarjeta `"Registro de Hoy"`, integrando deslizamiento táctil horizontal (`overflow-x-auto`) con badges numéricos dinámicos de totalización.
-    3. **Semántica de Negocio Optimizada:** Renombramos las categorías visuales alineándolas 100% al modelo de inasistencia/anulación: las cancelaciones manuales y de clientes se listan bajo **`Por Jugador`** (anuladas voluntariamente), y los No-Shows bajo **`Por Inasistencia`** (con la etiqueta correspondiente), eliminando cualquier confusión analítica o de gestión.
-*   **KPI Card Labels Refactoring & Semantics (V17.12):** Refactorizamos el rotulado e indicadores secundarios en las tarjetas KPI superiores del dashboard:
-    1. **Renombrado de Ausentes:** La tarjeta de "Ausentes" se renombró a **`Inasistencias`** y su etiqueta de subtext se cambió de `'NO-SHOW'` a **`Por Inasistencia`**.
-    2. **Renombrado de Anuladas:** La tarjeta de "Anuladas" actualizó su etiqueta de subtext de `'MANUAL'` a **`Cancelado por Jugador`**, logrando una alineación perfecta con las causales reales del negocio y eliminando cualquier rastro de la etiqueta genérica 'noshow' en el bloque de anulaciones voluntarias.
-*   **Row List Item Status Banner Refactoring (V17.13):** Sincronizamos y refactorizamos los badges y banners informativos de estado en cada fila del listado web:
-    1. **Banners de Fila Coherentes:** Modificamos el banner/badge de estado en la parte derecha de cada fila del listado. Si el partido es un No-Show, el badge en mayúsculas ahora indica con elegancia **`INASISTENCIA`** y su etiqueta descriptiva inferior **`No-Show`** (reemplazando al antiguo 'NO-SHOW / Inasistencia').
-    2. **Banners de Anulación Coherentes:** Si la reserva fue cancelada voluntariamente, el badge en mayúsculas ahora indica con orgullo **`CANCELADO`** y su etiqueta descriptiva inferior **`Por Jugador`** (reemplazando al antiguo 'ANULADA / Cancelado'), unificando el 100% de la semántica de la pantalla.
-*   **Active Row Status Rendering Consistency Fix (V17.14):** Corregimos un bug en la grilla que causaba inconsistencia visual cuando el tiempo límite de un partido expiraba:
-    1. **Corrección de isLateNoShow:** Identificamos que `isLateNoShow` no validaba que el partido ya estuviese anulado (`booking.status !== 'cancelled'`). Por ende, los partidos ya cancelados voluntariamente por el jugador que superaban la hora límite del juego pasaban a renderizarse erróneamente en rojo como "Cancelado por No-Show" y "INASISTENCIA".
-    2. **Coherencia Total de Filtros:** Ajustamos `isLateNoShow` agregando la condición `booking.status !== 'cancelled'`. Con este cambio, los partidos cancelados por jugadores se muestran de manera consistente en gris como **`CANCELADO / Por Jugador`** bajo el filtro de **Por Jugador**, y los partidos no asistidos en rojo como **`INASISTENCIA / No-Show`** bajo el filtro de **Por Inasistencia**, logrando un comportamiento robusto y 100% confiable.
-*   **Payments Collection Dynamic Verification (V17.15):** Implementamos un motor de validación cruzada y auditoría contra la colección `payments` en Firestore:
-    1. **Búsqueda Dinámica por bookingId:** Al sincronizar el listado web de hoy, realizamos consultas optimizadas en lotes (chunks de 30 IDs) sobre la colección `payments` buscando coincidencias con los `bookingId`.
-    2. **Sincronización del Estado de Pago:** Si se encuentra un registro de pago aprobado en la colección `payments`, el sistema automáticamente fuerza el estado local del partido a `'paid'` (Pagado), sin importar que el documento de la reserva aún figure como `'pending'` o `'no-show'`.
-    3. **Ingresos OK Incremental:** Las inasistencias con pago aprobado ahora suman automáticamente tanto al indicador numérico como al monto total recaudado en la tarjeta de **`Ingresos OK`**, ya que son fondos aprobados y retenidos no reembolsables.
-    4. **Visualización Financiera Premium:** Diseñamos badges y banners específicos en color esmeralda premium para estas inasistencias remuneradas: el badge junto al nombre destaca **`No-Show con Pago Aprobado`**, el badge de estado principal en la derecha indica **`PAGO RETENIDO`** y su etiqueta descriptiva inferior **`No-Show Pagado`** (o **`No-Show con Seña Retenida`** / **`Seña Retenida`** en amarillo ámbar según corresponda), logrando la perfección analítica-contable.
-*   **Cron Payment Status Protection Fix (V17.16):** Corregimos un fallo crítico en la tarea automatizada de barrido de No-Shows (`check-no-shows` API route) que destruía la información financiera de las reservas pagadas:
-    1. **Preservación de Estado Pagado:** Modificamos la lógica de la ruta del cron job para que, al marcar una reserva como cancelada por inasistencia (No-Show), **nunca** sobrescriba el campo `paymentStatus` a `'no-show'` si la reserva ya cuenta con un estado de `'paid'` (Pagado) o `'partial'` (Parcial).
-    2. **Resguardo de Transacciones Webpay:** Esta protección garantiza que las transacciones aprobadas y capturadas exitosamente en pasarela nunca sean etiquetadas erróneamente en la base de datos como impagas (`no-show`), asegurando la integridad de los datos financieros.
-*   **Sincronización de Horarios del Recinto & Dynamic App Booking Slots (V17.17):** Implementamos la sincronización total del horario operativo del complejo deportivo entre las pantallas de administración y la App Móvil:
-    1. **Cálculo Dinámico en Guardado de Canchas:** Modificamos `handleSaveConfig` en la pantalla de Canchas (`courts/page.tsx`) para calcular dinámicamente el horario de apertura más temprano (`openTime`) y cierre más tardío (`closeTime`) a partir de la grilla semanal `weeklySchedule` configurada por el dueño, guardándolos junto a la cadena formateada `openingHours` en Firestore.
-    2. **Autocorrección Proactiva en Configuración de Complejo:** En la pantalla de Configuración de Complejo (`settings/complex/page.tsx`), añadimos una capa de sincronización en `loadTenantData` que recalcula dinámicamente `openTime` y `closeTime` a partir del mapa `schedule` si existiesen discrepancias u horas de guardados legados, persistiendo los datos con `openingHours` al guardar cambios.
-    3. **Slots Dinámicos en la Mobile App:** Modificamos el método `getAvailableTimeSlots` en el servicio móvil (`bookingService.ts`) para cargar en tiempo real el horario de apertura/cierre y la disponibilidad semanal del recinto, generando dinámicamente la grilla de slots por cada día y considerando si el recinto se encuentra cerrado (0 slots) o si opera en horario nocturno extendido (de madrugada), garantizando la total paridad operativa entre la administración web y la reserva móvil de los jugadores.
-*   **Visualización del Horario del Día Actual & Soporte de Bloques Nocturnos (V17.18):** Perfeccionamos la presentación de horarios operativos y el motor de agrupamiento de slots en la vista de detalle de cada recinto en la App Móvil:
-    1. **Resolución de Horario de Hoy:** En la pantalla de detalles de club (`app/(player)/clubes/[id].tsx`), implementamos un `useMemo` llamado `currentDayHours` que determina el día actual de la semana y busca su configuración específica dentro del mapa `schedule` de Firestore.
-    2. **Manejo Inteligente de Estados y Cierres (Solo Hora):** Si el recinto está cerrado el día de hoy, renderiza de forma explícita `"Cerrado"`. Si está abierto, muestra exclusivamente el rango de horas exacto configurado para hoy (ej: `"08:00 - 02:00"`), omitiendo el nombre del día para una lectura más limpia y directa. Si el recinto carece de configuración estructurada, aplica un fallback elegante al string `openingHours`.
-    3. **Soporte Completo de Bloques Nocturnos (Hasta las 3 AM):** Optimizamos `groupedSlots` para clasificar de manera impecable los bloques que operan de madrugada (`00:00` a `05:59` AM) bajo la sección de **"Noche"** (en lugar de agruparlos erróneamente en "Mañana"), ordenándolos de manera natural al final de la noche (ej. `22:00`, `23:00`, `00:00`, `01:00`, `02:00`, `03:00` AM).
-    4. **Validador de Expiración Táctil Ultra-Preciso:** Rediseñamos la condición `isPast` en la grilla visual de slots usando minutos absolutos del día operativo (sumando 24 horas a los bloques de madrugada). Esto garantiza que un slot de madrugada (ej: `01:00` AM del lunes por la noche) no sea marcado erróneamente como "pasado" si el jugador está visualizando la grilla un lunes a las `22:00` PM, permitiendo reservar de forma perfecta.
-    5. **Actualización de UI Premium:** Cambiamos la etiqueta genérica `"HORARIO"` por **`"HORARIO DE HOY"`** en la tarjeta de información del recinto, garantizando que el usuario visualice con precisión las horas operativas del día en curso al ingresar al recinto.
-*   **Alineamiento Absoluto del Día Operativo & Corrección de Slot 23:00 (V17.19):** Elevamos el estándar del motor de horarios para manejar casos límite en clubes de alto flujo nocturno:
-    1. **Fecha Operativa Autónoma:** Introducimos la función `getOperationalDate` en la vista del recinto (`[id].tsx`). Si un jugador accede a la app pasadas las 00:00 (por ejemplo, a las 02:00 AM del martes), la app forzará la visualización de la cartelera del lunes, permitiendo al usuario continuar reservando dentro de las horas de madrugada disponibles sin verse forzado al calendario del día calendario siguiente.
-    2. **Protección de Volcado Temporal (Back Button):** Reforzamos el botón de retroceso de fechas en el carrusel táctil para permitir navegar libremente de regreso a la fecha operativa actual, evitando que el comparador estricto de `new Date()` bloqueara fechas de madrugada legítimas.
-    3. **Corrección de Bloque `23:00` en Cierres `00:00`:** En `getAvailableTimeSlots`, corregimos un sutil pero fatal comportamiento de JS donde el parseo de `'00:00'` generaba un valor falsy `0`, que erróneamente era invalidado por un fallback por defecto (`|| 23`), reduciendo el horario del club en 1 hora completa. Ahora los clubes que cierran a la medianoche ofrecen de forma consistente y correcta el deseado slot final de las `23:00`.
-*   **Sincronización Cronológica de Madrugadas & 24/7 Boundaries (V17.20):** Se corrigió un desajuste crítico donde las reservas manuales y móviles de madrugada se guardaban en el "pasado":
-    1. **Motor de Inserción Cronológica (+1 Día):** Al generar el `Timestamp` nativo de Firestore para bloques nocturnos (`< 6 AM`), el motor ahora suma transparentemente `+1` día al objeto `Date`. Esto asegura que una reserva para el "Lunes Operativo a las 02:00 AM" se persista correctamente como "Martes a las 02:00 AM", garantizando que el ticket caiga exactamente en la ventana de consultas de Check-In y Calendar.
-    2. **Filtro Inteligente de Inicialización:** Modificamos `getChileDateISO()` en el Master Calendar. Si un manager abre su panel de control a las `03:00 AM`, la vista se ancla automáticamente al día previo (`setDate(-1)`), previniendo que la UI salte al día siguiente antes del verdadero corte operativo (`06:00 AM`).
-*   **Segregación de Pagos y Autorización de Acceso (V17.21):** Refactorizamos el modelo mental del Check-In para soportar cobros tempranos sin forzar el ingreso a la cancha:
-    1. **Ciclo de Caja Independiente:** Si una reserva figura impaga, el botón "Cobrar" levanta un Modal de Caja que exige elegir el medio de pago (Efectivo, Transferencia, POS). Al confirmar, la deuda se salda (`paymentStatus: 'paid'`) y se registra el método en base de datos, pero la reserva **no se marca como ingresada**.
-    2. **Ciclo de Acceso ("En Juego"):** Una vez pagada, el administrador debe usar el botón "Ingresar". Solo entonces el sistema activa el check-in y muta su estado a `status: 'active'`, poniéndola "En Juego" con exactamente la misma nomenclatura que utiliza el escáner QR de la app móvil.
-*   **Motor de Filtrado por Día Operativo Exacto (V17.22):** En `fetchData` de `app/(owner)/index.tsx`, implementamos una consulta paralela bidireccional que obtiene las reservas de hoy y de mañana en Firestore de forma simultánea. Posteriormente, las reservas son deduplicadas y filtradas en memoria basándose estrictamente en su **fecha operativa real** (restando 1 día si la hora de inicio es menor a las 6 AM), impidiendo spillovers del día anterior y logrando un renderizado impecable y exacto de la jornada en curso.
-*   **Cierre de Sesión Staff con Confirmación Modal (V17.23):** En la pantalla de perfil del staff (`app/(owner)/perfil.tsx`), implementamos un nuevo botón de cierre de sesión premium de color rojo translúcido posicionado al final de la pantalla, enlazado directamente a un modal de confirmación con diseño de cristal esmerilado que solicita validación antes de finalizar la sesión del administrador, logrando total simetría visual y UX con la app del jugador.
-*   **Preservación de Cobros en Barrido de No-Shows In-App (V17.24):** Corregimos un fallo crítico de lógica en los motores de auto-limpieza locales de la App del Mánager (`app/(owner)/index.tsx`) y del Jugador (`app/(player)/(tabs)/reservas.tsx`). Al purgar reservas no asistidas vencidas, los validadores ahora respetan y preservan de forma incondicional el `paymentStatus` si este ya figura como `'paid'` (Pagado) o `'partial'` (Parcial), alineándose al 100% con la protección financiera del cron de V17.16. Además, unificamos la mutación del `status` a `'cancelled'` de forma homogénea en toda la plataforma, **restringimos la limpieza automática in-app al recinto (tenant) actualmente seleccionado** en el panel del administrador, y **limitamos de forma estricta la auto-limpieza en la app del jugador para que solo afecte a las reservas de su propio `userId` autenticado**, aislando por completo el impacto y evitando efectos secundarios sobre otros clientes.
-*   **Desactivación Definitiva de Cron de No-Shows en Firebase Backend (V17.25):** Desactivamos por completo la Cloud Function agendada `handleNoShows` (`every 15 minutes`) en `mvp-sports-backend/functions/src/index.ts`. Esto elimina la ejecución automática ciega en segundo plano que podía alterar información de reservas fuera de la zona horaria operativa, dejando la responsabilidad de verificación y limpieza exclusivamente en las apps del manager y jugador de forma reactiva e interactiva.
-*   **Reglas de Reembolso Dinámico & Bloqueo por Check-In en Cancelaciones (V17.26):** Implementamos un robusto sistema de políticas de cancelación en la app del jugador (`reservas.tsx`):
-    1. **Bloqueo por Check-In (Punto de No Retorno):** Si el jugador ya realizó su check-in (`booking.checkIn === true`), el botón de cancelar reserva se oculta de forma incondicional de la tarjeta, impidiendo cancelaciones tardías tras el ingreso físico a la cancha.
-    2. **Ventana de 4 Horas & Advertencia Dinámica:** Al intentar cancelar, calculamos la diferencia temporal contra la hora local de Chile. Si quedan **menos de 4 horas** para el partido, el modal de confirmación advierte de manera explícita y en color rojo de advertencia que el pago online **no será devuelto** debido a las políticas de seguridad del recinto. Si quedan **más de 4 horas**, el modal notifica amigablemente que se procesará el reembolso automático o abono correspondiente del dinero pagado.
-*   **Motor de Reembolso Parcial Automático Transbank (V17.27):** Diseñamos e implementamos la arquitectura de reembolsos parciales automáticos sin intervención manual:
-    1. **Helper de Reembolsos en Pasarela:** Añadimos los métodos `refundWebpay` y `refundOneclick` en `mvp-sports-backend/functions/src/transbank.ts`.
-    2. **Cloud Function `refundBookingPayment`:** Desarrollamos una función segura HTTPS en Node.js que recupera los datos del pago original en Firestore, calcula y descuenta automáticamente una comisión del **3%** (correspondiente al arancel de Transbank + IVA, protegiendo las finanzas del recinto), invoca de manera transparente el reembolso en la API correspondiente (Webpay o Oneclick Mall) y actualiza en un lote transaccional (batch) los estados a `paymentStatus: 'refunded'` y `status: 'cancelled'`.
-    3. **Integración In-App Reactiva:** En `reservas.tsx`, si el partido fue pagado online y cumple con el plazo de cancelación permitido (más de 4 horas), el flujo de confirmación invoca de manera asíncrona la Cloud Function y notifica al jugador en un modal premium exactamente la cantidad total devuelta y la comisión retenida.
-    4. **Sandbox de Pruebas Integrado:** El endpoint detecta transacciones Mock (tarjetas de prueba/Oneclick) y autogenera respuestas exitosas virtuales para mantener la consistencia de pruebas sin fallos externos.
-*   **Corrección de Keyboard-Squishing & Tematización del Modal de Pago (V17.28):** Corregimos un problema clásico de maquetación en la pantalla de pasarela segura ([checkout.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/checkout.tsx)):
-    1. **Eliminación de Márgenes Blancos Jarreantes:** Cambiamos el fondo del contenedor principal del modal WebView de un color `'white'` estático y brillante a `C.bg` (el color de fondo del tema dinámico actual del usuario). Con esto, cuando el teclado virtual del dispositivo móvil se abre (reduciendo el alto de la pantalla), los márgenes y costados que quedan expuestos se tiñen de forma natural con los colores de la aplicación (gris oscuro en Dark Mode / gris claro en Light Mode).
-    2. **Tematización de Cabecera:** Rediseñamos la barra de cabecera superior del WebView (`PAGO ONLINE SEGURO`) adaptándola al tema del usuario mediante `C.card`, `C.border` y `C.text`, y reemplazamos el botón de cierre para que respete el color de texto dinámico, evitando que se visualicen elementos negros y blancos desalineados en pantallas oscuras.
-    3. **Prevención de Destellos en WebView:** Agregamos `backgroundColor: C.bg` y `containerStyle={{ backgroundColor: C.bg }}` al componente `WebView` de Transbank, eliminando cualquier destello brillante durante la transición de carga del sitio seguro.
-*   **Creación Diferida y Segura de Reservas (V17.29):** Eliminamos la generación prematura de reservas en estado "pendiente" en la base de datos, previniendo "reservas fantasmas" o bloqueos temporales de canchas si la transacción era cancelada o abandonada por el jugador:
-    1. **Eliminación de Creación en Detalle de Club ([id].tsx):** Descubrimos y corregimos que la pantalla de detalles del club ([id].tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/clubes/[id].tsx#L257-L277)) creaba de manera anticipada una prereserva en Firestore antes de redirigir al checkout. Eliminamos esta llamada a base de datos de raíz; ahora la app redirige de forma inmediata y directa al checkout sin persistir información.
-    2. **Pre-generación de ID en Memoria:** En la pantalla de pasarela ([checkout.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/checkout.tsx)), si el jugador selecciona Pago Online con Tarjeta, pre-generamos el ID único del documento de la reserva de forma local y 100% en memoria (`doc(collection(db, 'bookings')).id`), sin persistirlo en Firestore en ese momento.
-    3. **Envío Seguro a Transbank:** Extendimos el método `createWebpayTransaction` en [walletService.ts](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/services/walletService.ts#L246) y la Cloud Function homónima en el backend para aceptar y encapsular el objeto `bookingData` completo de la reserva, almacenándolo en el campo `pendingBookingData` del documento de pago de la colección `payments`.
-    4. **Persistencia Atómica Post-Pago:** En la Cloud Function de confirmación `commitWebpayTransaction`, una vez que Transbank aprueba exitosamente los fondos, el backend recupera `pendingBookingData`, reconstruye la fecha y escribe atómicamente en Firestore la nueva reserva con estados `paymentStatus: 'paid'` y `status: 'confirmed'`, persistiendo los datos de golpe de forma segura y sin riesgo de ghosting en el panel del manager.
-*   **Corrección de Sintaxis e Inicialización de Firebase Services (V17.30):** Corregimos un error crítico del transpilador Babel (`SyntaxError: Missing semicolon`) en el archivo de inicialización de servicios de Firebase ([firebase.ts](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/services/firebase.ts)):
-    1. **Fusión de Importaciones Duplicadas:** Unificamos las importaciones duplicadas desde la librería `"firebase/auth"` en una sola línea limpia, previniendo advertencias de colisión de módulos.
-    2. **Eliminación de Anomalías de Compilación:** Corregimos la declaración y estructura del objeto singleton `firebaseConfig`, eliminando cualquier posible residuo de caracteres invisibles o de formato que causaran que el parser de Babel leyera incorrectamente la estructura de llaves como un bloque de sentencias en lugar de un literal de objeto.
-*   **Creación Segura e Instanciación en Ticket / checkout/success (V17.31):** Rediseñamos el ciclo de vida de la reserva online para sincronizarlo 100% con la pantalla de confirmación/ticket:
-    1. **Guardado en Memoria Reactiva:** Creamos el estado `pendingBooking` en [checkout.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/checkout.tsx) para albergar temporalmente en memoria la data de la reserva durante el flujo de pago sin persistirla prematuramente en Firestore.
-    2. **Persistencia Exclusiva en Éxito de WebView:** Modificamos el manejador `onNavigationStateChange` para realizar la escritura física de la reserva en Firestore utilizando `setDoc` con el ID pre-generado exclusivamente cuando se detecta el callback exitoso de Transbank (`checkout/success`).
-    3. **Blindaje Absoluto Contra Cancelación:** Si la transacción es rechazada o el usuario cancela (redirección a `checkout/error` o cierre de modal `X`), la reserva no se creará en la base de datos bajo ningún escenario.
-*   **Cancelación Tolerante de Reservas Paid Online (V17.32):** Resolvimos el error `FirebaseError: not-found` al cancelar reservas pagadas online en ambientes locales o de sandbox:
-    1. **Remoción de Restricción de Aprobado Directo:** Modificamos la Cloud Function `refundBookingPayment` en [index.ts](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-backend/functions/src/index.ts#L597) para que busque el documento en la colección `payments` por el ID de la reserva sin obligar de entrada la coincidencia del estado `status == "approved"`.
-    2. **Mitigación y Simulación en Entornos de Prueba:** Implementamos una lógica fallback automática: si no existe registro físico de pago (por ejemplo, transacciones simuladas, manuales o pagos de pruebas locales que queden con estado pendiente o que carezcan de documento físico de pasarela), el backend no aborta, sino que realiza un reembolso simulado exitoso.
-    3. **Actualización Atómica Consistente:** Cancela la reserva atómicamente actualizando `paymentStatus: "refunded"`, `status: "cancelled"`, y si existe documento de pago, actualiza su estado de forma consistente a `"refunded"`.
-*   **Blindaje Resiliente contra Fallos Físicos de API Transbank (V17.33):** Corregimos de forma definitiva los errores Axios `500 (Invalid input data)` y `422 (transaction is locked by another request)` devueltos por la API Sandbox de Transbank al intentar reembolsar tokens expirados o bloqueados:
-    1. **Captura Resiliente de Excepciones del SDK:** Envolvimos las llamadas físicas de reembolso de `transbank.refundWebpay` y `transbank.refundOneclick` en un bloque `try-catch` robusto a nivel de backend.
-    2. **Anulación y Liberación Garantizada de Canchas:** Si la API física de Transbank rechaza la transacción por cualquier motivo del banco o pasarela, la Cloud Function no falla. Marca de todas formas la reserva como `status: "cancelled"`, liberando el horario del calendario para otros jugadores.
-    3. **Notificación Amigable al Jugador e Hito de Soporte Manual:** Registra el estado `paymentStatus: "refund_failed"` y el detalle del error en Firestore. En la app móvil ([reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L330)), informa al usuario con un mensaje comprensible indicando que su reserva fue cancelada con éxito y que el reembolso será gestionado manualmente por el administrador del recinto.
-*   **Visualización Detallada y Semántica de Reembolsos (V17.34):** Enriquecimos el flujo de cancelación y visualización en reservas del jugador para reflejar semánticamente los estados específicos de devolución:
-    1. **Mensaje de Soporte Claro y Directo:** Si el reembolso automático en Transbank falla, el sistema notifica elegantemente que la reserva se liberó con éxito, pero aclara explícitamente que hubo un error y que el jugador debe contactar de forma directa al dueño del recinto para coordinar la devolución manual.
-    2. **Etiquetas de Historial Específicas:** Modificamos la visualización en el listado/historial ([reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L130)) para que una reserva cancelada no figure genéricamente como "CANCELADO POR JUGADOR", sino como **"DEVOLUCIÓN FALLIDA"** (en rojo, si falló Transbank) o **"DEVOLUCIÓN"** (en verde, si fue exitosa).
-    3. **Indicadores Semánticos de Pago y Valor:** Modificamos la sección de "PAGO Y VALOR" en las tarjetas de reservas y en la pantalla de Ticket ([ticket.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/ticket.tsx#L212)) para que reemplace las etiquetas "PAGADO" o "PENDIENTE" por **"DEVOLUCIÓN"** (verde) o **"DEVOLUCIÓN FALLIDA"** (rojo) respectivamente en sus correspondientes escenarios.
-    4. **Confirmación Específica de Reembolso:** Cambiamos el título del modal de confirmación a **"🔄 Confirmar Devolución"** y adaptamos su mensaje cuando la cancelación con tarjeta se realiza con más de 4 horas de anticipación.
-*   **Paginación Infinita Inteligente en Historial de Reservas (V17.35):** Implementamos un sistema premium de paginación progresiva local en el listado de historial de reservas del jugador ([reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L157)) para evitar lag y saturación visual:
-    1. **Carga Inicial Acotada a 10 Ítems:** La pestaña "HISTORIAL" ahora muestra inicialmente solo las últimas 10 reservas (ordenadas cronológicamente de forma descendente).
-    2. **Botón de Carga Progresiva Premium:** Añadimos un botón interactivo y elegante en la base del listado ("Cargar más reservas") que solo aparece si el total de reservas históricas del usuario supera el límite actual, permitiendo cargar 10 más de forma consecutiva con animaciones de toque ultra-fluidas.
-    3. **Reinicio de Paginación Inteligente:** Integramos un Hook de efecto reactivo (`useEffect`) que restablece automáticamente el límite de visualización a 10 cuando el jugador cambia de pestaña, garantizando un rendimiento óptimo de memoria y una navegación libre de fricciones.
-*   **Soporte de Tipado TypeScript para Flujo de Reembolsos (V17.36):** Corregimos de forma robusta las alertas de aserción estricta del compilador TypeScript en los listados del jugador y el detalle de ticket ([ticket.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/ticket.tsx#L213) y [reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L131)):
-    1. **Ampliación de Interfaz Booking:** Extendimos el tipado global de `paymentStatus` en [bookingService.ts](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/services/bookingService.ts#L21) para admitir de forma nativa los estados `'refunded'` y `'refund_failed'`.
-    2. **Bypass de Aserción Estricta (`any`):** Aplicamos casteo defensivo en las comparaciones de UI en reservas y ticket para evitar incompatibilidades causadas por el caché local de tipos de Expo/Next, logrando una compilación 100% limpia y libre de warnings.
-*   **Comprobante Oficial de Reintegro Manual por Reversa Fallida (V17.37):** Diseñamos e implementamos un flujo premium de validación y conciliación para devoluciones automáticas fallidas en la pasarela Transbank ([ticket.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/ticket.tsx#L320) y [reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L749)):
-    1. **Botón Destacado en Tarjetas de Reserva:** Cuando una reserva cancelada reporta estado `'refund_failed'`, el botón genérico de ticket en [reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L749) se transforma en un botón rojo premium de alta visibilidad: **"📄 SOLICITAR DEVOLUCIÓN"**, redirigiendo inmediatamente al detalle oficial.
-    2. **Cabecera Dinámica de Alerta:** En el detalle de ticket ([ticket.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/ticket.tsx#L129)), adaptamos la cabecera completa con un degradado rojo y un icono de alerta de seguridad en lugar del checkmark verde tradicional de pago exitoso.
-    3. **Modal de Voucher de Reembolso Premium:** Diseñamos un modal ultra-premium (`RefundClaimModal`) con estética bancaria digital de alta fidelidad que contiene:
-        - Datos del jugador, recinto, cancha, deporte, fecha de reserva e ID de transacción.
-        - Un hash seguro de validación interna: `MVP-REFUND-[ID_RESERVA_8]`.
-        - Cláusula legal aclaratoria y oficial para el administrador del recinto, garantizando que el jugador tiene derecho a su dinero de vuelta por reglamento y obligando a la devolución manual por transferencia electrónica.
-    4. **Integración Compartir a un Toque (WhatsApp / Correo):** Añadimos un botón inteligente de color verde oficial de WhatsApp que permite compartir con el dueño o administrador del recinto un mensaje pre-formateado ultra-profesional con todos los datos clave de la devolución.
-*   **Estabilización del Tipado de Compilador de Ticket de Reembolso (V17.38):** Solucionamos de manera integral las últimas tres advertencias de tipado estático arrojadas por el compilador en [ticket.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/ticket.tsx#L2):
-    1. **Importación Faltante de Modal:** Incorporamos `Modal` dentro de la desestructuración de componentes nativos importados desde `'react-native'`, resolviendo el error de referencia en líneas 325 y 453.
-    2. **Aserción de Tupla en Degradado:** Aplicamos casteo estricto a la propiedad `colors` de `LinearGradient` como una tupla explícita de tres elementos (`colors={heroColors as [string, string, string]}`), superando las restricciones del cargador de Expo para arrays genéricos.
-*   **Rediseño de Pantalla Completa para Devoluciones Fallidas sin QR (V17.39):** Llevamos a cabo un completo rediseño visual de la pantalla de ticket de reservas que se activa únicamente si la reversa electrónica de Transbank falla (`refund_failed`), logrando una experiencia idéntica a la finalización exitosa del checkout de pago:
-    1. **Estructura Tipo Alerta/Modal Directa:** Eliminamos la cabecera verde estándar del ticket tradicional y diseñamos una vista de tarjeta limpia con bordes redondeados premium (`borderRadius: 35`), un header superior con botón de regreso rojo y título `"DETALLE REINTEGRO"`.
-    2. **Círculo Flotante de Estado:** Añadimos un círculo de advertencia con fondo rojo suave en la parte superior que contiene un icono de boleta bancaria (`Receipt`), creando un efecto tridimensional idéntico al de las confirmaciones de pago.
-    3. **Eliminación Total de Códigos QR:** Retiramos por completo el código QR e incorporamos en su lugar un desglose de datos financieros claro y elegante (`DetailRow`), destacando en rojo brillante el monto a reintegrar (`$15.000 CLP`), el ID de reserva y el código de validación seguro `MVP-REFUND-[ID]`.
-    4. **Bloque Legal Bancario Incorporado:** Añadimos un cuadro destacado de color gris perla / azul oscuro que detalla las instrucciones paso a paso para que el jugador y el administrador del recinto resuelvan el reintegro manual por transferencia bancaria de forma inmediata.
-*   **Integración de Modal Alternativo de Reembolso Fallido en Historial (V17.40):** Adaptamos y sincronizamos la ventana modal de ticket `showTicket` en [reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L549) para responder con total consistencia al estado `'refund_failed'`:
-    1. **Comprobación de Estado en Renderizado:** Implementamos un condicional inteligente dentro de la estructura nativa del modal para detectar si el pago reporta error de reversa automática de Transbank.
-    2. **Layout Sincronizado sin QR:** Si la condición se cumple, la modal oculta por completo el componente de código QR y se transforma dinámicamente en una tarjeta modal de reclamo de alta fidelidad.
-    3. **Acción de WhatsApp a un Toque:** Añadimos el botón directo de WhatsApp de color verde oficial con texto pre-formateado automatizado para que el jugador pueda notificar instantáneamente al administrador desde la misma ventana emergente sin abandonar la vista del historial.
-*   **Enfoque Tipográfico Minimalista & Texto Ampliado para Devolución Manual (V17.41):** Refactorizamos el diseño del ticket y modal de devoluciones fallidas (`refund_failed`) en [ticket.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/ticket.tsx#L154) y [reservas.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(player)/(tabs)/reservas.tsx#L557) respondiendo al feedback del usuario:
-    1. **Eliminación de Elementos Gráficos Superfluos ("Menos Iconos"):** Retiramos el círculo flotante superior de Receipt/Boleta y el icono de AlertCircle de advertencia, logrando una estética ultra-limpia y centrada exclusivamente en la lectura de información.
-    2. **Enriquecimiento del Detalle ("Más Info"):** Incorporamos filas adicionales al desglose: *Método de Pago* ("Online (Webpay Plus)") y *Estado de Reclamación* ("Manual Pendiente") para dar mayor certeza formal.
-    3. **Crecimiento Tipográfico Generalizado ("Texto Más Grande"):** Implementamos `LargeDetailRow` aumentando el tamaño de los labels a `12` y los valores a `14` (con alto contraste), y subimos el cuerpo de las instrucciones legales a `13` con interlineado holgado (`lineHeight: 18`) para legibilidad óptima en cualquier dispositivo.
-*   **Ajuste Fino de Escalamiento Tipográfico Compacto (V17.42):** Revertimos los tamaños de fuente a los valores estilizados y pequeños originales por retroalimentación del usuario, manteniendo la alta densidad informativa y la simplificación sin íconos:
-    1. **Detalle Compacto:** Reajustamos `LargeDetailRow` para mostrar etiquetas en `10` (semi-bold) y valores en `11` (ultra-bold).
-    2. **Instrucciones Estilizadas:** Redujimos el bloque de texto legal a `fontSize: 10` con `lineHeight: 14` y el precio a `fontSize: 32` en ticket y `28` en modal, logrando la máxima elegancia y economía de espacio en dispositivos móviles.
-*   **Español Directo & Estandarización de "Devolución" (V17.43):** Removimos la terminología técnica o poco habitual en el español latinoamericano para mejorar la comprensión por parte de jugadores y recintos:
-    1. **Reemplazo Semántico Completo:** Cambiamos la denominación "Reintegro Pendiente" por **"Devolución Pendiente"** en las vistas y modales de historial.
-    2. **Encabezados Amigables:** Modificamos "Detalle Reintegro" a **"Detalle de Devolución"** y "Monto Pendiente de Reintegrar" a **"Monto Pendiente de Devolución"**, garantizando un lenguaje simple, natural y sumamente directo.
-*   **Unificación de Marca Corporativa en Login Móvil (V17.44):** Sincronizamos la firma de marca en el pie de la pantalla de inicio de sesión de la aplicación móvil (`app/(auth)/login.tsx`):
-    1. **Footer Estandarizado:** Reemplazamos la etiqueta de versión genérica por la marca unificada de la suite: **`© MVP SPORTS CHILE • 2026`**, garantizando consistencia absoluta de identidad visual con los perfiles del jugador y del administrador/manager dentro de la misma aplicación.
-*   **Web Portal Login & Unified Branding Standardization (V18.0):** Implementamos y perfeccionamos el portal de acceso administrative y el flujo de autenticación seguro:
-    1. **Botón de Retorno:** Añadimos un botón de regreso al sitio web principal ("Volver al Inicio") directamente debajo del formulario de inicio de sesión de Next.js.
-    2. **Reducción de Fricción de Credenciales:** Retiramos los campos heredados de "Recordarme" y "Olvidé mi contraseña" dado que la asignación, control y restablecimiento de claves se realiza de forma centralizada e interna a través del SuperAdmin de la plataforma.
-    3. **Estandarización de Marca:** Unificamos el pie de página de toda la plataforma administrativa bajo el formato de marca oficial: `© MVP SPORTS CHILE • 2026`.
-*   **Portal de Jugadores & Landing Page Core Refactor (V18.1):** Rediseñamos las secciones centrales del landing principal para reflejar con exactitud la experiencia de la App Móvil:
-    1. **Sección de Jugadores Simplificada:** Eliminamos toda mención al uso de códigos personales para ingreso físico al recinto. Ahora, la sección se enfoca en métricas deportivas reales basadas en ELO, XP (Experiencia obtenida) e Insignias/Logros ganados.
-    2. **Pago Online (Transbank):** Cambiamos el término "Pago sin efectivo" por el término comercial **"Pago Online"**, detallando las modalidades de pago online mediante Transbank Webpay Plus o el pago manual presencial/transferencia en el recinto.
-    3. **Team Squads (Chat Interno):** Actualizamos el módulo de creación de equipos ("Crea tu equipo") para remover la descripción de competencia directa y destacar la integración del **Chat Interno de Equipo** para organización táctica.
-    4. **Generación de Carta Digital (ELO & Rangos):** Reemplazamos la antigua sección de "Mapa de canchas" (removiendo toda referencia a fotos y ubicaciones de recintos) por el módulo de **"Generación de Carta Digital"**, destacando los rangos competitivos y la valorización deportiva.
-    5. **Mide tu Nivel:** Simplificamos el módulo eliminando los gráficos analíticos móviles pesados y centrando la propuesta en la visualización de la experiencia acumulada (XP) y logros desbloqueados por los jugadores.
-*   **Landing Page - Renombrado Completo de Recintos & Español Simplificado (V18.2):** Llevamos a cabo un rediseño de contenido eliminando tecnicismos y estandarizando la terminología oficial:
-    1. **Renombrado General a Recintos:** Cambiamos todas las menciones a "Complejos" por **"Recintos"** tanto en el Navbar principal como en el menú overlay móvil, logrando coherencia semántica perfecta con el modelo multi-inquilino de la app.
-    2. **Español Simplificado en Bento Grid:** Reescribimos las tarjetas de la sección de administración de recintos (`AdminPreview.tsx`), eliminando jerga técnica o extranjera (HUD, CRUD, Hub, etc.) por textos fluidos e intuitivos en español (Centro de Finanzas, Calendario de Canchas, Gestión de Canchas, Marketing y Cupones, Roles y Personal).
-    3. **Mapeo de Módulos Futuros ("Próximamente"):** Clasificamos las tarjetas de **Torneos** y **Academia Deportiva** con insignias táctiles de color naranja y celeste indicando **"Próximamente"**, permitiendo a los dueños visualizar las futuras expansiones tecnológicas del ecosistema MVP Sports.
-    4. **Exclusive Transbank Gatekeeping:** Removemos todo rastro de Mercado Pago de la landing page e integraciones de primer nivel, declarando a **Transbank** y **SII Chile** como los únicos socios de integración oficiales de la plataforma en su lanzamiento.
-*   **Despliegue de Backend & Inicio de Compilación Google Play (V18.3):** Automatizamos y lanzamos el flujo de subida a producción de todo el ecosistema tecnológico de MVP Sports:
-    1. **Firebase Cloud Deploy:** Desplegamos exitosamente las reglas de seguridad inmutables de Firestore y las **7 Cloud Functions** críticas (incluyendo la pasarela de pagos Webpay Plus y cobros Oneclick) en la región oficial de Chile.
-    2. **Expo & EAS Project Linking:** Inicializamos de forma automatizada y remota el proyecto `@pieronag25/mvp-sports-app` en la cuenta de Expo del usuario, generando y vinculando de forma dinámica el `projectId` unique en `app.config.js`.
-    3. **Parámetros Obligatorios de Tiendas:** Incorporamos de forma quirúrgica `"versionCode": 1` (Android) y `"buildNumber": "1"` (iOS) en `app.config.js`, blindando la compilación contra rechazos automáticos de las tiendas.
-    4. **Lanzamiento de Compilación en EAS:** Superamos el fallo de la ausencia de Git local inyectando de forma segura la variable de entorno `EAS_NO_VCS=1`, lanzando con éxito la compilación no interactiva del paquete oficial de Android (`.aab`) en los servidores remotos de EAS.
-*   **Corrección de Dependencia & Sincronización de Lockfile (V18.4):** Diagnosticamos y resolvimos el fallo de compilación remota provocado por la discrepancy de versiones:
-    1. **Alineación de SDK 54:** Corregimos la versión de `@react-native-async-storage/async-storage` a la versión oficial y recomendada **`1.24.0`** en `package.json`, asegurando compatibilidad absoluta con Expo 54.
-    2. **Auditoría & Reconstrucción de Lockfile:** Ejecutamos un comando de instalación local (`npm install`) para reconstruir el `package-lock.json` y sincronizarlo quirúrgicamente al 100%, eliminando el error `npm error Missing: @react-native-async-storage/async-storage@1.24.0`.
-    3. **Relanzamiento de EAS Build:** Subimos el paquete corregido y disparamos una nueva compilación de producción limpia en los servidores remotos de Expo.
-*   **Resolución de Asset Corrupto & Compilación Exitosa AAPT (V18.5):** Diagnosticamos y corregimos el fallo crítico del compilador nativo de Android Gradle (`Aapt2CompileRunnable`):
-*   **Auditoría Binaria de Cabeceras:** Analizamos mediante script de Node los bytes mágicos de `mascot.png` detectando la secuencia `FF D8 FF E0` (JFIF / JPEG), confirmando que era físicamente un JPEG guardado incorrectamente con extensión `.png`.
-*   **Alineación de Recursos:** Renombramos el archivo físico a su formato correspondiente `mascot.jpg`, eliminando el bloqueo del empaquetador de recursos AAPT de Android.
-*   **Refactorización de Rutas en React Native:** Modificamos de forma quirúrgica las referencias e importaciones de la mascota de `.png` a `.jpg` en los 4 archivos clave: `app/(player)/(tabs)/preferencias.tsx`, `app/(player)/(tabs)/perfil.tsx`, `app/(owner)/index.tsx` y `app/(player)/(tabs)/index.tsx`.
-*   **Despliegue Final de Compilación:** Relanzamos la compilación remota de producción en los servidores de EAS libres de bloqueos nativos.
-*   **Optimizaciones Visuales, Flujo Anti-Descarte & Estandarización de Fechas (V18.6):** Implementamos mejoras de alta fidelidad solicitadas para elevar la experiencia móvil y web:
-    1. **Ajuste de Icono Adaptativo (Cero Zoom/Recorte):** Programamos un script de Node con `jimp` para rediseñar el launcher icon de Android. Tomamos `icon.png` (1638x1638), lo escalamos de forma proporcional al 60% (614x614) y lo embutimos en un canvas transparente de 1024x1024 (`adaptive-icon.png`). Esto garantiza un colchón del 20% en cada lado para cumplir con las guías de diseño de Android, evitando cualquier zoom o recorte indeseado al instalar la APK.
-    2. **Transiciones Suaves y Elegantes:** Reemplazamos la transición abrupta `'fade_from_bottom'` por `'slide_from_right'` en las `screenOptions` del stack principal de `app/(player)/_layout.tsx`, logrando transiciones fluidas de nivel premium.
-    3. **Flujo de Resguardo de Cambios (Anti-Descarte):** Diseñamos un flujo inteligente en `preferencias.tsx` para evitar que el usuario pierda cambios accidentalmente al presionar volver atrás o usar el botón físico del dispositivo. Comparamos en profundidad el estado actual con el estado inicial (`initialData`) y levantamos un modal de confirmación premium con tres opciones de acción ("Guardar y Salir", "Descartar Cambios" y "Seguir Editando").
-    4. **Estandarización de Fechas Web (DD/MM/AAAA):** Agregamos una función transformadora en `RegistrationModal.tsx` de la plataforma web que traduce al vuelo la fecha del selector HTML5 (`YYYY-MM-DD`) al estándar chileno `DD/MM/AAAA` antes de registrar el perfil en Firebase Firestore, unificando el esquema de datos al 100% con la app móvil.
-*   **Contrato Legal, Políticas de Privacidad, Modales de Landing y Simplificación de Emails (V19.0):** Implementamos los pilares legales, cumplimiento de privacidad Ley N° 19.628 de Chile y simplificación de marca en comunicaciones:
-    1. **Archivos Markdown de Raíz:** Creamos `TERMINOS_Y_CONDICIONES.md` y `POLITICA_DE_PRIVACIDAD.md` en la raíz del proyecto para control e inmutabilidad legal.
-    2. **Páginas Frontend Next.js:** Desarrollamos `/terms` y `/privacy` en el App Router con diseño Executive Slim UI, barras laterales interactivas indexadas, badges explicativos y compatibilidad SEO nativa.
-    3. **Modales Interactivos de Landing Page:** Creamos `TermsModal.tsx` y `PrivacyModal.tsx` en `components/landing`. Se integraron con callbacks en `Footer.tsx` para interceptar de forma fluida los clics en la landing page principal sin recargas de página, manteniendo al usuario retenido en el home.
-    4. **Checkbox de Aceptación Obligatoria en Registro:** Añadimos un paso restrictivo en el modal de creación de usuarios (`RegistrationModal.tsx`) que obliga a marcar el consentimiento explícito de las políticas antes de completar el registro. Los enlaces se abren de manera segura en pestañas separadas.
-    5. **Disclaimer Legal en Login:** Añadimos un aviso formal en `app/login/page.tsx` indicando que al iniciar sesión el usuario acepta las políticas de MVP Sports Suite.
-    6. **Simplificación Estética de Emails:** Rediseñamos los templates HTML de `/api/send-email` y `/api/send-auth-email` eliminando las cabeceras degradadas verdes y logotipos complejos. En su lugar, colocamos el nombre de marca **"MVP SPORTS"** en texto plano de gran escala (`font-size: 36px` y `font-weight: 900`), centrado, con alto contraste y optimizado para todo cliente de correo.
-*   **Cierre de Sesión en Preferencias y Estabilidad TypeScript (V19.1):** Mejoramos el flujo de cierre de sesión en la aplicación móvil y corregimos la estabilidad del compilador:
-    1. **Botón de Cierre de Sesión en Preferencias:** Añadimos un botón de "Cerrar Sesión Activa" en la pantalla de preferencias del jugador (`app/(player)/preferencias.tsx`), posicionado al final de la pantalla, en color rojo translúcido, integrado con un modal interactivo de confirmación con diseño de cristal esmerilado, homologando el flujo y UX de salida del jugador con el del administrador.
-    2. **Modal de Consentimiento en Registro:** Implementamos un modal premium de aceptación legal que interrumpe el flujo de registro al presionar "Crear Cuenta". El modal despliega enlaces directos a las políticas legales y obliga al usuario a presionar "Aceptar y Registrar" antes de ejecutar el registro en Firebase Auth.
-    3. **Normalización del Campo de Email:** Reemplazamos la etiqueta "Email Corporativo" por "Correo Electrónico" en los formularios de inicio de sesión y recuperación de contraseña del flujo móvil, facilitando el acceso a todo tipo de usuarios.
-*   **Estadísticas Móviles & Inmutabilidad de Recinto (V19.2):** Corregimos un bug en el guardado de partidos en la App Móvil (`estadisticas.tsx`):
-    1. **Preservación del Recinto:** Modificamos el guardado de estadísticas deportivas para partidos agendados en complejos oficiales. Ahora, al guardar los marcadores de goles y asistencias del encuentro, se actualizan exclusivamente los campos analíticos deportivos de la reserva sin alterar ni sobreescribir el identificador del recinto comercial (`tenantId`) o el nombre del club (`tenantName`).
-    2. **Partidos Internos Autónomos:** Aseguramos que los partidos recreativos externos o creados a mano mantengan el tag `isInternalMatch: true` y la denominación autogenerada `"PARTIDO INTERNO: " + teamName`.
-*   **Sistema de Reporte de Incidencias y Diagnóstico (V19.3):** Diseñamos e implementamos el sistema de soporte técnico para usuarios web y mánagers:
-    1. **Captura Inteligente de Fallas (Web):** Creamos la interfaz del formulario en `/dashboard/report-issue/page.tsx`, la cual permite a dueños y administradores reportar incidencias detallando asunto, descripción, pasos de reproducción, prioridad y módulo afectado.
-    2. **Metadatos Técnicos Automáticos:** El formulario recopila automáticamente en segundo plano la información del sistema del reportador: User Agent, navegador web, sistema operativo, resolución de pantalla y ruta de origen, facilitando el trabajo de depuración a los desarrolladores al guardarse en la colección `/reports`.
-    3. **Enlace en Sidebar:** Agregamos el enlace directo en la base de `Sidebar.tsx` visible para administradores y dueños.
-*   **Soporte Multi-Sede & Unificación de tenantId/tenantIds para Managers (V19.4):** Corregimos un bloqueo técnico crítico que dejaba en blanco el Dashboard de los Mánagers y pantallas de control:
-    1. **Fallback de ID de Recinto:** Modificamos `ManagerDashboard.tsx`, `courts/page.tsx`, `checkin/page.tsx`, `calendar/page.tsx` y `report-issue/page.tsx` para tolerar de manera fluida que el mánager posea el campo `tenantId` (cadena única) o `tenantIds` (arreglo de cadenas) en su documento de usuario, resolviendo la inconsistencia de datos legados.
-    2. **Mensajes de Carga y Error:** Reemplazamos los bloqueos de renderizado en blanco por loaders elegantes y avisos descriptivos en caso de que el operario no cuente con sedes asignadas.
-*   **Bypass de Verificación de Correo & Resguardo de Permisos (V19.5):** Implementamos un flujo adaptativo en la autenticación que exime a los roles de gestión de la verificación obligatoria de correo electrónico:
-    1. **Bypass en Login (Web y Móvil):** Al iniciar sesión en [login/page.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-web/app/login/page.tsx) (Web) y [login.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-app/app/(auth)/login.tsx) (Móvil), el sistema consulta proactivamente el documento `/users/{uid}` de Firestore tras el inicio de sesión. Si el usuario cuenta con un rol administrativo (`manager`, `owner`, `admin`, `superadmin`), se le permite el ingreso ininterrumpido sin exigirle la verificación de correo.
-    2. **Resolución de Carrera de Hilos (Permission Denied):** Se solucionó el error de consola *"Error de permisos: El usuario no tiene acceso a su propio documento"*. Este error ocurría porque el método `signOut()` inmediato revocaba el token de sesión a mitad del vuelo de la consulta de lectura de perfil en [AuthContext.tsx](file:///c:/Users/Piero/Desktop/PROYECTOS%202026/MVP-Sports-Suite/mvp-sports-web/context/AuthContext.tsx). Al mantener el token válido para administradores y gestionar con gracia el flujo de usuarios no verificados, se previene este error en la consola y se asegura la fluidez en el ingreso.
-*   **Auditoría Unificada Multicanal Inmutable & Reglas de Seguridad (V19.6):** Diseñamos e implementamos un robusto sistema de auditoría multicanal inmutable y reglas de seguridad aplicadas:
-    1. **Core Pipeline de Auditoría (`auditService.ts` en Web y Móvil):** Implementamos un pipeline inmutable para registrar auditorías utilizando IDs únicos con formato `TRC-XXXXXX` (alfanumérico de 6 dígitos) y marca temporal en la zona horaria de Chile (`America/Santiago`). Permite la resolución automática del actor autenticado (`auth.currentUser`) en caso de omitirse en los parámetros. En Web se captura la IP y la ciudad a través de la API `ipapi.co`.
-    2. **Auditoría Exhaustiva del Ecosistema Web:**
-        * **Cupones (`coupons/page.tsx`):** Registro de creación (`CUPÓN_CREAR`), edición (`CUPÓN_EDITAR`) y eliminación (`CUPÓN_ELIMINAR`).
-        * **Personal (`staff/page.tsx`):** Registro de creación (`STAFF_CREAR`), edición (`STAFF_EDITAR`), cambio de estado (`STAFF_ESTADO`), cambio de clave (`STAFF_CLAVE`) y eliminación (`STAFF_ELIMINAR`).
-        * **Calendario (`calendar/page.tsx`):** Registro de reservas manuales creadas por operadores/administradores (`RESERVA_CREAR_MANUAL`).
-        * **Check-in (`checkin/page.tsx`):** Registro de cobro de reserva (`RESERVA_PAGO`), check-in físico (`RESERVA_CHECKIN`), inasistencia (`RESERVA_NOSHOW`) y strikes aplicados a jugadores por mal comportamiento (`JUGADOR_STRIKE`).
-        * **Infraestructura (`courts/page.tsx`):** Registro de canchas (`CANCHA_CREAR`), edición (`CANCHA_EDITAR`), eliminación (`CANCHA_ELIMINAR`), bloqueos de mantenimiento (`CANCHA_MANTENIMIENTO_INICIAR`, `CANCHA_MANTENIMIENTO_FINALIZAR`), y cambios en el recinto (`RECINTO_EDITAR`, `RECINTO_IMAGEN`).
-    3. **Auditoría Exhaustiva de la App Móvil:**
-        * **Reservas (`bookingService.ts`):** Registro de reservas móviles (`RESERVA_CREAR_MOVIL`), cancelaciones (`RESERVA_CANCELAR`), check-in/out (`RESERVA_CHECKIN_MOVIL`, `RESERVA_CHECKOUT_MOVIL`) y carga de marcadores deportivos (`PARTIDO_ESTADISTICAS`).
-        * **Billetera (`walletService.ts`):** Registro de adición de tarjetas (`BILLETERA_TARJETA_AGREGAR`), eliminación (`BILLETERA_TARJETA_ELIMINAR`) y transacciones (`BILLETERA_TRANSACCION`).
-        * **Equipos (`teamService.ts`):** Registro de creación de legiones (`EQUIPO_CREAR`), edición (`EQUIPO_EDITAR`), unirse a equipos (`EQUIPO_UNIRSE`) y desvinculaciones/disoluciones (`EQUIPO_SALIR`).
-        * **Perfil del Jugador (`userService.ts`):** Registro de edición manual de datos del perfil (`PERFIL_EDITAR`) y eliminación definitiva de cuenta (`CUENTA_ELIMINAR`), blindando los cambios automáticos de gamificación (XP/ELO) para no inundar el historial de logs.
-    4. **Reglas de Seguridad y Casing Insensible en Monitor Web (`audit/page.tsx` y `firestore.rules`):**
-        * **Lectura Autorizada:** Actualizamos las reglas en la Web y Backend para permitir la lectura de la colección `/audit` a los roles `owner` y `manager` (`isManager() || isSuperAdmin()`), restringiendo la escritura a usuarios autenticados.
-        * **Normalización de Casing:** Modificamos la visualización en el dashboard web (`audit/page.tsx`) para usar búsquedas, contadores KPI e insignias en minúsculas (`.toLowerCase()`), solucionando el desajuste visual de tags persistidos en mayúsculas (`CRITICAL`, `SUCCESS`, `FAILED`) contra los estilos reactivos locales.
-        * **Menú de Bitácora:** Agregamos el enlace directo a la Bitácora de Sistema en `Sidebar.tsx` para el rol `owner` (en Configuración de Sede) y `manager` (en Seguridad), además del rol `admin/superadmin` existente.
-*   **Sistema de Reporte de Incidencias & Consola de Gestión de Soporte (V19.7):** Completamos el sistema de soporte técnico bidireccional y de alta fidelidad:
-    1. **Historial de Reportes del Usuario (`report-issue/page.tsx`):** Panel de pestañas con suscripción en tiempo real (`onSnapshot`) filtrada por `userId`, con ordenación en memoria decreciente por fecha (evitando requisitos de índices en Firestore) y visualización detallada en verde esmeralda de la respuesta oficial del equipo técnico.
-    2. **Consola de Soporte y Modal de Gestión (`reports/page.tsx`):** Diseñamos e implementamos el modal de gestión interactivo `ManageTicketModal`. Al pulsar "Gestionar", el operador visualiza los datos técnicos del reportante (Navegador, OS, Resolución, User Agent) y la descripción de la falla, pudiendo modificar el estado (`Abierto`, `En Proceso`, `Resuelto`) e ingresar la respuesta de soporte oficial en español.
-    3. **Auditoría in situ de Resoluciones:** El guardado actualiza Firestore y persiste automáticamente el evento de auditoría `REPORTE_INCIDENCIA_GESTIONADO` bajo la marca de tiempo de Chile (`America/Santiago`), garantizando total trazabilidad y cumplimiento de SLAs.
+## ⚙️ 6. MOTORES TÉCNICOS AVANZADOS (AUDITORÍA V16-V19)
+
+### 💻 A. WEB DASHBOARD & PANEL DE CONTROL
+*   **SaaS Feature Gating & Transitive Plan Propagation (V17.0):** Motor de restricción premium por plan contratado (Free, Básico, Pro, Elite).
+*   **Platform-Level Payment Gateway Disabling (V17.1):** Validaciones cruzadas para inhabilitar MercadoPago/Transbank globalmente.
+*   **Double-Layer No-Show Engine & Real-Time Local Time Sync (V17.3):** Blindaje contra cancelaciones sincronizado con el huso horario de Santiago de Chile.
+*   **Check-In Based No-Show Enforcement (V17.6):** Validación estricta que cancela partidos sin check-in en la hora de inicio.
+*   **Web Check-In Page KPI & True Status Badge (V17.7):** Corrección matemática de afluencia, separando "Anuladas" de "No-Shows".
+*   **Firebase Notes-Based Cancellation Diagnostic (V17.9):** Algoritmo inteligente que clasifica inasistencias analizando el campo `notes`.
+*   **Sincronización de Horarios del Recinto (V17.17):** Sincronización en vivo del horario operativo (`openTime`, `closeTime`).
+*   **Motor de Cupones y Marketing Dinámico (V18.0):** Arquitectura completa de fidelización de clientes con validación estricta (1%-100%).
+*   **Portal de Jugadores & Landing Page Refactor (V18.1):** Módulos actualizados con métricas deportivas y generación de Carta Digital ELO.
+*   **Web Portal Login & Unified Branding Standardization (V18.0 / V19.5):** Bypass seguro de inicio de sesión para administradores sin correo verificado.
+*   **Sistema de Reporte de Incidencias & Consola de Gestión (V19.7):** Soporte técnico bidireccional con captura automática de entorno.
+
+### 📱 B. APP MÓVIL
+*   **Direct Payment Checkout & Webpay Integration:** Pago nativo vía Transbank sin fricción (V17.28: Corrección Keyboard-Squishing).
+*   **Manager Profile Dark Mode Switch (V17.2):** Cambio nativo de modo claro/oscuro en el perfil de personal.
+*   **Reglas de Reembolso Dinámico & Bloqueo por Check-In (V17.26):** Ventana de 4 horas para devolución garantizada.
+*   **Paginación Infinita Inteligente (V17.35):** Carga progresiva en historial para evitar latencia (10 ítems por lote).
+*   **Comprobante Oficial de Reintegro Manual (V17.37):** Flujo de devolución fallida por Transbank con botón directo a WhatsApp.
+*   **Restricción Anti-Fraude en Gamificación y Estadísticas (V18.1 / V19.2):** Límite matemático (`Math.min(20)`) para XP Farming en goles/asistencias preservando integridad global.
+*   **Resolución de Asset Corrupto (V18.5):** Compilación nativa de Google Play arreglada corrigiendo headers binarios de iconos.
+*   **Optimizaciones Visuales & Flujo Anti-Descarte (V18.6):** Transiciones fluidas (`slide_from_right`) y modal interactivo anti-pérdida de cambios.
+
+### ☁️ C. BACKEND SERVERLESS & INFRAESTRUCTURA
+*   **Webpay Plus Payment Pipeline:** Cloud Function `createWebpayTransaction` operando en la región de baja latencia `southamerica-west1`.
+*   **Zero-Dependency Serverless Architecture Refactor (V16.2):** Eliminación de cron jobs pasivos, delegando lógica de purga a interacción reactiva frontend.
+*   **Player Account Control & Deletion Engine (V16.3):** Baja con reautenticación segura protegiendo integridad de las reservas pasadas.
+*   **Firestore Security Rules Alignment (V17.5 / V19.6):** Reglas ultra restrictivas de acceso inquilino (Tenant Scope).
+*   **Motor de Reembolso Parcial Automático Transbank (V17.27):** Reintegro automatizado descontando de manera segura la comisión operativa del 3%.
+*   **Blindaje Resiliente contra Fallos Físicos de API (V17.33):** Cancelación tolerante y liberación de canchas para tokens expirados en la pasarela.
+*   **Notificaciones Email (Resend) & Políticas Legales (V19.0):** Envío serverless en Vercel con integración de T&C y Privacidad.
+*   **Auditoría Unificada Multicanal Inmutable (V19.6):** Pipeline de auditoría con IDs únicos `TRC-XXXXXX` y geolocalización IP en Firestore.
 
 ---
 
-## 🛠️ 7. ESPECIFICACIONES TÉCNICAS NUCLEARES
-*   **Web Engine:** Next.js 16 (App Router) & React 19 (High Performance Edition).
-*   **Mobile Stack:** Expo 54 | React Native 0.81 | NativeWind 4.
-*   **Styling System:** Tailwind CSS 4 + Framer Motion V12.0.
-*   **Data Vis:** Recharts High-Fidelity con personalización de tooltips.
-*   **Backend:** Firebase Ecosystem (Auth, Firestore, Cloud Functions).
+## ✅ 7. ESTADO DE DESARROLLO Y PROGRESO INTEGRAL
+
+### 📱 APP MÓVIL (`mvp-sports-app`) — **100.0%**
+| Módulo Clave | Estado | Funcionalidad Operativa |
+| :--- | :---: | :--- |
+| **Login Móvil / Bypass** | **FINALIZADO** | Redireccionamiento inteligente y bypass para roles de staff. |
+| **Billetera & Ledger** | **FINALIZADO** | Balance Ejecutivo con segregación contable online vs local. |
+| **Checkout WebView** | **FINALIZADO** | Pagos webpay plus, cupones dinámicos V18 y pre-validación de deuda. |
+| **Check-in QR Escáner** | **FINALIZADO** | Optimizado a 30 FPS para túneles oscuros. |
+| **Gamificación & ELO** | **FINALIZADO** | Evolución del deportista con topes matemáticos de anti-fraude. |
+
+### 💻 PANEL WEB (`mvp-sports-web`) — **100.0%**
+| Módulo Clave | Estado | Funcionalidad Operativa |
+| :--- | :---: | :--- |
+| **Admin Dashboard** | **FINALIZADO** | Multi-tenant SaaS, gestión de sedes, bloqueos regionales. |
+| **Check-In Dashboard** | **FINALIZADO** | Analíticas de ocupación, cancelación matemática de No-Shows. |
+| **Marketing & Cupones**| **FINALIZADO** | Códigos porcentuales protegidos con restricción de cupos. |
+| **Monitor de Auditoría**| **FINALIZADO** | Rastreo inmutable de acciones críticas e IPs forenses. |
+
+### ☁️ BACKEND & NUBE (`mvp-sports-backend`) — **100.0%**
+| Módulo Clave | Estado | Funcionalidad Operativa |
+| :--- | :---: | :--- |
+| **Motor de Pagos** | **FINALIZADO** | Reversas Transbank y cobros Oneclick procesados asíncronamente. |
+| **Seguridad Firestore**| **FINALIZADO** | Aislamiento por Tenant, roles sin custom-claims (fallbacks de seguridad). |
+| **Pipeline Base64** | **FINALIZADO** | Persistencia nativa de imágenes evitando lag de CDN. |
 
 ---
 
-## ✅ 8. ESTADO DE DESARROLLO POR CARPETAS (AUDITADO DE ALTA DENSIDAD)
+## 🚀 8. ROADMAP & FUNCIONES PENDIENTES
+*Estas características están programadas en la hoja de ruta para su completa interconexión y pruebas QA (V20).*
 
-### 📱 1. APLICACIÓN MÓVIL (`mvp-sports-app`) — **99.6% COMPLETADO**
-*El núcleo móvil nativo que empodera a jugadores finales y al personal operativo en sitio.*
-
-| Módulo / Archivo Clave | Estado | Progreso | Descripción Operativa & Funcionalidad |
-| :--- | :---: | :---: | :--- |
-| **Login Móvil con Bypass** (`/app/(auth)/login.tsx`) | **FINALIZADO** | 100% | Flujo de acceso adaptativo con bypass de email verificado y redireccionamiento inteligente por rol. |
-| **Billetera & Ledger** (`/app/(player)/wallet.tsx`) | **FINALIZADO** | 100% | Matriz de Balance Ejecutivo que divide transacciones Webpay de pagos presenciales en el recinto. |
-| **Checkout WebView** (`/app/(player)/checkout.tsx`) | **FINALIZADO** | 100% | Flujo de pago Webpay Plus en WebView in-app con pasarelas automáticas y filtrado dinámico. |
-| **Devoluciones Manuales** (`/app/(player)/ticket.tsx`) | **FINALIZADO** | 100% | Ticket de reembolso fallido sin QR, diseño tipográfico simplificado de alta legibilidad. |
-| **Historial & Modales** (`/app/(player)/(tabs)/reservas.tsx`) | **FINALIZADO** | 100% | Control del modal inteligente `showTicket` adaptado dinámicamente para QR o reclamos de reembolso. |
-| **Perfil del Manager** (`/app/(owner)/perfil.tsx`) | **FINALIZADO** | 100% | Switch nativo de Modo Oscuro, footer de marca estándar, tipografía corregida a 700. |
-| **Validador check-in QR** (`/app/(owner)/checkin.tsx`) | **FINALIZADO** | 100% | Escáner inmersivo a 30 FPS vertical con recuadro dinámico, tasa de exposición optimizada. |
-| **Buscador & Mapa** (`/app/(player)/explore.tsx`) | **FINALIZADO** | 100% | Buscador pricing-aware y cálculo real de geolocalización por distancia de km. |
-| **Gamificación & ELO** (`/app/(player)/elo-stats.tsx`) | **FINALIZADO** | 100% | Visualización de rango competitivos, XP acumulados y carta digital del deportista. |
-| **Torneos & Squads** (`/app/(player)/torneos/`) | **COMPLETO** | 95% | Postulación de squads, chat de legiones, bases e inscripción mediante Webpay. |
-| **Estadísticas de Canchas** (`/app/(player)/estadisticas.tsx`) | **FINALIZADO** | 100% | Actualización de marcadores deportivos sin alterar la consistencia de nombres e IDs de recintos. |
-| **Servicio de Auditoría Móvil** (`/services/auditService.ts`) | **FINALIZADO** | 100% | Registro asíncrono y optimizado de acciones móviles críticas bajo traceId, fecha y hora local. |
-
----
-
-### 💻 2. PANEL ADMINISTRATIVO WEB (`mvp-sports-web`) — **99.5% COMPLETADO**
-*La plataforma de control y analítica para administradores de recintos, dueños y superadmins.*
-
-| Módulo / Archivo Clave | Estado | Progreso | Descripción Operativa & Funcionalidad |
-| :--- | :---: | :---: | :--- |
-| **Login Web con Bypass** (`/app/login/page.tsx`) | **FINALIZADO** | 100% | Login en Next.js con bypass de correo verificado para roles de gestión y disclaimer de políticas. |
-| **Admin Dashboard Multi-Tenant** (`/components/dashboard/AdminDashboard.tsx`) | **FINALIZADO** | 100% | Panel global de SuperAdmin con soporte multinquilino nativo, resolución de nombres reales y KPIs premium. |
-| **SuperAdmin Settings** (`/app/dashboard/settings/`) | **FINALIZADO** | 100% | Dashboard global de comisiones, definición de planes de suscripción y switches de red. |
-| **Configuración Recinto** (`/app/dashboard/complex/`) | **FINALIZADO** | 100% | Gating visual de cristal en integraciones externas de MercadoPago/Transbank bloqueadas por plan. |
-| **Cupones & Marketing** (`/app/dashboard/coupons/`) | **FINALIZADO** | 100% | CRUD de códigos promocionales con blindaje y modal explicativo premium. |
-| **Suscripciones & Billing** (`/app/dashboard/billing-subscription/`) | **FINALIZADO** | 100% | Visualizador de licenciamiento con indexación insensible a mayúsculas/minúsculas. |
-| **Gestión de Recintos** (`/app/dashboard/tenants/`) | **FINALIZADO** | 100% | Registro y CRUD de sedes, corrección de referencia asíncrona `tenantRef` e interfaz unificada. |
-| **Check-In Dashboard** (`/app/dashboard/checkin/`) | **FINALIZADO** | 100% | Analíticas de ocupación, KPIs corregidos (No-Shows vs cancelados) y badges por motivo. |
-| **Maestro Calendario** (`/app/dashboard/calendar/`) | **FINALIZADO** | 100% | Agenda de canchas multi-deporte con cargas en tiempo real y solapamiento imposible. |
-| **Términos y Privacidad (Páginas)** | **FINALIZADO** | 100% | Páginas públicas `/terms` y `/privacy` con navegación por índice lateral, badges y diseño glassmorphic. |
-| **Modales de Términos (Landing)** | **FINALIZADO** | 100% | Modales emergentes `TermsModal` y `PrivacyModal` integrados en el Footer de la landing page con interceptor de enlaces. |
-| **Torneos & Ligas** (`/app/dashboard/championships/`) | **COMPLETO** | 95% | Generación de brackets dinámicos y fixture round-robin en base a inscritos. |
-| **Academia Deportiva** (`/app/dashboard/academy/`) | **COMPLETO** | 90% | Control de clases y alumnos matriculados por grupo etario. |
-| **Monitor de Auditoría** (`/app/dashboard/audit/`) | **FINALIZADO** | 100% | Visualizador de logs forenses interactivos con filtros avanzados de IP, fecha y severidad. |
-| **Reportar Incidencia** (`/app/dashboard/report-issue/`) | **FINALIZADO** | 100% | Formulario exhaustivo de fallas con extracción automatizada de User Agent, OS y resolución. |
-| **Consola de Incidencias** (`/app/dashboard/reports/`) | **FINALIZADO** | 100% | Consola de soporte con filtros de prioridad/estado, detalles de entorno y modal de gestión funcional. |
-| **Servicio de Auditoría Web** (`/services/auditService.ts`) | **FINALIZADO** | 100% | Cliente de logs estructurados con geo-localización y resolución de red vía ipapi.co. |
-
----
-
-### ☁️ 3. INFRAESTRUCTURA & BACKEND (`backend` / `cloud-functions`) — **100.0% COMPLETADO**
-*El cerebro asíncrono serverless, bases de datos y seguridad que mantiene el ecosistema en pie.*
-
-| Módulo / Componente Clave | Estado | Progreso | Descripción Operativa & Funcionalidad |
-| :--- | :---: | :---: | :--- |
-| **Auto-Cancellations Cron** (`/api/cron/check-no-shows`) | **FINALIZADO** | 100% | Sincronizado bajo huso de Chile (`America/Santiago`), anula reservas sin Check-In activo. |
-| **Firestore Security Rules** (`/firestore.rules`) | **FINALIZADO** | 100% | Políticas multi-inquilino restrictivas, validador de roles `getRole()` e inmutabilidad. |
-| **Funciones de Pago** (`/functions/createWebpayTransaction`) | **FINALIZADO** | 100% | Enrutador regional `southamerica-west1` y captura de retornos HTTPS seguros. |
-| **Serialización de Imágenes** (`Base64 Image Pipeline`) | **FINALIZADO** | 100% | Inserción inmutable de perfiles codificados Base64 con sincronización triple a Auth y staff. |
-| **Notificaciones Email** (`/api/send-email`) | **FINALIZADO** | 100% | Motor Resend integrado en Vercel, HTML simplificado con título minimalista a gran escala. |
-
----
-
-### 🏁 4. RESUMEN GLOBAL OPERATIVO DE PROGRESO
-*   **App Móvil (`mvp-sports-app`):** **100.0%**
-*   **Web Dashboard (`mvp-sports-web`):** **100.0%**
-*   **Backend Serverless (`mvp-sports-backend`):** **100.0%**
-*   **PROGRESO INTEGRAL DE LA SUITE:** 🚀 **100.0% OPERATIVO** (Ecosistema Blindado y Listo para Escalar)
-
----
-
-### 🔍 DETALLES DE LA AUDITORÍA DE CÓDIGO REAL
-*   **Torneos & Ligas Automatizadas (95%):** Completamente implementado y conectado. El backend cuenta con generadores dinámicos de Brackets (Eliminación Directa) y Tablas de Posiciones (Round-Robin). La consola de administración de torneos en la web (`app/dashboard/championships/page.tsx`) permite gestionar las categorías, límites de equipos, periodos de juego e inscripciones. En la App del Jugador (`app/(player)/torneos/index.tsx`), se listan de forma interactiva las ligas, se leen sus bases tácticas y los capitanes pueden postular su squad y pagar la inscripción mediante la pasarela segura **Transbank Webpay Plus** (`checkout.tsx`).
-*   **Academia Deportiva (90%):** Módulo de control estructural 100% funcional. La interfaz web (`app/dashboard/academy/page.tsx`) cuenta con un administrador de clases, profesores, horarios y control de alumnos matriculados por grupo de edad. Incluye el switch `isVisibleInApp` para sincronización directa con el marketplace de la App móvil.
-*   **Optimización Elite V17.5 (100%):** Se implementó blindaje contra alta concurrencia y resiliencia offline. Se migró la aplicación móvil a `@shopify/flash-list` para renderizado masivo a 60FPS. El Dashboard del Staff (`app/(owner)`) ahora cuenta con un HUD interactivo que indica estado offline ("Operando Local") apalancado en persistencia global de Firestore. El backend incluye bloqueo transaccional por idempotencia en pagos y reembolsos para evitar fallas o doble facturación ante inestabilidades de red.
-*   **Unificación de Estados de Pago y No-Show (100%):** Se unificó la lógica de detección de inasistencias (`No-Show`) desde la App móvil hacia todo el panel administrativo web. Todos los Dashboards (Admin, Manager, Owner, Metrics y Finance) ahora reflejan el método de pago real (Webpay, Oneclick, Efectivo, Transferencia, Online App) y los estados precisos (Pagado, Pendiente, Parcial, Reembolsado, No-Show) incluyendo sus respectivas representaciones visuales y badge rendering. Además, el reporte financiero en PDF captura el abanico completo de estados para la auditoría contable.
-*   **Bloqueo de Reservas a Morosos por No-Show (100%):** El sistema de Checkout (`checkout.tsx`) y el servicio de reservas ahora evalúan el historial del jugador en tiempo real. Si el usuario registra una inasistencia (No-Show) en una reserva agendada bajo modalidad "Pago en Recinto" (efectivo), el sistema le bloquea automáticamente esta opción para futuras reservas, obligándolo a pagar por adelantado mediante pasarela online. Si el recinto de destino no posee pasarela online activa, el sistema bloquea de manera absoluta e insalvable la reserva, protegiendo las finanzas del recinto.
+*   **🏆 Torneos & Ligas Automatizadas (Progreso: 95%):**
+    *   *Desarrollado:* Generadores dinámicos de Brackets (Eliminación directa) y Fixture (Round-Robin) en backend. La Consola Web permite establecer el número máximo de equipos y la inscripción funciona vía Transbank en la App Móvil.
+    *   *Pendiente:* Pruebas de borde en avance de fase (Fase de Grupo hacia Eliminación Directa).
+*   **🎓 Academia Deportiva (Progreso: 90%):**
+    *   *Desarrollado:* El Dashboard web soporta el CRUD avanzado de clases, profesores y bloques semanales con sincronización en tiempo real.
+    *   *Pendiente:* Habilitación del sistema de pago recurrente mensual para la matricula móvil.
 
 ---
 **ORION TECHNOLOGY - MVP Sports Chile - 2026**
 *Sistemas de Inteligencia y Eficiencia Operativa de Precisión*
-

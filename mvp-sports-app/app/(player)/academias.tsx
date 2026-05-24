@@ -11,6 +11,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { useAuth } from '../../store/useAuth';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 
 const { width } = Dimensions.get('window');
 
@@ -90,8 +91,8 @@ export default function AcademiasScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: C.bg }}>
             {/* PRÓXIMAMENTE MODAL OVERLAY */}
-            <Modal visible={true} transparent={false} animationType="fade">
-                <View style={{ flex: 1, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center', padding: 30 }}>
+            <Modal visible={true} transparent={true} animationType="fade">
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 30, backgroundColor: isDark ? 'rgba(2,6,23,0.98)' : 'rgba(248,250,252,0.98)' }}>
                     <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
                     <View style={{ width: 140, height: 140, borderRadius: 50, backgroundColor: accent + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 35, borderWidth: 2, borderColor: accent + '30' }}>
                         <GraduationCap color={accent} size={64} strokeWidth={1.5} />

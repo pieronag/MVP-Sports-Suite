@@ -83,7 +83,7 @@ export default function CheckoutScreen() {
         tenantId, tenantName, courtId, courtName, price, date, startTime, sport, sportColor,
         tournamentId, teamId, teamName, tournamentName,
         venueName, location, category, tournamentType,
-        bookingId
+        bookingId, requireOnlinePayment
     } = params;
 
     const activeColor = (sportColor as string) || '#10b981';
@@ -114,10 +114,12 @@ export default function CheckoutScreen() {
 
     // Si la API del recinto no está configurada, forzar pago en recinto
     useEffect(() => {
-        if (!loadingTenant && !isPaymentApiActive && !hasCashNoShow) {
+        if (requireOnlinePayment === 'true') {
+            setPaymentMethod('card');
+        } else if (!loadingTenant && !isPaymentApiActive && !hasCashNoShow) {
             setPaymentMethod('venue');
         }
-    }, [loadingTenant, isPaymentApiActive, hasCashNoShow]);
+    }, [loadingTenant, isPaymentApiActive, hasCashNoShow, requireOnlinePayment]);
 
     useEffect(() => {
         if (user) {
@@ -513,7 +515,7 @@ export default function CheckoutScreen() {
 
                 <View style={{ marginHorizontal: 30, gap: 12 }}>
                     {/* OPCIÓN 1: PAGO EN RECINTO */}
-                    {!hasCashNoShow && (
+                    {!hasCashNoShow && requireOnlinePayment !== 'true' && (
                         <TouchableOpacity 
                             onPress={() => setPaymentMethod('venue')}
                             style={{ 
