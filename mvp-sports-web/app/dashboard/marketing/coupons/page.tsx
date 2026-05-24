@@ -132,6 +132,14 @@ export default function CouponsPage() {
             setNotification({ msg: "La fecha de fin no puede ser anterior al inicio", type: 'error' });
             return;
         }
+        if (Number(formData.discount) < 1 || Number(formData.discount) > 100) {
+            setNotification({ msg: "El descuento debe ser un porcentaje válido entre 1 y 100", type: 'error' });
+            return;
+        }
+        if (Number(formData.minimumPurchase) < 0) {
+            setNotification({ msg: "La compra mínima no puede ser negativa", type: 'error' });
+            return;
+        }
         setSaving(true);
         try {
             const payload = {
@@ -359,7 +367,9 @@ export default function CouponsPage() {
                                         <div className="p-6 flex-1 flex flex-col">
                                             <div className="flex justify-between items-start mb-4">
                                                 <div className="w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-500/10 text-pink-600 flex items-center justify-center border border-pink-100 dark:border-pink-500/20"><PercentBadgeIcon className="w-5 h-5" /></div>
-                                                <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${c.status === 'active' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>{c.status === 'active' ? 'VIGENTE' : 'CADUCADO'}</span>
+                                                <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase ${c.status === 'active' && new Date(c.validUntil) >= new Date() ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}`}>
+                                                    {new Date(c.validUntil) < new Date() ? 'CADUCADO' : (c.status === 'active' ? 'VIGENTE' : 'INACTIVO')}
+                                                </span>
                                             </div>
                                             <h3 className="font-black text-slate-900 dark:text-white text-lg tracking-widest uppercase mb-1">{c.code}</h3>
                                             <p className="text-[10px] font-black text-pink-500 uppercase mb-3">{c.discount}% DESCUENTO</p>
@@ -407,12 +417,16 @@ export default function CouponsPage() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">Descuento (%)</label>
-                                    <input required type="number" value={formData.discount} onChange={e => setFormData({ ...formData, discount: Number(e.target.value) })} className="w-full px-4 py-2.5 bg-pink-50 dark:bg-pink-500/5 border border-pink-200 dark:border-pink-500/20 rounded-xl text-xs font-black outline-none" />
+                                    <input required type="number" min="1" max="100" value={formData.discount} onChange={e => setFormData({ ...formData, discount: Number(e.target.value) })} className="w-full px-4 py-2.5 bg-pink-50 dark:bg-pink-500/5 border border-pink-200 dark:border-pink-500/20 rounded-xl text-xs font-black outline-none" />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">Límite Usos</label>
-                                    <input required type="number" value={formData.limit} onChange={e => setFormData({ ...formData, limit: Number(e.target.value) })} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-black outline-none" />
+                                    <input required type="number" min="1" value={formData.limit} onChange={e => setFormData({ ...formData, limit: Number(e.target.value) })} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-black outline-none" />
                                 </div>
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-black text-slate-400 uppercase block mb-1">Monto Mínimo Compra ($)</label>
+                                <input required type="number" min="0" value={formData.minimumPurchase} onChange={e => setFormData({ ...formData, minimumPurchase: Number(e.target.value) })} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-black outline-none" />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>

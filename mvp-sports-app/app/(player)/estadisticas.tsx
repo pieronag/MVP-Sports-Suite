@@ -1313,7 +1313,7 @@ export default function EstadisticasScreen() {
                                                                                 </TouchableOpacity>
                                                                                 <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', width: 16, textAlign: 'center' }}>{currentGoals}</Text>
                                                                                 <TouchableOpacity 
-                                                                                    onPress={() => setMemberGoals(prev => ({ ...prev, [member.uid]: (prev[member.uid] || 0) + 1 }))}
+                                                                                    onPress={() => setMemberGoals(prev => ({ ...prev, [member.uid]: Math.min(20, (prev[member.uid] || 0) + 1) }))}
                                                                                     style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0', alignItems: 'center', justifyContent: 'center' }}
                                                                                 >
                                                                                     <Plus color={C.text} size={12} />
@@ -1333,7 +1333,7 @@ export default function EstadisticasScreen() {
                                                                                 </TouchableOpacity>
                                                                                 <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', width: 16, textAlign: 'center' }}>{currentAssists}</Text>
                                                                                 <TouchableOpacity 
-                                                                                    onPress={() => setMemberAssists(prev => ({ ...prev, [member.uid]: (prev[member.uid] || 0) + 1 }))}
+                                                                                    onPress={() => setMemberAssists(prev => ({ ...prev, [member.uid]: Math.min(20, (prev[member.uid] || 0) + 1) }))}
                                                                                     style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0', alignItems: 'center', justifyContent: 'center' }}
                                                                                 >
                                                                                     <Plus color={C.text} size={12} />

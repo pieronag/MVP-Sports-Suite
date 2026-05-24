@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, ScrollView, StatusBar, ActivityIndicator,
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ChevronLeft, CreditCard, ShieldCheck, Zap, Calendar, Clock, Trophy, MapPin, Users, CheckCircle2, XCircle, X, Plus } from 'lucide-react-native';
 import { WebView } from 'react-native-webview';
+import { TextInput } from 'react-native';
+import { couponService, Coupon } from '../../services/couponService';
 import { useAuth } from '../../store/useAuth';
 import { bookingService } from '../../services/bookingService';
 import { walletService } from '../../services/walletService';
@@ -71,6 +73,9 @@ export default function CheckoutScreen() {
     const [isNewBookingCreated, setIsNewBookingCreated] = useState(false);
     const [pendingBooking, setPendingBooking] = useState<any>(null);
     const [hasCashNoShow, setHasCashNoShow] = useState(false);
+    const [couponInput, setCouponInput] = useState('');
+    const [validatingCoupon, setValidatingCoupon] = useState(false);
+    const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
     // Parámetros dinámicos (pueden ser de Reserva o de Torneo)
     const { 
@@ -134,6 +139,31 @@ export default function CheckoutScreen() {
         }
     }, [user?.uid]);
 
+    const handleApplyCoupon = async () => {
+        if (!couponInput.trim()) return;
+        setValidatingCoupon(true);
+        try {
+            const coupon = await couponService.validateCoupon(couponInput, tenantId as string, Number(price));
+            setAppliedCoupon(coupon);
+            setCustomAlert({
+                visible: true,
+                title: 'CUPÓN APLICADO',
+                message: `Se ha aplicado un ${coupon.discount}% de descuento exitosamente.`,
+                type: 'success'
+            });
+        } catch (error: any) {
+            setAppliedCoupon(null);
+            setCustomAlert({
+                visible: true,
+                title: 'CUPÓN INVÁLIDO',
+                message: error.message,
+                type: 'error'
+            });
+        } finally {
+            setValidatingCoupon(false);
+        }
+    };
+
     const handleConfirm = async () => {
         if (!user) return;
 
@@ -149,7 +179,9 @@ export default function CheckoutScreen() {
 
         setProcessing(true);
         try {
-            const priceNum = Number(price);
+            const basePriceNum = Number(price);
+            const discountAmount = appliedCoupon ? (basePriceNum * appliedCoupon.discount / 100) : 0;
+            const priceNum = basePriceNum - discountAmount;
             const userProfile = profile as any;
             const clientName = userProfile?.displayName || userProfile?.fullName || user.displayName || 'Jugador MVP';
 
@@ -197,7 +229,6 @@ export default function CheckoutScreen() {
 
             } else {
                 // FLUJO DE RESERVA
-                const priceNum = Number(price);
                 const [startH, startM] = (startTime as string).split(':').map(Number);
                 const endH = startH + 1;
                 const endTime = `${endH.toString().padStart(2, '0')}:${(startM || 0).toString().padStart(2, '0')}`;
@@ -218,6 +249,9 @@ export default function CheckoutScreen() {
                     startTime: startTime as string,
                     endTime: endTime,
                     totalPrice: priceNum,
+                    originalPrice: basePriceNum,
+                    couponCode: appliedCoupon ? appliedCoupon.code : null,
+                    discountApplied: appliedCoupon ? appliedCoupon.discount : 0,
                     status: 'confirmed', 
                     paymentStatus: 'pending',
                     source: 'mobile_app',
@@ -274,6 +308,10 @@ export default function CheckoutScreen() {
                         await bookingService.updateBooking(finalBookingId, bookingData);
                     } else {
                         finalBookingId = await bookingService.createBooking(bookingData);
+                    }
+
+                    if (appliedCoupon) {
+                        await couponService.incrementCouponUsage(appliedCoupon.id);
                     }
 
                     router.replace({
@@ -360,15 +398,54 @@ export default function CheckoutScreen() {
 
                     <View style={{ marginTop: 25, paddingTop: 25, borderTopWidth: 1, borderTopColor: C.border, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <View>
-                            <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', letterSpacing: 1 }}>COSTO DE INSCRIPCIÓN</Text>
-                            <Text style={{ color: C.text, fontSize: 32, fontWeight: '900', letterSpacing: -1 }}>
+                            <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', letterSpacing: 1 }}>{appliedCoupon ? 'SUBTOTAL' : 'COSTO TOTAL'}</Text>
+                            <Text style={{ color: appliedCoupon ? C.sub : C.text, fontSize: appliedCoupon ? 20 : 32, fontWeight: '900', letterSpacing: -1, textDecorationLine: appliedCoupon ? 'line-through' : 'none' }}>
                                 ${Number(price).toLocaleString('es-CL')}
                             </Text>
+                            {appliedCoupon && (
+                                <>
+                                    <Text style={{ color: activeColor, fontSize: 10, fontWeight: '900', marginTop: 2 }}>DESCUENTO ({appliedCoupon.discount}%)</Text>
+                                    <Text style={{ color: C.text, fontSize: 32, fontWeight: '900', letterSpacing: -1 }}>
+                                        ${(Number(price) - (Number(price) * appliedCoupon.discount / 100)).toLocaleString('es-CL')}
+                                    </Text>
+                                </>
+                            )}
                         </View>
                         <View style={{ backgroundColor: activeColor + '10', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 }}>
                             <Text style={{ color: activeColor, fontWeight: '900', fontSize: 10 }}>MVP</Text>
                         </View>
                     </View>
+                </View>
+
+                {/* CÓDIGO PROMOCIONAL */}
+                <SectionLabel label="CÓDIGO PROMOCIONAL" />
+                <View style={{ marginHorizontal: 30, flexDirection: 'row', gap: 10 }}>
+                    <View style={{ flex: 1, backgroundColor: C.card, borderRadius: 16, borderWidth: 1, borderColor: appliedCoupon ? '#10b981' : C.border, paddingHorizontal: 16, justifyContent: 'center', height: 50 }}>
+                        <TextInput 
+                            placeholder="Ej. MVP2026"
+                            placeholderTextColor={C.sub}
+                            value={couponInput}
+                            onChangeText={(t) => setCouponInput(t.toUpperCase())}
+                            editable={!appliedCoupon && !validatingCoupon}
+                            style={{ color: appliedCoupon ? '#10b981' : C.text, fontSize: 13, fontWeight: '900', letterSpacing: 1 }}
+                        />
+                    </View>
+                    {appliedCoupon ? (
+                        <TouchableOpacity 
+                            onPress={() => setAppliedCoupon(null)}
+                            style={{ backgroundColor: '#ef4444', width: 50, borderRadius: 16, justifyContent: 'center', alignItems: 'center', height: 50 }}
+                        >
+                            <XCircle color="white" size={20} />
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity 
+                            onPress={handleApplyCoupon}
+                            disabled={validatingCoupon || !couponInput.trim()}
+                            style={{ backgroundColor: validatingCoupon || !couponInput.trim() ? C.border : activeColor, paddingHorizontal: 20, borderRadius: 16, justifyContent: 'center', alignItems: 'center', height: 50 }}
+                        >
+                            {validatingCoupon ? <ActivityIndicator color="white" size="small" /> : <Text style={{ color: 'white', fontWeight: '900', fontSize: 11 }}>APLICAR</Text>}
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 {/* SELECCIÓN DE EQUIPO (SOLO PARA RESERVAS) */}
@@ -613,6 +690,10 @@ export default function CheckoutScreen() {
                                                 updatedAt: fsServerTimestamp()
                                             };
                                             await fsSetDoc(fsDoc(db, 'bookings', webpayData.bookingId), finalData);
+
+                                            if (appliedCoupon) {
+                                                await couponService.incrementCouponUsage(appliedCoupon.id);
+                                            }
                                         } catch (err) {
                                             console.error("Error creating booking in success callback:", err);
                                         }

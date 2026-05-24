@@ -9,6 +9,11 @@ import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useColorScheme } from 'nativewind';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  'Due to changes in Androids permission requirements, Expo Go can no longer provide full access'
+]);
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
