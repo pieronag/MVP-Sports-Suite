@@ -9,7 +9,7 @@ import {
     ChevronLeft, Mail, AlertCircle, CheckCircle2, 
     Shield, Activity, Sparkles, ArrowRight, Smartphone, User
 } from 'lucide-react-native';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { useAuth } from '../../store/useAuth';
 import { auditService } from '../../services/auditService';
@@ -62,6 +62,41 @@ export default function ReporteScreen() {
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [activeTab, setActiveTab] = useState<'nuevo' | 'historial'>('nuevo');
+    const [myReports, setMyReports] = useState<any[]>([]);
+    const [loadingReports, setLoadingReports] = useState(false);
+
+    useEffect(() => {
+        if (activeTab === 'historial') {
+            fetchMyReports();
+        }
+    }, [activeTab]);
+
+    const fetchMyReports = async () => {
+        if (!user) return;
+        setLoadingReports(true);
+        try {
+            const q = query(
+                collection(db, 'reports'),
+                where('userId', '==', user.uid)
+            );
+            const snapshot = await getDocs(q);
+            const reportsData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+                createdAt: doc.data().createdAt ? new Date(doc.data().createdAt.seconds * 1000) : new Date()
+            }));
+            
+            // Ordenar en memoria para no requerir índice compuesto en Firebase
+            reportsData.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+            
+            setMyReports(reportsData);
+        } catch (error) {
+            console.error("Error al cargar mis reportes:", error);
+        } finally {
+            setLoadingReports(false);
+        }
+    };
 
     // Form states
     const [subject, setSubject] = useState('');
@@ -163,11 +198,27 @@ export default function ReporteScreen() {
                 >
                     <ChevronLeft color={accent} size={24} />
                 </TouchableOpacity>
-                <Text style={[styles.headerTitle, { color: C.text }]}>Reportar Problema</Text>
+                <Text style={[styles.headerTitle, { color: C.text }]}>Soporte</Text>
                 <View style={{ width: 44 }} />
             </View>
 
-            {success ? (
+            {/* TABS */}
+            <View style={[styles.tabsContainer, { backgroundColor: C.card, borderBottomColor: C.border }]}>
+                <TouchableOpacity 
+                    style={[styles.tabButton, activeTab === 'nuevo' && { borderBottomColor: accent, borderBottomWidth: 2 }]} 
+                    onPress={() => setActiveTab('nuevo')}
+                >
+                    <Text style={[styles.tabText, { color: activeTab === 'nuevo' ? accent : C.sub }]}>NUEVO REPORTE</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    style={[styles.tabButton, activeTab === 'historial' && { borderBottomColor: accent, borderBottomWidth: 2 }]} 
+                    onPress={() => setActiveTab('historial')}
+                >
+                    <Text style={[styles.tabText, { color: activeTab === 'historial' ? accent : C.sub }]}>MIS REPORTES</Text>
+                </TouchableOpacity>
+            </View>
+
+            {success && activeTab === 'nuevo' ? (
                 <View style={[styles.successContainer, { backgroundColor: C.bg }]}>
                     <View style={[styles.successIconWrapper, { backgroundColor: accent + '15', borderColor: accent + '30' }]}>
                         <CheckCircle2 color={accent} size={64} strokeWidth={1.5} />
@@ -187,12 +238,50 @@ export default function ReporteScreen() {
                         <ArrowRight color="white" size={16} style={{ marginLeft: 8 }} />
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={() => router.back()}
+                        onPress={() => setActiveTab('historial')}
                         style={[styles.backHomeButton, { borderColor: C.border, backgroundColor: C.card }]}
                     >
-                        <Text style={[styles.backHomeButtonText, { color: C.text }]}>Volver a Ajustes</Text>
+                        <Text style={[styles.backHomeButtonText, { color: C.text }]}>Ver mis Reportes</Text>
                     </TouchableOpacity>
                 </View>
+            ) : activeTab === 'historial' ? (
+                <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                    {loadingReports ? (
+                        <View style={{ padding: 40, alignItems: 'center' }}>
+                            <ActivityIndicator color={accent} size="large" />
+                            <Text style={{ marginTop: 10, color: C.sub, fontWeight: '700', fontSize: 12 }}>Cargando reportes...</Text>
+                        </View>
+                    ) : myReports.length === 0 ? (
+                        <View style={{ padding: 40, alignItems: 'center' }}>
+                            <AlertCircle color={C.sub} size={40} style={{ marginBottom: 15, opacity: 0.5 }} />
+                            <Text style={{ color: C.text, fontWeight: '800', fontSize: 16 }}>No hay reportes</Text>
+                            <Text style={{ color: C.sub, marginTop: 5, textAlign: 'center', fontSize: 12 }}>Aún no has enviado ningún reporte al equipo de soporte.</Text>
+                        </View>
+                    ) : (
+                        myReports.map(report => (
+                            <View key={report.id} style={[styles.reportCard, { backgroundColor: C.card, borderColor: C.border }]}>
+                                <View style={styles.reportHeader}>
+                                    <View style={[styles.reportStatus, { backgroundColor: report.status === 'Resuelto' ? '#10b98115' : '#3b82f615', borderColor: report.status === 'Resuelto' ? '#10b98130' : '#3b82f630' }]}>
+                                        <Text style={[styles.reportStatusText, { color: report.status === 'Resuelto' ? '#10b981' : '#3b82f6' }]}>{report.status}</Text>
+                                    </View>
+                                    <Text style={[styles.reportDate, { color: C.sub }]}>{report.createdAt.toLocaleDateString()}</Text>
+                                </View>
+                                <Text style={[styles.reportSubject, { color: C.text }]}>{report.subject}</Text>
+                                <Text style={[styles.reportDesc, { color: C.sub }]} numberOfLines={3}>{report.description}</Text>
+                                
+                                {report.response ? (
+                                    <View style={[styles.reportResponse, { backgroundColor: isDark ? 'rgba(16,185,129,0.05)' : '#F8FAFC', borderColor: isDark ? 'rgba(16,185,129,0.2)' : C.border }]}>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }}>
+                                            <Shield color={accent} size={16} style={{ marginRight: 8 }} />
+                                            <Text style={{ fontSize: 10, fontWeight: '900', color: accent, letterSpacing: 1 }}>SOPORTE MVP ({report.repliedBy || 'Oficial'})</Text>
+                                        </View>
+                                        <Text style={{ fontSize: 13, fontWeight: '700', color: C.text, lineHeight: 20 }}>{report.response}</Text>
+                                    </View>
+                                ) : null}
+                            </View>
+                        ))
+                    )}
+                </ScrollView>
             ) : (
                 <ScrollView 
                     showsVerticalScrollIndicator={false}
@@ -445,6 +534,23 @@ const styles = StyleSheet.create({
         fontWeight: '900',
         textTransform: 'uppercase',
         letterSpacing: -0.5
+    },
+    tabsContainer: {
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+    },
+    tabButton: {
+        flex: 1,
+        paddingVertical: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderBottomWidth: 2,
+        borderBottomColor: 'transparent',
+    },
+    tabText: {
+        fontSize: 11,
+        fontWeight: '900',
+        letterSpacing: 1,
     },
     scrollContent: {
         padding: 30,
@@ -705,5 +811,56 @@ const styles = StyleSheet.create({
         fontSize: 13,
         textTransform: 'uppercase',
         letterSpacing: 0.5
+    },
+    reportCard: {
+        padding: 25,
+        borderRadius: 30,
+        borderWidth: 1,
+        marginBottom: 20,
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowRadius: 20,
+        elevation: 4
+    },
+    reportHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 15
+    },
+    reportStatus: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 10,
+        borderWidth: 1
+    },
+    reportStatusText: {
+        fontSize: 10,
+        fontWeight: '900',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5
+    },
+    reportDate: {
+        fontSize: 12,
+        fontWeight: '800'
+    },
+    reportSubject: {
+        fontSize: 18,
+        fontWeight: '900',
+        marginBottom: 8,
+        letterSpacing: -0.5,
+        textTransform: 'uppercase'
+    },
+    reportDesc: {
+        fontSize: 13,
+        fontWeight: '600',
+        lineHeight: 20,
+        marginBottom: 15
+    },
+    reportResponse: {
+        marginTop: 10,
+        padding: 20,
+        borderRadius: 20,
+        borderWidth: 1
     }
 });

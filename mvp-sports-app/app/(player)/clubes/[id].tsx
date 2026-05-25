@@ -9,8 +9,12 @@ import {
     X, ShieldCheck, ChevronRight, Activity, Info, CreditCard,
     Smartphone, Trophy, Target, Navigation as NavIcon, Users,
     Timer, CalendarDays, Share2, ArrowRight, Sun, Moon, Sunrise,
-    Dribbble, Flame, Medal, CircleDot, LayoutDashboard, Navigation2
+    Dribbble, Flame, Medal, CircleDot, LayoutDashboard, Navigation2, CheckCircle2, ChevronDown, Check, ChevronUp, User
 } from 'lucide-react-native';
+import { 
+    FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon,
+    CanchaFutbolIcon, CanchaPadelIcon, CanchaTenisIcon, CanchaBasquetbolIcon, CanchaVoleibolIcon
+} from '../../../components/icons/sports';
 import { Image } from 'expo-image';
 import { useAuth } from '../../../store/useAuth';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -54,12 +58,12 @@ const formatDistance = (lat1: number, lon1: number, lat2: number, lon2: number) 
 const getSportInfo = (sportName: string) => {
     const s = (sportName || '').toLowerCase();
     const config: any = {
-        'futbol': { color: '#10b981', icon: Trophy },
-        'padel': { color: '#3b82f6', icon: Zap },
-        'tenis': { color: '#f59e0b', icon: CircleDot },
-        'basquet': { color: '#6366f1', icon: Dribbble },
-        'voley': { color: '#ec4899', icon: Activity },
-        'default': { color: '#10b981', icon: Medal }
+        'futbol': { color: '#10b981', icon: FutbolIcon, courtIcon: CanchaFutbolIcon },
+        'padel': { color: '#3b82f6', icon: PadelIcon, courtIcon: CanchaPadelIcon },
+        'tenis': { color: '#f59e0b', icon: TenisIcon, courtIcon: CanchaTenisIcon },
+        'basquet': { color: '#6366f1', icon: BasquetbolIcon, courtIcon: CanchaBasquetbolIcon },
+        'voley': { color: '#ec4899', icon: VoleibolIcon, courtIcon: CanchaVoleibolIcon },
+        'default': { color: '#10b981', icon: Medal, courtIcon: LayoutDashboard }
     };
     if (s.includes('futbol') || s.includes('fútbol')) return config['futbol'];
     if (s.includes('padel') || s.includes('pádel')) return config['padel'];
@@ -178,9 +182,10 @@ export default function VenueDetailsScreen() {
 
     const filteredCourts = useMemo(() => {
         if (!selectedSport) return [];
+        const normalizeSport = (s: string) => s ? s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : '';
         return courts.filter(c => {
-            const courtSport = (c.sport || '').toLowerCase();
-            const selSport = selectedSport.toLowerCase();
+            const courtSport = normalizeSport(c.sport || '');
+            const selSport = normalizeSport(selectedSport);
             return courtSport.includes(selSport) || selSport.includes(courtSport);
         });
     }, [courts, selectedSport]);
@@ -439,7 +444,7 @@ export default function VenueDetailsScreen() {
                             <View style={{ gap: 12 }}>
                                 {filteredCourts.map(court => (
                                     <TouchableOpacity key={court.id} onPress={() => { setSelectedCourtId(court.id); setBookingStep(3); }} style={{ height: 85, backgroundColor: C.card, borderRadius: 25, borderWidth: 1, borderColor: selectedCourtId === court.id ? activeSportInfo.color : C.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25, shadowColor: activeSportInfo.color, shadowOpacity: selectedCourtId === court.id ? 0.15 : 0, shadowRadius: 10 }}>
-                                        <View style={{ width: 45, height: 45, borderRadius: 12, backgroundColor: activeSportInfo.color + '10', alignItems: 'center', justifyContent: 'center' }}><LayoutDashboard color={activeSportInfo.color} size={20} /></View>
+                                        <View style={{ width: 45, height: 45, borderRadius: 12, backgroundColor: activeSportInfo.color + '10', alignItems: 'center', justifyContent: 'center' }}><activeSportInfo.courtIcon color={activeSportInfo.color} size={20} /></View>
                                         <View style={{ flex: 1, marginLeft: 20 }}><Text style={{ color: C.text, fontSize: 17, fontWeight: '900' }}>{court.name}</Text><Text style={{ color: C.sub, fontSize: 10, fontWeight: '800', textTransform: 'uppercase' }}>Infraestructura Pro</Text></View>
                                         <ChevronRight color={C.sub} size={20} />
                                     </TouchableOpacity>

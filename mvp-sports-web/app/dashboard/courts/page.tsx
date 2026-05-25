@@ -16,9 +16,10 @@ import CourtCard from '@/components/courts/CourtCard';
 import CourtModal from '@/components/courts/CourtModal';
 import MaintenanceModal from '@/components/courts/MaintenanceModal';
 import { PanelGlass, TarjetaKpi } from '@/components/ui/DashboardWidgets';
+import { SoccerIcon, PadelIcon, TennisIcon, BasketballIcon, VolleyballIcon } from '@/components/icons/SportsIcons';
 
 // --- CONSTANTES ---
-const AVAILABLE_SPORTS = ['Padel', 'Futbolito', 'Tenis', 'Squash', 'Pickleball', 'Basketball', 'Voleibol'];
+const AVAILABLE_SPORTS = ['Fútbol', 'Futbolito', 'Pádel', 'Tenis', 'Básquetbol', 'Vóleibol'];
 
 const DAYS_MAP: { [key: string]: string } = {
     monday: 'Lunes', tuesday: 'Martes', wednesday: 'Miércoles', thursday: 'Jueves',
@@ -121,6 +122,10 @@ export default function CourtsPage() {
     const [activePricingTab, setActivePricingTab] = useState<string>('');
     const [activeDayTypeTab, setActiveDayTypeTab] = useState<'weekday' | 'weekend'>('weekday');
     const [venueImageLoading, setVenueImageLoading] = useState(false);
+
+    // HELPER PARA NORMALIZAR DEPORTES (TILDES Y MAYUSCULAS)
+    const normalizeSport = (str: string) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : '';
+    const isSportSelected = (sport: string) => selectedSports.some(s => normalizeSport(s) === normalizeSport(sport));
 
     // FILTRO Y MODAL
     const [filterSport, setFilterSport] = useState<string>('Todos');
@@ -355,9 +360,9 @@ export default function CourtsPage() {
         setWeeklySchedule(prev => ({ ...prev, [day]: { ...prev[day], [field]: value } }));
     };
     const toggleSport = (sport: string) => {
-        if (selectedSports.includes(sport)) {
-            setSelectedSports(prev => prev.filter(s => s !== sport));
-            if (activePricingTab === sport) setActivePricingTab('');
+        if (isSportSelected(sport)) {
+            setSelectedSports(prev => prev.filter(s => normalizeSport(s) !== normalizeSport(sport)));
+            if (normalizeSport(activePricingTab) === normalizeSport(sport)) setActivePricingTab('');
         } else {
             setSelectedSports(prev => [...prev, sport]);
             if (!activePricingTab) setActivePricingTab(sport);
@@ -621,7 +626,8 @@ export default function CourtsPage() {
         }
     };
 
-    const filteredCourts = courts.filter(c => filterSport === 'Todos' ? true : c.sport === filterSport);
+    // FUNCIONES SECUNDARIAS
+    const filteredCourts = courts.filter(c => filterSport === 'Todos' ? true : normalizeSport(c.sport) === normalizeSport(filterSport));
     const sortedCourts = [...filteredCourts].sort((a, b) => a.name.localeCompare(b.name));
 
     if (!selectedVenue) {
@@ -793,9 +799,14 @@ export default function CourtsPage() {
                                         <button 
                                             key={s} 
                                             onClick={() => toggleSport(s)} 
-                                            className={`p-3 rounded-lg text-[9px] font-black uppercase border transition-all flex flex-col items-center gap-2 ${selectedSports.includes(s) ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-50 dark:bg-white/5 border-slate-100 dark:border-white/5 text-slate-400 hover:border-emerald-500/30'}`}
+                                            className={`p-3 rounded-lg text-[9px] font-black uppercase border transition-all flex flex-col items-center gap-2 ${isSportSelected(s) ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-50 dark:bg-white/5 border-slate-100 dark:border-white/5 text-slate-400 hover:border-emerald-500/30'}`}
                                         >
-                                            <BoltIcon className={`w-4 h-4 ${selectedSports.includes(s) ? 'text-white' : 'text-slate-300'}`} />
+                                            {normalizeSport(s) === 'futbol' || normalizeSport(s) === 'futbolito' ? <SoccerIcon className={`w-4 h-4 ${isSportSelected(s) ? 'text-white' : 'text-slate-300'}`} /> : 
+                                             normalizeSport(s) === 'padel' ? <PadelIcon className={`w-4 h-4 ${isSportSelected(s) ? 'text-white' : 'text-slate-300'}`} /> :
+                                             normalizeSport(s) === 'tenis' ? <TennisIcon className={`w-4 h-4 ${isSportSelected(s) ? 'text-white' : 'text-slate-300'}`} /> :
+                                             normalizeSport(s) === 'basquetbol' ? <BasketballIcon className={`w-4 h-4 ${isSportSelected(s) ? 'text-white' : 'text-slate-300'}`} /> :
+                                             normalizeSport(s) === 'voleibol' ? <VolleyballIcon className={`w-4 h-4 ${isSportSelected(s) ? 'text-white' : 'text-slate-300'}`} /> :
+                                             <SoccerIcon className={`w-4 h-4 ${isSportSelected(s) ? 'text-white' : 'text-slate-300'}`} />}
                                             {s}
                                         </button>
                                     ))}

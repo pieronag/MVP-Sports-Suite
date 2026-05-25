@@ -322,12 +322,14 @@ export default function Page() {
                     <ClockIcon className="w-4 h-4 text-slate-400" />
                     <span className="text-[10px] text-slate-400 font-bold uppercase">{t.created}</span>
                   </div>
-                  <button 
-                    onClick={() => handleOpenManageModal(t)}
-                    className="px-5 py-2 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 shadow-xl"
-                  >
-                    Gestionar
-                  </button>
+                  {t.status !== 'Resuelto' && (
+                    <button 
+                      onClick={() => handleOpenManageModal(t)}
+                      className="px-5 py-2 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 shadow-xl"
+                    >
+                      Gestionar
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -430,12 +432,14 @@ export default function Page() {
 
                     {/* 8. ACCIONES */}
                     <td className="px-4 py-3 text-right align-top">
-                      <button 
-                        onClick={() => handleOpenManageModal(t)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400 text-[10px] font-bold uppercase transition-all shadow-sm"
-                      >
-                        Gestionar
-                      </button>
+                      {t.status !== 'Resuelto' && (
+                        <button 
+                          onClick={() => handleOpenManageModal(t)}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400 text-[10px] font-bold uppercase transition-all shadow-sm"
+                        >
+                          Gestionar
+                        </button>
+                      )}
                     </td>
 
                   </tr>

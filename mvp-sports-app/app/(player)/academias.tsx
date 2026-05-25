@@ -33,12 +33,16 @@ const THEME = {
     accent: '#8b5cf6' // Morado para Academias
 };
 
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from '../../components/icons/sports';
+
 const CATEGORIAS = [
     { id: 'todo', name: 'Todos', icon: Compass },
-    { id: 'futbol', name: 'Fútbol', icon: Activity },
-    { id: 'padel', name: 'Pádel', icon: Target },
-    { id: 'tenis', name: 'Tenis', icon: Trophy },
-    { id: 'basquet', name: 'Básquet', icon: Dribbble },
+    { id: 'futbol', name: 'Fútbol', icon: FutbolIcon },
+    { id: 'futbolito', name: 'Futbolito', icon: FutbolIcon },
+    { id: 'padel', name: 'Pádel', icon: PadelIcon },
+    { id: 'tenis', name: 'Tenis', icon: TenisIcon },
+    { id: 'basquetbol', name: 'Básquetbol', icon: BasquetbolIcon },
+    { id: 'voleibol', name: 'Vóleibol', icon: VoleibolIcon },
 ];
 
 export default function AcademiasScreen() {
@@ -80,11 +84,13 @@ export default function AcademiasScreen() {
 
     const filteredAcademias = useMemo(() => {
         if (activeSport === 'todo') return academias;
+        const normalizeSport = (s: string) => s ? s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : '';
         return academias.filter(a => {
-            const sport = (a.sport || a.deporte || '').toLowerCase();
-            const category = (a.category || a.categoria || '').toLowerCase();
-            const name = (a.name || a.nombre || '').toLowerCase();
-            return sport.includes(activeSport) || category.includes(activeSport) || name.includes(activeSport);
+            const sport = normalizeSport(a.sport || a.deporte || '');
+            const category = normalizeSport(a.category || a.categoria || '');
+            const name = normalizeSport(a.name || a.nombre || '');
+            const normActive = normalizeSport(activeSport);
+            return sport.includes(normActive) || category.includes(normActive) || name.includes(normActive);
         });
     }, [academias, activeSport]);
 

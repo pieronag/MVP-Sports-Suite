@@ -158,7 +158,6 @@ export default function Sidebar() {
                         </MenuGroup>
                         <MenuGroup title="Configuración de Sede">
                             <NavItem href="/dashboard/settings/complex" active={pathname?.includes("/settings/complex")} icon={<AdjustmentsVerticalIcon />} onClick={() => setMobileOpen(false)}>Perfil Comercial</NavItem>
-                            <NavItem href="/dashboard/audit" active={pathname?.includes("/audit")} icon={<FingerPrintIcon />} onClick={() => setMobileOpen(false)}>Bitácora de Sistema</NavItem>
                         </MenuGroup>
 
                     </>
@@ -169,9 +168,6 @@ export default function Sidebar() {
                             <NavItem href="/dashboard" active={pathname === "/dashboard"} icon={<HomeModernIcon />} onClick={() => setMobileOpen(false)}>Resumen de Reserva</NavItem>
                             <NavItem href="/dashboard/calendar" active={pathname?.includes("/calendar")} icon={<CalendarDaysIcon />} onClick={() => setMobileOpen(false)}>Control de Canchas</NavItem>
                             <NavItem href="/dashboard/checkin" active={pathname?.includes("/checkin")} icon={<ClipboardDocumentCheckIcon />} onClick={() => setMobileOpen(false)}>Validación de Accesos</NavItem>
-                        </MenuGroup>
-                        <MenuGroup title="Seguridad">
-                            <NavItem href="/dashboard/audit" active={pathname?.includes("/audit")} icon={<FingerPrintIcon />} onClick={() => setMobileOpen(false)}>Bitácora de Sistema</NavItem>
                         </MenuGroup>
                     </>
                 )}

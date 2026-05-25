@@ -232,7 +232,7 @@ export default function AcademyPage() {
                                     </InputGroupPremium>
                                     <div className="flex flex-col gap-1">
                                         <label className="text-[8px] font-black uppercase text-black">Descripción Ejecutiva</label>
-                                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3 py-2 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl text-[9px] font-bold outline-none h-20 uppercase resize-none focus:border-indigo-500 text-black dark:text-white" />
+                                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3 py-2 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl text-[9px] font-normal outline-none h-20 uppercase resize-none focus:border-indigo-500 text-black dark:text-white" />
                                     </div>
                                 </div>
 
@@ -250,10 +250,9 @@ export default function AcademyPage() {
                                         <InputGroupPremium label="H. Inicio" type="time" value={formData.startTime} onChange={(e: any) => setFormData({ ...formData, startTime: e.target.value })} />
                                         <InputGroupPremium label="H. Fin" type="time" value={formData.endTime} onChange={(e: any) => setFormData({ ...formData, endTime: e.target.value })} />
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                        <InputGroupPremium label="Mensualidad ($)" type="number" value={formData.price} onChange={(e: any) => setFormData({ ...formData, price: e.target.value })} icon={<CurrencyDollarIcon className="w-4 h-4" />} />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         <InputGroupPremium label="Cap. Alumnos" type="number" value={formData.maxStudents} onChange={(e: any) => setFormData({ ...formData, maxStudents: e.target.value })} icon={<UserGroupIcon className="w-4 h-4" />} />
-                                        <InputGroupPremium label="Días de Alerta" type="number" value={formData.alertDays} onChange={(e: any) => setFormData({ ...formData, alertDays: e.target.value })} icon={<ClockIcon className="w-4 h-4" />} placeholder="Ej: 3" />
+                                        <InputGroupPremium label="Mensualidad ($)" type="number" value={formData.price} onChange={(e: any) => setFormData({ ...formData, price: e.target.value })} icon={<CurrencyDollarIcon className="w-4 h-4" />} />
                                     </div>
                                 </div>
 
@@ -304,9 +303,9 @@ function InputGroupPremium({ label, value, onChange, placeholder, icon, readOnly
             <div className="relative">
                 {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 dark:text-white/20 group-focus-within:text-indigo-500 transition-colors">{icon}</div>}
                 {type === 'select' ? (
-                    <select value={value || ''} onChange={onChange} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-8 py-2 bg-white dark:bg-[#0B0F19] border border-slate-100 dark:border-white/5 rounded-xl text-[10px] font-bold text-black dark:text-white focus:border-indigo-500 outline-none transition-all appearance-none uppercase cursor-pointer shadow-sm`}>{children}</select>
+                    <select value={value || ''} onChange={onChange} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-8 py-2 bg-white dark:bg-[#0B0F19] border border-slate-100 dark:border-white/5 rounded-xl text-[10px] font-normal text-black dark:text-white focus:border-indigo-500 outline-none transition-all appearance-none uppercase cursor-pointer shadow-sm`}>{children}</select>
                 ) : (
-                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2 rounded-xl border text-[10px] font-bold transition-all outline-none shadow-sm ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-white border-slate-100 text-black focus:border-indigo-500 dark:bg-[#0B0F19] dark:border-white/5 dark:text-white'}`} />
+                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2 rounded-xl border text-[10px] font-normal transition-all outline-none shadow-sm ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-white border-slate-100 text-black focus:border-indigo-500 dark:bg-[#0B0F19] dark:border-white/5 dark:text-white'}`} />
                 )}
                 {type === 'select' && <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"><ChevronDownIcon className="w-3 h-3" /></div>}
             </div>

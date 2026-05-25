@@ -175,11 +175,10 @@ export default function BillingPage() {
                 <button onClick={() => setIsHistoryModalOpen(true)} className="px-6 py-2.5 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 active:scale-95"><DocumentTextIcon className="w-4 h-4 text-emerald-500" /> Historial de Pagos</button>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <TarjetaKpi titulo="Sedes" valor={tenants.length.toString()} sub="INFRAESTRUCTURA" icon={<BuildingStorefrontIcon />} />
                 <TarjetaKpi titulo="Costo Mensual" valor={formatPrice(tenants.reduce((acc, t) => { const p = plans.find(pl => pl.id === t.planId); return acc + (p?.price || 0); }, 0))} sub="TOTAL PLANES" icon={<CurrencyDollarIcon />} brillo />
                 <TarjetaKpi titulo="Próximo Cobro" valor="Día 30" sub="FECHA ESTÁNDAR" icon={<CalendarIcon />} />
-                <TarjetaKpi titulo="Ahorro Anual" valor="20% OFF" sub="PAGO ADELANTADO" icon={<SparklesIcon />} />
             </div>
 
             <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10 flex items-center gap-4">
@@ -221,10 +220,6 @@ export default function BillingPage() {
                 <div className="pt-10 space-y-8">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <HeaderSeccion titulo={`Planes para ${activeTenant.name}`} desc="Elige el nivel de servicio ideal para tu sede." />
-                        <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-xl">
-                            <button onClick={() => setBillingCycle('monthly')} className={`px-5 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${billingCycle === 'monthly' ? 'bg-white dark:bg-emerald-600 shadow-sm text-slate-900 dark:text-white' : 'text-slate-400'}`}>Mensual</button>
-                            <button onClick={() => setBillingCycle('annual')} className={`px-5 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${billingCycle === 'annual' ? 'bg-white dark:bg-emerald-600 shadow-sm text-slate-900 dark:text-white' : 'text-slate-400'}`}>Anual -20%</button>
-                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -235,8 +230,8 @@ export default function BillingPage() {
                                     <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">{p.name}</h4>
                                     <div className="mb-6">
                                         <div className="flex items-baseline gap-1">
-                                            <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">{formatPrice(billingCycle === 'annual' ? p.price * 0.8 * 12 : p.price, false)}</span>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase">{billingCycle === 'annual' ? '/AÑO' : '/MES'}</span>
+                                            <span className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">{formatPrice(p.price, false)}</span>
+                                            <span className="text-[10px] font-bold text-slate-400 uppercase">/MES</span>
                                         </div>
                                         <p className="text-[9px] font-black text-emerald-500 uppercase mt-1">+ {p.commission}% de comisión</p>
                                     </div>

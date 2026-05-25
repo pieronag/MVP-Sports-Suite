@@ -39,12 +39,16 @@ const THEME = {
     accent: '#f43f5e'
 };
 
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from '../../components/icons/sports';
+
 const CATEGORIAS = [
     { id: 'todo', name: 'Todos', icon: Compass },
-    { id: 'futbol', name: 'Fútbol', icon: Activity },
-    { id: 'padel', name: 'Pádel', icon: Target },
-    { id: 'tenis', name: 'Tenis', icon: Trophy },
-    { id: 'basquet', name: 'Básquet', icon: Dribbble },
+    { id: 'futbol', name: 'Fútbol', icon: FutbolIcon },
+    { id: 'futbolito', name: 'Futbolito', icon: FutbolIcon },
+    { id: 'padel', name: 'Pádel', icon: PadelIcon },
+    { id: 'tenis', name: 'Tenis', icon: TenisIcon },
+    { id: 'basquetbol', name: 'Básquetbol', icon: BasquetbolIcon },
+    { id: 'voleibol', name: 'Vóleibol', icon: VoleibolIcon },
 ];
 
 const statusMap: Record<string, string> = {
@@ -217,10 +221,11 @@ export default function TorneosScreen() {
 
     const filteredTournaments = useMemo(() => {
         if (activeSport === 'todo') return tournaments;
+        const normalizeSport = (s: string) => s ? s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : '';
         return tournaments.filter(t => {
-            const cat = t.category?.toLowerCase() || '';
-            const sport = t.sport?.toLowerCase() || '';
-            return cat.includes(activeSport) || sport.includes(activeSport);
+            const cat = normalizeSport(t.category || '');
+            const sport = normalizeSport(t.sport || '');
+            return cat.includes(normalizeSport(activeSport)) || sport.includes(normalizeSport(activeSport));
         });
     }, [tournaments, activeSport]);
 

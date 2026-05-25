@@ -20,6 +20,23 @@ import { doc, getDoc } from 'firebase/firestore';
 import { userService } from '../../../services/userService';
 import { teamService } from '../../../services/teamService';
 import { bookingService, Booking } from '../../../services/bookingService';
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon } from '../../../components/icons/sports';
+
+const getSportIcon = (sport: string | undefined, color: string, size: number) => {
+    switch(sport?.toLowerCase()) {
+        case 'futbol':
+        case 'futbolito':
+            return <FutbolIcon color={color} size={size} width={size} height={size} />;
+        case 'padel':
+            return <PadelIcon color={color} size={size} width={size} height={size} />;
+        case 'tenis':
+            return <TenisIcon color={color} size={size} width={size} height={size} />;
+        case 'basketball':
+            return <BasquetbolIcon color={color} size={size} width={size} height={size} />;
+        default:
+            return <Trophy color={color} size={size} />;
+    }
+};
 
 const { width, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -317,7 +334,7 @@ export default function TeamDetailsScreen() {
                         <Text style={{ color: C.sub, fontSize: 7, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 2 }}>MIEMBROS</Text>
                     </View>
                     <View style={{ flex: 1, backgroundColor: C.card, borderRadius: 28, padding: 16, borderWidth: 1, borderColor: C.border, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 }}>
-                        <Trophy color="#f59e0b" size={24} />
+                        {getSportIcon(teamInfo?.sport, "#f59e0b", 24)}
                         <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', marginTop: 12, textTransform: 'uppercase' }} numberOfLines={1}>
                             {teamInfo?.sport ? (teamInfo.sport === 'basketball' ? 'BASKET' : teamInfo.sport.toUpperCase()) : 'GENERAL'}
                         </Text>

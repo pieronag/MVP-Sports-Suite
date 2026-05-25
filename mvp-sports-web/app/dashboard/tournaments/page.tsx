@@ -478,10 +478,10 @@ export default function ChampionshipsPage() {
                                         <div className="space-y-3 pt-2">
                                             <div className="flex flex-col gap-1">
                                                 <label className="text-[8px] font-black uppercase text-black">Reglas y Descripción</label>
-                                                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3 py-2 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl text-[9px] font-bold outline-none h-16 uppercase resize-none focus:border-amber-500 text-black dark:text-white" />
+                                                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3 py-2 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl text-[9px] font-normal outline-none h-16 uppercase resize-none focus:border-amber-500 text-black dark:text-white" />
                                             </div>
                                             <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-100 dark:border-white/10">
-                                                <div className="flex flex-col"><span className="text-[9px] font-black uppercase text-black dark:text-white">Ida y Vuelta</span><span className="text-[7px] text-slate-400 uppercase font-bold">Doble partido</span></div>
+                                                <div className="flex flex-col"><span className="text-[9px] font-black uppercase text-black dark:text-white">Ida y Vuelta</span><span className="text-[7px] text-slate-400 uppercase font-normal mt-1">Doble partido (La final es a partido único)</span></div>
                                                 <button type="button" onClick={() => setFormData({ ...formData, isHomeAway: !formData.isHomeAway })} className={`w-10 h-5 rounded-full transition-all flex items-center px-1 ${formData.isHomeAway ? 'bg-amber-500' : 'bg-slate-200 dark:bg-white/10'}`}><div className={`w-3 h-3 rounded-full bg-white transition-all ${formData.isHomeAway ? 'translate-x-5' : 'translate-x-0'}`} /></button>
                                             </div>
                                         </div>
@@ -650,9 +650,9 @@ function InputGroupPremium({ label, value, onChange, placeholder, icon, readOnly
             <div className="relative">
                 {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 dark:text-white/20 group-focus-within:text-amber-500 transition-colors">{icon}</div>}
                 {type === 'select' ? (
-                    <select value={value || ''} onChange={onChange} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-8 py-2 bg-white dark:bg-[#0B0F19] border border-slate-100 dark:border-white/5 rounded-xl text-[10px] font-bold text-black dark:text-white focus:border-amber-500 outline-none transition-all appearance-none uppercase cursor-pointer shadow-sm`}>{children}</select>
+                    <select value={value || ''} onChange={onChange} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-8 py-2 bg-white dark:bg-[#0B0F19] border border-slate-100 dark:border-white/5 rounded-xl text-[10px] font-normal text-black dark:text-white focus:border-amber-500 outline-none transition-all appearance-none uppercase cursor-pointer shadow-sm`}>{children}</select>
                 ) : (
-                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2 rounded-xl border text-[10px] font-bold transition-all outline-none shadow-sm ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-white border-slate-100 text-black focus:border-amber-500 dark:bg-[#0B0F19] dark:border-white/5 dark:text-white'}`} />
+                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2 rounded-xl border text-[10px] font-normal transition-all outline-none shadow-sm ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-white border-slate-100 text-black focus:border-amber-500 dark:bg-[#0B0F19] dark:border-white/5 dark:text-white'}`} />
                 )}
                 {type === 'select' && <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"><ChevronDownIcon className="w-3 h-3" /></div>}
             </div>

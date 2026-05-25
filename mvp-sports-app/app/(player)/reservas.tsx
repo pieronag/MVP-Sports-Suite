@@ -11,6 +11,7 @@ import {
     ShieldCheck, CalendarDays, Timer, LayoutDashboard, History, Trophy, CircleDot, Dribbble, Medal, Navigation2, Plus, Minus, Users,
     Trash2
 } from 'lucide-react-native';
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from '../../components/icons/sports';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import QRCode from 'react-native-qrcode-svg';
@@ -90,10 +91,11 @@ const COLORS = {
 };
 
 const SPORT_CONFIG: Record<string, { color: string, icon: any }> = {
-    'futbol': { color: '#10b981', icon: Trophy },
-    'padel': { color: '#3b82f6', icon: Zap },
-    'tenis': { color: '#f59e0b', icon: CircleDot },
-    'basquet': { color: '#6366f1', icon: Dribbble },
+    'futbol': { color: '#10b981', icon: FutbolIcon },
+    'padel': { color: '#3b82f6', icon: PadelIcon },
+    'tenis': { color: '#f59e0b', icon: TenisIcon },
+    'basquet': { color: '#6366f1', icon: BasquetbolIcon },
+    'voley': { color: '#ec4899', icon: VoleibolIcon },
     'default': { color: '#10b981', icon: Medal }
 };
 
@@ -103,6 +105,7 @@ const getSportInfo = (sportName: string) => {
     if (s.includes('padel') || s.includes('pádel')) return SPORT_CONFIG['padel'];
     if (s.includes('tenis')) return SPORT_CONFIG['tenis'];
     if (s.includes('basquet') || s.includes('basket')) return SPORT_CONFIG['basquet'];
+    if (s.includes('voley')) return SPORT_CONFIG['voley'];
     return SPORT_CONFIG['default'];
 };
 
@@ -513,6 +516,7 @@ export default function MisReservasScreen() {
                     renderItem={({ item: b }) => (
                         <BookingEliteCard
                             booking={b}
+                            venueName={venues[b.tenantId]?.name || b.tenantName}
                             isDark={isDark}
                             onView={() => { setSelectedBooking(b); setShowTicket(true); }}
                             onMaps={() => handleOpenMaps(b)}
@@ -735,7 +739,7 @@ const TabButton = ({ label, active, onPress, isDark }: any) => (
     </TouchableOpacity>
 );
 
-const BookingEliteCard = ({ booking, isDark, onView, onMaps, onCheckIn, onCheckOut, onStats, onCancel }: any) => {
+const BookingEliteCard = ({ booking, venueName, isDark, onView, onMaps, onCheckIn, onCheckOut, onStats, onCancel }: any) => {
     const C = isDark ? COLORS.dark : COLORS.light;
     const sportInfo = getSportInfo(booking.sport || '');
     const status = getStatusInfo(booking, C);
@@ -744,6 +748,11 @@ const BookingEliteCard = ({ booking, isDark, onView, onMaps, onCheckIn, onCheckO
     const isActive = booking.status === 'active' && !booking.checkOut;
     const isCompleted = booking.status === 'completed' || booking.status === 'past' || booking.checkOut === true;
     const isCancelled = booking.status === 'cancelled';
+    const showMapsAndTicket = (!isCompleted && !isCancelled) || booking.paymentStatus === 'refund_failed';
+    const hasButtons = (isConfirmed && !booking.checkIn) || 
+                       (isActive && !booking.checkOut) || 
+                       showMapsAndTicket || 
+                       (!isCompleted && !isCancelled && !isActive && !booking.checkIn);
 
     return (
         <View style={{ marginHorizontal: 25, marginBottom: 25, backgroundColor: C.card, borderRadius: 35, borderWidth: 1, borderColor: C.border, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 20, overflow: 'hidden' }}>
@@ -754,7 +763,7 @@ const BookingEliteCard = ({ booking, isDark, onView, onMaps, onCheckIn, onCheckO
                             <sportInfo.icon color={sportInfo.color} size={24} />
                         </View>
                         <View>
-                            <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{booking.tenantName}</Text>
+                            <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{venueName || booking.tenantName}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                                 <MapPinned color={C.sub} size={10} />
                                 <Text style={{ color: C.sub, fontSize: 10, fontWeight: '800', textTransform: 'uppercase' }}>{booking.courtName}</Text>
@@ -798,8 +807,9 @@ const BookingEliteCard = ({ booking, isDark, onView, onMaps, onCheckIn, onCheckO
                         </View>
                     </View>
                 </View>
-                <View style={{ flexDirection: 'row', gap: 8, borderTopWidth: 1, borderTopColor: C.border, paddingTop: 15 }}>
-                    {isConfirmed && !booking.checkIn && (
+                {hasButtons && (
+                    <View style={{ flexDirection: 'row', gap: 8, borderTopWidth: 1, borderTopColor: C.border, paddingTop: 15 }}>
+                        {isConfirmed && !booking.checkIn && (
                         <TouchableOpacity onPress={onCheckIn} style={{ flex: 2, height: 50, borderRadius: 15, backgroundColor: COLORS.accent, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, shadowColor: COLORS.accent, shadowOpacity: 0.2, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } }}>
                             <ShieldCheck color="white" size={18} />
                             <Text style={{ color: 'white', fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>INGRESAR</Text>
@@ -811,16 +821,17 @@ const BookingEliteCard = ({ booking, isDark, onView, onMaps, onCheckIn, onCheckO
                             <Text style={{ color: 'white', fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>CHECK-OUT</Text>
                         </TouchableOpacity>
                     )}
-
-                    <TouchableOpacity onPress={onMaps} style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: COLORS.maps + '10', alignItems: 'center', justifyContent: 'center' }}>
-                        <Navigation color={COLORS.maps} size={20} />
-                    </TouchableOpacity>
+                    {showMapsAndTicket && (
+                        <TouchableOpacity onPress={onMaps} style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: COLORS.maps + '10', alignItems: 'center', justifyContent: 'center' }}>
+                            <Navigation color={COLORS.maps} size={20} />
+                        </TouchableOpacity>
+                    )}
                     {!isCompleted && !isCancelled && !isActive && !booking.checkIn && (
                         <TouchableOpacity onPress={onCancel} style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: '#ef444410', alignItems: 'center', justifyContent: 'center' }}>
                             <XCircle color="#ef4444" size={20} />
                         </TouchableOpacity>
                     )}
-                    {(!isConfirmed || booking.checkIn || booking.paymentStatus === 'refund_failed') && (
+                    {showMapsAndTicket && (!isConfirmed || booking.checkIn || booking.paymentStatus === 'refund_failed') && (
                         <TouchableOpacity 
                             onPress={onView} 
                             style={{ 
@@ -850,6 +861,7 @@ const BookingEliteCard = ({ booking, isDark, onView, onMaps, onCheckIn, onCheckO
                         </TouchableOpacity>
                     )}
                 </View>
+                )}
             </View>
         </View>
     );

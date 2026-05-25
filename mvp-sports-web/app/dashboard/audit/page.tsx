@@ -17,6 +17,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/services/firebase';
+import { useAuth } from '@/context/AuthContext';
 
 import { PanelGlass, TarjetaKpi } from '@/components/ui/DashboardWidgets';
 
@@ -44,6 +45,7 @@ export default function Page() {
   const [filter, setFilter] = useState('Todos');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const { role } = useAuth();
 
   // --- 1. CARGAR LOGS ---
   const fetchLogs = async () => {
@@ -116,6 +118,18 @@ export default function Page() {
     if (status === 'blocked') return 'text-purple-500';
     return 'text-red-500';
   };
+
+  if (role !== 'admin' && role !== 'superadmin') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-10 animate-fadeIn">
+        <ShieldCheckIcon className="w-20 h-20 text-red-500/50 mb-6" />
+        <h1 className="text-2xl font-black uppercase text-slate-900 dark:text-white mb-2">Acceso Restringido</h1>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+          Esta vista es exclusiva para administradores del sistema.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-6 pb-10 text-left relative animate-fadeIn">

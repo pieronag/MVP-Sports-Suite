@@ -124,7 +124,8 @@ export default function CheckoutScreen() {
     useEffect(() => {
         if (user) {
             teamService.getUserTeams(user.uid).then(teams => {
-                const filtered = teams.filter(t => t.sport.toLowerCase() === (sport as string).toLowerCase());
+                const normalizeSport = (s: string) => s ? s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : '';
+                const filtered = teams.filter(t => normalizeSport(t.sport) === normalizeSport(sport as string));
                 setUserTeams(filtered);
             });
         }

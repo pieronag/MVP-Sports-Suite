@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StatusBar, ActivityIndicator, Alert, Share, BackHandler, StyleSheet, Dimensions, Modal } from 'react-native';
 import { useRouter, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { CheckCircle, MapPin, Share2, Download, Calendar, Clock, Trophy, Zap, Target, CircleDot, Dribbble, Medal, ArrowRight, Home, ShieldCheck, AlertCircle, Receipt, X, FileText, ChevronLeft } from 'lucide-react-native';
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from '../../components/icons/sports';
 import { useAuth } from '../../store/useAuth';
 import { LinearGradient } from 'expo-linear-gradient';
 import { bookingService, Booking } from '../../services/bookingService';
@@ -44,10 +45,11 @@ const COLORS = {
 };
 
 const SPORT_CONFIG: Record<string, { color: string, icon: any }> = {
-    'futbol': { color: '#10b981', icon: Trophy },
-    'padel': { color: '#3b82f6', icon: Zap },
-    'tenis': { color: '#f59e0b', icon: CircleDot },
-    'basquet': { color: '#6366f1', icon: Dribbble },
+    'futbol': { color: '#10b981', icon: FutbolIcon },
+    'padel': { color: '#3b82f6', icon: PadelIcon },
+    'tenis': { color: '#f59e0b', icon: TenisIcon },
+    'basquet': { color: '#6366f1', icon: BasquetbolIcon },
+    'voley': { color: '#ec4899', icon: VoleibolIcon },
     'default': { color: '#10b981', icon: Medal }
 };
 
@@ -57,6 +59,7 @@ const getSportInfo = (sportName: string) => {
     if (s.includes('padel') || s.includes('pádel')) return SPORT_CONFIG['padel'];
     if (s.includes('tenis')) return SPORT_CONFIG['tenis'];
     if (s.includes('basquet') || s.includes('basket')) return SPORT_CONFIG['basquet'];
+    if (s.includes('voley')) return SPORT_CONFIG['voley'];
     return SPORT_CONFIG['default'];
 };
 

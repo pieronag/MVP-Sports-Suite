@@ -6,8 +6,9 @@ import {
     ArrowRight, Compass, Navigation, Phone,
     Clock, CircleDot, Info, X, ChevronDown,
     Dribbble, Activity, TrendingUp, Zap, Heart,
-    Trophy, MapPinned
+    Trophy, MapPinned, Dumbbell, Medal
 } from 'lucide-react-native';
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from '../../../components/icons/sports';
 import { Image } from 'expo-image';
 import { useAuth } from '../../../store/useAuth';
 import { venueService, Tenant } from '../../../services/venueService';
@@ -44,6 +45,18 @@ const formatDistance = (lat1: number, lon1: number, lat2: number, lon2: number) 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const d = R * c;
     return d < 1 ? `${Math.round(d * 1000)}m` : `${d.toFixed(1)}km`;
+};
+
+const getSportIcon = (sportName: string) => {
+    const s = (sportName || '').toLowerCase();
+    if (s === 'todos' || s === 'todo') return null;
+    if (s.includes('futbol') || s.includes('fútbol')) return FutbolIcon;
+    if (s.includes('padel') || s.includes('pádel')) return PadelIcon;
+    if (s.includes('tenis')) return TenisIcon;
+    if (s.includes('basquet') || s.includes('basket')) return BasquetbolIcon;
+    if (s.includes('voley') || s.includes('vóley')) return VoleibolIcon;
+    if (s.includes('entrenamiento') || s.includes('training')) return Dumbbell;
+    return Medal;
 };
 
 export default function ExploreClubesScreen() {
@@ -85,8 +98,10 @@ export default function ExploreClubesScreen() {
     const sportsList = useMemo(() => {
         const sports = new Set(['Todos']);
         venues.forEach(v => {
-            const s = (v as any).activeSports?.[0] || (v as any).sports?.[0];
-            if (s) sports.add(s);
+            const allSports = (v as any).activeSports || (v as any).sports || [];
+            allSports.forEach((s: string) => {
+                if (s) sports.add(s);
+            });
         });
         return Array.from(sports);
     }, [venues]);
@@ -101,10 +116,13 @@ export default function ExploreClubesScreen() {
     }, [venues]);
 
     const filteredVenues = useMemo(() => {
+        const normalizeSport = (s: string) => s ? s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : '';
+        const normalizedSelected = normalizeSport(selectedSport);
+
         return venues.filter(v => {
             const matchesSearch = v.name.toLowerCase().includes(search.toLowerCase());
-            const sport = (v as any).activeSports?.[0] || (v as any).sports?.[0];
-            const matchesSport = selectedSport === 'Todos' || sport === selectedSport;
+            const allSports = (v as any).activeSports || (v as any).sports || [];
+            const matchesSport = selectedSport === 'Todos' || allSports.some((s: string) => normalizeSport(s).includes(normalizedSelected) || normalizedSelected.includes(normalizeSport(s)));
             const commune = (v as any).commune || (v as any).comuna;
             const matchesCommune = selectedCommune === 'Todas' || commune === selectedCommune;
             return matchesSearch && matchesSport && matchesCommune;
@@ -151,12 +169,15 @@ export default function ExploreClubesScreen() {
 
                 <View style={{ marginBottom: 10 }}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 25, paddingVertical: 10 }}>
-                        {sportsList.map(sport => (
-                            <FilterChip
-                                key={sport} label={sport} active={selectedSport === sport}
-                                onPress={() => setSelectedSport(sport)} isDark={isDark} C={C} accent={accent}
-                            />
-                        ))}
+                        {sportsList.map(sport => {
+                            const Icon = getSportIcon(sport);
+                            return (
+                                <FilterChip
+                                    key={sport} label={sport} active={selectedSport === sport} icon={Icon}
+                                    onPress={() => setSelectedSport(sport)} isDark={isDark} C={C} accent={accent}
+                                />
+                            );
+                        })}
                     </ScrollView>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 25 }}>
                         {communesList.map(commune => (
@@ -178,16 +199,19 @@ export default function ExploreClubesScreen() {
     );
 }
 
-const FilterChip = ({ label, active, onPress, isDark, C, accent }: any) => (
+const FilterChip = ({ label, active, onPress, isDark, C, accent, icon: IconComponent }: any) => (
     <TouchableOpacity
         onPress={onPress}
         style={{
+            flexDirection: 'row',
+            alignItems: 'center',
             paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12, marginRight: 8,
             backgroundColor: active ? accent : (isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9'),
             borderWidth: 1, borderColor: active ? accent : C.border
         }}
     >
-        <Text style={{ color: active ? 'white' : C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>{label}</Text>
+        {IconComponent && <IconComponent color={active ? 'white' : C.sub} size={14} />}
+        <Text style={{ marginLeft: IconComponent ? 8 : 0, color: active ? 'white' : C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>{label}</Text>
     </TouchableOpacity>
 );
 
@@ -195,12 +219,13 @@ const RecintoVerticalEliteCard = ({ venue, isDark, userLoc, C, accent }: any) =>
     const router = useRouter();
     const data = venue as any;
     const vComuna = data.commune || data.comuna || 'Santiago';
-    const sport = (data.activeSports?.[0] || data.sports?.[0] || 'Multicancha');
+    const allSports = (data.activeSports || data.sports || ['Multicancha']) as string[];
+    const firstSport = allSports[0] || 'Multicancha';
 
     const getVenueImage = () => {
         const url = data.imageURL || data.imageUrl || venue.imageUrl;
         if (url && (url.startsWith('data:image') || url.startsWith('http'))) return url;
-        const s = sport.toLowerCase();
+        const s = firstSport.toLowerCase();
         if (s.includes('padel')) return 'https://images.unsplash.com/photo-1626248801379-51a0748a5f96';
         if (s.includes('tenis')) return 'https://images.unsplash.com/photo-1595435064215-68d148332009';
         return 'https://images.unsplash.com/photo-1574629810360-7efbbe195018';
@@ -234,8 +259,17 @@ const RecintoVerticalEliteCard = ({ venue, isDark, userLoc, C, accent }: any) =>
             <TouchableOpacity onPress={() => router.push({ pathname: '/(player)/clubes/[id]', params: { id: venue.id } } as any)} activeOpacity={0.9} style={{ width: '100%', aspectRatio: 1.6, backgroundColor: isDark ? '#0F172A' : '#F8FAFC' }}>
                 <Image source={{ uri: getVenueImage() }} style={StyleSheet.absoluteFill} contentFit="cover" />
                 <LinearGradient colors={['rgba(0,0,0,0.1)', 'rgba(0,0,0,0.8)']} style={StyleSheet.absoluteFill} />
-                <View style={{ position: 'absolute', top: 20, left: 20, backgroundColor: 'rgba(16,185,129,0.9)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 }}>
-                    <Text style={{ color: 'white', fontSize: 10, fontWeight: '900', letterSpacing: 1 }}>{sport.toUpperCase()}</Text>
+                <View style={{ position: 'absolute', top: 20, left: 20, flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
+                    {allSports.slice(0,3).map(s => (
+                        <View key={s} style={{ backgroundColor: 'rgba(16,185,129,0.9)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 }}>
+                            <Text style={{ color: 'white', fontSize: 9, fontWeight: '900', letterSpacing: 1 }}>{s.toUpperCase()}</Text>
+                        </View>
+                    ))}
+                    {allSports.length > 3 && (
+                        <View style={{ backgroundColor: 'rgba(16,185,129,0.9)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 }}>
+                            <Text style={{ color: 'white', fontSize: 9, fontWeight: '900' }}>+{allSports.length - 3}</Text>
+                        </View>
+                    )}
                 </View>
             </TouchableOpacity>
 

@@ -12,6 +12,8 @@ import BottomMenu from '../../components/BottomMenu';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 const GoogleMaps = MapView;
 
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from '../../components/icons/sports';
+
 const { width } = Dimensions.get('window');
 
 // PALETA DE COLORES ELITE (Sincronizada con Perfil y Reservas)
@@ -34,12 +36,13 @@ const THEME = {
 };
 
 const CATEGORIAS = [
-    { id: 'todo', name: 'Todos', icon: Compass },
-    { id: 'futbol', name: 'Fútbol', icon: Activity },
-    { id: 'padel', name: 'Pádel', icon: Target },
-    { id: 'tenis', name: 'Tenis', icon: Trophy },
-    { id: 'basquet', name: 'Básquet', icon: Dribbble },
-    { id: 'voley', name: 'Voley', icon: Activity },
+    { id: 'todo', name: 'Todos' },
+    { id: 'futbol', name: 'Fútbol', icon: FutbolIcon },
+    { id: 'futbolito', name: 'Futbolito', icon: FutbolIcon },
+    { id: 'padel', name: 'Pádel', icon: PadelIcon },
+    { id: 'tenis', name: 'Tenis', icon: TenisIcon },
+    { id: 'basquet', name: 'Básquet', icon: BasquetbolIcon },
+    { id: 'voley', name: 'Voley', icon: VoleibolIcon },
     { id: 'entrenamiento', name: 'Training', icon: Dumbbell },
 ];
 
@@ -116,9 +119,17 @@ export default function MapaBusquedaScreen() {
                     ...(v.sports || []),
                     ...(v.activeSports || []),
                     ...(v.pricing ? Object.keys(v.pricing) : [])
-                ].map(s => s.toLowerCase());
+                ].map((s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase());
+                
+                if (activeSport === 'futbol') {
+                    return venueSports.some((s: string) => s.includes('futbol') && !s.includes('futbolito'));
+                }
+                if (activeSport === 'futbolito') {
+                    return venueSports.some((s: string) => s.includes('futbolito'));
+                }
+                
                 const searchKey = activeSport === 'entrenamiento' ? 'training' : activeSport.toLowerCase();
-                return venueSports.some(s => s.includes(searchKey));
+                return venueSports.some((s: string) => s.includes(searchKey));
             });
 
             const processed = filtered.map((v: any) => {
@@ -140,6 +151,28 @@ export default function MapaBusquedaScreen() {
         }
     }, [rawVenues, activeSport, locationData]);
 
+    const activeCategories = useMemo(() => {
+        if (!rawVenues) return [CATEGORIAS[0]];
+        const availableSports = new Set<string>();
+        rawVenues.forEach((v: any) => {
+            const venueSports = [
+                ...(v.sports || []),
+                ...(v.activeSports || []),
+                ...(v.pricing ? Object.keys(v.pricing) : [])
+            ].map((s: string) => s.toLowerCase());
+            venueSports.forEach((s: string) => {
+                if (s.includes('futbolito')) availableSports.add('futbolito');
+                else if (s.includes('futbol')) availableSports.add('futbol');
+                if (s.includes('padel')) availableSports.add('padel');
+                if (s.includes('tenis')) availableSports.add('tenis');
+                if (s.includes('basquet') || s.includes('basket')) availableSports.add('basquet');
+                if (s.includes('voley')) availableSports.add('voley');
+                if (s.includes('entrenamiento') || s.includes('training')) availableSports.add('entrenamiento');
+            });
+        });
+        return CATEGORIAS.filter(cat => cat.id === 'todo' || availableSports.has(cat.id));
+    }, [rawVenues]);
+
     return (
         <View style={{ flex: 1, backgroundColor: C.bg }}>
             <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={C.card} />
@@ -160,7 +193,7 @@ export default function MapaBusquedaScreen() {
                 {/* FILTROS GLASSY */}
                 <View style={{ paddingVertical: 20, backgroundColor: C.card, borderBottomWidth: 1, borderBottomColor: C.border }}>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 25 }}>
-                        {CATEGORIAS.map(cat => (
+                        {activeCategories.map(cat => (
                             <TouchableOpacity
                                 key={cat.id}
                                 onPress={() => setActiveSport(cat.id)}
@@ -176,8 +209,8 @@ export default function MapaBusquedaScreen() {
                                     borderColor: activeSport === cat.id ? accent : C.border
                                 }}
                             >
-                                <cat.icon color={activeSport === cat.id ? 'white' : C.sub} size={14} />
-                                <Text style={{ marginLeft: 8, color: activeSport === cat.id ? 'white' : C.text, fontWeight: '900', fontSize: 10, textTransform: 'uppercase' }}>{cat.name}</Text>
+                                {cat.icon && <cat.icon color={activeSport === cat.id ? 'white' : C.sub} size={14} />}
+                                <Text style={{ marginLeft: cat.icon ? 8 : 0, color: activeSport === cat.id ? 'white' : C.text, fontWeight: '900', fontSize: 10, textTransform: 'uppercase' }}>{cat.name}</Text>
                             </TouchableOpacity>
                         ))}
                     </ScrollView>

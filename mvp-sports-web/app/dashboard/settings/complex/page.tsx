@@ -378,7 +378,7 @@ export default function TenantSettingsPage() {
 
                             {/* CASILLA 4: INTEGRACIONES FINANCIERAS */}
                             <div className="md:col-span-2 space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+                                <div className="grid grid-cols-1 gap-6 relative">
                                     {isApiLocked && (
                                         <div className="absolute inset-0 bg-white/70 dark:bg-[#0B0F19]/80 backdrop-blur-md z-40 rounded-[2.5rem] flex flex-col items-center justify-center p-6 text-center border border-slate-200 dark:border-white/10 shadow-2xl">
                                             <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-4">
@@ -386,7 +386,7 @@ export default function TenantSettingsPage() {
                                             </div>
                                             <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-[0.2em] mb-2">Integraciones de API bloqueadas</h4>
                                             <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase max-w-sm leading-relaxed mb-6">
-                                                Requiere plan <span className="text-amber-500 font-black">ELITE</span> para configurar pasarelas de pago externas (MercadoPago / Transbank) y facturación SII automatizada.
+                                                Requiere plan <span className="text-amber-500 font-black">ELITE</span> para configurar pasarela de pago externa (Transbank).
                                             </p>
                                             <a 
                                                 href="/dashboard/billing-subscription" 
@@ -396,32 +396,7 @@ export default function TenantSettingsPage() {
                                             </a>
                                         </div>
                                     )}
-                                    {/* MP CARD */}
-                                    <PanelGlass className={`p-6 border-none shadow-xl transition-all ${isMpGloballyDisabled ? 'opacity-40 grayscale' : isMpActive ? 'shadow-blue-500/5 bg-blue-500/[0.01]' : 'opacity-60 grayscale'}`}>
-                                        <div className="flex items-center justify-between mb-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
-                                                    <CreditCardIcon className="w-6 h-6" />
-                                                </div>
-                                                <div>
-                                                    <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest leading-none">MercadoPago</h4>
-                                                    {isMpGloballyDisabled && (
-                                                        <p className="text-[7px] font-black text-red-500 uppercase tracking-widest mt-1">Desactivado por Plataforma</p>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <ToggleMini enabled={isMpActive} onChange={() => setFormData({ ...formData, isMercadopagoActive: !formData.isMercadopagoActive })} disabled={isMpGloballyDisabled} color="bg-blue-500 shadow-blue-500/20" />
-                                        </div>
-                                        {isMpActive && (
-                                            <div className="space-y-4 animate-fadeIn">
-                                                <InputMini label="Public Key" value={formData.mercadopagoPublicKey} onChange={(e: any) => setFormData({ ...formData, mercadopagoPublicKey: e.target.value })} icon={<KeyIcon className="w-4 h-4 text-blue-500" />} />
-                                                <InputMini label="Access Token" type="password" value={formData.mercadopagoAccessToken} onChange={(e: any) => setFormData({ ...formData, mercadopagoAccessToken: e.target.value })} icon={<ShieldCheckIcon className="w-4 h-4 text-blue-500" />} />
-                                                <button onClick={() => simulateApiTest('mercadopago')} className="w-full py-3 bg-blue-500 text-white text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20">Probar Conexión</button>
-                                            </div>
-                                        )}
-                                    </PanelGlass>
-
-                                    {/* TRANSBANK CARD */}
+                                    {/* MP CARD (ELIMINADO) */}                                    {/* TRANSBANK CARD */}
                                     <PanelGlass className={`p-6 border-none shadow-xl transition-all ${isTbGloballyDisabled ? 'opacity-40 grayscale' : isTbActive ? 'shadow-pink-500/5 bg-pink-500/[0.01]' : 'opacity-60 grayscale'}`}>
                                         <div className="flex items-center justify-between mb-6">
                                             <div className="flex items-center gap-3">
@@ -446,29 +421,7 @@ export default function TenantSettingsPage() {
                                         )}
                                     </PanelGlass>
 
-                                    {/* SII CARD */}
-                                    <PanelGlass className={`md:col-span-2 p-6 border-none shadow-xl transition-all ${formData.isSiiActive ? 'shadow-emerald-500/5 bg-emerald-500/[0.01]' : 'opacity-60 grayscale'}`}>
-                                        <div className="flex items-center justify-between mb-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                                                    <DocumentCheckIcon className="w-6 h-6" />
-                                                </div>
-                                                <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest">Facturación SII (DTE)</h4>
-                                            </div>
-                                            <ToggleMini enabled={formData.isSiiActive} onChange={() => setFormData({ ...formData, isSiiActive: !formData.isSiiActive })} color="bg-emerald-500 shadow-emerald-500/20" />
-                                        </div>
-                                        {formData.isSiiActive && (
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fadeIn">
-                                                <div className="space-y-4">
-                                                    <InputMini label="RUT Facturación" value={formData.siiRut} onChange={(e: any) => setFormData({ ...formData, siiRut: e.target.value })} icon={<IdentificationIcon className="w-4 h-4 text-emerald-500" />} />
-                                                    <InputMini label="Token de Certificación" type="password" value={formData.siiApiKey} onChange={(e: any) => setFormData({ ...formData, siiApiKey: e.target.value })} icon={<KeyIcon className="w-4 h-4 text-emerald-500" />} />
-                                                </div>
-                                                <div className="flex flex-col justify-end">
-                                                    <button onClick={() => simulateApiTest('sii')} className="w-full py-3 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20">Validar Certificado SII</button>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </PanelGlass>
+                                    {/* SII CARD (ELIMINADO) */}
                                 </div>
 
                                 {/* TERMINAL DE DIAGNÓSTICO (RESPONSIVE) */}
