@@ -46,6 +46,32 @@ const CATEGORIAS = [
     { id: 'entrenamiento', name: 'Training', icon: Dumbbell },
 ];
 
+const getSportColor = (sportId: string) => {
+    switch (sportId) {
+        case 'futbol':
+        case 'futbolito': return '#10b981'; // Emerald
+        case 'padel': return '#3b82f6'; // Blue
+        case 'tenis': return '#f59e0b'; // Amber
+        case 'basquet': return '#f97316'; // Orange
+        case 'voley': return '#a855f7'; // Purple
+        case 'entrenamiento': return '#ef4444'; // Red
+        default: return '#10b981'; // Default MVP
+    }
+};
+
+const getSportIcon = (sportId: string) => {
+    switch (sportId) {
+        case 'futbol':
+        case 'futbolito': return FutbolIcon;
+        case 'padel': return PadelIcon;
+        case 'tenis': return TenisIcon;
+        case 'basquet': return BasquetbolIcon;
+        case 'voley': return VoleibolIcon;
+        case 'entrenamiento': return Dumbbell;
+        default: return MapPin;
+    }
+};
+
 const formatDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
     const R = 6371; // km
     const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -144,7 +170,19 @@ export default function MapaBusquedaScreen() {
                     distLabel = formatDistance(locationData.coords.latitude, locationData.coords.longitude, lat, lng);
                 }
 
-                return { ...v, lat, lng, displaySports: displaySports.length > 0 ? displaySports.join(' • ') : 'Sesión', distance: distLabel };
+                let primarySportId = 'todo';
+                if (displaySports.length > 0) {
+                    const firstSport = displaySports[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                    if (firstSport.includes('futbolito')) primarySportId = 'futbolito';
+                    else if (firstSport.includes('futbol')) primarySportId = 'futbol';
+                    else if (firstSport.includes('padel')) primarySportId = 'padel';
+                    else if (firstSport.includes('tenis')) primarySportId = 'tenis';
+                    else if (firstSport.includes('basquet') || firstSport.includes('basket')) primarySportId = 'basquet';
+                    else if (firstSport.includes('voley')) primarySportId = 'voley';
+                    else if (firstSport.includes('entrena') || firstSport.includes('training')) primarySportId = 'entrenamiento';
+                }
+
+                return { ...v, lat, lng, displaySports: displaySports.length > 0 ? displaySports.join(' • ') : 'Sesión', distance: distLabel, primarySportId };
             }).filter((v: any) => !isNaN(v.lat) && !isNaN(v.lng));
 
             setVenues(processed);
@@ -204,9 +242,9 @@ export default function MapaBusquedaScreen() {
                                     height: 40,
                                     borderRadius: 12,
                                     marginRight: 10,
-                                    backgroundColor: activeSport === cat.id ? accent : (isDark ? 'rgba(255,255,255,0.03)' : THEME.light.bg),
+                                    backgroundColor: activeSport === cat.id ? getSportColor(cat.id) : (isDark ? 'rgba(255,255,255,0.03)' : THEME.light.bg),
                                     borderWidth: 1,
-                                    borderColor: activeSport === cat.id ? accent : C.border
+                                    borderColor: activeSport === cat.id ? getSportColor(cat.id) : C.border
                                 }}
                             >
                                 {cat.icon && <cat.icon color={activeSport === cat.id ? 'white' : C.sub} size={14} />}
@@ -228,7 +266,10 @@ export default function MapaBusquedaScreen() {
                             showsUserLocation={true}
                             showsMyLocationButton={false} // Desactiva el botón nativo interno
                         >
-                            {venues.map((venue: any) => (
+                            {venues.map((venue: any) => {
+                                const pinColor = getSportColor(venue.primarySportId);
+                                const SportIcon = getSportIcon(venue.primarySportId);
+                                return (
                                 <Marker
                                     key={venue.id}
                                     coordinate={{ latitude: venue.lat, longitude: venue.lng }}
@@ -239,30 +280,33 @@ export default function MapaBusquedaScreen() {
                                         <View 
                                             collapsable={false}
                                             style={{ 
-                                                width: 40, 
-                                                height: 40, 
-                                                borderRadius: 20, 
-                                                backgroundColor: accent, 
-                                                borderWidth: 3, 
+                                                width: 36, 
+                                                height: 36, 
+                                                borderRadius: 18, 
+                                                backgroundColor: pinColor, 
+                                                borderWidth: 2.5, 
                                                 borderColor: isDark ? C.card : 'white', 
                                                 alignItems: 'center', 
                                                 justifyContent: 'center',
-                                                overflow: 'hidden',
-                                                shadowColor: '#000',
-                                                shadowOpacity: 0.5,
-                                                shadowRadius: 5,
+                                                shadowColor: pinColor,
+                                                shadowOpacity: 0.6,
+                                                shadowRadius: 6,
                                                 elevation: 8
                                             }}
                                         >
-                                            <Image 
-                                                source={require('../../assets/images/Logo.png')} 
-                                                style={{ width: '70%', height: '70%', tintColor: 'white' }} 
-                                                resizeMode="contain" 
-                                            />
+                                            {venue.primarySportId === 'todo' ? (
+                                                <Image 
+                                                    source={require('../../assets/images/Logo.png')} 
+                                                    style={{ width: '55%', height: '55%', tintColor: 'white' }} 
+                                                    resizeMode="contain" 
+                                                />
+                                            ) : (
+                                                <SportIcon color="white" size={16} />
+                                            )}
                                         </View>
                                     </View>
                                 </Marker>
-                            ))}
+                            )})}
                         </GoogleMaps>
 
                         <View style={{ position: 'absolute', bottom: 20, right: 20, gap: 8 }}>

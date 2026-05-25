@@ -11,13 +11,13 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
         <div className="flex flex-col lg:flex-row gap-16 items-end mb-24 animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="flex-[2] space-y-4">
             <h2 className="text-4xl lg:text-6xl font-black text-white leading-[0.9] tracking-tighter font-heading uppercase">
-              GESTIÓN DE RECINTOS <br />
-              <span className="text-gradient">DE ALTO RENDIMIENTO.</span>
+              ADMINISTRA TU <br />
+              <span className="text-gradient">COMPLEJO DEPORTIVO.</span>
             </h2>
           </div>
           <div className="flex-1 lg:pb-2">
             <p className="text-base text-slate-400 font-medium leading-relaxed border-l-2 border-[#00df82]/30 pl-6">
-              Hemos simplificado la gestión de tu recinto deportivo para que puedas enfocarte en lo que importa: hacer crecer tu comunidad.
+              Todo lo que necesitas para automatizar tus reservas, controlar los pagos y maximizar la ocupación de tus canchas.
             </p>
           </div>
         </div>
@@ -131,10 +131,6 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
                <div className="flex flex-col items-center gap-1">
                  <span className="text-base lg:text-lg font-black text-white tracking-tighter">TRANSBANK</span>
                  <span className="text-[8px] font-bold text-slate-500">PAGOS SEGUROS</span>
-               </div>
-               <div className="flex flex-col items-center gap-1">
-                 <span className="text-base lg:text-lg font-black text-white tracking-tighter">SII CHILE</span>
-                 <span className="text-[8px] font-bold text-slate-500">BOLETA ELECTRÓNICA</span>
                </div>
             </div>
           </div>

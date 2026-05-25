@@ -44,7 +44,7 @@ export default function AppShowcase() {
 
                   <div className="relative w-full h-full">
                     <Image
-                      src="/app-screenshot.png?v=2"
+                      src="/app-screenshot.png?v=3"
                       alt="MVP Sports App"
                       fill
                       className="object-cover object-top"
@@ -62,14 +62,14 @@ export default function AppShowcase() {
                   <span className="flex h-1.5 w-1.5 rounded-full bg-[#00df82] animate-pulse" />
                   <span className="text-[10px] font-black text-[#00df82] uppercase tracking-[0.2em]">Aplicación Oficial</span>
                 </div>
-                
+
                 <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black text-white leading-[0.9] tracking-tighter font-heading uppercase">
-                  TU JUEGO <br />
-                  <span className="text-gradient">SIN LÍMITES.</span>
+                  TU CANCHA <br />
+                  <span className="text-gradient">EN TU BOLSILLO.</span>
                 </h2>
-                
+
                 <p className="text-sm sm:text-base text-slate-400 font-medium leading-relaxed max-w-lg mx-auto lg:mx-0">
-                  Hemos condensado toda la potencia de nuestra plataforma en una aplicación móvil intuitiva y rápida. Gestiona tus reservas y sigue tu evolución.
+                  Hemos condensado toda la potencia de nuestra plataforma en una aplicación móvil intuitiva. Gestiona tus reservas en segundos y ten tu código QR siempre a mano para ingresar a los recintos.
                 </p>
               </div>
 
@@ -80,7 +80,7 @@ export default function AppShowcase() {
                     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.1 2.48-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.24-1.99 1.1-3.15-1.09.04-2.41.72-3.19 1.63-.7.8-1.32 1.96-1.14 3.08 1.22.1 2.48-.7 3.23-1.56z" />
                   </svg>
                   <div className="flex flex-col text-left">
-                    <span className="text-[8px] font-medium text-slate-400 uppercase tracking-wider">Consíguelo en el</span>
+                    <span className="text-[8px] font-medium text-slate-400 uppercase tracking-wider">Próximamente en</span>
                     <span className="text-base font-bold text-white leading-none">App Store</span>
                   </div>
                 </a>
@@ -94,7 +94,7 @@ export default function AppShowcase() {
                     <path d="M3.65393 21.444L17.2739 13.624L14.2239 10.574L3.22393 21.574C3.29393 21.584 3.36393 21.594 3.43393 21.594C3.60393 21.594 3.77393 21.544 3.92393 21.464L3.65393 21.444Z" fill="#EA4335" />
                   </svg>
                   <div className="flex flex-col text-left">
-                    <span className="text-[8px] font-medium text-slate-400 uppercase tracking-wider">DISPONIBLE EN</span>
+                    <span className="text-[8px] font-medium text-slate-400 uppercase tracking-wider">Próximamente en</span>
                     <span className="text-base font-bold text-white leading-none">Google Play</span>
                   </div>
                 </a>

@@ -3,6 +3,7 @@ import { useState } from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
 import AppFunctions from "../components/landing/AppFunctions";
+import SupportedSports from "../components/landing/SupportedSports";
 import AppShowcase from "../components/landing/AppShowcase";
 import AdminPreview from "../components/landing/AdminPreview";
 import Footer from "../components/landing/Footer";
@@ -25,6 +26,9 @@ export default function Home() {
         <div className="container mx-auto">
           <Hero onRegisterClick={() => setIsRegisterOpen(true)} />
         </div>
+        
+        {/* SUPPORTED SPORTS BANNER */}
+        <SupportedSports />
         
         {/* PLAYER FIRST APPROACH - Bento Grid */}
         <div className="container mx-auto">

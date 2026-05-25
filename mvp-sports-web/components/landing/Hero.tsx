@@ -40,11 +40,11 @@ export default function Hero({ onRegisterClick }: { onRegisterClick: () => void 
 
             <div className="space-y-6">
               <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white leading-[0.9] tracking-tighter text-sharp font-heading animate-in fade-in slide-in-from-left-10 duration-1000 stagger-1 uppercase">
-                EL ADN DEL <br />
-                <span className="text-gradient">DEPORTE.</span>
+                TU CANCHA, <br />
+                <span className="text-gradient">A UN CLIC.</span>
               </h1>
               <p className="text-sm sm:text-base lg:text-lg text-slate-400 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed animate-in fade-in slide-in-from-left-10 duration-1000 stagger-2">
-                Trasciende los límites del campo y profesionaliza tu pasión. La plataforma definitiva para deportistas de élite que buscan la excelencia y gloria en cada partido. Registra tus estadísticas, sube de nivel y domina la liga.
+                La plataforma definitiva para reservar complejos deportivos, organizar tus partidos y gestionar tus pagos. Simplifica tus reservas y dedícate sólo a jugar.
               </p>
             </div>
 
@@ -53,7 +53,7 @@ export default function Hero({ onRegisterClick }: { onRegisterClick: () => void 
                 onClick={onRegisterClick}
                 className="w-full sm:w-auto px-10 py-5 bg-[#00df82] text-slate-950 font-black rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_40px_rgba(0,223,130,0.3)] uppercase tracking-[0.2em] text-[10px]"
               >
-                Crear Mi Perfil
+                Comenzar a Jugar
               </button>
               <Link
                 href="#owners"

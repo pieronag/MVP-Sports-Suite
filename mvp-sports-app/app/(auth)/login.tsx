@@ -850,11 +850,13 @@ export default function AuthScreen() {
                                 </Text>
                             </View>
                             <Text className="text-xs text-slate-400 font-semibold mb-3 leading-relaxed">
-                                El acceso administrativo está segmentado en planes:
+                                El acceso administrativo está segmentado en planes y bajo un modelo de facturación a mes vencido (Post-Pago), sin retenciones automáticas:
                             </Text>
                             <Text className="text-xs text-slate-400 font-semibold mb-4 leading-relaxed">
-                                • <Text className="text-white font-bold">Free:</Text> 8% de comisión por reservas online. Limitado a sede única.{'\n\n'}
-                                • <Text className="text-white font-bold">Elite:</Text> 5% de comisión por reservas online, habilitando integraciones avanzadas de facturación electrónica con el SII y pasarelas dedicadas.
+                                • <Text className="text-white font-bold">Free:</Text> $0/mes y 8% de comisión.{'\n\n'}
+                                • <Text className="text-white font-bold">Básico:</Text> $29.990/mes y 7% de comisión.{'\n\n'}
+                                • <Text className="text-white font-bold">Pro:</Text> $59.990/mes y 6% de comisión.{'\n\n'}
+                                • <Text className="text-white font-bold">Elite:</Text> $99.990/mes y 5% de comisión, habilitando integraciones avanzadas de facturación electrónica con el SII y pasarelas dedicadas.
                             </Text>
                         </View>
 

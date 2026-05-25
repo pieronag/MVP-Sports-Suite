@@ -8,13 +8,13 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-start lg:items-end mb-16 lg:mb-24 animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="flex-[2] space-y-4">
             <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black text-white leading-[0.9] tracking-tighter font-heading uppercase">
-              LA EXPERIENCIA <br />
-              <span className="text-gradient">DEL JUGADOR ÉLITE.</span>
+              TU APP PARA <br />
+              <span className="text-gradient">AGENDAR CANCHAS.</span>
             </h2>
           </div>
           <div className="flex-1 lg:pb-2">
             <p className="text-sm sm:text-base text-slate-400 font-medium leading-relaxed border-l-2 border-blue-500/30 pl-6">
-              Hemos diseñado una interfaz maestra para que cada partido sea una experiencia profesional, desde la reserva hasta el tercer tiempo.
+              Todo lo que necesitas para encontrar tu cancha ideal, organizar el partido con tus amigos y realizar el pago de manera segura.
             </p>
           </div>
         </div>
@@ -43,10 +43,10 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
             <div className="relative z-10 h-full flex flex-col justify-between gap-6">
               <div className="space-y-4">
                 <h4 className="text-blue-400 font-black text-[10px] uppercase tracking-[0.3em]">Tu Perfil</h4>
-                <p className="text-xl sm:text-2xl font-black text-white leading-tight">Toda tu carrera <br/> deportiva en un lugar.</p>
+                <p className="text-xl sm:text-2xl font-black text-white leading-tight">Todo tu historial <br/> en un solo lugar.</p>
               </div>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed text-justify">
-                Sube de nivel acumulando experiencia obtenida en tus partidos y colecciona insignias o logros ganados por tu desempeño.
+                Lleva el registro de todas tus reservas, asiste a tus partidos y obtén recompensas e insignias por tu fidelidad.
               </p>
             </div>
             <div className="absolute -right-8 -bottom-8 opacity-5 group-hover:opacity-10 transition-opacity hidden sm:block">
@@ -67,21 +67,21 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           <div className="md:col-span-3 lg:col-span-4 lg:row-span-1 group p-8 rounded-[2rem] bg-orange-500/10 border border-white/5 hover:border-orange-500/30 transition-all duration-500 relative overflow-hidden">
             <div className="relative z-10">
               <h4 className="text-orange-400 font-black text-[10px] uppercase tracking-[0.3em] mb-1">Tus Estadísticas</h4>
-              <p className="text-lg font-bold text-white mb-2">Mide tu nivel.</p>
-              <p className="text-xs text-slate-500 leading-tight">Sigue tu progreso en tiempo real y conoce tu nivel competitivo analizando detalladamente la experiencia (XP) que acumulas tras cada partido.</p>
+              <p className="text-lg font-bold text-white mb-2">Monitorea tu actividad.</p>
+              <p className="text-xs text-slate-500 leading-tight">Sigue tu progreso, revisa cuántos partidos has jugado y analiza detalladamente tu asistencia a los recintos deportivos.</p>
             </div>
           </div>
 
           {/* Equipos */}
           <div className="md:col-span-2 lg:col-span-3 lg:row-span-1 group p-8 rounded-[2rem] bg-indigo-500/10 border border-white/5 hover:border-indigo-500/30 transition-all duration-500 flex flex-col justify-between gap-4">
-            <h4 className="text-indigo-400 font-black text-[10px] uppercase tracking-[0.3em]">Crea tu Equipo</h4>
-            <p className="text-xs text-slate-400 leading-tight">Arma tu equipo con tus amigos, mantente en contacto a través de nuestro chat interno y coordinen sus encuentros deportivos fácilmente.</p>
+            <h4 className="text-indigo-400 font-black text-[10px] uppercase tracking-[0.3em]">Organiza tu Equipo</h4>
+            <p className="text-xs text-slate-400 leading-tight">Crea grupos con tus amigos, comunícate a través de la app y coordinen los pagos o asistencias fácilmente.</p>
           </div>
 
           {/* Ficha / Carta de Jugador */}
           <div className="md:col-span-2 lg:col-span-3 lg:row-span-1 group p-8 rounded-[2rem] bg-sky-500/10 border border-white/5 hover:border-sky-500/30 transition-all duration-500 flex flex-col justify-between gap-4">
-            <h4 className="text-sky-400 font-black text-[10px] uppercase tracking-[0.3em]">Genera tu Carta</h4>
-            <p className="text-xs text-slate-400 leading-tight">Crea y descarga tu propia carta coleccionable Topps Now 2026 personalizada con tu valoración (OVR) y rango.</p>
+            <h4 className="text-sky-400 font-black text-[10px] uppercase tracking-[0.3em]">Comparte tus logros</h4>
+            <p className="text-xs text-slate-400 leading-tight">Crea y descarga tu propia carta de jugador personalizada y compártela en redes sociales con tu grupo de amigos.</p>
           </div>
 
           {/* Historial */}

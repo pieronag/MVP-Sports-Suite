@@ -474,7 +474,7 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-[26px] text-slate-400 hover:text-white transition-colors"
+                  className="absolute right-3 bottom-[10px] text-slate-400 hover:text-white transition-colors"
                 >
                   {showPassword ? (
                     <EyeSlashIcon className="w-4 h-4" />
@@ -496,7 +496,7 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-[26px] text-slate-400 hover:text-white transition-colors"
+                  className="absolute right-3 bottom-[10px] text-slate-400 hover:text-white transition-colors"
                 >
                   {showConfirmPassword ? (
                     <EyeSlashIcon className="w-4 h-4" />

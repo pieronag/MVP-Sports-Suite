@@ -33,8 +33,9 @@ El acceso de los Recintos al Dashboard Administrativo está sujeto al plan contr
   - API de pasarela de pago configurada de forma independiente.
   - Gestión Multi-Sede bajo una misma identidad digital.
 
-### 2.2. Cobros de Licencia y Comisiones
-La plataforma recauda de manera automática o mediante liquidaciones los porcentajes de comisión acordados según el plan contratado por cada reserva pagada en línea a través de Transbank Webpay Plus.
+### 2.2. Modalidad de Facturación y Cobros Mensuales
+Los fondos recaudados por reservas pagadas en línea ingresarán íntegramente de manera directa a la cuenta comercial del Dueño del Recinto. La plataforma **no** realiza retenciones automáticas por transacción. 
+En su lugar, el día **1 de cada mes**, MVP Sports emitirá un cobro o factura correspondiente a la suma de todas las comisiones generadas por el uso de la plataforma durante el **mes calendario inmediatamente anterior** (ej. el 1 de julio se cobra el uso completo de junio). El recinto cuenta con un plazo máximo de pago de entre 5 a 10 días corridos sin acceso a crédito interno. El no pago facultará a la plataforma a suspender temporalmente el servicio.
 
 ---
 

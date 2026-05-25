@@ -182,6 +182,7 @@ export default function TermsPage() {
                     <thead>
                       <tr className="bg-slate-900/80 border-b border-white/5 text-[10px] font-black uppercase tracking-wider text-slate-400">
                         <th className="p-4">Plan contratado</th>
+                        <th className="p-4">Costo Fijo Mensual</th>
                         <th className="p-4">Comisión Reservas Online</th>
                         <th className="p-4">Características principales</th>
                       </tr>
@@ -189,30 +190,39 @@ export default function TermsPage() {
                     <tbody className="divide-y divide-white/5">
                       <tr>
                         <td className="p-4 font-bold text-white">Free</td>
+                        <td className="p-4 text-white font-bold">$0</td>
                         <td className="p-4 text-[#00df82] font-bold">8%</td>
                         <td className="p-4 text-slate-400">Sede única, gestión de canchas básica y calendario. Sin cupones ni API.</td>
                       </tr>
                       <tr>
                         <td className="p-4 font-bold text-white">Básico</td>
+                        <td className="p-4 text-white font-bold">$29.990</td>
                         <td className="p-4 text-[#00df82] font-bold">7%</td>
                         <td className="p-4 text-slate-400">Gestión estructurada de canchas, reportes básicos de ventas.</td>
                       </tr>
                       <tr>
                         <td className="p-4 font-bold text-white">Pro</td>
+                        <td className="p-4 text-white font-bold">$59.990</td>
                         <td className="p-4 text-[#00df82] font-bold">6%</td>
                         <td className="p-4 text-slate-400">Soporte multi-sede, acceso a gestión de torneos y academias.</td>
                       </tr>
                       <tr className="bg-[#00df82]/5">
                         <td className="p-4 font-bold text-[#00df82]">Elite (Full)</td>
+                        <td className="p-4 text-[#00df82] font-bold">$99.990</td>
                         <td className="p-4 text-[#00df82] font-bold">5%</td>
                         <td className="p-4 text-slate-300 font-medium">Cupones de marketing, integraciones de API personalizadas, facturación electrónica SII directa.</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <p className="text-[11px] text-slate-500 uppercase tracking-wide">
-                  * Las comisiones se deducen automáticamente en las reservas liquidadas mediante la pasarela de pago Transbank Webpay Plus.
-                </p>
+                <div className="p-5 bg-amber-950/20 border border-amber-900/30 rounded-xl mt-4">
+                  <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs mb-2">
+                    Modalidad de Facturación y Cobros Mensuales (Post-Pago)
+                  </h4>
+                  <p className="text-slate-400 text-xs leading-relaxed">
+                    Los fondos recaudados por reservas pagadas en línea ingresarán íntegramente de manera directa a la cuenta comercial del Recinto. La plataforma <strong>no</strong> realiza retenciones automáticas por transacción. En su lugar, el día <strong>1 de cada mes</strong>, MVP Sports emitirá una factura correspondiente a la suma de todas las comisiones y costos fijos generados por el uso del mes anterior. El recinto cuenta con un plazo de pago de 5 a 10 días corridos sin acceso a crédito interno.
+                  </p>
+                </div>
               </div>
             </div>
 
