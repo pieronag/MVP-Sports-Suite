@@ -1,6 +1,6 @@
 {
   "name": "mvp-sports-app",
-  "version": "1.19.3",
+  "version": "1.19.8",
   "main": "expo-router/entry",
   "private": true,
   "engines": {
