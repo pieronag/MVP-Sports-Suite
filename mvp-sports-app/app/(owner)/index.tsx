@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StatusBar, StyleSheet, ActivityIndicator, Dimensions, RefreshControl, Image, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { QrCode, CheckCircle2, Clock, Calendar, Building2, TrendingUp, DollarSign, ChevronRight, Zap, Target, ShieldCheck, ArrowUpRight, XCircle, ChevronDown } from 'lucide-react-native';
 import { useAuth } from '../../store/useAuth';
 import { bookingService, Booking } from '../../services/bookingService';
@@ -46,9 +46,6 @@ const getBookingDateTimeChile = (bookingDate: Date, startTime: string) => {
         const getPart = (type: string) => Number(parts.find(p => p.type === type)?.value || 0);
         const [hours, minutes] = (startTime || "00:00").split(':').map(Number);
         const res = new Date(getPart("year"), getPart("month") - 1, getPart("day"), hours, minutes, 0, 0);
-        if (hours < 6) {
-            res.setDate(res.getDate() + 1);
-        }
         return res;
     } catch (e) {
         return new Date();
@@ -210,52 +207,7 @@ export default function ManagerDashboard() {
                 return getBookingOperationalDateStr(booking) === targetOpDateStr;
             });
 
-            // Auto check-in local / no-show validation on loaded bookings
-            const verifiedBookings = await Promise.all(operationalBookings.map(async (booking) => {
-                if (
-                    booking.tenantId === currentTenantId &&
-                    booking.status !== 'cancelled' && 
-                    booking.status !== 'completed' &&
-                    booking.checkIn !== true && 
-                    booking.date && 
-                    booking.startTime
-                ) {
-                    let bookingDate: Date;
-                    if ((booking.date as any).toDate) {
-                        bookingDate = (booking.date as any).toDate();
-                    } else {
-                        bookingDate = new Date(booking.date as any);
-                    }
-                    
-                    const startDateTime = getBookingDateTimeChile(bookingDate, booking.startTime);
-                    
-                    if (nowChile >= startDateTime) {
-                        try {
-                            const isPrePaid = booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial';
-                            const targetPaymentStatus = isPrePaid ? booking.paymentStatus : 'no-show';
-
-                            const bookingRef = doc(db, 'bookings', booking.id as string);
-                            await updateDoc(bookingRef, {
-                                status: 'cancelled',
-                                paymentStatus: targetPaymentStatus,
-                                notes: 'Cancelación automática por inasistencia sin check-in (No-Show).',
-                                updatedAt: new Date()
-                            });
-                            return {
-                                ...booking,
-                                status: 'cancelled' as const,
-                                paymentStatus: targetPaymentStatus as any,
-                                notes: 'Cancelación automática por inasistencia sin check-in (No-Show).'
-                            };
-                        } catch (e) {
-                            console.error("No-show update error:", e);
-                        }
-                    }
-                }
-                return booking;
-            }));
-
-            setBookings(verifiedBookings);
+            setBookings(operationalBookings);
         } catch (error) {
             console.error("Dashboard Load Error:", error);
         } finally {
@@ -264,13 +216,19 @@ export default function ManagerDashboard() {
         }
     }, [profile?.uid, profile?.tenantIds, selectedTenantId]);
 
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+        }, [fetchData])
+    );
+
     useEffect(() => {
         fetchData();
 
-        // Configurar intervalo para actualizar y verificar no-shows automáticamente cada 15 minutos (900,000 ms)
+        // Configurar intervalo para actualizar automáticamente cada 30 segundos (30,000 ms)
         const interval = setInterval(() => {
             fetchData();
-        }, 900000);
+        }, 30000);
 
         return () => clearInterval(interval);
     }, [fetchData]);
@@ -589,7 +547,7 @@ export default function ManagerDashboard() {
                                 </View>
                                 <View style={{ alignItems: 'flex-end' }}>
                                     <View style={{ paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, backgroundColor: b.status === 'cancelled' ? COLORS.error + '15' : (b.paymentStatus === 'paid' ? COLORS.accent + '22' : '#f59e0b22') }}>
-                                        <Text style={{ color: b.status === 'cancelled' ? COLORS.error : (b.paymentStatus === 'paid' ? COLORS.accent : '#f59e0b'), fontSize: 9, fontWeight: '900' }}>{b.status === 'cancelled' ? 'X' : (b.paymentStatus === 'paid' ? 'OK' : '$')}</Text>
+                                        <Text style={{ color: b.status === 'cancelled' ? COLORS.error : (b.paymentStatus === 'paid' ? COLORS.accent : '#f59e0b'), fontSize: 9, fontWeight: '900', textTransform: 'uppercase' }}>{b.status === 'cancelled' ? 'CANCELADA' : (b.paymentStatus === 'paid' ? 'PAGADA' : 'PAGO EN RECINTO')}</Text>
                                     </View>
                                 </View>
                             </TouchableOpacity>
@@ -731,6 +689,46 @@ export default function ManagerDashboard() {
                                 onPress={async () => {
                                     setIsNoShowConfirmOpen(false);
                                     setRefreshing(true);
+                                    
+                                    try {
+                                        const currentTenantId = selectedTenantId || venues[0]?.id;
+                                        if (currentTenantId) {
+                                            const nowChile = getSantiagoDateTime(new Date());
+                                            const gracePeriodMs = 0; // Sin gracia en manual, el admin decide limpiar
+                                            
+                                            // Traer todas las reservas para limpiar historial
+                                            const allBookings = await bookingService.getVenueBookings(currentTenantId);
+                                            
+                                            const toCancel = allBookings.filter(b => {
+                                                if (b.status === 'cancelled' || b.status === 'completed' || b.checkIn === true) return false;
+                                                if (!b.date || !b.startTime) return false;
+                                                
+                                                let bookingDate: Date;
+                                                if ((b.date as any).toDate) {
+                                                    bookingDate = (b.date as any).toDate();
+                                                } else {
+                                                    bookingDate = new Date(b.date as any);
+                                                }
+                                                
+                                                const startDateTime = getBookingDateTimeChile(bookingDate, b.startTime);
+                                                return nowChile.getTime() >= (startDateTime.getTime() + gracePeriodMs);
+                                            });
+
+                                            for (const booking of toCancel) {
+                                                const isPrePaid = booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial';
+                                                const targetPaymentStatus = isPrePaid ? booking.paymentStatus : 'no-show';
+                                                
+                                                await bookingService.updateBooking(booking.id as string, {
+                                                    status: 'cancelled',
+                                                    paymentStatus: targetPaymentStatus,
+                                                    notes: 'Cancelación automática por inasistencia sin check-in (No-Show).'
+                                                });
+                                            }
+                                        }
+                                    } catch (e) {
+                                        console.error("Manual No-Show Validation Error:", e);
+                                    }
+
                                     await fetchData();
                                     setIsNoShowSuccessOpen(true);
                                 }}

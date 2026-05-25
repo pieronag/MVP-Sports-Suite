@@ -59,9 +59,6 @@ const getBookingDateTimeChile = (bookingDate: Date, startTime: string) => {
         const getPart = (type: string) => Number(parts.find(p => p.type === type)?.value || 0);
         const [hours, minutes] = (startTime || "00:00").split(':').map(Number);
         const res = new Date(getPart("year"), getPart("month") - 1, getPart("day"), hours, minutes, 0, 0);
-        if (hours < 6) {
-            res.setDate(res.getDate() + 1);
-        }
         return res;
     } catch (e) {
         return new Date();
@@ -196,59 +193,12 @@ export default function MisReservasScreen() {
         try {
             const all = await bookingService.getUserBookings(user.uid);
             
-            // Auto check-in local / no-show validation on loaded bookings
-            const nowChile = getSantiagoDateTime(new Date());
-
-            const verifiedBookings = await Promise.all(all.map(async (booking) => {
-                if (
-                    booking.userId === user?.uid &&
-                    booking.status !== 'cancelled' && 
-                    booking.status !== 'completed' &&
-                    booking.checkIn !== true && 
-                    booking.date && 
-                    booking.startTime
-                ) {
-                    let bookingDate: Date;
-                    if ((booking.date as any).toDate) {
-                        bookingDate = (booking.date as any).toDate();
-                    } else {
-                        bookingDate = new Date(booking.date as any);
-                    }
-                    
-                    const startDateTime = getBookingDateTimeChile(bookingDate, booking.startTime);
-                    
-                    if (nowChile >= startDateTime) {
-                        try {
-                            const isPrePaid = booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial';
-                            const targetPaymentStatus = isPrePaid ? booking.paymentStatus : 'no-show';
-
-                            const bookingRef = doc(db, 'bookings', booking.id as string);
-                            await updateDoc(bookingRef, {
-                                status: 'cancelled',
-                                paymentStatus: targetPaymentStatus,
-                                notes: 'Cancelación automática por inasistencia sin check-in (No-Show).',
-                                updatedAt: new Date()
-                            });
-                            return {
-                                ...booking,
-                                status: 'cancelled' as any,
-                                paymentStatus: targetPaymentStatus as any,
-                                notes: 'Cancelación automática por inasistencia sin check-in (No-Show).'
-                            };
-                        } catch (e) {
-                            console.error("Player no-show update error:", e);
-                        }
-                    }
-                }
-                return booking;
-            }));
-
-            const tenantIds = Array.from(new Set(verifiedBookings.map(b => b.tenantId)));
+            const tenantIds = Array.from(new Set(all.map(b => b.tenantId)));
             const venueList = await venueService.getVenuesByIds(tenantIds);
             const venueMap: Record<string, Tenant> = {};
             venueList.forEach(v => { venueMap[v.id] = v; });
             setVenues(venueMap);
-            setBookings(verifiedBookings.sort((a, b) => ((b.date as any)?.seconds || 0) - ((a.date as any)?.seconds || 0)));
+            setBookings(all.sort((a, b) => ((b.date as any)?.seconds || 0) - ((a.date as any)?.seconds || 0)));
         } catch (e) { console.error(e); } finally { setLoading(false); setRefreshing(false); }
     };
 
