@@ -268,18 +268,33 @@ export default function PerfilScreen() {
 
             <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 120 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => loadData(true)} tintColor={COLORS.accent} />}>
 
-                {/* GENERADOR DE FICHA */}
-                <View style={{ padding: 30, paddingBottom: 10 }}>
-                    <TouchableOpacity onPress={handleDownloadCard} disabled={generatingCard} style={{ borderRadius: 30, overflow: 'hidden' }}>
-                        <LinearGradient colors={['#10b981', '#059669']} style={{ padding: 25, flexDirection: 'row', alignItems: 'center' }}>
-                            <View style={{ width: 50, height: 50, backgroundColor: 'transparent', borderRadius: 15, alignItems: 'center', justifyContent: 'center' }}>
-                                <Carta width={36} height={36} color="white" />
+                {/* GENERADOR DE FICHA (ESTILO CARTA MVP PRO) */}
+                <View style={{ paddingHorizontal: 25, marginTop: 10, marginBottom: 15 }}>
+                    <TouchableOpacity
+                        onPress={handleDownloadCard}
+                        disabled={generatingCard}
+                        activeOpacity={0.9}
+                    >
+                        <LinearGradient
+                            colors={isDark ? ['#1e1b4b', '#312e81'] : ['#4338ca', '#6366f1']}
+                            style={{ borderRadius: 40, padding: 35, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', shadowColor: '#6366f1', shadowOpacity: 0.4, shadowRadius: 20, elevation: 12 }}
+                        >
+                            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                                <View style={{ backgroundColor: '#f59e0b', width: 65, height: 85, borderRadius: 18, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 12, transform: [{ rotate: '-5deg' }] }}>
+                                    <Text style={{ color: 'black', fontWeight: '900', fontSize: 10 }}>VAL</Text>
+                                    <Text style={{ color: 'black', fontWeight: '900', fontSize: 26 }}>{ovr}</Text>
+                                </View>
+                                <View style={{ marginLeft: 25, flex: 1 }}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
+                                        <Text style={{ color: 'rgba(255,255,255,0.7)', fontWeight: '900', fontSize: 9, letterSpacing: 1.5 }}>CARTA MVP 2026</Text>
+                                    </View>
+                                    <Text style={{ color: 'white', fontSize: 22, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Generar Carta</Text>
+                                    <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: '700', marginTop: 4 }}>Descarga tu edición coleccionista.</Text>
+                                </View>
                             </View>
-                            <View style={{ marginLeft: 20, flex: 1 }}>
-                                <Text style={{ color: 'white', fontSize: 18, fontWeight: '900', textTransform: 'uppercase' }}>Generar Carta Pro</Text>
-                                <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 10, fontWeight: '700' }}>Edición Coleccionista 2026</Text>
+                            <View style={{ backgroundColor: 'rgba(255,255,255,0.15)', width: 55, height: 55, borderRadius: 20, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)' }}>
+                                {generatingCard ? <ActivityIndicator color="white" /> : <Download color="white" size={24} />}
                             </View>
-                            {generatingCard ? <ActivityIndicator color="white" /> : <ChevronRight color="white" size={22} />}
                         </LinearGradient>
                     </TouchableOpacity>
                 </View>
@@ -651,10 +666,10 @@ export default function PerfilScreen() {
             </Modal>
 
             {/* PREVIEW MODAL */}
-            <Modal visible={showCardModal} transparent animationType="fade">
-                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.98)', alignItems: 'center', justifyContent: 'center', padding: 30 }}>
-                    <View style={{ width: '100%', height: '85%', borderRadius: 40, overflow: 'hidden', borderWidth: 2, borderColor: '#10b981' }}>
-                        {capturedUri && <Image source={{ uri: capturedUri }} style={{ width: '100%', height: '100%' }} resizeMode="contain" />}
+            <Modal visible={showCardModal} transparent animationType="fade" statusBarTranslucent>
+                <View style={{ flex: 1, backgroundColor: '#000000', alignItems: 'center', justifyContent: 'center', padding: 30 }}>
+                    <View style={{ height: '75%', maxWidth: '100%', aspectRatio: 750 / 1250, borderRadius: 0, overflow: 'hidden', borderWidth: 2, borderColor: '#10b981' }}>
+                        {capturedUri && <Image source={{ uri: capturedUri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />}
                     </View>
                     <View style={{ flexDirection: 'row', marginTop: 30, gap: 15, width: '100%' }}>
                         <TouchableOpacity onPress={() => setShowCardModal(false)} style={{ flex: 1, height: 60, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' }}>
@@ -934,7 +949,7 @@ const ProfileRow = ({ icon: Icon, color, label, value, isDark }: any) => {
     return (
         <View style={{ height: 80, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25 }}>
             <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: color + '40', alignItems: 'center', justifyContent: 'center' }}>
-                <Icon color={color} size={20} strokeWidth={2.5} width={30} height={30} />
+                <Icon color={color} size={20} strokeWidth={1.25} width={30} height={30} />
             </View>
             <View style={{ marginLeft: 20, flex: 1 }}>
                 <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>{label}</Text>

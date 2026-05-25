@@ -188,7 +188,7 @@ export default function TeamDetailsScreen() {
         setActionLoading(true);
         try {
             await teamService.deleteTeam(teamInfo.id);
-            router.replace('/(player)/(tabs)/equipos/explore');
+            router.replace('/(player)/equipos/explore');
         } catch (error) {
             showFeedback('error', 'No pudimos eliminar el equipo.');
         } finally {

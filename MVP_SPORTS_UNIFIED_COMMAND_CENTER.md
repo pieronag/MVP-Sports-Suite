@@ -49,6 +49,9 @@ Bajo la arquitectura **Multi-Tenant SaaS**, el sistema elimina la fricción oper
 - **Gestión de Tickets QR (V19.8):** Flujo inmersivo de Check-in en portería utilizando códigos QR.
 - **Anti-Fraude Gamification:** Topes matemáticos (`Math.min(20)`) en estadísticas de goles/asistencias para evitar "farming" de XP.
 - **Sistema Bidireccional de Soporte (V19.7):** Consola de tickets y reportes entre jugadores y administración.
+- **Full-Screen Immersive Modals (V19.9):** Paneles de tickets y encuestas de valoración que ocupan el 100% de pantalla con barras de estado translúcidas.
+- **MVP Elite Identity (V19.9):** Diseño de perfil e insignias estandarizado con la nueva "MVP Pro Card", ajustando trazos y jerarquías visuales.
+- **Flujo de Check-Out Seguro (V19.9):** Corrección y protección del flujo de recálculo global de ratings de recinto, y aseguramiento del checkout de jugador antes del conteo estadístico.
 
 ---
 

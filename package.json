@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "potrace": "^2.1.8",
-    "svgo": "^4.0.1"
-  }
-}

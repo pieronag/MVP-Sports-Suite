@@ -506,7 +506,7 @@ export default function EstadisticasScreen() {
         });
 
         const matchesList = bookings.filter(b => {
-            const isCompleted = b.status === 'completed' || b.checkIn || b.checkOut === true;
+            const isCompleted = b.status === 'completed' || b.checkOut === true;
             const isNoShow = b.status === 'no-show' || 
                              b.paymentStatus === 'no-show' || 
                              b.noShow === true || 
@@ -520,7 +520,7 @@ export default function EstadisticasScreen() {
             const bStats = b as any;
             
             // 1. Determinar estado de la reserva
-            const isCompleted = b.status === 'completed' || b.checkIn || b.checkOut === true;
+            const isCompleted = b.status === 'completed' || b.checkOut === true;
             const isNoShow = b.status === 'no-show' || 
                              b.paymentStatus === 'no-show' || 
                              b.noShow === true || 
@@ -588,8 +588,6 @@ export default function EstadisticasScreen() {
             const performance = [];
             if (bStats.goals > 0) performance.push({ text: `${bStats.goals} GOLES`, icon: Target, color: '#ef4444' });
             if (bStats.isMVP) performance.push({ text: 'MVP', icon: Star, color: '#f59e0b' });
-            if (b.checkIn) performance.push({ text: 'CHECK-IN', icon: ShieldCheck, color: '#10b981' });
-            if (isNoShow) performance.push({ text: 'NO-SHOW', icon: AlertCircle, color: '#ef4444' });
 
             return { ...b, dateObj, displayStatus, resultText, resultType, matchXP, performance, formattedTime: b.startTime || '--:--' };
         });
@@ -726,7 +724,7 @@ export default function EstadisticasScreen() {
                         }}
                     >
                         <Text style={{ color: activeTab === 'partidos' ? '#FFF' : C.text, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                            ⚽ Partidos ({analytics.bitacora.filter((h: any) => !h.isBadge).length})
+                            Partidos ({analytics.bitacora.filter((h: any) => !h.isBadge).length})
                         </Text>
                     </TouchableOpacity>
                     <TouchableOpacity 
@@ -743,7 +741,7 @@ export default function EstadisticasScreen() {
                         }}
                     >
                         <Text style={{ color: activeTab === 'logros' ? '#FFF' : C.text, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                            🏆 Logros ({analytics.bitacora.filter((h: any) => h.isBadge).length})
+                            Logros ({analytics.bitacora.filter((h: any) => h.isBadge).length})
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -804,7 +802,7 @@ export default function EstadisticasScreen() {
                                                             borderWidth: 1,
                                                             borderColor: b.badgeColor + '30'
                                                         }}>
-                                                            <BIcon color={b.badgeColor} size={22} strokeWidth={2.5} />
+                                                            <BIcon color={b.badgeColor} size={22} strokeWidth={1.25} />
                                                         </View>
                                                         
                                                         <View style={{ flex: 1 }}>

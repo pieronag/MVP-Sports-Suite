@@ -34,7 +34,7 @@ export default function BottomMenu({ activeTab }: BottomMenuProps) {
         
         if (tab === 'home') {
             // Regresar al Home limpio en el stack
-            router.replace('/(player)/(tabs)/');
+            router.replace('/(player)/');
         } else {
             router.push(`/(player)/${tab}` as any);
         }

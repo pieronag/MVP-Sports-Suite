@@ -451,7 +451,7 @@ export const userService = {
             } as any);
 
         } catch (error) {
-            console.error('Error in recalculateUserStatsAndELO:', error);
+            console.warn('Could not recalculate ELO (likely permission denied for other players):', error);
         }
     },
 
@@ -519,7 +519,7 @@ export const userService = {
 
             await Promise.all(promises);
         } catch (error) {
-            console.error('Error awarding internal match XP and stats:', error);
+            console.warn('Could not award internal match XP and stats to all players:', error);
         }
     }
 };

@@ -309,7 +309,7 @@ export default function SettingsScreen() {
             // Redirigir al inicio después de un breve momento para que vea el mensaje
             setTimeout(() => {
                 setModalVisible(false);
-                router.replace('/(player)/(tabs)/');
+                router.replace('/(player)/');
             }, 1500);
         } catch (error) {
             showFeedback('error', 'Ocurrió un problema al intentar guardar tus ajustes.');
@@ -670,7 +670,7 @@ export default function SettingsScreen() {
                     if (onFeedbackClose) {
                         onFeedbackClose();
                     } else if (modalType === 'success') {
-                        router.replace('/(player)/(tabs)/');
+                        router.replace('/(player)/');
                     }
                 }} 
                 isDark={isDark}

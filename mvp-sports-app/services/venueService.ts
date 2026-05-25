@@ -255,7 +255,11 @@ export const venueService = {
             });
 
             // Actualizar el rating real usando el nuevo método de recalculo total
-            await this.recalculateVenueRating(tenantId);
+            try {
+                await this.recalculateVenueRating(tenantId);
+            } catch (calcError) {
+                console.warn('Could not recalculate venue rating (likely permission denied for player), skipping:', calcError);
+            }
         } catch (error) {
             console.error('Error submitting feedback:', error);
             throw error;

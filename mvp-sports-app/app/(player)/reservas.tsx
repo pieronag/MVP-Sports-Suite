@@ -142,7 +142,7 @@ const getStatusInfo = (booking: Booking | null, C: any) => {
         if (booking.cancelledBy) return { label: 'CANCELADO POR JUGADOR', color: COLORS.error };
         return { label: 'ANULADO', color: COLORS.error };
     }
-    if (booking.status === 'active' && !booking.checkOut) return { label: 'EN JUEGO', color: '#3b82f6' };
+    if ((booking.status === 'active' || booking.checkIn) && !booking.checkOut) return { label: 'EN JUEGO', color: '#3b82f6' };
     if (booking.status === 'completed' || booking.status === 'past' || booking.checkOut === true) return { label: 'FINALIZADO', color: C.sub };
     
     if (booking.paymentStatus === 'pending') {
@@ -503,7 +503,7 @@ export default function MisReservasScreen() {
                 />
             </View>
 
-            <Modal visible={showTicket} animationType="slide" transparent={true}>
+            <Modal visible={showTicket} animationType="slide" transparent={true} statusBarTranslucent>
                 {selectedBooking?.paymentStatus === 'refund_failed' ? (
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', padding: 20 }}>
                         <View style={{ backgroundColor: C.card, borderRadius: 30, borderWidth: 1, borderColor: C.border, overflow: 'hidden' }}>
@@ -695,7 +695,7 @@ const BookingEliteCard = ({ booking, venueName, isDark, onView, onMaps, onCheckI
     const status = getStatusInfo(booking, C);
     const dateInfo = getFormattedDate(booking.date);
     const isConfirmed = booking.status === 'confirmed' && !booking.checkOut;
-    const isActive = booking.status === 'active' && !booking.checkOut;
+    const isActive = (booking.status === 'active' || booking.checkIn) && !booking.checkOut;
     const isCompleted = booking.status === 'completed' || booking.status === 'past' || booking.checkOut === true;
     const isCancelled = booking.status === 'cancelled';
     const showMapsAndTicket = (!isCompleted && !isCancelled) || booking.paymentStatus === 'refund_failed';
@@ -771,7 +771,7 @@ const BookingEliteCard = ({ booking, venueName, isDark, onView, onMaps, onCheckI
                             <Text style={{ color: 'white', fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>CHECK-OUT</Text>
                         </TouchableOpacity>
                     )}
-                    {showMapsAndTicket && (
+                    {showMapsAndTicket && !isActive && (
                         <TouchableOpacity onPress={onMaps} style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: COLORS.maps + '10', alignItems: 'center', justifyContent: 'center' }}>
                             <Navigation color={COLORS.maps} size={20} />
                         </TouchableOpacity>
@@ -781,7 +781,7 @@ const BookingEliteCard = ({ booking, venueName, isDark, onView, onMaps, onCheckI
                             <XCircle color="#ef4444" size={20} />
                         </TouchableOpacity>
                     )}
-                    {showMapsAndTicket && (!isConfirmed || booking.checkIn || booking.paymentStatus === 'refund_failed') && (
+                    {showMapsAndTicket && !isActive && (!isConfirmed || booking.checkIn || booking.paymentStatus === 'refund_failed') && (
                         <TouchableOpacity 
                             onPress={onView} 
                             style={{ 
@@ -824,7 +824,7 @@ const SectionLabel = ({ label }: { label: string }) => (
 const FeedbackModal = ({ visible, type, message, onClose, isDark }: any) => {
     const C = isDark ? COLORS.dark : COLORS.light;
     return (
-        <Modal visible={visible} transparent animationType="fade">
+        <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
             <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
                 <View style={{ backgroundColor: C.card, borderRadius: 35, padding: 30, alignItems: 'center', width: '100%', borderWidth: 1, borderColor: C.border }}>
                     <View style={{ width: 70, height: 70, borderRadius: 35, backgroundColor: (type === 'error' ? '#ef444422' : '#10b98122'), alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
@@ -844,7 +844,7 @@ const FeedbackModal = ({ visible, type, message, onClose, isDark }: any) => {
 const EliteActionModal = ({ visible, onClose, onConfirm, title, message, confirmText, icon, isDark, danger }: any) => {
     const C = isDark ? COLORS.dark : COLORS.light;
     return (
-        <Modal visible={visible} transparent animationType="fade">
+        <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
             <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
                 <View style={{ backgroundColor: C.card, borderRadius: 35, padding: 30, alignItems: 'center', width: '100%', borderWidth: 1, borderColor: C.border }}>
                     <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: (danger ? '#ef4444' : COLORS.accent) + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
@@ -873,7 +873,7 @@ const SurveyModal = ({ visible, onClose, onSave, isDark }: any) => {
     const [rating, setRating] = useState(5);
     const [feedback, setFeedback] = useState('');
     return (
-        <Modal visible={visible} animationType="slide" transparent>
+        <Modal visible={visible} animationType="slide" transparent statusBarTranslucent>
             <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', padding: 25 }}>
                 <View style={{ backgroundColor: C.bg, borderRadius: 35, padding: 30, borderWidth: 1, borderColor: C.border }}>
                     <View style={{ alignItems: 'center', marginBottom: 25 }}>

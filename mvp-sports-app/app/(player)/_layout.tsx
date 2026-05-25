@@ -65,7 +65,7 @@ export default function PlayerLayout() {
                 contentStyle: { backgroundColor: theme === 'dark' ? '#020617' : '#F8FAFC' }
             }}
         >
-            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="index" options={{ presentation: 'card' }} />
             <Stack.Screen name="estadisticas" options={{ presentation: 'card' }} />
             <Stack.Screen name="reporte" options={{ presentation: 'card' }} />
             <Stack.Screen name="billetera" options={{ presentation: 'card' }} />

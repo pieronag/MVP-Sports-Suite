@@ -171,7 +171,9 @@ export default function MapaBusquedaScreen() {
                 }
 
                 let primarySportId = 'todo';
-                if (displaySports.length > 0) {
+                if (activeSport !== 'todo') {
+                    primarySportId = activeSport;
+                } else if (displaySports.length > 0) {
                     const firstSport = displaySports[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
                     if (firstSport.includes('futbolito')) primarySportId = 'futbolito';
                     else if (firstSport.includes('futbol')) primarySportId = 'futbol';
