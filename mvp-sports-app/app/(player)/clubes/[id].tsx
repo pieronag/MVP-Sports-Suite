@@ -112,7 +112,7 @@ export default function VenueDetailsScreen() {
     const [refreshing, setRefreshing] = useState(false);
     const [isCreatingBooking, setIsCreatingBooking] = useState(false);
     const [reviews, setReviews] = useState<any[]>([]);
-    const [visibleReviewsCount, setVisibleReviewsCount] = useState(3);
+    const [visibleReviewsCount, setVisibleReviewsCount] = useState(0);
 
     const fetchData = useCallback(async () => {
         if (!id) return;
@@ -125,12 +125,15 @@ export default function VenueDetailsScreen() {
             setReviews(r);
 
             // Sincronizar el rating real con el documento si hay discrepancia
+            // (Comentado porque los jugadores no tienen permisos de escritura en tenants)
+            /*
             if (r.length > 0 && v) {
                 const currentAvg = Math.round((r.reduce((acc, rev) => acc + rev.rating, 0) / r.length) * 10) / 10;
                 if (v.rating !== currentAvg || (v as any).totalFeedbacks !== r.length) {
                     venueService.recalculateVenueRating(id as string).catch(e => console.error("Sync rating failed:", e));
                 }
             }
+            */
         } catch (error) {
             console.error(error);
         } finally {
@@ -556,12 +559,14 @@ export default function VenueDetailsScreen() {
                     </View>
                 )}
                 ListEmptyComponent={() => (
-                    <View style={{ paddingHorizontal: 30 }}>
-                        <View style={{ backgroundColor: C.card, borderRadius: 25, padding: 30, alignItems: 'center', borderWidth: 1, borderColor: C.border, borderStyle: 'dashed' }}>
-                            <Info color={C.sub} size={30} strokeWidth={1.5} />
-                            <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', marginTop: 15, textAlign: 'center' }}>Aún no hay valoraciones para este recinto. ¡Sé el primero en jugar y calificar!</Text>
+                    reviews.length === 0 ? (
+                        <View style={{ paddingHorizontal: 30 }}>
+                            <View style={{ backgroundColor: C.card, borderRadius: 25, padding: 30, alignItems: 'center', borderWidth: 1, borderColor: C.border, borderStyle: 'dashed' }}>
+                                <Info color={C.sub} size={30} strokeWidth={1.5} />
+                                <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', marginTop: 15, textAlign: 'center' }}>Aún no hay valoraciones para este recinto. ¡Sé el primero en jugar y calificar!</Text>
+                            </View>
                         </View>
-                    </View>
+                    ) : null
                 )}
                 ListFooterComponent={() => (
                     reviews.length > visibleReviewsCount ? (
@@ -584,7 +589,9 @@ export default function VenueDetailsScreen() {
                                             elevation: 1
                                         }}
                                     >
-                                        <Text style={{ color: accent, fontSize: 12, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 }}>Cargar 3 opiniones más</Text>
+                                        <Text style={{ color: accent, fontSize: 12, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 }}>
+                                            {visibleReviewsCount === 0 ? 'Ver Opiniones' : 'Cargar 3 opiniones más'}
+                                        </Text>
                                     </TouchableOpacity>
                         </View>
                     ) : null

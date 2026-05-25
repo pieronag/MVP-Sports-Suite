@@ -485,7 +485,7 @@ export default function MisReservasScreen() {
             <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
 
             <View style={{ paddingTop: 60, paddingBottom: 20, paddingHorizontal: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: C.card }}>
-                <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
+                <TouchableOpacity onPress={() => router.push('/(player)')} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={COLORS.accent} size={24} />
                 </TouchableOpacity>
                 <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Mis Reservas</Text>
@@ -518,7 +518,7 @@ export default function MisReservasScreen() {
                             isDark={isDark}
                             onView={() => { setSelectedBooking(b); setShowTicket(true); }}
                             onMaps={() => handleOpenMaps(b)}
-                            onCheckIn={() => b.id && handleCheckIn(b)}
+                            onCheckIn={() => { setSelectedBooking(b); setShowTicket(true); }}
                             onCheckOut={() => handleCheckOut(b)}
                             onStats={() => {}}
                             onCancel={() => b.id && handleCancel(b.id)}
