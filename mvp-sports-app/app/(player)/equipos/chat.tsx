@@ -11,6 +11,7 @@ import {
 import { useAuth } from '../../../store/useAuth';
 import { chatService, ChatMessage } from '../../../services/chatService';
 import { teamService } from '../../../services/teamService';
+import { userService } from '../../../services/userService';
 
 const { width } = Dimensions.get('window');
 
@@ -49,9 +50,10 @@ export default function ChatEquiposScreen() {
 
     useFocusEffect(
         React.useCallback(() => {
-            if (!teamId) return;
+            if (!teamId || !user) return;
 
             teamService.getTeamById(teamId as string).then(t => setTeam(t));
+            userService.markChatAsRead(user.uid, teamId as string);
 
             const unsubscribe = chatService.subscribeToMessages(
                 teamId as string,
@@ -59,13 +61,14 @@ export default function ChatEquiposScreen() {
                     setMessages(msgs);
                     setLoading(false);
                     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+                    userService.markChatAsRead(user.uid, teamId as string);
                 }
             );
 
             return () => {
                 unsubscribe();
             };
-        }, [teamId])
+        }, [teamId, user])
     );
 
     const handleSend = useCallback(async () => {
@@ -95,6 +98,36 @@ export default function ChatEquiposScreen() {
         } catch { return ''; }
     };
 
+    const groupMessagesByDate = (msgs: ChatMessage[]) => {
+        const groups: { dateLabel: string, messages: ChatMessage[] }[] = [];
+        let currentLabel = '';
+        msgs.forEach(msg => {
+            if (!msg.createdAt) return;
+            let date;
+            try {
+                date = msg.createdAt.toDate ? msg.createdAt.toDate() : new Date(msg.createdAt);
+            } catch { return; }
+            
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            let label = date.toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' });
+            if (date.toDateString() === today.toDateString()) label = 'Hoy';
+            else if (date.toDateString() === yesterday.toDateString()) label = 'Ayer';
+
+            if (label !== currentLabel) {
+                groups.push({ dateLabel: label, messages: [msg] });
+                currentLabel = label;
+            } else {
+                groups[groups.length - 1].messages.push(msg);
+            }
+        });
+        return groups;
+    };
+
+    const groupedMessages = groupMessagesByDate(messages);
+
     return (
         <View style={{ flex: 1, backgroundColor: C.bg }}>
             <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
@@ -123,7 +156,7 @@ export default function ChatEquiposScreen() {
                     </View>
                 ) : (
                     <ScrollView ref={scrollRef} style={{ flex: 1, paddingHorizontal: 20 }} contentContainerStyle={{ paddingVertical: 30 }} showsVerticalScrollIndicator={false}>
-                        {messages.length === 0 ? (
+                        {groupedMessages.length === 0 ? (
                             <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 100 }}>
                                 <View style={{ width: 80, height: 80, borderRadius: 30, backgroundColor: COLORS.accent + '11', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
                                     <MessageCircle color={COLORS.accent} size={35} />
@@ -131,29 +164,42 @@ export default function ChatEquiposScreen() {
                                 <Text style={{ color: C.sub, fontSize: 11, fontWeight: '800', textTransform: 'uppercase', textAlign: 'center', letterSpacing: 2 }}>Sala de estrategia lista.{'\n'}Inicia el chat con tu equipo.</Text>
                             </View>
                         ) : (
-                            messages.map((msg, i) => {
-                                const isMe = msg.senderId === user?.uid;
-                                return (
-                                    <View key={msg.id || i} style={{ flexDirection: 'row', justifyContent: isMe ? 'flex-end' : 'flex-start', marginBottom: 15 }}>
-                                        {!isMe && (
-                                            <View style={{ width: 35, height: 35, borderRadius: 12, overflow: 'hidden', backgroundColor: C.border, marginRight: 10 }}>
-                                                {msg.senderPhoto ? <Image source={{ uri: msg.senderPhoto }} style={{ width: '100%', height: '100%' }} /> : <User color="white" size={20} />}
-                                            </View>
-                                        )}
-                                        <View style={{ maxWidth: width * 0.7 }}>
-                                            {!isMe && <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', marginBottom: 4, marginLeft: 5 }}>{msg.senderName}</Text>}
-                                            <View style={{ 
-                                                backgroundColor: isMe ? COLORS.accent : (isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9'),
-                                                padding: 15, borderRadius: 20, borderBottomRightRadius: isMe ? 4 : 20, borderBottomLeftRadius: isMe ? 20 : 4,
-                                                borderWidth: isMe ? 0 : 1, borderColor: C.border
-                                            }}>
-                                                <Text style={{ color: isMe ? 'white' : C.text, fontSize: 15, fontWeight: '600', lineHeight: 20 }}>{msg.text}</Text>
-                                            </View>
-                                            <Text style={{ color: C.sub, fontSize: 8, fontWeight: '800', marginTop: 5, textAlign: isMe ? 'right' : 'left' }}>{formatTime(msg.createdAt)}</Text>
+                            groupedMessages.map((group, gIdx) => (
+                                <View key={`group-${gIdx}`}>
+                                    {/* SEPARADOR DE FECHA TIPO WHATSAPP */}
+                                    <View style={{ alignItems: 'center', marginVertical: 15 }}>
+                                        <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#E2E8F0', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 10 }}>
+                                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', textTransform: 'uppercase' }}>{group.dateLabel}</Text>
                                         </View>
                                     </View>
-                                );
-                            })
+                                    
+                                    {group.messages.map((msg, i) => {
+                                        const isMe = msg.senderId === user?.uid;
+                                        return (
+                                            <View key={msg.id || i} style={{ flexDirection: 'row', justifyContent: isMe ? 'flex-end' : 'flex-start', marginBottom: 12 }}>
+                                                {!isMe && (
+                                                    <View style={{ width: 30, height: 30, borderRadius: 10, overflow: 'hidden', backgroundColor: C.border, marginRight: 8, alignSelf: 'flex-end' }}>
+                                                        {msg.senderPhoto ? <Image source={{ uri: msg.senderPhoto }} style={{ width: '100%', height: '100%' }} /> : <User color="white" size={18} />}
+                                                    </View>
+                                                )}
+                                                <View style={{ maxWidth: width * 0.75 }}>
+                                                    {!isMe && <Text style={{ color: C.sub, fontSize: 10, fontWeight: '800', marginBottom: 2, marginLeft: 2 }}>{msg.senderName}</Text>}
+                                                    <View style={{ 
+                                                        backgroundColor: isMe ? COLORS.accent : (isDark ? '#1E293B' : '#FFFFFF'),
+                                                        paddingHorizontal: 12, paddingVertical: 8, borderRadius: 16, 
+                                                        borderBottomRightRadius: isMe ? 4 : 16, borderBottomLeftRadius: isMe ? 16 : 4,
+                                                        borderWidth: isDark || isMe ? 0 : 1, borderColor: '#E2E8F0',
+                                                        flexDirection: 'row', alignItems: 'flex-end', flexWrap: 'wrap'
+                                                    }}>
+                                                        <Text style={{ color: isMe ? 'white' : C.text, fontSize: 15, fontWeight: '500', lineHeight: 20, marginRight: 10, marginBottom: 2 }}>{msg.text}</Text>
+                                                        <Text style={{ color: isMe ? 'rgba(255,255,255,0.7)' : C.sub, fontSize: 9, fontWeight: '700', alignSelf: 'flex-end' }}>{formatTime(msg.createdAt)}</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        );
+                                    })}
+                                </View>
+                            ))
                         )}
                     </ScrollView>
                 )}

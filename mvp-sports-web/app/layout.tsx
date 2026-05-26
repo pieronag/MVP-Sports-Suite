@@ -11,8 +11,15 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-montserrat", display: "swap" });
 
 export const metadata: Metadata = {
-  title: "MVP Sports | La Plataforma Deportiva Todo-en-Uno",
-  description: "La solución definitiva para la gestión de recintos deportivos, torneos y academias. Eleva tu juego con MVP Sports.",
+  title: "MVP Sports | Reserva de Canchas y Software Deportivo en Chile",
+  description: "¿Buscas dónde jugar? Encuentra y reserva al instante canchas de pádel, futbolito y tenis. Además, descubre el software líder para la gestión de recintos.",
+  keywords: [
+    "arriendo de canchas", "arriendo padel", "arriendo futbolito", "reserva de canchas",
+    "canchas de padel", "canchas de futbolito", "canchas de tenis", "jugar futbolito",
+    "app para reservar canchas", "arriendo de canchas chile", "software para complejos deportivos",
+    "gestión de recintos deportivos", "sistema de reservas para canchas", "software administracion de canchas",
+    "mvp sports"
+  ],
 };
 
 export default function RootLayout({

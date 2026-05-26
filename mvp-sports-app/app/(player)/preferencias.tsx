@@ -429,7 +429,7 @@ export default function SettingsScreen() {
                 <TouchableOpacity onPress={handleBack} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={COLORS.accent} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase' }}>Preferencias</Text>
+                <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Ajustes de Jugador</Text>
                 <TouchableOpacity onPress={handleSave} disabled={saving} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: '#10b981', alignItems: 'center', justifyContent: 'center' }}>
                     {saving ? <ActivityIndicator color="white" size="small" /> : <Save color="white" size={20} />}
                 </TouchableOpacity>

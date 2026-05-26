@@ -15,6 +15,8 @@ export interface Team {
     winRate?: number;
     trophies?: number;
     inviteCode?: string;
+    joinRequests?: string[];
+    lastMessageAt?: any;
     createdAt: any;
 }
 
@@ -85,14 +87,31 @@ export const teamService = {
 
     async joinTeam(teamId: string, userId: string): Promise<void> {
         try {
+            const teamDoc = await getDoc(doc(db, 'teams', teamId));
+            if (!teamDoc.exists()) throw new Error("Equipo no encontrado.");
+            const teamData = teamDoc.data();
+
+            if (teamData.members?.includes(userId)) {
+                throw new Error("Ya eres miembro de este equipo.");
+            }
+            if (teamData.joinRequests?.includes(userId)) {
+                throw new Error("Ya tienes una solicitud pendiente para este equipo.");
+            }
+            if ((teamData.members?.length || 0) >= 25) {
+                throw new Error("El equipo está lleno (máx. 25 agentes).");
+            }
+            if ((teamData.joinRequests?.length || 0) >= 10) {
+                throw new Error("El equipo tiene demasiadas solicitudes pendientes (máx. 10). Intenta más tarde.");
+            }
+
             const teamRef = doc(db, 'teams', teamId);
             await updateDoc(teamRef, {
-                members: arrayUnion(userId)
+                joinRequests: arrayUnion(userId)
             });
             await auditService.logAuditEvent({
-                action: 'EQUIPO_UNIRSE',
+                action: 'EQUIPO_UNIRSE_SOLICITUD',
                 module: 'Equipos/Móvil',
-                details: `Usuario ${userId} se unió al equipo ${teamId}.`,
+                details: `Usuario ${userId} solicitó unirse al equipo ${teamId}.`,
                 severity: 'LOW',
                 status: 'SUCCESS'
             });
@@ -141,6 +160,7 @@ export const teamService = {
                 sport,
                 ownerId,
                 members: [ownerId],
+                joinRequests: [],
                 elo: 1000,
                 winRate: 0,
                 trophies: 0,
@@ -230,18 +250,26 @@ export const teamService = {
                 return { success: false, error: 'Ya eres miembro de este equipo.' };
             }
 
-            if ((teamData.members?.length || 0) >= 15) {
-                return { success: false, error: 'El equipo está lleno (máx. 15 agentes).' };
+            if (teamData.joinRequests?.includes(userId)) {
+                return { success: false, error: 'Ya has enviado una solicitud a este equipo.' };
+            }
+
+            if ((teamData.members?.length || 0) >= 25) {
+                return { success: false, error: 'El equipo está lleno (máx. 25 agentes).' };
+            }
+
+            if ((teamData.joinRequests?.length || 0) >= 10) {
+                return { success: false, error: 'El equipo tiene demasiadas solicitudes pendientes (máx. 10). Intenta más tarde.' };
             }
 
             await updateDoc(doc(db, 'teams', teamDoc.id), {
-                members: arrayUnion(userId)
+                joinRequests: arrayUnion(userId)
             });
 
             await auditService.logAuditEvent({
-                action: 'EQUIPO_UNIRSE',
+                action: 'EQUIPO_UNIRSE_SOLICITUD',
                 module: 'Equipos/Móvil',
-                details: `Usuario ${userId} se unió al equipo "${teamData.name}" (ID: ${teamDoc.id}) usando código de invitación.`,
+                details: `Usuario ${userId} solicitó unirse al equipo "${teamData.name}" (ID: ${teamDoc.id}) usando código de invitación.`,
                 severity: 'LOW',
                 status: 'SUCCESS'
             });
@@ -257,6 +285,62 @@ export const teamService = {
                 status: 'FAILED'
             });
             return { success: false, error: 'Error al unirse. Intenta de nuevo.' };
+        }
+    },
+
+    /**
+     * Accept a join request
+     */
+    async acceptJoinRequest(teamId: string, userId: string, ownerId: string): Promise<void> {
+        try {
+            const team = await this.getTeamById(teamId);
+            if (!team || team.ownerId !== ownerId) {
+                throw new Error('Solo el capitán puede aceptar solicitudes.');
+            }
+            if ((team.members?.length || 0) >= 25) {
+                throw new Error('El equipo está lleno (máx. 25 agentes).');
+            }
+            const teamRef = doc(db, 'teams', teamId);
+            await updateDoc(teamRef, {
+                joinRequests: arrayRemove(userId),
+                members: arrayUnion(userId)
+            });
+            await auditService.logAuditEvent({
+                action: 'EQUIPO_SOLICITUD_ACEPTAR',
+                module: 'Equipos/Móvil',
+                details: `Capitán ${ownerId} aceptó la solicitud del usuario ${userId} en el equipo ${teamId}.`,
+                severity: 'LOW',
+                status: 'SUCCESS'
+            });
+        } catch (error: any) {
+            console.error("Error aceptando solicitud:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Reject a join request
+     */
+    async rejectJoinRequest(teamId: string, userId: string, ownerId: string): Promise<void> {
+        try {
+            const team = await this.getTeamById(teamId);
+            if (!team || team.ownerId !== ownerId) {
+                throw new Error('Solo el capitán puede rechazar solicitudes.');
+            }
+            const teamRef = doc(db, 'teams', teamId);
+            await updateDoc(teamRef, {
+                joinRequests: arrayRemove(userId)
+            });
+            await auditService.logAuditEvent({
+                action: 'EQUIPO_SOLICITUD_RECHAZAR',
+                module: 'Equipos/Móvil',
+                details: `Capitán ${ownerId} rechazó la solicitud del usuario ${userId} en el equipo ${teamId}.`,
+                severity: 'LOW',
+                status: 'SUCCESS'
+            });
+        } catch (error: any) {
+            console.error("Error rechazando solicitud:", error);
+            throw error;
         }
     },
 

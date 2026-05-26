@@ -45,5 +45,6 @@ export interface UserProfile {
     xp?: number;
     position?: string;
     mainSport?: string;
+    readReceipts?: Record<string, string>;
 }
 

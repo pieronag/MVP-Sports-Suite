@@ -1,4 +1,4 @@
-# 🏆 MVP SPORTS SUITE: UNIFIED COMMAND CENTER (V19.8)
+# 🏆 MVP SPORTS SUITE: UNIFIED COMMAND CENTER (V19.9)
 ### Manual de Operaciones y Especificación Técnica Industrial
 **Propiedad de MVP SPORTS CHILE - 2026**
 
@@ -31,31 +31,49 @@ Bajo la arquitectura **Multi-Tenant SaaS**, el sistema elimina la fricción oper
 
 ---
 
-## ⚙️ 3. MOTORES TÉCNICOS AVANZADOS (Core V16 - V19)
+## ⚙️ 3. MOTORES TÉCNICOS AVANZADOS (Core V16 - V19.9)
 
 ### 🛡️ Seguridad y Control Financiero
-- **Webpay Plus Pipeline (V17-V18):** Integración nativa sin fricción para App y Web, con motores de reversas asíncronas y reembolsos parciales descontando la comisión operativa del 3%.
+- **Webpay Plus Pipeline:** Integración nativa sin fricción para App y Web, con motores de reversas asíncronas y reembolsos parciales descontando la comisión operativa del 3%.
 - **SaaS Feature Gating:** Restricción premium por plan contratado (Free, Básico, Pro, Elite) y validaciones cruzadas para pasarelas.
 - **Tenant Security Rules:** Aislamiento absoluto de datos en Firestore por `tenantId` asegurando integridad B2B.
 
 ### ⚡ Automatización Operativa
 - **Double-Layer No-Show Engine:** Sistema estricto sincronizado al huso horario chileno que cancela reservas si no hay check-in. Validaciones manuales operan con 0 margen de error.
-- **Monitor Manager "En Vivo" (V19.8):** Auto-refresh inmersivo cada 30 segundos en el dashboard del Owner para monitoreo en tiempo real.
-- **Auditoría Inmutable (V19.6):** Tracking con IDs únicos (`TRC-XXXXXX`) y geolocalización IP en Firestore de acciones críticas.
-- **Galería Fotográfica Dinámica (V19.8):** Persistencia en base64 de alta eficiencia para exhibir los recintos mediante carruseles en la App Móvil.
+- **Monitor Manager "En Vivo":** Auto-refresh inmersivo cada 30 segundos en el dashboard del Owner para monitoreo en tiempo real.
+- **Auditoría Inmutable:** Tracking con IDs únicos (`TRC-XXXXXX`) y geolocalización IP en Firestore de acciones críticas.
+- **Galería Fotográfica Dinámica:** Persistencia en base64 de alta eficiencia para exhibir los recintos mediante carruseles en la App Móvil.
 
 ### 🎨 Experiencia de Usuario (UX)
-- **Dynamic SVG Ecosystem (V19.8):** SVGs vectoriales nativos para deportes, reactivos a Dark Mode.
-- **Gestión de Tickets QR (V19.8):** Flujo inmersivo de Check-in en portería utilizando códigos QR.
+- **Dynamic SVG Ecosystem:** SVGs vectoriales nativos para deportes, reactivos a Dark Mode.
+- **Gestión de Tickets QR:** Flujo inmersivo de Check-in en portería utilizando códigos QR.
 - **Anti-Fraude Gamification:** Topes matemáticos (`Math.min(20)`) en estadísticas de goles/asistencias para evitar "farming" de XP.
-- **Sistema Bidireccional de Soporte (V19.7):** Consola de tickets y reportes entre jugadores y administración.
-- **Full-Screen Immersive Modals (V19.9):** Paneles de tickets y encuestas de valoración que ocupan el 100% de pantalla con barras de estado translúcidas.
-- **MVP Elite Identity (V19.9):** Diseño de perfil e insignias estandarizado con la nueva "MVP Pro Card", ajustando trazos y jerarquías visuales.
-- **Flujo de Check-Out Seguro (V19.9):** Corrección y protección del flujo de recálculo global de ratings de recinto, y aseguramiento del checkout de jugador antes del conteo estadístico.
+- **Sistema Bidireccional de Soporte:** Consola de tickets y reportes entre jugadores y administración.
+- **Full-Screen Immersive Modals:** Paneles de tickets y encuestas de valoración que ocupan el 100% de pantalla con barras de estado translúcidas.
+- **MVP Elite Identity:** Diseño de perfil e insignias estandarizado con la nueva "MVP Pro Card", ajustando trazos y jerarquías visuales.
+- **Flujo de Check-Out Seguro:** Corrección y protección del flujo de recálculo global de ratings de recinto, y aseguramiento del checkout de jugador antes del conteo estadístico.
 
 ---
 
-## ✅ 4. ESTADO DE DESARROLLO Y PROGRESO INTEGRAL
+## 🎯 4. HITOS FINALES ALCANZADOS (V20 READY)
+*Los últimos módulos críticos han completado su desarrollo e interconexión.*
+
+*   **🏆 Torneos & Ligas Automatizadas:**
+    *   *Core Backend:* Generadores dinámicos de Brackets (Eliminación directa) y Fixtures (Round-Robin).
+    *   *Completado:* Lógica de final a partido único en modalidad "Ida y Vuelta" y restricción absoluta de pagos presenciales para inscripciones seguras.
+*   **🎓 Academia Deportiva:**
+    *   *Core Backend:* Soporte CRUD avanzado de clases, profesores y bloques semanales sincronizados.
+    *   *Completado:* Sistema de cobro mensual habilitado, con alertas dinámicas automatizadas y refinamiento tipográfico en todo el ecosistema.
+*   **🛡️ Módulo de Equipos V2 & Chat:**
+    *   *Core Backend:* Gestión robusta de solicitudes pendientes (máx. 10), límite de plantilla (máx. 25 miembros) y privilegios exclusivos para el Capitán.
+    *   *Completado:* Chat estilo WhatsApp con separación temporal, notificaciones individualizadas ("Read Receipts") y estandarización UI con SVG nativos.
+*   **✨ Refinamiento Visual y UX V2.1:**
+    *   Alineación estética de íconos (Target/Handshake), nomenclaturas estandarizadas ("Perfil de Jugador", "Pagos Realizados") y ajustes micrométricos de diseño.
+    *   *Despliegue:* Construcción (Build) versión `1.19.9` (Code `199`) para Android iniciada vía Expo Application Services (EAS).
+
+---
+
+## ✅ 5. ESTADO DE DESARROLLO Y PROGRESO INTEGRAL
 
 ### 📱 APP MÓVIL (`mvp-sports-app`) — **100.0%**
 | Módulo Clave | Estado | Funcionalidad Operativa |
@@ -80,18 +98,6 @@ Bajo la arquitectura **Multi-Tenant SaaS**, el sistema elimina la fricción oper
 | **Motor de Pagos** | **FINALIZADO** | Reversas Transbank y validaciones procesadas asíncronamente. |
 | **Seguridad Firestore**| **FINALIZADO** | Aislamiento por Tenant, roles estrictos sin vulnerar datos. |
 | **Pipeline Base64** | **FINALIZADO** | Persistencia nativa de imágenes evitando lag y costos de CDN. |
-
----
-
-## 🎯 5. HITOS FINALES ALCANZADOS (V20 READY)
-*Los últimos módulos críticos han completado su desarrollo e interconexión.*
-
-*   **🏆 Torneos & Ligas Automatizadas (Progreso: 100%):**
-    *   *Core Backend:* Generadores dinámicos de Brackets (Eliminación directa) y Fixtures (Round-Robin).
-    *   *Completado:* Lógica de final a partido único en modalidad "Ida y Vuelta" y restricción absoluta de pagos presenciales para inscripciones seguras.
-*   **🎓 Academia Deportiva (Progreso: 100%):**
-    *   *Core Backend:* Soporte CRUD avanzado de clases, profesores y bloques semanales sincronizados.
-    *   *Completado:* Sistema de cobro mensual habilitado, con alertas dinámicas automatizadas y refinamiento tipográfico en todo el ecosistema.
 
 ---
 **ORION TECHNOLOGY - MVP Sports Chile - 2026**

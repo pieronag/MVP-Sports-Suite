@@ -1,4 +1,4 @@
-import { collection, addDoc, query, orderBy, onSnapshot, Timestamp, limit, doc, getDoc } from 'firebase/firestore';
+import { collection, addDoc, query, orderBy, onSnapshot, Timestamp, limit, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
 
 export interface ChatMessage {
@@ -25,6 +25,13 @@ export const chatService = {
             ...message,
             createdAt: Timestamp.now()
         });
+
+        // Update team with lastMessageAt
+        const teamRef = doc(db, 'teams', teamId);
+        await updateDoc(teamRef, {
+            lastMessageAt: new Date().toISOString()
+        });
+
         return docRef.id;
     },
 

@@ -10,7 +10,8 @@ import {
     ChevronRight, Users, User, Medal, BarChart3, Settings, Building2,
     Compass, Sparkles, Target, Activity, ClipboardList, LayoutGrid,
     CalendarRange, Map as MapIcon, ShieldCheck, Heart, Clock, Zap, TrendingUp,
-    ArrowRight, GraduationCap
+    ArrowRight, GraduationCap, CalendarCheck, Shield, LineChart, UserCircle2, SlidersHorizontal,
+    Navigation, Crown, Dumbbell, CreditCard, ShieldHalf, Settings2, CalendarDays, Ticket
 } from 'lucide-react-native';
 import { useAuth } from '../../store/useAuth';
 import { useUserLocation } from '../../src/features/player/hooks/useDashboardData';
@@ -159,17 +160,17 @@ export default function PlayerDashboard() {
                     </View>
 
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                        <QuickIcon bit={<CalendarRange size={24} />} label="Reservas" color="#3b82f6" route="/(player)/reservas" C={C} isDark={isDark} />
-                        <QuickIcon bit={<MapPin size={24} />} label="Mapa" color="#10b981" route="/(player)/mapa" C={C} isDark={isDark} />
-                        <QuickIcon bit={<Trophy size={24} />} label="Torneos" color="#f43f5e" route="/(player)/torneos" C={C} isDark={isDark} />
-                        <QuickIcon bit={<GraduationCap size={24} />} label="Academias" color="#8b5cf6" route="/(player)/academias" C={C} isDark={isDark} />
-                        <QuickIcon bit={<Wallet size={24} />} label="Billetera" color="#14b8a6" route="/(player)/billetera" C={C} isDark={isDark} />
+                        <QuickIcon bit={<CalendarCheck size={28} />} label="Reservas" color="#3b82f6" route="/(player)/reservas" C={C} isDark={isDark} />
+                        <QuickIcon bit={<MapPin size={28} />} label="Mapa" color="#10b981" route="/(player)/mapa" C={C} isDark={isDark} />
+                        <QuickIcon bit={<Trophy size={28} />} label="Torneos" color="#f43f5e" route="/(player)/torneos" C={C} isDark={isDark} />
+                        <QuickIcon bit={<GraduationCap size={28} />} label="Academias" color="#8b5cf6" route="/(player)/academias" C={C} isDark={isDark} />
+                        <QuickIcon bit={<CreditCard size={28} />} label="Pagos" color="#14b8a6" route="/(player)/billetera" C={C} isDark={isDark} />
 
-                        <QuickIcon bit={<Building2 size={24} />} label="Recintos" color="#f59e0b" route="/(player)/clubes/explore" C={C} isDark={isDark} />
-                        <QuickIcon bit={<Users size={24} />} label="Equipos" color="#f97316" route="/(player)/equipos/explore" C={C} isDark={isDark} />
-                        <QuickIcon bit={<BarChart3 size={24} />} label="Estadísticas" color="#f97316" route="/(player)/estadisticas" C={C} isDark={isDark} />
-                        <QuickIcon bit={<User size={24} />} label="Perfil" color="#8b5cf6" route="/(player)/perfil" C={C} isDark={isDark} />
-                        <QuickIcon bit={<Settings size={24} />} label="Ajustes" color="#64748b" route="/(player)/preferencias" C={C} isDark={isDark} />
+                        <QuickIcon bit={<Building2 size={28} />} label="Recintos" color="#f59e0b" route="/(player)/clubes/explore" C={C} isDark={isDark} />
+                        <QuickIcon bit={<Shield size={28} />} label="Equipos" color="#f97316" route="/(player)/equipos/explore" C={C} isDark={isDark} />
+                        <QuickIcon bit={<TrendingUp size={28} />} label="Estadísticas" color="#ec4899" route="/(player)/estadisticas" C={C} isDark={isDark} />
+                        <QuickIcon bit={<User size={28} />} label="Perfil" color="#8b5cf6" route="/(player)/perfil" C={C} isDark={isDark} />
+                        <QuickIcon bit={<SlidersHorizontal size={28} />} label="Ajustes" color="#64748b" route="/(player)/preferencias" C={C} isDark={isDark} />
                     </View>
                 </View>
 
@@ -231,7 +232,7 @@ const QuickIcon = ({ bit, label, color, route, C, isDark }: any) => {
                 shadowRadius: 12,
                 elevation: 3
             }}>
-                {React.cloneElement(bit, { color, strokeWidth: 2.5 })}
+                {React.cloneElement(bit, { color, strokeWidth: 2 })}
             </View>
             <Text style={{ color: C.text, fontWeight: '900', fontSize: 8, textTransform: 'uppercase', letterSpacing: 1, marginTop: 12, textAlign: 'center' }} numberOfLines={1}>{label}</Text>
         </TouchableOpacity>

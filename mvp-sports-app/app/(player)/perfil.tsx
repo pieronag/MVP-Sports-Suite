@@ -260,7 +260,7 @@ export default function PerfilScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={COLORS.accent} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase' }}>Perfil MVP</Text>
+                <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Perfil de Jugador</Text>
                 <TouchableOpacity onPress={toggleTheme} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     {isDark ? <Sun color="#facc15" size={20} /> : <Moon color="#1e293b" size={20} />}
                 </TouchableOpacity>
@@ -269,7 +269,7 @@ export default function PerfilScreen() {
             <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 120 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => loadData(true)} tintColor={COLORS.accent} />}>
 
                 {/* GENERADOR DE FICHA (ESTILO CARTA MVP PRO) */}
-                <View style={{ paddingHorizontal: 25, marginTop: 10, marginBottom: 15 }}>
+                <View style={{ paddingHorizontal: 25, marginTop: 30, marginBottom: 15 }}>
                     <TouchableOpacity
                         onPress={handleDownloadCard}
                         disabled={generatingCard}
@@ -352,9 +352,9 @@ export default function PerfilScreen() {
                     <Separator isDark={isDark} />
                     <ProfileRow icon={Victorias} color="#f59e0b" label="Victorias Totales" value={profile?.stats?.won || 0} isDark={isDark} />
                     <Separator isDark={isDark} />
-                    <ProfileRow icon={Goles} color="#ef4444" label="Goles / Puntos" value={profile?.stats?.goals || 0} isDark={isDark} />
+                    <ProfileRow icon={Target} color="#ef4444" label="Goles / Puntos" value={profile?.stats?.goals || 0} isDark={isDark} />
                     <Separator isDark={isDark} />
-                    <ProfileRow icon={Asistencias} color="#10b981" label="Asistencias" value={profile?.stats?.assists || 0} isDark={isDark} />
+                    <ProfileRow icon={Handshake} color="#10b981" label="Asistencias" value={profile?.stats?.assists || 0} isDark={isDark} />
                     <Separator isDark={isDark} />
                     <ProfileRow icon={Mvp} color="#8b5cf6" label="Premios MVP" value={profile?.stats?.mvps || 0} isDark={isDark} />
                 </View>
@@ -949,7 +949,7 @@ const ProfileRow = ({ icon: Icon, color, label, value, isDark }: any) => {
     return (
         <View style={{ height: 80, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25 }}>
             <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: color + '40', alignItems: 'center', justifyContent: 'center' }}>
-                <Icon color={color} size={20} strokeWidth={1.25} width={30} height={30} />
+                <Icon color={color} size={20} strokeWidth={1.5} width={24} height={24} />
             </View>
             <View style={{ marginLeft: 20, flex: 1 }}>
                 <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>{label}</Text>

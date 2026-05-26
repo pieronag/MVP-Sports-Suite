@@ -12,6 +12,26 @@ import {
 import { useAuth } from '../../../store/useAuth';
 import { LinearGradient } from 'expo-linear-gradient';
 import { teamService, Team } from '../../../services/teamService';
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from '../../../components/icons/sports';
+
+const getSportIcon = (sport: string | undefined, color: string, size: number) => {
+    switch(sport?.toLowerCase()) {
+        case 'futbol':
+        case 'futbolito':
+            return <FutbolIcon color={color} size={size} width={size} height={size} />;
+        case 'padel':
+            return <PadelIcon color={color} size={size} width={size} height={size} />;
+        case 'tenis':
+            return <TenisIcon color={color} size={size} width={size} height={size} />;
+        case 'basketball':
+        case 'basquetbol':
+            return <BasquetbolIcon color={color} size={size} width={size} height={size} />;
+        case 'voleibol':
+            return <VoleibolIcon color={color} size={size} width={size} height={size} />;
+        default:
+            return <Trophy color={color} size={size} />;
+    }
+};
 
 const { width } = Dimensions.get('window');
 
@@ -48,7 +68,7 @@ const CATEGORIAS = [
 export default function EquiposExploreScreen() {
     const scrollViewRef = useRef<ScrollView>(null);
     const router = useRouter();
-    const { user, theme } = useAuth();
+    const { user, profile, theme } = useAuth();
     const isDark = theme === 'dark';
     const C = isDark ? COLORS.dark : COLORS.light;
 
@@ -122,7 +142,7 @@ export default function EquiposExploreScreen() {
                 setShowJoinModal(false);
                 setInviteCode('');
                 fetchTeams();
-                showFeedback('success', `¡Bienvenido a ${result.teamName}!`);
+                showFeedback('success', `¡Solicitud enviada al equipo ${result.teamName}! El capitán debe aceptarla.`);
             } else {
                 showFeedback('error', result.error || 'Código inválido o equipo lleno.');
             }
@@ -153,14 +173,12 @@ export default function EquiposExploreScreen() {
             <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
 
             {/* TOP BAR */}
-            <View style={{ paddingTop: 60, paddingBottom: 20, paddingHorizontal: 30, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: C.border }}>
-                <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
+            <View style={{ paddingTop: 60, paddingBottom: 20, paddingHorizontal: 30, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: C.card }}>
+                <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={COLORS.orange} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase' }}>Equipos</Text>
-                <TouchableOpacity onPress={() => setShowJoinModal(true)} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
-                    <UserPlus color={COLORS.orange} size={22} />
-                </TouchableOpacity>
+                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Equipos</Text>
+                <View style={{ width: 44 }} />
             </View>
 
             <ScrollView 
@@ -169,17 +187,25 @@ export default function EquiposExploreScreen() {
                 contentContainerStyle={{ paddingBottom: 120 }}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchTeams(); }} tintColor={COLORS.orange} />}
             >
-                {/* BANNER CREAR EQUIPO */}
-                <View style={{ padding: 30, paddingTop: 40 }}>
-                    <TouchableOpacity onPress={() => setShowCreateModal(true)} style={{ borderRadius: 35, overflow: 'hidden' }}>
-                        <LinearGradient colors={['#f97316', '#ea580c']} style={{ padding: 30, flexDirection: 'row', alignItems: 'center' }}>
-                            <View style={{ flex: 1 }}>
-                                <Text style={{ color: 'white', fontSize: 24, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Crea tu Equipo</Text>
-                                <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 11, fontWeight: '700', marginTop: 5 }}>Lidera tu propia franquicia MVP</Text>
+                {/* ACTIONS HERO */}
+                <View style={{ padding: 30, paddingTop: 40, flexDirection: 'row', gap: 15 }}>
+                    <TouchableOpacity onPress={() => setShowCreateModal(true)} style={{ flex: 1, borderRadius: 28, overflow: 'hidden' }}>
+                        <LinearGradient colors={['#f97316', '#ea580c']} style={{ padding: 25, alignItems: 'center' }}>
+                            <View style={{ width: 45, height: 45, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', marginBottom: 15 }}>
+                                <Plus color="white" size={24} />
                             </View>
-                            <View style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' }}>
-                                <Plus color="white" size={30} />
+                            <Text style={{ color: 'white', fontSize: 15, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5, textAlign: 'center' }}>Crear Equipo</Text>
+                            <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 9, fontWeight: '800', marginTop: 5, textAlign: 'center', textTransform: 'uppercase' }}>Lidera tu escuadra</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => setShowJoinModal(true)} style={{ flex: 1, borderRadius: 28, overflow: 'hidden' }}>
+                        <LinearGradient colors={isDark ? ['#1E293B', '#0F172A'] : ['#F1F5F9', '#E2E8F0']} style={{ padding: 25, alignItems: 'center', borderWidth: 1, borderColor: C.border, borderRadius: 28 }}>
+                            <View style={{ width: 45, height: 45, borderRadius: 15, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#FFFFFF', alignItems: 'center', justifyContent: 'center', marginBottom: 15 }}>
+                                <UserPlus color={COLORS.orange} size={24} />
                             </View>
+                            <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5, textAlign: 'center' }}>Unirme</Text>
+                            <Text style={{ color: C.sub, fontSize: 9, fontWeight: '800', marginTop: 5, textAlign: 'center', textTransform: 'uppercase' }}>Usa un código</Text>
                         </LinearGradient>
                     </TouchableOpacity>
                 </View>
@@ -194,45 +220,47 @@ export default function EquiposExploreScreen() {
                         </View>
                     ) : (
                         teams.filter(t => t.members?.includes(user?.uid) || t.ownerId === user?.uid).map(team => (
-                            <TeamIsland key={`my-${team.id}`} team={team} isDark={isDark} router={router} isMember />
+                            <TeamIsland key={`my-${team.id}`} team={team} isDark={isDark} router={router} isMember profile={profile} />
                         ))
                     )}
                 </View>
             </ScrollView>
 
             {/* MODAL: CREAR EQUIPO */}
-            <Modal visible={showCreateModal} animationType="slide" transparent={true}>
-                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-                    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' }}>
-                        <View style={{ backgroundColor: C.card, borderTopLeftRadius: 40, borderTopRightRadius: 40, padding: 30, paddingBottom: 50, borderWidth: 1, borderColor: C.border }}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
+            <Modal visible={showCreateModal} animationType="fade" transparent={true}>
+                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+                    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', padding: 25 }}>
+                        <View style={{ backgroundColor: C.card, borderRadius: 35, padding: 30, borderWidth: 1, borderColor: C.border, shadowColor: '#000', shadowOpacity: 0.5, shadowRadius: 20, elevation: 10 }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, marginTop: 10 }}>
                                 <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', textTransform: 'uppercase' }}>Nuevo Equipo</Text>
                                 <TouchableOpacity onPress={() => setShowCreateModal(false)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}>
                                     <X color={C.text} size={20} />
                                 </TouchableOpacity>
                             </View>
+                            <Text style={{ color: C.sub, fontSize: 13, fontWeight: '600', marginBottom: 25 }}>Funda tu propio escuadrón, elige la especialidad y comienza a reclutar a la élite de tu zona.</Text>
 
                             <TextInput 
                                 placeholder="Ej: Los Galácticos" 
                                 placeholderTextColor={isDark ? '#334155' : '#CBD5E1'}
                                 value={newTeamName}
                                 onChangeText={setNewTeamName}
-                                style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', borderRadius: 15, height: 65, paddingHorizontal: 20, color: C.text, fontSize: 18, fontWeight: '800', borderWidth: 1, borderColor: C.border, marginBottom: 20 }}
+                                style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', borderRadius: 15, height: 60, paddingHorizontal: 20, color: C.text, fontSize: 18, fontWeight: '800', borderWidth: 1, borderColor: C.border, marginBottom: 20 }}
                             />
 
                             <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', marginBottom: 10, marginLeft: 5 }}>Especialidad del Equipo</Text>
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 30 }} contentContainerStyle={{ gap: 10 }}>
-                                {['futbol', 'futbolito', 'padel', 'tenis', 'basketball'].map((s) => (
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 30 }} contentContainerStyle={{ gap: 12 }}>
+                                {['futbol', 'futbolito', 'padel', 'tenis', 'basquetbol', 'voleibol'].map((s) => (
                                     <TouchableOpacity 
                                         key={s}
                                         onPress={() => setNewTeamSport(s)}
                                         style={{ 
-                                            paddingHorizontal: 20, height: 45, borderRadius: 12, alignItems: 'center', justifyContent: 'center',
+                                            paddingHorizontal: 20, height: 65, borderRadius: 16, alignItems: 'center', justifyContent: 'center',
                                             backgroundColor: newTeamSport === s ? COLORS.orange : (isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9'),
-                                            borderWidth: 1, borderColor: newTeamSport === s ? COLORS.orange : C.border
+                                            borderWidth: 1, borderColor: newTeamSport === s ? COLORS.orange : C.border, minWidth: 80
                                         }}
                                     >
-                                        <Text style={{ color: newTeamSport === s ? 'white' : C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase' }}>{s === 'basketball' ? 'Basket' : s}</Text>
+                                        {getSportIcon(s, newTeamSport === s ? 'white' : C.sub, 26)}
+                                        <Text style={{ color: newTeamSport === s ? 'white' : C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', marginTop: 8 }}>{s === 'basquetbol' ? 'Basket' : s === 'voleibol' ? 'Voley' : s}</Text>
                                     </TouchableOpacity>
                                 ))}
                             </ScrollView>
@@ -240,7 +268,7 @@ export default function EquiposExploreScreen() {
                             <TouchableOpacity 
                                 onPress={handleCreateTeam}
                                 disabled={actionLoading || !newTeamName.trim()}
-                                style={{ backgroundColor: COLORS.orange, height: 65, borderRadius: 20, alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.orange, shadowOpacity: 0.3, shadowRadius: 10, opacity: newTeamName.trim() ? 1 : 0.6 }}
+                                style={{ backgroundColor: COLORS.orange, height: 60, borderRadius: 20, alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.orange, shadowOpacity: 0.3, shadowRadius: 10, opacity: newTeamName.trim() ? 1 : 0.6 }}
                             >
                                 {actionLoading ? <ActivityIndicator color="white" /> : <Text style={{ color: 'white', fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Crear Mi Equipo</Text>}
                             </TouchableOpacity>
@@ -249,35 +277,39 @@ export default function EquiposExploreScreen() {
                 </KeyboardAvoidingView>
             </Modal>
 
-            {/* MODAL: UNIRSE POR CÓDIGO */}
+            {/* MODAL: UNIRSE A ESCUADRÓN */}
             <Modal visible={showJoinModal} animationType="fade" transparent={true}>
-                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', alignItems: 'center', justifyContent: 'center', padding: 30 }}>
-                    <View style={{ width: '100%', backgroundColor: C.card, borderRadius: 40, padding: 30, borderWidth: 1, borderColor: C.border }}>
-                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', textTransform: 'uppercase', textAlign: 'center', marginBottom: 10 }}>Unirse a Escuadrón</Text>
-                        <Text style={{ color: C.sub, fontSize: 12, fontWeight: '600', textAlign: 'center', marginBottom: 30 }}>Ingresa el código secreto de invitación</Text>
-                        
-                        <TextInput 
-                            placeholder="CÓDIGO" 
-                            placeholderTextColor={C.sub}
-                            value={inviteCode}
-                            onChangeText={t => setInviteCode(t.toUpperCase())}
-                            maxLength={6}
-                            style={{ height: 80, borderRadius: 25, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', textAlign: 'center', fontSize: 32, fontWeight: '900', color: C.text, letterSpacing: 5, marginBottom: 30, borderWidth: 1, borderColor: C.border }}
-                        />
+                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+                    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', padding: 25 }}>
+                        <View style={{ backgroundColor: C.card, borderRadius: 35, padding: 30, borderWidth: 1, borderColor: C.border, shadowColor: '#000', shadowOpacity: 0.5, shadowRadius: 20, elevation: 10 }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, marginTop: 10 }}>
+                                <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', textTransform: 'uppercase' }}>Unirse a Equipo</Text>
+                                <TouchableOpacity onPress={() => setShowJoinModal(false)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}>
+                                    <X color={C.text} size={20} />
+                                </TouchableOpacity>
+                            </View>
 
-                        <TouchableOpacity 
-                            onPress={handleJoinByCode}
-                            disabled={actionLoading || inviteCode.length !== 6}
-                            style={{ backgroundColor: COLORS.orange, height: 65, borderRadius: 20, alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.orange, shadowOpacity: 0.3, shadowRadius: 10, opacity: inviteCode.length === 6 ? 1 : 0.6 }}
-                        >
-                            {actionLoading ? <ActivityIndicator color="white" /> : <Text style={{ color: 'white', fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Validar Invitación</Text>}
-                        </TouchableOpacity>
+                            <Text style={{ color: C.sub, fontSize: 13, fontWeight: '600', marginBottom: 25 }}>Ingresa el código secreto proporcionado por el capitán para solicitar unirte a su escuadrón.</Text>
 
-                        <TouchableOpacity onPress={() => setShowJoinModal(false)} style={{ marginTop: 20, alignItems: 'center' }}>
-                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase' }}>Cerrar</Text>
-                        </TouchableOpacity>
+                            <TextInput 
+                                placeholder="CÓDIGO" 
+                                placeholderTextColor={isDark ? '#334155' : '#CBD5E1'}
+                                value={inviteCode}
+                                onChangeText={t => setInviteCode(t.toUpperCase())}
+                                maxLength={6}
+                                style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', borderRadius: 15, height: 65, paddingHorizontal: 20, color: C.text, fontSize: 20, fontWeight: '900', borderWidth: 1, borderColor: C.border, marginBottom: 30, textAlign: 'center', letterSpacing: 4 }}
+                            />
+
+                            <TouchableOpacity 
+                                onPress={handleJoinByCode}
+                                disabled={actionLoading || inviteCode.length !== 6}
+                                style={{ backgroundColor: COLORS.orange, height: 60, borderRadius: 20, alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.orange, shadowOpacity: 0.3, shadowRadius: 10, opacity: inviteCode.length === 6 ? 1 : 0.6 }}
+                            >
+                                {actionLoading ? <ActivityIndicator color="white" /> : <Text style={{ color: 'white', fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Enviar Solicitud</Text>}
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                </View>
+                </KeyboardAvoidingView>
             </Modal>
 
             {/* FEEDBACK MODAL */}
@@ -292,8 +324,21 @@ const SectionLabel = ({ label }: { label: string }) => (
     <Text style={{ color: '#f97316', fontWeight: '900', fontSize: 11, textTransform: 'uppercase', letterSpacing: 2, marginHorizontal: 40, marginTop: 30, marginBottom: 15 }}>{label}</Text>
 );
 
-const TeamIsland = ({ team, router, isMember, isDark }: { team: any; router: any; isMember?: boolean; isDark: boolean }) => {
+const TeamIsland = ({ team, router, isMember, isDark, profile }: { team: any; router: any; isMember?: boolean; isDark: boolean; profile?: any }) => {
     const C = isDark ? COLORS.dark : COLORS.light;
+    
+    // Check for unread messages
+    const lastReadStr = profile?.readReceipts?.[team.id];
+    const lastMessageAtStr = team.lastMessageAt;
+    let hasUnread = false;
+    if (lastMessageAtStr) {
+        if (!lastReadStr) {
+            hasUnread = true;
+        } else {
+            hasUnread = new Date(lastMessageAtStr) > new Date(lastReadStr);
+        }
+    }
+
     return (
         <TouchableOpacity 
             onPress={() => router.push(`/equipos/${team.id}` as any)} 
@@ -313,12 +358,15 @@ const TeamIsland = ({ team, router, isMember, isDark }: { team: any; router: any
                         </View>
                         {isMember && (
                             <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 8, marginLeft: 10, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' }}>
-                                <Text style={{ color: 'white', fontSize: 8, fontWeight: '900', textTransform: 'uppercase' }}>MIEMBRO</Text>
+                                <Text style={{ color: 'white', fontSize: 8, fontWeight: '900', textTransform: 'uppercase' }}>{team.ownerId === profile?.uid ? 'CAPITÁN' : 'MIEMBRO'}</Text>
                             </View>
                         )}
                     </View>
                     <Text style={{ color: 'white', fontSize: 26, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>{team.name}</Text>
                 </View>
+                {hasUnread && (
+                    <View style={{ position: 'absolute', top: -5, right: -5, width: 20, height: 20, borderRadius: 10, backgroundColor: '#f43f5e', borderWidth: 2, borderColor: C.bg }} />
+                )}
             </View>
             <View style={{ padding: 20, paddingHorizontal: 25, backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#F8FAFC', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>

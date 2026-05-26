@@ -130,6 +130,7 @@ export const userService = {
                 displayName: data.displayName || 'Staff',
                 email: data.email || '',
                 photoURL: data.photoURL,
+                createdAt: data.createdAt ? (typeof data.createdAt === 'string' ? data.createdAt : new Date(data.createdAt.seconds ? data.createdAt.seconds * 1000 : data.createdAt).toISOString()) : new Date().toISOString(),
                 tier: data.tier || 'Bronce',
                 ovr: data.ovr || 0,
                 stats: data.stats || { 
@@ -141,7 +142,8 @@ export const userService = {
                 teamName: data.teamName || 'MVP Staff',
                 xp: data.xp || 0,
                 role: data.role || 'manager',
-                tenantIds: data.tenantIds || []
+                tenantIds: data.tenantIds || [],
+                readReceipts: data.readReceipts || {}
             } as UserProfile;
         } catch (error) {
             console.error('Error fetching user profile:', error);
@@ -520,6 +522,20 @@ export const userService = {
             await Promise.all(promises);
         } catch (error) {
             console.warn('Could not award internal match XP and stats to all players:', error);
+        }
+    },
+
+    /**
+     * Mark a team's chat as read for the user
+     */
+    async markChatAsRead(uid: string, teamId: string): Promise<void> {
+        try {
+            const userRef = doc(db, 'users', uid);
+            await updateDoc(userRef, {
+                [`readReceipts.${teamId}`]: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('Error marking chat as read:', error);
         }
     }
 };

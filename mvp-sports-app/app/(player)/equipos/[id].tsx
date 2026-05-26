@@ -20,7 +20,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { userService } from '../../../services/userService';
 import { teamService } from '../../../services/teamService';
 import { bookingService, Booking } from '../../../services/bookingService';
-import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon } from '../../../components/icons/sports';
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from '../../../components/icons/sports';
 
 const getSportIcon = (sport: string | undefined, color: string, size: number) => {
     switch(sport?.toLowerCase()) {
@@ -32,7 +32,10 @@ const getSportIcon = (sport: string | undefined, color: string, size: number) =>
         case 'tenis':
             return <TenisIcon color={color} size={size} width={size} height={size} />;
         case 'basketball':
+        case 'basquetbol':
             return <BasquetbolIcon color={color} size={size} width={size} height={size} />;
+        case 'voleibol':
+            return <VoleibolIcon color={color} size={size} width={size} height={size} />;
         default:
             return <Trophy color={color} size={size} />;
     }
@@ -80,13 +83,14 @@ interface MemberProfile {
 export default function TeamDetailsScreen() {
     const { id } = useLocalSearchParams();
     const router = useRouter();
-    const { user, theme } = useAuth();
+    const { user, profile, theme } = useAuth();
     const isDark = theme === 'dark';
     const C = isDark ? COLORS.dark : COLORS.light;
     const scrollViewRef = useRef<ScrollView>(null);
 
     const [teamInfo, setTeamInfo] = useState<any>(null);
     const [memberProfiles, setMemberProfiles] = useState<MemberProfile[]>([]);
+    const [requestProfiles, setRequestProfiles] = useState<MemberProfile[]>([]);
     const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -98,9 +102,10 @@ export default function TeamDetailsScreen() {
     const [editName, setEditName] = useState('');
     const [editDescription, setEditDescription] = useState('');
     const [editSport, setEditSport] = useState('futbol');
-    const [showInviteModal, setShowInviteModal] = useState(false);
-    const [codeCopied, setCodeCopied] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showRemoveModal, setShowRemoveModal] = useState(false);
+    const [showLeaveModal, setShowLeaveModal] = useState(false);
+    const [memberToRemove, setMemberToRemove] = useState<MemberProfile | null>(null);
 
     // Feedback
     const [fbVisible, setFbVisible] = useState(false);
@@ -127,6 +132,21 @@ export default function TeamDetailsScreen() {
                     });
                 }
                 setMemberProfiles(profiles);
+
+                // Fetch requests profiles
+                const requests = (data as any).joinRequests || [];
+                const reqProfs: MemberProfile[] = [];
+                for (const reqId of requests.slice(0, 20)) {
+                    const mp = await userService.getUserProfile(reqId);
+                    reqProfs.push({ 
+                        uid: reqId, 
+                        displayName: mp?.displayName || 'Jugador', 
+                        photoURL: mp?.photoURL || null, 
+                        tier: mp?.tier, 
+                        ovr: mp?.ovr 
+                    });
+                }
+                setRequestProfiles(reqProfs);
                 
                 // Fetch bookings
                 const allB: Booking[] = [];
@@ -165,20 +185,67 @@ export default function TeamDetailsScreen() {
         try { 
             await teamService.joinTeam(teamInfo.id, user.uid); 
             fetchTeam(); 
-            showFeedback('success', '¡Te has unido al equipo!');
+            showFeedback('success', '¡Solicitud enviada al capitán!');
         } catch (error) { 
             showFeedback('error', 'No pudimos procesar tu solicitud.'); 
         } finally { setActionLoading(false); }
     };
 
-    const handleLeave = async () => {
+    const handleAcceptRequest = async (reqId: string) => {
+        if (!user || !teamInfo || !isOwner) return;
+        setActionLoading(true);
+        try {
+            await teamService.acceptJoinRequest(teamInfo.id, reqId, user.uid);
+            fetchTeam();
+            showFeedback('success', 'Solicitud aceptada. Nuevo miembro agregado.');
+        } catch (error) {
+            showFeedback('error', 'Error al aceptar solicitud.');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleRejectRequest = async (reqId: string) => {
+        if (!user || !teamInfo || !isOwner) return;
+        setActionLoading(true);
+        try {
+            await teamService.rejectJoinRequest(teamInfo.id, reqId, user.uid);
+            fetchTeam();
+            showFeedback('success', 'Solicitud rechazada.');
+        } catch (error) {
+            showFeedback('error', 'Error al rechazar solicitud.');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleConfirmRemove = async () => {
+        if (!user || !teamInfo || !isOwner || !memberToRemove) return;
+        setShowRemoveModal(false);
+        setActionLoading(true);
+        try {
+            await teamService.removeMember(teamInfo.id, memberToRemove.uid, user.uid);
+            fetchTeam();
+            showFeedback('success', 'Jugador expulsado del equipo.');
+        } catch(error) {
+            showFeedback('error', 'Error al expulsar jugador.');
+        } finally {
+            setActionLoading(false);
+            setMemberToRemove(null);
+        }
+    };
+
+    const handleConfirmLeave = async () => {
         if (!user || !teamInfo || isOwner) return;
-        setShowOptions(false);
+        setShowLeaveModal(false);
+        setActionLoading(true);
         try { 
             await teamService.leaveTeam(teamInfo.id, user.uid); 
-            router.back(); 
+            router.replace('/(player)/equipos/explore'); 
         } catch (error) { 
             showFeedback('error', 'No pudimos procesar tu salida.'); 
+        } finally {
+            setActionLoading(false);
         }
     };
 
@@ -239,6 +306,14 @@ export default function TeamDetailsScreen() {
 
     const isMember = user ? (teamInfo?.members?.includes(user.uid) || teamInfo?.ownerId === user.uid) : false;
     const isOwner = user ? teamInfo?.ownerId === user.uid : false;
+    const hasRequested = user ? (teamInfo?.joinRequests?.includes(user.uid)) : false;
+
+    const hasUnread = React.useMemo(() => {
+        if (!teamInfo?.lastMessageAt) return false;
+        const lastReadStr = profile?.readReceipts?.[teamInfo.id];
+        if (!lastReadStr) return true;
+        return new Date(teamInfo.lastMessageAt) > new Date(lastReadStr);
+    }, [teamInfo?.lastMessageAt, profile?.readReceipts]);
 
     if (loading) return (
         <View style={{ flex: 1, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center' }}>
@@ -273,14 +348,11 @@ export default function TeamDetailsScreen() {
                             setEditDescription(teamInfo.description || ''); 
                             setEditSport(teamInfo.sport || 'futbol');
                         }} style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: C.border }}>
-                            <Text style={{ color: C.text, fontWeight: '800', fontSize: 12, textTransform: 'uppercase' }}>Editar Perfil</Text>
+                            <Text style={{ color: C.text, fontWeight: '800', fontSize: 12, textTransform: 'uppercase' }}>Editar Equipo</Text>
                         </TouchableOpacity>
                     )}
-                    <TouchableOpacity onPress={() => { setShowOptions(false); setShowInviteModal(true); }} style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: C.border }}>
-                        <Text style={{ color: COLORS.accent, fontWeight: '800', fontSize: 12, textTransform: 'uppercase' }}>Invitar Amigos</Text>
-                    </TouchableOpacity>
                     {!isOwner && (
-                        <TouchableOpacity onPress={handleLeave} style={{ padding: 20 }}>
+                        <TouchableOpacity onPress={() => { setShowOptions(false); setShowLeaveModal(true); }} style={{ padding: 20 }}>
                             <Text style={{ color: COLORS.error, fontWeight: '800', fontSize: 12, textTransform: 'uppercase' }}>Salir del Equipo</Text>
                         </TouchableOpacity>
                     )}
@@ -307,7 +379,7 @@ export default function TeamDetailsScreen() {
                         style={StyleSheet.absoluteFill} 
                     />
                     
-                    <View style={{ position: 'absolute', bottom: 40, left: 30, right: 30 }}>
+                    <View style={{ position: 'absolute', bottom: 55, left: 30, right: 30 }}>
                         <View style={{ flexDirection: 'row', gap: 10, marginBottom: 20 }}>
                             <View style={{ backgroundColor: COLORS.accent, paddingHorizontal: 15, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
                                 <Text style={{ color: 'white', fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 }}>{teamInfo?.sport?.toUpperCase() || 'GENERAL'}</Text>
@@ -322,7 +394,6 @@ export default function TeamDetailsScreen() {
                             )}
                         </View>
                         <Text style={{ color: 'white', fontSize: 48, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -2, lineHeight: 48 }}>{teamInfo?.name}</Text>
-                        <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: '800', marginTop: 10, textTransform: 'uppercase', letterSpacing: 2 }}>Fundado en 2026 • EQUIPO</Text>
                     </View>
                 </View>
 
@@ -336,7 +407,7 @@ export default function TeamDetailsScreen() {
                     <View style={{ flex: 1, backgroundColor: C.card, borderRadius: 28, padding: 16, borderWidth: 1, borderColor: C.border, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10, elevation: 5 }}>
                         {getSportIcon(teamInfo?.sport, "#f59e0b", 24)}
                         <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', marginTop: 12, textTransform: 'uppercase' }} numberOfLines={1}>
-                            {teamInfo?.sport ? (teamInfo.sport === 'basketball' ? 'BASKET' : teamInfo.sport.toUpperCase()) : 'GENERAL'}
+                            {teamInfo?.sport ? (teamInfo.sport === 'basquetbol' || teamInfo.sport === 'basketball' ? 'BASKET' : teamInfo.sport === 'voleibol' ? 'VOLEY' : teamInfo.sport.toUpperCase()) : 'GENERAL'}
                         </Text>
                         <Text style={{ color: C.sub, fontSize: 7, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 4 }}>DEPORTE</Text>
                     </View>
@@ -355,6 +426,40 @@ export default function TeamDetailsScreen() {
                         </Text>
                         <Text style={{ color: C.sub, fontSize: 7, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.2, marginTop: 4 }}>CÓDIGO</Text>
                     </TouchableOpacity>
+                </View>
+
+                {/* ACTION BUTTON (CHAT / JOIN) ABOVE ROSTER */}
+                <View style={{ paddingHorizontal: 30, marginTop: 30, marginBottom: 10 }}>
+                    {isMember ? (
+                        <TouchableOpacity 
+                            onPress={() => router.push({ pathname: '/(player)/equipos/chat', params: { teamId: teamInfo.id, teamName: teamInfo.name } } as any)}
+                            style={{ height: 65, backgroundColor: COLORS.accent, borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.accent, shadowOpacity: 0.4, shadowRadius: 15, elevation: 10, position: 'relative' }}
+                        >
+                            <MessageCircle color="white" size={24} />
+                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 14, textTransform: 'uppercase', marginLeft: 12, letterSpacing: 1.5 }}>Chat del Equipo</Text>
+                            {hasUnread && (
+                                <View style={{ position: 'absolute', top: -5, right: -5, width: 20, height: 20, borderRadius: 10, backgroundColor: '#f43f5e', borderWidth: 2, borderColor: C.bg }} />
+                            )}
+                        </TouchableOpacity>
+                    ) : hasRequested ? (
+                        <View style={{ height: 65, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
+                            <Clock color={C.sub} size={24} />
+                            <Text style={{ color: C.sub, fontWeight: '900', fontSize: 14, textTransform: 'uppercase', marginLeft: 12, letterSpacing: 1.5 }}>Solicitud Pendiente</Text>
+                        </View>
+                    ) : (
+                        <TouchableOpacity 
+                            onPress={handleJoin}
+                            disabled={actionLoading}
+                            style={{ height: 65, backgroundColor: COLORS.accent, borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.accent, shadowOpacity: 0.4, shadowRadius: 15, elevation: 10 }}
+                        >
+                            {actionLoading ? <ActivityIndicator color="white" /> : (
+                                <>
+                                    <Shield color="white" size={24} />
+                                    <Text style={{ color: 'white', fontWeight: '900', fontSize: 14, textTransform: 'uppercase', marginLeft: 12, letterSpacing: 1.5 }}>Solicitar Ingreso</Text>
+                                </>
+                            )}
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 {/* ROSTER ELITE LIST */}
@@ -380,90 +485,84 @@ export default function TeamDetailsScreen() {
                                         <Text style={{ color: COLORS.accent, fontSize: 10, fontWeight: '900', marginLeft: 10 }}>OVR {m.ovr || 75}</Text>
                                     </View>
                                 </View>
+                                {isOwner && m.uid !== user?.uid && (
+                                    <TouchableOpacity onPress={() => { setMemberToRemove(m); setShowRemoveModal(true); }} style={{ paddingHorizontal: 12, paddingVertical: 8, backgroundColor: COLORS.error + '22', borderRadius: 12 }}>
+                                        <Text style={{ color: COLORS.error, fontSize: 9, fontWeight: '900', textTransform: 'uppercase' }}>Eliminar</Text>
+                                    </TouchableOpacity>
+                                )}
                             </View>
                             {i < memberProfiles.length - 1 && <View style={{ height: 1, backgroundColor: C.border, marginHorizontal: 25 }} />}
                         </React.Fragment>
                     ))}
                 </View>
 
-                {/* ACTION BUTTON AT THE END */}
-                <View style={{ paddingHorizontal: 30, marginTop: 40 }}>
-                    {isMember ? (
-                        <TouchableOpacity 
-                            onPress={() => router.push({ pathname: '/(player)/equipos/chat', params: { teamId: teamInfo.id, teamName: teamInfo.name } } as any)}
-                            style={{ height: 75, backgroundColor: COLORS.accent, borderRadius: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.accent, shadowOpacity: 0.4, shadowRadius: 15, elevation: 10 }}
-                        >
-                            <MessageCircle color="white" size={26} />
-                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 16, textTransform: 'uppercase', marginLeft: 15, letterSpacing: 2 }}>Entrar al Vestuario</Text>
-                        </TouchableOpacity>
-                    ) : (
-                        <TouchableOpacity 
-                            onPress={handleJoin}
-                            disabled={actionLoading}
-                            style={{ height: 75, backgroundColor: COLORS.accent, borderRadius: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', shadowColor: COLORS.accent, shadowOpacity: 0.4, shadowRadius: 15, elevation: 10 }}
-                        >
-                            {actionLoading ? <ActivityIndicator color="white" /> : (
-                                <>
-                                    <Shield color="white" size={26} />
-                                    <Text style={{ color: 'white', fontWeight: '900', fontSize: 16, textTransform: 'uppercase', marginLeft: 15, letterSpacing: 2 }}>Solicitar Ingreso</Text>
-                                </>
-                            )}
-                        </TouchableOpacity>
-                    )}
-                </View>
+                {/* SOLICITUDES PENDIENTES */}
+                {isOwner && requestProfiles.length > 0 && (
+                    <View>
+                        <SectionLabel label="Solicitudes Pendientes" />
+                        <View style={{ marginHorizontal: 30, backgroundColor: C.card, borderRadius: 35, borderWidth: 1, borderColor: C.border, overflow: 'hidden' }}>
+                            {requestProfiles.map((req, i) => (
+                                <React.Fragment key={`req-${req.uid}`}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', padding: 25 }}>
+                                        <View style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
+                                            {req.photoURL ? <Image source={{ uri: req.photoURL }} style={{ width: '100%', height: '100%' }} /> : <User color={C.sub} size={24} />}
+                                        </View>
+                                        <View style={{ marginLeft: 15, flex: 1 }}>
+                                            <Text style={{ color: C.text, fontSize: 16, fontWeight: '900' }}>{req.displayName.toUpperCase()}</Text>
+                                        </View>
+                                        <View style={{ flexDirection: 'row', gap: 10 }}>
+                                            <TouchableOpacity onPress={() => handleRejectRequest(req.uid)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.error + '22', alignItems: 'center', justifyContent: 'center' }}>
+                                                <X color={COLORS.error} size={18} />
+                                            </TouchableOpacity>
+                                            <TouchableOpacity onPress={() => handleAcceptRequest(req.uid)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.success + '22', alignItems: 'center', justifyContent: 'center' }}>
+                                                <CheckCircle2 color={COLORS.success} size={18} />
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                    {i < requestProfiles.length - 1 && <View style={{ height: 1, backgroundColor: C.border, marginHorizontal: 25 }} />}
+                                </React.Fragment>
+                            ))}
+                        </View>
+                    </View>
+                )}
+
+                {/* LIST END */}
             </ScrollView>
 
             {/* MODALS */}
-            <Modal visible={showEditModal} animationType="slide" transparent>
-                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' }}>
-                    <View style={{ backgroundColor: C.card, borderTopLeftRadius: 40, borderTopRightRadius: 40, padding: 30, paddingBottom: 50 }}>
-                        <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', textTransform: 'uppercase', marginBottom: 30 }}>Editar Equipo</Text>
+            <Modal visible={showEditModal} animationType="fade" transparent>
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', padding: 25 }}>
+                    <View style={{ backgroundColor: C.card, borderRadius: 35, padding: 30, shadowColor: '#000', shadowOpacity: 0.5, shadowRadius: 20, elevation: 10, borderWidth: 1, borderColor: C.border }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 }}>
+                            <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', textTransform: 'uppercase' }}>Editar Equipo</Text>
+                            <TouchableOpacity onPress={() => setShowEditModal(false)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#f1f5f9', alignItems: 'center', justifyContent: 'center' }}>
+                                <X color={C.text} size={20} />
+                            </TouchableOpacity>
+                        </View>
                         
                         <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', marginBottom: 10, marginLeft: 5 }}>Nombre del Club</Text>
                         <TextInput value={editName} onChangeText={setEditName} placeholder="Nombre del Equipo" placeholderTextColor={C.sub} style={{ height: 60, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9', borderRadius: 15, color: C.text, fontWeight: '800', marginBottom: 20, paddingHorizontal: 20, borderWidth: 1, borderColor: C.border }} />
                         
                         <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', marginBottom: 10, marginLeft: 5 }}>Especialidad / Deporte</Text>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 20 }} contentContainerStyle={{ gap: 10 }}>
-                            {['futbol', 'futbolito', 'padel', 'tenis', 'basketball'].map((s) => (
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 30 }} contentContainerStyle={{ gap: 12 }}>
+                            {['futbol', 'futbolito', 'padel', 'tenis', 'basquetbol', 'voleibol'].map((s) => (
                                 <TouchableOpacity 
                                     key={s}
                                     onPress={() => setEditSport(s)}
                                     style={{ 
-                                        paddingHorizontal: 20, height: 45, borderRadius: 12, alignItems: 'center', justifyContent: 'center',
+                                        paddingHorizontal: 20, height: 65, borderRadius: 16, alignItems: 'center', justifyContent: 'center',
                                         backgroundColor: editSport === s ? COLORS.accent : (isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9'),
-                                        borderWidth: 1, borderColor: editSport === s ? COLORS.accent : C.border
+                                        borderWidth: 1, borderColor: editSport === s ? COLORS.accent : C.border, minWidth: 80
                                     }}
                                 >
-                                    <Text style={{ color: editSport === s ? 'white' : C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase' }}>{s === 'basketball' ? 'Basket' : s}</Text>
+                                    {getSportIcon(s, editSport === s ? 'white' : C.sub, 26)}
+                                    <Text style={{ color: editSport === s ? 'white' : C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', marginTop: 8 }}>{s === 'basquetbol' ? 'Basket' : s === 'voleibol' ? 'Voley' : s}</Text>
                                 </TouchableOpacity>
                             ))}
                         </ScrollView>
 
-                        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', marginBottom: 10, marginLeft: 5 }}>Biografía del Equipo</Text>
-                        <TextInput value={editDescription} onChangeText={setEditDescription} placeholder="Biografía..." placeholderTextColor={C.sub} multiline style={{ height: 100, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9', borderRadius: 15, color: C.text, fontWeight: '600', marginBottom: 30, textAlignVertical: 'top', padding: 20, borderWidth: 1, borderColor: C.border }} />
-                        <TouchableOpacity onPress={handleSaveEdit} style={{ height: 65, backgroundColor: COLORS.accent, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
-                            <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase' }}>Guardar Cambios</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setShowEditModal(false)} style={{ marginTop: 20, alignItems: 'center' }}>
-                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900' }}>CANCELAR</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
-
-            <Modal visible={showInviteModal} transparent animationType="fade">
-                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', alignItems: 'center', justifyContent: 'center', padding: 30 }}>
-                    <View style={{ width: '100%', backgroundColor: C.card, borderRadius: 40, padding: 35, alignItems: 'center' }}>
-                        <Zap color={COLORS.accent} size={40} />
-                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', marginTop: 20 }}>Código de Invitación</Text>
-                        <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', padding: 30, borderRadius: 25, width: '100%', alignItems: 'center', marginVertical: 30 }}>
-                            <Text style={{ color: COLORS.accent, fontSize: 48, fontWeight: '900', letterSpacing: 5 }}>{teamInfo?.inviteCode || '----'}</Text>
-                        </View>
-                        <TouchableOpacity onPress={() => { Clipboard.setStringAsync(teamInfo.inviteCode); setCodeCopied(true); setTimeout(() => setCodeCopied(false), 2000); }} style={{ height: 60, backgroundColor: C.text, borderRadius: 20, width: '100%', alignItems: 'center', justifyContent: 'center' }}>
-                            <Text style={{ color: C.bg, fontWeight: '900', textTransform: 'uppercase' }}>{codeCopied ? '¡Copiado!' : 'Copiar Código'}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setShowInviteModal(false)} style={{ marginTop: 20 }}>
-                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900' }}>CERRAR</Text>
+                        <TouchableOpacity onPress={handleSaveEdit} disabled={actionLoading || !editName.trim()} style={{ height: 60, backgroundColor: COLORS.accent, borderRadius: 20, alignItems: 'center', justifyContent: 'center', opacity: editName.trim() ? 1 : 0.6 }}>
+                            {actionLoading ? <ActivityIndicator color="white" /> : <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Guardar Cambios</Text>}
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -491,6 +590,60 @@ export default function TeamDetailsScreen() {
                         </TouchableOpacity>
                         
                         <TouchableOpacity onPress={() => setShowDeleteModal(false)} style={{ marginTop: 20 }}>
+                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase' }}>CANCELAR</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* REMOVE MEMBER MODAL */}
+            <Modal visible={showRemoveModal} transparent animationType="fade">
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', alignItems: 'center', justifyContent: 'center', padding: 30 }}>
+                    <View style={{ width: '100%', backgroundColor: C.card, borderRadius: 40, padding: 35, alignItems: 'center', borderWidth: 1, borderColor: C.border }}>
+                        <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: '#ef444422', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+                            <AlertCircle color="#ef4444" size={40} />
+                        </View>
+                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', textAlign: 'center' }}>¿Eliminar Miembro?</Text>
+                        <Text style={{ color: C.sub, fontSize: 14, fontWeight: '600', textAlign: 'center', marginTop: 15, lineHeight: 22 }}>
+                            Estás a punto de eliminar a <Text style={{ color: C.text, fontWeight: '900' }}>{memberToRemove?.displayName}</Text> del equipo. Esta acción no se puede deshacer.
+                        </Text>
+                        
+                        <TouchableOpacity 
+                            onPress={handleConfirmRemove}
+                            disabled={actionLoading}
+                            style={{ height: 60, backgroundColor: '#ef4444', borderRadius: 20, width: '100%', alignItems: 'center', justifyContent: 'center', marginTop: 30, opacity: actionLoading ? 0.6 : 1 }}
+                        >
+                            {actionLoading ? <ActivityIndicator color="white" /> : <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase' }}>SÍ, ELIMINAR</Text>}
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity onPress={() => setShowRemoveModal(false)} style={{ marginTop: 20 }}>
+                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase' }}>CANCELAR</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
+            {/* LEAVE TEAM MODAL */}
+            <Modal visible={showLeaveModal} transparent animationType="fade">
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', alignItems: 'center', justifyContent: 'center', padding: 30 }}>
+                    <View style={{ width: '100%', backgroundColor: C.card, borderRadius: 40, padding: 35, alignItems: 'center', borderWidth: 1, borderColor: C.border }}>
+                        <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: '#ef444422', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+                            <AlertCircle color="#ef4444" size={40} />
+                        </View>
+                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', textAlign: 'center' }}>¿Abandonar Equipo?</Text>
+                        <Text style={{ color: C.sub, fontSize: 14, fontWeight: '600', textAlign: 'center', marginTop: 15, lineHeight: 22 }}>
+                            Estás a punto de salir de <Text style={{ color: C.text, fontWeight: '900' }}>{teamInfo?.name}</Text>. Si quieres volver, el capitán tendrá que aceptar tu solicitud nuevamente.
+                        </Text>
+                        
+                        <TouchableOpacity 
+                            onPress={handleConfirmLeave}
+                            disabled={actionLoading}
+                            style={{ height: 60, backgroundColor: '#ef4444', borderRadius: 20, width: '100%', alignItems: 'center', justifyContent: 'center', marginTop: 30, opacity: actionLoading ? 0.6 : 1 }}
+                        >
+                            {actionLoading ? <ActivityIndicator color="white" /> : <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase' }}>SÍ, ABANDONAR</Text>}
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity onPress={() => setShowLeaveModal(false)} style={{ marginTop: 20 }}>
                             <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase' }}>CANCELAR</Text>
                         </TouchableOpacity>
                     </View>
