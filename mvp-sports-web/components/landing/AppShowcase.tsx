@@ -44,7 +44,7 @@ export default function AppShowcase() {
 
                   <div className="relative w-full h-full">
                     <Image
-                      src="/app-screenshot.png?v=3"
+                      src="/app-screenshot.png?v=4"
                       alt="MVP Sports App"
                       fill
                       className="object-cover object-top"
