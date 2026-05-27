@@ -247,6 +247,9 @@ export default function PrivacyPage() {
                   <p className="text-slate-400 text-xs leading-relaxed">
                     Al presionar "Eliminar Cuenta Definitivamente" en la app móvil, el sistema remueve tus credenciales y perfil personal. No obstante, las reservas pasadas y transacciones financieras se conservan bajo un estado de <strong>anonimización irreversible</strong>, lo que significa que el balance contable del recinto se mantiene sin asociar ningún dato que permita identificarte personalmente.
                   </p>
+                  <p className="text-slate-400 text-xs leading-relaxed mt-3 border-t border-white/5 pt-3">
+                    <strong>Eliminación Web:</strong> Si no tienes acceso a la aplicación y deseas solicitar la eliminación completa de tu cuenta y todos los datos asociados, envíanos un correo directamente a <a href="mailto:oriontechnologyspa@gmail.com" className="text-white font-bold">oriontechnologyspa@gmail.com</a> o <a href="mailto:soporte@mvpsports.cl" className="text-white font-bold">soporte@mvpsports.cl</a> con el asunto "Eliminar mi cuenta". Procesaremos tu solicitud en menos de 72 horas.
+                  </p>
                 </div>
               </div>
             </div>
