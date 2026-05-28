@@ -47,6 +47,7 @@ Por la prestación de los servicios descritos, El Cliente se obliga a pagar a La
 ### 4.2. Obligaciones del Cliente:
 - Mantener actualizado el estado y disponibilidad de las canchas en el calendario para evitar "sobre-reservas" (overbooking).
 - Respetar y validar las reservas generadas a través de la aplicación móvil MVP Sports.
+- Solicitar y gestionar directamente ante Transbank S.A. el alta comercial, la obtención del Código de Comercio y las credenciales de la API de integración (API REST Webpay Plus) a nombre de su empresa, siendo este un requisito indispensable para la habilitación de los pagos en línea en la plataforma.
 - Utilizar la plataforma de manera lícita, sin intentar vulnerar su seguridad o código fuente.
 - Proveer un recinto en condiciones óptimas y seguras para los deportistas.
 
@@ -97,5 +98,6 @@ Para que el presente contrato tenga total validez y se proceda a la habilitació
 3. **Carpeta Tributaria para Solicitar Créditos:** (Opcional, para validar comportamiento comercial) o en su defecto, Certificado de Inicio de Actividades emitido por el SII.
 4. **Certificado de Vigencia de Poderes y/o Sociedad:** Documento con vigencia no mayor a 60 días (emitido por el Registro de Empresas y Sociedades o Conservador de Bienes Raíces) que certifique que quien firma tiene la facultad de representación.
 5. **Comprobante de Cuenta Bancaria Comercial:** Captura o certificado del banco que acredite que la cuenta receptora de las liquidaciones (transferencias de Transbank/MVP Sports) se encuentra efectivamente a nombre de la razón social de la empresa y no de personas naturales de terceros.
+6. **Credenciales de Integración Transbank:** Código de Comercio emitido por Transbank S.A. asociado a la razón social de El Cliente, junto con el API Key (Llave Secreta) habilitada para el entorno de producción de Webpay Plus REST.
 
 *(La documentación será auditada y resguardada por el Departamento Legal de ORION TECHNOLOGY SpA de manera estrictamente confidencial).*
