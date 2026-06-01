@@ -26,7 +26,7 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           <div className="md:col-span-3 lg:col-span-4 lg:row-span-2 group p-8 rounded-[2rem] lg:rounded-[2.5rem] bg-[#00df82]/10 border border-white/5 hover:border-[#00df82]/30 transition-all duration-500 hover:shadow-[0_0_40px_rgba(0,223,130,0.1)] overflow-hidden relative">
             <div className="relative z-10 h-full flex flex-col justify-between gap-6">
               <div className="space-y-4">
-                <h4 className="text-[#00df82] font-black text-[10px] uppercase tracking-[0.3em]">Reserva Fácil</h4>
+                <h3 className="text-[#00df82] font-black text-[10px] uppercase tracking-[0.3em]">Reserva Fácil</h3>
                 <p className="text-xl sm:text-2xl font-black text-white leading-tight">Encuentra tu cancha <br/> en pocos segundos.</p>
               </div>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed text-justify">
@@ -42,7 +42,7 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           <div className="md:col-span-3 lg:col-span-4 lg:row-span-2 group p-8 rounded-[2rem] lg:rounded-[2.5rem] bg-blue-500/10 border border-white/5 hover:border-blue-500/30 transition-all duration-500 hover:shadow-[0_0_40px_rgba(59,130,246,0.1)] overflow-hidden relative">
             <div className="relative z-10 h-full flex flex-col justify-between gap-6">
               <div className="space-y-4">
-                <h4 className="text-blue-400 font-black text-[10px] uppercase tracking-[0.3em]">Tu Perfil</h4>
+                <h3 className="text-blue-400 font-black text-[10px] uppercase tracking-[0.3em]">Tu Perfil</h3>
                 <p className="text-xl sm:text-2xl font-black text-white leading-tight">Todo tu historial <br/> en un solo lugar.</p>
               </div>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed text-justify">
@@ -57,36 +57,36 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           {/* Pagos */}
           <div className="md:col-span-3 lg:col-span-4 lg:row-span-1 group p-8 rounded-[2rem] bg-emerald-500/10 border border-white/5 hover:border-emerald-500/30 transition-all duration-500 relative overflow-hidden">
             <div className="relative z-10">
-              <h4 className="text-emerald-400 font-black text-[10px] uppercase tracking-[0.3em] mb-1">Pagos Digitales</h4>
+              <h3 className="text-emerald-400 font-black text-[10px] uppercase tracking-[0.3em] mb-1">Pagos Digitales</h3>
               <p className="text-lg font-bold text-white mb-2">Pago Online</p>
-              <p className="text-xs text-slate-500 leading-tight">Realiza tus pagos de forma rápida y segura online a través de Transbank, o si lo prefieres, directamente en el recinto de forma presencial.</p>
+              <p className="text-xs text-slate-400 leading-tight">Realiza tus pagos de forma rápida y segura online a través de Transbank, o si lo prefieres, directamente en el recinto de forma presencial.</p>
             </div>
           </div>
 
           {/* Estadísticas */}
           <div className="md:col-span-3 lg:col-span-4 lg:row-span-1 group p-8 rounded-[2rem] bg-orange-500/10 border border-white/5 hover:border-orange-500/30 transition-all duration-500 relative overflow-hidden">
             <div className="relative z-10">
-              <h4 className="text-orange-400 font-black text-[10px] uppercase tracking-[0.3em] mb-1">Tus Estadísticas</h4>
+              <h3 className="text-orange-400 font-black text-[10px] uppercase tracking-[0.3em] mb-1">Tus Estadísticas</h3>
               <p className="text-lg font-bold text-white mb-2">Monitorea tu actividad.</p>
-              <p className="text-xs text-slate-500 leading-tight">Sigue tu progreso, revisa cuántos partidos has jugado y analiza detalladamente tu asistencia a los recintos deportivos.</p>
+              <p className="text-xs text-slate-400 leading-tight">Sigue tu progreso, revisa cuántos partidos has jugado y analiza detalladamente tu asistencia a los recintos deportivos.</p>
             </div>
           </div>
 
           {/* Equipos */}
           <div className="md:col-span-2 lg:col-span-3 lg:row-span-1 group p-8 rounded-[2rem] bg-indigo-500/10 border border-white/5 hover:border-indigo-500/30 transition-all duration-500 flex flex-col justify-between gap-4">
-            <h4 className="text-indigo-400 font-black text-[10px] uppercase tracking-[0.3em]">Organiza tu Equipo</h4>
+            <h3 className="text-indigo-400 font-black text-[10px] uppercase tracking-[0.3em]">Organiza tu Equipo</h3>
             <p className="text-xs text-slate-400 leading-tight">Crea grupos con tus amigos, comunícate a través de la app y coordinen los pagos o asistencias fácilmente.</p>
           </div>
 
           {/* Ficha / Carta de Jugador */}
           <div className="md:col-span-2 lg:col-span-3 lg:row-span-1 group p-8 rounded-[2rem] bg-sky-500/10 border border-white/5 hover:border-sky-500/30 transition-all duration-500 flex flex-col justify-between gap-4">
-            <h4 className="text-sky-400 font-black text-[10px] uppercase tracking-[0.3em]">Comparte tus logros</h4>
+            <h3 className="text-sky-400 font-black text-[10px] uppercase tracking-[0.3em]">Comparte tus logros</h3>
             <p className="text-xs text-slate-400 leading-tight">Crea y descarga tu propia carta de jugador personalizada y compártela en redes sociales con tu grupo de amigos.</p>
           </div>
 
           {/* Historial */}
           <div className="md:col-span-2 lg:col-span-3 lg:row-span-1 group p-8 rounded-[2rem] bg-purple-500/10 border border-white/5 hover:border-purple-500/30 transition-all duration-500 flex flex-col justify-between gap-4">
-            <h4 className="text-purple-400 font-black text-[10px] uppercase tracking-[0.3em]">Tus Partidos</h4>
+            <h3 className="text-purple-400 font-black text-[10px] uppercase tracking-[0.3em]">Tus Partidos</h3>
             <p className="text-xs text-slate-400 leading-tight">Revisa tus reservas confirmadas, mira tus resultados pasados y califica la calidad del recinto donde jugaste.</p>
           </div>
 
@@ -96,7 +96,7 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
             <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-2xl animate-pulse pointer-events-none" />
             
             <div className="relative z-10">
-              <h4 className="text-white/80 font-black text-[9px] uppercase tracking-[0.3em] mb-1">Únete a la comunidad</h4>
+              <h3 className="text-white/80 font-black text-[9px] uppercase tracking-[0.3em] mb-1">Únete a la comunidad</h3>
               <p className="text-2xl font-black text-white uppercase tracking-tighter leading-none">Regístrate Gratis</p>
             </div>
             

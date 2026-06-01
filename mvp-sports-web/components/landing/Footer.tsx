@@ -30,12 +30,12 @@ export default function Footer({ onTermsClick, onPrivacyClick }: FooterProps) {
 
           <div className="space-y-4">
             {/* DERECHOS RESERVADOS */}
-            <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-slate-500">
+            <p className="text-[10px] md:text-xs font-black uppercase tracking-[0.3em] text-slate-400">
               © 2026 MVP Sports Suite. Todos los derechos reservados.
             </p>
 
             {/* TERMINOS Y CONDICIONES */}
-            <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-slate-600">
+            <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-slate-400">
               <Link 
                 href="/terms" 
                 onClick={(e) => {

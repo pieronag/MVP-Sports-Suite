@@ -90,6 +90,7 @@ export default function Navbar({ onRegisterClick }: { onRegisterClick: () => voi
           <button 
             className="lg:hidden p-2 text-white hover:bg-white/5 rounded-xl transition-all"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
           >
             {isMobileMenuOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
           </button>

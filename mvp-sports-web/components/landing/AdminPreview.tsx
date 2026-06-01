@@ -28,7 +28,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           <div className="md:col-span-3 lg:col-span-4 row-span-2 group p-8 rounded-[2.5rem] bg-blue-500/10 border border-white/5 hover:border-blue-500/30 transition-all duration-500 hover:shadow-[0_0_40px_rgba(59,130,246,0.1)] overflow-hidden relative">
             <div className="relative z-10 h-full flex flex-col justify-between">
               <div className="space-y-4">
-                <h4 className="text-blue-400 font-black text-sm uppercase tracking-widest">Centro de Finanzas</h4>
+                <h3 className="text-blue-400 font-black text-sm uppercase tracking-widest">Centro de Finanzas</h3>
                 <p className="text-xl lg:text-2xl font-black text-white leading-tight">Controla tus ingresos <br/> y ocupación en tiempo real.</p>
               </div>
               <p className="text-sm text-slate-400 leading-relaxed text-justify">
@@ -44,7 +44,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           <div className="md:col-span-3 lg:col-span-4 row-span-2 group p-8 rounded-[2.5rem] bg-[#00df82]/10 border border-white/5 hover:border-[#00df82]/30 transition-all duration-500 hover:shadow-[0_0_40px_rgba(0,223,130,0.1)] overflow-hidden relative">
             <div className="relative z-10 h-full flex flex-col justify-between">
               <div className="space-y-4">
-                <h4 className="text-[#00df82] font-black text-sm uppercase tracking-widest">Calendario de Canchas</h4>
+                <h3 className="text-[#00df82] font-black text-sm uppercase tracking-widest">Calendario de Canchas</h3>
                 <p className="text-xl lg:text-2xl font-black text-white leading-tight">Organiza tus canchas <br/> sin complicaciones.</p>
               </div>
               <p className="text-sm text-slate-400 leading-relaxed text-justify">
@@ -59,40 +59,40 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           {/* Gestor de Torneos */}
           <div className="md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-[2rem] bg-orange-500/10 border border-white/5 hover:border-orange-500/30 transition-all duration-500 relative overflow-hidden">
             <div className="relative z-10">
-              <h4 className="text-orange-400 font-black text-xs uppercase tracking-widest mb-1 flex items-center gap-2">
+              <h3 className="text-orange-400 font-black text-xs uppercase tracking-widest mb-1 flex items-center gap-2">
                 Torneos
                 <span className="text-[9px] bg-orange-500/20 px-2 py-0.5 rounded-full font-bold">Próximamente</span>
-              </h4>
+              </h3>
               <p className="text-lg font-bold text-white mb-2">Ligas y campeonatos.</p>
-              <p className="text-xs text-slate-500 leading-tight">Creación y administración de ligas comunitarias, torneos de eliminación directa y fases de grupos con tablas dinámicas de posiciones y fixture automático.</p>
+              <p className="text-xs text-slate-400 leading-tight">Creación y administración de ligas comunitarias, torneos de eliminación directa y fases de grupos con tablas dinámicas de posiciones y fixture automático.</p>
             </div>
           </div>
 
           {/* Academia Deportiva */}
           <div className="md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-[2rem] bg-sky-500/10 border border-white/5 hover:border-sky-500/30 transition-all duration-500 relative overflow-hidden">
             <div className="relative z-10">
-              <h4 className="text-sky-400 font-black text-xs uppercase tracking-widest mb-1 flex items-center gap-2">
+              <h3 className="text-sky-400 font-black text-xs uppercase tracking-widest mb-1 flex items-center gap-2">
                 Academia Deportiva
                 <span className="text-[9px] bg-sky-500/20 px-2 py-0.5 rounded-full font-bold">Próximamente</span>
-              </h4>
+              </h3>
               <p className="text-lg font-bold text-white mb-2">Clases y Profesores.</p>
-              <p className="text-xs text-slate-500 leading-tight">Control de tus escuelas de deporte. Gestiona horarios de clases, listas de alumnos inscritos, asistencias y asignación de profesores.</p>
+              <p className="text-xs text-slate-400 leading-tight">Control de tus escuelas de deporte. Gestiona horarios de clases, listas de alumnos inscritos, asistencias y asignación de profesores.</p>
             </div>
           </div>
 
           {/* Cards inferiores más compactas */}
           <div className="md:col-span-2 lg:col-span-3 row-span-1 group p-6 rounded-[2rem] bg-purple-500/10 border border-white/5 hover:border-purple-500/30 transition-all duration-500 flex flex-col justify-between">
-            <h4 className="text-purple-400 font-black text-xs uppercase tracking-widest mb-2">Gestión de Canchas</h4>
+            <h3 className="text-purple-400 font-black text-xs uppercase tracking-widest mb-2">Gestión de Canchas</h3>
             <p className="text-xs text-slate-400 leading-tight">Administra los datos de tus canchas: tipo de superficie, iluminación y si son techadas o al aire libre en un solo clic.</p>
           </div>
 
           <div className="md:col-span-2 lg:col-span-3 row-span-1 group p-6 rounded-[2rem] bg-pink-500/10 border border-white/5 hover:border-pink-500/30 transition-all duration-500 flex flex-col justify-between">
-            <h4 className="text-pink-400 font-black text-xs uppercase tracking-widest mb-2">Marketing y Cupones</h4>
+            <h3 className="text-pink-400 font-black text-xs uppercase tracking-widest mb-2">Marketing y Cupones</h3>
             <p className="text-xs text-slate-400 leading-tight">Generación de códigos promocionales y descuentos configurables con límites de uso por cliente y fechas de expiración.</p>
           </div>
 
           <div className="md:col-span-2 lg:col-span-3 row-span-1 group p-6 rounded-[2rem] bg-emerald-500/10 border border-white/5 hover:border-emerald-500/30 transition-all duration-500 flex flex-col justify-between">
-            <h4 className="text-emerald-400 font-black text-xs uppercase tracking-widest mb-2">Roles y Personal</h4>
+            <h3 className="text-emerald-400 font-black text-xs uppercase tracking-widest mb-2">Roles y Personal</h3>
             <p className="text-xs text-slate-400 leading-tight">Gestión avanzada de empleados con asignación de roles específicos y matriz de accesos controlados.</p>
           </div>
 
@@ -105,7 +105,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
             <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-2xl animate-pulse pointer-events-none" />
             
             <div className="relative z-10 space-y-1">
-              <h4 className="text-slate-900 font-black text-[9px] uppercase tracking-[0.2em] opacity-80">Asesoría Personalizada</h4>
+              <h3 className="text-slate-900 font-black text-[9px] uppercase tracking-[0.2em] opacity-80">Asesoría Personalizada</h3>
               <p className="text-xl lg:text-2xl font-black text-slate-950 uppercase tracking-tighter leading-tight">Habla con <br/> un experto</p>
             </div>
             
@@ -130,7 +130,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
             <div className="flex flex-wrap justify-center md:justify-end gap-10 lg:gap-12 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
                <div className="flex flex-col items-center gap-1">
                  <span className="text-base lg:text-lg font-black text-white tracking-tighter">TRANSBANK</span>
-                 <span className="text-[8px] font-bold text-slate-500">PAGOS SEGUROS</span>
+                 <span className="text-[8px] font-bold text-slate-400">PAGOS SEGUROS</span>
                </div>
             </div>
           </div>

@@ -16,9 +16,9 @@ export default function SupportedSports() {
       <div className="container mx-auto px-6">
         <div className="flex flex-col items-center justify-center text-center space-y-8 md:space-y-10">
           <div className="space-y-2">
-            <h3 className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-[#00df82]">
+            <h2 className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-[#00df82]">
               Ecosistema Deportivo
-            </h3>
+            </h2>
             <p className="text-slate-400 text-sm md:text-base font-medium max-w-xl mx-auto">
               Nuestra plataforma está optimizada nativamente para gestionar la complejidad táctica y operativa de los siguientes deportes.
             </p>
