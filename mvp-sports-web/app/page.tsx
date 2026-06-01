@@ -7,10 +7,12 @@ import SupportedSports from "../components/landing/SupportedSports";
 import AppShowcase from "../components/landing/AppShowcase";
 import AdminPreview from "../components/landing/AdminPreview";
 import Footer from "../components/landing/Footer";
-import RegistrationModal from "../components/landing/RegistrationModal";
 import ScrollToTop from "../components/landing/ScrollToTop";
-import TermsModal from "../components/landing/TermsModal";
-import PrivacyModal from "../components/landing/PrivacyModal";
+import dynamic from "next/dynamic";
+
+const RegistrationModal = dynamic(() => import("../components/landing/RegistrationModal"));
+const TermsModal = dynamic(() => import("../components/landing/TermsModal"));
+const PrivacyModal = dynamic(() => import("../components/landing/PrivacyModal"));
 
 export default function Home() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);

@@ -25,13 +25,23 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
+import { usePathname } from "next/navigation";
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<UserRole>(null);
   const [loading, setLoading] = useState(true);
   const [firestoreUser, setFirestoreUser] = useState<any>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
+    // Si estamos en la landing page principal y no en otra ruta, retrasamos la inicialización
+    // de Firebase para no bloquear el hilo principal y mejorar el LCP/PageSpeed.
+    if (pathname === "/") {
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
 
@@ -43,11 +53,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
           const userDoc = await getDoc(doc(db, "users", currentUser.uid));
           if (userDoc.exists()) {
-            // Si existe el documento, tomamos el rol
             setRole(userDoc.data().role as UserRole);
             setFirestoreUser(userDoc.data());
           } else {
-            // Si el usuario es nuevo y no tiene doc, evitamos el bucle y asignamos rol null o uno seguro
             console.warn("Usuario autenticado sin documento en Firestore. UID:", currentUser.uid);
             setRole(null);
             setFirestoreUser(null);
@@ -70,7 +78,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [pathname]);
 
   // Función comodín para hacer logout y limpiar todo
   const logout = async () => {

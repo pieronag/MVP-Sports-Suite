@@ -30,6 +30,10 @@ export default function RootLayout({
   // CORRECCIÓN: Eliminamos el comentario y espacios entre <html> y <body>
   return (
     <html lang="es">
+      <head>
+        <link rel="preconnect" href="https://mvp-sports-chile.firebaseapp.com" />
+        <link rel="preconnect" href="https://apis.google.com" />
+      </head>
       <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased bg-slate-50 dark:bg-[#050b14] text-slate-900 dark:text-slate-200 transition-colors duration-300`}>
         <AuthProvider>
           <ThemeProvider>

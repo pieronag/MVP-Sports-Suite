@@ -10,6 +10,8 @@ export default function AppShowcase() {
           src="/app-bg.png"
           alt="Background"
           fill
+          sizes="100vw"
+          quality={60}
           className="object-cover transition-transform duration-[10s] group-hover/section:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
@@ -47,6 +49,7 @@ export default function AppShowcase() {
                       src="/app-screenshot.jpg?v=1"
                       alt="MVP Sports App"
                       fill
+                      sizes="(max-width: 640px) 320px, 300px"
                       className="object-cover object-top"
                       priority
                     />
