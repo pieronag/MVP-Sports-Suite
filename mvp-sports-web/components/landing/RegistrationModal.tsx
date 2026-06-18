@@ -4,7 +4,7 @@ import { XMarkIcon, CheckCircleIcon, ArrowRightIcon, ArrowLeftIcon, ExclamationC
 import { auth, db, functions } from "../../services/firebase";
 import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
 import { doc, setDoc, getDoc, getDocs, collection, query, where } from "firebase/firestore";
-import { httpsCallable } from "firebase/functions";
+import { emailService } from "../../services/emailService";
 
 const SPORT_POSITIONS: Record<string, string[]> = {
   'Fútbol': ['Arquero', 'Defensa', 'Lateral', 'Volante', 'Delantero'],
@@ -55,7 +55,25 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
 
-  // Resetear estado al abrir el modal
+  const openMailClient = () => {
+    try {
+      window.open('mailto:' + formData.email, '_blank');
+    } catch (e) {
+      window.open('https://mail.google.com', '_blank');
+    }
+  };
+
+  const handleClose = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error("Error al cerrar sesión:", err);
+    } finally {
+      onClose();
+    }
+  };
+
+  // Resetear estado al abrir el modal y cerrar sesión al cerrar
   useEffect(() => {
     if (isOpen) {
       setStep(1);
@@ -64,12 +82,21 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
       setShowPassword(false);
       setShowConfirmPassword(false);
       setAcceptTerms(false);
-      // Opcional: Limpiar formulario al abrir
       setFormData({
         displayName: "", email: "", confirmEmail: "", phone: "", rut: "", password: "", confirmPassword: "",
         mainSport: "", position: "", dominantFoot: "", height: "", weight: "",
         favTime: "", frequency: "", city: "", birthDate: "", gender: ""
       });
+    } else {
+      (async () => {
+        try {
+          if (auth.currentUser) {
+            await signOut(auth);
+          }
+        } catch (err) {
+          console.error("Error al limpiar sesión al cerrar modal:", err);
+        }
+      })();
     }
   }, [isOpen]);
 
@@ -342,16 +369,14 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
       const user = userCredential.user;
       await updateProfile(user, { displayName: formData.displayName });
 
-      // Enviar correo de verificación utilizando la Cloud Function directa sendAuthEmail
+      // Enviar correo de verificación utilizando emailService (Cloud Function + fallback nativo)
       try {
-        const sendAuthEmailFn = httpsCallable(functions, 'sendAuthEmail');
-        await sendAuthEmailFn({
-          email: formData.email.trim(),
-          type: 'verify',
-          name: formData.displayName,
-        });
+        await emailService.sendAuthEmail(formData.email, 'verify', formData.displayName);
       } catch (emailErr) {
         console.error('Error al enviar correo de verificación:', emailErr);
+        setError("No se pudo enviar el correo de verificación. Intente nuevamente.");
+        setLoading(false);
+        return;
       }
 
       // Formatear fecha de YYYY-MM-DD a DD/MM/AAAA para compatibilidad total de la Suite
@@ -431,9 +456,6 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
       } catch (emailErr) {
         console.error("No se pudo enviar el correo de confirmación de registro:", emailErr);
       }
-
-      // Forzar cierre de sesión tras el registro como solicita el usuario
-      await signOut(auth);
 
       setSuccess(true);
     } catch (err: any) {
@@ -571,7 +593,7 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl">
       <div className="relative w-full max-w-xl max-h-[90vh] flex flex-col bg-slate-900/50 border border-white/10 rounded-[2.5rem] shadow-[0_0_150px_rgba(0,0,0,0.7)] overflow-hidden">
         <div className="absolute top-0 left-0 h-1 bg-[#00df82] transition-all duration-700 z-30" style={{ width: `${(step / 3) * 100}%` }} />
-        <button onClick={onClose} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white transition-colors z-30 bg-white/5 rounded-full">
+        <button onClick={handleClose} className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white transition-colors z-30 bg-white/5 rounded-full">
           <XMarkIcon className="w-4 h-4" />
         </button>
 
@@ -603,13 +625,34 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
             </form>
           </div>
         ) : (
-          <div className="p-12 text-center space-y-6 animate-in zoom-in duration-500">
-            <CheckCircleIcon className="w-16 h-16 text-[#00df82] mx-auto animate-bounce" />
-            <div className="space-y-2">
-              <h2 className="text-2xl font-black text-white font-heading">¡CUENTA CREADA!</h2>
-              <p className="text-xs text-slate-400 max-w-[320px] mx-auto">
-                Te hemos enviado un correo de verificación. Por favor, confirma tu cuenta haciendo clic en el enlace del correo antes de iniciar sesión.
-              </p>
+          <div className="p-8 sm:p-10 overflow-y-auto flex-1 custom-scrollbar">
+            <div className="text-center space-y-6 animate-in zoom-in duration-500">
+              <CheckCircleIcon className="w-16 h-16 text-[#00df82] mx-auto animate-bounce" />
+              <div className="space-y-2">
+                <h2 className="text-2xl font-black text-white font-heading">¡CUENTA CREADA!</h2>
+                <p className="text-xs text-slate-400 max-w-[320px] mx-auto leading-relaxed">
+                  Te hemos enviado un correo de verificación. Por favor, confirma tu cuenta haciendo clic en el enlace del correo antes de iniciar sesión.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="px-8 py-3 bg-white text-slate-950 font-black rounded-xl text-[10px] uppercase shadow-lg"
+                >
+                  Entendido
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await handleClose();
+                    openMailClient();
+                  }}
+                  className="px-8 py-3 bg-[#00df82] text-slate-950 font-black rounded-xl text-[10px] uppercase shadow-[0_0_20px_rgba(0,223,130,0.3)]"
+                >
+                  Abrir Correo
+                </button>
+              </div>
             </div>
           </div>
         )}
