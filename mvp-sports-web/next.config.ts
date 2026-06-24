@@ -14,10 +14,20 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'lh3.googleusercontent.com', // Google Auth
+        hostname: 'lh3.googleusercontent.com',
       },
     ],
   },
 }
 
-module.exports = nextConfig
+const { withSentryConfig } = require("@sentry/nextjs");
+module.exports = withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  tunnelRoute: "/monitoring",
+  hideSourceMaps: true,
+  disableLogger: true,
+  automaticVercelMonitors: true,
+});
