@@ -12,7 +12,7 @@ async function seedSuperAdmin() {
 
         if (snap.empty) {
             console.log("⚠️ Usuario no encontrado. Creando perfil de Superadmin de emergencia...");
-            const newAdminRef = doc(usersRef, "emergency_superadmin");
+            const newAdminRef = doc(collection(db, 'users'));
             await setDoc(newAdminRef, {
                 email: targetEmail,
                 fullName: "Piero Abarca",

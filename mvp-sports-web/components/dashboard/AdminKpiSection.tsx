@@ -45,22 +45,18 @@ export default function AdminKpiSection({ kpis, formatCLP }: AdminKpiSectionProp
                 titulo="DENSIDAD (RESERVAS)"
                 valor={kpis.usageDensity.toFixed(1)}
                 sub="AVG X RECINTO X MES"
-                tendencia="+5%"
                 icono={<PresentationChartLineIcon />}
             />
             <TarjetaKpi
-                titulo="TASA DE DESERCIÓN"
+                titulo="INACTIVOS"
                 valor={`${kpis.churn.toFixed(1)}%`}
-                sub="RECINTOS INACTIVOS"
-                tendencia="-0.5%"
-                tendenciaPositiva={true}
+                sub="RECINTOS NO ACTIVOS"
                 icono={<BoltIcon />}
             />
             <TarjetaKpi
                 titulo="LTV PROMEDIO"
                 valor={formatCLP(kpis.ltv)}
                 sub="VALOR X CLIENTE"
-                tendencia="+8%"
                 icono={<SparklesIcon />}
             />
         </div>

@@ -260,7 +260,7 @@ export default function LoginPage() {
                             </svg>
                             <span className="text-[10px] font-bold">{error}</span>
                         </div>
-                        {error.includes("verifica tu correo") && (
+                        {(error.includes("verifica tu correo") || error.includes("verify") || error.toLowerCase().includes("email not verified")) && (
                             <button
                                 type="button"
                                 onClick={handleResendVerification}

@@ -1,6 +1,23 @@
 import React from 'react';
 import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline';
 
+interface TarjetaKpiProps {
+    titulo?: string;
+    label?: string;
+    valor?: string | number;
+    value?: string | number;
+    sub?: string;
+    tendencia?: string;
+    trend?: { value: string; isUp?: boolean };
+    icono?: React.ReactNode;
+    icon?: React.ReactNode;
+    tendenciaPositiva?: boolean;
+    isUp?: boolean;
+    brillo?: boolean;
+    className?: string;
+    valueClassName?: string;
+}
+
 export function PanelGlass({ children, className = "" }: { children: React.ReactNode, className?: string }) {
     return (
         <div className={`
@@ -24,7 +41,7 @@ export function TarjetaKpi({
     brillo = false,
     className = "",
     valueClassName = "text-xl"
-}: any) {
+}: TarjetaKpiProps) {
     const displayTitulo = titulo || label;
     const displayValor = valor ?? value ?? '';
     const displayIcono = icono || icon;
@@ -62,7 +79,7 @@ export function TarjetaKpi({
     )
 }
 
-export function SystemStatusRow({ name, status, ping }: any) {
+export function SystemStatusRow({ name, status, ping }: { name: string; status: string; ping?: string }) {
     return (
         <div className="flex items-center justify-between text-[10px] p-1.5 rounded bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5">
             <div className="flex items-center gap-2">
@@ -75,7 +92,7 @@ export function SystemStatusRow({ name, status, ping }: any) {
     )
 }
 
-export function BotonAccion({ icon, etiqueta, onClick }: any) {
+export function BotonAccion({ icon, etiqueta, onClick }: { icon: React.ReactNode; etiqueta?: string; onClick?: () => void }) {
     return (
         <button
             onClick={onClick}

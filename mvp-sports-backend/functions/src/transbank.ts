@@ -9,10 +9,15 @@ import {
 } from "transbank-sdk";
 
 // Por defecto usamos integración
+const TEST_CODE_PREFIXES = ["5970"];
+
+function isTestCommerceCode(code: string): boolean {
+  return TEST_CODE_PREFIXES.some((prefix) => code.startsWith(prefix));
+}
+
 const getOptions = (commerceCode?: string, apiKey?: string) => {
   if (commerceCode && apiKey) {
-    // Detectar si es código de prueba (empieza con 5970) o producción
-    const env = commerceCode.startsWith("5970") ?
+    const env = isTestCommerceCode(commerceCode) ?
       Environment.Integration : Environment.Production;
     return new Options(commerceCode, apiKey, env);
   }
@@ -25,7 +30,7 @@ const getOptions = (commerceCode?: string, apiKey?: string) => {
 
 const getOneclickOptions = (commerceCode?: string, apiKey?: string) => {
   if (commerceCode && apiKey) {
-    const env = commerceCode.startsWith("5970") ?
+    const env = isTestCommerceCode(commerceCode) ?
       Environment.Integration : Environment.Production;
     return new Options(commerceCode, apiKey, env);
   }

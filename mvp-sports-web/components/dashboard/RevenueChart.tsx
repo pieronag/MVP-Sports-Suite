@@ -17,6 +17,11 @@ interface RevenueChartProps {
     formatCLP: (amount: number) => string;
 }
 
+function getDaysInCurrentMonth(): number {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+}
+
 export default function RevenueChart({ data, isHistorical, revenue, formatCLP }: RevenueChartProps) {
     return (
         <PanelGlass className="h-[320px] flex flex-col">
@@ -34,7 +39,7 @@ export default function RevenueChart({ data, isHistorical, revenue, formatCLP }:
                     {!isHistorical && (
                         <>
                             <h2 className="text-xl font-mono font-black text-emerald-600 dark:text-emerald-400">
-                                {formatCLP(revenue / 30)}
+                                {formatCLP(revenue / getDaysInCurrentMonth())}
                             </h2>
                             <p className="text-[9px] text-slate-400 uppercase font-bold">PROMEDIO X DÍA</p>
                         </>

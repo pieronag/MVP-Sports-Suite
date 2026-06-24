@@ -286,21 +286,21 @@ export default function FeedbackPage() {
                     label="Opiniones Totales" 
                     value={filteredReviews.length.toString()} 
                     icon={<ChatBubbleLeftRightIcon className="w-5 h-5" />} 
-                    trend={{ value: 'Actualizado', isPositive: true }} 
+                    trend={{ value: 'Actualizado', isUp: true }} 
                 />
                 
                 <TarjetaKpi 
                     label="Positivas (4-5)" 
                     value={filteredReviews.filter(r => r.rating >= 4).length.toString()} 
                     icon={<HandThumbUpIcon className="w-5 h-5" />} 
-                    trend={{ value: 'Alta Satisfacción', isPositive: true }} 
+                    trend={{ value: 'Alta Satisfacción', isUp: true }} 
                 />
 
                 <TarjetaKpi 
                     label="Por Mejorar (1-2)" 
                     value={filteredReviews.filter(r => r.rating <= 2).length.toString()} 
                     icon={<HandThumbDownIcon className="w-5 h-5" />} 
-                    trend={{ value: 'Atención Crítica', isPositive: false }} 
+                    trend={{ value: 'Atención Crítica', isUp: false }} 
                 />
             </div>
 

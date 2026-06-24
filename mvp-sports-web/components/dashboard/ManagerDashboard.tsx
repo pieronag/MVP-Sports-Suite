@@ -215,7 +215,7 @@ export default function ManagerDashboard() {
                 }).sort((a,b) => {
                     const hourA = parseInt(a.startTime.split(':')[0]) || 0;
                     const hourB = parseInt(b.startTime.split(':')[0]) || 0;
-                    return hourB - hourA;
+                    return hourA - hourB;
                 }).slice(0, 5));
                 setLoading(false);
             }, (err) => {
@@ -235,7 +235,7 @@ export default function ManagerDashboard() {
     const formatMoney = (amount: number) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }).format(amount);
     const formatTime = (ts: Timestamp | Date | string) => {
         if (typeof ts === 'string') return ts;
-        const date = ts instanceof Timestamp ? ts.toDate() : ts;
+        const date = ts instanceof Date ? ts : ts.toDate();
         return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
     };
     if (loading && myVenues.length === 0) {

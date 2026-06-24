@@ -155,10 +155,10 @@ export default function AcademyPage() {
 
             {/* KPI */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <TarjetaKpi label="Clases" value={classes.length.toString()} icon={<AcademicCapIcon className="w-5 h-5" />} trend={{ value: 'TOTAL', isPositive: true }} />
-                <TarjetaKpi label="Activas" value={classes.filter(c => c.status === 'active').length.toString()} icon={<PlayCircleIcon className="w-5 h-5" />} trend={{ value: 'EN CURSO', isPositive: true }} />
-                <TarjetaKpi label="Alumnos" value={classes.reduce((acc, c) => acc + (c.enrolledStudents || 0), 0).toString()} icon={<UserGroupIcon className="w-5 h-5" />} trend={{ value: 'REGISTRADOS', isPositive: true }} />
-                <TarjetaKpi label="Ingresos" value={`$${classes.reduce((acc, c) => acc + (c.enrolledStudents * (c.price || 0)), 0).toLocaleString()}`} icon={<CurrencyDollarIcon className="w-5 h-5" />} trend={{ value: 'PROYECTADO', isPositive: true }} />
+                <TarjetaKpi label="Clases" value={classes.length.toString()} icon={<AcademicCapIcon className="w-5 h-5" />} trend={{ value: 'TOTAL', isUp: true }} />
+                <TarjetaKpi label="Activas" value={classes.filter(c => c.status === 'active').length.toString()} icon={<PlayCircleIcon className="w-5 h-5" />} trend={{ value: 'EN CURSO', isUp: true }} />
+                <TarjetaKpi label="Alumnos" value={classes.reduce((acc, c) => acc + (c.enrolledStudents || 0), 0).toString()} icon={<UserGroupIcon className="w-5 h-5" />} trend={{ value: 'REGISTRADOS', isUp: true }} />
+                <TarjetaKpi label="Ingresos" value={`$${classes.reduce((acc, c) => acc + (c.enrolledStudents * (c.price || 0)), 0).toLocaleString()}`} icon={<CurrencyDollarIcon className="w-5 h-5" />} trend={{ value: 'PROYECTADO', isUp: true }} />
             </div>
 
             {/* LISTADO */}

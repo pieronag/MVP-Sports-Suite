@@ -92,7 +92,7 @@ export default function AdminDashboard() {
             const paidTenants = tenants.filter((t: any) => t.plan !== 'Free' && t.status === 'Activo').length;
             const conversionRate = activeTenants > 0 ? (paidTenants / activeTenants) * 100 : 0;
             const totalTenantsCount = tenants.length;
-            const churnRate = totalTenantsCount > 0 ? ((totalTenantsCount - activeTenants) / totalTenantsCount) * 100 : 0;
+            const inactiveRate = totalTenantsCount > 0 ? ((totalTenantsCount - activeTenants) / totalTenantsCount) * 100 : 0;
 
             const plansCount: any = { 'Free': 0, 'Básico': 0, 'Pro': 0, 'Elite': 0 };
             tenants.forEach((t) => {
@@ -109,7 +109,7 @@ export default function AdminDashboard() {
                 ...prev,
                 tenants: activeTenants,
                 totalTenants: totalTenantsCount,
-                churn: isNaN(churnRate) ? 0 : churnRate,
+                churn: isNaN(inactiveRate) ? 0 : inactiveRate,
                 conversionRate: isNaN(conversionRate) ? 0 : conversionRate
             }));
 
@@ -128,18 +128,26 @@ export default function AdminDashboard() {
                     else if (rawPlan.includes('elite')) displayPlan = 'Elite';
                     return { id: t.id, name: t.name, plan: displayPlan, status: t.status, date: t.createdAt?.toDate().toLocaleDateString('es-CL') || 'Reciente' };
                 }));
+        }, (error: any) => {
+            console.error("Error tenants snapshot:", error);
         });
 
         const unsubscribeInvoices = onSnapshot(query(collection(db, "invoices"), orderBy("issueDate", "desc")), (invoicesSnap: any) => {
             setRawInvoices(invoicesSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
+        }, (error: any) => {
+            console.error("Error invoices snapshot:", error);
         });
 
         const qBookings = query(collection(db, "bookings"), orderBy("date", "desc"), limit(100));
         const unsubscribeBookings = onSnapshot(qBookings, (bookingsSnap: any) => {
             setRawBookings(bookingsSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
+        }, (error: any) => {
+            console.error("Error bookings snapshot:", error);
         });
 
-        const unsubUsers = onSnapshot(collection(db, "users"), (s: any) => setKpis(prev => ({ ...prev, users: s.size })));
+        const unsubUsers = onSnapshot(collection(db, "users"), (s: any) => setKpis(prev => ({ ...prev, users: s.size })), (error: any) => {
+            console.error("Error users snapshot:", error);
+        });
         const qAudit = query(collection(db, "audit"), orderBy("timestamp", "desc"), limit(10));
         const unsubAudit = onSnapshot(qAudit, (auditSnap: any) => {
             setRecentActivity(auditSnap.docs.map((d: any) => {
@@ -153,10 +161,15 @@ export default function AdminDashboard() {
                 };
             }));
             setLoading(false);
+        }, (error: any) => {
+            console.error("Error audit snapshot:", error);
+            setLoading(false);
         });
 
         const unsubSettings = onSnapshot(doc(db, "settings", "global"), (snap: any) => {
             if (snap.exists()) setCommissionRate(snap.data().commissionRate || 8);
+        }, (error: any) => {
+            console.error("Error settings snapshot:", error);
         });
 
         return () => {
@@ -173,10 +186,12 @@ export default function AdminDashboard() {
         const prevMonthDate = new Date(year, month - 2, 1);
 
         let calculatedRevenue = 0;
-        let prevMonthRevenue = 0;
         let totalRevenueAllTime = 0;
         const tenantRevenueMap: any = {};
         const monthlyRevenueMap: any = {};
+
+        const prevMonth = new Date(year, month - 2, 1);
+        const prevMonthEnd = new Date(year, month - 1, 0, 23, 59, 59);
 
         // 1. Ingresos por Invoices (Histórico/Pagado)
         rawInvoices.forEach(inv => {
@@ -210,6 +225,13 @@ export default function AdminDashboard() {
         if (!isHistorical && calculatedRevenue === 0) {
             calculatedRevenue = Math.round(monthBookingsRevenue);
         }
+
+        const prevMonthRevenue = rawInvoices
+            .filter(inv => {
+                const date = inv.issueDate?.toDate ? inv.issueDate.toDate() : (inv.issueDate ? new Date(inv.issueDate) : new Date());
+                return date >= prevMonth && date <= prevMonthEnd && (inv.status === 'Pagada' || inv.status === 'paid');
+            })
+            .reduce((acc, inv) => acc + Number(inv.amount || inv.total || 0), 0);
 
         const mrrGrowth = prevMonthRevenue > 0 ? ((calculatedRevenue - prevMonthRevenue) / prevMonthRevenue) * 100 : 0;
         setChartData(Object.values(monthlyRevenueMap).sort((a: any, b: any) => a.sort - b.sort));

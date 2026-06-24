@@ -335,10 +335,10 @@ export default function ChampionshipsPage() {
 
             {/* KPI */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <TarjetaKpi label="Torneos" value={tournaments.length.toString()} icon={<TrophyIcon className="w-5 h-5" />} trend={{ value: 'TOTAL', isPositive: true }} />
-                <TarjetaKpi label="Activos" value={tournaments.filter(t => t.status === 'active').length.toString()} icon={<PlayCircleIcon className="w-5 h-5" />} trend={{ value: 'EN VIVO', isPositive: true }} />
-                <TarjetaKpi label="Equipos" value={tournaments.reduce((acc, t) => acc + (t.teams?.length || 0), 0).toString()} icon={<UserGroupIcon className="w-5 h-5" />} trend={{ value: 'PARTICIPANTES', isPositive: true }} />
-                <TarjetaKpi label="Potencial" value={`$${tournaments.reduce((acc, t) => acc + (t.maxTeams * (t.price || 0)), 0).toLocaleString()}`} icon={<CurrencyDollarIcon className="w-5 h-5" />} trend={{ value: 'INGRESOS', isPositive: true }} />
+                <TarjetaKpi label="Torneos" value={tournaments.length.toString()} icon={<TrophyIcon className="w-5 h-5" />} trend={{ value: 'TOTAL', isUp: true }} />
+                <TarjetaKpi label="Activos" value={tournaments.filter(t => t.status === 'active').length.toString()} icon={<PlayCircleIcon className="w-5 h-5" />} trend={{ value: 'EN VIVO', isUp: true }} />
+                <TarjetaKpi label="Equipos" value={tournaments.reduce((acc, t) => acc + (t.teams?.length || 0), 0).toString()} icon={<UserGroupIcon className="w-5 h-5" />} trend={{ value: 'PARTICIPANTES', isUp: true }} />
+                <TarjetaKpi label="Potencial" value={`$${tournaments.reduce((acc, t) => acc + (t.maxTeams * (t.price || 0)), 0).toLocaleString()}`} icon={<CurrencyDollarIcon className="w-5 h-5" />} trend={{ value: 'INGRESOS', isUp: true }} />
             </div>
 
             {/* LISTADO */}

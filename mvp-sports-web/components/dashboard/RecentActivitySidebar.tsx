@@ -72,7 +72,7 @@ export default function RecentActivitySidebar({ activities }: RecentActivitySide
                             <p className="text-[9px] text-slate-400 font-mono mt-0.5">{evt.tiempo}</p>
                         </div>
                     )) : (
-                        <p className="text-[10px] text-slate-400 pl-5 uppercase font-bold">CARGANDO ACTIVIDAD...</p>
+                        <p className="text-[10px] text-slate-400 pl-5 uppercase font-bold">SIN ACTIVIDAD REGISTRADA</p>
                     )}
 
                 </div>

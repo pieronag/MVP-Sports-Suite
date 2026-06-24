@@ -106,7 +106,7 @@ export default function OwnerDashboard() {
                 endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
             } else if (timeRange === '7d') {
                 startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7, 23, 59, 59);
+                endDate = now;
             } else {
                 startDate = new Date(now.getFullYear(), now.getMonth(), 1);
                 endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
@@ -116,9 +116,13 @@ export default function OwnerDashboard() {
             const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
             const venueIds = selectedVenueId === 'all' ? venuesList.map(v => v.id) : [selectedVenueId];
             
+            const limitedVenueIds = venueIds.slice(0, 30);
+            if (venueIds.length > 30) {
+                console.warn(`OwnerDashboard: más de 30 recintos. Mostrando datos de los primeros 30.`);
+            }
             const qBookings = query(
                 collection(db, "bookings"),
-                where("tenantId", "in", venueIds.slice(0, 30)),
+                where("tenantId", "in", limitedVenueIds),
                 where("date", ">=", Timestamp.fromDate(startDate)),
                 where("date", "<=", Timestamp.fromDate(endDate))
             );

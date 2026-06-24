@@ -4,7 +4,7 @@ import React from 'react';
 interface MetricCardProps {
     label: string;
     value: string;
-    icon: any;
+    icon: React.ComponentType<{ className?: string }>;
     color: 'emerald' | 'blue' | 'amber' | 'purple' | 'indigo';
     subtext?: string;
 }

@@ -54,6 +54,17 @@ export const awardPlayerXp = onCall(async (request) => {
     action: "checkin" | "match" | "win" | "mvp";
   };
 
+  if (action === "win" || action === "mvp") {
+    const requesterDoc = await db.collection("profiles").doc(uid).get();
+    const requesterRole = requesterDoc.data()?.role || "player";
+    if (!["superadmin", "admin", "owner", "manager", "staff"].includes(requesterRole)) {
+      throw new HttpsError(
+        "permission-denied",
+        "Solo el personal autorizado puede otorgar XP por victorias o MVP.",
+      );
+    }
+  }
+
   try {
     const [settingsDoc, userDoc] = await Promise.all([
       db.collection("settings").doc("gamification").get(),
@@ -217,15 +228,18 @@ export const commitWebpayTransaction = onRequest(
           const batch = db.batch();
           batch.update(payDoc.ref, {status: "approved", result});
           if (bookingId) {
-            if (pendingBookingData) {
+              if (pendingBookingData) {
+              const rawDate = pendingBookingData.date;
               let finalDate = admin.firestore.FieldValue.serverTimestamp();
-              if (pendingBookingData.date) {
-                if (pendingBookingData.date._seconds) {
-                  finalDate = new admin.firestore.Timestamp(pendingBookingData.date._seconds, pendingBookingData.date._nanoseconds || 0);
-                } else if (typeof pendingBookingData.date === "string") {
-                  finalDate = admin.firestore.Timestamp.fromDate(new Date(pendingBookingData.date));
-                } else if (pendingBookingData.date.seconds) {
-                  finalDate = new admin.firestore.Timestamp(pendingBookingData.date.seconds, pendingBookingData.date.nanoseconds || 0);
+              if (rawDate) {
+                if (typeof rawDate?.toDate === "function") {
+                  finalDate = rawDate;
+                } else if (typeof rawDate === "string") {
+                  finalDate = admin.firestore.Timestamp.fromDate(new Date(rawDate));
+                } else if (rawDate?._seconds != null) {
+                  finalDate = new admin.firestore.Timestamp(rawDate._seconds, rawDate._nanoseconds || 0);
+                } else if (rawDate?.seconds != null) {
+                  finalDate = new admin.firestore.Timestamp(rawDate.seconds, rawDate.nanoseconds || 0);
                 }
               }
               batch.set(db.collection("bookings").doc(bookingId), {
