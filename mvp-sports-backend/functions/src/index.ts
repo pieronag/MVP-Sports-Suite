@@ -3,14 +3,20 @@ import {onSchedule} from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
 import {transbank} from "./transbank";
+import {checkRateLimit} from "./rateLimiter";
 import {IntegrationCommerceCodes} from "transbank-sdk";
-// import cors from "cors";
-
-// const corsHandler = cors({origin: true});
 
 admin.initializeApp();
 
 const db = admin.firestore();
+
+function getBaseUrl(): string {
+  return process.env.CF_BASE_URL || "https://commitwebpaytransaction-i6cn7w2g5a-tl.a.run.app";
+}
+
+function getOneclickBaseUrl(): string {
+  return process.env.ONECLICK_BASE_URL || "https://finishoneclickinscription-i6cn7w2g5a-tl.a.run.app";
+}
 
 interface GamificationSettings {
   xpPerCheckin: number;
@@ -41,10 +47,12 @@ export const awardPlayerXp = onCall(async (request) => {
     );
   }
 
+  const uid = request.auth.uid;
+  await checkRateLimit("awardPlayerXp", uid);
+
   const {action} = request.data as {
     action: "checkin" | "match" | "win" | "mvp";
   };
-  const uid = request.auth.uid;
 
   try {
     const [settingsDoc, userDoc] = await Promise.all([
@@ -105,8 +113,10 @@ export const createWebpayTransaction = onCall(
       throw new HttpsError("unauthenticated", "Debes estar autenticado.");
     }
 
-    const {bookingId, tenantId, amount, buyOrder, bookingData} = request.data;
     const uid = request.auth.uid;
+    await checkRateLimit("createWebpayTransaction", uid);
+
+    const {bookingId, tenantId, amount, buyOrder, bookingData} = request.data;
 
     try {
       const tenantDoc = await db.collection("tenants").doc(tenantId).get();
@@ -115,8 +125,7 @@ export const createWebpayTransaction = onCall(
       const commerceCode = tenantData?.transbankCommerceCode;
       const apiKey = tenantData?.transbankApiKey;
 
-      // URL directa a la Cloud Function para evitar 404 en el Hosting
-      const baseUrl = "https://commitwebpaytransaction-i6cn7w2g5a-tl.a.run.app";
+      const baseUrl = getBaseUrl();
       const commitUrl = `${baseUrl}?tenantId=${tenantId}`;
 
       const response = await transbank.createWebpay(
@@ -160,7 +169,14 @@ export const createWebpayTransaction = onCall(
 export const commitWebpayTransaction = onRequest(
   {region: "southamerica-west1"},
   async (req, res) => {
-    // No usar corsHandler en webhooks/redirects de Transbank
+    const requestToken = req.query._token as string;
+    const settingsDoc = await db.collection("settings").doc("webhook_secret").get();
+    const webhookSecret = settingsDoc.data()?.secret;
+    if (webhookSecret && requestToken !== webhookSecret) {
+      logger.error("Webhook commit: invalid secret token");
+      return res.redirect("mvpdeportes://checkout/error?reason=invalid_webhook");
+    }
+
     const token = req.body.token_ws || req.query.token_ws || req.body.TBK_TOKEN || req.query.TBK_TOKEN;
     const tenantId = req.query.tenantId as string;
 
@@ -189,6 +205,12 @@ export const commitWebpayTransaction = onRequest(
         if (!paySnap.empty) {
           const payDoc = paySnap.docs[0];
           const payData = payDoc.data();
+
+          if (payData.status === "approved") {
+            logger.info(`Webpay commit: payment already processed for token ${token}`);
+            return res.redirect(`mvpdeportes://checkout/success?token=${token}`);
+          }
+
           const bookingId = payData.bookingId;
           const pendingBookingData = payData.pendingBookingData;
 
@@ -243,8 +265,10 @@ export const startOneclickInscription = onCall(
       throw new HttpsError("unauthenticated", "Debes estar autenticado.");
     }
 
-    const {email, cardNumber, holderName, expiryMonth, expiryYear} = request.data;
     const uid = request.auth.uid;
+    await checkRateLimit("createWebpayTransaction", uid);
+
+    const {email, cardNumber, holderName, expiryMonth, expiryYear} = request.data;
     const cleanEmail = email || request.auth.token.email || `user_${uid}@mvpsports.cl`;
 
     logger.info(`Starting Inscription for UID: ${uid} | Email: ${cleanEmail}`);
@@ -279,8 +303,7 @@ export const startOneclickInscription = onCall(
         };
       }
 
-      const baseUrl = "https://finishoneclickinscription-i6cn7w2g5a-tl.a.run.app";
-      const resUrl = baseUrl;
+      const resUrl = getOneclickBaseUrl();
       
       // Intentar cargar llaves maestras globales
       const masterDoc = await db.collection("settings").doc("transbank_master").get();
@@ -315,7 +338,14 @@ export const startOneclickInscription = onCall(
 export const finishOneclickInscription = onRequest(
   {region: "southamerica-west1"},
   async (req, res) => {
-    // No usar corsHandler en webhooks/redirects de Transbank
+    const requestToken = req.query._token as string;
+    const settingsDoc = await db.collection("settings").doc("webhook_secret").get();
+    const webhookSecret = settingsDoc.data()?.secret;
+    if (webhookSecret && requestToken !== webhookSecret) {
+      logger.error("Oneclick finish: invalid secret token");
+      return res.redirect("mvpdeportes://wallet/error?reason=invalid_webhook");
+    }
+
     const token = req.body.TBK_TOKEN || req.query.TBK_TOKEN || req.body.token_ws || req.query.token_ws;
 
     logger.info(`Finish Inscription Check - Method: ${req.method} | Token: ${token}`);
@@ -331,6 +361,13 @@ export const finishOneclickInscription = onRequest(
       const commerceCode = mData?.commerceCode;
       const apiKey = mData?.apiKey;
 
+      // Idempotency: check if this token was already processed
+      const existingCard = await db.collection("settings").doc(`inscription_${token}`).get();
+      if (existingCard.exists) {
+        logger.info(`Oneclick finish: inscription ${token} already processed`);
+        return res.redirect("mvpdeportes://wallet/success?already=true");
+      }
+
       const result = await transbank.finishInscription(token as string, commerceCode, apiKey);
       logger.info("Oneclick Finish Result:", JSON.stringify(result));
 
@@ -344,6 +381,13 @@ export const finishOneclickInscription = onRequest(
           last4: result.card_number,
           brand: result.card_type,
           isDefault: true,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        // Mark as processed for idempotency
+        await db.collection("settings").doc(`inscription_${token}`).set({
+          processed: true,
+          uid,
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 
@@ -368,8 +412,10 @@ export const authorizeOneclickPayment = onCall(
       throw new HttpsError("unauthenticated", "Debes estar autenticado.");
     }
 
-    const {amount, bookingId, tenantId, cardId} = request.data;
     const uid = request.auth.uid;
+    await checkRateLimit("authorizeOneclickPayment", uid);
+
+    const {amount, bookingId, tenantId, cardId} = request.data;
 
     try {
       // Determinar qué tarjeta usar
@@ -578,6 +624,9 @@ export const refundBookingPayment = onCall({region: "southamerica-west1"}, async
     throw new HttpsError("unauthenticated", "Debes estar autenticado.");
   }
 
+  const uid = request.auth.uid;
+  await checkRateLimit("refundBookingPayment", uid);
+
   const {bookingId} = request.data as { bookingId: string };
   if (!bookingId) {
     throw new HttpsError("invalid-argument", "Debe proveer un bookingId.");
@@ -743,6 +792,12 @@ export const refundBookingPayment = onCall({region: "southamerica-west1"}, async
  * utilizando Resend y plantillas HTML modernas.
  */
 export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Debes estar autenticado.");
+  }
+
+  await checkRateLimit("sendAuthEmail", request.auth.uid);
+
   const { email, type, name: providedName } = request.data as {
     email: string;
     type: "verify" | "reset";

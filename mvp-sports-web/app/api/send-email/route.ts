@@ -1,7 +1,19 @@
 import { NextResponse } from 'next/server';
+import { adminAuth } from '@/services/firebase-admin';
 
 export async function POST(request: Request) {
   try {
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'No autorizado.' }, { status: 401 });
+    }
+    const token = authHeader.split('Bearer ')[1];
+    try {
+      await adminAuth.verifyIdToken(token);
+    } catch {
+      return NextResponse.json({ error: 'Token inválido.' }, { status: 401 });
+    }
+
     const { name, email, rut, phone, sport, position } = await request.json();
 
     if (!email || !name) {
@@ -173,7 +185,7 @@ export async function POST(request: Request) {
         'Authorization': `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        from: 'MVP Sports <onboarding@resend.dev>',
+        from: process.env.RESEND_FROM_EMAIL || 'MVP Sports <noreply@mvpsports.cl>',
         to: [email],
         subject: '¡Bienvenido a la Élite de MVP Sports!',
         html: htmlContent,

@@ -30,7 +30,7 @@ service cloud.firestore {
 
     function isSuperAdmin() {
       let role = getRole();
-      return isAuthenticated() && (request.auth.token.email == 'piero.abarca@gmail.com' || role == 'admin' || role == 'superadmin');
+      return isAuthenticated() && (role == 'admin' || role == 'superadmin');
     }
 
     function isOwner() {
@@ -159,7 +159,7 @@ service cloud.firestore {
     
     match /payments/{paymentId} {
       allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isManager() || isSuperAdmin());
-      allow create: if isAuthenticated();
+      allow create: if isSuperAdmin();
       allow update, delete: if isSuperAdmin();
     }
 
@@ -233,8 +233,8 @@ service cloud.firestore {
     }
 
     match /audit/{id} {
-      allow read: if isManager() || isSuperAdmin();
-      allow write: if isAuthenticated(); 
+      allow read: if isStaff() || isSuperAdmin();
+      allow write: if isStaff() || isSuperAdmin();
     }
   }
 }
