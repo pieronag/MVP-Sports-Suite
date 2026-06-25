@@ -1,0 +1,50 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar",
+    "retry": "Reintentar",
+    "back": "Volver"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "academy": "Academia",
+    "audit": "Auditoría",
+    "calendar": "Calendario",
+    "checkin": "Check-In",
+    "courts": "Canchas",
+    "feedback": "Feedback",
+    "finance": "Finanzas",
+    "gamification": "Gamificación",
+    "invoices": "Facturas",
+    "bookings": "Reservas",
+    "marketing": "Marketing",
+    "metrics": "Métricas",
+    "owners": "Dueños",
+    "profile": "Perfil",
+    "reports": "Reportes",
+    "settings": "Configuración",
+    "staff": "Personal",
+    "tenants": "Recintos",
+    "tournaments": "Torneos",
+    "users": "Usuarios"
+  },
+  "dashboard": {
+    "title": "Panel de Control",
+    "kpi_revenue": "Ingresos",
+    "kpi_tenants": "Recintos",
+    "kpi_users": "Usuarios",
+    "kpi_bookings": "Reservas",
+    "kpi_occupancy": "Ocupación"
+  },
+  "errors": {
+    "generic": "Ocurrió un error inesperado",
+    "not_found": "No encontrado",
+    "unauthorized": "No autorizado",
+    "network": "Error de conexión"
+  }
+}
