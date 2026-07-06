@@ -289,7 +289,7 @@ export default function LoginPage() {
                         w-full py-3.5 rounded-lg font-heading font-black text-xs uppercase tracking-widest shadow-lg relative overflow-hidden group
                         ${loading 
                             ? 'bg-slate-200 text-transparent cursor-not-allowed dark:bg-slate-800' 
-                            : 'bg-slate-900 text-white hover:bg-black hover:shadow-xl dark:bg-mvp-volt dark:text-mvp-dark dark:hover:bg-[#b8e600] dark:hover:shadow-[0_0_30px_rgba(0, 223, 130,0.4)] hover:-translate-y-0.5'
+                            : 'bg-slate-900 text-white hover:bg-black hover:shadow-xl dark:bg-mvp-green dark:text-black dark:hover:bg-[#b8e600] dark:hover:shadow-[0_0_40px_rgba(0,223,130,0.5)] dark:border dark:border-mvp-green/50 hover:-translate-y-0.5'
                         }
                     `}
                 >

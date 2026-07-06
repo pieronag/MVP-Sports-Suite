@@ -26,6 +26,7 @@ const config: Config = {
         mvp: {
           dark: "#050b14",
           green: "#00df82",
+          volt: "#00df82",
           cyan: "#00e0ff",
           silver: "#e2e8f0",
         },
