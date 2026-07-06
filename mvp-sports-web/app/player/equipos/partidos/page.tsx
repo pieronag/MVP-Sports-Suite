@@ -338,25 +338,36 @@ export default function PartidosPage() {
                   const alreadyChallenged = challenges.some(c => c.status !== "declined" && (c.challengedTeamId === entry.teamId || c.challengerTeamId === entry.teamId) && c.senderId === uid);
                   return (
                     <GlowCard key={entry.id} isDark={isDark}>
-                      <div className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-11 h-11 rounded-[14px] flex items-center justify-center shrink-0 ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}>
-                            <Swords size={20} className="text-emerald-500" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.teamName}</p>
-                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                              <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-[14px] ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>{entry.sport.toUpperCase()}</span>
-                              <span className={`text-[9px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.memberCount} jugadores</span>
-                              {entry.communes && entry.communes.length > 0 ? <span className={`text-[8px] font-medium flex items-center gap-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}><MapPin size={9} />{entry.communes.slice(0, 2).join(", ")}{entry.communes.length > 2 ? ` +${entry.communes.length - 2}` : ""}</span> : entry.commune ? <span className={`text-[8px] font-medium flex items-center gap-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}><MapPin size={9} />{entry.commune}</span> : null}
+                      <div className="overflow-hidden">
+                        {/* Hero image */}
+                        <div className="h-[90px] relative" style={{ background: entry.teamImageUrl ? `url(${entry.teamImageUrl}) center/cover` : `linear-gradient(135deg, #059669, #047857)` }}>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                          <div className="absolute bottom-3 left-4 right-4">
+                            <div className="flex items-center gap-2">
+                              <span className="bg-emerald-500 px-2 py-0.5 rounded-[14px] text-white font-semibold text-[7px] uppercase tracking-wider">{entry.sport.toUpperCase()}</span>
+                              <span className="bg-black/40 px-2 py-0.5 rounded-[14px] text-white/80 text-[7px] font-medium">{entry.memberCount} jugadores</span>
                             </div>
                           </div>
-                          <button onClick={() => handleChallenge(entry)} disabled={actionLoading || alreadyChallenged}
-                            className={`px-4 h-9 rounded-[14px] text-[9px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${alreadyChallenged ? (isDark ? "bg-white/[0.06] text-slate-500" : "bg-slate-100 text-slate-400") : "bg-emerald-500 text-white"}`}>
-                            {alreadyChallenged ? "Retado" : "Retar"}
-                          </button>
                         </div>
-                        {entry.description && <p className={`text-[10px] font-medium mt-2 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.description}</p>}
+                        <div className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1 min-w-0">
+                              <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.teamName}</p>
+                              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                {entry.communes && entry.communes.length > 0 ? (
+                                  <span className={`text-[8px] font-medium flex items-center gap-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}><MapPin size={9} />{entry.communes.slice(0, 2).join(", ")}{entry.communes.length > 2 ? ` +${entry.communes.length - 2}` : ""} · {entry.region}</span>
+                                ) : entry.commune ? (
+                                  <span className={`text-[8px] font-medium flex items-center gap-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}><MapPin size={9} />{entry.commune}</span>
+                                ) : null}
+                              </div>
+                            </div>
+                            <button onClick={() => handleChallenge(entry)} disabled={actionLoading || alreadyChallenged}
+                              className={`px-4 h-9 rounded-[14px] text-[9px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] shrink-0 ml-2 ${alreadyChallenged ? (isDark ? "bg-white/[0.06] text-slate-500" : "bg-slate-100 text-slate-400") : "bg-emerald-500 text-white"}`}>
+                              {alreadyChallenged ? "Retado" : "Retar"}
+                            </button>
+                          </div>
+                          {entry.description && <p className={`text-[10px] font-medium mt-2 leading-snug ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.description}</p>}
+                        </div>
                       </div>
                     </GlowCard>
                   );
@@ -389,29 +400,35 @@ export default function PartidosPage() {
                     <GlowCard key={entry.id} isDark={isDark}>
                       <div className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-11 h-11 rounded-[14px] overflow-hidden shrink-0" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
-                            {entry.photoURL ? <img src={entry.photoURL} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User size={20} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
+                          <div className="w-14 h-14 rounded-[14px] overflow-hidden shrink-0 border-2" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0" }}>
+                            {entry.photoURL ? <img src={entry.photoURL} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><User size={24} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.displayName}</p>
-                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                              <span className={`text-[8px] font-semibold px-1.5 py-0.5 rounded-[14px] ${isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>{entry.position || "Jugador"}</span>
-                              <span className="text-emerald-500 text-[9px] font-semibold">OVR {entry.ovr}</span>
-                              <span className={`text-[8px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.tier}</span>
-                              {entry.communes && entry.communes.length > 0 ? <span className={`text-[8px] font-medium flex items-center gap-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}><MapPin size={9} />{entry.communes.slice(0, 2).join(", ")}{entry.communes.length > 2 ? ` +${entry.communes.length - 2}` : ""}</span> : entry.commune ? <span className={`text-[8px] font-medium flex items-center gap-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}><MapPin size={9} />{entry.commune}</span> : null}
+                            <div className="flex items-center justify-between">
+                              <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.displayName}</p>
+                              <span className="text-emerald-500 text-[13px] font-bold shrink-0 ml-2">OVR {entry.ovr}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                              <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-[14px] ${isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>{entry.position || "Jugador"}</span>
+                              <span className={`text-[8px] font-medium px-1.5 py-0.5 rounded-[14px] ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>{entry.tier}</span>
+                              {entry.communes && entry.communes.length > 0 ? (
+                                <span className={`text-[8px] font-medium flex items-center gap-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}><MapPin size={9} />{entry.communes[0]}</span>
+                              ) : entry.commune ? (
+                                <span className={`text-[8px] font-medium flex items-center gap-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}><MapPin size={9} />{entry.commune}</span>
+                              ) : null}
                             </div>
                             {entry.sports && entry.sports.length > 0 && (
-                              <div className="flex gap-1 mt-1.5 flex-wrap">
-                                {entry.sports.map(s => <span key={s} className={`text-[7px] font-medium px-1.5 py-0.5 rounded-[14px] ${isDark ? "bg-white/[0.04] text-slate-400" : "bg-slate-100 text-slate-500"}`}>{s.toUpperCase()}</span>)}
+                              <div className="flex gap-1 mt-2 flex-wrap">
+                                {entry.sports.map(s => <span key={s} className={`text-[7px] font-medium px-2 py-0.5 rounded-[14px] ${isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>{s}</span>)}
                               </div>
                             )}
+                            {entry.description && <p className={`text-[9px] font-medium mt-1.5 leading-snug ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.description}</p>}
                           </div>
-                          <button onClick={() => handleContact(entry)} disabled={actionLoading || alreadyContacted}
-                            className={`px-4 h-9 rounded-[14px] text-[9px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${alreadyContacted ? (isDark ? "bg-white/[0.06] text-slate-500" : "bg-slate-100 text-slate-400") : "bg-emerald-500 text-white"}`}>
-                            {alreadyContacted ? "Contactado" : "Contactar"}
-                          </button>
                         </div>
-                        {entry.description && <p className={`text-[10px] font-medium mt-2 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.description}</p>}
+                        <button onClick={() => handleContact(entry)} disabled={actionLoading || alreadyContacted}
+                          className={`w-full mt-3 h-10 rounded-[14px] text-[9px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${alreadyContacted ? (isDark ? "bg-white/[0.06] text-slate-500 border border-white/[0.06]" : "bg-slate-100 text-slate-400 border border-slate-200") : "bg-emerald-500 text-white shadow-sm shadow-emerald-500/25"}`}>
+                          {alreadyContacted ? "Contactado" : "Contactar"}
+                        </button>
                       </div>
                     </GlowCard>
                   );
