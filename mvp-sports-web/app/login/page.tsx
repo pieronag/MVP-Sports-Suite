@@ -165,7 +165,7 @@ export default function LoginPage() {
         
         <div className="w-full max-w-[340px] mx-auto">
             <div className="lg:hidden text-center mb-8">
-                <div className={`relative w-16 h-16 mx-auto mb-4 ${theme === 'light' ? 'brightness-0' : ''}`}>
+                <div className={`relative w-48 h-48 mx-auto mb-4 ${theme === 'light' ? 'brightness-0' : ''}`}>
                     <Image src="/Logo.png" alt="Logo" fill className="object-contain"/>
                 </div>
             </div>
