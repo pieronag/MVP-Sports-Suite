@@ -17,6 +17,9 @@ export interface MatchEntry {
     ovr?: number;
     tier?: string;
     city?: string;
+    region?: string;
+    commune?: string;
+    communes?: string[];
     description?: string;
     status: "active" | "matched" | "closed";
     createdAt: Timestamp;
@@ -85,14 +88,13 @@ export const matchmakingService = {
     async publishTeam(data: {
         teamId: string; teamName: string; teamImageUrl?: string;
         sport: string; memberCount: number; description?: string;
+        region?: string; communes?: string[];
     }, userId: string): Promise<string> {
-        const docRef = await addDoc(collection(db, 'matchmaking'), {
-            type: 'team',
-            ...data,
-            userId,
-            status: 'active',
-            createdAt: Timestamp.now(),
-        });
+        const clean: any = { type: 'team', ...data, userId, status: 'active', createdAt: Timestamp.now() };
+        if (!clean.city) delete clean.city;
+        if (!clean.region) delete clean.region;
+        if (!clean.communes || clean.communes.length === 0) delete clean.communes;
+        const docRef = await addDoc(collection(db, 'matchmaking'), clean);
         return docRef.id;
     },
 
@@ -100,6 +102,7 @@ export const matchmakingService = {
         userId: string; displayName: string; photoURL?: string;
         position: string; ovr: number; tier: string;
         sports: string[]; city?: string; description?: string;
+        region?: string; communes?: string[];
     }): Promise<string> {
         const clean: any = {
             type: 'player',
@@ -114,6 +117,8 @@ export const matchmakingService = {
         };
         if (data.photoURL) clean.photoURL = data.photoURL;
         if (data.city) clean.city = data.city;
+        if (data.region) clean.region = data.region;
+        if (data.communes && data.communes.length > 0) clean.communes = data.communes;
         if (data.description) clean.description = data.description;
         const docRef = await addDoc(collection(db, 'matchmaking'), clean);
         return docRef.id;
@@ -121,6 +126,15 @@ export const matchmakingService = {
 
     async closeEntry(entryId: string): Promise<void> {
         await updateDoc(doc(db, 'matchmaking', entryId), { status: 'closed' });
+    },
+
+    async updateEntry(entryId: string, data: Partial<{ sport: string; sports: string[]; description: string; position: string }>): Promise<void> {
+        const clean: any = {};
+        if (data.description !== undefined) clean.description = data.description;
+        if (data.sport !== undefined) clean.sport = data.sport;
+        if (data.sports !== undefined) clean.sports = data.sports;
+        if (data.position !== undefined) clean.position = data.position;
+        await updateDoc(doc(db, 'matchmaking', entryId), clean);
     },
 
     // ── Challenges ──
