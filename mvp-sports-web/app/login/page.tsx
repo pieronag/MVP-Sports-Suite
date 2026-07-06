@@ -12,7 +12,7 @@ import { useAuth } from "../../context/AuthContext"; // Importamos AuthContext
 export default function LoginPage() {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme(); 
-  const { user } = useAuth(); // Obtenemos el usuario del contexto global
+  const { user, role } = useAuth();
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,13 +25,12 @@ export default function LoginPage() {
 
   useEffect(() => setMounted(true), []);
 
-  // INTEGRACIÓN AUTH CONTEXT:
-  // Si el usuario ya existe (AuthContext lo detecta), lo enviamos al dashboard inmediatamente.
   useEffect(() => {
     if (user) {
-      router.push("/dashboard");
+      const target = role && role !== 'player' ? '/dashboard' : '/player';
+      router.push(target);
     }
-  }, [user, router]);
+  }, [user, router, role]);
 
   const handleResendVerification = async () => {
     if (!email) return;
@@ -62,18 +61,22 @@ export default function LoginPage() {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Consultar el rol del usuario en Firestore para ver si está exento de verificación de correo
         let userRole = null;
         try {
             const userDoc = await getDoc(doc(db, "users", user.uid));
             if (userDoc.exists()) {
                 userRole = userDoc.data().role;
+            } else {
+                const profileDoc = await getDoc(doc(db, "profiles", user.uid));
+                if (profileDoc.exists()) {
+                    userRole = profileDoc.data().role || "player";
+                }
             }
         } catch (dbErr) {
             console.error("Error al obtener rol del usuario durante login:", dbErr);
         }
 
-        const exemptRoles = ["manager", "owner", "admin", "superadmin"];
+        const exemptRoles = ["manager", "owner", "admin", "superadmin", "player"];
         const isExempt = userRole && exemptRoles.includes(userRole);
 
         if (!user.emailVerified && !isExempt) {
@@ -83,7 +86,8 @@ export default function LoginPage() {
             return;
         }
         
-        router.push("/dashboard"); 
+        const target = userRole && userRole !== 'player' ? '/dashboard' : '/player';
+        router.push(target); 
     } catch (err: any) {
         setError("Credenciales incorrectas.");
         setLoading(false);

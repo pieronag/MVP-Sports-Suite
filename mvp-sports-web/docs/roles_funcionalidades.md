@@ -1,85 +1,163 @@
-# 🏆 MVP Sports Suite - Documentación Funcional por Roles
+# MVP Sports Suite — Documentación Funcional por Roles
 
-Este documento detalla todas las funcionalidades del sistema **MVP Sports Suite**, organizadas según el nivel de acceso y responsabilidades de cada perfil de usuario.
+## Rol: Jugador (`/player/*`)
 
----
+### Pantalla Principal
+- Header con nombre del usuario
+- **ID Card**: Avatar, nombre, rango, OVR, XP acumulados (GlowCard glassmorphism)
+- **Acceso Rápido**: Grid 5 columnas (Reservas, Mapa, Torneos, Academias, Pagos, Recintos, Equipos, Estadísticas, Perfil, Ajustes)
+- **Carta MVP**: Genera y comparte carta de valoración descargable (estilo TOPPS NOW 2026) con `html-to-image`
 
-## 🛡️ ROL: ADMINISTRADOR CENTRAL (SUPERADMIN)
-Este es el rol de mayor jerarquía, responsable de la infraestructura global del sistema y la supervisión de todos los recintos deportivos.
+### Reservas (`/player/reservas`)
+- Lista de reservas agrupadas en Activas / Historial
+- Vista detalle por card con: icono deporte SVG, recinto, cancha, sport, fecha, horario, valor, pago
+- Check-in, Check-out, Cancelar con reembolso parcial (comisión 3%)
+- Modal QR para ingreso al recinto
+- Modal encuesta post-partido (rating 1-5 + comentario)
+- Modal confirmación de cancelación con política según tiempo restante
 
-### 1. Panel Maestro (Protocolo Admin)
-*   **Gestión Comercial y Planes**: 
-    *   Configuración dinámica de planes SaaS (Free, Básico, Pro, Elite).
-    *   Ajuste de precios mensuales y beneficios específicos (SEO, Reportes, Soporte) sincronizados con Firebase Cloud.
-*   **Protocolos de Auditoría**:
-    *   Visualización de logs inmutables con niveles de prioridad (`CRITICAL` para destrucciones, `HIGH` para finanzas, `LOW` para tests).
-    *   Trazabilidad completa de acciones administrativas (Quién, Qué, Cuándo).
-*   **Seguridad y Resiliencia**:
-    *   **Snapshot Manual**: Creación de respaldos de la base de datos en tiempo real.
-    *   **WIPE Selectivo**: Purgado total de datos dinámicos (reservas, logs, notificaciones) manteniendo intacta la configuración de marca.
-    *   **Stress Test**: Botón de inserción masiva para validar la integridad del sistema bajo carga pesada.
-*   **Branding (Marca Blanca)**:
-    *   Personalización global del nombre de la plataforma, logos y colores de acento.
-    *   Configuración de correos de soporte técnico global.
+### Mapa (`/player/mapa`)
+- Google Maps con markers personalizados por deporte
+- Filtro por deporte (chips)
+- Geolocalización del usuario
+- Lista de recintos con distancia
+- Al pinchar marker → redirige a `/player/clubes/[id]`
 
-### 2. Finanzas Centralizadas
-*   **Gestión de Comisiones**: Ajuste del % de comisión por transacción que cobra el ecosistema.
-*   **Control de Pasarelas**: Activación/Desactivación de métodos de pago (Mercado Pago, Webpay, Stripe).
+### Clubes / Detalle Recinto (`/player/clubes/[id]`)
+- Hero con imagen del recinto
+- Rating, distancia (geolocalización), horario del día
+- Galería de imágenes (modal lightbox con navegación)
+- Contacto: Teléfono, WhatsApp, Instagram, Web
+- Métodos de pago aceptados (Webpay, Mercado Pago)
+- Deportes disponibles, Amenidades, Reglas del recinto (modal)
+- **Wizard de Reserva** (4 pasos centrados):
+  1. Elegir deporte (iconos SVG)
+  2. Seleccionar fecha (calendario con timezone Chile)
+  3. Elegir cancha + horario (slots mañana/tarde/noche)
+  4. Resumen + confirmar (redirige a checkout)
+- Reseñas de jugadores
 
-### 3. Supervisión de Recintos (Venues)
-*   Visualización de todos los ingresos proyectados y reales por cada complejo deportivo.
-*   Monitorización del estado de conexión de las APIs de infraestructura.
+### Checkout (`/player/checkout`)
+- Resumen de reserva con detalle de precio
+- Input de cupón de descuento (válido por tenant/sport/vigencia)
+- Selector de equipo (para reservas grupales)
+- Botón "Pagar Online" → Cloud Function Webpay → redirección a Transbank
 
----
+### Ticket (`/player/ticket`)
+- Hero con estado (éxito/falla/reversa)
+- Resumen de reserva + transacción (ID, estado, método, código)
+- QR Code para ingreso al recinto
+- Botón compartir WhatsApp / descargar
+- Reclamo de devolución si falla la reversa automática
 
-## 🏟️ ROL: ADMINISTRADOR DE RECINTO (OWNER)
-Dueño o gerente de un complejo deportivo específico. Su enfoque es la rentabilidad de su local.
+### Perfil (`/player/perfil`)
+- Foto de perfil (editable con FileReader → base64 → Firestore)
+- Nombre, email, ciudad
+- Nivel de temporada (progresión por tiers: bronce → leyenda)
+- Estadísticas: OVR, partidos, victorias, goles, asistencias, MVPs (con iconos SVG)
+- **Insignias (20 logros)**: Artillero, Maestro, Muralla, Ganador, Estrella, Leyenda, etc. Cada una con tier BRONCE/PLATA/ORO según progreso
+- **Glosario de Insignias**: Modal con progreso por badge, milestones, barra de progreso
+- **Carta MVP**: Diseño TOPPS NOW 2026 con foto de perfil, OVR, nombre, stats. Descargable como PNG via `html-to-image`
+- Botón "Generar Carta MVP" con preview modal + descarga + Web Share API
 
-### 1. Dashboard de Operaciones
-*   **Métricas en Vivo**: Visualización de ingresos (CLP) y volumen de transacciones mediante gráficos avanzados de áreas y líneas.
-*   **KPIs Críticos**: Ocupación de canchas, ingresos del día anterior y promedio proyectado por día.
-*   **Filtros Inteligentes**: Capacidad de filtrar toda la data por rangos históricos (Día, Semana, Mes, Año).
+### Preferencias (`/player/preferencias`)
+- Formulario completo: nombre, teléfono, RUT (con validación + máscara), fecha nacimiento, altura, peso
+- Deporte principal + posición + lado hábil
+- Horario preferido, frecuencia, intensidad
+- Bio, ciudad, género
+- Modo oscuro (toggle)
+- Cambiar contraseña (con reautenticación)
+- Soporte (redirige a reporte)
+- Cerrar sesión / Eliminar cuenta
 
-### 2. Control de Canchas y Horarios
-*   **Ajuste de Tarifas**: Capacidad de cambiar el precio de las canchas según franjas horarias.
-*   **Bloqueos Preventivos**: Inhabilitación de canchas por mantenimiento o eventos privados.
-*   **Configuración de Tiempos**: Ajuste del tiempo de gracia para reservas (ej. cancelar automáticamente después de 15 min de retraso).
+### Equipos (`/player/equipos`)
+- Explorador: Crear equipo (nombre + deporte + código invitación), Unirse por código
+- Listado de equipos del usuario con foto de portada
+- **Detalle equipo** (`/player/equipos/[id]`):
+  - Hero con fotografía (editable por capitán)
+  - Stats: miembros, trofeos, código invitación (copiable)
+  - Chat del equipo
+  - **Roster**: cada miembro muestra foto, nombre, tier, OVR, badge de capitán
+  - **Solicitudes pendientes** (capitán): aceptar/rechazar con foto + nombre
+  - Menú opciones: editar equipo (nombre, descripción, deporte), eliminar, abandonar, expulsar miembro
+  - Toda acción vía `teamService` con validaciones de ownership
 
-### 3. Gestión de Personal (Staff)
-*   **Directorio Local**: Creación y edición de perfiles para recepcionistas y personal de campo.
-*   **Asignación de Roles**: Definición de quién puede ver ingresos y quién solo puede gestionar el calendario.
+### Estadísticas (`/player/estadisticas`)
+- Rango actual con barra de progreso
+- Datos físicos (altura, peso, pie dominante)
+- Cómo ganar XP (reglas del sistema de gamificación)
+- Bitácora de partidos y logros con tabs
+- Registro manual de estadísticas internas (goles, asistencias, MVP, equipos)
 
----
+### Billetera (`/player/billetera`)
+- Historial de transacciones
+- Cupones disponibles
+- Saldo y método de pago preferido
 
-## 💼 ROL: RECEPCIONISTA / STAFF
-Perfil operativo centrado en el día a día del recinto.
+### Reporte (`/player/reporte`)
+- Formulario de incidencia con: asunto, categoría (Bug, Pago, Sugerencia, Soporte, Otro), prioridad, pantalla, descripción, pasos
+- Diagnóstico automático (navegador, usuario, rol)
+- Historial de reportes del usuario
 
-### 1. Gestión de Reservas (Booking Core)
-*   **Vista de Calendario**: Interfaz visual para ver el estado de todas las canchas en tiempo real.
-*   **Check-in y Pagos**: Marcado de asistencia y procesamiento de pagos presenciales.
-*   **Cobro de Garantías**: Gestión de depósitos previos para asegurar la reserva.
+## Rol: Owner / Admin (`/dashboard/*`)
 
-### 2. Atención al Cliente (CRM Básico)
-*   **Base de Usuarios**: Búsqueda rápida de clientes frecuentes y visualización de deudas pendientes.
-*   **Notificaciones**: Envío de confirmaciones vía correo o alertas internas.
+### Dashboard General
+- KPIs: ingresos, reservas, ocupación, miembros
+- Gráficos de área y línea con filtros por período
+- Tarjetas de métricas (TarjetaKpi + PanelGlass con glassmorphism)
 
----
+### Recintos (Tenants)
+- CRUD completo con imagen, coordenadas, región/comuna, plan, owner
+- Modal de creación con selección de owners y planes SaaS (Free/Básico/Pro/Elite)
+- Estados: Activo/Suspendido, deuda
 
-## ⚽ ROL: CLIENTE / JUGADOR
-Usuario final que busca y reserva canchas mediante la aplicación móvil o web.
+### Configuración de Recinto (Complex Settings)
+- Identidad: nombre, descripción, dirección
+- Legal: razón social, RUT, representante legal, giro
+- Contacto: WhatsApp, Instagram, sitio web
+- Pasarelas de pago: Transbank (código comercio + API key), Mercado Pago
+- Amenidades: WiFi, Parking, Duchas, Luz LED, Café, Pro Shop
+- Reglas: lista de 13 reglas toggle
+- Horarios: openTime / closeTime
 
-### 1. Búsqueda y Filtros
-*   Localización de complejos deportivos más cercanos o por deporte (Tenis, Padel, Fútbol).
-*   Visualización de fotos reales de las canchas y servicios (Duchas, Estacionamiento, Cafetería).
+### Canchas (Courts)
+- CRUD de canchas por recinto
+- Configuración semanal (7 días con isOpen + open/close)
+- Matrix de precios por deporte (weekday / weekend por hora)
+- Sports disponibles (Futbol, Futbolito, Padel, Tenis, Basquetbol, Voleibol)
+- Galería de imágenes (hasta 6)
 
-### 2. Flujo de Reserva
-*   **Selección de Horario**: Vista de disponibilidad real.
-*   **Pago Seguro**: Pago integrado vía Mercado Pago o Stripe.
-*   **Mis Reservas**: Historial de juegos pasados y próximos encuentros con código QR para ingreso.
+### Personal (Staff)
+- CRUD de miembros del staff con autenticación
+- Roles y permisos por recinto
 
----
+### Calendario
+- Vista general de reservas por cancha/día
+- Check-in / Check-out con marcación de asistencia
+- Gestión de No-Show (Inasistencia)
 
-## 📈 DOCUMENTACIÓN TÉCNICA GENERAL
-*   **Firebase Integration**: Sincronización en tiempo real para evitar reservas duplicadas (Overbooking).
-*   **Responsive UI**: Optimizado para Tablets de recepción y móviles de jugadores.
-*   **CLP Standard**: Todo el sistema financiero opera bajo el estándar de moneda completa para Chile.
+### Finanzas
+- Ingresos por recinto, comisiones, facturación
+- Gráficos históricos con filtros
+
+### Usuarios
+- Listado de jugadores con perfil, estadísticas, historial
+- Analytics: gráficos de crecimiento, retención, deportes populares
+
+### Marcas (Gamification)
+- Configuración de XP, tiers, badges (bronze/silver/gold thresholds)
+- Reglas de gamificación
+
+### Torneos / Academias
+- Gestión de torneos (Coming Soon)
+- Gestión de academias/clases
+
+### Auditoría
+- Logs inmutables con prioridad (CRITICAL, HIGH, LOW)
+- Trazabilidad: quién, qué, cuándo
+
+### Configuración Global
+- Planes SaaS (nombre, precio, features como SEO, analytics, marketing, API)
+- Pasarelas globales (Mercado Pago, Webpay, SII)
+- Staff directivo global
+- Comisiones del sistema

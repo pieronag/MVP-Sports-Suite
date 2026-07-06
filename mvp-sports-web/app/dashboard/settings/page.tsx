@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from 'react';
 import {
     Cog6ToothIcon, CurrencyDollarIcon, ServerIcon, GlobeAltIcon, UsersIcon,
@@ -280,11 +280,11 @@ export default function SettingsPage() {
                     </h1>
                 </div>
 
-                <div className="flex items-center gap-3 p-1.5 rounded-2xl">
+                <div className="flex items-center gap-3 p-1.5 rounded-[14px]">
                     <button 
                         onClick={handleSave} 
                         disabled={saving || isExecuting} 
-                        className="px-10 py-3 bg-emerald-500 text-white dark:text-slate-950 font-black text-[10px] uppercase tracking-[0.2em] rounded-xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/30 flex items-center gap-3 disabled:opacity-50 border-none"
+                        className="px-10 py-3 bg-emerald-500 text-white dark:text-slate-950 font-black text-[10px] uppercase tracking-[0.2em] rounded-[14px] transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/30 flex items-center gap-3 disabled:opacity-50 border-none"
                     >
                         {saving ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <CheckBadgeIcon className="w-4 h-4" />} 
                         GUARDAR CAMBIOS
@@ -298,7 +298,7 @@ export default function SettingsPage() {
                     <button 
                         key={t.id} 
                         onClick={() => setActiveTab(t.id)} 
-                        className={`flex items-center gap-2.5 px-5 py-2.5 rounded-xl border text-[10px] font-black uppercase transition-all shrink-0 ${
+                        className={`flex items-center gap-2.5 px-5 py-2.5 rounded-[14px] border text-[10px] font-black uppercase transition-all shrink-0 ${
                             activeTab === t.id 
                             ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/20' 
                             : 'bg-white dark:bg-white/5 border-slate-100 dark:border-white/5 text-slate-400 hover:text-slate-600 dark:hover:text-white'
@@ -315,7 +315,7 @@ export default function SettingsPage() {
                         <HeaderSeccion titulo="Modelos de Monetización" desc="Gestión de planes SaaS y comisiones transaccionales." />
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {settings.plans.map((p, idx) => (
-                                <div key={p.id} className="p-6 rounded-2xl bg-white dark:bg-[#0B0F19] border border-slate-100 dark:border-white/5 shadow-sm transition-all group relative overflow-hidden hover:scale-[1.01]">
+                                <div key={p.id} className="p-6 rounded-[14px] bg-white dark:bg-[#0B0F19] border border-slate-100 dark:border-white/5 shadow-sm transition-all group relative overflow-hidden hover:scale-[1.01]">
                                     {/* Fondo decorativo */}
                                     <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl -mr-12 -mt-12 group-hover:bg-emerald-500/10 transition-colors"></div>
                                     
@@ -329,7 +329,7 @@ export default function SettingsPage() {
                                         </div>
                                         <div className="text-right">
                                             <div className="flex flex-col items-end">
-                                                <div className="flex items-center gap-1 bg-slate-50 dark:bg-black/40 px-3 py-1.5 rounded-xl border border-slate-100 dark:border-white/5">
+                                                <div className="flex items-center gap-1 bg-slate-50 dark:bg-black/40 px-3 py-1.5 rounded-[14px] border border-slate-100 dark:border-white/5">
                                                     <span className="text-[10px] font-black text-emerald-500">$</span>
                                                     <input 
                                                         type="number" 
@@ -344,14 +344,14 @@ export default function SettingsPage() {
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-3 mb-8 relative z-10">
-                                        <div className="p-4 bg-slate-50 dark:bg-black/40 rounded-2xl border border-slate-100 dark:border-white/5 group/input hover:border-emerald-500/30 transition-all">
+                                        <div className="p-4 bg-slate-50 dark:bg-black/40 rounded-[14px] border border-slate-100 dark:border-white/5 group/input hover:border-emerald-500/30 transition-all">
                                             <p className="text-[7px] font-black text-slate-400 uppercase mb-1.5 tracking-widest leading-none">Comisión %</p>
                                             <div className="flex items-center gap-1">
                                                 <span className="text-emerald-500 font-black text-[10px]">%</span>
                                                 <input type="number" step="0.1" value={p.commission} onChange={e => { const np = [...settings.plans]; np[idx].commission = parseFloat(e.target.value); setSettings({...settings, plans: np}); }} className="w-full bg-transparent text-xs font-black outline-none text-slate-900 dark:text-white" />
                                             </div>
                                         </div>
-                                        <div className="p-4 bg-slate-50 dark:bg-black/40 rounded-2xl border border-slate-100 dark:border-white/5 group/input hover:border-indigo-500/30 transition-all">
+                                        <div className="p-4 bg-slate-50 dark:bg-black/40 rounded-[14px] border border-slate-100 dark:border-white/5 group/input hover:border-indigo-500/30 transition-all">
                                             <p className="text-[7px] font-black text-slate-400 uppercase mb-1.5 tracking-widest leading-none">Ranking Score</p>
                                             <div className="flex items-center gap-1">
                                                 <BoltIcon className="w-2.5 h-2.5 text-indigo-500" />
@@ -365,7 +365,7 @@ export default function SettingsPage() {
                                         {benefitCatalog.map(b => (
                                             <div key={b.key} className="flex items-center justify-between group/item">
                                                 <div className={`flex items-center gap-3 transition-all ${p.features?.[b.key] ? 'text-slate-900 dark:text-white' : 'text-slate-300 dark:text-white/10'}`}>
-                                                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${p.features?.[b.key] ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-50 dark:bg-white/5'}`}>{b.icon}</div>
+                                                    <div className={`w-6 h-6 rounded-[14px] flex items-center justify-center transition-all ${p.features?.[b.key] ? 'bg-emerald-500/10 text-emerald-500' : 'bg-slate-50 dark:bg-white/5'}`}>{b.icon}</div>
                                                     <span className="text-[9px] font-black uppercase tracking-tight">{b.label}</span>
                                                 </div>
                                                 <button 
@@ -390,13 +390,13 @@ export default function SettingsPage() {
                     <div className="space-y-10 animate-fadeIn">
                         <HeaderSeccion titulo="Protocolos Fiscales" desc="Gestión automatizada de tributos y canales de pago." />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                            <div className="p-10 rounded-[2.5rem] bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-white/5 space-y-8">
+                            <div className="p-10 rounded-[14px] bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-white/5 space-y-8">
                                 <div className="flex items-center gap-4 mb-2">
-                                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500"><CpuChipIcon className="w-5 h-5" /></div>
+                                    <div className="w-8 h-8 rounded-[14px] bg-emerald-500/10 flex items-center justify-center text-emerald-500"><CpuChipIcon className="w-5 h-5" /></div>
                                     <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest leading-none">Integración SII Automática</h4>
                                 </div>
                                 <div className="space-y-6">
-                                    <div className="flex items-center justify-between bg-white dark:bg-white/5 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm group hover:border-emerald-500/30 transition-all">
+                                    <div className="flex items-center justify-between bg-white dark:bg-white/5 p-5 rounded-[14px] border border-slate-100 dark:border-white/5 shadow-sm group hover:border-emerald-500/30 transition-all">
                                         <div>
                                             <p className="text-[10px] font-black uppercase tracking-tight text-slate-900 dark:text-white">Estado de Integración</p>
                                             <p className="text-[8px] font-black text-slate-400 uppercase mt-1">Habilitar motor DTE global</p>
@@ -406,7 +406,7 @@ export default function SettingsPage() {
                                         </button>
                                     </div>
 
-                                    <div className="flex items-center justify-between bg-white dark:bg-white/5 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm group hover:border-amber-500/30 transition-all">
+                                    <div className="flex items-center justify-between bg-white dark:bg-white/5 p-5 rounded-[14px] border border-slate-100 dark:border-white/5 shadow-sm group hover:border-amber-500/30 transition-all">
                                         <div>
                                             <p className="text-[10px] font-black uppercase tracking-tight text-slate-900 dark:text-white">Modo de Certificación</p>
                                             <p className="text-[8px] font-black text-slate-400 uppercase mt-1">Ambiente de pruebas (Sandbox)</p>
@@ -416,7 +416,7 @@ export default function SettingsPage() {
                                         </button>
                                     </div>
 
-                                    <div className="flex items-center justify-between bg-white dark:bg-white/5 p-5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm group hover:border-emerald-500/30 transition-all">
+                                    <div className="flex items-center justify-between bg-white dark:bg-white/5 p-5 rounded-[14px] border border-slate-100 dark:border-white/5 shadow-sm group hover:border-emerald-500/30 transition-all">
                                         <div>
                                             <p className="text-[10px] font-black uppercase tracking-tight text-slate-900 dark:text-white">Facturación Multi-Tenant</p>
                                             <p className="text-[8px] font-black text-slate-400 uppercase mt-1">Permitir DTE a todos los recintos</p>
@@ -429,25 +429,25 @@ export default function SettingsPage() {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-2">RUT Corporativo</label>
-                                            <input type="text" value={settings.sii.rutEmpresa} onChange={e => updateNested('sii', 'rutEmpresa', e.target.value)} className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-xl px-4 py-2.5 text-xs font-black outline-none focus:ring-2 ring-emerald-500/20" />
+                                            <input type="text" value={settings.sii.rutEmpresa} onChange={e => updateNested('sii', 'rutEmpresa', e.target.value)} className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-[14px] px-4 py-2.5 text-xs font-black outline-none focus:ring-2 ring-emerald-500/20" />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-2">Tasa IVA %</label>
-                                            <input type="number" value={settings.sii.taxRate} onChange={e => updateNested('sii', 'taxRate', parseInt(e.target.value))} className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-xl px-4 py-2.5 text-xs font-black outline-none focus:ring-2 ring-emerald-500/20" />
+                                            <input type="number" value={settings.sii.taxRate} onChange={e => updateNested('sii', 'taxRate', parseInt(e.target.value))} className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-[14px] px-4 py-2.5 text-xs font-black outline-none focus:ring-2 ring-emerald-500/20" />
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="p-10 rounded-[2.5rem] bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-white/5 space-y-8">
+                            <div className="p-10 rounded-[14px] bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-white/5 space-y-8">
                                 <div className="flex items-center gap-4 mb-2">
-                                    <div className="w-8 h-8 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500"><CreditCardIcon className="w-5 h-5" /></div>
+                                    <div className="w-8 h-8 rounded-[14px] bg-indigo-500/10 flex items-center justify-center text-indigo-500"><CreditCardIcon className="w-5 h-5" /></div>
                                     <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest leading-none">Pasarelas Activas</h4>
                                 </div>
                                 <div className="space-y-4">
                                     {[['mercadoPago', 'Mercado Pago', 'mercado_pago_logo'], ['webpay', 'Transbank Webpay', 'webpay_logo']].map(([id, label, img]) => (
-                                        <div key={id} className="flex items-center justify-between p-6 bg-white dark:bg-white/5 rounded-[2rem] border border-slate-100 dark:border-white/5 shadow-sm group hover:border-indigo-500/30 transition-all">
+                                        <div key={id} className="flex items-center justify-between p-6 bg-white dark:bg-white/5 rounded-[14px] border border-slate-100 dark:border-white/5 shadow-sm group hover:border-indigo-500/30 transition-all">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 bg-slate-50 dark:bg-black/40 rounded-xl flex items-center justify-center opacity-50 group-hover:opacity-100 transition-all"><CurrencyDollarIcon className="w-5 h-5 text-indigo-500" /></div>
+                                                <div className="w-10 h-10 bg-slate-50 dark:bg-black/40 rounded-[14px] flex items-center justify-center opacity-50 group-hover:opacity-100 transition-all"><CurrencyDollarIcon className="w-5 h-5 text-indigo-500" /></div>
                                                 <p className="text-[10px] font-black uppercase text-slate-900 dark:text-white">{label}</p>
                                             </div>
                                             <button onClick={() => updateNested('paymentGateways', id, !settings.paymentGateways[id as keyof typeof settings.paymentGateways])} className={`w-12 h-6 rounded-full relative transition-all ${settings.paymentGateways[id as keyof typeof settings.paymentGateways] ? 'bg-indigo-600 shadow-indigo-500/40' : 'bg-slate-300 dark:bg-white/10'}`}><div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-md ${settings.paymentGateways[id as keyof typeof settings.paymentGateways] ? 'right-1' : 'left-1'}`}></div></button>
@@ -464,16 +464,16 @@ export default function SettingsPage() {
                         <HeaderSeccion titulo="ADN Corporativo" desc="Personalización de marca y estructura legal del sistema." />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-4">
-                                <div className="p-6 bg-slate-50 dark:bg-black/20 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
+                                <div className="p-6 bg-slate-50 dark:bg-black/20 rounded-[14px] border border-slate-100 dark:border-white/5 shadow-sm">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block pl-1">Marca de Plataforma</label>
-                                    <input type="text" value={settings.platformName} onChange={e => setSettings({...settings, platformName: e.target.value})} className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-xl px-4 py-3 text-xs font-black outline-none focus:ring-2 ring-emerald-500/20 text-slate-900 dark:text-white" />
+                                    <input type="text" value={settings.platformName} onChange={e => setSettings({...settings, platformName: e.target.value})} className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-[14px] px-4 py-3 text-xs font-black outline-none focus:ring-2 ring-emerald-500/20 text-slate-900 dark:text-white" />
                                 </div>
-                                <div className="p-6 bg-slate-50 dark:bg-black/20 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm">
+                                <div className="p-6 bg-slate-50 dark:bg-black/20 rounded-[14px] border border-slate-100 dark:border-white/5 shadow-sm">
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block pl-1">Soporte Central</label>
-                                    <input type="email" value={settings.supportEmail} onChange={e => setSettings({...settings, supportEmail: e.target.value})} className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-xl px-4 py-3 text-xs font-black outline-none focus:ring-2 ring-emerald-500/20 text-slate-900 dark:text-white" />
+                                    <input type="email" value={settings.supportEmail} onChange={e => setSettings({...settings, supportEmail: e.target.value})} className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-[14px] px-4 py-3 text-xs font-black outline-none focus:ring-2 ring-emerald-500/20 text-slate-900 dark:text-white" />
                                 </div>
                             </div>
-                            <div className="p-6 bg-slate-50 dark:bg-black/20 rounded-2xl border border-slate-100 dark:border-white/5 space-y-4">
+                            <div className="p-6 bg-slate-50 dark:bg-black/20 rounded-[14px] border border-slate-100 dark:border-white/5 space-y-4">
                                 <div className="flex items-center gap-3 mb-2">
                                     <BriefcaseIcon className="w-4 h-4 text-emerald-500" />
                                     <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest">Entidad Legal</h4>
@@ -481,7 +481,7 @@ export default function SettingsPage() {
                                 {[['rut', 'Número de RUT'], ['razonSocial', 'Razón Social Oficial'], ['direccion', 'Domicilio Legal']].map(([key, label]) => (
                                     <div key={key}>
                                         <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1.5 block pl-1">{label}</label>
-                                        <input type="text" value={settings.corporateData[key as keyof typeof settings.corporateData]} onChange={e => updateNested('corporateData', key, e.target.value)} className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-xl px-4 py-2.5 text-xs font-bold outline-none text-slate-700 dark:text-slate-200 focus:border-indigo-500/40" />
+                                        <input type="text" value={settings.corporateData[key as keyof typeof settings.corporateData]} onChange={e => updateNested('corporateData', key, e.target.value)} className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-[14px] px-4 py-2.5 text-xs font-bold outline-none text-slate-700 dark:text-slate-200 focus:border-indigo-500/40" />
                                     </div>
                                 ))}
                             </div>
@@ -493,21 +493,21 @@ export default function SettingsPage() {
                     <div className="space-y-10 animate-fadeIn">
                         <HeaderSeccion titulo="Staff Directivo" desc="Jerarquía y privilegios de acceso al núcleo administrativo." />
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                            <div className="md:col-span-1 p-6 rounded-2xl bg-indigo-600 shadow-xl shadow-indigo-500/10 h-fit">
+                            <div className="md:col-span-1 p-6 rounded-[14px] bg-indigo-600 shadow-xl shadow-indigo-500/10 h-fit">
                                 <div className="flex items-center gap-3 mb-4">
                                     <CheckBadgeIcon className="w-5 h-5 text-white" />
                                     <h4 className="text-[11px] font-black text-indigo-100 uppercase tracking-widest leading-none">Elevar Privilegios</h4>
                                 </div>
                                 <div className="space-y-3">
-                                    <input type="email" value={promoEmail} onChange={e => setPromoEmail(e.target.value)} className="w-full bg-white/10 border-none rounded-xl px-4 py-3 text-[11px] font-black placeholder-indigo-300 text-white outline-none focus:ring-2 ring-white/20" placeholder="email@mvp.cl" />
-                                    <button onClick={promoteUser} disabled={saving} className="w-full py-3 bg-white text-indigo-600 rounded-xl text-[10px] font-black uppercase active:scale-95 shadow-lg hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2">Asignar Rango <ArrowUpRightIcon className="w-3.5 h-3.5" /></button>
+                                    <input type="email" value={promoEmail} onChange={e => setPromoEmail(e.target.value)} className="w-full bg-white/10 border-none rounded-[14px] px-4 py-3 text-[11px] font-black placeholder-indigo-300 text-white outline-none focus:ring-2 ring-white/20" placeholder="email@mvp.cl" />
+                                    <button onClick={promoteUser} disabled={saving} className="w-full py-3 bg-white text-indigo-600 rounded-[14px] text-[10px] font-black uppercase active:scale-95 shadow-lg hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2">Asignar Rango <ArrowUpRightIcon className="w-3.5 h-3.5" /></button>
                                 </div>
                             </div>
                             <div className="md:col-span-2 space-y-4">
                                 {adminTeam.map(a => (
-                                    <div key={a.uid} className="flex items-center justify-between p-5 bg-white dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm group hover:border-emerald-500/20 transition-all">
+                                    <div key={a.uid} className="flex items-center justify-between p-5 bg-white dark:bg-white/5 rounded-[14px] border border-slate-100 dark:border-white/5 shadow-sm group hover:border-emerald-500/20 transition-all">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-black/40 flex items-center justify-center text-slate-400 group-hover:text-emerald-500 transition-colors shadow-inner"><UserCircleIcon className="w-6 h-6" /></div>
+                                            <div className="w-10 h-10 rounded-[14px] bg-slate-50 dark:bg-black/40 flex items-center justify-center text-slate-400 group-hover:text-emerald-500 transition-colors shadow-inner"><UserCircleIcon className="w-6 h-6" /></div>
                                             <div>
                                                 <p className="text-[11px] font-black text-slate-900 dark:text-white uppercase leading-none mb-1">{a.fullName || 'Administrador'}</p>
                                                 <p className="text-[9px] font-bold text-slate-400 font-mono">{a.email}</p>
@@ -515,7 +515,7 @@ export default function SettingsPage() {
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest shadow-sm ${a.role === 'superadmin' ? 'bg-indigo-600 text-white' : 'bg-emerald-500 text-white'}`}>{a.role}</span>
-                                            <button className="p-2 text-slate-200 hover:text-red-500 transition-colors rounded-xl hover:bg-red-50 dark:hover:bg-red-500/10"><TrashIcon className="w-4 h-4" /></button>
+                                            <button className="p-2 text-slate-200 hover:text-red-500 transition-colors rounded-[14px] hover:bg-red-50 dark:hover:bg-red-500/10"><TrashIcon className="w-4 h-4" /></button>
                                         </div>
                                     </div>
                                 ))}
@@ -530,35 +530,35 @@ export default function SettingsPage() {
                     <div className="space-y-10 animate-fadeIn">
                         <HeaderSeccion titulo="Comandos Estructurales" desc="Control nuclear y mantenimiento preventivo de bajo nivel." />
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <div className="p-8 rounded-2xl bg-emerald-500 shadow-xl shadow-emerald-500/10 text-center space-y-6 relative overflow-hidden group">
+                            <div className="p-8 rounded-[14px] bg-emerald-500 shadow-xl shadow-emerald-500/10 text-center space-y-6 relative overflow-hidden group">
                                 <CircleStackIcon className="w-12 h-12 text-white mx-auto relative z-10" />
                                 <div className="relative z-10">
                                     <h4 className="text-xs font-black uppercase text-white tracking-widest">Snapshot Estructural</h4>
                                     <p className="text-[9px] font-black text-emerald-100 mt-1.5 uppercase opacity-70">Respaldo Total Cloud</p>
                                 </div>
-                                <button onClick={runBackup} className="w-full py-4 bg-white text-emerald-600 rounded-xl text-[10px] font-black uppercase shadow-lg active:scale-95 transition-all relative z-10 hover:bg-emerald-50">Ejecutar Backup</button>
+                                <button onClick={runBackup} className="w-full py-4 bg-white text-emerald-600 rounded-[14px] text-[10px] font-black uppercase shadow-lg active:scale-95 transition-all relative z-10 hover:bg-emerald-50">Ejecutar Backup</button>
                                 <div className="absolute -bottom-6 -right-6 opacity-10 group-hover:scale-110 transition-transform">
                                     <CircleStackIcon className="w-32 h-32 text-white" />
                                 </div>
                             </div>
-                            <div className="p-8 rounded-2xl bg-amber-500 shadow-xl shadow-amber-500/10 text-center space-y-6 relative overflow-hidden group">
+                            <div className="p-8 rounded-[14px] bg-amber-500 shadow-xl shadow-amber-500/10 text-center space-y-6 relative overflow-hidden group">
                                 <ShieldExclamationIcon className="w-12 h-12 text-white mx-auto relative z-10" />
                                 <div className="relative z-10">
                                     <h4 className="text-xs font-black uppercase text-white tracking-widest">Acceso Restringido</h4>
                                     <p className="text-[9px] font-black text-amber-100 mt-1.5 uppercase opacity-70">Mantenimiento Global</p>
                                 </div>
-                                <button onClick={() => updateDoc(doc(db, 'settings', 'global'), { maintenanceMode: !settings.maintenanceMode })} className={`w-full py-4 rounded-xl text-[10px] font-black uppercase shadow-lg active:scale-95 transition-all relative z-10 ${settings.maintenanceMode ? 'bg-slate-900 text-white' : 'bg-white text-amber-600 hover:bg-amber-50'}`}>{settings.maintenanceMode ? 'Finalizar Protocolo' : 'Iniciar Protocolo'}</button>
+                                <button onClick={() => updateDoc(doc(db, 'settings', 'global'), { maintenanceMode: !settings.maintenanceMode })} className={`w-full py-4 rounded-[14px] text-[10px] font-black uppercase shadow-lg active:scale-95 transition-all relative z-10 ${settings.maintenanceMode ? 'bg-slate-900 text-white' : 'bg-white text-amber-600 hover:bg-amber-50'}`}>{settings.maintenanceMode ? 'Finalizar Protocolo' : 'Iniciar Protocolo'}</button>
                                 <div className="absolute -bottom-6 -right-6 opacity-10 group-hover:scale-110 transition-transform">
                                     <ShieldExclamationIcon className="w-32 h-32 text-white" />
                                 </div>
                             </div>
-                            <div className="p-8 rounded-2xl bg-slate-900 shadow-xl shadow-slate-900/20 text-center space-y-6 relative overflow-hidden group">
+                            <div className="p-8 rounded-[14px] bg-slate-900 shadow-xl shadow-slate-900/20 text-center space-y-6 relative overflow-hidden group">
                                 <TrashIcon className="w-12 h-12 text-red-500 mx-auto relative z-10" />
                                 <div className="relative z-10">
                                     <h4 className="text-xs font-black uppercase text-white tracking-widest">Purga de Datos</h4>
                                     <p className="text-[9px] font-black text-slate-400 mt-1.5 uppercase opacity-70">Reinicio Nuclear v0.0</p>
                                 </div>
-                                <button onClick={wipeData} className="w-full py-4 bg-red-600 text-white rounded-xl text-[10px] font-black uppercase shadow-lg shadow-red-600/20 active:scale-95 transition-all relative z-10 hover:bg-red-700">Purga Atómica</button>
+                                <button onClick={wipeData} className="w-full py-4 bg-red-600 text-white rounded-[14px] text-[10px] font-black uppercase shadow-lg shadow-red-600/20 active:scale-95 transition-all relative z-10 hover:bg-red-700">Purga Atómica</button>
                                 <div className="absolute -bottom-6 -right-6 opacity-5 group-hover:scale-110 transition-transform">
                                     <TrashIcon className="w-32 h-32 text-white" />
                                 </div>
@@ -571,16 +571,16 @@ export default function SettingsPage() {
             {/* MODAL ADN PREMIUM */}
             {modal.show && (
                 <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md animate-fadeIn" onClick={() => setModal(prev => ({...prev, show: false}))}>
-                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-md rounded-[3rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] border-2 border-slate-100 dark:border-white/10 p-12 text-center relative overflow-hidden" onClick={e => e.stopPropagation()}>
-                        <div className={`w-20 h-20 rounded-[2rem] mx-auto mb-8 flex items-center justify-center shadow-xl ${modal.type === 'danger' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'}`}>
+                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-md rounded-[14px] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] border-2 border-slate-100 dark:border-white/10 p-12 text-center relative overflow-hidden" onClick={e => e.stopPropagation()}>
+                        <div className={`w-20 h-20 rounded-[14px] mx-auto mb-8 flex items-center justify-center shadow-xl ${modal.type === 'danger' ? 'bg-red-500 text-white' : 'bg-emerald-500 text-white'}`}>
                             {modal.type === 'danger' ? <ExclamationTriangleIcon className="w-10 h-10" /> : <CheckBadgeIcon className="w-10 h-10" />}
                         </div>
                         <h3 className="text-2xl font-black uppercase text-slate-900 dark:text-white mb-3 tracking-tighter leading-none">{modal.title}</h3>
                         <p className="text-[11px] font-black text-slate-400 uppercase mb-10 leading-relaxed tracking-widest">{modal.message}</p>
                         {modal.type === 'confirm' || modal.type === 'danger' ? (
                             <div className="flex flex-col gap-4">
-                                <button onClick={() => { modal.onConfirm?.(); setModal(prev => ({...prev, show: false})); }} className={`w-full py-5 text-white rounded-[2rem] text-[10px] font-black uppercase shadow-2xl active:scale-95 transition-all ${modal.type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-900 dark:bg-emerald-600 hover:shadow-emerald-500/20'}`}>Ejecutar Protocolo</button>
-                                <button onClick={() => setModal(prev => ({...prev, show: false}))} className="w-full py-5 bg-slate-50 dark:bg-white/5 text-slate-400 rounded-[2rem] text-[10px] font-black uppercase transition-all hover:bg-slate-100 dark:hover:bg-white/10">Abortar Operación</button>
+                                <button onClick={() => { modal.onConfirm?.(); setModal(prev => ({...prev, show: false})); }} className={`w-full py-5 text-white rounded-[14px] text-[10px] font-black uppercase shadow-2xl active:scale-95 transition-all ${modal.type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-900 dark:bg-emerald-600 hover:shadow-emerald-500/20'}`}>Ejecutar Protocolo</button>
+                                <button onClick={() => setModal(prev => ({...prev, show: false}))} className="w-full py-5 bg-slate-50 dark:bg-white/5 text-slate-400 rounded-[14px] text-[10px] font-black uppercase transition-all hover:bg-slate-100 dark:hover:bg-white/10">Abortar Operación</button>
                             </div>
                         ) : null}
                     </div>

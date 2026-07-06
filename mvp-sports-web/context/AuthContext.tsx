@@ -4,8 +4,7 @@ import { onAuthStateChanged, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../services/firebase";
 
-// Tipos de roles permitidos
-export type UserRole = "superadmin" | "admin" | "owner" | "manager" | "staff" | null;
+export type UserRole = "superadmin" | "admin" | "owner" | "manager" | "staff" | "player" | null;
 
 interface AuthContextType {
   user: User | null;
@@ -49,23 +48,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Sincronizar cookie para el Middleware de Next.js
         document.cookie = "auth_session=true; path=/; max-age=31536000; SameSite=Lax";
 
-        // BUSCAR EL ROL EN FIRESTORE
         try {
-          const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+          let userDoc = await getDoc(doc(db, "users", currentUser.uid));
+          let foundRole: UserRole = null;
+          let foundUser: any = null;
           if (userDoc.exists()) {
-            setRole(userDoc.data().role as UserRole);
-            setFirestoreUser(userDoc.data());
+            foundRole = userDoc.data().role as UserRole;
+            foundUser = userDoc.data();
           } else {
-            console.warn("Usuario autenticado sin documento en Firestore. UID:", currentUser.uid);
-            setRole(null);
-            setFirestoreUser(null);
+            const profileDoc = await getDoc(doc(db, "profiles", currentUser.uid));
+            if (profileDoc.exists()) {
+              foundRole = (profileDoc.data().role || "player") as UserRole;
+              foundUser = profileDoc.data();
+            }
           }
+          setRole(foundRole);
+          setFirestoreUser(foundUser);
         } catch (error: any) {
           console.error("Error buscando rol:", error);
-          if (error.code === 'permission-denied') {
-            console.error("Error de permisos: El usuario no tiene acceso a su propio documento.");
-          }
           setRole(null);
+          setFirestoreUser(null);
         }
       } else {
         // Limpiar cookie y rol al cerrar sesión

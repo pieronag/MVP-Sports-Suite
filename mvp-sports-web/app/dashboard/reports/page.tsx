@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from 'react';
 import {
   MagnifyingGlassIcon,
@@ -236,7 +236,7 @@ export default function Page() {
             </h1>
           </div>
 
-          <div className="flex items-center gap-2 bg-white dark:bg-white/5 p-1.5 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
+          <div className="flex items-center gap-2 bg-white dark:bg-white/5 p-1.5 rounded-[14px] border border-slate-200 dark:border-white/5 shadow-sm">
             <BotonAccion 
               icon={<ArrowPathIcon className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />} 
               onClick={fetchTickets} 
@@ -263,16 +263,16 @@ export default function Page() {
             placeholder="BUSCAR TICKET..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-1.5 bg-slate-50 dark:bg-white/5 border border-transparent focus:border-emerald-500/30 rounded-lg text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white placeholder:text-slate-400 transition-all"
+            className="w-full pl-9 pr-4 py-1.5 bg-slate-50 dark:bg-white/5 border border-transparent focus:border-emerald-500/30 rounded-[14px] text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white placeholder:text-slate-400 transition-all"
           />
         </div>
 
-        <div className="flex bg-slate-50 dark:bg-white/5 p-1 rounded-xl">
+        <div className="flex bg-slate-50 dark:bg-white/5 p-1 rounded-[14px]">
           {['Abiertos', 'Críticos', 'Resueltos', 'Todos'].map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-lg transition-all ${filter === f ? "bg-white dark:bg-emerald-500 text-slate-900 shadow-sm" : "text-slate-400 hover:text-slate-600 dark:hover:text-white"}`}
+              className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-[14px] transition-all ${filter === f ? "bg-white dark:bg-emerald-500 text-slate-900 shadow-sm" : "text-slate-400 hover:text-slate-600 dark:hover:text-white"}`}
             >
               {f}
             </button>
@@ -283,14 +283,14 @@ export default function Page() {
       {/* 3. LISTA DE TICKETS - MODO CARDS PARA MOBILE/TABLET, TABLA PARA XL */}
       <div className="relative min-h-[400px]">
         {loading && (
-          <div className="absolute inset-0 bg-white/60 dark:bg-[#0B0F19]/60 z-30 flex flex-col items-center justify-center backdrop-blur-sm rounded-2xl border border-slate-200 dark:border-white/5">
+          <div className="absolute inset-0 bg-white/60 dark:bg-[#0B0F19]/60 z-30 flex flex-col items-center justify-center backdrop-blur-sm rounded-[14px] border border-slate-200 dark:border-white/5">
             <ArrowPathIcon className="w-8 h-8 text-emerald-500 animate-spin mb-4" />
             <p className="text-[10px] font-black uppercase text-slate-500 animate-pulse">Sincronizando reportes...</p>
           </div>
         )}
 
         {filteredTickets.length === 0 && !loading && (
-          <div className="flex flex-col items-center justify-center py-32 text-slate-400 opacity-60 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-2xl bg-slate-50/50 dark:bg-white/[0.02]">
+          <div className="flex flex-col items-center justify-center py-32 text-slate-400 opacity-60 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-[14px] bg-slate-50/50 dark:bg-white/[0.02]">
             <TicketIcon className="w-16 h-16 mx-auto mb-4 stroke-1" />
             <p className="text-[10px] font-black uppercase tracking-[0.2em]">Sín reportes registrados</p>
           </div>
@@ -299,11 +299,11 @@ export default function Page() {
         {/* VISTA CARDS (IPAD / MOBILE) */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:hidden gap-4">
           {filteredTickets.map(t => (
-            <div key={t.id} className="bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 rounded-2xl p-5 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between group">
+            <div key={t.id} className="bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 rounded-[14px] p-5 shadow-sm hover:shadow-lg transition-all flex flex-col justify-between group">
               <div>
                 <div className="flex justify-between items-start mb-4">
-                  <span className="text-[9px] font-black font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-100 dark:border-emerald-500/20">#{t.id.slice(0, 8)}</span>
-                  <span className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase border ${getStatusBadge(t.status)}`}>{t.status}</span>
+                  <span className="text-[9px] font-black font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-[14px] border border-emerald-100 dark:border-emerald-500/20">#{t.id.slice(0, 8)}</span>
+                  <span className={`px-2 py-1 rounded-[14px] text-[8px] font-black uppercase border ${getStatusBadge(t.status)}`}>{t.status}</span>
                 </div>
                 <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase leading-tight mb-1 group-hover:text-emerald-500 transition-colors">{t.subject}</h4>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mb-4 leading-relaxed font-medium">{t.desc}</p>
@@ -315,7 +315,7 @@ export default function Page() {
                     <UserCircleIcon className="w-4 h-4 text-slate-400" />
                     <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase">{t.tenant}</span>
                   </div>
-                  <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase border ${getPriorityStyle(t.priority)}`}>{t.priority}</span>
+                  <span className={`px-2 py-0.5 rounded-[14px] text-[8px] font-black uppercase border ${getPriorityStyle(t.priority)}`}>{t.priority}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -325,7 +325,7 @@ export default function Page() {
                   {t.status !== 'Resuelto' && (
                     <button 
                       onClick={() => handleOpenManageModal(t)}
-                      className="px-5 py-2 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 shadow-xl"
+                      className="px-5 py-2 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-[14px] transition-all active:scale-95 shadow-xl"
                     >
                       Gestionar
                     </button>
@@ -337,7 +337,7 @@ export default function Page() {
         </div>
 
         {/* VISTA TABLA (XL+ DESKTOP) */}
-        <div className="hidden xl:block rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden bg-white dark:bg-[#0B0F19] shadow-sm relative">
+        <div className="hidden xl:block rounded-[14px] border border-slate-200 dark:border-white/5 overflow-hidden bg-white dark:bg-[#0B0F19] shadow-sm relative">
           <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5">
             <h3 className="text-[10px] font-black text-slate-700 dark:text-white uppercase tracking-widest flex items-center gap-2">
               <TicketIcon className="w-3.5 h-3.5 text-emerald-500" />
@@ -435,7 +435,7 @@ export default function Page() {
                       {t.status !== 'Resuelto' && (
                         <button 
                           onClick={() => handleOpenManageModal(t)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400 text-[10px] font-bold uppercase transition-all shadow-sm"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[14px] bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400 text-[10px] font-bold uppercase transition-all shadow-sm"
                         >
                           Gestionar
                         </button>
@@ -459,12 +459,12 @@ export default function Page() {
       {/* MODAL DE GESTIÓN */}
       {modalOpen && selectedTicket && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-white dark:bg-[#0B0F19] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-2xl overflow-hidden animate-fadeIn text-left">
+          <div className="bg-white dark:bg-[#0B0F19] rounded-[14px] shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-2xl overflow-hidden animate-fadeIn text-left">
             
             {/* Cabecera del Modal */}
             <div className="flex items-center justify-between px-6 py-4 bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400">
+                <div className="p-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-[14px] text-emerald-600 dark:text-emerald-400">
                   <WrenchIcon className="w-5 h-5" />
                 </div>
                 <div>
@@ -486,7 +486,7 @@ export default function Page() {
             <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
               
               {/* Información del Reportante y Recinto */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 dark:bg-white/[0.02] p-4 rounded-xl border border-slate-100 dark:border-white/5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 dark:bg-white/[0.02] p-4 rounded-[14px] border border-slate-100 dark:border-white/5">
                 <div className="space-y-2">
                   <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400 font-bold">Información del Cliente</h4>
                   <div className="text-[11px] space-y-1">
@@ -533,13 +533,13 @@ export default function Page() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Descripción del Problema</h4>
-                    <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3.5 text-xs text-slate-700 dark:text-slate-300 font-medium whitespace-pre-line leading-relaxed max-h-32 overflow-y-auto">
+                    <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[14px] p-3.5 text-xs text-slate-700 dark:text-slate-300 font-medium whitespace-pre-line leading-relaxed max-h-32 overflow-y-auto">
                       {selectedTicket.desc}
                     </div>
                   </div>
                   <div>
                     <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Pasos para Reproducir</h4>
-                    <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3.5 text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-pre-line leading-relaxed max-h-32 overflow-y-auto">
+                    <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[14px] p-3.5 text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-pre-line leading-relaxed max-h-32 overflow-y-auto">
                       {selectedTicket.stepsToReproduce}
                     </div>
                   </div>
@@ -550,25 +550,25 @@ export default function Page() {
               <div className="space-y-2">
                 <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400">Detalles del Entorno Técnico</h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-                  <div className="bg-slate-50 dark:bg-[#0E1322] p-2.5 rounded-lg border border-slate-200 dark:border-white/5 text-center">
+                  <div className="bg-slate-50 dark:bg-[#0E1322] p-2.5 rounded-[14px] border border-slate-200 dark:border-white/5 text-center">
                     <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Sistema Operativo</p>
                     <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase">{selectedTicket.os || 'Desconocido'}</p>
                   </div>
-                  <div className="bg-slate-50 dark:bg-[#0E1322] p-2.5 rounded-lg border border-slate-200 dark:border-white/5 text-center">
+                  <div className="bg-slate-50 dark:bg-[#0E1322] p-2.5 rounded-[14px] border border-slate-200 dark:border-white/5 text-center">
                     <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Navegador Web</p>
                     <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase truncate" title={selectedTicket.browser}>{selectedTicket.browser || 'Desconocido'}</p>
                   </div>
-                  <div className="bg-slate-50 dark:bg-[#0E1322] p-2.5 rounded-lg border border-slate-200 dark:border-white/5 text-center">
+                  <div className="bg-slate-50 dark:bg-[#0E1322] p-2.5 rounded-[14px] border border-slate-200 dark:border-white/5 text-center">
                     <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Módulo / Pantalla</p>
                     <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase truncate" title={selectedTicket.screen}>{selectedTicket.screen || 'No especificada'}</p>
                   </div>
-                  <div className="bg-slate-50 dark:bg-[#0E1322] p-2.5 rounded-lg border border-slate-200 dark:border-white/5 text-center">
+                  <div className="bg-slate-50 dark:bg-[#0E1322] p-2.5 rounded-[14px] border border-slate-200 dark:border-white/5 text-center">
                     <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Tipo de Cliente</p>
                     <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase">Web Console</p>
                   </div>
                 </div>
                 {selectedTicket.userAgent && (
-                  <div className="p-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg text-[9px] font-mono text-slate-400 dark:text-slate-500 break-all select-all">
+                  <div className="p-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[14px] text-[9px] font-mono text-slate-400 dark:text-slate-500 break-all select-all">
                     UserAgent: {selectedTicket.userAgent}
                   </div>
                 )}
@@ -582,7 +582,7 @@ export default function Page() {
                     <select
                       value={ticketStatus}
                       onChange={(e) => setTicketStatus(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-bold outline-none text-slate-800 dark:text-white focus:border-emerald-500/50 transition-all font-bold"
+                      className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[14px] text-xs font-bold outline-none text-slate-800 dark:text-white focus:border-emerald-500/50 transition-all font-bold"
                     >
                       <option value="Abierto">Abierto</option>
                       <option value="En Proceso">En Proceso</option>
@@ -614,7 +614,7 @@ export default function Page() {
                     value={adminResponse}
                     onChange={(e) => setAdminResponse(e.target.value)}
                     placeholder="ESCRIBE LA RESPUESTA U OFICIO DE SOPORTE QUE SE MOSTRARÁ AL CLIENTE..."
-                    className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-bold outline-none text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 transition-all"
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[14px] text-xs font-bold outline-none text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 transition-all"
                     required
                   />
                 </div>
@@ -627,14 +627,14 @@ export default function Page() {
               <button
                 onClick={() => setModalOpen(false)}
                 disabled={saving}
-                className="px-5 py-2.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all disabled:opacity-50"
+                className="px-5 py-2.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase tracking-wider rounded-[14px] transition-all disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSaveManagement}
                 disabled={saving || !adminResponse.trim()}
-                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] uppercase rounded-xl tracking-wider transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+                className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] uppercase rounded-[14px] tracking-wider transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-emerald-500/20"
               >
                 {saving ? (
                   <>

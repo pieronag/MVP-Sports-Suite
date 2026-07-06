@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
@@ -291,7 +291,7 @@ export default function FinancePage() {
                     </h1>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 bg-white dark:bg-[#0B0F19] p-1.5 rounded-xl border border-slate-200 dark:border-white/5 shadow-lg">
+                <div className="flex flex-wrap items-center gap-3 bg-white dark:bg-[#0B0F19] p-1.5 rounded-[14px] border border-slate-200 dark:border-white/5 shadow-lg">
                     {/* Selectores */}
                     <div className="flex items-center gap-2 px-3 border-r border-slate-100 dark:border-white/5">
                         <select
@@ -314,7 +314,7 @@ export default function FinancePage() {
                         <select
                             value={selectedVenueId}
                             onChange={(e) => setSelectedVenueId(e.target.value)}
-                            className="bg-transparent border-none rounded-lg px-2 py-1 text-[11px] font-bold outline-none text-slate-700 dark:text-white uppercase cursor-pointer"
+                            className="bg-transparent border-none rounded-[14px] px-2 py-1 text-[11px] font-bold outline-none text-slate-700 dark:text-white uppercase cursor-pointer"
                         >
                             <option value="all">TODOS LOS RECINTOS</option>
                             {myVenues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
@@ -361,12 +361,12 @@ export default function FinancePage() {
             {/* TABLA ADN SIMPLIFICADA */}
             <PanelGlass className="border-none shadow-xl dark:shadow-none p-0 overflow-hidden">
                 <div className="p-6 bg-slate-50/50 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5 flex flex-col lg:flex-row justify-between items-center gap-4">
-                    <div className="flex bg-white dark:bg-[#020611] p-1 rounded-lg border border-slate-200 dark:border-white/10 w-full lg:w-auto">
+                    <div className="flex bg-white dark:bg-[#020611] p-1 rounded-[14px] border border-slate-200 dark:border-white/10 w-full lg:w-auto">
                         {(['all', 'reserva', 'torneo', 'pending'] as const).map((type) => (
                             <button 
                                 key={type}
                                 onClick={() => setFilterType(type)}
-                                className={`flex-1 lg:flex-none px-5 py-2 text-[10px] font-bold uppercase rounded-md transition-all ${
+                                className={`flex-1 lg:flex-none px-5 py-2 text-[10px] font-bold uppercase rounded-[14px] transition-all ${
                                     filterType === type 
                                     ? type === 'pending' 
                                         ? 'bg-amber-500 text-white dark:bg-amber-500 dark:text-slate-950'
@@ -386,7 +386,7 @@ export default function FinancePage() {
                             placeholder="BUSCAR CLIENTE O DETALLE..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-white dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-[11px] font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 uppercase tracking-tight"
+                            className="w-full bg-white dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-[14px] pl-10 pr-4 py-2.5 text-[11px] font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 uppercase tracking-tight"
                         />
                     </div>
                 </div>
@@ -449,15 +449,15 @@ export default function FinancePage() {
                                                 {(() => {
                                                     const ps = (t.paymentStatus || 'pending').toLowerCase();
                                                     if (t.type === 'torneo' || ps === 'paid') {
-                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 border border-emerald-500/10"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Pagado</div>;
+                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-[14px] text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 border border-emerald-500/10"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Pagado</div>;
                                                     } else if (ps === 'partial') {
-                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase text-sky-500 bg-sky-500/10 border border-sky-500/10"><div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>Parcial</div>;
+                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-[14px] text-[9px] font-bold uppercase text-sky-500 bg-sky-500/10 border border-sky-500/10"><div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>Parcial</div>;
                                                     } else if (ps === 'refunded') {
-                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase text-rose-500 bg-rose-500/10 border border-rose-500/10"><div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div>Reembolsado</div>;
+                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-[14px] text-[9px] font-bold uppercase text-rose-500 bg-rose-500/10 border border-rose-500/10"><div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div>Reembolsado</div>;
                                                     } else if (ps === 'no-show') {
-                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase text-red-500 bg-red-500/10 border border-red-500/10"><div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>No-Show</div>;
+                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-[14px] text-[9px] font-bold uppercase text-red-500 bg-red-500/10 border border-red-500/10"><div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>No-Show</div>;
                                                     } else {
-                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-[9px] font-bold uppercase text-amber-500 bg-amber-500/10 border border-amber-500/10"><div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>Pendiente</div>;
+                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-[14px] text-[9px] font-bold uppercase text-amber-500 bg-amber-500/10 border border-amber-500/10"><div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>Pendiente</div>;
                                                     }
                                                 })()}
                                             </div>

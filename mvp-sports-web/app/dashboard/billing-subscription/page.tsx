@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
@@ -162,7 +162,7 @@ export default function BillingPage() {
 
     return (
         <div className="w-full space-y-5 pb-10 text-left relative">
-            {toast && <div className={`fixed top-4 right-4 px-4 py-2.5 rounded-xl shadow-2xl text-[9px] font-black uppercase tracking-widest z-[300] text-white flex items-center gap-2 ${toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`}>{toast.msg}</div>}
+            {toast && <div className={`fixed top-4 right-4 px-4 py-2.5 rounded-[14px] shadow-2xl text-[9px] font-black uppercase tracking-widest z-[300] text-white flex items-center gap-2 ${toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`}>{toast.msg}</div>}
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/5">
                 <div>
@@ -172,7 +172,7 @@ export default function BillingPage() {
                     </div>
                     <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase leading-none">Pagos & <span className="text-emerald-500">Planes</span></h1>
                 </div>
-                <button onClick={() => setIsHistoryModalOpen(true)} className="px-6 py-2.5 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 active:scale-95"><DocumentTextIcon className="w-4 h-4 text-emerald-500" /> Historial de Pagos</button>
+                <button onClick={() => setIsHistoryModalOpen(true)} className="px-6 py-2.5 bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white rounded-[14px] text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 active:scale-95"><DocumentTextIcon className="w-4 h-4 text-emerald-500" /> Historial de Pagos</button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -181,7 +181,7 @@ export default function BillingPage() {
                 <TarjetaKpi titulo="Próximo Cobro" valor="Día 30" sub="FECHA ESTÁNDAR" icon={<CalendarIcon />} />
             </div>
 
-            <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10 flex items-center gap-4">
+            <div className="p-4 rounded-[14px] bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10 flex items-center gap-4">
                 <InformationCircleIcon className="w-6 h-6 text-emerald-500 shrink-0" />
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase leading-relaxed">Los cambios de plan se aplican el primer día del mes siguiente para mantener tu facturación ordenada.</p>
             </div>
@@ -193,7 +193,7 @@ export default function BillingPage() {
                         const isSelected = t.id === selectedTenantId;
                         const plan = plans.find(p => p.id === t.planId);
                         return (
-                            <div key={t.id} onClick={() => setSelectedTenantId(t.id)} className={`p-5 rounded-2xl border cursor-pointer transition-all ${isSelected ? 'border-emerald-500 bg-white dark:bg-[#0B0F19] shadow-lg ring-1 ring-emerald-500/20' : 'border-slate-100 dark:border-white/5 bg-white dark:bg-[#0B0F19] opacity-60 hover:opacity-100'}`}>
+                            <div key={t.id} onClick={() => setSelectedTenantId(t.id)} className={`p-5 rounded-[14px] border cursor-pointer transition-all ${isSelected ? 'border-emerald-500 bg-white dark:bg-[#0B0F19] shadow-lg ring-1 ring-emerald-500/20' : 'border-slate-100 dark:border-white/5 bg-white dark:bg-[#0B0F19] opacity-60 hover:opacity-100'}`}>
                                 <BuildingStorefrontIcon className={`w-8 h-8 mb-4 ${isSelected ? 'text-emerald-500' : 'text-slate-300'}`} />
                                 <h4 className="text-sm font-black uppercase text-slate-900 dark:text-white truncate">{t.name}</h4>
                                 <p className="text-[10px] font-bold text-emerald-500 uppercase mt-1">Plan {plan?.name || 'Básico'}</p>
@@ -204,7 +204,7 @@ export default function BillingPage() {
             </div>
 
             {activeTenant?.pendingPlanId && (
-                <div className="p-6 rounded-2xl bg-slate-900 text-white flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
+                <div className="p-6 rounded-[14px] bg-slate-900 text-white flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
                     <div className="flex items-center gap-4">
                         <SparklesIcon className="w-8 h-8 text-emerald-400" />
                         <div>
@@ -212,7 +212,7 @@ export default function BillingPage() {
                             <p className="text-[10px] font-bold opacity-70 uppercase">Pasarás al plan {activeTenant.pendingPlanName} el próximo mes.</p>
                         </div>
                     </div>
-                    <button onClick={cancelScheduledChange} className="px-5 py-2.5 bg-white text-slate-900 rounded-xl text-[10px] font-black uppercase active:scale-95">Deshacer Cambio</button>
+                    <button onClick={cancelScheduledChange} className="px-5 py-2.5 bg-white text-slate-900 rounded-[14px] text-[10px] font-black uppercase active:scale-95">Deshacer Cambio</button>
                 </div>
             )}
 
@@ -226,7 +226,7 @@ export default function BillingPage() {
                         {plans.map((p) => {
                             const isCurrent = activeTenant.planId === p.id;
                             return (
-                                <div key={p.id} className={`flex flex-col bg-white dark:bg-[#0B0F19] rounded-3xl border p-6 transition-all ${isCurrent ? 'border-emerald-500 ring-1 ring-emerald-500/20' : 'border-slate-100 dark:border-white/5 shadow-sm'}`}>
+                                <div key={p.id} className={`flex flex-col bg-white dark:bg-[#0B0F19] rounded-[14px] border p-6 transition-all ${isCurrent ? 'border-emerald-500 ring-1 ring-emerald-500/20' : 'border-slate-100 dark:border-white/5 shadow-sm'}`}>
                                     <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">{p.name}</h4>
                                     <div className="mb-6">
                                         <div className="flex items-baseline gap-1">
@@ -241,7 +241,7 @@ export default function BillingPage() {
                                             return <div key={key} className={`flex items-center gap-2 ${active ? 'text-slate-700 dark:text-slate-200' : 'text-slate-300 dark:text-slate-800'}`}><CheckCircleIcon className={`w-3.5 h-3.5 ${active ? 'text-emerald-500' : 'opacity-20'}`} /><span className="text-[9px] font-bold uppercase truncate">{FEATURE_LABELS[key].label}</span></div>
                                         })}
                                     </div>
-                                    <button onClick={() => !isCurrent && setConfirmModal({ isOpen: true, planId: p.id, planName: p.name })} disabled={isCurrent || processingPlan !== null} className={`w-full py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 ${isCurrent ? 'bg-slate-50 dark:bg-white/5 text-slate-400 border border-slate-100 dark:border-white/5' : 'bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 shadow-lg'}`}>{isCurrent ? 'Plan Actual' : 'Cambiar Plan'}</button>
+                                    <button onClick={() => !isCurrent && setConfirmModal({ isOpen: true, planId: p.id, planName: p.name })} disabled={isCurrent || processingPlan !== null} className={`w-full py-3.5 rounded-[14px] text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 ${isCurrent ? 'bg-slate-50 dark:bg-white/5 text-slate-400 border border-slate-100 dark:border-white/5' : 'bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 shadow-lg'}`}>{isCurrent ? 'Plan Actual' : 'Cambiar Plan'}</button>
                                 </div>
                             )
                         })}
@@ -251,7 +251,7 @@ export default function BillingPage() {
 
             {isHistoryModalOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={() => setIsHistoryModalOpen(false)}>
-                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-3xl rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-3xl rounded-[14px] shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
                         <div className="p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center">
                             <h3 className="text-xs font-black uppercase text-slate-900 dark:text-white">Historial de Pagos</h3>
                             <button onClick={() => setIsHistoryModalOpen(false)} className="text-slate-400"><XMarkIcon className="w-6 h-6" /></button>
@@ -264,7 +264,7 @@ export default function BillingPage() {
                                     </thead>
                                     <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-[10px] font-bold uppercase">
                                         {invoices.map(inv => (
-                                            <tr key={inv.id} className="text-slate-600 dark:text-slate-300"><td className="py-4">{inv.date.toLocaleDateString()}</td><td className="py-4">{inv.planName || 'Básico'}</td><td className="py-4 text-emerald-600">{formatPrice(inv.amount)}</td><td className="py-4 text-center"><button className="p-2 bg-slate-50 dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-900 transition-all"><ArrowDownTrayIcon className="w-4 h-4" /></button></td></tr>
+                                            <tr key={inv.id} className="text-slate-600 dark:text-slate-300"><td className="py-4">{inv.date.toLocaleDateString()}</td><td className="py-4">{inv.planName || 'Básico'}</td><td className="py-4 text-emerald-600">{formatPrice(inv.amount)}</td><td className="py-4 text-center"><button className="p-2 bg-slate-50 dark:bg-white/5 rounded-[14px] border border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-900 transition-all"><ArrowDownTrayIcon className="w-4 h-4" /></button></td></tr>
                                         ))}
                                     </tbody>
                                 </table>
@@ -276,12 +276,12 @@ export default function BillingPage() {
 
             {confirmModal?.isOpen && (
                 <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={() => setConfirmModal(null)}>
-                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 p-8 text-center" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-[14px] shadow-2xl border border-slate-200 dark:border-white/10 p-8 text-center" onClick={e => e.stopPropagation()}>
                         <h3 className="text-xl font-black uppercase text-slate-900 dark:text-white mb-2">Cambiar Suscripción</h3>
                         <p className="text-[10px] font-bold text-slate-400 uppercase mb-8 leading-relaxed">¿Deseas pasar al plan {confirmModal.planName}? El cambio se aplicará al inicio del próximo ciclo.</p>
                         <div className="flex flex-col gap-3">
-                            <button onClick={executePlanChange} className="w-full py-3.5 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-600/20 active:scale-95">Confirmar Cambio</button>
-                            <button onClick={() => setConfirmModal(null)} className="w-full py-3.5 bg-slate-50 dark:bg-white/5 text-slate-400 rounded-xl text-[10px] font-black uppercase">Cancelar</button>
+                            <button onClick={executePlanChange} className="w-full py-3.5 bg-emerald-600 text-white rounded-[14px] text-[10px] font-black uppercase shadow-lg shadow-emerald-600/20 active:scale-95">Confirmar Cambio</button>
+                            <button onClick={() => setConfirmModal(null)} className="w-full py-3.5 bg-slate-50 dark:bg-white/5 text-slate-400 rounded-[14px] text-[10px] font-black uppercase">Cancelar</button>
                         </div>
                     </div>
                 </div>

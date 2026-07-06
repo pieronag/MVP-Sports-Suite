@@ -1,4 +1,4 @@
-import { SkeletonKpiGrid, SkeletonChart, SkeletonTable } from "@/components/ui/Skeleton";
+﻿import { SkeletonKpiGrid, SkeletonChart, SkeletonTable } from "@/components/ui/Skeleton";
 
 export default function DashboardLoading() {
   return (
@@ -12,10 +12,10 @@ export default function DashboardLoading() {
       <SkeletonKpiGrid />
       <SkeletonChart />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="h-[300px] bg-white dark:bg-[#0B0F19] rounded-xl border border-slate-200 dark:border-white/5 p-6">
+        <div className="h-[300px] bg-white dark:bg-[#0B0F19] rounded-[14px] border border-slate-200 dark:border-white/5 p-6">
           <SkeletonTable rows={4} />
         </div>
-        <div className="h-[300px] bg-white dark:bg-[#0B0F19] rounded-xl border border-slate-200 dark:border-white/5 p-6">
+        <div className="h-[300px] bg-white dark:bg-[#0B0F19] rounded-[14px] border border-slate-200 dark:border-white/5 p-6">
           <SkeletonTable rows={4} />
         </div>
       </div>

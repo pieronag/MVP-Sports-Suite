@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db, auth, storage } from '@/services/firebase';
@@ -22,13 +22,13 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructi
     if (!isOpen) return null;
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={onCancel}>
-            <div className="bg-white dark:bg-[#0B0F19] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white dark:bg-[#0B0F19] rounded-[14px] shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
                 <div className={`absolute top-0 left-0 w-full h-1 ${isDestructive ? 'bg-red-500' : 'bg-emerald-500'}`}></div>
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter leading-none">{title}</h3>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-8 uppercase leading-relaxed">{message}</p>
                 <div className="flex gap-3 justify-end">
-                    <button onClick={onCancel} className="px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 transition-all">Cancelar</button>
-                    <button onClick={onConfirm} className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl text-white shadow-lg transition-all active:scale-95 ${isDestructive ? 'bg-red-600 shadow-red-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}>Confirmar</button>
+                    <button onClick={onCancel} className="px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-[14px] bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 transition-all">Cancelar</button>
+                    <button onClick={onConfirm} className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-[14px] text-white shadow-lg transition-all active:scale-95 ${isDestructive ? 'bg-red-600 shadow-red-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}>Confirmar</button>
                 </div>
             </div>
         </div>
@@ -282,7 +282,7 @@ export default function ProfilePage() {
         {/* TOASTS PREMIUM */}
         <div className="fixed top-6 right-6 z-[200] flex flex-col gap-3 pointer-events-none">
             {toasts.map(toast => (
-                <div key={toast.id} className={`pointer-events-auto flex items-center gap-3 px-5 py-3 rounded-2xl shadow-2xl border animate-slideInRight backdrop-blur-md ${
+                <div key={toast.id} className={`pointer-events-auto flex items-center gap-3 px-5 py-3 rounded-[14px] shadow-2xl border animate-slideInRight backdrop-blur-md ${
                     toast.type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:border-emerald-500/50 dark:text-emerald-400' : 
                     toast.type === 'error' ? 'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:border-red-500/50 dark:text-red-400' : 
                     'bg-white/90 border-blue-500 text-blue-700 dark:bg-[#0B0F19]/90 dark:border-blue-500/50 dark:text-blue-400'
@@ -312,14 +312,14 @@ export default function ProfilePage() {
             <div className="flex gap-2">
                 <button 
                     onClick={handleLogout} 
-                    className="px-4 py-2 bg-white dark:bg-white/5 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 text-[10px] font-black uppercase rounded-xl transition-all hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-2"
+                    className="px-4 py-2 bg-white dark:bg-white/5 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 text-[10px] font-black uppercase rounded-[14px] transition-all hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-2"
                 >
                     <ArrowRightOnRectangleIcon className="w-4 h-4" /> Salir
                 </button>
                 <button 
                     onClick={handleSave} 
                     disabled={saving} 
-                    className="px-6 py-2 bg-slate-950 dark:bg-emerald-500 text-white dark:text-slate-950 text-[10px] font-black uppercase rounded-xl shadow-xl transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                    className="px-6 py-2 bg-slate-950 dark:bg-emerald-500 text-white dark:text-slate-950 text-[10px] font-black uppercase rounded-[14px] shadow-xl transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
                 >
                     {saving ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <CheckCircleIcon className="w-4 h-4" />}
                     {saving ? 'Guardando...' : 'Guardar Cambios'}
@@ -362,10 +362,10 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="w-full pt-6 border-t border-slate-50 dark:border-white/5 flex flex-col gap-2">
-                        <div className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border ${getRoleBadge(profile.role)}`}>
+                        <div className={`px-4 py-2 rounded-[14px] text-[9px] font-black uppercase tracking-widest border ${getRoleBadge(profile.role)}`}>
                             Rol: {getRoleLabel(profile.role)}
                         </div>
-                        <div className="px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest bg-slate-50 dark:bg-white/5 text-slate-400 border border-slate-100 dark:border-white/5">
+                        <div className="px-4 py-2 rounded-[14px] text-[9px] font-black uppercase tracking-widest bg-slate-50 dark:bg-white/5 text-slate-400 border border-slate-100 dark:border-white/5">
                             Estado: <span className="text-emerald-500">{profile.status === 'active' ? 'Activo' : 'Inactivo'}</span>
                         </div>
                     </div>
@@ -378,12 +378,12 @@ export default function ProfilePage() {
                         <KeyIcon className="w-4 h-4 text-emerald-500" /> Seguridad
                     </h3>
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5">
+                        <div className="flex items-center justify-between p-3 rounded-[14px] bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5">
                             <div>
                                 <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase">Contraseña</p>
                                 <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Cambia tu clave periódicamente</p>
                             </div>
-                            <button onClick={() => setIsPassModalOpen(true)} className="px-3 py-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[8px] font-black uppercase rounded-lg shadow-lg active:scale-95 transition-all">
+                            <button onClick={() => setIsPassModalOpen(true)} className="px-3 py-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[8px] font-black uppercase rounded-[14px] shadow-lg active:scale-95 transition-all">
                                 Actualizar
                             </button>
                         </div>
@@ -436,9 +436,9 @@ export default function ProfilePage() {
                             <BellIcon className="w-4 h-4 text-emerald-500" /> Preferencias y Alertas
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 group hover:border-emerald-500/30 transition-all">
+                            <div className="flex items-center justify-between p-4 rounded-[14px] bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 group hover:border-emerald-500/30 transition-all">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2.5 bg-white dark:bg-[#0B0F19] rounded-xl text-slate-400 group-hover:text-emerald-500 transition-colors shadow-sm">
+                                    <div className="p-2.5 bg-white dark:bg-[#0B0F19] rounded-[14px] text-slate-400 group-hover:text-emerald-500 transition-colors shadow-sm">
                                         <EnvelopeIcon className="w-4 h-4" />
                                     </div>
                                     <div>
@@ -448,9 +448,9 @@ export default function ProfilePage() {
                                 </div>
                                 <ToggleSwitch enabled={profile.notificationsEnabled} onChange={() => setProfile({ ...profile, notificationsEnabled: !profile.notificationsEnabled })} />
                             </div>
-                            <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 group hover:border-emerald-500/30 transition-all">
+                            <div className="flex items-center justify-between p-4 rounded-[14px] bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 group hover:border-emerald-500/30 transition-all">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2.5 bg-white dark:bg-[#0B0F19] rounded-xl text-slate-400 group-hover:text-emerald-500 transition-colors shadow-sm">
+                                    <div className="p-2.5 bg-white dark:bg-[#0B0F19] rounded-[14px] text-slate-400 group-hover:text-emerald-500 transition-colors shadow-sm">
                                         <GlobeAmericasIcon className="w-4 h-4" />
                                     </div>
                                     <div>
@@ -458,7 +458,7 @@ export default function ProfilePage() {
                                         <p className="text-[8px] font-bold text-slate-400 uppercase">{profile.timezone}</p>
                                     </div>
                                 </div>
-                                <div className="p-1 bg-emerald-500/10 text-emerald-500 rounded-lg"><ClockIcon className="w-3.5 h-3.5" /></div>
+                                <div className="p-1 bg-emerald-500/10 text-emerald-500 rounded-[14px]"><ClockIcon className="w-3.5 h-3.5" /></div>
                             </div>
                         </div>
                     </div>
@@ -484,8 +484,8 @@ export default function ProfilePage() {
                             <MagnifyingGlassPlusIcon className="w-4 h-4 text-slate-400" />
                         </div>
                         <div className="flex gap-4">
-                            <button onClick={() => { setShowCropper(false); setImageToCrop(null); }} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-slate-500 border border-slate-100 rounded-xl">Descartar</button>
-                            <button onClick={handleConfirmCrop} disabled={uploadingImg} className="flex-1 py-3 bg-emerald-500 text-slate-950 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl disabled:opacity-50">{uploadingImg ? 'Subiendo...' : 'Finalizar'}</button>
+                            <button onClick={() => { setShowCropper(false); setImageToCrop(null); }} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-slate-500 border border-slate-100 rounded-[14px]">Descartar</button>
+                            <button onClick={handleConfirmCrop} disabled={uploadingImg} className="flex-1 py-3 bg-emerald-500 text-slate-950 rounded-[14px] font-black text-[10px] uppercase tracking-widest shadow-xl disabled:opacity-50">{uploadingImg ? 'Subiendo...' : 'Finalizar'}</button>
                         </div>
                     </div>
                 </PanelGlass>
@@ -504,7 +504,7 @@ export default function ProfilePage() {
                         <InputGroupPremium label="Contraseña Actual" type="password" value={passForm.current} onChange={(e: any) => setPassForm({ ...passForm, current: e.target.value })} icon={<KeyIcon className="w-4 h-4" />} />
                         <InputGroupPremium label="Nueva Contraseña" type="password" value={passForm.new} onChange={(e: any) => setPassForm({ ...passForm, new: e.target.value })} icon={<ShieldCheckIcon className="w-4 h-4" />} />
                         <InputGroupPremium label="Confirmar Nueva" type="password" value={passForm.confirm} onChange={(e: any) => setPassForm({ ...passForm, confirm: e.target.value })} icon={<ShieldCheckIcon className="w-4 h-4" />} />
-                        <button type="submit" disabled={passLoading} className="w-full py-3.5 bg-slate-950 dark:bg-emerald-500 text-white dark:text-slate-950 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-xl disabled:opacity-50">
+                        <button type="submit" disabled={passLoading} className="w-full py-3.5 bg-slate-950 dark:bg-emerald-500 text-white dark:text-slate-950 rounded-[14px] font-black text-[10px] uppercase tracking-widest shadow-xl disabled:opacity-50">
                             {passLoading ? 'Procesando...' : 'Confirmar Cambio'}
                         </button>
                     </form>
@@ -550,7 +550,7 @@ function InputGroupPremium({ label, value, onChange, placeholder, icon, readOnly
                     onChange={onChange} 
                     readOnly={readOnly} 
                     placeholder={placeholder} 
-                    className={`w-full pl-11 pr-4 py-3 rounded-2xl border text-[11px] font-black transition-all outline-none ${
+                    className={`w-full pl-11 pr-4 py-3 rounded-[14px] border text-[11px] font-black transition-all outline-none ${
                         readOnly 
                         ? 'bg-slate-50 border-slate-100 text-slate-400 cursor-not-allowed dark:bg-white/5 dark:border-white/5' 
                         : 'bg-white border-slate-100 text-slate-900 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 dark:bg-[#0B0F19] dark:border-white/5 dark:text-white'

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from 'react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -205,7 +205,7 @@ export default function MetricsPage() {
                     <h1 className="text-2xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none">Métricas de <span className="text-emerald-500 dark:text-emerald-400">Desempeño</span></h1>
                 </div>
                 <div className="relative group">
-                    <input type="month" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="pl-4 pr-10 py-2.5 bg-white dark:bg-[#0B0F19] border border-slate-100 dark:border-white/5 rounded-xl text-[10px] font-black uppercase text-black dark:text-white outline-none focus:border-emerald-500 transition-all cursor-pointer shadow-xl" />
+                    <input type="month" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="pl-4 pr-10 py-2.5 bg-white dark:bg-[#0B0F19] border border-slate-100 dark:border-white/5 rounded-[14px] text-[10px] font-black uppercase text-black dark:text-white outline-none focus:border-emerald-500 transition-all cursor-pointer shadow-xl" />
                     <CalendarDaysIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>
             </div>
@@ -266,7 +266,7 @@ export default function MetricsPage() {
                             <span className="text-3xl font-black text-black dark:text-white leading-none">{collectionStats[0]?.value}%</span>
                         </div>
                     </div>
-                    <div className="w-full mt-6 flex justify-between items-center px-4 py-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                    <div className="w-full mt-6 flex justify-between items-center px-4 py-3 bg-slate-50 dark:bg-white/5 rounded-[14px] border border-slate-100 dark:border-white/5">
                         <span className="text-[9px] font-black text-slate-400 uppercase">Saldo Pendiente</span>
                         <span className="text-[10px] font-black text-amber-500">{collectionStats[1]?.value}%</span>
                     </div>
@@ -275,9 +275,9 @@ export default function MetricsPage() {
 
             {/* TABLES SECTION */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="rounded-2xl border border-slate-100 dark:border-white/5 overflow-hidden bg-white dark:bg-[#0B0F19] shadow-xl shadow-slate-200/20">
+                <div className="rounded-[14px] border border-slate-100 dark:border-white/5 overflow-hidden bg-white dark:bg-[#0B0F19] shadow-xl shadow-slate-200/20">
                     <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex justify-between items-center">
-                        <h3 className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest flex items-center gap-3"><div className="p-2 bg-emerald-500 rounded-lg shadow-lg shadow-emerald-500/20"><ClockIcon className="w-4 h-4 text-white" /></div> Transacciones en Línea</h3>
+                        <h3 className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest flex items-center gap-3"><div className="p-2 bg-emerald-500 rounded-[14px] shadow-lg shadow-emerald-500/20"><ClockIcon className="w-4 h-4 text-white" /></div> Transacciones en Línea</h3>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
@@ -297,7 +297,7 @@ export default function MetricsPage() {
                                         <td className="px-6 py-4 text-right font-black text-slate-400">{formatCLP(tx.amount)}</td>
                                         <td className="px-6 py-4 text-right font-black text-emerald-600">{formatCLP(tx.fee)}</td>
                                         <td className="px-6 py-4 text-center">
-                                            <span className={`text-[8px] font-black px-2 py-0.5 rounded-md uppercase ${tx.method === 'noshow' ? 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400' : tx.method === 'webpay' || tx.method === 'oneclick' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : tx.method === 'cash' ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400' : tx.method === 'transfer' ? 'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400' : tx.method === 'online' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400'}`}>
+                                            <span className={`text-[8px] font-black px-2 py-0.5 rounded-[14px] uppercase ${tx.method === 'noshow' ? 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400' : tx.method === 'webpay' || tx.method === 'oneclick' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' : tx.method === 'cash' ? 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400' : tx.method === 'transfer' ? 'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400' : tx.method === 'online' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-slate-100 text-slate-500 dark:bg-white/5 dark:text-slate-400'}`}>
                                                 {tx.methodLabel}
                                             </span>
                                         </td>
@@ -309,9 +309,9 @@ export default function MetricsPage() {
                     </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-100 dark:border-white/5 overflow-hidden bg-white dark:bg-[#0B0F19] shadow-xl shadow-slate-200/20">
+                <div className="rounded-[14px] border border-slate-100 dark:border-white/5 overflow-hidden bg-white dark:bg-[#0B0F19] shadow-xl shadow-slate-200/20">
                     <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex justify-between items-center">
-                        <h3 className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest flex items-center gap-3"><div className="p-2 bg-amber-500 rounded-lg shadow-lg shadow-amber-500/20"><ExclamationTriangleIcon className="w-4 h-4 text-white" /></div> Cuentas por Cobrar (Top 10)</h3>
+                        <h3 className="text-[10px] font-black text-black dark:text-white uppercase tracking-widest flex items-center gap-3"><div className="p-2 bg-amber-500 rounded-[14px] shadow-lg shadow-amber-500/20"><ExclamationTriangleIcon className="w-4 h-4 text-white" /></div> Cuentas por Cobrar (Top 10)</h3>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
@@ -329,7 +329,7 @@ export default function MetricsPage() {
                                         <td className="px-6 py-4 uppercase truncate max-w-[150px]">{t.name}</td>
                                         <td className="px-6 py-4 text-right text-emerald-500">{formatCLP(t.commission)}</td>
                                         <td className="px-6 py-4 text-right font-black">{formatCLP(t.totalDebt)}</td>
-                                        <td className="px-6 py-4 text-center"><span className={`px-2 py-0.5 rounded-lg text-[8px] font-black uppercase border ${t.status === 'Pendiente' ? 'bg-amber-50 border-amber-500/30 text-amber-600' : 'bg-red-50 border-red-500/30 text-red-600'}`}>{t.status}</span></td>
+                                        <td className="px-6 py-4 text-center"><span className={`px-2 py-0.5 rounded-[14px] text-[8px] font-black uppercase border ${t.status === 'Pendiente' ? 'bg-amber-50 border-amber-500/30 text-amber-600' : 'bg-red-50 border-red-500/30 text-red-600'}`}>{t.status}</span></td>
                                     </tr>
                                 ))}
                             </tbody>

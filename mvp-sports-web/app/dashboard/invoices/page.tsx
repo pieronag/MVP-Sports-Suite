@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useMemo } from 'react';
 import {
     MagnifyingGlassIcon,
@@ -396,8 +396,8 @@ export default function Page() {
                     <h1 className="text-2xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none">Gestión de <span className="text-emerald-500 dark:text-emerald-400">Facturación</span></h1>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button onClick={() => showAlert("Envío Masivo", "Enviando recordatorios a recintos con saldos pendientes...")} className="px-6 py-2.5 bg-white dark:bg-white/5 text-black dark:text-white text-[10px] font-black uppercase rounded-xl border border-slate-200 dark:border-white/10 flex items-center gap-2 active:scale-95 transition-all"><EnvelopeIcon className="w-4 h-4 text-emerald-500" /> Envío Masivo</button>
-                    <button onClick={() => setShowConfirmModal(true)} disabled={isGenerating} className="px-6 py-2.5 bg-slate-950 dark:bg-emerald-600 text-white dark:text-slate-950 text-[10px] font-black uppercase rounded-xl shadow-xl flex items-center gap-2 active:scale-95 transition-all"><CurrencyDollarIcon className="w-4 h-4" /> Generar Masivo</button>
+                    <button onClick={() => showAlert("Envío Masivo", "Enviando recordatorios a recintos con saldos pendientes...")} className="px-6 py-2.5 bg-white dark:bg-white/5 text-black dark:text-white text-[10px] font-black uppercase rounded-[14px] border border-slate-200 dark:border-white/10 flex items-center gap-2 active:scale-95 transition-all"><EnvelopeIcon className="w-4 h-4 text-emerald-500" /> Envío Masivo</button>
+                    <button onClick={() => setShowConfirmModal(true)} disabled={isGenerating} className="px-6 py-2.5 bg-slate-950 dark:bg-emerald-600 text-white dark:text-slate-950 text-[10px] font-black uppercase rounded-[14px] shadow-xl flex items-center gap-2 active:scale-95 transition-all"><CurrencyDollarIcon className="w-4 h-4" /> Generar Masivo</button>
                 </div>
             </div>
 
@@ -414,22 +414,22 @@ export default function Page() {
                 <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
                     <div className="relative w-full md:w-64">
                         <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
-                        <input type="text" placeholder="BUSCAR POR RECINTO O DUEÑO..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-white/5 border border-transparent focus:border-emerald-500/30 rounded-xl text-[10px] font-black uppercase outline-none text-black dark:text-white transition-all shadow-sm" />
+                        <input type="text" placeholder="BUSCAR POR RECINTO O DUEÑO..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-white/5 border border-transparent focus:border-emerald-500/30 rounded-[14px] text-[10px] font-black uppercase outline-none text-black dark:text-white transition-all shadow-sm" />
                     </div>
                     <div className="relative">
                         <CalendarDaysIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
-                        <input type="month" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="pl-10 pr-4 py-2 bg-slate-50 dark:bg-white/5 border border-transparent focus:border-emerald-500/30 rounded-xl text-[10px] font-black uppercase outline-none text-black dark:text-white transition-all cursor-pointer" />
+                        <input type="month" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="pl-10 pr-4 py-2 bg-slate-50 dark:bg-white/5 border border-transparent focus:border-emerald-500/30 rounded-[14px] text-[10px] font-black uppercase outline-none text-black dark:text-white transition-all cursor-pointer" />
                     </div>
                 </div>
-                <div className="flex bg-slate-50 dark:bg-white/5 p-1 rounded-xl border border-slate-100 dark:border-white/10">
+                <div className="flex bg-slate-50 dark:bg-white/5 p-1 rounded-[14px] border border-slate-100 dark:border-white/10">
                     {["Todas", "Pendientes", "Pagadas"].map((f) => (
-                        <button key={f} onClick={() => setFilterStatus(f)} className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-lg transition-all ${filterStatus === f ? "bg-white dark:bg-emerald-500 text-black shadow-sm" : "text-slate-400 hover:text-black dark:hover:text-white"}`}>{f.toUpperCase()}</button>
+                        <button key={f} onClick={() => setFilterStatus(f)} className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-[14px] transition-all ${filterStatus === f ? "bg-white dark:bg-emerald-500 text-black shadow-sm" : "text-slate-400 hover:text-black dark:hover:text-white"}`}>{f.toUpperCase()}</button>
                     ))}
                 </div>
             </PanelGlass>
 
             {/* LISTADO DE FACTURAS */}
-            <div className="rounded-2xl border border-slate-100 dark:border-white/5 overflow-x-auto bg-white dark:bg-[#0B0F19] shadow-xl">
+            <div className="rounded-[14px] border border-slate-100 dark:border-white/5 overflow-x-auto bg-white dark:bg-[#0B0F19] shadow-xl">
                 <table className="w-full text-left min-w-[1000px]">
                     <thead className="bg-slate-50/50 dark:bg-white/[0.02] text-black dark:text-slate-400 font-black uppercase text-[8px] tracking-[0.2em] border-b border-slate-100 dark:border-white/5">
                         <tr>
@@ -464,7 +464,7 @@ export default function Page() {
                                 </td>
                                 <td className="px-6 py-4">
                                     <div className="flex flex-col gap-1">
-                                        <span className="px-2 py-0.5 bg-slate-100 dark:bg-white/5 rounded-lg text-[8px] font-black text-slate-500 uppercase border border-slate-200 dark:border-white/10 w-fit">PLAN {inv.breakdown?.planName?.toUpperCase() || 'BASE'}</span>
+                                        <span className="px-2 py-0.5 bg-slate-100 dark:bg-white/5 rounded-[14px] text-[8px] font-black text-slate-500 uppercase border border-slate-200 dark:border-white/10 w-fit">PLAN {inv.breakdown?.planName?.toUpperCase() || 'BASE'}</span>
                                         <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter line-clamp-1 italic">{inv.details}</p>
                                     </div>
                                 </td>
@@ -473,11 +473,11 @@ export default function Page() {
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex items-center justify-end gap-2">
-                                        <span className={`px-2.5 py-1 rounded-xl text-[9px] font-black uppercase border shadow-sm transition-all ${inv.status === 'Pagada' ? 'bg-emerald-50 border-emerald-500/30 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-rose-50 border-rose-500/30 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400'}`}>{inv.status.toUpperCase()}</span>
+                                        <span className={`px-2.5 py-1 rounded-[14px] text-[9px] font-black uppercase border shadow-sm transition-all ${inv.status === 'Pagada' ? 'bg-emerald-50 border-emerald-500/30 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-rose-50 border-rose-500/30 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400'}`}>{inv.status.toUpperCase()}</span>
                                         <div className="flex gap-1">
-                                            <button onClick={() => handleDownload(inv)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-black dark:hover:text-white rounded-xl transition-all"><PrinterIcon className="w-5 h-5" /></button>
-                                            <button onClick={() => handleDeleteInvoice(inv.id)} className="p-2 hover:bg-red-50 text-red-400 rounded-xl transition-all dark:hover:bg-red-500/10"><TrashIcon className="w-5 h-5" /></button>
-                                            <button onClick={() => handleToggleStatus(inv)} title="Marcar como Pagada" className={`p-2 rounded-xl transition-all ${inv.status === 'Pagada' ? 'hover:bg-amber-50 text-amber-500 dark:hover:bg-amber-500/10' : 'hover:bg-emerald-50 text-emerald-500 dark:hover:bg-emerald-500/10'}`}>{inv.status === 'Pagada' ? <ArrowPathRoundedSquareIcon className="w-5 h-5" /> : <CheckCircleIcon className="w-5 h-5" />}</button>
+                                            <button onClick={() => handleDownload(inv)} className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-black dark:hover:text-white rounded-[14px] transition-all"><PrinterIcon className="w-5 h-5" /></button>
+                                            <button onClick={() => handleDeleteInvoice(inv.id)} className="p-2 hover:bg-red-50 text-red-400 rounded-[14px] transition-all dark:hover:bg-red-500/10"><TrashIcon className="w-5 h-5" /></button>
+                                            <button onClick={() => handleToggleStatus(inv)} title="Marcar como Pagada" className={`p-2 rounded-[14px] transition-all ${inv.status === 'Pagada' ? 'hover:bg-amber-50 text-amber-500 dark:hover:bg-amber-500/10' : 'hover:bg-emerald-50 text-emerald-500 dark:hover:bg-emerald-500/10'}`}>{inv.status === 'Pagada' ? <ArrowPathRoundedSquareIcon className="w-5 h-5" /> : <CheckCircleIcon className="w-5 h-5" />}</button>
                                         </div>
                                     </div>
                                 </td>
@@ -490,14 +490,14 @@ export default function Page() {
             {/* MODAL GENERACION MASIVA */}
             {showConfirmModal && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
-                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-3xl p-8 border border-slate-200 dark:border-white/10 shadow-2xl text-center relative overflow-hidden">
+                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-[14px] p-8 border border-slate-200 dark:border-white/10 shadow-2xl text-center relative overflow-hidden">
                         <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-slate-50 dark:from-white/[0.03] to-transparent pointer-events-none"></div>
-                        <div className="relative z-10 w-20 h-20 bg-emerald-50 dark:bg-emerald-500/10 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 border border-emerald-100 dark:border-emerald-500/20 shadow-xl shadow-emerald-500/10"><CurrencyDollarIcon className="w-10 h-10 text-emerald-600" /></div>
+                        <div className="relative z-10 w-20 h-20 bg-emerald-50 dark:bg-emerald-500/10 rounded-[14px] flex items-center justify-center mx-auto mb-6 border border-emerald-100 dark:border-emerald-500/20 shadow-xl shadow-emerald-500/10"><CurrencyDollarIcon className="w-10 h-10 text-emerald-600" /></div>
                         <h3 className="relative z-10 text-xl font-black uppercase text-black dark:text-white mb-2 tracking-tighter italic">Liquidación Masiva</h3>
                         <p className="relative z-10 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8 leading-relaxed px-4">Se generarán las facturas considerando <strong>ÚNICAMENTE PAGOS ACEPTADOS</strong> para el periodo {selectedMonth}.</p>
                         <div className="relative z-10 flex gap-4">
-                            <button onClick={() => setShowConfirmModal(false)} className="flex-1 py-4 text-[9px] font-black uppercase rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-500">CANCELAR</button>
-                            <button onClick={handleGenerateBulk} className="flex-1 py-4 text-[9px] font-black uppercase rounded-2xl text-white bg-emerald-600 shadow-xl shadow-emerald-600/30 active:scale-95 transition-all">PROCEDER</button>
+                            <button onClick={() => setShowConfirmModal(false)} className="flex-1 py-4 text-[9px] font-black uppercase rounded-[14px] bg-slate-100 dark:bg-white/5 text-slate-500">CANCELAR</button>
+                            <button onClick={handleGenerateBulk} className="flex-1 py-4 text-[9px] font-black uppercase rounded-[14px] text-white bg-emerald-600 shadow-xl shadow-emerald-600/30 active:scale-95 transition-all">PROCEDER</button>
                         </div>
                     </div>
                 </div>
@@ -505,10 +505,10 @@ export default function Page() {
 
             {modalConfig.isOpen && (
                 <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setModalConfig({ ...modalConfig, isOpen: false })}>
-                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-2xl p-8 border border-slate-200 dark:border-white/10 shadow-2xl text-center" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-[14px] p-8 border border-slate-200 dark:border-white/10 shadow-2xl text-center" onClick={e => e.stopPropagation()}>
                         <h3 className="text-xl font-black uppercase text-black dark:text-white mb-2 tracking-tighter italic">{modalConfig.title}</h3>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 leading-relaxed">{modalConfig.message}</p>
-                        <button onClick={() => { modalConfig.onConfirm?.(); setModalConfig({ ...modalConfig, isOpen: false }); }} className="w-full py-4 text-[10px] font-black uppercase rounded-2xl text-white bg-emerald-600 shadow-xl shadow-emerald-600/20 active:scale-95 transition-all">ENTENDIDO</button>
+                        <button onClick={() => { modalConfig.onConfirm?.(); setModalConfig({ ...modalConfig, isOpen: false }); }} className="w-full py-4 text-[10px] font-black uppercase rounded-[14px] text-white bg-emerald-600 shadow-xl shadow-emerald-600/20 active:scale-95 transition-all">ENTENDIDO</button>
                     </div>
                 </div>
             )}

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
@@ -72,7 +72,7 @@ interface Court {
 function HeaderSeccion({ titulo, desc, icon: Icon }: any) {
     return (
         <div className="flex items-center gap-3 mb-6">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+            <div className="w-8 h-8 rounded-[14px] bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
                 <Icon className="w-4 h-4" />
             </div>
             <div className="space-y-0">
@@ -87,13 +87,13 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructi
     if (!isOpen) return null;
     return (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={onCancel}>
-            <div className="bg-white dark:bg-[#0B0F19] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white dark:bg-[#0B0F19] rounded-[14px] shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
                 <div className={`absolute top-0 left-0 w-full h-1 ${isDestructive ? 'bg-red-500' : 'bg-emerald-500'}`}></div>
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter leading-none">{title}</h3>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-8 uppercase leading-relaxed">{message}</p>
                 <div className="flex gap-3 justify-end">
-                    <button onClick={onCancel} className="px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 transition-all">Cancelar</button>
-                    <button onClick={onConfirm} className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-xl text-white shadow-lg transition-all active:scale-95 ${isDestructive ? 'bg-red-600 shadow-red-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}>Confirmar</button>
+                    <button onClick={onCancel} className="px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-[14px] bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 transition-all">Cancelar</button>
+                    <button onClick={onConfirm} className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-[14px] text-white shadow-lg transition-all active:scale-95 ${isDestructive ? 'bg-red-600 shadow-red-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}>Confirmar</button>
                 </div>
             </div>
         </div>
@@ -647,10 +647,10 @@ export default function CourtsPage() {
                         </h1>
                     </div>
 
-                    <div className="flex items-center gap-2 p-1.5 rounded-xl">
+                    <div className="flex items-center gap-2 p-1.5 rounded-[14px]">
                         <button 
                             onClick={fetchVenues} 
-                            className="px-6 py-2.5 bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 font-black text-[9px] uppercase tracking-[0.2em] rounded-xl transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-emerald-500/20 flex items-center gap-2 border border-emerald-400/20 dark:border-white/10"
+                            className="px-6 py-2.5 bg-emerald-600 dark:bg-emerald-500 text-white dark:text-slate-950 font-black text-[9px] uppercase tracking-[0.2em] rounded-[14px] transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-emerald-500/20 flex items-center gap-2 border border-emerald-400/20 dark:border-white/10"
                         >
                             <ArrowPathIcon className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> ACTUALIZAR RED
                         </button>
@@ -683,7 +683,7 @@ export default function CourtsPage() {
 
     return (
         <div className="w-full space-y-6 pb-10 text-left relative animate-fadeIn">
-            {toast && <div className={`fixed top-6 right-6 px-6 py-3.5 rounded-2xl shadow-2xl text-[10px] font-black uppercase tracking-[0.1em] z-[1000] text-white flex items-center gap-3 animate-slideIn ${toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`}>{toast.type === 'success' ? <CheckCircleIcon className="w-4 h-4" /> : <ExclamationTriangleIcon className="w-4 h-4" />} {toast.msg}</div>}
+            {toast && <div className={`fixed top-6 right-6 px-6 py-3.5 rounded-[14px] shadow-2xl text-[10px] font-black uppercase tracking-[0.1em] z-[1000] text-white flex items-center gap-3 animate-slideIn ${toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`}>{toast.type === 'success' ? <CheckCircleIcon className="w-4 h-4" /> : <ExclamationTriangleIcon className="w-4 h-4" />} {toast.msg}</div>}
             <ConfirmModal 
                 isOpen={confirmData.isOpen} 
                 title={confirmData.title} 
@@ -694,7 +694,7 @@ export default function CourtsPage() {
             />
 
             {/* CABECERA MAESTRA SEDE - FINANCE PREMIUM */}
-            <div className="relative overflow-hidden rounded-2xl border border-slate-100 dark:border-white/5 bg-white dark:bg-[#0B0F19] shadow-xl">
+            <div className="relative overflow-hidden rounded-[14px] border border-slate-100 dark:border-white/5 bg-white dark:bg-[#0B0F19] shadow-xl">
                 {/* Banner de Fondo con Blur */}
                 <div className="absolute inset-0 h-32 bg-gradient-to-r from-emerald-500/20 to-indigo-500/20 opacity-30 blur-3xl -top-10"></div>
                 
@@ -703,14 +703,14 @@ export default function CourtsPage() {
                         {(!selectedVenue.features || selectedVenue.features.multiRecinto !== false) && (
                             <button 
                                 onClick={() => setSelectedVenue(null)} 
-                                className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 rounded-xl transition-all active:scale-95 hover:bg-slate-100 dark:hover:bg-white/10 shadow-sm border border-slate-200 dark:border-white/5 text-slate-400 group"
+                                className="w-10 h-10 flex items-center justify-center bg-slate-50 dark:bg-white/5 rounded-[14px] transition-all active:scale-95 hover:bg-slate-100 dark:hover:bg-white/10 shadow-sm border border-slate-200 dark:border-white/5 text-slate-400 group"
                             >
                                 <ArrowLeftIcon className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                             </button>
                         )}
                         <div>
                             <div className="flex items-center gap-2 mb-1.5">
-                                <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[8px] font-black uppercase tracking-[0.2em] border border-emerald-500/20">
+                                <span className="px-2 py-0.5 rounded-[14px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[8px] font-black uppercase tracking-[0.2em] border border-emerald-500/20">
                                     Gestión de Activos
                                 </span>
                                 <span className="text-slate-300 dark:text-white/10">•</span>
@@ -725,16 +725,16 @@ export default function CourtsPage() {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3 p-1 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-100 dark:border-white/5">
+                    <div className="flex items-center gap-3 p-1 bg-slate-50 dark:bg-black/20 rounded-[14px] border border-slate-100 dark:border-white/5">
                         <button 
                             onClick={() => setActiveTab('config')} 
-                            className={`flex items-center gap-2 px-6 py-2.5 text-[9px] font-black uppercase rounded-lg transition-all ${activeTab === 'config' ? 'bg-white dark:bg-emerald-500 shadow-lg text-slate-900 dark:text-slate-900' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
+                            className={`flex items-center gap-2 px-6 py-2.5 text-[9px] font-black uppercase rounded-[14px] transition-all ${activeTab === 'config' ? 'bg-white dark:bg-emerald-500 shadow-lg text-slate-900 dark:text-slate-900' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                         >
                             <Cog6ToothIcon className="w-4 h-4" /> INFRAESTRUCTURA
                         </button>
                         <button 
                             onClick={() => isConfigured ? setActiveTab('courts') : showToast("Define los deportes primero", 'error')} 
-                            className={`flex items-center gap-2 px-6 py-2.5 text-[9px] font-black uppercase rounded-lg transition-all ${activeTab === 'courts' ? 'bg-white dark:bg-emerald-500 shadow-lg text-slate-900 dark:text-slate-900' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
+                            className={`flex items-center gap-2 px-6 py-2.5 text-[9px] font-black uppercase rounded-[14px] transition-all ${activeTab === 'courts' ? 'bg-white dark:bg-emerald-500 shadow-lg text-slate-900 dark:text-slate-900' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                         >
                             <Squares2X2Icon className="w-4 h-4" /> GESTIÓN DE CANCHAS
                         </button>
@@ -748,9 +748,9 @@ export default function CourtsPage() {
                     <>
                         {/* Sidebar de Configuración */}
                         <div className="lg:col-span-4 space-y-6">
-                            <PanelGlass className="p-8 overflow-hidden group rounded-xl">
+                            <PanelGlass className="p-8 overflow-hidden group rounded-[14px]">
                                 <HeaderSeccion titulo="Imagen Corporativa" desc="Identidad visual del recinto" icon={PhotoIcon} />
-                                <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-100 dark:border-white/5 shadow-2xl transition-all group-hover:scale-[1.01] cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                                <div className="relative aspect-video rounded-[14px] overflow-hidden border border-slate-100 dark:border-white/5 shadow-2xl transition-all group-hover:scale-[1.01] cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                                     {selectedVenue.imageURL ? (
                                         <img src={selectedVenue.imageURL} className="w-full h-full object-cover" />
                                     ) : (
@@ -760,7 +760,7 @@ export default function CourtsPage() {
                                         </div>
                                     )}
                                     <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                                        <div className="bg-white/10 p-4 rounded-xl border border-white/20">
+                                        <div className="bg-white/10 p-4 rounded-[14px] border border-white/20">
                                             <PencilSquareIcon className="w-8 h-8 text-white" />
                                         </div>
                                     </div>
@@ -769,21 +769,21 @@ export default function CourtsPage() {
                                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleVenueImageUpload} />
                             </PanelGlass>
 
-                            <PanelGlass className="p-8 rounded-xl overflow-hidden group">
+                            <PanelGlass className="p-8 rounded-[14px] overflow-hidden group">
                                 <HeaderSeccion titulo="Galería Fotográfica" desc="Imágenes del Recinto para App Móvil (Max 6)" icon={PhotoIcon} />
                                 <div className="grid grid-cols-2 gap-4">
                                     {(selectedVenue.gallery || []).map((img, idx) => (
-                                        <div key={idx} className="relative aspect-video rounded-xl overflow-hidden group border border-slate-100 dark:border-white/5 shadow-md">
+                                        <div key={idx} className="relative aspect-video rounded-[14px] overflow-hidden group border border-slate-100 dark:border-white/5 shadow-md">
                                             <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
                                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                <button onClick={() => handleRemoveGalleryImage(idx)} className="p-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors shadow-lg">
+                                                <button onClick={() => handleRemoveGalleryImage(idx)} className="p-2 bg-red-500 text-white rounded-[14px] hover:bg-red-600 transition-colors shadow-lg">
                                                     <TrashIcon className="w-4 h-4" />
                                                 </button>
                                             </div>
                                         </div>
                                     ))}
                                     {(selectedVenue.gallery || []).length < 6 && (
-                                        <div className="relative aspect-video rounded-xl border-2 border-dashed border-slate-200 dark:border-white/10 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-white/5 transition-all group">
+                                        <div className="relative aspect-video rounded-[14px] border-2 border-dashed border-slate-200 dark:border-white/10 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-white/5 transition-all group">
                                             <PhotoIcon className="w-6 h-6 text-slate-300 dark:text-white/20 group-hover:text-emerald-500 transition-colors" />
                                             <span className="text-[8px] font-black uppercase text-slate-400">Añadir Foto</span>
                                             <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleGalleryUpload} />
@@ -792,14 +792,14 @@ export default function CourtsPage() {
                                 </div>
                             </PanelGlass>
 
-                            <PanelGlass className="p-8 rounded-xl">
+                            <PanelGlass className="p-8 rounded-[14px]">
                                 <HeaderSeccion titulo="Disciplinas" desc="Deportes disponibles" icon={TrophyIcon} />
                                 <div className="grid grid-cols-2 gap-3">
                                     {AVAILABLE_SPORTS.map(s => (
                                         <button 
                                             key={s} 
                                             onClick={() => toggleSport(s)} 
-                                            className={`p-3 rounded-lg text-[9px] font-black uppercase border transition-all flex flex-col items-center gap-2 ${isSportSelected(s) ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-50 dark:bg-white/5 border-slate-100 dark:border-white/5 text-slate-400 hover:border-emerald-500/30'}`}
+                                            className={`p-3 rounded-[14px] text-[9px] font-black uppercase border transition-all flex flex-col items-center gap-2 ${isSportSelected(s) ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-50 dark:bg-white/5 border-slate-100 dark:border-white/5 text-slate-400 hover:border-emerald-500/30'}`}
                                         >
                                             {normalizeSport(s) === 'futbol' || normalizeSport(s) === 'futbolito' ? <SoccerIcon className={`w-4 h-4 ${isSportSelected(s) ? 'text-white' : 'text-slate-300'}`} /> : 
                                              normalizeSport(s) === 'padel' ? <PadelIcon className={`w-4 h-4 ${isSportSelected(s) ? 'text-white' : 'text-slate-300'}`} /> :
@@ -816,7 +816,7 @@ export default function CourtsPage() {
 
                         {/* Configuración Principal (Horarios y Precios) */}
                         <div className="lg:col-span-8 space-y-8">
-                            <PanelGlass className="p-8 rounded-xl">
+                            <PanelGlass className="p-8 rounded-[14px]">
                                 <div className="flex items-center justify-between mb-8">
                                     <HeaderSeccion titulo="Matriz Horaria" desc="Disponibilidad operativa semanal" icon={ClockIcon} />
                                     <div className="h-px flex-1 bg-slate-100 dark:bg-white/5 mx-8 hidden md:block"></div>
@@ -825,7 +825,7 @@ export default function CourtsPage() {
                                     {Object.keys(DAYS_MAP).map(dayKey => {
                                         const day = weeklySchedule[dayKey] || DEFAULT_DAY_SCHEDULE;
                                         return (
-                                            <div key={dayKey} className={`p-4 rounded-xl border transition-all ${day.isOpen ? 'border-emerald-500/30 bg-emerald-500/[0.02] shadow-sm' : 'border-slate-100 dark:border-white/5 opacity-30 grayscale'}`}>
+                                            <div key={dayKey} className={`p-4 rounded-[14px] border transition-all ${day.isOpen ? 'border-emerald-500/30 bg-emerald-500/[0.02] shadow-sm' : 'border-slate-100 dark:border-white/5 opacity-30 grayscale'}`}>
                                                 <div className="flex justify-between items-center mb-4">
                                                     <span className="text-[10px] font-black uppercase tracking-tighter text-slate-900 dark:text-white">{DAYS_MAP[dayKey]}</span>
                                                     <button 
@@ -837,8 +837,8 @@ export default function CourtsPage() {
                                                 </div>
                                                 {day.isOpen && (
                                                     <div className="grid grid-cols-2 gap-2">
-                                                        <input type="time" value={day.open} onChange={e => updateDaySchedule(dayKey, 'open', e.target.value)} className="bg-white dark:bg-black/40 border border-slate-100 dark:border-white/5 rounded-lg px-2 py-2 text-[10px] font-black outline-none focus:border-emerald-500 text-center" />
-                                                        <input type="time" value={day.close} onChange={e => updateDaySchedule(dayKey, 'close', e.target.value)} className="bg-white dark:bg-black/40 border border-slate-100 dark:border-white/5 rounded-lg px-2 py-2 text-[10px] font-black outline-none focus:border-emerald-500 text-center" />
+                                                        <input type="time" value={day.open} onChange={e => updateDaySchedule(dayKey, 'open', e.target.value)} className="bg-white dark:bg-black/40 border border-slate-100 dark:border-white/5 rounded-[14px] px-2 py-2 text-[10px] font-black outline-none focus:border-emerald-500 text-center" />
+                                                        <input type="time" value={day.close} onChange={e => updateDaySchedule(dayKey, 'close', e.target.value)} className="bg-white dark:bg-black/40 border border-slate-100 dark:border-white/5 rounded-[14px] px-2 py-2 text-[10px] font-black outline-none focus:border-emerald-500 text-center" />
                                                     </div>
                                                 )}
                                             </div>
@@ -848,26 +848,26 @@ export default function CourtsPage() {
                             </PanelGlass>
 
                             {selectedSports.length > 0 && (
-                                <PanelGlass className="p-8 rounded-xl">
+                                <PanelGlass className="p-8 rounded-[14px]">
                                     <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-10 pb-6 border-b border-slate-100 dark:border-white/5">
                                         <HeaderSeccion titulo="Estructura Tarifaria" desc="Precios por deporte y tramo horario" icon={CurrencyDollarIcon} />
-                                        <div className="flex flex-wrap gap-2 p-1 bg-slate-50 dark:bg-black/40 rounded-xl border border-slate-100 dark:border-white/5">
+                                        <div className="flex flex-wrap gap-2 p-1 bg-slate-50 dark:bg-black/40 rounded-[14px] border border-slate-100 dark:border-white/5">
                                             {selectedSports.map(s => (
-                                                <button key={s} onClick={() => setActivePricingTab(s)} className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${activePricingTab === s ? 'bg-white dark:bg-emerald-500 shadow-xl text-slate-900 dark:text-slate-900' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}>{s}</button>
+                                                <button key={s} onClick={() => setActivePricingTab(s)} className={`px-4 py-2 rounded-[14px] text-[9px] font-black uppercase transition-all ${activePricingTab === s ? 'bg-white dark:bg-emerald-500 shadow-xl text-slate-900 dark:text-slate-900' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}>{s}</button>
                                             ))}
                                         </div>
                                     </div>
 
                                     {activePricingTab && (
                                         <div className="space-y-8 animate-fadeIn">
-                                            <div className="flex gap-2 p-1 bg-slate-50 dark:bg-black/40 rounded-xl w-fit">
-                                                <button onClick={() => setActiveDayTypeTab('weekday')} className={`px-6 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${activeDayTypeTab === 'weekday' ? 'bg-white dark:bg-slate-800 shadow-md text-slate-900 dark:text-white' : 'text-slate-400'}`}>Lunes a Viernes</button>
-                                                <button onClick={() => setActiveDayTypeTab('weekend')} className={`px-6 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${activeDayTypeTab === 'weekend' ? 'bg-white dark:bg-slate-800 shadow-md text-slate-900 dark:text-white' : 'text-slate-400'}`}>Fines de Semana</button>
+                                            <div className="flex gap-2 p-1 bg-slate-50 dark:bg-black/40 rounded-[14px] w-fit">
+                                                <button onClick={() => setActiveDayTypeTab('weekday')} className={`px-6 py-2 rounded-[14px] text-[9px] font-black uppercase transition-all ${activeDayTypeTab === 'weekday' ? 'bg-white dark:bg-slate-800 shadow-md text-slate-900 dark:text-white' : 'text-slate-400'}`}>Lunes a Viernes</button>
+                                                <button onClick={() => setActiveDayTypeTab('weekend')} className={`px-6 py-2 rounded-[14px] text-[9px] font-black uppercase transition-all ${activeDayTypeTab === 'weekend' ? 'bg-white dark:bg-slate-800 shadow-md text-slate-900 dark:text-white' : 'text-slate-400'}`}>Fines de Semana</button>
                                             </div>
 
                                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                                                 {timeSlots.map((time, idx) => (
-                                                    <div key={time} className="p-4 bg-slate-50/50 dark:bg-white/[0.02] rounded-xl border border-slate-100 dark:border-white/5 relative group hover:border-emerald-500/30 transition-all">
+                                                    <div key={time} className="p-4 bg-slate-50/50 dark:bg-white/[0.02] rounded-[14px] border border-slate-100 dark:border-white/5 relative group hover:border-emerald-500/30 transition-all">
                                                         <div className="flex items-center gap-2 mb-2">
                                                             <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter">{time}</label>
                                                         </div>
@@ -877,13 +877,13 @@ export default function CourtsPage() {
                                                                 type="number"
                                                                 value={pricingMatrix[activePricingTab]?.[activeDayTypeTab]?.[time] || ''}
                                                                 onChange={e => updatePrice(activePricingTab, activeDayTypeTab, time, parseInt(e.target.value) || 0)}
-                                                                className="w-full pl-6 pr-2 py-2.5 bg-white dark:bg-black/40 border border-slate-100 dark:border-white/5 rounded-lg text-[11px] font-black outline-none focus:ring-1 ring-emerald-500 text-emerald-600 dark:text-emerald-400"
+                                                                className="w-full pl-6 pr-2 py-2.5 bg-white dark:bg-black/40 border border-slate-100 dark:border-white/5 rounded-[14px] text-[11px] font-black outline-none focus:ring-1 ring-emerald-500 text-emerald-600 dark:text-emerald-400"
                                                                 placeholder="0"
                                                             />
                                                         </div>
                                                         <button 
                                                             onClick={() => handleCopyPriceDown(activePricingTab, activeDayTypeTab, idx)} 
-                                                            className="absolute -right-2 -bottom-2 w-7 h-7 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-xl z-10"
+                                                            className="absolute -right-2 -bottom-2 w-7 h-7 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 rounded-[14px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-xl z-10"
                                                         >
                                                             <ArrowDownIcon className="w-3.5 h-3.5" />
                                                         </button>
@@ -898,7 +898,7 @@ export default function CourtsPage() {
                             <div className="flex justify-end pt-4">
                                 <button 
                                     onClick={handleSaveConfig} 
-                                    className="px-12 py-5 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 font-black text-[10px] uppercase tracking-[0.2em] rounded-xl shadow-2xl shadow-emerald-500/20 active:scale-95 transition-all hover:-translate-y-1"
+                                    className="px-12 py-5 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 font-black text-[10px] uppercase tracking-[0.2em] rounded-[14px] shadow-2xl shadow-emerald-500/20 active:scale-95 transition-all hover:-translate-y-1"
                                 >
                                     Sincronizar Estructura Maestra
                                 </button>
@@ -907,26 +907,26 @@ export default function CourtsPage() {
                     </>
                 ) : (
                     <div className="lg:col-span-12 space-y-8 animate-fadeIn">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-[#0B0F19] p-6 rounded-xl border border-slate-100 dark:border-white/5 shadow-xl">
-                            <div className="flex items-center gap-3 p-1 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-100 dark:border-white/5">
-                                <button onClick={() => setFilterSport('Todos')} className={`px-6 py-2.5 text-[9px] font-black uppercase rounded-lg transition-all ${filterSport === 'Todos' ? 'bg-white dark:bg-emerald-500 shadow-xl text-slate-900 dark:text-slate-900' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}>Todos</button>
-                                {selectedSports.map(s => <button key={s} onClick={() => setFilterSport(s)} className={`px-6 py-2.5 text-[9px] font-black uppercase rounded-lg transition-all ${filterSport === s ? 'bg-white dark:bg-emerald-500 shadow-xl text-slate-900 dark:text-slate-900' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}>{s}</button>)}
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-[#0B0F19] p-6 rounded-[14px] border border-slate-100 dark:border-white/5 shadow-xl">
+                            <div className="flex items-center gap-3 p-1 bg-slate-50 dark:bg-black/20 rounded-[14px] border border-slate-100 dark:border-white/5">
+                                <button onClick={() => setFilterSport('Todos')} className={`px-6 py-2.5 text-[9px] font-black uppercase rounded-[14px] transition-all ${filterSport === 'Todos' ? 'bg-white dark:bg-emerald-500 shadow-xl text-slate-900 dark:text-slate-900' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}>Todos</button>
+                                {selectedSports.map(s => <button key={s} onClick={() => setFilterSport(s)} className={`px-6 py-2.5 text-[9px] font-black uppercase rounded-[14px] transition-all ${filterSport === s ? 'bg-white dark:bg-emerald-500 shadow-xl text-slate-900 dark:text-slate-900' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}>{s}</button>)}
                             </div>
-                            <button onClick={handleOpenCreate} className="px-8 py-4 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 font-black text-[10px] uppercase rounded-xl flex items-center justify-center gap-3 active:scale-95 shadow-xl shadow-emerald-500/20 transition-all hover:-translate-y-1">
+                            <button onClick={handleOpenCreate} className="px-8 py-4 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-900 font-black text-[10px] uppercase rounded-[14px] flex items-center justify-center gap-3 active:scale-95 shadow-xl shadow-emerald-500/20 transition-all hover:-translate-y-1">
                                 <PlusIcon className="w-5 h-5" /> Integrar Nueva Cancha
                             </button>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
                             {sortedCourts.map(c => (
-                                <div key={c.id} className="bg-white dark:bg-[#0B0F19] rounded-xl border border-slate-100 dark:border-white/5 p-4 shadow-sm relative group hover:border-emerald-500/30 transition-all">
+                                <div key={c.id} className="bg-white dark:bg-[#0B0F19] rounded-[14px] border border-slate-100 dark:border-white/5 p-4 shadow-sm relative group hover:border-emerald-500/30 transition-all">
                                     <div className="flex justify-between items-start mb-4">
                                         <div className={`px-2 py-1 rounded text-[9px] font-black uppercase tracking-widest border ${c.status === 'maintenance' ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20 text-red-500' : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-500'}`}>
                                             {c.status === 'maintenance' ? 'En Pausa' : 'Activo'}
                                         </div>
                                         <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button onClick={() => handleOpenEdit(c)} className="p-1.5 bg-slate-50 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
-                                            <button onClick={() => handleDeleteCourt(c.id)} className="p-1.5 bg-slate-50 dark:bg-white/5 rounded-md text-slate-400 hover:text-red-500 transition-all"><TrashIcon className="w-3.5 h-3.5" /></button>
+                                            <button onClick={() => handleOpenEdit(c)} className="p-1.5 bg-slate-50 dark:bg-white/5 rounded-[14px] text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all"><PencilSquareIcon className="w-3.5 h-3.5" /></button>
+                                            <button onClick={() => handleDeleteCourt(c.id)} className="p-1.5 bg-slate-50 dark:bg-white/5 rounded-[14px] text-slate-400 hover:text-red-500 transition-all"><TrashIcon className="w-3.5 h-3.5" /></button>
                                         </div>
                                     </div>
                                     
@@ -960,16 +960,16 @@ export default function CourtsPage() {
 
                                     <div className="pt-3">
                                         {c.status === 'maintenance' ? (
-                                            <button onClick={() => handleRestoreCourt(c.id)} className="w-full py-2 bg-emerald-500 text-slate-900 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all hover:scale-[1.02]">Restaurar</button>
+                                            <button onClick={() => handleRestoreCourt(c.id)} className="w-full py-2 bg-emerald-500 text-slate-900 rounded-[14px] text-[8px] font-black uppercase tracking-widest transition-all hover:scale-[1.02]">Restaurar</button>
                                         ) : (
-                                            <button onClick={() => handleOpenMaintenance(c)} className="w-full py-2 bg-slate-50 dark:bg-white/5 text-slate-400 dark:text-slate-500 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all hover:bg-red-600 hover:text-white">Mantenimiento</button>
+                                            <button onClick={() => handleOpenMaintenance(c)} className="w-full py-2 bg-slate-50 dark:bg-white/5 text-slate-400 dark:text-slate-500 rounded-[14px] text-[8px] font-black uppercase tracking-widest transition-all hover:bg-red-600 hover:text-white">Mantenimiento</button>
                                         )}
                                     </div>
                                 </div>
                             ))}
                             {sortedCourts.length === 0 && (
                                 <div className="col-span-full py-40 text-center space-y-4">
-                                    <div className="w-20 h-20 bg-slate-50 dark:bg-white/5 rounded-xl flex items-center justify-center mx-auto text-slate-300">
+                                    <div className="w-20 h-20 bg-slate-50 dark:bg-white/5 rounded-[14px] flex items-center justify-center mx-auto text-slate-300">
                                         <PuzzlePieceIcon className="w-10 h-10" />
                                     </div>
                                     <div>

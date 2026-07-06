@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useAuth } from '@/context/AuthContext';
@@ -37,14 +37,14 @@ const StatusModal = ({ isOpen, title, message, type, onClose }: any) => {
 
     return (
         <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={onClose}>
-            <div className="bg-white dark:bg-[#0B0F19] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative text-center" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-white dark:bg-[#0B0F19] rounded-[14px] shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative text-center" onClick={(e) => e.stopPropagation()}>
                 <div className={`absolute top-0 left-0 w-full h-1 ${isError ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-emerald-500'}`}></div>
-                <div className={`w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center ${isError ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : isWarning ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-500' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500'}`}>
+                <div className={`w-14 h-14 rounded-[14px] mx-auto mb-4 flex items-center justify-center ${isError ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : isWarning ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-500' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500'}`}>
                     {isError ? <XMarkIcon className="w-8 h-8" /> : isWarning ? <ExclamationCircleIcon className="w-8 h-8" /> : <InformationCircleIcon className="w-8 h-8" />}
                 </div>
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter">{title}</h3>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-8 uppercase leading-relaxed">{message}</p>
-                <button onClick={onClose} className={`w-full py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl text-white shadow-lg transition-all active:scale-95 ${isError ? 'bg-red-600 shadow-red-500/20' : isWarning ? 'bg-amber-600 shadow-amber-500/20' : 'bg-slate-900 dark:bg-emerald-600 shadow-emerald-500/20'}`}>
+                <button onClick={onClose} className={`w-full py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-[14px] text-white shadow-lg transition-all active:scale-95 ${isError ? 'bg-red-600 shadow-red-500/20' : isWarning ? 'bg-amber-600 shadow-amber-500/20' : 'bg-slate-900 dark:bg-emerald-600 shadow-emerald-500/20'}`}>
                     Entendido
                 </button>
             </div>
@@ -643,15 +643,15 @@ export default function CheckInPage() {
                     {/* Viewfinder Tunnel View - Ajustado según el ALTO */}
                     <div className="flex-1 relative bg-black flex items-center justify-center overflow-hidden">
                         {!cameraError ? (
-                            <div className="relative w-[70vh] h-[70vh] max-w-[90vw] max-h-[90vw] md:max-w-[400px] md:max-h-[400px] rounded-3xl overflow-hidden border-2 border-emerald-500/40 shadow-[0_0_40px_rgba(16,185,129,0.2)]">
+                            <div className="relative w-[70vh] h-[70vh] max-w-[90vw] max-h-[90vw] md:max-w-[400px] md:max-h-[400px] rounded-[14px] overflow-hidden border-2 border-emerald-500/40 shadow-[0_0_40px_rgba(16,185,129,0.2)]">
                                 <div id="qr-reader" className="w-full h-full [&>video]:object-contain [&>video]:-scale-x-100"></div>
                                 
                                 {/* Guías Visuales Internas */}
                                 <div className="absolute inset-0 pointer-events-none z-10">
-                                    <div className="absolute border-[3px] border-transparent border-t-emerald-400 border-r-emerald-400 w-10 h-10 top-0 right-0 rounded-tr-2xl"></div>
-                                    <div className="absolute border-[3px] border-transparent border-t-emerald-400 border-l-emerald-400 w-10 h-10 top-0 left-0 rounded-tl-2xl"></div>
-                                    <div className="absolute border-[3px] border-transparent border-b-emerald-400 border-l-emerald-400 w-10 h-10 bottom-0 left-0 rounded-bl-2xl"></div>
-                                    <div className="absolute border-[3px] border-transparent border-b-emerald-400 border-r-emerald-400 w-10 h-10 bottom-0 right-0 rounded-br-2xl"></div>
+                                    <div className="absolute border-[3px] border-transparent border-t-emerald-400 border-r-emerald-400 w-10 h-10 top-0 right-0 rounded-[14px]"></div>
+                                    <div className="absolute border-[3px] border-transparent border-t-emerald-400 border-l-emerald-400 w-10 h-10 top-0 left-0 rounded-[14px]"></div>
+                                    <div className="absolute border-[3px] border-transparent border-b-emerald-400 border-l-emerald-400 w-10 h-10 bottom-0 left-0 rounded-[14px]"></div>
+                                    <div className="absolute border-[3px] border-transparent border-b-emerald-400 border-r-emerald-400 w-10 h-10 bottom-0 right-0 rounded-[14px]"></div>
                                     <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-400 shadow-[0_0_15px_#34D399] animate-scan-vertical opacity-80"></div>
                                 </div>
                             </div>
@@ -663,8 +663,8 @@ export default function CheckInPage() {
                                     <p className="text-xs text-white/60 leading-relaxed">{cameraError}</p>
                                 </div>
                                 <div className="flex flex-col gap-2 w-full max-w-[200px]">
-                                    <button onClick={startCamera} className="w-full px-5 py-2.5 bg-white text-black rounded-xl text-xs font-black uppercase tracking-wide">Reintentar</button>
-                                    <button onClick={stopCamera} className="w-full px-5 py-2.5 bg-red-500/20 text-red-500 rounded-xl text-xs font-bold uppercase tracking-wide">Cerrar</button>
+                                    <button onClick={startCamera} className="w-full px-5 py-2.5 bg-white text-black rounded-[14px] text-xs font-black uppercase tracking-wide">Reintentar</button>
+                                    <button onClick={stopCamera} className="w-full px-5 py-2.5 bg-red-500/20 text-red-500 rounded-[14px] text-xs font-bold uppercase tracking-wide">Cerrar</button>
                                 </div>
                             </div>
                         )}
@@ -694,13 +694,13 @@ export default function CheckInPage() {
                         <select
                             value={selectedVenueId}
                             onChange={(e) => setSelectedVenueId(e.target.value)}
-                            className="appearance-none bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-lg pl-9 pr-8 py-2 text-[9px] font-black outline-none text-slate-700 dark:text-white uppercase cursor-pointer shadow-sm transition-all focus:border-emerald-500"
+                            className="appearance-none bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-[14px] pl-9 pr-8 py-2 text-[9px] font-black outline-none text-slate-700 dark:text-white uppercase cursor-pointer shadow-sm transition-all focus:border-emerald-500"
                         >
                             {venues.map(v => <option key={v.id} value={v.id} className="dark:bg-[#0B0F19]">{v.name}</option>)}
                         </select>
                         <ChevronDownIcon className="w-3 h-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                     </div>
-                    <button onClick={fetchTodayBookings} className="p-2 rounded-lg bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 hover:text-emerald-500 hover:border-emerald-500/50 transition-all active:scale-90" title="Sincronizar Datos">
+                    <button onClick={fetchTodayBookings} className="p-2 rounded-[14px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 hover:text-emerald-500 hover:border-emerald-500/50 transition-all active:scale-90" title="Sincronizar Datos">
                         <ArrowPathIcon className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
@@ -708,9 +708,9 @@ export default function CheckInPage() {
 
             {/* === KPI GRID PREMIUM COMPACT === */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-xl border border-slate-100 dark:border-white/5 shadow-sm relative overflow-hidden group">
+                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-[14px] border border-slate-100 dark:border-white/5 shadow-sm relative overflow-hidden group">
                     <div className="flex items-center gap-2.5 mb-2">
-                        <div className="p-1.5 bg-slate-50 dark:bg-white/5 rounded-lg text-slate-400 group-hover:text-emerald-500 transition-colors">
+                        <div className="p-1.5 bg-slate-50 dark:bg-white/5 rounded-[14px] text-slate-400 group-hover:text-emerald-500 transition-colors">
                             <UserGroupIcon className="w-3.5 h-3.5" />
                         </div>
                         <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Afluencia Total</p>
@@ -721,10 +721,10 @@ export default function CheckInPage() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-xl border border-emerald-100 dark:border-emerald-500/20 shadow-lg shadow-emerald-500/5 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-12 h-12 bg-emerald-500/5 rounded-bl-full"></div>
+                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-[14px] border border-emerald-100 dark:border-emerald-500/20 shadow-lg shadow-emerald-500/5 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-12 h-12 bg-emerald-500/5 rounded-[14px]"></div>
                     <div className="flex items-center gap-2.5 mb-2">
-                        <div className="p-1.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg text-emerald-500">
+                        <div className="p-1.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-[14px] text-emerald-500">
                             <CheckCircleIcon className="w-3.5 h-3.5" />
                         </div>
                         <p className="text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Ingresos OK</p>
@@ -735,9 +735,9 @@ export default function CheckInPage() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-xl border border-amber-100 dark:border-amber-500/20 shadow-sm group">
+                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-[14px] border border-amber-100 dark:border-amber-500/20 shadow-sm group">
                     <div className="flex items-center gap-2.5 mb-2">
-                        <div className="p-1.5 bg-amber-50 dark:bg-amber-500/10 rounded-lg text-amber-500">
+                        <div className="p-1.5 bg-amber-50 dark:bg-amber-500/10 rounded-[14px] text-amber-500">
                             <BanknotesIcon className="w-3.5 h-3.5" />
                         </div>
                         <p className="text-[8px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">Saldo por Cobrar</p>
@@ -748,9 +748,9 @@ export default function CheckInPage() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-xl border border-red-100 dark:border-red-500/20 shadow-sm group">
+                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-[14px] border border-red-100 dark:border-red-500/20 shadow-sm group">
                     <div className="flex items-center gap-2.5 mb-2">
-                        <div className="p-1.5 bg-red-50 dark:bg-red-500/10 rounded-lg text-red-500">
+                        <div className="p-1.5 bg-red-50 dark:bg-red-500/10 rounded-[14px] text-red-500">
                             <ExclamationTriangleIcon className="w-3.5 h-3.5" />
                         </div>
                         <p className="text-[8px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Inasistencias</p>
@@ -761,9 +761,9 @@ export default function CheckInPage() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm group">
+                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-[14px] border border-slate-200 dark:border-white/10 shadow-sm group">
                     <div className="flex items-center gap-2.5 mb-2">
-                        <div className="p-1.5 bg-slate-100 dark:bg-white/5 rounded-lg text-slate-400">
+                        <div className="p-1.5 bg-slate-100 dark:bg-white/5 rounded-[14px] text-slate-400">
                             <NoSymbolIcon className="w-3.5 h-3.5" />
                         </div>
                         <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Anuladas</p>
@@ -779,7 +779,7 @@ export default function CheckInPage() {
             <div className="flex flex-col sm:flex-row gap-2">
                 <button
                     onClick={startCamera}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 h-12 px-6 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950 rounded-xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all shrink-0 group"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 h-12 px-6 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950 rounded-[14px] shadow-xl hover:scale-[1.02] active:scale-95 transition-all shrink-0 group"
                     title="Activar Escáner de Acceso"
                 >
                     <QrCodeIcon className="w-5 h-5 group-hover:rotate-12 transition-transform" />
@@ -792,13 +792,13 @@ export default function CheckInPage() {
                     <input
                         type="text"
                         placeholder="Buscar por código de reserva o nombre..."
-                        className="w-full h-12 pl-10 pr-24 bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-bold outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 uppercase placeholder:normal-case placeholder:font-medium shadow-sm transition-all text-slate-800 dark:text-white"
+                        className="w-full h-12 pl-10 pr-24 bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-[14px] text-[11px] font-bold outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 uppercase placeholder:normal-case placeholder:font-medium shadow-sm transition-all text-slate-800 dark:text-white"
                         value={manualCode}
                         onChange={(e) => setManualCode(e.target.value)}
                     />
                     <button
                         type="submit"
-                        className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-lg text-[9px] font-black uppercase active:scale-95 transition-all shadow-md disabled:opacity-50"
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-[14px] text-[9px] font-black uppercase active:scale-95 transition-all shadow-md disabled:opacity-50"
                         disabled={!manualCode}
                     >
                         Validar
@@ -819,7 +819,7 @@ export default function CheckInPage() {
 
             {/* Camera permission hint on mobile */}
             {cameraPermission === 'denied' && (
-                <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-lg p-3 text-[10px] text-amber-700 dark:text-amber-400 font-bold flex items-center gap-2">
+                <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-[14px] p-3 text-[10px] text-amber-700 dark:text-amber-400 font-bold flex items-center gap-2">
                     <CameraIcon className="w-4 h-4 shrink-0" />
                     <span>Permiso de cámara bloqueado. Habilítalo en la configuración del navegador para escanear códigos QR.</span>
                 </div>
@@ -834,7 +834,7 @@ export default function CheckInPage() {
                     <input
                         type="text"
                         placeholder="Filtrar por nombre o cancha..."
-                        className="w-full pl-9 pr-4 py-2 bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 rounded-lg text-[10px] font-bold text-slate-800 dark:text-white outline-none focus:border-emerald-500 transition-colors shadow-sm"
+                        className="w-full pl-9 pr-4 py-2 bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 rounded-[14px] text-[10px] font-bold text-slate-800 dark:text-white outline-none focus:border-emerald-500 transition-colors shadow-sm"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -842,7 +842,7 @@ export default function CheckInPage() {
             </div>
 
             {/* === LISTA DE RESERVAS FINANCE STYLE COMPACT === */}
-            <div className="bg-white dark:bg-[#0B0F19] rounded-2xl border border-slate-100 dark:border-white/5 shadow-xl overflow-hidden">
+            <div className="bg-white dark:bg-[#0B0F19] rounded-[14px] border border-slate-100 dark:border-white/5 shadow-xl overflow-hidden">
                 <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <h3 className="text-[9px] font-black text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-2 shrink-0">
                         <ClockIcon className="w-3.5 h-3.5 text-emerald-500" /> Registro de Hoy
@@ -852,7 +852,7 @@ export default function CheckInPage() {
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
-                                className={`px-2.5 py-1.5 rounded-lg text-[8px] font-black uppercase whitespace-nowrap transition-all border ${filter === f
+                                className={`px-2.5 py-1.5 rounded-[14px] text-[8px] font-black uppercase whitespace-nowrap transition-all border ${filter === f
                                     ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 shadow-md'
                                     : 'bg-white dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/10 hover:border-slate-300'}`}
                             >
@@ -886,7 +886,7 @@ export default function CheckInPage() {
                             return (
                                 <div key={booking.id} className={`group flex items-center gap-4 p-3.5 transition-all hover:bg-slate-50/50 dark:hover:bg-white/[0.01] ${(isCheckedIn || booking.status === 'cancelled' || isLateNoShow) ? 'opacity-50 grayscale-[0.5]' : ''}`}>
                                     {/* INDICADOR DE HORA COMPACT */}
-                                    <div className="flex flex-col items-center justify-center w-12 h-12 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg shrink-0 group-hover:scale-105 transition-transform">
+                                    <div className="flex flex-col items-center justify-center w-12 h-12 rounded-[14px] bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg shrink-0 group-hover:scale-105 transition-transform">
                                         <span className="text-[11px] font-black tracking-tighter">{booking.startTimeStr || formatTime(booking.startTime)}</span>
                                         <span className="text-[6px] font-black uppercase opacity-60">HORA</span>
                                     </div>
@@ -986,7 +986,7 @@ export default function CheckInPage() {
                                                 <div className="flex items-center gap-2">
                                                     <button
                                                         onClick={() => { setConfirmActionType(isPaid ? 'checkin' : 'pay'); handleCheckInAction(booking); }}
-                                                        className={`h-9 px-4 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95
+                                                        className={`h-9 px-4 rounded-[14px] text-[9px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95
                                                             ${isPaid
                                                                 ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-105 shadow-slate-900/10'
                                                                 : 'bg-amber-500 text-white hover:bg-amber-600 shadow-amber-500/20'
@@ -997,7 +997,7 @@ export default function CheckInPage() {
                                                     <button
                                                         onClick={() => handleNoShow(booking)}
                                                         disabled={processingId === booking.id}
-                                                        className="h-9 w-9 flex items-center justify-center rounded-lg bg-red-50 dark:bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all active:scale-90"
+                                                        className="h-9 w-9 flex items-center justify-center rounded-[14px] bg-red-50 dark:bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all active:scale-90"
                                                         title="Marcar como No-Show (Sanción)"
                                                     >
                                                         <NoSymbolIcon className="w-4 h-4" />
@@ -1016,10 +1016,10 @@ export default function CheckInPage() {
             {/* === MODAL DE CONFIRMACIÓN DE CHECK-IN === */}
             {isConfirmModalOpen && selectedBookingForConfirm && (
                 <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10 animate-scaleIn">
+                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-[14px] overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10 animate-scaleIn">
                         {/* Header Modal FINANCE STYLE */}
                         <div className="p-8 pb-4 text-center">
-                            <div className={`w-16 h-16 rounded-3xl flex items-center justify-center mb-6 mx-auto border ${confirmActionType === 'pay' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-emerald-500/10 border-emerald-500/20'}`}>
+                            <div className={`w-16 h-16 rounded-[14px] flex items-center justify-center mb-6 mx-auto border ${confirmActionType === 'pay' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-emerald-500/10 border-emerald-500/20'}`}>
                                 {confirmActionType === 'pay' ? <BanknotesIcon className="w-8 h-8 text-amber-500" /> : <ShieldCheckIcon className="w-8 h-8 text-emerald-500" />}
                             </div>
                             <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
@@ -1036,7 +1036,7 @@ export default function CheckInPage() {
 
                         {/* Contenido Datos PREMIUM COMPACT */}
                         <div className="px-6 py-4 space-y-3">
-                            <div className="bg-slate-50 dark:bg-white/5 rounded-2xl p-4 space-y-3 border border-slate-100 dark:border-white/5 shadow-inner">
+                            <div className="bg-slate-50 dark:bg-white/5 rounded-[14px] p-4 space-y-3 border border-slate-100 dark:border-white/5 shadow-inner">
                                 <div className="flex justify-between items-center border-b border-slate-200/50 dark:border-white/5 pb-2">
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Cliente</span>
                                     <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase">{selectedBookingForConfirm?.clientName}</span>
@@ -1067,7 +1067,7 @@ export default function CheckInPage() {
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Estado Pago</span>
-                                    <span className={`text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider ${selectedBookingForConfirm?.paymentStatus === 'paid'
+                                    <span className={`text-[9px] font-black px-2.5 py-1 rounded-[14px] uppercase tracking-wider ${selectedBookingForConfirm?.paymentStatus === 'paid'
                                         ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
                                         : 'bg-amber-500 text-white shadow-lg shadow-amber-500/20 animate-pulse'
                                         }`}>
@@ -1078,7 +1078,7 @@ export default function CheckInPage() {
 
                             {selectedBookingForConfirm?.paymentStatus !== 'paid' && (
                                 <div className="space-y-3 mt-3">
-                                    <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-xl p-3 flex gap-2.5">
+                                    <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-[14px] p-3 flex gap-2.5">
                                         <ExclamationTriangleIcon className="w-4 h-4 text-amber-600 shrink-0" />
                                         <p className="text-[9px] leading-relaxed font-bold text-amber-700 dark:text-amber-400 uppercase">
                                             Alerta: El cliente tiene saldos pendientes. Al autorizar, se registrará el pago.
@@ -1089,7 +1089,7 @@ export default function CheckInPage() {
                                         <select 
                                             value={selectedPaymentMethod} 
                                             onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                                            className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-[10px] font-black uppercase text-slate-700 dark:text-white outline-none cursor-pointer appearance-none"
+                                            className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[14px] px-4 py-3 text-[10px] font-black uppercase text-slate-700 dark:text-white outline-none cursor-pointer appearance-none"
                                         >
                                             <option value="cash" className="dark:bg-[#0B0F19]">Efectivo</option>
                                             <option value="transfer" className="dark:bg-[#0B0F19]">Transferencia</option>
@@ -1104,14 +1104,14 @@ export default function CheckInPage() {
                         <div className="p-6 flex gap-2">
                             <button
                                 onClick={() => { setIsConfirmModalOpen(false); setSelectedBookingForConfirm(null); }}
-                                className="flex-1 py-3.5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/60 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all active:scale-95"
+                                className="flex-1 py-3.5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/60 rounded-[14px] text-[9px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all active:scale-95"
                             >
                                 Cancelar
                             </button>
                             <button
                                 onClick={confirmCheckIn}
                                 disabled={!!processingId}
-                                className={`flex-[2] py-3.5 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 ${confirmActionType === 'pay' ? 'bg-amber-500 text-white shadow-amber-500/20' : 'bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950'}`}
+                                className={`flex-[2] py-3.5 rounded-[14px] text-[9px] font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 ${confirmActionType === 'pay' ? 'bg-amber-500 text-white shadow-amber-500/20' : 'bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950'}`}
                             >
                                 {processingId ? (
                                     <ArrowPathIcon className="w-4 h-4 animate-spin" />

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
@@ -18,7 +18,7 @@ import {
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
     return (
-        <div className={`fixed top-5 right-5 z-[160] flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border animate-slideIn ${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-emerald-400 dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
+        <div className={`fixed top-5 right-5 z-[160] flex items-center gap-3 px-4 py-3 rounded-[14px] shadow-xl border animate-slideIn ${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-emerald-400 dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
             {type === 'success' ? <CheckCircleIcon className="w-5 h-5" /> : <ExclamationTriangleIcon className="w-5 h-5" />}
             <span className="text-[10px] font-black uppercase tracking-widest">{message}</span>
         </div>
@@ -283,11 +283,11 @@ export default function TenantSettingsPage() {
                     </h1>
                 </div>
 
-                <div className="flex items-center gap-3 p-1.5 rounded-2xl">
+                <div className="flex items-center gap-3 p-1.5 rounded-[14px]">
                     <button 
                         onClick={handleSave} 
                         disabled={saving} 
-                        className="px-10 py-3 bg-emerald-500 text-white dark:text-slate-950 font-black text-[10px] uppercase tracking-[0.2em] rounded-xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/30 flex items-center gap-3 disabled:opacity-50 border-none"
+                        className="px-10 py-3 bg-emerald-500 text-white dark:text-slate-950 font-black text-[10px] uppercase tracking-[0.2em] rounded-[14px] transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/30 flex items-center gap-3 disabled:opacity-50 border-none"
                     >
                         {saving ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <DocumentCheckIcon className="w-4 h-4" />}
                         GUARDAR CAMBIOS
@@ -298,7 +298,7 @@ export default function TenantSettingsPage() {
             {loading ? (
                 <div className="flex justify-center py-20 text-slate-400 text-xs uppercase font-bold tracking-widest"><ArrowPathIcon className="w-5 h-5 animate-spin mr-2 inline-block" /> Leyendo base de datos...</div>
             ) : tenants.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#0B0F19] rounded-xl border border-dashed border-slate-300 dark:border-white/10 text-center">
+                <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-[#0B0F19] rounded-[14px] border border-dashed border-slate-300 dark:border-white/10 text-center">
                     <BuildingOfficeIcon className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-4" />
                     <h2 className="text-lg font-black text-slate-800 dark:text-white uppercase">Sin recintos asociados</h2>
                     <p className="text-xs text-slate-500 mt-2 font-bold uppercase">Crea un recinto en el módulo 'Mis Recintos' para configurar su info.</p>
@@ -306,7 +306,7 @@ export default function TenantSettingsPage() {
             ) : (
                 <div className="flex flex-col">
                     {/* SELECTOR DE RECINTO ADN PREMIUM */}
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-white dark:bg-[#0B0F19] p-8 rounded-[2.5rem] border border-slate-200 dark:border-white/5 shadow-2xl shadow-slate-200/20 dark:shadow-none">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-white dark:bg-[#0B0F19] p-8 rounded-[14px] border border-slate-200 dark:border-white/5 shadow-2xl shadow-slate-200/20 dark:shadow-none">
                         <div className="lg:col-span-4">
                             <div className="flex items-center gap-3 mb-1">
                                 <BuildingOfficeIcon className="w-5 h-5 text-emerald-500" />
@@ -319,7 +319,7 @@ export default function TenantSettingsPage() {
                                 <select
                                     value={selectedTenantId}
                                     onChange={(e) => handleSelectTenant(e.target.value)}
-                                    className="w-full pl-8 pr-12 py-5 bg-slate-50 dark:bg-black/40 border-2 border-transparent focus:border-emerald-500/20 rounded-[1.5rem] text-[12px] font-black outline-none cursor-pointer text-slate-700 dark:text-white uppercase transition-all appearance-none shadow-inner font-mono"
+                                    className="w-full pl-8 pr-12 py-5 bg-slate-50 dark:bg-black/40 border-2 border-transparent focus:border-emerald-500/20 rounded-[14px] text-[12px] font-black outline-none cursor-pointer text-slate-700 dark:text-white uppercase transition-all appearance-none shadow-inner font-mono"
                                 >
                                     {tenants.map(t => <option key={t.id} value={t.id} className="dark:bg-[#0B0F19] font-sans">{t.name}</option>)}
                                 </select>
@@ -346,7 +346,7 @@ export default function TenantSettingsPage() {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Reseña del Club</label>
-                                        <textarea rows={3} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-5 py-4 bg-slate-50 dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-2xl text-xs font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 resize-none transition-all uppercase" placeholder="Misión del complejo..." />
+                                        <textarea rows={3} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-5 py-4 bg-slate-50 dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-[14px] text-xs font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 resize-none transition-all uppercase" placeholder="Misión del complejo..." />
                                     </div>
                                 </div>
                             </PanelGlass>
@@ -380,8 +380,8 @@ export default function TenantSettingsPage() {
                             <div className="md:col-span-2 space-y-6">
                                 <div className="grid grid-cols-1 gap-6 relative">
                                     {isApiLocked && (
-                                        <div className="absolute inset-0 bg-white/70 dark:bg-[#0B0F19]/80 backdrop-blur-md z-40 rounded-[2.5rem] flex flex-col items-center justify-center p-6 text-center border border-slate-200 dark:border-white/10 shadow-2xl">
-                                            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mb-4">
+                                        <div className="absolute inset-0 bg-white/70 dark:bg-[#0B0F19]/80 backdrop-blur-md z-40 rounded-[14px] flex flex-col items-center justify-center p-6 text-center border border-slate-200 dark:border-white/10 shadow-2xl">
+                                            <div className="w-14 h-14 rounded-[14px] bg-amber-500/10 text-amber-500 flex items-center justify-center mb-4">
                                                 <KeyIcon className="w-6 h-6 stroke-[1.5]" />
                                             </div>
                                             <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-[0.2em] mb-2">Integraciones de API bloqueadas</h4>
@@ -390,7 +390,7 @@ export default function TenantSettingsPage() {
                                             </p>
                                             <a 
                                                 href="/dashboard/billing-subscription" 
-                                                className="px-8 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white dark:text-slate-950 font-black text-[9px] uppercase tracking-[0.2em] rounded-xl hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-amber-500/20 border border-amber-400/20"
+                                                className="px-8 py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white dark:text-slate-950 font-black text-[9px] uppercase tracking-[0.2em] rounded-[14px] hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-amber-500/20 border border-amber-400/20"
                                             >
                                                 MEJORAR PLAN A ELITE
                                             </a>
@@ -400,7 +400,7 @@ export default function TenantSettingsPage() {
                                     <PanelGlass className={`p-6 border-none shadow-xl transition-all ${isTbGloballyDisabled ? 'opacity-40 grayscale' : isTbActive ? 'shadow-pink-500/5 bg-pink-500/[0.01]' : 'opacity-60 grayscale'}`}>
                                         <div className="flex items-center justify-between mb-6">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-pink-500/10 flex items-center justify-center text-pink-500">
+                                                <div className="w-10 h-10 rounded-[14px] bg-pink-500/10 flex items-center justify-center text-pink-500">
                                                     <BuildingStorefrontIcon className="w-6 h-6" />
                                                 </div>
                                                 <div>
@@ -416,7 +416,7 @@ export default function TenantSettingsPage() {
                                             <div className="space-y-4 animate-fadeIn">
                                                 <InputMini label="Commerce Code" value={formData.transbankCommerceCode} onChange={(e: any) => setFormData({ ...formData, transbankCommerceCode: e.target.value })} icon={<KeyIcon className="w-4 h-4 text-pink-500" />} />
                                                 <InputMini label="API Key" type="password" value={formData.transbankApiKey} onChange={(e: any) => setFormData({ ...formData, transbankApiKey: e.target.value })} icon={<ShieldCheckIcon className="w-4 h-4 text-pink-500" />} />
-                                                <button onClick={() => simulateApiTest('transbank')} className="w-full py-3 bg-pink-500 text-white text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-pink-600 transition-all shadow-lg shadow-pink-500/20">Verificar API</button>
+                                                <button onClick={() => simulateApiTest('transbank')} className="w-full py-3 bg-pink-500 text-white text-[9px] font-black uppercase tracking-widest rounded-[14px] hover:bg-pink-600 transition-all shadow-lg shadow-pink-500/20">Verificar API</button>
                                             </div>
                                         )}
                                     </PanelGlass>
@@ -425,7 +425,7 @@ export default function TenantSettingsPage() {
                                 </div>
 
                                 {/* TERMINAL DE DIAGNÓSTICO (RESPONSIVE) */}
-                                <div className="rounded-[2rem] bg-white dark:bg-slate-950 shadow-inner overflow-hidden border border-slate-200 dark:border-white/10 flex flex-col h-[280px]">
+                                <div className="rounded-[14px] bg-white dark:bg-slate-950 shadow-inner overflow-hidden border border-slate-200 dark:border-white/10 flex flex-col h-[280px]">
                                     <div className="bg-slate-100/50 dark:bg-white/[0.03] p-4 flex items-center justify-between border-b border-slate-200 dark:border-white/10">
                                         <div className="flex gap-1.5">
                                             <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
@@ -446,13 +446,13 @@ export default function TenantSettingsPage() {
                                 </div>
 
                                 {/* CUADRO DE INSTRUCCIONES API */}
-                                <div className="p-8 bg-slate-900 rounded-[2rem] border border-white/5 shadow-2xl relative overflow-hidden group">
+                                <div className="p-8 bg-slate-900 rounded-[14px] border border-white/5 shadow-2xl relative overflow-hidden group">
                                     <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
                                         <ShieldCheckIcon className="w-24 h-24 text-emerald-500" />
                                     </div>
                                     <div className="relative z-10">
                                         <div className="flex items-center gap-3 mb-4">
-                                            <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-500">
+                                            <div className="w-8 h-8 rounded-[14px] bg-emerald-500/20 flex items-center justify-center text-emerald-500">
                                                 <ShieldCheckIcon className="w-5 h-5" />
                                             </div>
                                             <h4 className="text-[10px] font-black uppercase text-white tracking-[0.2em]">Protocolo de Seguridad Bancaria</h4>
@@ -498,7 +498,7 @@ export default function TenantSettingsPage() {
                                                     const exists = formData.amenities.includes(item);
                                                     setFormData({ ...formData, amenities: exists ? formData.amenities.filter(i => i !== item) : [...formData.amenities, item] });
                                                 }}
-                                                className={`py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest border transition-all ${formData.amenities.includes(item) ? 'bg-slate-900 text-white dark:bg-emerald-500 dark:text-slate-950 shadow-lg shadow-emerald-500/20' : 'bg-slate-50 dark:bg-white/5 border-transparent text-slate-400 hover:border-emerald-500/30'}`}
+                                                className={`py-3 rounded-[14px] text-[10px] font-bold uppercase tracking-widest border transition-all ${formData.amenities.includes(item) ? 'bg-slate-900 text-white dark:bg-emerald-500 dark:text-slate-950 shadow-lg shadow-emerald-500/20' : 'bg-slate-50 dark:bg-white/5 border-transparent text-slate-400 hover:border-emerald-500/30'}`}
                                             >
                                                 {item}
                                             </button>
@@ -513,7 +513,7 @@ export default function TenantSettingsPage() {
                                     <HeaderSeccion titulo="Protocolos" desc="Políticas del Recinto" />
                                 </div>
                                 <div className="p-6 space-y-5">
-                                    <div className="p-4 bg-white dark:bg-[#020611] rounded-2xl border border-slate-200 dark:border-white/10">
+                                    <div className="p-4 bg-white dark:bg-[#020611] rounded-[14px] border border-slate-200 dark:border-white/10">
                                         <div className="flex items-center gap-3 mb-2">
                                             <ClockIcon className="w-4 h-4 text-emerald-500" />
                                             <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase">Horario de Red</span>
@@ -544,7 +544,7 @@ export default function TenantSettingsPage() {
                                                         const exists = formData.rules.includes(rule);
                                                         setFormData({ ...formData, rules: exists ? formData.rules.filter(r => r !== rule) : [...formData.rules, rule] });
                                                     }}
-                                                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl border text-[9px] font-bold uppercase transition-all ${formData.rules.includes(rule) ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600' : 'bg-slate-50 dark:bg-white/5 border-transparent text-slate-400'}`}
+                                                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-[14px] border text-[9px] font-bold uppercase transition-all ${formData.rules.includes(rule) ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600' : 'bg-slate-50 dark:bg-white/5 border-transparent text-slate-400'}`}
                                                 >
                                                     <div className={`w-3.5 h-3.5 rounded border flex items-center justify-center ${formData.rules.includes(rule) ? 'bg-emerald-500 border-emerald-500' : 'bg-white dark:bg-white/5 border-slate-200'}`}>
                                                         {formData.rules.includes(rule) && <CheckCircleIcon className="w-2.5 h-2.5 text-white" />}
@@ -576,7 +576,7 @@ function InputMini({ label, value, icon, onChange, type = "text", placeholder = 
                     placeholder={placeholder} 
                     value={value} 
                     onChange={onChange} 
-                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border bg-white dark:bg-[#020611] border-slate-200 dark:border-white/10 text-xs font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all uppercase tracking-tight text-slate-700 dark:text-white" 
+                    className="w-full pl-12 pr-4 py-3.5 rounded-[14px] border bg-white dark:bg-[#020611] border-slate-200 dark:border-white/10 text-xs font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all uppercase tracking-tight text-slate-700 dark:text-white" 
                 />
             </div>
         </div>

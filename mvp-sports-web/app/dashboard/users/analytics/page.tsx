@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useMemo } from 'react';
 import {
     ChartBarIcon,
@@ -87,7 +87,7 @@ export default function PlayerAnalyticsPage() {
     const CustomTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-white dark:bg-black p-3 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl backdrop-blur-md">
+                <div className="bg-white dark:bg-black p-3 border border-slate-200 dark:border-white/10 rounded-[14px] shadow-2xl backdrop-blur-md">
                     {label && <p className="text-[10px] font-black text-emerald-500 uppercase mb-1.5 tracking-tighter border-b border-slate-100 dark:border-white/5 pb-1">{label}</p>}
                     <div className="space-y-1">
                         {payload.map((entry: any, index: number) => (
@@ -114,7 +114,7 @@ export default function PlayerAnalyticsPage() {
                     </div>
                     <h1 className="text-2xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none">Analítica de <span className="text-emerald-500 dark:text-emerald-400">Atletas</span></h1>
                 </div>
-                <button onClick={fetchPlayers} className="p-2.5 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl hover:bg-emerald-500 dark:hover:bg-emerald-600 hover:text-white transition-all active:scale-90"><ArrowPathIcon className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} /></button>
+                <button onClick={fetchPlayers} className="p-2.5 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-[14px] hover:bg-emerald-500 dark:hover:bg-emerald-600 hover:text-white transition-all active:scale-90"><ArrowPathIcon className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} /></button>
             </div>
 
             {/* KPI INDICADORES */}
@@ -205,7 +205,7 @@ export default function PlayerAnalyticsPage() {
                                     if (active && payload && payload.length) {
                                         const d = payload[0].payload;
                                         return (
-                                            <div className="bg-white dark:bg-black p-3 border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl backdrop-blur-md">
+                                            <div className="bg-white dark:bg-black p-3 border border-slate-200 dark:border-white/10 rounded-[14px] shadow-2xl backdrop-blur-md">
                                                 <p className="text-[10px] font-black text-emerald-500 uppercase mb-1.5 tracking-tighter border-b border-slate-100 dark:border-white/5 pb-1">{d.name}</p>
                                                 <p className="text-[10px] font-bold text-slate-700 dark:text-slate-200 uppercase">NIVEL: <span className="font-black text-black dark:text-white">{d.x}</span></p>
                                                 <p className="text-[10px] font-bold text-slate-700 dark:text-slate-200 uppercase">VICTORIAS: <span className="font-black text-black dark:text-white">{d.y}</span></p>

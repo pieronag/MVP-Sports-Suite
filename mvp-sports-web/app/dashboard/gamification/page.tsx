@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from 'react';
 import {
     TrophyIcon,
@@ -91,7 +91,7 @@ const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 
     }, [onClose]);
 
     return (
-        <div className={`fixed top-5 right-5 z-[150] flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border animate-slideIn 
+        <div className={`fixed top-5 right-5 z-[150] flex items-center gap-3 px-4 py-3 rounded-[14px] shadow-2xl border animate-slideIn 
             \${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-emerald-400 dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
             {type === 'success' ? <CheckCircleIcon className="w-5 h-5 text-emerald-500" /> : <ExclamationTriangleIcon className="w-5 h-5 text-red-500" />}
             <span className="text-[10px] font-black uppercase tracking-widest">{message}</span>
@@ -204,11 +204,11 @@ export default function GamificationSettingsPage() {
                     </h1>
                 </div>
 
-                <div className="flex items-center gap-3 p-1.5 rounded-2xl">
+                <div className="flex items-center gap-3 p-1.5 rounded-[14px]">
                     <button 
                         onClick={handleSave} 
                         disabled={saving} 
-                        className="px-10 py-3 bg-emerald-500 text-white dark:text-slate-950 font-black text-[10px] uppercase tracking-[0.2em] rounded-xl transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/30 flex items-center gap-3 disabled:opacity-50 border-none"
+                        className="px-10 py-3 bg-emerald-500 text-white dark:text-slate-950 font-black text-[10px] uppercase tracking-[0.2em] rounded-[14px] transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-emerald-500/30 flex items-center gap-3 disabled:opacity-50 border-none"
                     >
                         {saving ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <CheckBadgeIcon className="w-4 h-4" />} 
                         {saving ? 'SINCRONIZANDO...' : 'GUARDAR CAMBIOS'}
@@ -229,7 +229,7 @@ export default function GamificationSettingsPage() {
                 <PanelGlass className="p-6 space-y-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-emerald-500/10 rounded-xl text-emerald-500"><FireIcon className="w-5 h-5" /></div>
+                            <div className="p-2 bg-emerald-500/10 rounded-[14px] text-emerald-500"><FireIcon className="w-5 h-5" /></div>
                             <div>
                                 <h2 className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest leading-none">Reglas Generales de Plataforma</h2>
                                 <p className="text-[9px] text-slate-400 uppercase font-bold tracking-tighter mt-1">Configuración transversal de XP (aplicable a todos los deportes)</p>
@@ -248,7 +248,7 @@ export default function GamificationSettingsPage() {
                 <PanelGlass className="p-6 space-y-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-4">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-amber-500/10 rounded-xl text-amber-500"><TrophyIcon className="w-5 h-5" /></div>
+                            <div className="p-2 bg-amber-500/10 rounded-[14px] text-amber-500"><TrophyIcon className="w-5 h-5" /></div>
                             <div>
                                 <h2 className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-widest leading-none">Economía de Logros e Insignias</h2>
                                 <p className="text-[9px] text-slate-400 uppercase font-bold tracking-tighter mt-1">XP otorgada por cada nivel de medalla alcanzado</p>
@@ -290,9 +290,9 @@ export default function GamificationSettingsPage() {
                         </div>
                         <div className="p-6 space-y-3">
                             {Object.entries(params.sportsOverrides || {}).map(([sport, config]) => (
-                                <div key={sport} className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-slate-50 dark:bg-[#0B0F19] rounded-2xl border border-slate-200 dark:border-white/10 hover:border-indigo-500/30 transition-all group">
+                                <div key={sport} className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-slate-50 dark:bg-[#0B0F19] rounded-[14px] border border-slate-200 dark:border-white/10 hover:border-indigo-500/30 transition-all group">
                                     <div className="flex items-center gap-3 w-40 shrink-0">
-                                        <div className="w-8 h-8 rounded-xl bg-white dark:bg-white/5 flex items-center justify-center border border-slate-200 dark:border-white/10 shadow-sm group-hover:scale-110 transition-transform">
+                                        <div className="w-8 h-8 rounded-[14px] bg-white dark:bg-white/5 flex items-center justify-center border border-slate-200 dark:border-white/10 shadow-sm group-hover:scale-110 transition-transform">
                                             <TrophyIcon className="w-4 h-4 text-indigo-500" />
                                         </div>
                                         <h3 className="text-[10px] font-black uppercase text-slate-800 dark:text-white tracking-widest">{sport}</h3>
@@ -305,7 +305,7 @@ export default function GamificationSettingsPage() {
                                             { label: 'Gol', value: config.goalXP ?? (config.countGoals ? 25 : 0), field: 'goalXP', color: 'text-indigo-500' },
                                             { label: 'Asist', value: config.assistXP ?? (config.countAssists ? 15 : 0), field: 'assistXP', color: 'text-sky-500' }
                                         ].map(input => (
-                                            <div key={input.field} className="flex items-center gap-2 bg-white dark:bg-[#131A2B] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
+                                            <div key={input.field} className="flex items-center gap-2 bg-white dark:bg-[#131A2B] px-3 py-1.5 rounded-[14px] border border-slate-200 dark:border-white/5 shadow-sm">
                                                 <span className="text-[7px] font-black uppercase text-slate-400 tracking-widest">{input.label}</span>
                                                 <input 
                                                     type="number" 
@@ -397,7 +397,7 @@ function OverallEngine({ tiers }: { tiers: any }) {
                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Valida la progresión del jugador en tiempo real</p>
                     </div>
 
-                    <div className="space-y-4 bg-slate-50 dark:bg-white/[0.02] p-6 rounded-xl border border-slate-200 dark:border-white/5 shadow-inner">
+                    <div className="space-y-4 bg-slate-50 dark:bg-white/[0.02] p-6 rounded-[14px] border border-slate-200 dark:border-white/5 shadow-inner">
                         <div className="flex justify-between items-center px-1">
                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Experiencia Acumulada</span>
                             <span className="text-lg font-black text-black dark:text-emerald-500 font-mono tracking-tighter">{testXP.toLocaleString()} <span className="text-[10px] text-slate-400">XP</span></span>
@@ -408,7 +408,7 @@ function OverallEngine({ tiers }: { tiers: any }) {
                             max={maxXP}
                             value={testXP}
                             onChange={(e) => setTestXP(Number(e.target.value))}
-                            className="w-full h-1.5 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                            className="w-full h-1.5 bg-slate-200 dark:bg-white/10 rounded-[14px] appearance-none cursor-pointer accent-emerald-500"
                         />
                         <div className="flex justify-between text-[8px] font-black text-slate-400 uppercase tracking-widest px-1">
                             <span>0 XP (BRONCE)</span>
@@ -417,14 +417,14 @@ function OverallEngine({ tiers }: { tiers: any }) {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="p-4 bg-white dark:bg-[#0B0F19] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm group hover:border-emerald-500/30 transition-all">
+                        <div className="p-4 bg-white dark:bg-[#0B0F19] rounded-[14px] border border-slate-200 dark:border-white/10 shadow-sm group hover:border-emerald-500/30 transition-all">
                             <div className="flex items-center gap-2 mb-1">
                                 < BoltIcon className="w-3 h-3 text-emerald-500" />
                                 <p className="text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Motor Lógico</p>
                             </div>
                             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Escalado de Raíz Cuadrada</p>
                         </div>
-                        <div className="p-4 bg-white dark:bg-[#0B0F19] rounded-xl border border-slate-200 dark:border-white/10 shadow-sm group hover:border-amber-500/30 transition-all">
+                        <div className="p-4 bg-white dark:bg-[#0B0F19] rounded-[14px] border border-slate-200 dark:border-white/10 shadow-sm group hover:border-amber-500/30 transition-all">
                             <div className="flex items-center gap-2 mb-1">
                                 <SparklesIcon className="w-3 h-3 text-amber-500" />
                                 <p className="text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Curva de Esfuerzo</p>
@@ -440,9 +440,9 @@ function OverallEngine({ tiers }: { tiers: any }) {
 
 function XPInputCard({ label, value, onChange, icon, isNegative = false, desc }: { label: string, value: number, onChange: (v: number) => void, icon: React.ReactNode, isNegative?: boolean, desc?: string }) {
     return (
-        <div className="bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 p-4 rounded-2xl flex flex-col justify-between transition-all hover:border-emerald-500/30 hover:shadow-xl shadow-sm group">
+        <div className="bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 p-4 rounded-[14px] flex flex-col justify-between transition-all hover:border-emerald-500/30 hover:shadow-xl shadow-sm group">
             <div className="flex items-center gap-3 mb-5">
-                <div className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-[#131A2B] shadow-sm flex items-center justify-center border border-slate-100 dark:border-white/5 text-slate-700 dark:text-white group-hover:scale-110 transition-transform">
+                <div className="w-9 h-9 rounded-[14px] bg-slate-50 dark:bg-[#131A2B] shadow-sm flex items-center justify-center border border-slate-100 dark:border-white/5 text-slate-700 dark:text-white group-hover:scale-110 transition-transform">
                     {icon}
                 </div>
                 <div>
@@ -450,7 +450,7 @@ function XPInputCard({ label, value, onChange, icon, isNegative = false, desc }:
                     <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">{desc}</p>
                 </div>
             </div>
-            <div className="flex items-center justify-between bg-slate-50 dark:bg-black/40 px-3 py-2 rounded-xl border border-slate-100 dark:border-white/5">
+            <div className="flex items-center justify-between bg-slate-50 dark:bg-black/40 px-3 py-2 rounded-[14px] border border-slate-100 dark:border-white/5">
                 <span className="text-[7px] text-slate-400 uppercase font-black tracking-widest">Valor XP</span>
                 <div className="flex items-center">
                     {isNegative && <span className="text-rose-500 text-xs font-black mr-1">-</span>}
@@ -478,12 +478,12 @@ function TierCard({ label, value, onChange, color, icon, highlight = false }: { 
     };
 
     return (
-        <div className={`p-4 rounded-2xl border flex flex-col justify-between items-center transition-all hover:-translate-y-1 bg-slate-50 dark:bg-[#0B0F19] border-slate-200 dark:border-white/10 ${highlight ? 'shadow-[0_0_15px_rgba(var(--color),0.05)] ring-1 ring-white/5' : ''}`}>
+        <div className={`p-4 rounded-[14px] border flex flex-col justify-between items-center transition-all hover:-translate-y-1 bg-slate-50 dark:bg-[#0B0F19] border-slate-200 dark:border-white/10 ${highlight ? 'shadow-[0_0_15px_rgba(var(--color),0.05)] ring-1 ring-white/5' : ''}`}>
             <div className="flex flex-col items-center gap-2 mb-3">
-                <div className={`p-2 rounded-xl border shadow-sm ${colorClasses[color]}`}>{icon}</div>
+                <div className={`p-2 rounded-[14px] border shadow-sm ${colorClasses[color]}`}>{icon}</div>
                 <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-white">{label}</h3>
             </div>
-            <div className="flex items-center justify-between w-full bg-white dark:bg-[#131A2B] px-2 py-1.5 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm">
+            <div className="flex items-center justify-between w-full bg-white dark:bg-[#131A2B] px-2 py-1.5 rounded-[14px] border border-slate-200 dark:border-white/5 shadow-sm">
                 <span className="text-[7px] text-slate-400 uppercase font-black tracking-widest ml-1">XP</span>
                 <input
                     type="number"

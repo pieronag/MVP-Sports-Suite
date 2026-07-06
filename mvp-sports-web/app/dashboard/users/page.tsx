@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   MagnifyingGlassIcon, NoSymbolIcon, CheckCircleIcon, TrophyIcon,
@@ -550,7 +550,7 @@ export default function Page() {
   return (
     <div className="w-full space-y-6 pb-12 animate-fadeIn relative">
       {notification && (
-        <div className={`fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-3 rounded-2xl shadow-2xl border animate-slideInRight backdrop-blur-md ${
+        <div className={`fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-3 rounded-[14px] shadow-2xl border animate-slideInRight backdrop-blur-md ${
             notification.type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-emerald-400 dark:border-emerald-500/50' : 
             'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
         }`}>
@@ -569,8 +569,8 @@ export default function Page() {
               <h1 className="text-2xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none">Directorio de <span className="text-emerald-500 dark:text-emerald-400">Atletas</span></h1>
           </div>
           <div className="flex items-center gap-2">
-              <button onClick={() => setIsBadgesModalOpen(true)} className="p-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl hover:bg-slate-50 transition-all active:scale-95 text-amber-500 shadow-sm"><TrophyIcon className="w-4 h-4" /></button>
-              <button onClick={handleBulkRecalculate} disabled={isBulkLoading || loading} className="px-6 py-2.5 bg-slate-950 dark:bg-emerald-600 text-white dark:text-slate-950 text-[10px] font-black uppercase rounded-xl shadow-xl flex items-center gap-2 active:scale-95 transition-all disabled:opacity-50">
+              <button onClick={() => setIsBadgesModalOpen(true)} className="p-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[14px] hover:bg-slate-50 transition-all active:scale-95 text-amber-500 shadow-sm"><TrophyIcon className="w-4 h-4" /></button>
+              <button onClick={handleBulkRecalculate} disabled={isBulkLoading || loading} className="px-6 py-2.5 bg-slate-950 dark:bg-emerald-600 text-white dark:text-slate-950 text-[10px] font-black uppercase rounded-[14px] shadow-xl flex items-center gap-2 active:scale-95 transition-all disabled:opacity-50">
                   <ArrowPathIcon className={`w-4 h-4 ${isBulkLoading ? 'animate-spin' : ''}`} /> Sincronizar ELO
               </button>
           </div>
@@ -588,28 +588,28 @@ export default function Page() {
       <PanelGlass className="flex flex-col md:flex-row gap-4 justify-between items-center py-3 px-4">
           <div className="relative w-full md:w-80">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
-              <input type="text" placeholder="BUSCAR JUGADOR..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-white/5 border border-transparent focus:border-emerald-500/30 rounded-xl text-[10px] font-black uppercase outline-none text-black dark:text-white transition-all shadow-sm" />
+              <input type="text" placeholder="BUSCAR JUGADOR..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-white/5 border border-transparent focus:border-emerald-500/30 rounded-[14px] text-[10px] font-black uppercase outline-none text-black dark:text-white transition-all shadow-sm" />
           </div>
-          <div className="flex items-center gap-2 bg-slate-50 dark:bg-white/5 p-1 rounded-xl border border-slate-100 dark:border-white/10 w-full md:w-auto overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 bg-slate-50 dark:bg-white/5 p-1 rounded-[14px] border border-slate-100 dark:border-white/10 w-full md:w-auto overflow-x-auto no-scrollbar">
               {["Todos", "Suspendidos"].map((f) => (
-                <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-lg transition-all whitespace-nowrap ${filter === f ? "bg-white dark:bg-emerald-500 text-black shadow-sm" : "text-slate-400 hover:text-black dark:hover:text-white"}`}>{f.toUpperCase()}</button>
+                <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-[14px] transition-all whitespace-nowrap ${filter === f ? "bg-white dark:bg-emerald-500 text-black shadow-sm" : "text-slate-400 hover:text-black dark:hover:text-white"}`}>{f.toUpperCase()}</button>
               ))}
               <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10 mx-1"></div>
               {uniqueSports.map((s) => (
-                <button key={s} onClick={() => setSportFilter(s)} className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-lg transition-all whitespace-nowrap ${sportFilter === s ? "bg-white dark:bg-emerald-500 text-black shadow-sm" : "text-slate-400 hover:text-black dark:hover:text-white"}`}>{s.toUpperCase()}</button>
+                <button key={s} onClick={() => setSportFilter(s)} className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-[14px] transition-all whitespace-nowrap ${sportFilter === s ? "bg-white dark:bg-emerald-500 text-black shadow-sm" : "text-slate-400 hover:text-black dark:hover:text-white"}`}>{s.toUpperCase()}</button>
               ))}
               <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10 mx-1"></div>
               <div className="flex items-center gap-0.5">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-[#0B0F19] text-emerald-500 dark:text-emerald-400 shadow-sm border border-slate-100 dark:border-white/5' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
+                  className={`p-1.5 rounded-[14px] transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-[#0B0F19] text-emerald-500 dark:text-emerald-400 shadow-sm border border-slate-100 dark:border-white/5' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                   title="Vista Cuadrícula"
                 >
                   <Squares2X2Icon className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white dark:bg-[#0B0F19] text-emerald-500 dark:text-emerald-400 shadow-sm border border-slate-100 dark:border-white/5' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
+                  className={`p-1.5 rounded-[14px] transition-all ${viewMode === 'list' ? 'bg-white dark:bg-[#0B0F19] text-emerald-500 dark:text-emerald-400 shadow-sm border border-slate-100 dark:border-white/5' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                   title="Vista Listado"
                 >
                   <ListBulletIcon className="w-4 h-4" />
@@ -629,7 +629,7 @@ export default function Page() {
           </div>
         ) : (
           viewMode === 'list' ? (
-            <PanelGlass className="overflow-hidden border border-slate-100 dark:border-white/5 rounded-3xl">
+            <PanelGlass className="overflow-hidden border border-slate-100 dark:border-white/5 rounded-[14px]">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -651,7 +651,7 @@ export default function Page() {
                           {/* JUGADOR */}
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center font-black text-slate-500 text-sm overflow-hidden border border-slate-100 dark:border-white/10 shrink-0">
+                              <div className="w-10 h-10 rounded-[14px] bg-slate-100 dark:bg-white/5 flex items-center justify-center font-black text-slate-500 text-sm overflow-hidden border border-slate-100 dark:border-white/10 shrink-0">
                                 {user.photoURL ? <img src={user.photoURL} className="w-full h-full object-cover" /> : user.name.charAt(0)}
                               </div>
                               <div className="min-w-0">
@@ -669,7 +669,7 @@ export default function Page() {
                           {/* VALORACIÓN (OVR) */}
                           <td className="py-4 px-6 text-center">
                             <div className="inline-flex flex-col items-center gap-1">
-                              <div className={`px-2.5 py-1 rounded-xl text-[10px] font-black shadow-sm ${getOvrColor(user.tier)}`}>
+                              <div className={`px-2.5 py-1 rounded-[14px] text-[10px] font-black shadow-sm ${getOvrColor(user.tier)}`}>
                                 {user.ovr} OVR
                               </div>
                               <span className="text-[6px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{user.tier}</span>
@@ -721,7 +721,7 @@ export default function Page() {
                           {/* ESTADO */}
                           <td className="py-4 px-6">
                             <div className="flex flex-col gap-1">
-                              <span className={`px-2 py-0.5 rounded-lg text-[7px] font-black uppercase w-fit border ${user.status === 'Activo' ? 'bg-emerald-50 border-emerald-500/20 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-red-50 border-red-500/20 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
+                              <span className={`px-2 py-0.5 rounded-[14px] text-[7px] font-black uppercase w-fit border ${user.status === 'Activo' ? 'bg-emerald-50 border-emerald-500/20 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-red-50 border-red-500/20 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
                                 {user.status}
                               </span>
                               {(user.strikes || 0) > 0 && (
@@ -736,9 +736,9 @@ export default function Page() {
                           {/* ACCIONES */}
                           <td className="py-4 px-6 text-right">
                             <div className="flex items-center justify-end gap-1.5">
-                              <button title="Historial" onClick={() => { setSelectedUser(user); setIsHistoryModalOpen(true); }} className="p-2 hover:bg-emerald-500 hover:text-white text-slate-400 dark:text-slate-500 rounded-xl transition-all active:scale-90"><ClockIcon className="w-4 h-4" /></button>
-                              <button title="Perfil" onClick={() => { setSelectedUser(user); setIsModalOpen(true); }} className="p-2 hover:bg-slate-900 dark:hover:bg-emerald-500 text-slate-400 dark:text-slate-500 hover:text-white rounded-xl transition-all active:scale-90"><UserCircleIcon className="w-4 h-4" /></button>
-                              <button onClick={() => toggleUserStatus(user.id, user.status)} className={`px-3 py-1.5 rounded-lg text-[7px] font-black uppercase transition-all active:scale-95 border ${user.status === 'Activo' ? 'border-red-200 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 dark:border-red-500/30' : 'border-emerald-200 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 dark:border-emerald-500/30'}`}>
+                              <button title="Historial" onClick={() => { setSelectedUser(user); setIsHistoryModalOpen(true); }} className="p-2 hover:bg-emerald-500 hover:text-white text-slate-400 dark:text-slate-500 rounded-[14px] transition-all active:scale-90"><ClockIcon className="w-4 h-4" /></button>
+                              <button title="Perfil" onClick={() => { setSelectedUser(user); setIsModalOpen(true); }} className="p-2 hover:bg-slate-900 dark:hover:bg-emerald-500 text-slate-400 dark:text-slate-500 hover:text-white rounded-[14px] transition-all active:scale-90"><UserCircleIcon className="w-4 h-4" /></button>
+                              <button onClick={() => toggleUserStatus(user.id, user.status)} className={`px-3 py-1.5 rounded-[14px] text-[7px] font-black uppercase transition-all active:scale-95 border ${user.status === 'Activo' ? 'border-red-200 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 dark:border-red-500/30' : 'border-emerald-200 text-emerald-500 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 dark:border-emerald-500/30'}`}>
                                 {user.status === 'Activo' ? 'Suspender' : 'Activar'}
                               </button>
                             </div>
@@ -753,33 +753,33 @@ export default function Page() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredUsers.map((user) => (
-                <div key={user.id} className={`bg-white dark:bg-[#0B0F19] rounded-3xl border transition-all flex flex-col group overflow-hidden ${user.status === 'Activo' ? 'border-slate-100 dark:border-white/5 shadow-xl shadow-slate-200/20' : 'border-red-100 opacity-70 shadow-none'}`}>
+                <div key={user.id} className={`bg-white dark:bg-[#0B0F19] rounded-[14px] border transition-all flex flex-col group overflow-hidden ${user.status === 'Activo' ? 'border-slate-100 dark:border-white/5 shadow-xl shadow-slate-200/20' : 'border-red-100 opacity-70 shadow-none'}`}>
                   <div className="p-6 flex-1">
                     <div className="flex justify-between items-start mb-6">
                       <div className="relative">
-                        <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center font-black text-slate-500 text-xl shadow-inner overflow-hidden shrink-0">
+                        <div className="w-14 h-14 rounded-[14px] bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center font-black text-slate-500 text-xl shadow-inner overflow-hidden shrink-0">
                           {user.photoURL ? <img src={user.photoURL} className="w-full h-full object-cover" /> : user.name.charAt(0)}
                         </div>
-                        <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-lg border-2 border-white dark:border-[#0B0F19] flex items-center justify-center font-black text-[8px] shadow-sm ${getOvrColor(user.tier)}`}>
+                        <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-[14px] border-2 border-white dark:border-[#0B0F19] flex items-center justify-center font-black text-[8px] shadow-sm ${getOvrColor(user.tier)}`}>
                           {user.ovr}
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1">
-                        <span className={`px-2.5 py-1 rounded-xl text-[8px] font-black uppercase border ${user.status === 'Activo' ? 'bg-emerald-50 border-emerald-500/20 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-red-50 border-red-500/20 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
+                        <span className={`px-2.5 py-1 rounded-[14px] text-[8px] font-black uppercase border ${user.status === 'Activo' ? 'bg-emerald-50 border-emerald-500/20 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'bg-red-50 border-red-500/20 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
                           {user.status}
                         </span>
-                        <span className="px-2 py-0.5 bg-slate-50 dark:bg-white/5 rounded-lg text-[7px] font-black text-slate-400 border border-slate-100 dark:border-white/10 uppercase tracking-widest">{user.tier}</span>
+                        <span className="px-2 py-0.5 bg-slate-50 dark:bg-white/5 rounded-[14px] text-[7px] font-black text-slate-400 border border-slate-100 dark:border-white/10 uppercase tracking-widest">{user.tier}</span>
                       </div>
                     </div>
 
                     <h3 className="font-black text-slate-900 dark:text-white text-base uppercase truncate leading-tight group-hover:text-emerald-500 transition-colors mb-1">{user.name}</h3>
                     <div className="flex flex-wrap items-center gap-2 mb-5">
                       <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter truncate max-w-[120px]">{user.email}</p>
-                      {user.role === 'Capitán' && <span className="px-1.5 py-0.5 bg-amber-500 text-black rounded-lg text-[7px] font-black uppercase">Capitán</span>}
-                      {user.mainSport && <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-lg text-[7px] font-black uppercase">{user.mainSport}</span>}
-                      {user.position && <span className="px-1.5 py-0.5 bg-cyan-500/10 text-cyan-500 dark:text-cyan-400 rounded-lg text-[7px] font-black uppercase">{user.position}</span>}
+                      {user.role === 'Capitán' && <span className="px-1.5 py-0.5 bg-amber-500 text-black rounded-[14px] text-[7px] font-black uppercase">Capitán</span>}
+                      {user.mainSport && <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-[14px] text-[7px] font-black uppercase">{user.mainSport}</span>}
+                      {user.position && <span className="px-1.5 py-0.5 bg-cyan-500/10 text-cyan-500 dark:text-cyan-400 rounded-[14px] text-[7px] font-black uppercase">{user.position}</span>}
                       {(user.strikes || 0) > 0 && (
-                        <span className="px-1.5 py-0.5 bg-rose-500 text-white rounded-lg text-[7px] font-black uppercase flex items-center gap-1">
+                        <span className="px-1.5 py-0.5 bg-rose-500 text-white rounded-[14px] text-[7px] font-black uppercase flex items-center gap-1">
                           <NoSymbolIcon className="w-2.5 h-2.5" />
                           {user.strikes} {user.strikes === 1 ? 'Strike' : 'Strikes'}
                         </span>
@@ -789,14 +789,14 @@ export default function Page() {
                     <div className="space-y-4">
                       {/* STATS RAPIDAS */}
                       <div className="grid grid-cols-2 gap-2">
-                        <div className="p-3 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-slate-100/50 dark:border-white/5">
+                        <div className="p-3 bg-slate-50/50 dark:bg-white/[0.02] rounded-[14px] border border-slate-100/50 dark:border-white/5">
                           <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">Récord</p>
                           <div className="flex items-center gap-1.5 font-mono">
                             <span className="text-[10px] font-black text-emerald-500">{user.stats.won}W</span>
                             <span className="text-[10px] font-black text-red-400">{user.stats.lost}L</span>
                           </div>
                         </div>
-                        <div className="p-3 bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-slate-100/50 dark:border-white/5">
+                        <div className="p-3 bg-slate-50/50 dark:bg-white/[0.02] rounded-[14px] border border-slate-100/50 dark:border-white/5">
                           <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-1">Goles</p>
                           <div className="flex items-center gap-1.5">
                             <FireIcon className="w-3 h-3 text-rose-500" />
@@ -813,7 +813,7 @@ export default function Page() {
                             <div className="flex flex-wrap gap-1.5">
                               {user.teamList.length > 0 ? (
                                   user.teamList.map((t, idx) => (
-                                  <span key={idx} className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[7px] font-black rounded-lg uppercase border border-indigo-500/10 tracking-tighter">{t}</span>
+                                  <span key={idx} className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[7px] font-black rounded-[14px] uppercase border border-indigo-500/10 tracking-tighter">{t}</span>
                                   ))
                               ) : (
                                   <span className="text-[7px] font-black text-slate-300 uppercase tracking-widest italic">Agente Libre</span>
@@ -826,7 +826,7 @@ export default function Page() {
                               <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest">Insignias</p>
                               <div className="flex gap-1 mt-1">
                                   {user.badges.length > 0 ? user.badges.slice(0, 5).map((b: any, i: number) => (
-                                      <span key={i} title={b.id} className="w-5 h-5 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center text-[8px] grayscale hover:grayscale-0 transition-all cursor-help shadow-sm">
+                                      <span key={i} title={b.id} className="w-5 h-5 rounded-[14px] bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center text-[8px] grayscale hover:grayscale-0 transition-all cursor-help shadow-sm">
                                           {b.id === 'scorer' ? '⚽' : b.id === 'wins' ? '🏆' : '🎖️'}
                                       </span>
                                   )) : <span className="text-[7px] font-bold text-slate-300 uppercase tracking-widest">---</span>}
@@ -844,10 +844,10 @@ export default function Page() {
 
                   <div className="px-6 py-4 bg-slate-50/50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
                     <div className="flex gap-1">
-                      <button title="Historial" onClick={() => { setSelectedUser(user); setIsHistoryModalOpen(true); }} className="p-2 hover:bg-emerald-500 hover:text-white text-slate-400 dark:text-slate-500 rounded-xl transition-all active:scale-90"><ClockIcon className="w-4 h-4" /></button>
-                      <button title="Perfil" onClick={() => { setSelectedUser(user); setIsModalOpen(true); }} className="p-2 hover:bg-slate-900 dark:hover:bg-emerald-500 text-slate-400 dark:text-slate-500 hover:text-white rounded-xl transition-all active:scale-90"><UserCircleIcon className="w-4 h-4" /></button>
+                      <button title="Historial" onClick={() => { setSelectedUser(user); setIsHistoryModalOpen(true); }} className="p-2 hover:bg-emerald-500 hover:text-white text-slate-400 dark:text-slate-500 rounded-[14px] transition-all active:scale-90"><ClockIcon className="w-4 h-4" /></button>
+                      <button title="Perfil" onClick={() => { setSelectedUser(user); setIsModalOpen(true); }} className="p-2 hover:bg-slate-900 dark:hover:bg-emerald-500 text-slate-400 dark:text-slate-500 hover:text-white rounded-[14px] transition-all active:scale-90"><UserCircleIcon className="w-4 h-4" /></button>
                     </div>
-                    <button onClick={() => toggleUserStatus(user.id, user.status)} className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase transition-all active:scale-95 ${user.status === 'Activo' ? 'bg-red-50 text-red-600 hover:bg-red-500 hover:text-white dark:bg-red-500/10' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10'}`}>
+                    <button onClick={() => toggleUserStatus(user.id, user.status)} className={`px-4 py-2 rounded-[14px] text-[8px] font-black uppercase transition-all active:scale-95 ${user.status === 'Activo' ? 'bg-red-50 text-red-600 hover:bg-red-500 hover:text-white dark:bg-red-500/10' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10'}`}>
                       {user.status === 'Activo' ? 'Suspender' : 'Activar'}
                     </button>
                   </div>
@@ -866,10 +866,10 @@ export default function Page() {
       {/* CONFIRM MODAL ESTANDARIZADO (ADN VISUAL) */}
       {confirmModal.isOpen && (
         <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-900/40 dark:bg-black/80 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setConfirmModal(p => ({ ...p, isOpen: false }))}>
-          <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-[2.5rem] p-8 border border-slate-200 dark:border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.3)] text-center relative overflow-hidden animate-in zoom-in duration-300" onClick={e => e.stopPropagation()}>
+          <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-[14px] p-8 border border-slate-200 dark:border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.3)] text-center relative overflow-hidden animate-in zoom-in duration-300" onClick={e => e.stopPropagation()}>
             <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-slate-50 dark:from-white/[0.03] to-transparent pointer-events-none"></div>
             
-            <div className={`relative z-10 w-20 h-20 mx-auto mb-6 rounded-3xl flex items-center justify-center border shadow-xl ${confirmModal.type === 'danger' ? 'bg-rose-50 border-rose-100 text-rose-600 dark:bg-rose-500/10 dark:border-rose-500/20 dark:text-rose-400' : 'bg-emerald-50 border-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400'}`}>
+            <div className={`relative z-10 w-20 h-20 mx-auto mb-6 rounded-[14px] flex items-center justify-center border shadow-xl ${confirmModal.type === 'danger' ? 'bg-rose-50 border-rose-100 text-rose-600 dark:bg-rose-500/10 dark:border-rose-500/20 dark:text-rose-400' : 'bg-emerald-50 border-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400'}`}>
                 {confirmModal.type === 'danger' ? <ExclamationTriangleIcon className="w-10 h-10" /> : <InformationCircleIcon className="w-10 h-10" />}
             </div>
             
@@ -877,8 +877,8 @@ export default function Page() {
             <p className="relative z-10 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-10 leading-relaxed px-2">{confirmModal.msg}</p>
             
             <div className="relative z-10 flex gap-4">
-              <button onClick={() => setConfirmModal(p => ({ ...p, isOpen: false }))} className="flex-1 py-4 text-[9px] font-black uppercase rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all">CANCELAR</button>
-              <button onClick={confirmModal.onConfirm} className={`flex-1 py-4 text-[9px] font-black uppercase rounded-2xl text-white shadow-2xl transition-all active:scale-95 ${confirmModal.type === 'danger' ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/30' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/30'}`}>CONFIRMAR</button>
+              <button onClick={() => setConfirmModal(p => ({ ...p, isOpen: false }))} className="flex-1 py-4 text-[9px] font-black uppercase rounded-[14px] bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition-all">CANCELAR</button>
+              <button onClick={confirmModal.onConfirm} className={`flex-1 py-4 text-[9px] font-black uppercase rounded-[14px] text-white shadow-2xl transition-all active:scale-95 ${confirmModal.type === 'danger' ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/30' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/30'}`}>CONFIRMAR</button>
             </div>
           </div>
         </div>

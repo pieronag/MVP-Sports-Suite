@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
@@ -15,7 +15,7 @@ import { PanelGlass, TarjetaKpi } from '@/components/ui/DashboardWidgets';
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
     return (
-        <div className={`fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-3 rounded-2xl shadow-2xl border animate-slideInRight backdrop-blur-md ${
+        <div className={`fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-3 rounded-[14px] shadow-2xl border animate-slideInRight backdrop-blur-md ${
             type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-emerald-400 dark:border-emerald-500/50' : 
             'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
         }`}>
@@ -201,7 +201,7 @@ export default function FeedbackPage() {
                     {/* Botón Actualizar */}
                     <button 
                         onClick={() => fetchData()}
-                        className="p-2.5 rounded-xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 text-slate-400 hover:text-emerald-500 hover:border-emerald-500/50 transition-all group"
+                        className="p-2.5 rounded-[14px] bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 text-slate-400 hover:text-emerald-500 hover:border-emerald-500/50 transition-all group"
                         title="Actualizar Datos"
                     >
                         <ArrowPathIcon className={`w-4 h-4 group-hover:rotate-180 transition-transform duration-500`} />
@@ -213,7 +213,7 @@ export default function FeedbackPage() {
                         <select
                             value={selectedVenueId}
                             onChange={(e) => setSelectedVenueId(e.target.value)}
-                            className="appearance-none bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl pl-8 pr-10 py-2 text-[9px] font-black outline-none text-slate-600 dark:text-slate-300 uppercase cursor-pointer transition-all hover:border-emerald-500/50"
+                            className="appearance-none bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-[14px] pl-8 pr-10 py-2 text-[9px] font-black outline-none text-slate-600 dark:text-slate-300 uppercase cursor-pointer transition-all hover:border-emerald-500/50"
                         >
                             <option value="all">TODOS LOS RECINTOS</option>
                             {venues.map(v => <option key={v.id} value={v.id}>{v.name.toUpperCase()}</option>)}
@@ -225,7 +225,7 @@ export default function FeedbackPage() {
                         <select
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
-                            className="appearance-none bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl px-4 py-2 text-[9px] font-black outline-none text-slate-600 dark:text-slate-300 uppercase cursor-pointer transition-all hover:border-emerald-500/50"
+                            className="appearance-none bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-[14px] px-4 py-2 text-[9px] font-black outline-none text-slate-600 dark:text-slate-300 uppercase cursor-pointer transition-all hover:border-emerald-500/50"
                         >
                             <option value="all">TODOS LOS MESES</option>
                             {MESES.map(m => <option key={m.id} value={m.id}>{m.name.toUpperCase()}</option>)}
@@ -237,16 +237,16 @@ export default function FeedbackPage() {
                         <select
                             value={selectedYear}
                             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                            className="appearance-none bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl px-4 py-2 text-[9px] font-black outline-none text-slate-600 dark:text-slate-300 uppercase cursor-pointer transition-all hover:border-emerald-500/50"
+                            className="appearance-none bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-[14px] px-4 py-2 text-[9px] font-black outline-none text-slate-600 dark:text-slate-300 uppercase cursor-pointer transition-all hover:border-emerald-500/50"
                         >
                             {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
                         </select>
                     </div>
 
-                    <div className="flex items-center gap-1 bg-white dark:bg-white/5 p-1 rounded-xl border border-slate-100 dark:border-white/10">
+                    <div className="flex items-center gap-1 bg-white dark:bg-white/5 p-1 rounded-[14px] border border-slate-100 dark:border-white/10">
                         <button 
                             onClick={() => setFilterRating('all')} 
-                            className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase transition-all ${filterRating === 'all' ? 'bg-slate-950 dark:bg-emerald-500 text-white dark:text-slate-950 shadow-lg' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
+                            className={`px-3 py-1 rounded-[14px] text-[9px] font-black uppercase transition-all ${filterRating === 'all' ? 'bg-slate-950 dark:bg-emerald-500 text-white dark:text-slate-950 shadow-lg' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                         >
                             TODAS
                         </button>
@@ -254,7 +254,7 @@ export default function FeedbackPage() {
                             <button 
                                 key={star} 
                                 onClick={() => setFilterRating(star)} 
-                                className={`flex items-center gap-1 px-3 py-1 rounded-lg text-[9px] font-black transition-all ${filterRating === star ? 'bg-slate-950 dark:bg-emerald-500 text-white dark:text-slate-950 shadow-lg' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
+                                className={`flex items-center gap-1 px-3 py-1 rounded-[14px] text-[9px] font-black transition-all ${filterRating === star ? 'bg-slate-950 dark:bg-emerald-500 text-white dark:text-slate-950 shadow-lg' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                             >
                                 {star} <StarIconSolid className="w-3 h-3 text-amber-500" />
                             </button>
@@ -277,7 +277,7 @@ export default function FeedbackPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                    <div className="w-10 h-10 rounded-[14px] bg-emerald-500/10 flex items-center justify-center text-emerald-500">
                         <StarIcon className="w-6 h-6" />
                     </div>
                 </PanelGlass>
@@ -322,7 +322,7 @@ export default function FeedbackPage() {
                             <div>
                                 <div className="flex justify-between items-start mb-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 shrink-0 border border-slate-200 dark:border-white/10 group-hover:bg-emerald-500/10 group-hover:text-emerald-500 transition-all">
+                                        <div className="w-8 h-8 rounded-[14px] bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 shrink-0 border border-slate-200 dark:border-white/10 group-hover:bg-emerald-500/10 group-hover:text-emerald-500 transition-all">
                                             <UserCircleIcon className="w-5 h-5" />
                                         </div>
                                         <div className="min-w-0">
@@ -337,7 +337,7 @@ export default function FeedbackPage() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex text-amber-500 bg-amber-500/5 px-2 py-0.5 rounded-lg border border-amber-500/10">
+                                    <div className="flex text-amber-500 bg-amber-500/5 px-2 py-0.5 rounded-[14px] border border-amber-500/10">
                                         {[1, 2, 3, 4, 5].map(s => (
                                             <StarIconSolid key={s} className={`w-2.5 h-2.5 ${s <= review.rating ? 'opacity-100' : 'opacity-10'}`} />
                                         ))}
@@ -345,18 +345,18 @@ export default function FeedbackPage() {
                                 </div>
 
                                 <div className="mb-4">
-                                    <p className="text-[11px] text-slate-700 dark:text-slate-300 italic font-medium leading-relaxed bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-100 dark:border-white/5 line-clamp-3 group-hover:line-clamp-none transition-all">
+                                    <p className="text-[11px] text-slate-700 dark:text-slate-300 italic font-medium leading-relaxed bg-slate-50 dark:bg-white/5 p-3 rounded-[14px] border border-slate-100 dark:border-white/5 line-clamp-3 group-hover:line-clamp-none transition-all">
                                         "{typeof review.comment === 'string' ? review.comment : 'Sin comentario'}"
                                     </p>
                                     
                                     {review.bookingId && (
                                         <div className="mt-3 flex flex-wrap gap-1.5">
-                                            <div className="bg-slate-50 dark:bg-white/5 px-2 py-1 rounded-lg border border-slate-100 dark:border-white/5 flex items-center gap-1.5">
+                                            <div className="bg-slate-50 dark:bg-white/5 px-2 py-1 rounded-[14px] border border-slate-100 dark:border-white/5 flex items-center gap-1.5">
                                                 <span className="text-[7px] font-black text-slate-400 uppercase">ID</span>
                                                 <span className="text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase">#{review.bookingId.toUpperCase()}</span>
                                             </div>
                                             {review.sport && (
-                                                <div className="bg-slate-50 dark:bg-white/5 px-2 py-1 rounded-lg border border-slate-100 dark:border-white/5 flex items-center gap-1.5">
+                                                <div className="bg-slate-50 dark:bg-white/5 px-2 py-1 rounded-[14px] border border-slate-100 dark:border-white/5 flex items-center gap-1.5">
                                                     <span className="text-[8px] font-black text-slate-600 dark:text-slate-300 uppercase">
                                                         {typeof review.sport === 'string' ? review.sport : 'General'}
                                                     </span>
@@ -374,7 +374,7 @@ export default function FeedbackPage() {
                                     <p className="text-[7px] font-black text-slate-400 uppercase tracking-tighter">Verificado</p>
                                 </div>
                                 {review.reply && (
-                                    <span className="text-[7px] font-bold text-emerald-600 uppercase bg-emerald-500/10 px-2 py-0.5 rounded-md">Analizado</span>
+                                    <span className="text-[7px] font-bold text-emerald-600 uppercase bg-emerald-500/10 px-2 py-0.5 rounded-[14px]">Analizado</span>
                                 )}
                             </div>
                         </PanelGlass>

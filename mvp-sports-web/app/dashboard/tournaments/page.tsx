@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
@@ -125,7 +125,7 @@ const generateGroups = (teams: any[]) => {
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
     return (
-        <div className={`fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-3 rounded-2xl shadow-2xl border animate-slideInRight backdrop-blur-md ${type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-emerald-400 dark:border-emerald-500/50' :
+        <div className={`fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-3 rounded-[14px] shadow-2xl border animate-slideInRight backdrop-blur-md ${type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-emerald-400 dark:border-emerald-500/50' :
                 'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
             }`}>
             {type === 'success' ? <CheckCircleIcon className="w-5 h-5" /> : <ExclamationTriangleIcon className="w-5 h-5" />}
@@ -330,7 +330,7 @@ export default function ChampionshipsPage() {
                     </div>
                     <h1 className="text-2xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none">Gestión de <span className="text-amber-500 dark:text-amber-400">Campeonatos</span></h1>
                 </div>
-                <button onClick={() => setIsModalOpen(true)} className="px-6 py-2.5 bg-slate-950 dark:bg-amber-600 text-white dark:text-slate-950 text-[10px] font-black uppercase rounded-xl shadow-xl flex items-center gap-2 active:scale-95 transition-all"><PlusIcon className="w-4 h-4" /> Nuevo Torneo</button>
+                <button onClick={() => setIsModalOpen(true)} className="px-6 py-2.5 bg-slate-950 dark:bg-amber-600 text-white dark:text-slate-950 text-[10px] font-black uppercase rounded-[14px] shadow-xl flex items-center gap-2 active:scale-95 transition-all"><PlusIcon className="w-4 h-4" /> Nuevo Torneo</button>
             </div>
 
             {/* KPI */}
@@ -350,7 +350,7 @@ export default function ChampionshipsPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {tournaments.map((t: any) => (
-                        <div key={t.id} className="flex flex-col h-full bg-white dark:bg-[#0B0F19] rounded-2xl border border-slate-100 dark:border-white/5 shadow-xl shadow-slate-200/20 overflow-hidden group transition-all duration-500">
+                        <div key={t.id} className="flex flex-col h-full bg-white dark:bg-[#0B0F19] rounded-[14px] border border-slate-100 dark:border-white/5 shadow-xl shadow-slate-200/20 overflow-hidden group transition-all duration-500">
                             <div className="relative h-44 overflow-hidden shrink-0">
                                 {t.imageUrl ? <img src={t.imageUrl} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" /> : <div className="absolute inset-0 bg-slate-900 flex items-center justify-center"><TrophyIcon className="w-12 h-12 text-white/5" /></div>}
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-90" />
@@ -362,23 +362,23 @@ export default function ChampionshipsPage() {
                             </div>
                             <div className="p-5 flex-1 flex flex-col">
                                 <div className="grid grid-cols-2 gap-3 mb-4">
-                                    <div className="bg-slate-50 dark:bg-white/[0.03] p-2 rounded-xl border border-slate-100 dark:border-white/5"><p className="text-[7px] font-black text-slate-400 uppercase mb-0.5">Formato</p><p className="text-[9px] font-black text-slate-700 dark:text-slate-200 uppercase">{t.type}</p></div>
-                                    <div className="bg-slate-50 dark:bg-white/[0.03] p-2 rounded-xl border border-slate-100 dark:border-white/5"><p className="text-[7px] font-black text-slate-400 uppercase mb-0.5">Inscripción</p><p className="text-[9px] font-black text-emerald-600 dark:text-emerald-400">${Number(t.price).toLocaleString()}</p></div>
+                                    <div className="bg-slate-50 dark:bg-white/[0.03] p-2 rounded-[14px] border border-slate-100 dark:border-white/5"><p className="text-[7px] font-black text-slate-400 uppercase mb-0.5">Formato</p><p className="text-[9px] font-black text-slate-700 dark:text-slate-200 uppercase">{t.type}</p></div>
+                                    <div className="bg-slate-50 dark:bg-white/[0.03] p-2 rounded-[14px] border border-slate-100 dark:border-white/5"><p className="text-[7px] font-black text-slate-400 uppercase mb-0.5">Inscripción</p><p className="text-[9px] font-black text-emerald-600 dark:text-emerald-400">${Number(t.price).toLocaleString()}</p></div>
                                 </div>
                                 <div className="space-y-3 mb-5">
                                     <div className="flex justify-between items-center text-[9px] font-black text-slate-400 uppercase"><span>Equipos Inscritos</span><span className="text-slate-900 dark:text-white">{(t.teams?.length || 0)} / {t.maxTeams}</span></div>
                                     <div className="w-full h-1 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-amber-500 transition-all duration-1000" style={{ width: `${((t.teams?.length || 0) / (t.maxTeams || 1)) * 100}%` }} /></div>
                                 </div>
-                                <div className="space-y-1.5 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-xl border border-slate-100 dark:border-white/5 mb-6">
+                                <div className="space-y-1.5 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-[14px] border border-slate-100 dark:border-white/5 mb-6">
                                     <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-amber-500" /><span className="text-[8px] font-black text-amber-600 uppercase w-12">1° Premio:</span><span className="text-[9px] font-bold text-slate-700 dark:text-slate-300 truncate uppercase">{t.prize1 || '---'}</span></div>
                                     <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-slate-400" /><span className="text-[8px] font-black text-slate-500 uppercase w-12">2° Premio:</span><span className="text-[9px] font-bold text-slate-700 dark:text-slate-300 truncate uppercase">{t.prize2 || '---'}</span></div>
                                     <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-amber-800" /><span className="text-[8px] font-black text-amber-800 uppercase w-12">3° Premio:</span><span className="text-[9px] font-bold text-slate-700 dark:text-slate-300 truncate uppercase">{t.prize3 || '---'}</span></div>
                                 </div>
-                                <div className="mt-auto p-2 bg-slate-50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5 flex gap-2 -mx-5 -mb-5 rounded-b-2xl">
-                                    <button onClick={() => handleOpenFixture(t)} className="flex-1 py-2 flex items-center justify-center bg-white dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-emerald-500 transition-all shadow-sm active:scale-95"><PlayCircleIcon className="w-4 h-4" /></button>
-                                    <button onClick={() => setParticipantsModal({ isOpen: true, tournament: t })} className="flex-1 py-2 flex items-center justify-center bg-white dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-blue-500 transition-all shadow-sm active:scale-95"><UserGroupIcon className="w-4 h-4" /></button>
-                                    <button onClick={() => handleOpenEdit(t)} className="flex-1 py-2 flex items-center justify-center bg-white dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm active:scale-95"><PencilSquareIcon className="w-4 h-4" /></button>
-                                    <button onClick={() => setTournamentToDelete(t.id)} className="flex-1 py-2 flex items-center justify-center bg-white dark:bg-white/5 rounded-lg border border-red-100 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all shadow-sm active:scale-95"><TrashIcon className="w-4 h-4" /></button>
+                                <div className="mt-auto p-2 bg-slate-50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5 flex gap-2 -mx-5 -mb-5 rounded-[14px]">
+                                    <button onClick={() => handleOpenFixture(t)} className="flex-1 py-2 flex items-center justify-center bg-white dark:bg-white/5 rounded-[14px] border border-slate-200 dark:border-white/10 text-slate-400 hover:text-emerald-500 transition-all shadow-sm active:scale-95"><PlayCircleIcon className="w-4 h-4" /></button>
+                                    <button onClick={() => setParticipantsModal({ isOpen: true, tournament: t })} className="flex-1 py-2 flex items-center justify-center bg-white dark:bg-white/5 rounded-[14px] border border-slate-200 dark:border-white/10 text-slate-400 hover:text-blue-500 transition-all shadow-sm active:scale-95"><UserGroupIcon className="w-4 h-4" /></button>
+                                    <button onClick={() => handleOpenEdit(t)} className="flex-1 py-2 flex items-center justify-center bg-white dark:bg-white/5 rounded-[14px] border border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shadow-sm active:scale-95"><PencilSquareIcon className="w-4 h-4" /></button>
+                                    <button onClick={() => setTournamentToDelete(t.id)} className="flex-1 py-2 flex items-center justify-center bg-white dark:bg-white/5 rounded-[14px] border border-red-100 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all shadow-sm active:scale-95"><TrashIcon className="w-4 h-4" /></button>
                                 </div>
                             </div>
                         </div>
@@ -389,9 +389,9 @@ export default function ChampionshipsPage() {
             {/* MODAL CREAR / EDITAR COMPLETO */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[180] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn" onClick={handleCloseModal}>
-                    <div onClick={e => e.stopPropagation()} className="bg-white dark:bg-[#0B0F19] w-full max-w-5xl rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[95vh]">
+                    <div onClick={e => e.stopPropagation()} className="bg-white dark:bg-[#0B0F19] w-full max-w-5xl rounded-[14px] shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[95vh]">
                         <div className="p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-white/[0.02]">
-                            <h3 className="text-sm font-black uppercase text-slate-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-amber-500 rounded-xl shadow-lg shadow-amber-500/20"><TrophyIcon className="w-5 h-5 text-white" /></div>{isEditing ? 'Configurar Competición' : 'Nueva Competición'}</h3>
+                            <h3 className="text-sm font-black uppercase text-slate-900 dark:text-white flex items-center gap-3"><div className="p-2 bg-amber-500 rounded-[14px] shadow-lg shadow-amber-500/20"><TrophyIcon className="w-5 h-5 text-white" /></div>{isEditing ? 'Configurar Competición' : 'Nueva Competición'}</h3>
                             <button onClick={handleCloseModal} className="p-2 text-slate-400 hover:text-red-500 transition-colors"><XMarkIcon className="w-6 h-6" /></button>
                         </div>
                         <form onSubmit={handleCreateOrUpdate} className="p-8 overflow-y-auto space-y-10 custom-scrollbar">
@@ -400,7 +400,7 @@ export default function ChampionshipsPage() {
                                 <div className="space-y-6">
                                     <div className="space-y-3">
                                         <label className="text-[9px] font-black uppercase text-black tracking-widest block">Imagen de Portada</label>
-                                        <div className="relative group aspect-video bg-slate-50 dark:bg-white/5 rounded-2xl border-2 border-dashed border-slate-200 dark:border-white/10 overflow-hidden flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-amber-500/50 transition-all">
+                                        <div className="relative group aspect-video bg-slate-50 dark:bg-white/5 rounded-[14px] border-2 border-dashed border-slate-200 dark:border-white/10 overflow-hidden flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-amber-500/50 transition-all">
                                             {formData.imagePreview ? (
                                                 <>
                                                     <img src={formData.imagePreview} className="absolute inset-0 w-full h-full object-cover" alt="" />
@@ -478,9 +478,9 @@ export default function ChampionshipsPage() {
                                         <div className="space-y-3 pt-2">
                                             <div className="flex flex-col gap-1">
                                                 <label className="text-[8px] font-black uppercase text-black">Reglas y Descripción</label>
-                                                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3 py-2 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl text-[9px] font-normal outline-none h-16 uppercase resize-none focus:border-amber-500 text-black dark:text-white" />
+                                                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3 py-2 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-[14px] text-[9px] font-normal outline-none h-16 uppercase resize-none focus:border-amber-500 text-black dark:text-white" />
                                             </div>
-                                            <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-100 dark:border-white/10">
+                                            <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/5 rounded-[14px] border border-slate-100 dark:border-white/10">
                                                 <div className="flex flex-col"><span className="text-[9px] font-black uppercase text-black dark:text-white">Ida y Vuelta</span><span className="text-[7px] text-slate-400 uppercase font-normal mt-1">Doble partido (La final es a partido único)</span></div>
                                                 <button type="button" onClick={() => setFormData({ ...formData, isHomeAway: !formData.isHomeAway })} className={`w-10 h-5 rounded-full transition-all flex items-center px-1 ${formData.isHomeAway ? 'bg-amber-500' : 'bg-slate-200 dark:bg-white/10'}`}><div className={`w-3 h-3 rounded-full bg-white transition-all ${formData.isHomeAway ? 'translate-x-5' : 'translate-x-0'}`} /></button>
                                             </div>
@@ -488,7 +488,7 @@ export default function ChampionshipsPage() {
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" disabled={saving} className="w-full py-4 bg-black dark:bg-amber-600 text-white dark:text-black rounded-xl text-[10px] font-black uppercase tracking-[0.3em] shadow-xl active:scale-[0.98] transition-all disabled:opacity-50 mt-4 flex items-center justify-center gap-2">
+                            <button type="submit" disabled={saving} className="w-full py-4 bg-black dark:bg-amber-600 text-white dark:text-black rounded-[14px] text-[10px] font-black uppercase tracking-[0.3em] shadow-xl active:scale-[0.98] transition-all disabled:opacity-50 mt-4 flex items-center justify-center gap-2">
                                 {saving ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <ShieldCheckIcon className="w-4 h-4" />}
                                 {isEditing ? 'ACTUALIZAR COMPETICIÓN' : 'LANZAR COMPETICIÓN'}
                             </button>
@@ -500,7 +500,7 @@ export default function ChampionshipsPage() {
             {/* MODAL FIXTURE (RESTAURADO) */}
             {fixtureModal.isOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fadeIn" onClick={() => setFixtureModal({ ...fixtureModal, isOpen: false })}>
-                    <div onClick={e => e.stopPropagation()} className="bg-white dark:bg-[#0B0F19] w-full max-w-5xl rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
+                    <div onClick={e => e.stopPropagation()} className="bg-white dark:bg-[#0B0F19] w-full max-w-5xl rounded-[14px] shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
                         <div className="p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-white/[0.02]">
                             <h3 className="text-sm font-black uppercase text-slate-900 dark:text-white tracking-widest">{fixtureModal.tournament?.name} - Fixture</h3>
                             <button onClick={() => setFixtureModal({ ...fixtureModal, isOpen: false })} className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 transition-colors text-slate-400"><XMarkIcon className="w-5 h-5" /></button>
@@ -512,59 +512,59 @@ export default function ChampionshipsPage() {
                                     <h4 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-tighter">Preparando Panel de Competición</h4>
                                     <div className="space-y-3">
                                         {fixtureModal.validations.map((v: any, idx: number) => (
-                                            <div key={idx} className={`flex items-center justify-between p-4 rounded-2xl border ${v.ok ? 'bg-emerald-50 border-emerald-100 dark:bg-emerald-500/5 dark:border-emerald-500/20' : 'bg-red-50 border-red-100 dark:bg-red-500/5 dark:border-red-500/20'}`}>
+                                            <div key={idx} className={`flex items-center justify-between p-4 rounded-[14px] border ${v.ok ? 'bg-emerald-50 border-emerald-100 dark:bg-emerald-500/5 dark:border-emerald-500/20' : 'bg-red-50 border-red-100 dark:bg-red-500/5 dark:border-red-500/20'}`}>
                                                 <div className="flex items-center gap-3">{v.ok ? <CheckCircleIcon className="w-5 h-5 text-emerald-500" /> : <ExclamationCircleIcon className="w-5 h-5 text-red-500" />}<span className={`text-[10px] font-black uppercase ${v.ok ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-700 dark:text-red-400'}`}>{v.label}</span></div>
                                                 <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${v.ok ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>{v.ok ? 'OK' : 'FAIL'}</span>
                                             </div>
                                         ))}
                                     </div>
-                                    <button disabled={!fixtureModal.validations.every((v: any) => v.ok)} onClick={handleGenerateFixture} className="w-full bg-slate-950 dark:bg-amber-600 text-white dark:text-slate-950 py-4 rounded-2xl text-[10px] font-black uppercase shadow-xl active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2">INICIAR SORTEO DE BOLILLAS</button>
+                                    <button disabled={!fixtureModal.validations.every((v: any) => v.ok)} onClick={handleGenerateFixture} className="w-full bg-slate-950 dark:bg-amber-600 text-white dark:text-slate-950 py-4 rounded-[14px] text-[10px] font-black uppercase shadow-xl active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2">INICIAR SORTEO DE BOLILLAS</button>
                                 </div>
                             )}
                             {fixtureModal.step === 'draw' && (
                                 <div className="space-y-10 py-10 animate-fadeIn">
                                     <div className="grid grid-cols-2 gap-10 max-w-4xl mx-auto">
-                                        <div className="bg-slate-50 dark:bg-white/[0.03] rounded-[2.5rem] p-10 border border-slate-100 dark:border-white/5 flex flex-col items-center justify-center space-y-8">
+                                        <div className="bg-slate-50 dark:bg-white/[0.03] rounded-[14px] p-10 border border-slate-100 dark:border-white/5 flex flex-col items-center justify-center space-y-8">
                                             <div className="w-40 h-40 rounded-full border-4 border-dashed border-amber-500/30 flex items-center justify-center relative animate-pulse">
                                                 {drawAnimation.currentPair[0] || drawAnimation.currentPair[1] ? <div className="text-sm font-black text-amber-500 animate-bounce uppercase">{drawAnimation.currentPair[0] || drawAnimation.currentPair[1]}</div> : <TrophyIcon className="w-16 h-16 text-slate-200 dark:text-white/5" />}
                                             </div>
-                                            <button onClick={pickBall} disabled={drawAnimation.remainingTeams.length === 0} className="w-full bg-slate-950 dark:bg-white text-white dark:text-slate-900 py-4 rounded-2xl text-[10px] font-black uppercase shadow-lg active:scale-95 transition-all disabled:opacity-30">SACAR BOLILLA DEL BINGO</button>
+                                            <button onClick={pickBall} disabled={drawAnimation.remainingTeams.length === 0} className="w-full bg-slate-950 dark:bg-white text-white dark:text-slate-900 py-4 rounded-[14px] text-[10px] font-black uppercase shadow-lg active:scale-95 transition-all disabled:opacity-30">SACAR BOLILLA DEL BINGO</button>
                                         </div>
                                         <div className="space-y-5">
                                             <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-3">Emparejamientos en Vivo</h5>
                                             <div className="space-y-2 max-h-[350px] overflow-y-auto pr-3 custom-scrollbar">
                                                 {drawAnimation.completedMatches.map((m: any, idx: number) => (
-                                                    <div key={idx} className="bg-white dark:bg-white/5 p-4 rounded-2xl border border-slate-100 dark:border-white/10 flex items-center justify-between text-[11px] font-black uppercase shadow-sm"><span className="truncate flex-1 text-left text-slate-900 dark:text-white">{m.t1}</span><span className="mx-4 text-amber-500 italic text-[9px]">VS</span><span className="truncate flex-1 text-right text-slate-900 dark:text-white">{m.t2}</span></div>
+                                                    <div key={idx} className="bg-white dark:bg-white/5 p-4 rounded-[14px] border border-slate-100 dark:border-white/10 flex items-center justify-between text-[11px] font-black uppercase shadow-sm"><span className="truncate flex-1 text-left text-slate-900 dark:text-white">{m.t1}</span><span className="mx-4 text-amber-500 italic text-[9px]">VS</span><span className="truncate flex-1 text-right text-slate-900 dark:text-white">{m.t2}</span></div>
                                                 ))}
-                                                {drawAnimation.currentPair[0] && <div className="bg-amber-500/5 p-4 rounded-2xl border border-amber-500/20 flex items-center justify-between text-[11px] font-black uppercase animate-pulse"><span className="truncate flex-1 text-left text-amber-600">{drawAnimation.currentPair[0]}</span><span className="mx-4 text-amber-500 italic text-[9px]">VS</span><span className="truncate flex-1 text-right text-slate-300 tracking-tighter">? ? ?</span></div>}
+                                                {drawAnimation.currentPair[0] && <div className="bg-amber-500/5 p-4 rounded-[14px] border border-amber-500/20 flex items-center justify-between text-[11px] font-black uppercase animate-pulse"><span className="truncate flex-1 text-left text-amber-600">{drawAnimation.currentPair[0]}</span><span className="mx-4 text-amber-500 italic text-[9px]">VS</span><span className="truncate flex-1 text-right text-slate-300 tracking-tighter">? ? ?</span></div>}
                                             </div>
                                         </div>
                                     </div>
-                                    {drawAnimation.remainingTeams.length === 0 && <button onClick={handleFinalizeDraw} className="w-full max-w-xl mx-auto block bg-emerald-600 text-white py-5 rounded-[2rem] text-[11px] font-black uppercase shadow-2xl animate-bounce">CONFIRMAR FIXTURE Y LANZAR TORNEO</button>}
+                                    {drawAnimation.remainingTeams.length === 0 && <button onClick={handleFinalizeDraw} className="w-full max-w-xl mx-auto block bg-emerald-600 text-white py-5 rounded-[14px] text-[11px] font-black uppercase shadow-2xl animate-bounce">CONFIRMAR FIXTURE Y LANZAR TORNEO</button>}
                                 </div>
                             )}
                             {fixtureModal.step === 'review' && (
                                 <div className="space-y-8 animate-slideUp">
-                                    <div className="flex justify-center gap-3 bg-slate-50 dark:bg-white/5 p-2 rounded-2xl w-fit mx-auto border border-slate-100 dark:border-white/5 shadow-sm">
-                                        <button className="px-8 py-3 rounded-xl text-[10px] font-black uppercase transition-all bg-amber-500 text-white shadow-xl shadow-amber-500/20">Calendario de Jornadas</button>
-                                        <button className="px-8 py-3 rounded-xl text-[10px] font-black uppercase text-slate-400">Tabla de Posiciones</button>
+                                    <div className="flex justify-center gap-3 bg-slate-50 dark:bg-white/5 p-2 rounded-[14px] w-fit mx-auto border border-slate-100 dark:border-white/5 shadow-sm">
+                                        <button className="px-8 py-3 rounded-[14px] text-[10px] font-black uppercase transition-all bg-amber-500 text-white shadow-xl shadow-amber-500/20">Calendario de Jornadas</button>
+                                        <button className="px-8 py-3 rounded-[14px] text-[10px] font-black uppercase text-slate-400">Tabla de Posiciones</button>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {fixtureModal.fixtureData?.matches?.filter((m: any) => m.round === fixtureModal.selectedRound).map((match: any, idx: number) => (
-                                            <div key={idx} className="bg-white dark:bg-[#0B0F19] p-5 rounded-[2rem] border border-slate-100 dark:border-white/5 shadow-lg space-y-5 transition-transform hover:scale-[1.02]">
+                                            <div key={idx} className="bg-white dark:bg-[#0B0F19] p-5 rounded-[14px] border border-slate-100 dark:border-white/5 shadow-lg space-y-5 transition-transform hover:scale-[1.02]">
                                                 <div className="flex justify-between items-center"><span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Match #{idx + 1}</span><span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase ${match.status === 'finished' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>{match.status === 'finished' ? 'Finalizado' : 'Próximamente'}</span></div>
                                                 <div className="flex items-center justify-between gap-4">
-                                                    <div className="flex-1 text-center space-y-2"><div className="w-12 h-12 bg-slate-50 dark:bg-white/5 rounded-2xl mx-auto flex items-center justify-center text-[12px] font-black shadow-inner">{match.team1_name[0]}</div><p className="text-[10px] font-black uppercase truncate text-slate-900 dark:text-white">{match.team1_name}</p></div>
-                                                    <div className="flex flex-col items-center gap-2"><div className="flex items-center gap-3"><span className="text-2xl font-black text-slate-950 dark:text-white">{match.score1 ?? '-'}</span><span className="text-[12px] font-black text-slate-300 italic">VS</span><span className="text-2xl font-black text-slate-950 dark:text-white">{match.score2 ?? '-'}</span></div><button className="text-[9px] font-black text-blue-600 uppercase hover:bg-blue-50 dark:hover:bg-blue-500/10 px-3 py-1 rounded-lg transition-all">Editar Score</button></div>
-                                                    <div className="flex-1 text-center space-y-2"><div className="w-12 h-12 bg-slate-50 dark:bg-white/5 rounded-2xl mx-auto flex items-center justify-center text-[12px] font-black shadow-inner">{match.team2_name[0]}</div><p className="text-[10px] font-black uppercase truncate text-slate-900 dark:text-white">{match.team2_name}</p></div>
+                                                    <div className="flex-1 text-center space-y-2"><div className="w-12 h-12 bg-slate-50 dark:bg-white/5 rounded-[14px] mx-auto flex items-center justify-center text-[12px] font-black shadow-inner">{match.team1_name[0]}</div><p className="text-[10px] font-black uppercase truncate text-slate-900 dark:text-white">{match.team1_name}</p></div>
+                                                    <div className="flex flex-col items-center gap-2"><div className="flex items-center gap-3"><span className="text-2xl font-black text-slate-950 dark:text-white">{match.score1 ?? '-'}</span><span className="text-[12px] font-black text-slate-300 italic">VS</span><span className="text-2xl font-black text-slate-950 dark:text-white">{match.score2 ?? '-'}</span></div><button className="text-[9px] font-black text-blue-600 uppercase hover:bg-blue-50 dark:hover:bg-blue-500/10 px-3 py-1 rounded-[14px] transition-all">Editar Score</button></div>
+                                                    <div className="flex-1 text-center space-y-2"><div className="w-12 h-12 bg-slate-50 dark:bg-white/5 rounded-[14px] mx-auto flex items-center justify-center text-[12px] font-black shadow-inner">{match.team2_name[0]}</div><p className="text-[10px] font-black uppercase truncate text-slate-900 dark:text-white">{match.team2_name}</p></div>
                                                 </div>
                                             </div>
                                         ))}
                                     </div>
                                     <div className="flex items-center justify-center gap-6 pt-10 border-t border-slate-100 dark:border-white/5">
-                                        <button onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: Math.max(1, p.selectedRound - 1) }))} className="p-4 rounded-2xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 transition-all disabled:opacity-20"><ChevronLeftIcon className="w-6 h-6 text-slate-900 dark:text-white" /></button>
+                                        <button onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: Math.max(1, p.selectedRound - 1) }))} className="p-4 rounded-[14px] bg-slate-100 dark:bg-white/5 hover:bg-slate-200 transition-all disabled:opacity-20"><ChevronLeftIcon className="w-6 h-6 text-slate-900 dark:text-white" /></button>
                                         <div className="flex flex-col items-center"><span className="text-[11px] font-black uppercase tracking-[0.4em] text-slate-900 dark:text-white">Jornada</span><span className="text-2xl font-black text-amber-500">{fixtureModal.selectedRound}</span></div>
-                                        <button onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: Math.min(fixtureModal.fixtureData?.totalRounds || 1, p.selectedRound + 1) }))} className="p-4 rounded-2xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 transition-all disabled:opacity-20"><ChevronRightIcon className="w-6 h-6 text-slate-900 dark:text-white" /></button>
+                                        <button onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: Math.min(fixtureModal.fixtureData?.totalRounds || 1, p.selectedRound + 1) }))} className="p-4 rounded-[14px] bg-slate-100 dark:bg-white/5 hover:bg-slate-200 transition-all disabled:opacity-20"><ChevronRightIcon className="w-6 h-6 text-slate-900 dark:text-white" /></button>
                                     </div>
                                 </div>
                             )}
@@ -576,15 +576,15 @@ export default function ChampionshipsPage() {
             {/* MODAL ELIMINAR ESTANDARIZADO */}
             {tournamentToDelete && (
                 <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setTournamentToDelete(null)}>
-                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-2xl p-6 border border-slate-200 dark:border-white/10 shadow-2xl text-center" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-[14px] p-6 border border-slate-200 dark:border-white/10 shadow-2xl text-center" onClick={e => e.stopPropagation()}>
                         <div className="w-16 h-16 bg-red-50 dark:bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100 dark:border-red-500/20">
                             <ExclamationTriangleIcon className="w-8 h-8 text-red-600" />
                         </div>
                         <h3 className="text-lg font-black uppercase text-black dark:text-white mb-2 tracking-tighter">¿Eliminar Registro?</h3>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Esta acción no se puede deshacer y borrará toda la información asociada.</p>
                         <div className="flex gap-3">
-                            <button onClick={() => setTournamentToDelete(null)} className="flex-1 py-3 text-[10px] font-black uppercase rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">CANCELAR</button>
-                            <button onClick={handleDelete} className="flex-1 py-3 text-[10px] font-black uppercase rounded-xl text-white bg-red-600 shadow-xl shadow-red-600/20">CONFIRMAR</button>
+                            <button onClick={() => setTournamentToDelete(null)} className="flex-1 py-3 text-[10px] font-black uppercase rounded-[14px] bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">CANCELAR</button>
+                            <button onClick={handleDelete} className="flex-1 py-3 text-[10px] font-black uppercase rounded-[14px] text-white bg-red-600 shadow-xl shadow-red-600/20">CONFIRMAR</button>
                         </div>
                     </div>
                 </div>
@@ -593,10 +593,10 @@ export default function ChampionshipsPage() {
             {/* MODAL PARTICIPANTES (EQUIPOS INSCRITOS) */}
             {participantsModal.isOpen && (
                 <div className="fixed inset-0 z-[180] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setParticipantsModal({ isOpen: false, tournament: null })}>
-                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-2xl rounded-[14px] shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
                         <div className="p-5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-white/[0.02]">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-blue-500 rounded-xl shadow-lg shadow-blue-500/20"><UserGroupIcon className="w-5 h-5 text-white" /></div>
+                                <div className="p-2 bg-blue-500 rounded-[14px] shadow-lg shadow-blue-500/20"><UserGroupIcon className="w-5 h-5 text-white" /></div>
                                 <div>
                                     <h3 className="text-xs font-black uppercase text-black dark:text-white tracking-widest">Equipos Inscritos</h3>
                                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mt-0.5">{participantsModal.tournament?.name}</p>
@@ -613,9 +613,9 @@ export default function ChampionshipsPage() {
                             ) : (
                                 <div className="grid grid-cols-1 gap-3">
                                     {participantsModal.tournament?.teams.map((team: any, idx: number) => (
-                                        <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/5">
+                                        <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/[0.03] rounded-[14px] border border-slate-100 dark:border-white/5">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center overflow-hidden">
+                                                <div className="w-10 h-10 rounded-[14px] bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center overflow-hidden">
                                                     {team.logo ? <img src={team.logo} className="w-full h-full object-cover" alt="" /> : <FlagIcon className="w-5 h-5 text-slate-300" />}
                                                 </div>
                                                 <div>
@@ -650,9 +650,9 @@ function InputGroupPremium({ label, value, onChange, placeholder, icon, readOnly
             <div className="relative">
                 {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 dark:text-white/20 group-focus-within:text-amber-500 transition-colors">{icon}</div>}
                 {type === 'select' ? (
-                    <select value={value || ''} onChange={onChange} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-8 py-2 bg-white dark:bg-[#0B0F19] border border-slate-100 dark:border-white/5 rounded-xl text-[10px] font-normal text-black dark:text-white focus:border-amber-500 outline-none transition-all appearance-none uppercase cursor-pointer shadow-sm`}>{children}</select>
+                    <select value={value || ''} onChange={onChange} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-8 py-2 bg-white dark:bg-[#0B0F19] border border-slate-100 dark:border-white/5 rounded-[14px] text-[10px] font-normal text-black dark:text-white focus:border-amber-500 outline-none transition-all appearance-none uppercase cursor-pointer shadow-sm`}>{children}</select>
                 ) : (
-                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2 rounded-xl border text-[10px] font-normal transition-all outline-none shadow-sm ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-white border-slate-100 text-black focus:border-amber-500 dark:bg-[#0B0F19] dark:border-white/5 dark:text-white'}`} />
+                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2 rounded-[14px] border text-[10px] font-normal transition-all outline-none shadow-sm ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-white border-slate-100 text-black focus:border-amber-500 dark:bg-[#0B0F19] dark:border-white/5 dark:text-white'}`} />
                 )}
                 {type === 'select' && <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"><ChevronDownIcon className="w-3 h-3" /></div>}
             </div>

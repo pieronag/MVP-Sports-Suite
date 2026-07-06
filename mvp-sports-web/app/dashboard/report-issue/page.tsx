@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
@@ -330,13 +330,13 @@ export default function ReportIssuePage() {
                         <div className="flex gap-4 justify-center">
                             <button
                                 onClick={() => setSuccess(false)}
-                                className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] uppercase rounded-xl tracking-wider transition-all shadow-lg shadow-emerald-500/20"
+                                className="px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] uppercase rounded-[14px] tracking-wider transition-all shadow-lg shadow-emerald-500/20"
                             >
                                 Reportar otro Problema
                             </button>
                             <button
                                 onClick={() => setActiveTab('list')}
-                                className="px-6 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-white font-black text-[10px] uppercase rounded-xl tracking-wider transition-all"
+                                className="px-6 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-white font-black text-[10px] uppercase rounded-[14px] tracking-wider transition-all"
                             >
                                 Ver Mis Reportes
                             </button>
@@ -349,7 +349,7 @@ export default function ReportIssuePage() {
                             <PanelGlass className="p-8 border-none shadow-xl shadow-slate-200/20">
                                 <form onSubmit={handleSubmit} className="space-y-5">
                                     {errorMsg && (
-                                        <div className="p-4 rounded-xl bg-red-50 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20 text-red-600 dark:text-red-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-2">
+                                        <div className="p-4 rounded-[14px] bg-red-50 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20 text-red-600 dark:text-red-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-2">
                                             <ExclamationTriangleIcon className="w-4 h-4 shrink-0" />
                                             {errorMsg}
                                         </div>
@@ -362,7 +362,7 @@ export default function ReportIssuePage() {
                                             <select
                                                 value={category}
                                                 onChange={(e) => setCategory(e.target.value)}
-                                                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-xs font-bold outline-none text-slate-800 dark:text-white focus:border-emerald-500/50 transition-all"
+                                                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-[14px] text-xs font-bold outline-none text-slate-800 dark:text-white focus:border-emerald-500/50 transition-all"
                                             >
                                                 <option value="Bug">Error del Sistema (Bug)</option>
                                                 <option value="Facturación">Problemas de Facturación o Pago</option>
@@ -378,7 +378,7 @@ export default function ReportIssuePage() {
                                             <select
                                                 value={priority}
                                                 onChange={(e) => setPriority(e.target.value)}
-                                                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-xs font-bold outline-none text-slate-800 dark:text-white focus:border-emerald-500/50 transition-all"
+                                                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-[14px] text-xs font-bold outline-none text-slate-800 dark:text-white focus:border-emerald-500/50 transition-all"
                                             >
                                                 <option value="Baja">Baja (Consulta general o sugerencia)</option>
                                                 <option value="Media">Media (Afecta parcialmente la navegación)</option>
@@ -397,7 +397,7 @@ export default function ReportIssuePage() {
                                                 placeholder="EJ. ERROR AL CONFIRMAR ARRIENDO DE CANCHA"
                                                 value={subject}
                                                 onChange={(e) => setSubject(e.target.value)}
-                                                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-xs font-bold outline-none text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 transition-all uppercase"
+                                                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-[14px] text-xs font-bold outline-none text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 transition-all uppercase"
                                                 required
                                             />
                                         </div>
@@ -410,7 +410,7 @@ export default function ReportIssuePage() {
                                                 placeholder="EJ. CALENDARIO / DETALLE DE FACTURA"
                                                 value={screen}
                                                 onChange={(e) => setScreen(e.target.value)}
-                                                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-xs font-bold outline-none text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 transition-all uppercase"
+                                                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-[14px] text-xs font-bold outline-none text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 transition-all uppercase"
                                             />
                                         </div>
                                     </div>
@@ -423,7 +423,7 @@ export default function ReportIssuePage() {
                                             placeholder="EXPLICA AQUÍ QUÉ PASÓ DETALLADAMENTE..."
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
-                                            className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-xs font-bold outline-none text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 transition-all"
+                                            className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-[14px] text-xs font-bold outline-none text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 transition-all"
                                             required
                                         />
                                     </div>
@@ -436,7 +436,7 @@ export default function ReportIssuePage() {
                                             placeholder="EJ: 1. IR A AGENDA, 2. CLICK EN HORA 18:00, 3. ELEGIR CLIENTE Y DAR GUARDAR"
                                             value={steps}
                                             onChange={(e) => setSteps(e.target.value)}
-                                            className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-xs font-bold outline-none text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 transition-all uppercase"
+                                            className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-[14px] text-xs font-bold outline-none text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/50 transition-all uppercase"
                                         />
                                     </div>
 
@@ -444,7 +444,7 @@ export default function ReportIssuePage() {
                                         <button
                                             type="submit"
                                             disabled={submitting}
-                                            className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] uppercase rounded-xl tracking-wider transition-all disabled:opacity-50 shadow-lg shadow-emerald-500/10 active:scale-[0.99]"
+                                            className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] uppercase rounded-[14px] tracking-wider transition-all disabled:opacity-50 shadow-lg shadow-emerald-500/10 active:scale-[0.99]"
                                         >
                                             {submitting ? (
                                                 <>
@@ -538,17 +538,17 @@ export default function ReportIssuePage() {
                 /* SECCIÓN DE HISTORIAL / MIS REPORTES ENVIADOS */
                 <div className="space-y-6">
                     {loadingReports ? (
-                        <div className="flex flex-col items-center justify-center py-24 text-slate-400 bg-slate-50/50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 rounded-2xl">
+                        <div className="flex flex-col items-center justify-center py-24 text-slate-400 bg-slate-50/50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 rounded-[14px]">
                             <ArrowPathIcon className="w-8 h-8 text-emerald-500 animate-spin mb-4" />
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sincronizando tus tickets...</p>
                         </div>
                     ) : reportsList.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-24 text-slate-400 bg-slate-50/50 dark:bg-white/[0.02] border-2 border-dashed border-slate-200 dark:border-white/5 rounded-2xl">
+                        <div className="flex flex-col items-center justify-center py-24 text-slate-400 bg-slate-50/50 dark:bg-white/[0.02] border-2 border-dashed border-slate-200 dark:border-white/5 rounded-[14px]">
                             <ChatBubbleLeftRightIcon className="w-12 h-12 mb-4 text-slate-300 dark:text-slate-700 stroke-1" />
                             <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">No has enviado ningún reporte de incidencia aún.</p>
                             <button
                                 onClick={() => setActiveTab('create')}
-                                className="mt-4 px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[9px] uppercase rounded-xl tracking-wider transition-all"
+                                className="mt-4 px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[9px] uppercase rounded-[14px] tracking-wider transition-all"
                             >
                                 Reportar Primer Problema
                             </button>
@@ -560,7 +560,7 @@ export default function ReportIssuePage() {
                                     {/* Cabecera del ticket */}
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/5 pb-4 mb-4">
                                         <div className="flex items-center gap-2.5">
-                                            <span className="text-[9px] font-black font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-100 dark:border-emerald-500/20">
+                                            <span className="text-[9px] font-black font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-[14px] border border-emerald-100 dark:border-emerald-500/20">
                                                 ID: #{ticket.id.slice(0, 8).toUpperCase()}
                                             </span>
                                             <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500">
@@ -588,7 +588,7 @@ export default function ReportIssuePage() {
                                             </p>
                                         </div>
 
-                                        <div className="bg-slate-50 dark:bg-white/[0.02] p-4 rounded-xl space-y-2 border border-slate-100 dark:border-white/5">
+                                        <div className="bg-slate-50 dark:bg-white/[0.02] p-4 rounded-[14px] space-y-2 border border-slate-100 dark:border-white/5">
                                             <div>
                                                 <h4 className="text-[8px] font-black uppercase tracking-widest text-slate-400">Descripción del problema:</h4>
                                                 <p className="text-xs text-slate-600 dark:text-slate-300 font-medium whitespace-pre-line mt-1">{ticket.description}</p>
@@ -609,7 +609,7 @@ export default function ReportIssuePage() {
 
                                         {/* Respuesta Oficial de Soporte */}
                                         {ticket.response ? (
-                                            <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-500/[0.02] space-y-2 mt-3 animate-fadeIn">
+                                            <div className="p-4 rounded-[14px] border border-emerald-500/20 bg-emerald-500/5 dark:bg-emerald-500/[0.02] space-y-2 mt-3 animate-fadeIn">
                                                 <div className="flex items-center justify-between border-b border-emerald-500/10 pb-2">
                                                     <div className="flex items-center gap-1.5">
                                                         <WrenchIcon className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -633,7 +633,7 @@ export default function ReportIssuePage() {
                                                 )}
                                             </div>
                                         ) : (
-                                            <div className="p-3 rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.01] text-[10px] text-slate-400 font-black uppercase tracking-wider flex items-center gap-2">
+                                            <div className="p-3 rounded-[14px] border border-slate-200 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.01] text-[10px] text-slate-400 font-black uppercase tracking-wider flex items-center gap-2">
                                                 <ClockIcon className="w-4 h-4 text-slate-400 animate-pulse" />
                                                 Esperando respuesta del soporte técnico...
                                             </div>
