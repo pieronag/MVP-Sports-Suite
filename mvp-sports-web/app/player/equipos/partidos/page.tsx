@@ -284,17 +284,15 @@ export default function PartidosPage() {
                 </div>
               )}
             </div>
-            <div className="flex gap-2">
-              <div className={`flex-1 relative`}>
-                <select value={regionFilter} onChange={e => { setRegionFilter(e.target.value); setCommuneFilters([]); }}
-                  className={`w-full h-11 rounded-[14px] px-4 text-[11px] font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0F172A]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-700 border-slate-200/60"} backdrop-blur-xl shadow-sm`}
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
-                  <option value="">Todas las regiones</option>
-                  {Object.keys(REGIONS).map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
+            <div className="space-y-2">
+              <select value={regionFilter} onChange={e => { setRegionFilter(e.target.value); setCommuneFilters([]); }}
+                className={`w-full h-11 rounded-[14px] px-4 text-[11px] font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0F172A]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-700 border-slate-200/60"} backdrop-blur-xl shadow-sm`}
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
+                <option value="">Todas las regiones</option>
+                {Object.keys(REGIONS).map(r => <option key={r} value={r}>{r}</option>)}
+              </select>
               {regionFilter && (
-                <div className="w-full">
+                <div>
                   <div className="flex flex-wrap gap-1.5">
                     {(REGIONS[regionFilter] || []).map(c => {
                       const selected = communeFilters.includes(c);
