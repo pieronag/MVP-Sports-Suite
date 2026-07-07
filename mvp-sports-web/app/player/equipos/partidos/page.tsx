@@ -91,6 +91,7 @@ export default function PartidosPage() {
   const [editSport, setEditSport] = useState("");
   const [editSports, setEditSports] = useState<string[]>([]);
   const [showTeamDetail, setShowTeamDetail] = useState<MatchEntry | null>(null);
+  const [teamDetailData, setTeamDetailData] = useState<{ team: any; profiles: Record<string, any> } | null>(null);
   const [showPlayerDetail, setShowPlayerDetail] = useState<MatchEntry | null>(null);
 
   const uid = user?.uid || "";
@@ -148,7 +149,7 @@ export default function PartidosPage() {
       }, uid);
       setFeedback({ type: "success", msg: "¡Equipo publicado! Ahora otros capitanes pueden retarte." });
       setShowPublishTeam(false);
-    } catch { setFeedback({ type: "error", msg: "Error al publicar." }); }
+    } catch (e: any) { setFeedback({ type: "error", msg: e?.message || "Error al publicar el equipo." }); }
     finally { setActionLoading(false); }
   };
 
@@ -371,7 +372,7 @@ export default function PartidosPage() {
                                 ) : null}
                               </div>
                             </div>
-                            <button onClick={() => setShowTeamDetail(entry)}
+                            <button onClick={async () => { setShowTeamDetail(entry); setTeamDetailData(null); try { const team = await teamService.getTeamById(entry.teamId!); if (team) { const p = await teamService.getMemberProfiles(team.members); setTeamDetailData({ team, profiles: p }); } } catch {} }}
                               className={`px-4 h-9 rounded-[14px] text-[9px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] shrink-0 ml-2 ${alreadyChallenged ? (isDark ? "bg-white/[0.06] text-slate-500" : "bg-slate-100 text-slate-400") : "bg-emerald-500 text-white"}`}>
                               {alreadyChallenged ? "Retado" : "Ver"}
                             </button>
@@ -690,11 +691,11 @@ export default function PartidosPage() {
 
       {/* Team Detail Modal */}
       {showTeamDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowTeamDetail(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => { setShowTeamDetail(null); setTeamDetailData(null); }}>
           <div className={`w-full max-w-sm rounded-[14px] overflow-hidden border shadow-2xl ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-            <div className="h-[120px] relative" style={{ background: showTeamDetail.teamImageUrl ? `url(${showTeamDetail.teamImageUrl}) center/cover` : `linear-gradient(135deg, #059669, #047857)` }}>
+            <div className="h-[130px] relative" style={{ background: showTeamDetail.teamImageUrl ? `url(${showTeamDetail.teamImageUrl}) center/cover` : `linear-gradient(135deg, #059669, #047857)` }}>
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-              <button onClick={() => setShowTeamDetail(null)} className="absolute top-4 right-4 w-8 h-8 rounded-[14px] bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
+              <button onClick={() => { setShowTeamDetail(null); setTeamDetailData(null); }} className="absolute top-4 right-4 w-8 h-8 rounded-[14px] bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
               <div className="absolute bottom-4 left-5 right-5">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="bg-emerald-500 px-2.5 py-1 rounded-[14px] text-white font-semibold text-[8px] uppercase">{showTeamDetail.sport.toUpperCase()}</span>
@@ -703,7 +704,7 @@ export default function PartidosPage() {
                 <p className="text-white text-lg font-semibold">{showTeamDetail.teamName}</p>
               </div>
             </div>
-            <div className="p-5 space-y-4">
+            <div className="p-5 space-y-4 max-h-[60vh] overflow-y-auto">
               {((showTeamDetail.communes && showTeamDetail.communes.length > 0) || showTeamDetail.region) && (
                 <div className="flex items-center gap-2">
                   <MapPin size={14} className="text-emerald-500 shrink-0" />
@@ -715,7 +716,63 @@ export default function PartidosPage() {
               {showTeamDetail.description && (
                 <p className={`text-[12px] font-medium leading-snug ${isDark ? "text-slate-400" : "text-slate-500"}`}>{showTeamDetail.description}</p>
               )}
-              <button onClick={() => { const e = showTeamDetail; setShowTeamDetail(null); handleChallenge(e); }} disabled={actionLoading}
+              {/* Team Stats */}
+              {teamDetailData && (
+                <div className="space-y-3">
+                  {/* Captain */}
+                  {(() => {
+                    const ownerProfile = teamDetailData.profiles[teamDetailData.team.ownerId];
+                    const ownerName = ownerProfile?.displayName || teamDetailData.team.ownerId.slice(0, 8);
+                    return (
+                      <div className="space-y-1.5">
+                        <p className={`text-[8px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>CAPITÁN</p>
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-[14px] overflow-hidden shrink-0" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
+                            {ownerProfile?.photoURL ? <img src={ownerProfile.photoURL} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
+                          </div>
+                          <span className={`text-[13px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{ownerName}</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                  {/* Average OVR */}
+                  {(() => {
+                    const ovrs = teamDetailData.team.members.map((mid: string) => teamDetailData.profiles[mid]?.ovr || 40);
+                    const avg = Math.round(ovrs.reduce((a: number, b: number) => a + b, 0) / ovrs.length);
+                    return (
+                      <div className="flex items-center justify-between p-3 rounded-[14px]" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
+                        <p className={`text-[10px] font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>OVR PROMEDIO</p>
+                        <span className="text-emerald-500 text-[16px] font-bold">{avg}</span>
+                      </div>
+                    );
+                  })()}
+                  {/* Member list */}
+                  <div className="space-y-1.5">
+                    <p className={`text-[8px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>JUGADORES ({teamDetailData.team.members.length})</p>
+                    <div className="space-y-1.5 max-h-[180px] overflow-y-auto">
+                      {teamDetailData.team.members.map((mid: string) => {
+                        const p = teamDetailData.profiles[mid] || {};
+                        const isOwner = mid === teamDetailData.team.ownerId;
+                        return (
+                          <div key={mid} className="flex items-center gap-2.5 p-2 rounded-[14px]" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.03)" : "transparent" }}>
+                            <div className="w-8 h-8 rounded-[14px] overflow-hidden shrink-0" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
+                              {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : <User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-[11px] font-medium truncate ${isDark ? "text-slate-200" : "text-slate-700"}`}>{p.displayName || mid.slice(0, 8)}{isOwner ? " (C)" : ""}</p>
+                            </div>
+                            <span className="text-emerald-500 text-[11px] font-semibold shrink-0">OVR {p.ovr || 40}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {!teamDetailData && (
+                <div className="flex justify-center py-4"><div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
+              )}
+              <button onClick={() => { if (!teamDetailData) return; const e = showTeamDetail; setShowTeamDetail(null); setTeamDetailData(null); handleChallenge(e); }} disabled={actionLoading || !teamDetailData}
                 className="w-full h-12 rounded-[14px] bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-emerald-500/25">
                 {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><Swords size={16} /> Retar a este equipo</>}
               </button>
