@@ -90,10 +90,11 @@ export const matchmakingService = {
         sport: string; memberCount: number; description?: string;
         region?: string; communes?: string[];
     }, userId: string): Promise<string> {
-        const clean: any = { type: 'team', ...data, userId, status: 'active', createdAt: Timestamp.now() };
-        if (!clean.city) delete clean.city;
-        if (!clean.region) delete clean.region;
-        if (!clean.communes || clean.communes.length === 0) delete clean.communes;
+        const clean: any = { type: 'team', teamId: data.teamId, teamName: data.teamName, sport: data.sport, memberCount: data.memberCount, userId, status: 'active', createdAt: Timestamp.now() };
+        if (data.teamImageUrl) clean.teamImageUrl = data.teamImageUrl;
+        if (data.description) clean.description = data.description;
+        if (data.region) clean.region = data.region;
+        if (data.communes && data.communes.length > 0) clean.communes = data.communes;
         const docRef = await addDoc(collection(db, 'matchmaking'), clean);
         return docRef.id;
     },
