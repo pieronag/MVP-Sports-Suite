@@ -27,7 +27,8 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      const target = role && role !== 'player' ? '/dashboard' : '/player';
+      const isMobile = typeof navigator !== "undefined" && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const target = isMobile ? '/player' : (role && role !== 'player' ? '/dashboard' : '/player');
       router.push(target);
     }
   }, [user, router, role]);
