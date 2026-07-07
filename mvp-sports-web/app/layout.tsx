@@ -37,7 +37,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#10b981" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="apple-touch-icon" href="/Logo.png" />
+        <link rel="apple-touch-icon" href="/icons/LogoFondo.png" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased bg-slate-50 dark:bg-[#050b14] text-slate-900 dark:text-slate-200 transition-colors duration-300`}>

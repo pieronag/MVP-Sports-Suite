@@ -54,15 +54,32 @@ export default function PlayerDashboard() {
     : { name: "Bronce", index: 0 };
   const ovr = gamification ? gamificationService.calculateOVR(xp, gamification) : 40;
 
-  const isIOS = useMemo(() => {
-    if (typeof navigator === "undefined") return false;
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [showInstallGuide, setShowInstallGuide] = useState(false);
+
+  useEffect(() => {
+    // Check if already installed (display-mode: standalone)
+    if (typeof window !== "undefined" && window.matchMedia("(display-mode: standalone)").matches) {
+      setIsInstalled(true);
+    }
+    // Listen for install prompt
+    const onPrompt = (e: any) => { e.preventDefault(); setInstallPrompt(e); };
+    window.addEventListener("beforeinstallprompt", onPrompt);
+    // Listen for installed
+    const onInstalled = () => { setInstallPrompt(null); setIsInstalled(true); };
+    window.addEventListener("appinstalled", onInstalled);
+    return () => { window.removeEventListener("beforeinstallprompt", onPrompt); window.removeEventListener("appinstalled", onInstalled); };
   }, []);
 
-  const isAndroid = useMemo(() => {
-    if (typeof navigator === "undefined") return false;
-    return /Android/.test(navigator.userAgent);
-  }, []);
+  const handleInstallClick = () => {
+    if (installPrompt) {
+      installPrompt.prompt();
+      installPrompt.userChoice.then(() => setInstallPrompt(null));
+    } else {
+      setShowInstallGuide(true);
+    }
+  };
 
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
@@ -241,15 +258,15 @@ export default function PlayerDashboard() {
           </Link>
         </div>
 
-        {/* Download App Button */}
+        {/* Install App Button */}
         <div className="px-5 mt-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
             <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">App Móvil</span>
             <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
           </div>
-          <Link href="/login"
-            className={`relative block rounded-[14px] overflow-hidden transition-all active:scale-[0.99] group ${
+          <button onClick={handleInstallClick}
+            className={`relative w-full block rounded-[14px] overflow-hidden transition-all active:scale-[0.99] group text-left ${
               isDark
                 ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]"
                 : "bg-white/80 backdrop-blur-xl border border-slate-200/60"
@@ -266,13 +283,41 @@ export default function PlayerDashboard() {
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Descargar App</p>
-                <p className={`text-[9px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Acceso directo desde tu dispositivo</p>
+                <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Instalar App</p>
+                <p className={`text-[9px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                  {installPrompt ? "Toca para instalar en tu dispositivo" : "Aprende cómo instalar en tu dispositivo"}
+                </p>
               </div>
               <ArrowRight size={16} className="text-emerald-500 shrink-0" />
             </div>
-          </Link>
+          </button>
         </div>
+
+        {/* Install Guide Modal */}
+        {showInstallGuide && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowInstallGuide(false)}>
+            <div className={`w-full max-w-sm rounded-[14px] p-6 border shadow-2xl ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+              <div className={`w-16 h-16 rounded-[14px] flex items-center justify-center mx-auto mb-4 ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}>
+                <svg className={`w-8 h-8 ${isDark ? "text-emerald-400" : "text-emerald-600"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              </div>
+              <p className={`font-semibold text-[15px] text-center mb-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>Instalar App</p>
+              <div className="space-y-3 mb-5">
+                <div className={`p-3 rounded-[14px] border ${isDark ? "border-white/[0.06] bg-white/[0.03]" : "border-slate-200 bg-slate-50"}`}>
+                  <p className={`font-semibold text-[12px] ${isDark ? "text-slate-200" : "text-slate-800"}`}>Chrome (Android)</p>
+                  <p className={`text-[10px] font-medium mt-1 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Menú ⋮ → "Agregar a pantalla de inicio"</p>
+                </div>
+                <div className={`p-3 rounded-[14px] border ${isDark ? "border-white/[0.06] bg-white/[0.03]" : "border-slate-200 bg-slate-50"}`}>
+                  <p className={`font-semibold text-[12px] ${isDark ? "text-slate-200" : "text-slate-800"}`}>Safari (iPhone/iPad)</p>
+                  <p className={`text-[10px] font-medium mt-1 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Compartir → "Agregar a pantalla de inicio"</p>
+                </div>
+              </div>
+              <button onClick={() => setShowInstallGuide(false)}
+                className="w-full py-3.5 rounded-[14px] bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25">Entendido</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

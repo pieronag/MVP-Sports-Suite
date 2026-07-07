@@ -10,21 +10,16 @@
   "categories": ["sports", "lifestyle"],
   "icons": [
     {
-      "src": "/Logo.png",
+      "src": "/icons/LogoFondo.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
-      "src": "/Logo.png",
+      "src": "/icons/LogoFondo.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/favicon.ico",
-      "sizes": "48x48 64x64",
-      "type": "image/x-icon"
+      "purpose": "any maskable"
     }
   ]
 }

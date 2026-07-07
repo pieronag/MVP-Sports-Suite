@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
 import AppFunctions from "../components/landing/AppFunctions";
@@ -15,9 +16,16 @@ const TermsModal = dynamic(() => import("../components/landing/TermsModal"));
 const PrivacyModal = dynamic(() => import("../components/landing/PrivacyModal"));
 
 export default function Home() {
+  const router = useRouter();
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) router.replace("/login");
+  }, [router]);
 
   return (
     <main className="min-h-screen bg-slate-950 selection:bg-[#00df82] selection:text-slate-950">
