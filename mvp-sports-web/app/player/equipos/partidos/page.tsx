@@ -90,6 +90,8 @@ export default function PartidosPage() {
   const [editDesc, setEditDesc] = useState("");
   const [editSport, setEditSport] = useState("");
   const [editSports, setEditSports] = useState<string[]>([]);
+  const [showTeamDetail, setShowTeamDetail] = useState<MatchEntry | null>(null);
+  const [showPlayerDetail, setShowPlayerDetail] = useState<MatchEntry | null>(null);
 
   const uid = user?.uid || "";
   const playerName = (profile as any)?.displayName || "Jugador";
@@ -98,26 +100,40 @@ export default function PartidosPage() {
   const playerOvr = (profile as any)?.ovr || 40;
   const playerTier = (profile as any)?.tier || "Bronce";
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [t, p, m, c, ut] = await Promise.all([
-        matchmakingService.getTeamsLooking(sportFilter || undefined).catch(() => []),
-        matchmakingService.getPlayersAvailable(sportFilter || undefined, positionFilter || undefined).catch(() => []),
-        matchmakingService.getMyEntries(uid).catch(() => []),
-        matchmakingService.getMyChallenges(uid).catch(() => []),
-        teamService.getUserTeams(uid).catch(() => []),
-      ]);
-      setTeams(t.filter(e => !regionFilter || (e.region || "").includes(regionFilter)).filter(e => communeFilters.length === 0 || (e.communes || []).some(c => communeFilters.includes(c))));
-      setPlayers(p.filter(e => !regionFilter || (e.region || "").includes(regionFilter)).filter(e => communeFilters.length === 0 || (e.communes || []).some(c => communeFilters.includes(c))));
-      setMyEntries(m);
-      setChallenges(c);
-      setUserTeams(ut);
-    } catch {}
-    finally { setLoading(false); }
-  }, [uid, sportFilter, positionFilter, regionFilter, communeFilters]);
+  // Real-time subscriptions
+  useEffect(() => {
+    if (!uid) return;
+    const unsubs: (() => void)[] = [];
 
-  useEffect(() => { if (uid) loadData(); }, [loadData]);
+    unsubs.push(matchmakingService.subscribeToTeamsLooking(sportFilter || undefined, (entries) => {
+      setTeams(entries.filter(e => e.userId !== uid)
+        .filter(e => !regionFilter || (e.region || "").includes(regionFilter))
+        .filter(e => communeFilters.length === 0 || (e.communes || []).some(c => communeFilters.includes(c))));
+    }));
+
+    const sportForPlayers = activeTab === "jugadores" ? sportFilter || undefined : undefined;
+    unsubs.push(matchmakingService.subscribeToPlayersAvailable(sportForPlayers, (entries) => {
+      let filtered = entries.filter(e => e.userId !== uid);
+      if (positionFilter) filtered = filtered.filter(e => e.position === positionFilter);
+      filtered = filtered.filter(e => !regionFilter || (e.region || "").includes(regionFilter));
+      filtered = filtered.filter(e => communeFilters.length === 0 || (e.communes || []).some(c => communeFilters.includes(c)));
+      setPlayers(filtered);
+    }));
+
+    unsubs.push(matchmakingService.subscribeToMyEntries(uid, (entries) => {
+      setMyEntries(entries);
+    }));
+
+    unsubs.push(matchmakingService.subscribeToMyChallenges(uid, (challenges) => {
+      setChallenges(challenges);
+    }));
+
+    // Fetch user teams once (they rarely change)
+    teamService.getUserTeams(uid).then(setUserTeams).catch(() => {});
+    setLoading(false);
+
+    return () => unsubs.forEach(u => u());
+  }, [uid, sportFilter, positionFilter, regionFilter, communeFilters, activeTab]);
 
   const handlePublishTeam = async () => {
     if (!selectedTeam) return;
@@ -132,7 +148,6 @@ export default function PartidosPage() {
       }, uid);
       setFeedback({ type: "success", msg: "¡Equipo publicado! Ahora otros capitanes pueden retarte." });
       setShowPublishTeam(false);
-      loadData();
     } catch { setFeedback({ type: "error", msg: "Error al publicar." }); }
     finally { setActionLoading(false); }
   };
@@ -150,7 +165,6 @@ export default function PartidosPage() {
       await matchmakingService.publishPlayer(data);
       setFeedback({ type: "success", msg: "¡Disponibilidad publicada! Los capitanes podrán contactarte." });
       setShowPublishPlayer(false);
-      loadData();
     } catch (e: any) {
       setFeedback({ type: "error", msg: e?.message || "Error al publicar disponibilidad." });
     }
@@ -171,7 +185,7 @@ export default function PartidosPage() {
         senderId: uid, receiverId: entry.userId || "",
       });
       setFeedback({ type: "success", msg: `¡Has retado a ${entry.teamName}!` });
-      loadData();
+      loadData;
     } catch { setFeedback({ type: "error", msg: "Error al retar." }); }
     finally { setActionLoading(false); }
   };
@@ -196,7 +210,6 @@ export default function PartidosPage() {
   const handleAcceptChallenge = async (challengeId: string) => {
     try {
       await matchmakingService.acceptChallenge(challengeId);
-      loadData();
     } catch {}
   };
 
@@ -210,7 +223,7 @@ export default function PartidosPage() {
       await matchmakingService.updateEntry(editEntry.id, data);
       setFeedback({ type: "success", msg: "Publicación actualizada." });
       setEditEntry(null);
-      loadData();
+      loadData;
     } catch { setFeedback({ type: "error", msg: "Error al actualizar." }); }
     finally { setActionLoading(false); }
   };
@@ -218,7 +231,6 @@ export default function PartidosPage() {
   const handleDeclineChallenge = async (challengeId: string) => {
     try {
       await matchmakingService.declineChallenge(challengeId);
-      loadData();
     } catch {}
   };
 
@@ -320,7 +332,7 @@ export default function PartidosPage() {
                 style={{ backgroundColor: "#10b981", color: "white" }}>
                 <Swords size={16} /> Publicar mi Equipo
               </button>
-              <button onClick={loadData} className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
+              <button onClick={() => {}} className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#94A3B8" : "#64748B"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
               </button>
             </div>
@@ -361,9 +373,9 @@ export default function PartidosPage() {
                                 ) : null}
                               </div>
                             </div>
-                            <button onClick={() => handleChallenge(entry)} disabled={actionLoading || alreadyChallenged}
+                            <button onClick={() => setShowTeamDetail(entry)}
                               className={`px-4 h-9 rounded-[14px] text-[9px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] shrink-0 ml-2 ${alreadyChallenged ? (isDark ? "bg-white/[0.06] text-slate-500" : "bg-slate-100 text-slate-400") : "bg-emerald-500 text-white"}`}>
-                              {alreadyChallenged ? "Retado" : "Retar"}
+                              {alreadyChallenged ? "Retado" : "Ver"}
                             </button>
                           </div>
                           {entry.description && <p className={`text-[10px] font-medium mt-2 leading-snug ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.description}</p>}
@@ -425,9 +437,9 @@ export default function PartidosPage() {
                             {entry.description && <p className={`text-[9px] font-medium mt-1.5 leading-snug ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.description}</p>}
                           </div>
                         </div>
-                        <button onClick={() => handleContact(entry)} disabled={actionLoading || alreadyContacted}
+                        <button onClick={() => setShowPlayerDetail(entry)} disabled={alreadyContacted}
                           className={`w-full mt-3 h-10 rounded-[14px] text-[9px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${alreadyContacted ? (isDark ? "bg-white/[0.06] text-slate-500 border border-white/[0.06]" : "bg-slate-100 text-slate-400 border border-slate-200") : "bg-emerald-500 text-white shadow-sm shadow-emerald-500/25"}`}>
-                          {alreadyContacted ? "Contactado" : "Contactar"}
+                          {alreadyContacted ? "Contactado" : "Ver"}
                         </button>
                       </div>
                     </GlowCard>
@@ -461,7 +473,7 @@ export default function PartidosPage() {
                           </div>
                           <button onClick={() => { setEditEntry(entry); setEditDesc(entry.description || ""); setEditSport(entry.sport || ""); setEditSports(entry.sports || []); }}
                             className={`px-3 h-8 rounded-[14px] text-[8px] font-semibold uppercase mr-1.5 ${isDark ? "bg-blue-500/10 text-blue-400" : "bg-blue-50 text-blue-500"}`}>Editar</button>
-                          <button onClick={async () => { await matchmakingService.closeEntry(entry.id); loadData(); }}
+                          <button onClick={async () => { await matchmakingService.closeEntry(entry.id); }}
                             className={`px-3 h-8 rounded-[14px] text-[8px] font-semibold uppercase ${isDark ? "bg-red-500/10 text-red-400" : "bg-red-50 text-red-500"}`}>Cerrar</button>
                         </div>
                       </GlowCard>
@@ -674,6 +686,96 @@ export default function PartidosPage() {
               className="w-full h-12 rounded-[14px] bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-emerald-500/25 flex items-center justify-center">
               {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Publicar Disponibilidad"}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Team Detail Modal */}
+      {showTeamDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowTeamDetail(null)}>
+          <div className={`w-full max-w-sm rounded-[14px] overflow-hidden border shadow-2xl ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+            <div className="h-[120px] relative" style={{ background: showTeamDetail.teamImageUrl ? `url(${showTeamDetail.teamImageUrl}) center/cover` : `linear-gradient(135deg, #059669, #047857)` }}>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+              <button onClick={() => setShowTeamDetail(null)} className="absolute top-4 right-4 w-8 h-8 rounded-[14px] bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
+              <div className="absolute bottom-4 left-5 right-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="bg-emerald-500 px-2.5 py-1 rounded-[14px] text-white font-semibold text-[8px] uppercase">{showTeamDetail.sport.toUpperCase()}</span>
+                  <span className="bg-black/40 px-2.5 py-1 rounded-[14px] text-white/80 text-[8px] font-medium">{showTeamDetail.memberCount} jugadores</span>
+                </div>
+                <p className="text-white text-lg font-semibold">{showTeamDetail.teamName}</p>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              {((showTeamDetail.communes && showTeamDetail.communes.length > 0) || showTeamDetail.region) && (
+                <div className="flex items-center gap-2">
+                  <MapPin size={14} className="text-emerald-500 shrink-0" />
+                  <span className={`text-[12px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                    {showTeamDetail.communes?.slice(0, 3).join(", ")}{showTeamDetail.communes && showTeamDetail.communes.length > 3 ? ` +${showTeamDetail.communes.length - 3}` : ""} · {showTeamDetail.region}
+                  </span>
+                </div>
+              )}
+              {showTeamDetail.description && (
+                <p className={`text-[12px] font-medium leading-snug ${isDark ? "text-slate-400" : "text-slate-500"}`}>{showTeamDetail.description}</p>
+              )}
+              <button onClick={() => { const e = showTeamDetail; setShowTeamDetail(null); handleChallenge(e); }} disabled={actionLoading}
+                className="w-full h-12 rounded-[14px] bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-emerald-500/25">
+                {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><Swords size={16} /> Retar a este equipo</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Player Detail Modal */}
+      {showPlayerDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowPlayerDetail(null)}>
+          <div className={`w-full max-w-sm rounded-[14px] overflow-hidden border shadow-2xl ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+            {/* Photo 1:1 */}
+            <div className="relative w-full" style={{ aspectRatio: "1/1", background: showPlayerDetail.photoURL ? `url(${showPlayerDetail.photoURL}) center/cover` : `linear-gradient(135deg, #059669, #047857)` }}>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+              <button onClick={() => setShowPlayerDetail(null)} className="absolute top-4 right-4 w-8 h-8 rounded-[14px] bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
+              <div className="absolute bottom-5 left-5 right-5">
+                <p className="text-white text-xl font-semibold">{showPlayerDetail.displayName}</p>
+              </div>
+            </div>
+            <div className="p-5 space-y-4">
+              {/* Position & OVR row */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-[14px] ${isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>{showPlayerDetail.position || "Jugador"}</span>
+                  <span className={`text-[9px] font-medium px-2 py-0.5 rounded-[14px] ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>{showPlayerDetail.tier}</span>
+                </div>
+                <span className="text-emerald-500 text-[17px] font-bold">OVR {showPlayerDetail.ovr}</span>
+              </div>
+              {/* Detail rows */}
+              {showPlayerDetail.sports && showPlayerDetail.sports.length > 0 && (
+                <div className="space-y-1.5">
+                  <p className={`text-[8px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>DEPORTES</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {showPlayerDetail.sports.map(s => <span key={s} className={`text-[11px] font-medium px-2.5 py-1 rounded-[14px] ${isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>{s}</span>)}
+                  </div>
+                </div>
+              )}
+              {((showPlayerDetail.communes && showPlayerDetail.communes.length > 0) || showPlayerDetail.region) && (
+                <div className="space-y-1.5">
+                  <p className={`text-[8px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>UBICACIÓN</p>
+                  <div className="flex items-center gap-2">
+                    <MapPin size={14} className="text-emerald-500 shrink-0" />
+                    <span className={`text-[12px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>{showPlayerDetail.communes?.slice(0, 2).join(", ")} · {showPlayerDetail.region}</span>
+                  </div>
+                </div>
+              )}
+              {showPlayerDetail.description && (
+                <div className="space-y-1.5">
+                  <p className={`text-[8px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>COMENTARIO</p>
+                  <p className={`text-[12px] font-medium leading-snug ${isDark ? "text-slate-400" : "text-slate-500"}`}>{showPlayerDetail.description}</p>
+                </div>
+              )}
+              <button onClick={() => { const e = showPlayerDetail; setShowPlayerDetail(null); handleContact(e); }} disabled={actionLoading}
+                className="w-full h-12 rounded-[14px] bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-emerald-500/25">
+                {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><MessageCircle size={16} /> Contactar Jugador</>}
+              </button>
+            </div>
           </div>
         </div>
       )}

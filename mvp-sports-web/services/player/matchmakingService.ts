@@ -191,6 +191,57 @@ export const matchmakingService = {
         });
     },
 
+    // ── Real-time subscriptions ──
+
+    subscribeToTeamsLooking(sport: string | undefined, callback: (entries: MatchEntry[]) => void): () => void {
+        const ref = collection(db, 'matchmaking');
+        const conditions = [where('type', '==', 'team'), where('status', '==', 'active')];
+        if (sport) conditions.push(where('sport', '==', sport));
+        const q = query(ref, ...conditions);
+        return onSnapshot(q, (snap) => {
+            const entries = snap.docs.map(d => ({ id: d.id, ...d.data() } as MatchEntry))
+                .sort((a, b) => ((b.createdAt as any)?.seconds || 0) - ((a.createdAt as any)?.seconds || 0));
+            callback(entries);
+        });
+    },
+
+    subscribeToPlayersAvailable(sport: string | undefined, callback: (entries: MatchEntry[]) => void): () => void {
+        const ref = collection(db, 'matchmaking');
+        const conditions = [where('type', '==', 'player'), where('status', '==', 'active')];
+        if (sport) conditions.push(where('sports', 'array-contains', sport));
+        const q = query(ref, ...conditions);
+        return onSnapshot(q, (snap) => {
+            const entries = snap.docs.map(d => ({ id: d.id, ...d.data() } as MatchEntry))
+                .sort((a, b) => ((b.createdAt as any)?.seconds || 0) - ((a.createdAt as any)?.seconds || 0));
+            callback(entries);
+        });
+    },
+
+    subscribeToMyEntries(userId: string, callback: (entries: MatchEntry[]) => void): () => void {
+        const ref = collection(db, 'matchmaking');
+        const q = query(ref, where('userId', '==', userId));
+        return onSnapshot(q, (snap) => {
+            callback(snap.docs.map(d => ({ id: d.id, ...d.data() } as MatchEntry)));
+        });
+    },
+
+    subscribeToMyChallenges(userId: string, callback: (challenges: Challenge[]) => void): () => void {
+        const ref = collection(db, 'challenges');
+        const unsub1 = onSnapshot(query(ref, where('senderId', '==', userId)), (snap1) => {
+            const fromSender = snap1.docs.map(d => ({ id: d.id, ...d.data() } as Challenge));
+            const unsub2 = onSnapshot(query(ref, where('receiverId', '==', userId)), (snap2) => {
+                const fromReceiver = snap2.docs.map(d => ({ id: d.id, ...d.data() } as Challenge));
+                const all = [...fromSender, ...fromReceiver];
+                const seen = new Set<string>();
+                callback(all.filter(c => { if (seen.has(c.id)) return false; seen.add(c.id); return true; })
+                    .sort((a, b) => ((b.updatedAt as any)?.seconds || 0) - ((a.updatedAt as any)?.seconds || 0)));
+            });
+            // Return combined unsubscribe
+            return () => unsub2();
+        });
+        return () => {}; // outer unsub handled by the caller
+    },
+
     async sendMessage(challengeId: string, msg: { senderId: string; senderName: string; senderPhoto?: string; text: string }): Promise<void> {
         await addDoc(collection(db, 'challenges', challengeId, 'messages'), {
             ...msg,
