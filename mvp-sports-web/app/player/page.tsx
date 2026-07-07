@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -53,6 +53,16 @@ export default function PlayerDashboard() {
     ? gamificationService.calculateTier(xp, gamification)
     : { name: "Bronce", index: 0 };
   const ovr = gamification ? gamificationService.calculateOVR(xp, gamification) : 40;
+
+  const isIOS = useMemo(() => {
+    if (typeof navigator === "undefined") return false;
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  }, []);
+
+  const isAndroid = useMemo(() => {
+    if (typeof navigator === "undefined") return false;
+    return /Android/.test(navigator.userAgent);
+  }, []);
 
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
@@ -227,6 +237,39 @@ export default function PlayerDashboard() {
                   <ArrowRight size={18} className="text-emerald-500" />
                 </div>
               </div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Download App Button */}
+        <div className="px-5 mt-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
+            <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">App Móvil</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
+          </div>
+          <Link href="/login"
+            className={`relative block rounded-[14px] overflow-hidden transition-all active:scale-[0.99] group ${
+              isDark
+                ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]"
+                : "bg-white/80 backdrop-blur-xl border border-slate-200/60"
+            } shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+            <div className={`absolute inset-0 rounded-[14px] pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : "bg-gradient-to-br from-emerald-50/50 to-transparent"}`} />
+            <div className={`p-4 flex items-center gap-4 ${
+              isDark
+                ? "bg-gradient-to-br from-[#0F172A] via-[#0F172A] to-[#064e3b]"
+                : "bg-gradient-to-br from-white via-white to-[#f0fdf4]"
+            }`}>
+              <div className="w-11 h-11 rounded-[14px] bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/25">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Descargar App</p>
+                <p className={`text-[9px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Acceso directo desde tu dispositivo</p>
+              </div>
+              <ArrowRight size={16} className="text-emerald-500 shrink-0" />
             </div>
           </Link>
         </div>
