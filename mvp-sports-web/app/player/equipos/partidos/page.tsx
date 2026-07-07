@@ -185,7 +185,6 @@ export default function PartidosPage() {
         senderId: uid, receiverId: entry.userId || "",
       });
       setFeedback({ type: "success", msg: `¡Has retado a ${entry.teamName}!` });
-      loadData;
     } catch { setFeedback({ type: "error", msg: "Error al retar." }); }
     finally { setActionLoading(false); }
   };
@@ -223,7 +222,6 @@ export default function PartidosPage() {
       await matchmakingService.updateEntry(editEntry.id, data);
       setFeedback({ type: "success", msg: "Publicación actualizada." });
       setEditEntry(null);
-      loadData;
     } catch { setFeedback({ type: "error", msg: "Error al actualizar." }); }
     finally { setActionLoading(false); }
   };

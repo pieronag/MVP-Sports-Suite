@@ -227,19 +227,19 @@ export const matchmakingService = {
 
     subscribeToMyChallenges(userId: string, callback: (challenges: Challenge[]) => void): () => void {
         const ref = collection(db, 'challenges');
-        const unsub1 = onSnapshot(query(ref, where('senderId', '==', userId)), (snap1) => {
-            const fromSender = snap1.docs.map(d => ({ id: d.id, ...d.data() } as Challenge));
-            const unsub2 = onSnapshot(query(ref, where('receiverId', '==', userId)), (snap2) => {
-                const fromReceiver = snap2.docs.map(d => ({ id: d.id, ...d.data() } as Challenge));
-                const all = [...fromSender, ...fromReceiver];
-                const seen = new Set<string>();
-                callback(all.filter(c => { if (seen.has(c.id)) return false; seen.add(c.id); return true; })
-                    .sort((a, b) => ((b.updatedAt as any)?.seconds || 0) - ((a.updatedAt as any)?.seconds || 0)));
-            });
-            // Return combined unsubscribe
-            return () => unsub2();
-        });
-        return () => {}; // outer unsub handled by the caller
+        const q1 = query(ref, where('senderId', '==', userId));
+        const q2 = query(ref, where('receiverId', '==', userId));
+        let snap1Cache: Challenge[] = [];
+        let snap2Cache: Challenge[] = [];
+        const merge = () => {
+            const all = [...snap1Cache, ...snap2Cache];
+            const seen = new Set<string>();
+            callback(all.filter(c => { if (seen.has(c.id)) return false; seen.add(c.id); return true; })
+                .sort((a, b) => ((b.updatedAt as any)?.seconds || 0) - ((a.updatedAt as any)?.seconds || 0)));
+        };
+        const unsub1 = onSnapshot(q1, (snap) => { snap1Cache = snap.docs.map(d => ({ id: d.id, ...d.data() } as Challenge)); merge(); });
+        const unsub2 = onSnapshot(q2, (snap) => { snap2Cache = snap.docs.map(d => ({ id: d.id, ...d.data() } as Challenge)); merge(); });
+        return () => { unsub1(); unsub2(); };
     },
 
     async sendMessage(challengeId: string, msg: { senderId: string; senderName: string; senderPhoto?: string; text: string }): Promise<void> {
