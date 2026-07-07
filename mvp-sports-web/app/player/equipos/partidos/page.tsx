@@ -93,6 +93,12 @@ export default function PartidosPage() {
   const [showTeamDetail, setShowTeamDetail] = useState<MatchEntry | null>(null);
   const [teamDetailData, setTeamDetailData] = useState<{ team: any; profiles: Record<string, any> } | null>(null);
   const [showPlayerDetail, setShowPlayerDetail] = useState<MatchEntry | null>(null);
+  const [showTeamSelector, setShowTeamSelector] = useState<MatchEntry | null>(null);
+  const [showChallengeDetail, setShowChallengeDetail] = useState<Challenge | null>(null);
+  const [challengeTeamData, setChallengeTeamData] = useState<{ team: any; profiles: Record<string, any> } | null>(null);
+  const [showCloseConfirm, setShowCloseConfirm] = useState<MatchEntry | null>(null);
+  const [confirmChallenge, setConfirmChallenge] = useState<{ entry: MatchEntry; team: any } | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{ challengeId: string; action: "accept" | "decline" } | null>(null);
 
   const uid = user?.uid || "";
   const playerName = (profile as any)?.displayName || "Jugador";
@@ -174,10 +180,21 @@ export default function PartidosPage() {
 
   const handleChallenge = async (entry: MatchEntry) => {
     if (!entry.teamId) return;
+    if (userCaptainTeams.length > 1) {
+      setShowTeamSelector(entry);
+      return;
+    }
+    if (userCaptainTeams.length === 1) {
+      setConfirmChallenge({ entry, team: userCaptainTeams[0] });
+      return;
+    }
+    setFeedback({ type: "error", msg: "Debes ser capitán de un equipo para retar." });
+  };
+
+  const executeChallenge = async (entry: MatchEntry, myTeam: any) => {
+    if (!entry.teamId || !myTeam) return;
     setActionLoading(true);
     try {
-      const myTeam = userTeams[0];
-      if (!myTeam) { setFeedback({ type: "error", msg: "Debes tener un equipo para retar." }); return; }
       await matchmakingService.createChallenge({
         type: "team_vs_team",
         challengerTeamId: myTeam.id, challengerTeamName: myTeam.name,
@@ -185,6 +202,7 @@ export default function PartidosPage() {
         sport: entry.sport,
         senderId: uid, receiverId: entry.userId || "",
       });
+      setConfirmChallenge(null);
       setFeedback({ type: "success", msg: `¡Has retado a ${entry.teamName}!` });
     } catch { setFeedback({ type: "error", msg: "Error al retar." }); }
     finally { setActionLoading(false); }
@@ -238,8 +256,9 @@ export default function PartidosPage() {
     setPublishSports(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
   };
 
+  const userCaptainTeams = userTeams.filter(t => t.ownerId === uid);
   const publishedTeamIds = new Set(myEntries.filter(e => e.type === "team" && e.status === "active").map(e => e.teamId));
-  const availableTeams = userTeams.filter(t => !publishedTeamIds.has(t.id));
+  const availableTeams = userCaptainTeams.filter(t => !publishedTeamIds.has(t.id));
 
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
@@ -346,7 +365,7 @@ export default function PartidosPage() {
             ) : (
               <div className="space-y-3">
                 {teams.filter(e => e.userId !== uid).map(entry => {
-                  const alreadyChallenged = challenges.some(c => c.status !== "declined" && (c.challengedTeamId === entry.teamId || c.challengerTeamId === entry.teamId) && c.senderId === uid);
+                  const alreadyChallenged = challenges.some(c => c.status !== "declined" && ((c.challengedTeamId === entry.teamId && c.senderId === uid) || (c.challengerTeamId === entry.teamId && c.receiverId === uid)));
                   return (
                     <GlowCard key={entry.id} isDark={isDark}>
                       <div className="overflow-hidden">
@@ -471,9 +490,9 @@ export default function PartidosPage() {
                             <p className={`text-[9px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.sport || entry.sports?.join(", ")}</p>
                           </div>
                           <button onClick={() => { setEditEntry(entry); setEditDesc(entry.description || ""); setEditSport(entry.sport || ""); setEditSports(entry.sports || []); }}
-                            className={`px-3 h-8 rounded-[14px] text-[8px] font-semibold uppercase mr-1.5 ${isDark ? "bg-blue-500/10 text-blue-400" : "bg-blue-50 text-blue-500"}`}>Editar</button>
-                          <button onClick={async () => { await matchmakingService.closeEntry(entry.id); }}
-                            className={`px-3 h-8 rounded-[14px] text-[8px] font-semibold uppercase ${isDark ? "bg-red-500/10 text-red-400" : "bg-red-50 text-red-500"}`}>Cerrar</button>
+                            className={`px-2.5 h-7 rounded-[14px] text-[8px] font-semibold uppercase ${isDark ? "bg-blue-500/10 text-blue-400" : "bg-blue-50 text-blue-500"}`}>Editar</button>
+                          <button onClick={() => setShowCloseConfirm(entry)}
+                            className={`px-2.5 h-7 rounded-[14px] text-[8px] font-semibold uppercase ml-1.5 ${isDark ? "bg-red-500/10 text-red-400" : "bg-red-50 text-red-500"}`}>Cancelar</button>
                         </div>
                       </GlowCard>
                     ))}
@@ -514,19 +533,17 @@ export default function PartidosPage() {
                                   <span className={`text-[8px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{c.sport}</span>
                                 </div>
                               </div>
+                              {(c.status === "pending" || c.status === "active") && c.type === "team_vs_team" && (
+                                <button onClick={async () => { setShowChallengeDetail(c); setChallengeTeamData(null); try { const teamId = c.senderId === uid ? c.challengedTeamId : c.challengerTeamId; const team = teamId ? await teamService.getTeamById(teamId) : null; if (team) { const p = await teamService.getMemberProfiles(team.members); setChallengeTeamData({ team, profiles: p }); } } catch {} }}
+                                  className={`px-3 h-9 rounded-[14px] text-[8px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>
+                                  Ver equipo
+                                </button>
+                              )}
                               {c.status === "active" && (
                                 <button onClick={() => router.push(`/player/equipos/partidos/chat?id=${c.id}`)}
                                   className="px-4 h-9 rounded-[14px] bg-emerald-500 text-white text-[9px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98]">
                                   Chat
                                 </button>
-                              )}
-                              {c.status === "pending" && isReceiver && (
-                                <div className="flex gap-1.5">
-                                  <button onClick={() => handleAcceptChallenge(c.id)}
-                                    className="w-9 h-9 rounded-[14px] bg-emerald-500/10 flex items-center justify-center"><CheckCircle2 size={16} className="text-emerald-500" /></button>
-                                  <button onClick={() => handleDeclineChallenge(c.id)}
-                                    className="w-9 h-9 rounded-[14px] bg-red-500/10 flex items-center justify-center"><X size={16} className="text-red-500" /></button>
-                                </div>
                               )}
                             </div>
                           </div>
@@ -685,6 +702,134 @@ export default function PartidosPage() {
               className="w-full h-12 rounded-[14px] bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-emerald-500/25 flex items-center justify-center">
               {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Publicar Disponibilidad"}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Team Selector Modal */}
+      {showTeamSelector && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowTeamSelector(null)}>
+          <div className={`w-full max-w-sm rounded-[14px] p-6 border shadow-2xl ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Retar a {showTeamSelector.teamName}</p>
+              <button onClick={() => setShowTeamSelector(null)} className="w-8 h-8 rounded-[14px] flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
+            </div>
+            <p className={`text-[10px] font-medium mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Selecciona con qué equipo quieres retar:</p>
+            <div className="space-y-2 mb-5">
+              {userCaptainTeams.map(t => (
+                <button key={t.id} onClick={async () => { setShowTeamSelector(null); setConfirmChallenge({ entry: showTeamSelector, team: t }); }}
+                  className={`w-full p-4 rounded-[14px] border text-left transition-all active:scale-[0.98] ${isDark ? "bg-[#0F172A]/90 border-white/[0.06] hover:bg-white/[0.04]" : "bg-white/80 border-slate-200/60 hover:bg-slate-50"}`}>
+                  <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{t.name}</p>
+                  <p className={`text-[9px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{(t.sport || "").charAt(0).toUpperCase() + (t.sport || "").slice(1)} · {t.members?.length || 1} jugadores</p>
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setShowTeamSelector(null)} className={`w-full py-3 rounded-[14px] font-semibold text-xs ${isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Challenge Modal */}
+      {confirmChallenge && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setConfirmChallenge(null)}>
+          <div className={`w-full max-w-sm rounded-[14px] p-6 border shadow-2xl text-center ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+            <div className="w-16 h-16 rounded-[14px] bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+              <Swords size={28} className="text-emerald-500" />
+            </div>
+            <p className={`font-semibold text-[15px] mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Retar a {confirmChallenge.entry.teamName}?</p>
+            <p className={`text-[11px] font-medium mb-1 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Con tu equipo:</p>
+            <p className={`font-semibold text-[13px] mb-5 ${isDark ? "text-slate-200" : "text-slate-700"}`}>{confirmChallenge.team.name} · {confirmChallenge.entry.sport.toUpperCase()}</p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmChallenge(null)} className={`flex-1 py-3.5 rounded-[14px] font-semibold text-sm ${isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+              <button onClick={() => executeChallenge(confirmChallenge.entry, confirmChallenge.team)} disabled={actionLoading}
+                className="flex-1 py-3.5 rounded-[14px] bg-emerald-500 text-white font-semibold text-sm disabled:opacity-50 shadow-lg shadow-emerald-500/25 flex items-center justify-center">
+                {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Confirmar Reto"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Challenge Detail Modal */}
+      {showChallengeDetail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => { setShowChallengeDetail(null); setChallengeTeamData(null); }}>
+          <div className={`w-full max-w-sm rounded-[14px] overflow-hidden border shadow-2xl ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+            <div className="h-[100px] relative bg-gradient-to-br from-emerald-800 to-slate-900">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+              <button onClick={() => { setShowChallengeDetail(null); setChallengeTeamData(null); }} className="absolute top-4 right-4 w-8 h-8 rounded-[14px] bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
+              <div className="absolute bottom-4 left-5 right-5">
+                <p className="text-white text-base font-semibold">{showChallengeDetail.type === "team_vs_team" ? (showChallengeDetail.senderId === uid ? showChallengeDetail.challengedTeamName : showChallengeDetail.challengerTeamName) : ""}</p>
+                <p className="text-white/70 text-[10px] font-medium mt-0.5">{showChallengeDetail.sport} · {showChallengeDetail.status === "pending" ? "Challenge pendiente" : showChallengeDetail.status === "active" ? "Challenge activo" : "Challenge cerrado"}</p>
+              </div>
+            </div>
+            <div className="p-5 space-y-4 max-h-[55vh] overflow-y-auto">
+              {challengeTeamData ? (
+                <>
+                  <div className="flex items-center justify-between p-3 rounded-[14px]" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
+                    <p className={`text-[10px] font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>MIEMBROS</p>
+                    <span className={`text-[13px] font-semibold ${isDark ? "text-slate-200" : "text-slate-800"}`}>{challengeTeamData.team.members.length}</span>
+                  </div>
+                  <div className="space-y-1.5">
+                    <p className={`text-[8px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>JUGADORES</p>
+                    <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
+                      {challengeTeamData.team.members.map((mid: string) => {
+                        const p = challengeTeamData.profiles[mid] || {};
+                        return (
+                          <div key={mid} className="flex items-center gap-2.5 p-2 rounded-[14px]" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.03)" : "transparent" }}>
+                            <div className="w-8 h-8 rounded-[14px] overflow-hidden shrink-0" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
+                              {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : <User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-[11px] font-medium truncate ${isDark ? "text-slate-200" : "text-slate-700"}`}>{p.displayName || mid.slice(0, 8)}{mid === challengeTeamData.team.ownerId ? " (C)" : ""}</p>
+                            </div>
+                            <span className="text-emerald-500 text-[11px] font-semibold shrink-0">OVR {p.ovr || 40}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex justify-center py-4"><div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
+              )}
+              {showChallengeDetail.status === "pending" && showChallengeDetail.receiverId === uid && (
+                <div className="flex gap-3 pt-2">
+                  <button onClick={() => setConfirmAction({ challengeId: showChallengeDetail.id, action: "accept" })}
+                    className="flex-1 h-11 rounded-[14px] bg-emerald-500 text-white font-semibold text-[10px] uppercase tracking-wider transition-all active:scale-[0.98] shadow-sm shadow-emerald-500/25">Aceptar</button>
+                  <button onClick={() => setConfirmAction({ challengeId: showChallengeDetail.id, action: "decline" })}
+                    className="flex-1 h-11 rounded-[14px] bg-red-500 text-white font-semibold text-[10px] uppercase tracking-wider transition-all active:scale-[0.98]">Rechazar</button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Action Modal (accept/decline challenge) */}
+      {confirmAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setConfirmAction(null)}>
+          <div className={`w-full max-w-sm rounded-[14px] p-6 border shadow-2xl text-center ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+            <div className={`w-16 h-16 rounded-[14px] flex items-center justify-center mx-auto mb-4 ${confirmAction.action === "accept" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
+              {confirmAction.action === "accept" ? <CheckCircle2 size={28} className="text-emerald-500" /> : <X size={28} className="text-red-500" />}
+            </div>
+            <p className={`font-semibold text-[15px] mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+              {confirmAction.action === "accept" ? "¿Aceptar challenge?" : "¿Rechazar challenge?"}
+            </p>
+            <p className={`text-[11px] font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+              {confirmAction.action === "accept" ? "Se abrirá un chat con el capitán del equipo rival." : "El equipo rival será notificado de tu decisión."}
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setConfirmAction(null)} className={`flex-1 py-3.5 rounded-[14px] font-semibold text-sm ${isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+              <button onClick={async () => {
+                const c = confirmAction; setConfirmAction(null); setShowChallengeDetail(null); setChallengeTeamData(null);
+                if (c.action === "accept") await handleAcceptChallenge(c.challengeId);
+                else await handleDeclineChallenge(c.challengeId);
+              }} disabled={actionLoading}
+                className="flex-1 py-3.5 rounded-[14px] font-semibold text-sm text-white disabled:opacity-50 flex items-center justify-center"
+                style={{ backgroundColor: confirmAction.action === "accept" ? "#10b981" : "#ef4444" }}>
+                {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : (confirmAction.action === "accept" ? "Aceptar" : "Rechazar")}
+              </button>
+            </div>
           </div>
         </div>
       )}
