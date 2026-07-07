@@ -66,7 +66,7 @@ export default function PartidosChatPage() {
     <div className={`min-h-screen flex flex-col ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
       <div className={`sticky top-0 z-10 px-5 pt-12 pb-4 flex items-center gap-3 border-b ${isDark ? "bg-[#020617] border-white/[0.06]" : "bg-[#F8FAFC] border-slate-200"}`}>
-        <button onClick={() => router.push("/player/equipos/partidos?tab=mis")} className={`w-10 h-10 rounded-[14px] flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button onClick={() => router.back()} className={`w-10 h-10 rounded-[14px] flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -141,7 +141,7 @@ export default function PartidosChatPage() {
             <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>El chat se cerrará y no podrán enviarse más mensajes.</p>
             <div className="flex gap-3">
               <button onClick={() => setShowCloseModal(false)} className={`flex-1 py-3.5 rounded-[14px] font-semibold text-sm ${isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
-              <button onClick={async () => { await matchmakingService.closeChallenge(challengeId); setShowCloseModal(false); router.push("/player/equipos/partidos?tab=mis"); }}
+              <button onClick={async () => { await matchmakingService.closeChallenge(challengeId); setShowCloseModal(false); router.back(); }}
                 className="flex-1 py-3.5 rounded-[14px] bg-red-500 text-white font-semibold text-sm">Finalizar</button>
             </div>
           </div>
