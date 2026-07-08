@@ -146,6 +146,7 @@ export default function CheckoutPage() {
         if (paymentMethod === "card") {
           const buyOrder = `TOR-${Date.now()}`;
           const res = await walletService.createWebpayTransaction(tournamentId, tenantId || "system", priceNum, buyOrder);
+          if (!res?.url) throw new Error("No se recibió URL de pago desde Transbank.");
           window.location.href = res.url;
         } else {
           await tournamentService.registerTeamInTournament(tournamentId, { id: teamId, name: teamName || "" }, (profile as any).uid, clientName, priceNum);
@@ -181,6 +182,7 @@ export default function CheckoutPage() {
               if (!id) { for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length)); }
               const buyOrder = `ORD-${Date.now()}`;
               const res = await walletService.createWebpayTransaction(id, tenantId || "", priceNum, buyOrder, data);
+              if (!res?.url) throw new Error("No se recibió URL de pago desde Transbank.");
               window.location.href = res.url;
             } else {
               const payResult = await walletService.authorizePayment((profile as any).uid, priceNum, bookingId || "", tenantId || "", selectedCardId);
@@ -206,6 +208,7 @@ export default function CheckoutPage() {
             if (!id) { for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length)); }
             const buyOrder = `ORD-${Date.now()}`;
             const res = await walletService.createWebpayTransaction(id, tenantId || "", priceNum, buyOrder, data);
+            if (!res?.url) throw new Error("No se recibió URL de pago desde Transbank.");
             window.location.href = res.url;
           }
         } else {
