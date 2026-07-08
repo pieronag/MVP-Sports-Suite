@@ -480,11 +480,14 @@ export const authorizeOneclickPayment = onCall(
       const buyOrder = `PAY-${Date.now()}`;
       logger.info(`AUTORIZANDO PAGO - Padre: ${masterCommerceCode} | Hijo: ${childCommerceCode}`);
 
-      // MODO RÁPIDO PARA PAGOS: Si es usuario de prueba, aprobamos directo
+      // MODO SIMULADO: Si la tarjeta no tiene tbkUser (agregada manualmente sin Oneclick)
+      // o tiene tbkUser de prueba, se simula el pago exitoso
       const tbkUser = (card.tbkUser || "").toString();
-      if (tbkUser && tbkUser.toUpperCase().includes("MOCK_USER")) {
+      const isMockCard = !tbkUser || tbkUser.toUpperCase().includes("MOCK_USER");
+
+      if (isMockCard) {
         if (tbkUser.toUpperCase().includes("REJECT")) {
-          logger.info("Simulando RECHAZO de pago Oneclick (Modo Prueba)");
+          logger.info("Simulando RECHAZO de pago (Modo Prueba)");
           return {
             success: false,
             error: "Transacción rechazada por el banco (Simulado)",
@@ -492,7 +495,20 @@ export const authorizeOneclickPayment = onCall(
           };
         }
 
-        logger.info("Simulando éxito de pago Oneclick (Modo Prueba)");
+        logger.info(`Simulando éxito de pago${tbkUser ? " Oneclick (Modo Prueba)" : " para tarjeta manual"} (Modo Prueba)`);
+        const batch = db.batch();
+        const paymentRef = db.collection("payments").doc();
+        batch.set(paymentRef, {
+          userId: uid, bookingId, amount, buyOrder,
+          authorizationCode: "123456",
+          status: "approved", method: "oneclick_mock",
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        if (bookingId) {
+          const bookingRef = db.collection("bookings").doc(bookingId);
+          batch.update(bookingRef, { paymentStatus: "paid", status: "confirmed" });
+        }
+        await batch.commit();
         return {
           success: true,
           buy_order: buyOrder,
