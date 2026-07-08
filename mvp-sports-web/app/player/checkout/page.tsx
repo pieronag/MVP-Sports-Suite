@@ -145,7 +145,8 @@ export default function CheckoutPage() {
         const { tournamentService } = await import("@/services/player/tournamentService");
         if (paymentMethod === "card") {
           const buyOrder = `TOR-${Date.now()}`;
-          const res = await walletService.createWebpayTransaction(tournamentId, tenantId || "system", priceNum, buyOrder);
+          const returnUrl = `https://mvpsports.cl/player/torneos`;
+          const res = await walletService.createWebpayTransaction(tournamentId, tenantId || "system", priceNum, buyOrder, undefined, returnUrl);
           if (!res?.url) throw new Error("No se recibió URL de pago desde Transbank.");
           window.location.href = res.url;
         } else {
@@ -181,7 +182,8 @@ export default function CheckoutPage() {
               let id = bookingId || "";
               if (!id) { for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length)); }
               const buyOrder = `ORD-${Date.now()}`;
-              const res = await walletService.createWebpayTransaction(id, tenantId || "", priceNum, buyOrder, data);
+              const returnUrl = `https://mvpsports.cl/player/ticket?bookingId=${id}&sport=${sport || ""}&sportColor=${encodeURIComponent(sportColor || "")}&tenantName=${encodeURIComponent((tenantName || "").toUpperCase())}&courtName=${encodeURIComponent((courtName || "").toUpperCase())}&startTime=${startTime || ""}&date=${date || ""}&price=${priceNum}`;
+              const res = await walletService.createWebpayTransaction(id, tenantId || "", priceNum, buyOrder, data, returnUrl);
               if (!res?.url) throw new Error("No se recibió URL de pago desde Transbank.");
               window.location.href = res.url;
             } else {
@@ -207,7 +209,8 @@ export default function CheckoutPage() {
             let id = bookingId || "";
             if (!id) { for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length)); }
             const buyOrder = `ORD-${Date.now()}`;
-            const res = await walletService.createWebpayTransaction(id, tenantId || "", priceNum, buyOrder, data);
+            const returnUrl = `https://mvpsports.cl/player/ticket?bookingId=${id}&sport=${sport || ""}&sportColor=${encodeURIComponent(sportColor || "")}&tenantName=${encodeURIComponent((tenantName || "").toUpperCase())}&courtName=${encodeURIComponent((courtName || "").toUpperCase())}&startTime=${startTime || ""}&date=${date || ""}&price=${priceNum}`;
+            const res = await walletService.createWebpayTransaction(id, tenantId || "", priceNum, buyOrder, data, returnUrl);
             if (!res?.url) throw new Error("No se recibió URL de pago desde Transbank.");
             window.location.href = res.url;
           }

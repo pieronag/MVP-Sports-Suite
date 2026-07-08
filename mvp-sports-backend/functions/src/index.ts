@@ -10,23 +10,24 @@ admin.initializeApp();
 
 const db = admin.firestore();
 
+function withTimeout<T>(promise: Promise<T>, ms: number, msg: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`Timeout: ${msg} (${ms}ms)`)), ms)
+    ),
+  ]);
+}
+
 // Configura estas variables de entorno con las URLs reales después del deploy:
 // CF_BASE_URL → URL de commitWebpayTransaction (HTTP onRequest)
 // ONECLICK_BASE_URL → URL de finishOneclickInscription (HTTP onRequest)
 function getBaseUrl(): string {
-  const url = process.env.CF_BASE_URL;
-  if (!url) {
-    logger.warn("CF_BASE_URL no configurada. Los webhooks de Transbank no funcionarán.");
-  }
-  return url || "https://southamerica-west1-mvp-sports-chile.cloudfunctions.net/commitWebpayTransaction";
+  return process.env.CF_BASE_URL || "https://commitwebpaytransaction-i6cn7w2g5a-tl.a.run.app";
 }
 
 function getOneclickBaseUrl(): string {
-  const url = process.env.ONECLICK_BASE_URL;
-  if (!url) {
-    logger.warn("ONECLICK_BASE_URL no configurada. La inscripción Oneclick no funcionará.");
-  }
-  return url || "https://southamerica-west1-mvp-sports-chile.cloudfunctions.net/finishOneclickInscription";
+  return process.env.ONECLICK_BASE_URL || "https://finishoneclickinscription-i6cn7w2g5a-tl.a.run.app";
 }
 
 interface GamificationSettings {
@@ -138,7 +139,7 @@ export const createWebpayTransaction = onCall(
     const uid = request.auth.uid;
     await checkRateLimit("createWebpayTransaction", uid);
 
-    const {bookingId, tenantId, amount, buyOrder, bookingData} = request.data;
+    const {bookingId, tenantId, amount, buyOrder, bookingData, returnUrl} = request.data;
 
     try {
       const tenantDoc = await db.collection("tenants").doc(tenantId).get();
@@ -150,13 +151,17 @@ export const createWebpayTransaction = onCall(
       const baseUrl = getBaseUrl();
       const commitUrl = `${baseUrl}?tenantId=${tenantId}`;
 
-      const response = await transbank.createWebpay(
-        buyOrder || `ORD-${Date.now()}`,
-        uid,
-        amount,
-        commitUrl,
-        commerceCode,
-        apiKey,
+      const response = await withTimeout(
+        transbank.createWebpay(
+          buyOrder || `ORD-${Date.now()}`,
+          uid,
+          amount,
+          commitUrl,
+          commerceCode,
+          apiKey,
+        ),
+        15000,
+        "Transbank.createWebpay",
       );
 
       await db.collection("payments").add({
@@ -169,6 +174,7 @@ export const createWebpayTransaction = onCall(
         status: "pending",
         method: "webpay_plus",
         pendingBookingData: bookingData || null,
+        returnUrl: returnUrl || null,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
@@ -201,8 +207,9 @@ export const commitWebpayTransaction = onRequest(
 
     const token = req.body.token_ws || req.query.token_ws || req.body.TBK_TOKEN || req.query.TBK_TOKEN;
     const tenantId = req.query.tenantId as string;
+    const fallbackUrl = req.query.fallbackUrl as string;
 
-    if (!token) return res.redirect("mvpdeportes://checkout/error?reason=no_token");
+    if (!token) return res.redirect(fallbackUrl || "mvpdeportes://checkout/error?reason=no_token");
 
     try {
       let commerceCode;
@@ -223,61 +230,63 @@ export const commitWebpayTransaction = onRequest(
       if (result.vci === "TSY" || result.response_code === 0) {
         const paySnap = await db.collection("payments")
           .where("token", "==", token).limit(1).get();
+        let redirectUrl: string | undefined;
 
         if (!paySnap.empty) {
           const payDoc = paySnap.docs[0];
           const payData = payDoc.data();
+          redirectUrl = payData.returnUrl;
 
           if (payData.status === "approved") {
             logger.info(`Webpay commit: payment already processed for token ${token}`);
-            return res.redirect(`mvpdeportes://checkout/success?token=${token}`);
+            return res.redirect(redirectUrl || `mvpdeportes://checkout/success?token=${token}`);
           }
 
           const bookingId = payData.bookingId;
           const pendingBookingData = payData.pendingBookingData;
 
-          const batch = db.batch();
-          batch.update(payDoc.ref, {status: "approved", result});
-          if (bookingId) {
-              if (pendingBookingData) {
-              const rawDate = pendingBookingData.date;
-              let finalDate = admin.firestore.FieldValue.serverTimestamp();
-              if (rawDate) {
-                if (typeof rawDate?.toDate === "function") {
-                  finalDate = rawDate;
-                } else if (typeof rawDate === "string") {
-                  finalDate = admin.firestore.Timestamp.fromDate(new Date(rawDate));
-                } else if (rawDate?._seconds != null) {
-                  finalDate = new admin.firestore.Timestamp(rawDate._seconds, rawDate._nanoseconds || 0);
-                } else if (rawDate?.seconds != null) {
-                  finalDate = new admin.firestore.Timestamp(rawDate.seconds, rawDate.nanoseconds || 0);
-                }
-              }
-              batch.set(db.collection("bookings").doc(bookingId), {
-                ...pendingBookingData,
-                date: finalDate,
-                paymentStatus: "paid",
-                status: "confirmed",
-                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-              });
-            } else {
-              batch.set(db.collection("bookings").doc(bookingId), {
-                paymentStatus: "paid",
-                status: "confirmed",
-                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-              }, {merge: true});
+      const batch = db.batch();
+      batch.update(payDoc.ref, {status: "approved", result});
+      if (bookingId) {
+          if (pendingBookingData) {
+          const rawDate = pendingBookingData.date;
+          let finalDate = admin.firestore.FieldValue.serverTimestamp();
+          if (rawDate) {
+            if (typeof rawDate?.toDate === "function") {
+              finalDate = rawDate;
+            } else if (typeof rawDate === "string") {
+              finalDate = admin.firestore.Timestamp.fromDate(new Date(rawDate));
+            } else if (rawDate?._seconds != null) {
+              finalDate = new admin.firestore.Timestamp(rawDate._seconds, rawDate._nanoseconds || 0);
+            } else if (rawDate?.seconds != null) {
+              finalDate = new admin.firestore.Timestamp(rawDate.seconds, rawDate.nanoseconds || 0);
             }
           }
-          await batch.commit();
+          batch.set(db.collection("bookings").doc(bookingId), {
+            ...pendingBookingData,
+            date: finalDate,
+            paymentStatus: "paid",
+            status: "confirmed",
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        } else {
+          batch.set(db.collection("bookings").doc(bookingId), {
+            paymentStatus: "paid",
+            status: "confirmed",
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          }, {merge: true});
         }
-        return res.redirect(`mvpdeportes://checkout/success?token=${token}`);
-      } else {
-        return res.redirect(`mvpdeportes://checkout/error?token=${token}&code=${result.response_code}`);
       }
-    } catch (error: any) {
-      logger.error("Webpay Commit Error:", error.message || error);
-      return res.redirect(`mvpdeportes://checkout/error?err=${encodeURIComponent(error.message || "unknown")}`);
+      await batch.commit();
     }
+    return res.redirect(redirectUrl || `mvpdeportes://checkout/success?token=${token}`);
+  } else {
+    return res.redirect(fallbackUrl || `mvpdeportes://checkout/error?token=${token}&code=${result.response_code}`);
+  }
+} catch (error: any) {
+  logger.error("Webpay Commit Error:", error.message || error);
+  return res.redirect(fallbackUrl || `mvpdeportes://checkout/error?err=${encodeURIComponent(error.message || "unknown")}`);
+}
   });
 
 /**
@@ -368,7 +377,7 @@ export const finishOneclickInscription = onRequest(
     const webhookSecret = settingsDoc.data()?.secret;
     if (webhookSecret && requestToken !== webhookSecret) {
       logger.error("Oneclick finish: invalid secret token");
-      return res.redirect("mvpdeportes://wallet/error?reason=invalid_webhook");
+      return res.redirect("https://mvpsports.cl/player/billetera?error=invalid_webhook");
     }
 
     const token = req.body.TBK_TOKEN || req.query.TBK_TOKEN || req.body.token_ws || req.query.token_ws;
@@ -377,7 +386,7 @@ export const finishOneclickInscription = onRequest(
 
     if (!token) {
       logger.error("No token received from Transbank");
-      return res.redirect("mvpdeportes://wallet/error?reason=no_token");
+      return res.redirect("https://mvpsports.cl/player/billetera?error=no_token");
     }
 
     try {
@@ -390,7 +399,7 @@ export const finishOneclickInscription = onRequest(
       const existingCard = await db.collection("settings").doc(`inscription_${token}`).get();
       if (existingCard.exists) {
         logger.info(`Oneclick finish: inscription ${token} already processed`);
-        return res.redirect("mvpdeportes://wallet/success?already=true");
+        return res.redirect("https://mvpsports.cl/player/billetera?card=already");
       }
 
       const result = await transbank.finishInscription(token as string, commerceCode, apiKey);
@@ -416,14 +425,14 @@ export const finishOneclickInscription = onRequest(
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
 
-        return res.redirect(`mvpdeportes://wallet/success?card=${result.card_number}`);
+        return res.redirect(`https://mvpsports.cl/player/billetera?card=${result.card_number}`);
       } else {
         logger.warn(`Oneclick rejected code: ${result.response_code}`);
-        return res.redirect(`mvpdeportes://wallet/error?code=${result.response_code}`);
+        return res.redirect(`https://mvpsports.cl/player/billetera?error=rejected&code=${result.response_code}`);
       }
     } catch (error: any) {
       logger.error("Oneclick Finish Error:", error.message || error);
-      return res.redirect(`mvpdeportes://wallet/error?err=${encodeURIComponent(error.message || "unknown")}`);
+      return res.redirect(`https://mvpsports.cl/player/billetera?error=unknown&err=${encodeURIComponent(error.message || "unknown")}`);
     }
   });
 
