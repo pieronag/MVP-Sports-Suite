@@ -17,10 +17,14 @@ export interface PaymentCard {
 
 export const walletService = {
   async createWebpayTransaction(bookingId: string, tenantId: string, amount: number, buyOrder: string, bookingData?: any, returnUrl?: string): Promise<{ url: string; token: string }> {
-    const functions = getFunctions(undefined, 'southamerica-west1');
-    const startFn = httpsCallable(functions, 'createWebpayTransaction');
-    const result = await startFn({ bookingId, tenantId, amount, buyOrder, bookingData, returnUrl });
-    return result.data as any;
+    const res = await fetch("/api/webpay/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bookingId, tenantId, amount, buyOrder, bookingData, returnUrl }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Error al iniciar pago");
+    return data;
   },
 
   async authorizePayment(userId: string, amount: number, bookingId: string, tenantId: string, cardId?: string): Promise<{ success: boolean; error?: string }> {
