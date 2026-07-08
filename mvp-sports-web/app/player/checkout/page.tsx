@@ -1,12 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, ChevronRight, CreditCard, ShieldCheck, Zap, Calendar, Clock, Trophy, MapPin, Users, CheckCircle2, XCircle, X, Star, Timer, AlertCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, CreditCard, ShieldCheck, Zap, Calendar, Clock, Trophy, MapPin, Users, CheckCircle2, XCircle, X, Star, Timer, AlertCircle, Plus } from "lucide-react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Timestamp } from "firebase/firestore";
 import { bookingService } from "@/services/player/bookingService";
 import { venueService } from "@/services/player/venueService";
-import { walletService } from "@/services/player/walletService";
+import { walletService, PaymentCard } from "@/services/player/walletService";
 import { couponService } from "@/services/player/couponService";
 import { teamService } from "@/services/player/teamService";
 
@@ -49,6 +49,8 @@ export default function CheckoutPage() {
   const [couponInput, setCouponInput] = useState("");
   const [validatingCoupon, setValidatingCoupon] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [savedCards, setSavedCards] = useState<PaymentCard[]>([]);
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
 
   const tenantId = searchParams.get("tenantId");
   const tenantName = searchParams.get("tenantName");
@@ -85,6 +87,16 @@ export default function CheckoutPage() {
     if (requireOnlinePayment === "true") setPaymentMethod("card");
     else if (!loadingTenant && !isPaymentApiActive && !hasCashNoShow) setPaymentMethod("venue");
   }, [loadingTenant, isPaymentApiActive, hasCashNoShow, requireOnlinePayment]);
+
+  useEffect(() => {
+    if (paymentMethod === "card" && (profile as any)?.uid) {
+      walletService.getCards((profile as any).uid).then(cards => {
+        setSavedCards(cards);
+        const defaultCard = cards.find(c => c.isDefault);
+        if (defaultCard?.id) setSelectedCardId(defaultCard.id);
+      });
+    }
+  }, [paymentMethod, profile]);
 
   useEffect(() => {
     if (profile && (profile as any).uid) {
@@ -161,12 +173,31 @@ export default function CheckoutPage() {
         };
 
         if (paymentMethod === "card") {
-          const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-          let id = bookingId || "";
-          if (!id) { for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length)); }
-          const buyOrder = `ORD-${Date.now()}`;
-          const res = await walletService.createWebpayTransaction(id, tenantId || "", priceNum, buyOrder, data);
-          window.location.href = res.url;
+          if (selectedCardId) {
+            const payResult = await walletService.authorizePayment((profile as any).uid, priceNum, bookingId || "", tenantId || "", selectedCardId);
+            if (!payResult.success) {
+              throw new Error(payResult.error || "Transacción rechazada por el banco.");
+            }
+            data.paymentStatus = "paid";
+            data.paymentMethod = "oneclick";
+            let id = bookingId || "";
+            if (id) await bookingService.updateBooking(id, data);
+            else {
+              const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+              for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
+              data.id = id;
+              id = await bookingService.createBooking(data);
+            }
+            if (appliedCoupon) await couponService.incrementCouponUsage(appliedCoupon.id);
+            setCustomAlert({ visible: true, title: "¡Pago Exitoso!", message: "Reserva confirmada con pago Oneclick.", type: "success", onClose: () => router.push(`/player/ticket?bookingId=${id}&sport=${sport || ""}&sportColor=${sportColor || ""}&tenantName=${encodeURIComponent((tenantName || "").toUpperCase())}&courtName=${encodeURIComponent((courtName || "").toUpperCase())}&startTime=${startTime || ""}&date=${date || ""}&price=${priceNum.toString()}`) });
+          } else {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let id = bookingId || "";
+            if (!id) { for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length)); }
+            const buyOrder = `ORD-${Date.now()}`;
+            const res = await walletService.createWebpayTransaction(id, tenantId || "", priceNum, buyOrder, data);
+            window.location.href = res.url;
+          }
         } else {
           let id = bookingId || "";
           data.paymentStatus = "pending"; data.paymentMethod = "cash";
@@ -345,17 +376,46 @@ export default function CheckoutPage() {
               </button>
             )}
             {isPaymentApiActive && (
-              <button onClick={() => setPaymentMethod("card")}
-                className={`w-full flex items-center gap-4 p-4 rounded-[14px] border transition-all active:scale-[0.98] ${paymentMethod === "card" ? "border-emerald-500 bg-emerald-500/5" : isDark ? "border-white/[0.06] hover:bg-white/[0.02]" : "border-slate-200 hover:bg-slate-50"}`}>
-                <div className="w-10 h-10 rounded-[14px] flex items-center justify-center" style={{ backgroundColor: paymentMethod === "card" ? `${activeColor}15` : isDark ? "rgba(255,255,255,0.04)" : "#F1F5F9" }}>
-                  <CreditCard size={20} color={paymentMethod === "card" ? activeColor : isDark ? "#94A3B8" : "#64748B"} />
-                </div>
-                <div className="flex-1 text-left">
-                  <p className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Pago Online</p>
-                  <p className="text-[9px] font-medium" style={{ color: activeColor }}>Webpay / Redcompra</p>
-                </div>
-                {paymentMethod === "card" && <CheckCircle2 size={18} style={{ color: activeColor }} />}
-              </button>
+              <div>
+                <button onClick={() => { setPaymentMethod("card"); setSelectedCardId(null); }}
+                  className={`w-full flex items-center gap-4 p-4 rounded-[14px] border transition-all active:scale-[0.98] ${paymentMethod === "card" ? "border-emerald-500 bg-emerald-500/5" : isDark ? "border-white/[0.06] hover:bg-white/[0.02]" : "border-slate-200 hover:bg-slate-50"}`}>
+                  <div className="w-10 h-10 rounded-[14px] flex items-center justify-center" style={{ backgroundColor: paymentMethod === "card" ? `${activeColor}15` : isDark ? "rgba(255,255,255,0.04)" : "#F1F5F9" }}>
+                    <CreditCard size={20} color={paymentMethod === "card" ? activeColor : isDark ? "#94A3B8" : "#64748B"} />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Pago Online</p>
+                    <p className="text-[9px] font-medium" style={{ color: activeColor }}>
+                      {selectedCardId ? `•••• ${savedCards.find(c => c.id === selectedCardId)?.last4 || ""}` : "Webpay / Oneclick"}
+                    </p>
+                  </div>
+                  {paymentMethod === "card" && <CheckCircle2 size={18} style={{ color: activeColor }} />}
+                </button>
+                {paymentMethod === "card" && savedCards.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    <p className={`text-[8px] font-semibold uppercase tracking-wider px-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Tus tarjetas guardadas</p>
+                    {savedCards.map(card => (
+                      <button key={card.id} onClick={() => setSelectedCardId(card.id || null)}
+                        className={`w-full flex items-center gap-3 p-3 rounded-[14px] border transition-all active:scale-[0.98] ${selectedCardId === card.id ? "border-emerald-500 bg-emerald-500/5" : isDark ? "border-white/[0.06] hover:bg-white/[0.02]" : "border-slate-200 hover:bg-slate-50"}`}>
+                        <CreditCard size={16} style={{ color: selectedCardId === card.id ? activeColor : isDark ? "#94A3B8" : "#64748B" }} />
+                        <span className={`flex-1 text-left text-xs font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>•••• {card.last4} {card.isDefault ? <Star size={10} className="inline text-amber-500 fill-amber-500" /> : ""}</span>
+                        <span className={`text-[9px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{card.brand}</span>
+                        {selectedCardId === card.id && <CheckCircle2 size={14} style={{ color: activeColor }} />}
+                      </button>
+                    ))}
+                    <button onClick={() => router.push("/player/billetera")}
+                      className={`w-full flex items-center gap-3 p-3 rounded-[14px] border border-dashed transition-all ${isDark ? "border-white/[0.06] text-slate-400 hover:text-emerald-500" : "border-slate-200 text-slate-500 hover:text-emerald-600"}`}>
+                      <Plus size={14} />
+                      <span className="text-[9px] font-semibold uppercase tracking-wider">Agregar tarjeta en Billetera</span>
+                    </button>
+                  </div>
+                )}
+                {paymentMethod === "card" && savedCards.length === 0 && (
+                  <div className="mt-3 p-3 rounded-[14px] bg-amber-500/10 border border-amber-500/20 text-center">
+                    <p className="text-[9px] font-semibold text-amber-500">Pago con Webpay Plus (redirección a Transbank)</p>
+                    <p className={`text-[7px] font-medium mt-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin tarjetas guardadas. Guarda una en tu Billetera para pagar más rápido.</p>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </GlowCard>

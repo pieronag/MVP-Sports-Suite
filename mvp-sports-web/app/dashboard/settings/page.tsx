@@ -10,7 +10,7 @@ import {
     ShieldExclamationIcon, CheckBadgeIcon, SignalIcon, CpuChipIcon,
     ArrowTrendingUpIcon, IdentificationIcon, ArrowUpRightIcon, CreditCardIcon
 } from '@heroicons/react/24/outline';
-import { doc, getDoc, updateDoc, collection, query, where, getDocs, addDoc, serverTimestamp, writeBatch, setDoc, orderBy, limit } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, query, where, getDocs, addDoc, serverTimestamp, writeBatch, setDoc, orderBy, limit, DocumentReference } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { PanelGlass, TarjetaKpi, BotonAccion } from '@/components/ui/DashboardWidgets';
 import { useAuth } from '@/context/AuthContext';
@@ -25,6 +25,7 @@ interface SettingsData {
 }
 
 interface AdminUser { uid: string; fullName?: string; email: string; role: string; status: string; }
+interface TransbankMaster { commerceCode: string; apiKey: string; }
 interface AuditLog { id: string; action: string; details: string; priority: 'low' | 'medium' | 'high' | 'critical'; adminName: string; timestamp: any; }
 interface ModalConfig { show: boolean; title: string; message: string; type: 'confirm' | 'alert' | 'success' | 'danger'; onConfirm?: () => void; onCancel?: () => void; }
 
@@ -72,6 +73,7 @@ export default function SettingsPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [adminTeam, setAdminTeam] = useState<AdminUser[]>([]);
+    const [transbankMaster, setTransbankMaster] = useState<TransbankMaster>({ commerceCode: '', apiKey: '' });
     const [isExecuting, setIsExecuting] = useState(false);
     const [promoEmail, setPromoEmail] = useState('');
     const [realStats, setRealStats] = useState({ totalRevenue: 0, eliteCount: 0, proCount: 0, totalTenants: 0 });
@@ -88,6 +90,8 @@ export default function SettingsPage() {
             try {
                 const snap = await getDoc(doc(db, 'settings', 'global'));
                 if (snap.exists()) setSettings({ ...DEFAULT_SETTINGS, ...snap.data() } as SettingsData);
+                const tbSnap = await getDoc(doc(db, 'settings', 'transbank_master'));
+                if (tbSnap.exists()) setTransbankMaster(tbSnap.data() as TransbankMaster);
                 const teamSnap = await getDocs(query(collection(db, 'users'), where('role', 'in', ['admin', 'superadmin'])));
                 setAdminTeam(teamSnap.docs.map(d => ({ uid: d.id, ...d.data() } as AdminUser)));
                 const tSnap = await getDocs(collection(db, 'tenants'));
@@ -102,6 +106,7 @@ export default function SettingsPage() {
         setSaving(true);
         try {
             await updateDoc(doc(db, 'settings', 'global'), { ...settings, updatedAt: serverTimestamp() });
+            await setDoc(doc(db, 'settings', 'transbank_master'), transbankMaster);
             const tSnap = await getDocs(collection(db, 'tenants'));
             const batch = writeBatch(db);
             tSnap.docs.forEach(d => {
@@ -453,6 +458,26 @@ export default function SettingsPage() {
                                             <button onClick={() => updateNested('paymentGateways', id, !settings.paymentGateways[id as keyof typeof settings.paymentGateways])} className={`w-12 h-6 rounded-full relative transition-all ${settings.paymentGateways[id as keyof typeof settings.paymentGateways] ? 'bg-indigo-600 shadow-indigo-500/40' : 'bg-slate-300 dark:bg-white/10'}`}><div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all shadow-md ${settings.paymentGateways[id as keyof typeof settings.paymentGateways] ? 'right-1' : 'left-1'}`}></div></button>
                                         </div>
                                     ))}
+                                </div>
+                            </div>
+                            <div className="p-10 rounded-[14px] bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-white/5 space-y-8">
+                                <div className="flex items-center gap-4 mb-2">
+                                    <div className="w-8 h-8 rounded-[14px] bg-pink-500/10 flex items-center justify-center text-pink-500"><KeyIcon className="w-5 h-5" /></div>
+                                    <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest leading-none">Transbank Oneclick Master</h4>
+                                </div>
+                                <p className="text-[8px] font-black text-slate-400 uppercase leading-relaxed">
+                                    Credenciales globales para Oneclick Mall (inscripción de tarjetas + pago con 1 clic).
+                                    Cada recinto puede tener su propio código de comercio hijo.
+                                </p>
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-2">Código de Comercio (Padre)</label>
+                                        <input type="text" value={transbankMaster.commerceCode} onChange={e => setTransbankMaster(prev => ({ ...prev, commerceCode: e.target.value }))} placeholder="5970123456" className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-[14px] px-4 py-2.5 text-xs font-black outline-none focus:ring-2 ring-pink-500/20 font-mono" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-2">API Key</label>
+                                        <input type="password" value={transbankMaster.apiKey} onChange={e => setTransbankMaster(prev => ({ ...prev, apiKey: e.target.value }))} placeholder="API Key de Transbank" className="w-full bg-white dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-[14px] px-4 py-2.5 text-xs font-black outline-none focus:ring-2 ring-pink-500/20 font-mono" />
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -10,12 +10,23 @@ admin.initializeApp();
 
 const db = admin.firestore();
 
+// Configura estas variables de entorno con las URLs reales después del deploy:
+// CF_BASE_URL → URL de commitWebpayTransaction (HTTP onRequest)
+// ONECLICK_BASE_URL → URL de finishOneclickInscription (HTTP onRequest)
 function getBaseUrl(): string {
-  return process.env.CF_BASE_URL || "https://commitwebpaytransaction-i6cn7w2g5a-tl.a.run.app";
+  const url = process.env.CF_BASE_URL;
+  if (!url) {
+    logger.warn("CF_BASE_URL no configurada. Los webhooks de Transbank no funcionarán.");
+  }
+  return url || "https://southamerica-west1-mvp-sports-chile.cloudfunctions.net/commitWebpayTransaction";
 }
 
 function getOneclickBaseUrl(): string {
-  return process.env.ONECLICK_BASE_URL || "https://finishoneclickinscription-i6cn7w2g5a-tl.a.run.app";
+  const url = process.env.ONECLICK_BASE_URL;
+  if (!url) {
+    logger.warn("ONECLICK_BASE_URL no configurada. La inscripción Oneclick no funcionará.");
+  }
+  return url || "https://southamerica-west1-mvp-sports-chile.cloudfunctions.net/finishOneclickInscription";
 }
 
 interface GamificationSettings {

@@ -1,11 +1,18 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import RevenueChart from '@/components/dashboard/RevenueChart';
 
 const formatCLP = (amount: number) =>
   new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }).format(amount);
 
 describe('RevenueChart', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 5, 15));
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
   it('renders title for historical mode', () => {
     render(<RevenueChart data={[]} isHistorical={true} revenue={0} formatCLP={formatCLP} />);
     expect(screen.getByText(/EVOLUCIÓN DE VENTAS/)).toBeInTheDocument();

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { adminAuth } from '@/services/firebase-admin';
+import { adminAuth as getAdminAuth } from '@/services/firebase-admin';
 
 export async function POST(request: Request) {
   try {
@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     }
     const token = authHeader.split('Bearer ')[1];
     try {
-      await adminAuth.verifyIdToken(token);
+      await getAdminAuth().verifyIdToken(token);
     } catch {
       return NextResponse.json({ error: 'Token inválido.' }, { status: 401 });
     }

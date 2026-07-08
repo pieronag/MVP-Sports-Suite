@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { adminAuth } from '@/services/firebase-admin'; // Importamos el archivo del Paso 1
+import { adminAuth as getAdminAuth } from '@/services/firebase-admin';
 
 export async function POST(request: Request) {
   try {
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
       }
 
-      const userRecord = await adminAuth.createUser({
+      const userRecord = await getAdminAuth().createUser({
         email,
         password,
         displayName: displayName || '',
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       });
 
       // Asignar rol 'owner'
-      await adminAuth.setCustomUserClaims(userRecord.uid, { role: role || 'owner' });
+      await getAdminAuth().setCustomUserClaims(userRecord.uid, { role: role || 'owner' });
 
       return NextResponse.json({ 
         success: true, 
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
       }
 
-      await adminAuth.updateUser(uid, {
+      await getAdminAuth().updateUser(uid, {
         password: password
       });
 
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     // Esto asegura que si borras al dueño de la BD, también se borre su acceso
     if (action === 'delete') {
        if (!uid) return NextResponse.json({ error: 'Falta UID' }, { status: 400 });
-       await adminAuth.deleteUser(uid);
+       await getAdminAuth().deleteUser(uid);
        return NextResponse.json({ success: true });
     }
 

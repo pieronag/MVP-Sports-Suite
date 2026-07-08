@@ -1,7 +1,9 @@
 import * as admin from "firebase-admin";
 import {HttpsError} from "firebase-functions/v2/https";
 
-const db = admin.firestore();
+function db(): admin.firestore.Firestore {
+  return admin.firestore();
+}
 
 interface RateLimitConfig {
   maxCalls: number;
@@ -28,7 +30,7 @@ export async function checkRateLimit(
   const now = admin.firestore.Timestamp.now();
   const windowStart = new Date(now.toMillis() - cfg.windowMs);
 
-  const recentCalls = await db.collection("rate_limits")
+  const recentCalls = await db().collection("rate_limits")
     .where("key", "==", key)
     .where("createdAt", ">=", admin.firestore.Timestamp.fromDate(windowStart))
     .count()
@@ -41,7 +43,7 @@ export async function checkRateLimit(
     );
   }
 
-  await db.collection("rate_limits").add({
+  await db().collection("rate_limits").add({
     key,
     userId,
     functionName,
@@ -49,14 +51,14 @@ export async function checkRateLimit(
   });
 
   // Cleanup old entries (best-effort)
-  const oldEntries = await db.collection("rate_limits")
+  const oldEntries = await db().collection("rate_limits")
     .where("key", "==", key)
     .where("createdAt", "<", admin.firestore.Timestamp.fromDate(windowStart))
     .limit(20)
     .get();
 
   if (!oldEntries.empty) {
-    const batch = db.batch();
+    const batch = db().batch();
     oldEntries.docs.forEach((doc) => batch.delete(doc.ref));
     await batch.commit();
   }

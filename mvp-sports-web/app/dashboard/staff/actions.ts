@@ -1,5 +1,5 @@
 "use server";
-import { adminAuth } from "@/services/firebase-admin";
+import { adminAuth as getAdminAuth } from "@/services/firebase-admin";
 
 /**
  * Actualiza la contraseña de un miembro del staff desde el servidor
@@ -16,7 +16,7 @@ export async function updateStaffPassword(uid: string, newPassword: string) {
             return { success: false, error: "La contraseña debe tener al menos 6 caracteres" };
         }
 
-        await adminAuth.updateUser(uid, {
+        await getAdminAuth().updateUser(uid, {
             password: newPassword,
         });
 

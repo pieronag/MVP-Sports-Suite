@@ -170,7 +170,7 @@ export const walletService = {
      */
     async deleteCard(userId: string, cardId: string): Promise<void> {
         try {
-            await deleteDoc(doc(db, 'users', userId, 'cards', cardId));
+            await deleteDoc(doc(db, 'profiles', userId, 'cards', cardId));
 
             await auditService.logAuditEvent({
                 action: 'BILLETERA_TARJETA_ELIMINAR',
@@ -198,7 +198,7 @@ export const walletService = {
         const cards = await this.getCards(userId);
         for (const card of cards) {
             if (card.id) {
-                await updateDoc(doc(db, 'users', userId, 'cards', card.id), {
+                await updateDoc(doc(db, 'profiles', userId, 'cards', card.id), {
                     isDefault: card.id === cardId
                 });
             }

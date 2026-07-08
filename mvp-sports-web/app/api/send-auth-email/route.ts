@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { adminAuth, adminDb } from '@/services/firebase-admin';
+import { adminAuth as getAdminAuth, adminDb as getAdminDb } from '@/services/firebase-admin';
 
 export async function POST(request: Request) {
   try {
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     // Resolving name from Firestore if not provided
     let name = providedName || 'Jugador';
     try {
-      const userQuery = await adminDb.collection('users').where('email', '==', email.toLowerCase().trim()).limit(1).get();
+      const userQuery = await getAdminDb().collection('users').where('email', '==', email.toLowerCase().trim()).limit(1).get();
       if (!userQuery.empty) {
         const userData = userQuery.docs[0].data();
         name = userData.displayName || name;
@@ -35,13 +35,13 @@ export async function POST(request: Request) {
     };
 
     if (type === 'verify') {
-      actionLink = await adminAuth.generateEmailVerificationLink(email, actionCodeSettings);
+      actionLink = await getAdminAuth().generateEmailVerificationLink(email, actionCodeSettings);
       subject = 'Verifica tu correo electrónico - MVP Sports';
       title = 'Activa tu Cuenta';
       description = `Hola, ${name}. Gracias por registrarte en la plataforma de MVP Sports. Para poder iniciar sesión en la aplicación móvil y el panel de control, debes verificar tu cuenta haciendo clic en el siguiente botón:`;
       buttonText = 'Verificar Cuenta';
     } else if (type === 'reset') {
-      actionLink = await adminAuth.generatePasswordResetLink(email, actionCodeSettings);
+      actionLink = await getAdminAuth().generatePasswordResetLink(email, actionCodeSettings);
       subject = 'Restablece tu contraseña - MVP Sports';
       title = 'Restablece tu Contraseña';
       description = `Hola, ${name}. Hemos recibido una solicitud para restablecer la contraseña de tu cuenta de MVP Sports. Si no realizaste esta solicitud, puedes ignorar este correo. De lo contrario, haz clic en el siguiente botón para crear una nueva contraseña:`;
@@ -160,7 +160,7 @@ export async function POST(request: Request) {
     // Fetch email settings from Firestore
     let dbSettings: any = {};
     try {
-      const settingsDoc = await adminDb.collection('settings').doc('email').get();
+      const settingsDoc = await getAdminDb().collection('settings').doc('email').get();
       if (settingsDoc.exists) {
         dbSettings = settingsDoc.data() || {};
       }
