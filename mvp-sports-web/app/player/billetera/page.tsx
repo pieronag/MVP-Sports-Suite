@@ -185,8 +185,9 @@ export default function BilleteraPage() {
     setProcessing(false);
   };
 
-  const onlinePayments = bookings.filter(b => b.paymentMethod === 'card' || b.paymentMethod === 'webpay' || b.paymentMethod === 'online');
-  const venuePayments = bookings.filter(b => !['card', 'webpay', 'online'].includes(b.paymentMethod || ''));
+  const onlineMethods = ['card', 'webpay', 'online', 'webpay_plus', 'oneclick'];
+  const onlinePayments = bookings.filter(b => onlineMethods.includes(b.paymentMethod || ''));
+  const venuePayments = bookings.filter(b => !onlineMethods.includes(b.paymentMethod || ''));
   const totalOnline = onlinePayments.reduce((s, b) => s + b.amount, 0);
   const totalVenue = venuePayments.reduce((s, b) => s + b.amount, 0);
 
@@ -314,7 +315,7 @@ export default function BilleteraPage() {
           {bookings.length > 0 ? (
             <div className="divide-y divide-emerald-500/5">
               {bookings.map((b) => {
-                const isOnline = b.paymentMethod === 'card' || b.paymentMethod === 'webpay' || b.paymentMethod === 'online';
+                const isOnline = onlineMethods.includes(b.paymentMethod || '');
                 const isNoShow = b.status === 'no-show' || b.paymentStatus === 'no-show' || b.noShow === true;
                 const badgeColor = isNoShow ? '#f43f5e' : isOnline ? '#10b981' : '#3b82f6';
                 const badgeBg = isNoShow ? '#f43f5e15' : isOnline ? '#10b98115' : '#3b82f615';

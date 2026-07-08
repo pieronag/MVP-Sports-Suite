@@ -140,7 +140,7 @@ export default function TicketPage() {
             {[
               { label: "ID Reserva", val: bookingId || "—" },
               { label: "Estado", val: statusBadge(booking?.paymentStatus || "") },
-              { label: "Método", val: (booking as any)?.paymentMethod === "card" ? "Tarjeta Online" : "Pago Recinto" },
+              { label: "Método", val: ["card", "webpay", "online"].includes((booking as any)?.paymentMethod || "") ? "Tarjeta Online" : "Pago Recinto" },
               { label: "Código", val: `#${(bookingId || "").slice(-6).toUpperCase()}` },
             ].map((r) => (
               <div key={r.label} className="flex items-center justify-between">

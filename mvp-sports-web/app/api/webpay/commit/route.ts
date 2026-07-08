@@ -84,6 +84,7 @@ export async function GET(request: NextRequest) {
           }
           batch.set(db.collection("bookings").doc(bookingId), {
             ...pendingBookingData,
+            paymentMethod: "webpay_plus",
             date: finalDate,
             paymentStatus: "paid",
             status: "confirmed",
@@ -91,6 +92,7 @@ export async function GET(request: NextRequest) {
           });
         } else {
           batch.update(db.collection("bookings").doc(bookingId), {
+            paymentMethod: "webpay_plus",
             paymentStatus: "paid",
             status: "confirmed",
             updatedAt: new Date(),
