@@ -480,42 +480,30 @@ export const authorizeOneclickPayment = onCall(
       const buyOrder = `PAY-${Date.now()}`;
       logger.info(`AUTORIZANDO PAGO - Padre: ${masterCommerceCode} | Hijo: ${childCommerceCode}`);
 
-      // MODO SIMULADO: Si la tarjeta no tiene tbkUser (agregada manualmente sin Oneclick)
-      // o tiene tbkUser de prueba, se simula el pago exitoso
       const tbkUser = (card.tbkUser || "").toString();
-      const isMockCard = !tbkUser || tbkUser.toUpperCase().includes("MOCK_USER");
+      if (!tbkUser) {
+        throw new HttpsError("failed-precondition",
+          "Esta tarjeta no está registrada para Oneclick. Usa Webpay Plus.");
+      }
 
-      if (isMockCard) {
+      // MOCK mode para tarjetas de prueba registradas vía Oneclick
+      if (tbkUser.toUpperCase().includes("MOCK_USER")) {
         if (tbkUser.toUpperCase().includes("REJECT")) {
-          logger.info("Simulando RECHAZO de pago (Modo Prueba)");
-          return {
-            success: false,
-            error: "Transacción rechazada por el banco (Simulado)",
-            response_code: 1
-          };
+          return { success: false, error: "Transacción rechazada (Simulado)", response_code: 1 };
         }
-
-        logger.info(`Simulando éxito de pago${tbkUser ? " Oneclick (Modo Prueba)" : " para tarjeta manual"} (Modo Prueba)`);
+        logger.info("Simulando éxito de pago Oneclick (Modo Prueba)");
         const batch = db.batch();
         const paymentRef = db.collection("payments").doc();
         batch.set(paymentRef, {
           userId: uid, bookingId, amount, buyOrder,
-          authorizationCode: "123456",
-          status: "approved", method: "oneclick_mock",
+          authorizationCode: "123456", status: "approved", method: "oneclick_mock",
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
         if (bookingId) {
-          const bookingRef = db.collection("bookings").doc(bookingId);
-          batch.update(bookingRef, { paymentStatus: "paid", status: "confirmed" });
+          batch.update(db.collection("bookings").doc(bookingId), { paymentStatus: "paid", status: "confirmed" });
         }
         await batch.commit();
-        return {
-          success: true,
-          buy_order: buyOrder,
-          authorization_code: "123456",
-          amount: amount,
-          response_code: 0
-        };
+        return { success: true, buy_order: buyOrder, authorization_code: "123456", amount, response_code: 0 };
       }
 
       const response = await transbank.authorizeOneclickPayment(

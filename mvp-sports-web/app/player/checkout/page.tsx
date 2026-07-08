@@ -174,22 +174,32 @@ export default function CheckoutPage() {
 
         if (paymentMethod === "card") {
           if (selectedCardId) {
-            const payResult = await walletService.authorizePayment((profile as any).uid, priceNum, bookingId || "", tenantId || "", selectedCardId);
-            if (!payResult.success) {
-              throw new Error(payResult.error || "Transacción rechazada por el banco.");
-            }
-            data.paymentStatus = "paid";
-            data.paymentMethod = "oneclick";
-            let id = bookingId || "";
-            if (id) await bookingService.updateBooking(id, data);
-            else {
+            const selectedCard = savedCards.find(c => c.id === selectedCardId);
+            if (selectedCard && !selectedCard.tbkUser) {
               const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-              for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
-              data.id = id;
-              id = await bookingService.createBooking(data);
+              let id = bookingId || "";
+              if (!id) { for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length)); }
+              const buyOrder = `ORD-${Date.now()}`;
+              const res = await walletService.createWebpayTransaction(id, tenantId || "", priceNum, buyOrder, data);
+              window.location.href = res.url;
+            } else {
+              const payResult = await walletService.authorizePayment((profile as any).uid, priceNum, bookingId || "", tenantId || "", selectedCardId);
+              if (!payResult.success) {
+                throw new Error(payResult.error || "Transacción rechazada por el banco.");
+              }
+              data.paymentStatus = "paid";
+              data.paymentMethod = "oneclick";
+              let id = bookingId || "";
+              if (id) await bookingService.updateBooking(id, data);
+              else {
+                const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+                for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length));
+                data.id = id;
+                id = await bookingService.createBooking(data);
+              }
+              if (appliedCoupon) await couponService.incrementCouponUsage(appliedCoupon.id);
+              setCustomAlert({ visible: true, title: "¡Pago Exitoso!", message: "Reserva confirmada.", type: "success", onClose: () => router.push(`/player/ticket?bookingId=${id}&sport=${sport || ""}&sportColor=${sportColor || ""}&tenantName=${encodeURIComponent((tenantName || "").toUpperCase())}&courtName=${encodeURIComponent((courtName || "").toUpperCase())}&startTime=${startTime || ""}&date=${date || ""}&price=${priceNum.toString()}`) });
             }
-            if (appliedCoupon) await couponService.incrementCouponUsage(appliedCoupon.id);
-            setCustomAlert({ visible: true, title: "¡Pago Exitoso!", message: "Reserva confirmada con pago Oneclick.", type: "success", onClose: () => router.push(`/player/ticket?bookingId=${id}&sport=${sport || ""}&sportColor=${sportColor || ""}&tenantName=${encodeURIComponent((tenantName || "").toUpperCase())}&courtName=${encodeURIComponent((courtName || "").toUpperCase())}&startTime=${startTime || ""}&date=${date || ""}&price=${priceNum.toString()}`) });
           } else {
             const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
             let id = bookingId || "";
@@ -398,6 +408,7 @@ export default function CheckoutPage() {
                         className={`w-full flex items-center gap-3 p-3 rounded-[14px] border transition-all active:scale-[0.98] ${selectedCardId === card.id ? "border-emerald-500 bg-emerald-500/5" : isDark ? "border-white/[0.06] hover:bg-white/[0.02]" : "border-slate-200 hover:bg-slate-50"}`}>
                         <CreditCard size={16} style={{ color: selectedCardId === card.id ? activeColor : isDark ? "#94A3B8" : "#64748B" }} />
                         <span className={`flex-1 text-left text-xs font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>•••• {card.last4} {card.isDefault ? <Star size={10} className="inline text-amber-500 fill-amber-500" /> : ""}</span>
+                        <span className={`text-[7px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded ${card.tbkUser ? "text-emerald-500 bg-emerald-500/10" : "text-blue-500 bg-blue-500/10"}`}>{card.tbkUser ? "1 Click" : "Webpay"}</span>
                         <span className={`text-[9px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{card.brand}</span>
                         {selectedCardId === card.id && <CheckCircle2 size={14} style={{ color: activeColor }} />}
                       </button>
