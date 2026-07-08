@@ -2,33 +2,32 @@ import { NextResponse } from "next/server";
 import { adminDb as getAdminDb } from "@/services/firebase-admin";
 import { WebpayPlus, Options, IntegrationCommerceCodes, IntegrationApiKeys, Environment } from "transbank-sdk";
 
-function isTestCommerceCode(code: string): boolean {
-  return code.startsWith("5970");
-}
-
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { bookingId, tenantId, amount, buyOrder, bookingData, returnUrl } = body;
 
-    if (!tenantId || !amount) {
-      return NextResponse.json({ error: "Faltan datos" }, { status: 400 });
+    if (!amount || amount <= 0) {
+      return NextResponse.json({ error: "Monto inválido" }, { status: 400 });
     }
-
-    const db = getAdminDb();
 
     let commerceCode: string | undefined;
     let apiKey: string | undefined;
 
-    if (tenantId && tenantId !== "system") {
-      const tenantDoc = await db.collection("tenants").doc(tenantId).get();
-      commerceCode = tenantDoc.data()?.transbankCommerceCode;
-      apiKey = tenantDoc.data()?.transbankApiKey;
+    try {
+      const db = getAdminDb();
+      if (tenantId && tenantId !== "system") {
+        const tenantDoc = await db.collection("tenants").doc(tenantId).get();
+        commerceCode = tenantDoc.data()?.transbankCommerceCode;
+        apiKey = tenantDoc.data()?.transbankApiKey;
+      }
+    } catch (dbErr: any) {
+      console.warn("Firestore lookup failed, using default credentials:", dbErr.message);
     }
 
     let options: Options;
     if (commerceCode && apiKey) {
-      const env = isTestCommerceCode(commerceCode)
+      const env = commerceCode.startsWith("5970")
         ? Environment.Integration
         : Environment.Production;
       options = new Options(commerceCode, apiKey, env);
@@ -41,25 +40,35 @@ export async function POST(request: Request) {
     }
 
     const tx = new WebpayPlus.Transaction(options);
+
+    const safeAmount = Math.round(Number(amount));
+    const safeBuyOrder = buyOrder || `ORD-${Date.now()}`;
+    const sessionId = `s-${Date.now()}`;
+
     const response = await tx.create(
-      buyOrder || `ORD-${Date.now()}`,
-      `session-${Date.now()}`,
-      amount,
-      `https://mvpsports.cl/api/webpay/commit`
+      safeBuyOrder,
+      sessionId,
+      safeAmount,
+      "https://mvpsports.cl/api/webpay/commit"
     );
 
-    await db.collection("payments").add({
-      bookingId,
-      tenantId,
-      amount,
-      buyOrder: buyOrder || `ORD-${Date.now()}`,
-      token: response.token,
-      status: "pending",
-      method: "webpay_plus",
-      pendingBookingData: bookingData || null,
-      returnUrl: returnUrl || null,
-      createdAt: new Date(),
-    });
+    try {
+      const db = getAdminDb();
+      await db.collection("payments").add({
+        bookingId: bookingId || null,
+        tenantId: tenantId || null,
+        amount: safeAmount,
+        buyOrder: safeBuyOrder,
+        token: response.token,
+        status: "pending",
+        method: "webpay_plus",
+        pendingBookingData: bookingData || null,
+        returnUrl: returnUrl || null,
+        createdAt: new Date(),
+      });
+    } catch (dbErr: any) {
+      console.warn("Payment record save failed:", dbErr.message);
+    }
 
     return NextResponse.json({
       url: response.url,
