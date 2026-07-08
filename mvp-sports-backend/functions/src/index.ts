@@ -79,11 +79,12 @@ export const awardPlayerXp = onCall(async (request) => {
 
   try {
     const [settingsDoc, userDoc] = await Promise.all([
-      db.collection("settings").doc("gamification").get(),
+      db.collection("settings").doc("global").get(),
       db.collection("profiles").doc(uid).get(),
     ]);
 
-    const settings = (settingsDoc.data() as GamificationSettings) ||
+    const globalData = settingsDoc.data();
+    const settings = (globalData?.gamification as GamificationSettings) ||
       DEFAULT_SETTINGS;
     const userData = userDoc.data();
 

@@ -14,7 +14,6 @@ import { gamificationService } from "@/services/player/gamificationService";
 import { bookingService, Booking } from "@/services/player/bookingService";
 import { userService } from "@/services/player/userService";
 import { teamService } from "@/services/player/teamService";
-import { getFunctions, httpsCallable } from 'firebase/functions';
 
 const RANGOS_CONFIG = [
   { id: 'bronze', name: 'BRONCE', min: 0, color: '#cd7f32' },
@@ -26,7 +25,7 @@ const RANGOS_CONFIG = [
   { id: 'legend', name: 'LEYENDA', min: 25000, color: '#8b5cf6' }
 ];
 
-const BADGE_XP_VALUES: Record<string, number> = { bronze: 50, silver: 150, gold: 500 };
+const DEFAULT_BADGE_XP: Record<string, number> = { bronze: 200, silver: 500, gold: 1000 };
 const BADGE_INFO: Record<string, { name: string }> = {
   scorer: { name: 'Artillero' }, playmaker: { name: 'Maestro' }, defender: { name: 'Muralla' },
   wins: { name: 'Ganador' }, mvp: { name: 'Estrella' }, experience: { name: 'Leyenda' },
@@ -51,6 +50,17 @@ const BADGE_ICONS: Record<string, React.ElementType> = {
   clutch: Zap, tournaments: Medal, invictus: ShieldCheck, rivalry: Sword,
   morning_player: Sun, night_player: Moon, loyal: Heart, weekend_warrior: Calendar,
   stamina: Activity, social: Share2,
+};
+const BADGE_SVGS: Record<string, string> = {
+  scorer: "/icons/logros/artillero.svg", playmaker: "/icons/logros/maestro.svg",
+  defender: "/icons/logros/muralla.svg", wins: "/icons/logros/ganador.svg",
+  mvp: "/icons/logros/estrella.svg", experience: "/icons/logros/legend.svg",
+  multi_sport: "/icons/logros/atleta.svg", captaincy: "/icons/logros/capitan.svg",
+  comeback: "/icons/logros/fenix.svg", precision: "/icons/logros/francotirador.svg",
+  clutch: "/icons/logros/clutch.svg", tournaments: "/icons/logros/competidor.svg",
+  invictus: "/icons/logros/invicto.svg", rivalry: "/icons/logros/verdugo.svg",
+  morning_player: "/icons/logros/madrugador.svg", night_player: "/icons/logros/nocturno.svg",
+  stamina: "/icons/logros/motor.svg", social: "/icons/logros/sociable.svg",
 };
 
 function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
@@ -197,7 +207,6 @@ export default function EstadisticasPage() {
       else if (uid) { await addDoc(collection(db, 'bookings'), { ...matchData, userId: uid, status: 'completed', date: new Date(), isInternalMatch: true, tenantName: `PARTIDO INTERNO: ${teamName}` }); }
       if (uid) {
         if (typeof (userService as any).awardInternalMatchXpAndStats === 'function') { await (userService as any).awardInternalMatchXpAndStats(teamAssignments, memberGoals, memberAssists, scoreA, scoreB, mvpUserIdInput, uid, activeUserOutcome); }
-        try { const awardFn = httpsCallable(getFunctions(), 'awardPlayerXp'); await awardFn({ userId: uid, matchData }); } catch {}
       }
       setShowStatsModal(false); await loadData(true);
     } catch (error) { console.error(error); }
@@ -207,10 +216,19 @@ export default function EstadisticasPage() {
   const userProfile = profile as any;
   const analytics = useMemo(() => {
     const puntosTotales = userProfile?.xp || 0;
-    let rangoActual = RANGOS_CONFIG[0];
-    let siguienteRango = RANGOS_CONFIG[1];
-    for (let i = RANGOS_CONFIG.length - 1; i >= 0; i--) {
-      if (puntosTotales >= RANGOS_CONFIG[i].min) { rangoActual = RANGOS_CONFIG[i]; siguienteRango = RANGOS_CONFIG[i + 1] || RANGOS_CONFIG[i]; break; }
+    const tiersFromSettings = gamification?.tiers;
+    const rankConfig = tiersFromSettings
+      ? [
+          { id: 'bronze', name: 'BRONCE', min: Number(tiersFromSettings.bronze) || 0, color: '#cd7f32' },
+          { id: 'silver', name: 'PLATA', min: Number(tiersFromSettings.silver) || 1000, color: '#94A3B8' },
+          { id: 'gold', name: 'ORO', min: Number(tiersFromSettings.gold) || 5000, color: '#f59e0b' },
+          { id: 'elite', name: 'ELITE', min: Number(tiersFromSettings.elite) || 10000, color: '#10b981' },
+        ]
+      : RANGOS_CONFIG;
+    let rangoActual = rankConfig[0];
+    let siguienteRango = rankConfig[1];
+    for (let i = rankConfig.length - 1; i >= 0; i--) {
+      if (puntosTotales >= rankConfig[i].min) { rangoActual = rankConfig[i]; siguienteRango = rankConfig[i + 1] || rankConfig[i]; break; }
     }
     const puntosEnEsteRango = puntosTotales - rangoActual.min;
     const puntosNecesarios = siguienteRango.min - rangoActual.min;
@@ -261,7 +279,7 @@ export default function EstadisticasPage() {
     const finalBadges = Array.from(computedBadgesMap.entries()).map(([id, tier]) => ({ id, tier })).sort((a, b) => (tierScores[b.tier] || 0) - (tierScores[a.tier] || 0));
     const badgeHistory = finalBadges.map((badge: any, idx: number) => {
       const info = BADGE_INFO[badge.id] || { name: 'Logro' };
-      const xpBonus = BADGE_XP_VALUES[badge.tier] || 0;
+      const xpBonus = (gamification?.badgeXpValues || DEFAULT_BADGE_XP)[badge.tier] || 0;
       const tn: Record<string, string> = { gold: 'ORO', silver: 'PLATA', bronze: 'BRONCE' };
       const tc: Record<string, string> = { gold: '#fbbf24', silver: '#94a3b8', bronze: '#b45309' };
       const dateObj = userProfile?.lastBulkSync ? new Date(userProfile.lastBulkSync) : new Date();
@@ -452,12 +470,17 @@ export default function EstadisticasPage() {
                     seen.add(uniqueKey);
                     if (item.isBadge) {
                       const BIcon = BADGE_ICONS[item.id] || Trophy;
+                      const bSvg = BADGE_SVGS[item.id];
                       return (
                         <div key={uniqueKey} className={`rounded-[14px] p-4 border`} style={{ borderColor: `${item.badgeColor}30`, backgroundColor: `${item.badgeColor}08` }}>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3 flex-1 min-w-0">
                               <div className="w-11 h-11 rounded-[14px] flex items-center justify-center shrink-0" style={{ backgroundColor: `${item.badgeColor}15`, border: `1px solid ${item.badgeColor}25` }}>
-                                <BIcon size={20} color={item.badgeColor} strokeWidth={1.25} />
+                                {bSvg ? (
+                                  <div style={{ width: 22, height: 22, backgroundColor: item.badgeColor, mask: `url(${bSvg}) center/contain no-repeat`, WebkitMask: `url(${bSvg}) center/contain no-repeat` }} />
+                                ) : (
+                                  <BIcon size={20} color={item.badgeColor} strokeWidth={1.25} />
+                                )}
                               </div>
                               <div className="min-w-0">
                                 <div className="flex items-center gap-2">

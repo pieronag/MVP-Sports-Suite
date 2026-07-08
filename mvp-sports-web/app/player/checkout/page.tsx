@@ -1,11 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, CreditCard, ShieldCheck, Zap, Calendar, Clock, Trophy, MapPin, Users, CheckCircle2, XCircle, X, AlertCircle } from "lucide-react";
+import { ChevronLeft, CreditCard, ShieldCheck, Zap, Calendar, Clock, Trophy, MapPin, Users, CheckCircle2, XCircle, X } from "lucide-react";
 import { usePlayer } from "@/context/PlayerContext";
 import { Timestamp } from "firebase/firestore";
-import { bookingService } from "@/services/player/bookingService";
-import { venueService } from "@/services/player/venueService";
 import { walletService } from "@/services/player/walletService";
 import { couponService } from "@/services/player/couponService";
 import { teamService } from "@/services/player/teamService";
@@ -42,10 +40,6 @@ export default function CheckoutPage() {
   const [customAlert, setCustomAlert] = useState<{ visible: boolean; title: string; message: string; type: "success" | "error"; onClose?: () => void }>({ visible: false, title: "", message: "", type: "success" });
   const [userTeams, setUserTeams] = useState<any[]>([]);
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "venue">("venue");
-  const [loadingTenant, setLoadingTenant] = useState(true);
-  const [isPaymentApiActive, setIsPaymentApiActive] = useState(false);
-  const [hasCashNoShow, setHasCashNoShow] = useState(false);
   const [couponInput, setCouponInput] = useState("");
   const [validatingCoupon, setValidatingCoupon] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
@@ -67,38 +61,18 @@ export default function CheckoutPage() {
   const tournamentName = searchParams.get("tournamentName");
   const venueName = searchParams.get("venueName");
   const tournamentType = searchParams.get("tournamentType");
-  const requireOnlinePayment = searchParams.get("requireOnlinePayment");
 
   const isTournament = type === "tournament";
 
   useEffect(() => {
-    if (tenantId) {
-      setLoadingTenant(true);
-      venueService.getVenueById(tenantId).then((tenantData) => {
-        const apiActive = !!(tenantData as any)?.paymentApiActive || !!(tenantData as any)?.isPaymentApiActive || !!(tenantData as any)?.transbankCommerceCode;
-        setIsPaymentApiActive(apiActive);
-      }).catch(() => {}).finally(() => setLoadingTenant(false));
-    } else { setLoadingTenant(false); }
-  }, [tenantId]);
-
-  useEffect(() => {
-    if (requireOnlinePayment === "true") setPaymentMethod("card");
-  }, [requireOnlinePayment]);
-
-  useEffect(() => {
     if (profile && (profile as any).uid) {
-      teamService.getUserTeams((profile as any).uid).then((teams) => {
+      const uid = (profile as any).uid;
+      teamService.getUserTeams(uid).then((teams) => {
         const norm = (s: string) => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-        setUserTeams(teams.filter((t: any) => norm(t.sport) === norm(sport || "")));
+        setUserTeams(teams.filter((t: any) => t.ownerId === uid && norm(t.sport) === norm(sport || "")));
       });
     }
   }, [profile, sport]);
-
-  useEffect(() => {
-    if ((profile as any)?.uid) {
-      bookingService.checkUserHasCashNoShow((profile as any).uid).then((banned) => { setHasCashNoShow(banned); if (banned) setPaymentMethod("card"); });
-    }
-  }, [profile]);
 
   const handleApplyCoupon = async () => {
     if (!couponInput.trim()) return;
@@ -127,27 +101,21 @@ export default function CheckoutPage() {
 
       if (isTournament) {
         if (!tournamentId || !teamId) throw new Error("Datos incompletos");
-        const { tournamentService } = await import("@/services/player/tournamentService");
-        if (paymentMethod === "card") {
-          const buyOrder = `TOR-${Date.now()}`;
-          const returnUrl = `https://mvpsports.cl/player/torneos`;
-          const res = await walletService.createWebpayTransaction(tournamentId, tenantId || "system", priceNum, buyOrder, undefined, returnUrl);
-          if (!res?.url) throw new Error("No se recibió URL de pago");
-          const form = document.createElement("form");
-          form.method = "POST";
-          form.action = res.url;
-          form.style.display = "none";
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = "token_ws";
-          input.value = res.token;
-          form.appendChild(input);
-          document.body.appendChild(form);
-          form.submit();
-        } else {
-          await tournamentService.registerTeamInTournament(tournamentId, { id: teamId, name: teamName || "" }, uid, clientName, priceNum);
-          setCustomAlert({ visible: true, title: "¡Inscripción Exitosa!", message: `${teamName} inscrito en ${tournamentName}.`, type: "success", onClose: () => router.back() });
-        }
+        const buyOrder = `TOR-${Date.now()}`;
+        const returnUrl = `https://mvpsports.cl/player/torneos`;
+        const res = await walletService.createWebpayTransaction(tournamentId, tenantId || "system", priceNum, buyOrder, undefined, returnUrl);
+        if (!res?.url) throw new Error("No se recibió URL de pago");
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = res.url;
+        form.style.display = "none";
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "token_ws";
+        input.value = res.token;
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
       } else {
         const [sh, sm] = (startTime || "00:00").split(":").map(Number);
         const endH = sh + 1;
@@ -155,58 +123,36 @@ export default function CheckoutPage() {
         bookingDate.setHours(sh, sm || 0, 0, 0);
         if (sh < 6) bookingDate.setDate(bookingDate.getDate() + 1);
 
-        if (paymentMethod === "card") {
-          const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-          let id = bookingId || "";
-          if (!id) { for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length)); }
-          const buyOrder = `ORD-${Date.now()}`;
-          const returnUrl = `https://mvpsports.cl/player/ticket?bookingId=${id}&sport=${sport || ""}&sportColor=${encodeURIComponent(sportColor || "")}&tenantName=${encodeURIComponent((tenantName || "").toUpperCase())}&courtName=${encodeURIComponent((courtName || "").toUpperCase())}&startTime=${startTime || ""}&date=${date || ""}&price=${priceNum}`;
-          const bookingData = {
-            userId: uid, tenantId: tenantId || "", tenantName: tenantName || "Recinto",
-            courtId: courtId || "", courtName: courtName || "Cancha", clientName, clientPhone: userProfile?.phone || "+56900000000",
-            date: Timestamp.fromDate(bookingDate), startTime: startTime || "",
-            endTime: `${endH.toString().padStart(2, "0")}:${(sm || 0).toString().padStart(2, "0")}`,
-            totalPrice: priceNum, originalPrice: basePriceNum,
-            couponCode: appliedCoupon?.code || null, discountApplied: appliedCoupon?.discount || 0,
-            status: "confirmed", paymentStatus: "pending", source: "web_app",
-            createdBy: userProfile?.email || uid,
-            paymentMethod: "card",
-            sport: sport || "futbol", createdAt: Timestamp.now(),
-            ...(selectedTeamId ? { teamId: selectedTeamId } : {}),
-          };
-          const res = await walletService.createWebpayTransaction(id, tenantId || "", priceNum, buyOrder, bookingData, returnUrl);
-          if (!res?.url) throw new Error("No se recibió URL de pago");
-          const form = document.createElement("form");
-          form.method = "POST";
-          form.action = res.url;
-          form.style.display = "none";
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = "token_ws";
-          input.value = res.token;
-          form.appendChild(input);
-          document.body.appendChild(form);
-          form.submit();
-        } else {
-          const bookingData = {
-            userId: uid, tenantId: tenantId || "", tenantName: tenantName || "Recinto",
-            courtId: courtId || "", courtName: courtName || "Cancha", clientName, clientPhone: userProfile?.phone || "+56900000000",
-            date: Timestamp.fromDate(bookingDate), startTime: startTime || "",
-            endTime: `${endH.toString().padStart(2, "0")}:${(sm || 0).toString().padStart(2, "0")}`,
-            totalPrice: priceNum, originalPrice: basePriceNum,
-            couponCode: appliedCoupon?.code || null, discountApplied: appliedCoupon?.discount || 0,
-            status: "confirmed", paymentStatus: "pending", source: "web_app",
-            createdBy: userProfile?.email || uid,
-            paymentMethod: "cash",
-            sport: sport || "futbol", createdAt: Timestamp.now(),
-            ...(selectedTeamId ? { teamId: selectedTeamId } : {}),
-          };
-          let id = bookingId || "";
-          if (id) await bookingService.updateBooking(id, bookingData as any);
-          else id = await bookingService.createBooking(bookingData as any);
-          if (appliedCoupon) await couponService.incrementCouponUsage(appliedCoupon.id);
-          router.push(`/player/ticket?bookingId=${id}&sport=${sport || ""}&sportColor=${sportColor || ""}&tenantName=${encodeURIComponent((tenantName || "").toUpperCase())}&courtName=${encodeURIComponent((courtName || "").toUpperCase())}&startTime=${startTime || ""}&date=${date || ""}&price=${priceNum.toString()}`);
-        }
+        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        let id = bookingId || "";
+        if (!id) { for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length)); }
+        const buyOrder = `ORD-${Date.now()}`;
+        const returnUrl = `https://mvpsports.cl/player/ticket?bookingId=${id}&sport=${sport || ""}&sportColor=${encodeURIComponent(sportColor || "")}&tenantName=${encodeURIComponent((tenantName || "").toUpperCase())}&courtName=${encodeURIComponent((courtName || "").toUpperCase())}&startTime=${startTime || ""}&date=${date || ""}&price=${priceNum}`;
+        const bookingData = {
+          userId: uid, tenantId: tenantId || "", tenantName: tenantName || "Recinto",
+          courtId: courtId || "", courtName: courtName || "Cancha", clientName, clientPhone: userProfile?.phone || "+56900000000",
+          date: Timestamp.fromDate(bookingDate), startTime: startTime || "",
+          endTime: `${endH.toString().padStart(2, "0")}:${(sm || 0).toString().padStart(2, "0")}`,
+          totalPrice: priceNum, originalPrice: basePriceNum,
+          couponCode: appliedCoupon?.code || null, discountApplied: appliedCoupon?.discount || 0,
+          status: "confirmed", paymentStatus: "pending", source: "web_app",
+          createdBy: userProfile?.email || uid,
+          sport: sport || "futbol", createdAt: Timestamp.now(),
+          ...(selectedTeamId ? { teamId: selectedTeamId } : {}),
+        };
+        const res = await walletService.createWebpayTransaction(id, tenantId || "", priceNum, buyOrder, bookingData, returnUrl);
+        if (!res?.url) throw new Error("No se recibió URL de pago");
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = res.url;
+        form.style.display = "none";
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "token_ws";
+        input.value = res.token;
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
       }
     } catch (error: any) {
       setCustomAlert({ visible: true, title: "Error de Pago", message: error.message || "Error al procesar.", type: "error" });
@@ -215,15 +161,6 @@ export default function CheckoutPage() {
 
   const discountAmount = appliedCoupon ? (Number(price) * appliedCoupon.discount / 100) : 0;
   const finalPrice = Number(price) - discountAmount;
-
-  if (loadingTenant) {
-    return (
-      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
-        <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[10px] font-semibold tracking-[3px] uppercase animate-pulse">Cargando</p>
-      </div>
-    );
-  }
 
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
@@ -349,39 +286,19 @@ export default function CheckoutPage() {
           </>
         )}
 
-        <SectionPill label="Método de Pago" />
-        {hasCashNoShow && (
-          <div className="flex items-center gap-3 p-4 rounded-[14px] bg-red-500/10 border border-red-500/20">
-            <AlertCircle size={18} className="text-red-400 shrink-0" />
-            <p className="text-red-400 text-[10px] font-semibold uppercase leading-tight">Pago en recinto deshabilitado por inasistencias.</p>
-          </div>
-        )}
+        <SectionPill label="Pago" />
         <GlowCard isDark={isDark}>
-          <div className="p-5 space-y-3">
-            {!hasCashNoShow && requireOnlinePayment !== "true" && (
-              <button onClick={() => setPaymentMethod("venue")}
-                className={`w-full flex items-center gap-4 p-4 rounded-[14px] border transition-all active:scale-[0.98] ${paymentMethod === "venue" ? "border-emerald-500 bg-emerald-500/5" : isDark ? "border-white/[0.06] hover:bg-white/[0.02]" : "border-slate-200 hover:bg-slate-50"}`}>
-                <div className="w-10 h-10 rounded-[14px] flex items-center justify-center" style={{ backgroundColor: paymentMethod === "venue" ? `${activeColor}15` : isDark ? "rgba(255,255,255,0.04)" : "#F1F5F9" }}>
-                  <MapPin size={20} color={paymentMethod === "venue" ? activeColor : isDark ? "#94A3B8" : "#64748B"} />
-                </div>
-                <div className="flex-1 text-left">
-                  <p className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Pagar en el Recinto</p>
-                  <p className={`text-[9px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Efectivo o transferencia al llegar</p>
-                </div>
-                {paymentMethod === "venue" && <CheckCircle2 size={18} style={{ color: activeColor }} />}
-              </button>
-            )}
-            <button onClick={() => setPaymentMethod("card")}
-              className={`w-full flex items-center gap-4 p-4 rounded-[14px] border transition-all active:scale-[0.98] ${paymentMethod === "card" ? "border-emerald-500 bg-emerald-500/5" : isDark ? "border-white/[0.06] hover:bg-white/[0.02]" : "border-slate-200 hover:bg-slate-50"}`}>
-              <div className="w-10 h-10 rounded-[14px] flex items-center justify-center" style={{ backgroundColor: paymentMethod === "card" ? `${activeColor}15` : isDark ? "rgba(255,255,255,0.04)" : "#F1F5F9" }}>
-                <CreditCard size={20} color={paymentMethod === "card" ? activeColor : isDark ? "#94A3B8" : "#64748B"} />
+          <div className="p-5">
+            <div className="flex items-center gap-4 p-4 rounded-[14px] border border-emerald-500 bg-emerald-500/5">
+              <div className="w-10 h-10 rounded-[14px] flex items-center justify-center bg-emerald-500/10">
+                <CreditCard size={20} className="text-emerald-500" />
               </div>
-              <div className="flex-1 text-left">
+              <div className="flex-1">
                 <p className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Pago Online</p>
-                <p className="text-[9px] font-medium" style={{ color: activeColor }}>Webpay / Redcompra</p>
+                <p className="text-[9px] font-medium text-emerald-500">Webpay Plus</p>
               </div>
-              {paymentMethod === "card" && <CheckCircle2 size={18} style={{ color: activeColor }} />}
-            </button>
+              <ShieldCheck size={18} className="text-emerald-500" />
+            </div>
           </div>
         </GlowCard>
 
@@ -395,7 +312,7 @@ export default function CheckoutPage() {
         <button onClick={handleConfirm} disabled={processing}
           className="w-full h-14 rounded-[14px] flex items-center justify-center gap-3 shadow-lg transition-all active:scale-[0.98]"
           style={{ backgroundColor: activeColor, boxShadow: `0 4px 20px ${activeColor}40` }}>
-          {processing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><Zap size={20} className="text-white" /><span className="text-white font-semibold text-sm uppercase tracking-wider">{isTournament ? "Confirmar Inscripción" : `Pagar $${formatMoney(finalPrice)}`}</span></>}
+          {processing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><CreditCard size={20} className="text-white" /><span className="text-white font-semibold text-sm uppercase tracking-wider">{isTournament ? "Pagar Inscripción" : `Pagar $${formatMoney(finalPrice)}`}</span></>}
         </button>
       </div>
 

@@ -70,6 +70,10 @@ export default function Navbar({ onRegisterClick }: { onRegisterClick: () => voi
             Recintos
             <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#00df82] group-hover:w-full transition-all" />
           </Link>
+          <Link href="#planes" className="hover:text-white transition-colors relative group">
+            Planes
+            <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#00df82] group-hover:w-full transition-all" />
+          </Link>
         </div>
 
         <div className="flex items-center gap-4 md:gap-6">
@@ -104,6 +108,7 @@ export default function Navbar({ onRegisterClick }: { onRegisterClick: () => voi
             <Link href="#" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-black text-white uppercase tracking-[0.3em] hover:text-[#00df82] transition-colors">Inicio</Link>
             <Link href="#player-functions" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-black text-white uppercase tracking-[0.3em] hover:text-[#00df82] transition-colors">Jugadores</Link>
             <Link href="#owners" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-black text-white uppercase tracking-[0.3em] hover:text-[#00df82] transition-colors">Recintos</Link>
+            <Link href="#planes" onClick={() => setIsMobileMenuOpen(false)} className="text-xl font-black text-white uppercase tracking-[0.3em] hover:text-[#00df82] transition-colors">Planes</Link>
           </div>
           
           <div className="w-4/5 h-px bg-white/10" />

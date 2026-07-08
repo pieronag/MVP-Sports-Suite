@@ -6,6 +6,9 @@ import AppFunctions from "../components/landing/AppFunctions";
 import SupportedSports from "../components/landing/SupportedSports";
 import AppShowcase from "../components/landing/AppShowcase";
 import AdminPreview from "../components/landing/AdminPreview";
+import Pricing from "../components/landing/Pricing";
+import PlanSimulator from "../components/landing/PlanSimulator";
+import IntegracionesSection from "../components/landing/IntegracionesSection";
 import Footer from "../components/landing/Footer";
 import ScrollToTop from "../components/landing/ScrollToTop";
 import dynamic from "next/dynamic";
@@ -44,6 +47,15 @@ export default function Home() {
         <div className="container mx-auto">
           <AdminPreview onRegisterClick={() => setIsRegisterOpen(true)} />
         </div>
+
+        {/* PRICING PLANS */}
+        <Pricing />
+
+        {/* PLAN SIMULATOR */}
+        <PlanSimulator />
+
+        {/* INTEGRACIONES */}
+        <IntegracionesSection />
       </div>
 
       <Footer 

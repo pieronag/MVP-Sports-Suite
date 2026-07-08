@@ -1,10 +1,8 @@
 "use client";
-import Image from "next/image";
 
 export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () => void }) {
   return (
     <section id="owners" className="py-32 relative overflow-hidden bg-slate-950/40">
-      {/* Decoración de fondo */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#00df82]/5 blur-[120px] rounded-full -translate-y-1/2 pointer-events-none" />
       
       <div className="container relative z-10">
@@ -17,22 +15,21 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           </div>
           <div className="flex-1 lg:pb-2">
             <p className="text-base text-slate-400 font-medium leading-relaxed border-l-2 border-[#00df82]/30 pl-6">
-              Todo lo que necesitas para automatizar tus reservas, controlar los pagos y maximizar la ocupación de tus canchas.
+              Panel de control completo para gestionar reservas, cobros online con Transbank, personal y métricas de tu negocio.
             </p>
           </div>
         </div>
 
-        {/* Diseño Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4 auto-rows-[160px]">
-                  {/* Centro de Finanzas (Grande) */}
+          {/* Centro de Finanzas (Grande) */}
           <div className="md:col-span-3 lg:col-span-4 row-span-2 group p-8 rounded-[2.5rem] bg-blue-500/10 border border-white/5 hover:border-blue-500/30 transition-all duration-500 hover:shadow-[0_0_40px_rgba(59,130,246,0.1)] overflow-hidden relative">
             <div className="relative z-10 h-full flex flex-col justify-between">
               <div className="space-y-4">
                 <h3 className="text-blue-400 font-black text-sm uppercase tracking-widest">Centro de Finanzas</h3>
-                <p className="text-xl lg:text-2xl font-black text-white leading-tight">Controla tus ingresos <br/> y ocupación en tiempo real.</p>
+                <p className="text-xl lg:text-2xl font-black text-white leading-tight">Ingresos y ocupación <br/> en tiempo real.</p>
               </div>
               <p className="text-sm text-slate-400 leading-relaxed text-justify">
-                Monitorea tus ingresos diarios, ocupación de canchas y deudas en una sola pantalla. Todo integrado con cobros en línea vía Transbank y presenciales mediante nuestro flujo de caja inteligente.
+                Dashboard financiero con ingresos diarios, ocupación de canchas, ticket promedio y montos por cobrar. Todo integrado con pagos online vía Transbank.
               </p>
             </div>
             <div className="absolute -right-8 -bottom-8 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -45,10 +42,10 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
             <div className="relative z-10 h-full flex flex-col justify-between">
               <div className="space-y-4">
                 <h3 className="text-[#00df82] font-black text-sm uppercase tracking-widest">Calendario de Canchas</h3>
-                <p className="text-xl lg:text-2xl font-black text-white leading-tight">Organiza tus canchas <br/> sin complicaciones.</p>
+                <p className="text-xl lg:text-2xl font-black text-white leading-tight">Gestión de horarios <br/> sin dobles reservas.</p>
               </div>
               <p className="text-sm text-slate-400 leading-relaxed text-justify">
-                Control absoluto de horarios por cancha con filtros por deporte. Bloquea espacios por mantenimiento y sincroniza reservas en tiempo real para evitar sobre-reservas.
+                Calendario visual con disponibilidad por cancha, filtros por deporte, bloqueo por mantenimiento y control total para evitar sobre-reservas.
               </p>
             </div>
             <div className="absolute -right-8 -bottom-8 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -64,7 +61,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
                 <span className="text-[9px] bg-orange-500/20 px-2 py-0.5 rounded-full font-bold">Próximamente</span>
               </h3>
               <p className="text-lg font-bold text-white mb-2">Ligas y campeonatos.</p>
-              <p className="text-xs text-slate-400 leading-tight">Creación y administración de ligas comunitarias, torneos de eliminación directa y fases de grupos con tablas dinámicas de posiciones y fixture automático.</p>
+              <p className="text-xs text-slate-400 leading-tight">Creación de torneos con fases de grupos y eliminación directa. Tabla de posiciones, fixture automático e inscripción de equipos.</p>
             </div>
           </div>
 
@@ -72,36 +69,35 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           <div className="md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-[2rem] bg-sky-500/10 border border-white/5 hover:border-sky-500/30 transition-all duration-500 relative overflow-hidden">
             <div className="relative z-10">
               <h3 className="text-sky-400 font-black text-xs uppercase tracking-widest mb-1 flex items-center gap-2">
-                Academia Deportiva
+                Academia
                 <span className="text-[9px] bg-sky-500/20 px-2 py-0.5 rounded-full font-bold">Próximamente</span>
               </h3>
-              <p className="text-lg font-bold text-white mb-2">Clases y Profesores.</p>
-              <p className="text-xs text-slate-400 leading-tight">Control de tus escuelas de deporte. Gestiona horarios de clases, listas de alumnos inscritos, asistencias y asignación de profesores.</p>
+              <p className="text-lg font-bold text-white mb-2">Clases y alumnos.</p>
+              <p className="text-xs text-slate-400 leading-tight">Administración de escuelas deportivas: horarios de clases, lista de alumnos, control de asistencias y asignación de profesores.</p>
             </div>
           </div>
 
           {/* Cards inferiores más compactas */}
           <div className="md:col-span-2 lg:col-span-3 row-span-1 group p-6 rounded-[2rem] bg-purple-500/10 border border-white/5 hover:border-purple-500/30 transition-all duration-500 flex flex-col justify-between">
             <h3 className="text-purple-400 font-black text-xs uppercase tracking-widest mb-2">Gestión de Canchas</h3>
-            <p className="text-xs text-slate-400 leading-tight">Administra los datos de tus canchas: tipo de superficie, iluminación y si son techadas o al aire libre en un solo clic.</p>
+            <p className="text-xs text-slate-400 leading-tight">Configura el tipo de superficie, iluminación, precio por hora y horarios de cada cancha. Agrega fotos y deportes disponibles.</p>
           </div>
 
           <div className="md:col-span-2 lg:col-span-3 row-span-1 group p-6 rounded-[2rem] bg-pink-500/10 border border-white/5 hover:border-pink-500/30 transition-all duration-500 flex flex-col justify-between">
-            <h3 className="text-pink-400 font-black text-xs uppercase tracking-widest mb-2">Marketing y Cupones</h3>
-            <p className="text-xs text-slate-400 leading-tight">Generación de códigos promocionales y descuentos configurables con límites de uso por cliente y fechas de expiración.</p>
+            <h3 className="text-pink-400 font-black text-xs uppercase tracking-widest mb-2">Cupones y Descuentos</h3>
+            <p className="text-xs text-slate-400 leading-tight">Crea códigos promocionales con descuentos porcentuales, límites de uso y fechas de vigencia para atraer más jugadores.</p>
           </div>
 
           <div className="md:col-span-2 lg:col-span-3 row-span-1 group p-6 rounded-[2rem] bg-emerald-500/10 border border-white/5 hover:border-emerald-500/30 transition-all duration-500 flex flex-col justify-between">
             <h3 className="text-emerald-400 font-black text-xs uppercase tracking-widest mb-2">Roles y Personal</h3>
-            <p className="text-xs text-slate-400 leading-tight">Gestión avanzada de empleados con asignación de roles específicos y matriz de accesos controlados.</p>
+            <p className="text-xs text-slate-400 leading-tight">Asigna roles a tu equipo: administradores, staff y supervisores, cada uno con permisos diferenciados dentro del panel.</p>
           </div>
 
-          {/* CTA CARD - WHATSAPP CONTACT MEJORADA */}
+          {/* CTA CARD - WHATSAPP CONTACT */}
           <a href="https://wa.me/56950194398?text=Hola,%20me%20interesa%20profesionalizar%20mi%20recinto%20deportivo%20con%20MVP%20Sports." 
              target="_blank" 
              rel="noopener noreferrer"
              className="md:col-span-2 lg:col-span-3 row-span-1 group p-6 rounded-[2rem] bg-gradient-to-br from-[#00df82] via-emerald-500 to-teal-500 border border-[#00df82]/30 hover:scale-[1.05] transition-all duration-500 flex flex-col justify-between cursor-pointer shadow-[0_0_50px_rgba(0,223,130,0.3)] relative overflow-hidden active:scale-95">
-            {/* Brillo dinámico */}
             <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-2xl animate-pulse pointer-events-none" />
             
             <div className="relative z-10 space-y-1">
@@ -121,23 +117,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
 
         </div>
 
-        <div className="mt-24 pt-16 border-t border-white/5">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-12 lg:gap-10 text-center md:text-left">
-            <div className="space-y-2">
-              <p className="text-[10px] font-black text-[#00df82] uppercase tracking-[0.4em]">Tecnología en la que confías</p>
-              <h3 className="text-2xl font-black text-white uppercase tracking-tighter">INTEGRACIONES DE PRIMER NIVEL</h3>
-            </div>
-            <div className="flex flex-wrap justify-center md:justify-end gap-10 lg:gap-12 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
-               <div className="flex flex-col items-center gap-1">
-                 <span className="text-base lg:text-lg font-black text-white tracking-tighter">TRANSBANK</span>
-                 <span className="text-[8px] font-bold text-slate-400">PAGOS SEGUROS</span>
-               </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
 }
-
-

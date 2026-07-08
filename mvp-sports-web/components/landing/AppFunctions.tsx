@@ -1,7 +1,6 @@
 export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () => void }) {
   return (
     <section id="player-functions" className="py-20 lg:py-32 relative overflow-hidden bg-slate-950/20">
-      {/* Decoración de fondo */}
       <div className="absolute top-0 right-1/4 w-[300px] lg:w-[500px] h-[300px] lg:h-[500px] bg-blue-500/5 blur-[80px] lg:blur-[120px] rounded-full -translate-y-1/2 pointer-events-none" />
       
       <div className="container relative z-10 px-6">
@@ -14,23 +13,22 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           </div>
           <div className="flex-1 lg:pb-2">
             <p className="text-sm sm:text-base text-slate-400 font-medium leading-relaxed border-l-2 border-blue-500/30 pl-6">
-              Todo lo que necesitas para encontrar tu cancha ideal, organizar el partido con tus amigos y realizar el pago de manera segura.
+              Encuentra canchas cerca de ti, reserva al instante y paga online con Transbank. Sin llamadas, sin efectivo.
             </p>
           </div>
         </div>
 
-        {/* Diseño Bento Grid Jugadores */}
         <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-6 lg:gap-4 lg:auto-rows-[160px]">
           
           {/* Reserva Maestro (Grande) */}
           <div className="md:col-span-3 lg:col-span-4 lg:row-span-2 group p-8 rounded-[2rem] lg:rounded-[2.5rem] bg-[#00df82]/10 border border-white/5 hover:border-[#00df82]/30 transition-all duration-500 hover:shadow-[0_0_40px_rgba(0,223,130,0.1)] overflow-hidden relative">
             <div className="relative z-10 h-full flex flex-col justify-between gap-6">
               <div className="space-y-4">
-                <h3 className="text-[#00df82] font-black text-[10px] uppercase tracking-[0.3em]">Reserva Fácil</h3>
-                <p className="text-xl sm:text-2xl font-black text-white leading-tight">Encuentra tu cancha <br/> en pocos segundos.</p>
+                <h3 className="text-[#00df82] font-black text-[10px] uppercase tracking-[0.3em]">Reserva al Instante</h3>
+                <p className="text-xl sm:text-2xl font-black text-white leading-tight">Canchas disponibles <br/> en tiempo real.</p>
               </div>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed text-justify">
-                Busca los mejores lugares para jugar cerca de donde estés. Elige el deporte, la hora que prefieras y confirma tu reserva al instante sin complicaciones.
+                Busca recintos por deporte, fecha y horario. Ve la disponibilidad al segundo y reserva sin esperar confirmación del dueño.
               </p>
             </div>
             <div className="absolute -right-8 -bottom-8 opacity-5 group-hover:opacity-10 transition-opacity hidden sm:block">
@@ -42,11 +40,11 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           <div className="md:col-span-3 lg:col-span-4 lg:row-span-2 group p-8 rounded-[2rem] lg:rounded-[2.5rem] bg-blue-500/10 border border-white/5 hover:border-blue-500/30 transition-all duration-500 hover:shadow-[0_0_40px_rgba(59,130,246,0.1)] overflow-hidden relative">
             <div className="relative z-10 h-full flex flex-col justify-between gap-6">
               <div className="space-y-4">
-                <h3 className="text-blue-400 font-black text-[10px] uppercase tracking-[0.3em]">Tu Perfil</h3>
-                <p className="text-xl sm:text-2xl font-black text-white leading-tight">Todo tu historial <br/> en un solo lugar.</p>
+                <h3 className="text-blue-400 font-black text-[10px] uppercase tracking-[0.3em]">Perfil y Progreso</h3>
+                <p className="text-xl sm:text-2xl font-black text-white leading-tight">Gana experiencia <br/> y sube de nivel.</p>
               </div>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed text-justify">
-                Lleva el registro de todas tus reservas, asiste a tus partidos y obtén recompensas e insignias por tu fidelidad.
+                Acumula XP por cada partido, desbloquea logros, sube de rango y construye tu historial deportivo con estadísticas detalladas.
               </p>
             </div>
             <div className="absolute -right-8 -bottom-8 opacity-5 group-hover:opacity-10 transition-opacity hidden sm:block">
@@ -57,37 +55,37 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           {/* Pagos */}
           <div className="md:col-span-3 lg:col-span-4 lg:row-span-1 group p-8 rounded-[2rem] bg-emerald-500/10 border border-white/5 hover:border-emerald-500/30 transition-all duration-500 relative overflow-hidden">
             <div className="relative z-10">
-              <h3 className="text-emerald-400 font-black text-[10px] uppercase tracking-[0.3em] mb-1">Pagos Digitales</h3>
-              <p className="text-lg font-bold text-white mb-2">Pago Online</p>
-              <p className="text-xs text-slate-400 leading-tight">Realiza tus pagos de forma rápida y segura online a través de Transbank, o si lo prefieres, directamente en el recinto de forma presencial.</p>
+              <h3 className="text-emerald-400 font-black text-[10px] uppercase tracking-[0.3em] mb-1">Pago 100% Online</h3>
+              <p className="text-lg font-bold text-white mb-2">Webpay Plus</p>
+              <p className="text-xs text-slate-400 leading-tight">Todos los pagos se procesan con Transbank. Paga con débito, crédito o Redcompra de forma segura, sin contacto con efectivo.</p>
             </div>
           </div>
 
           {/* Estadísticas */}
           <div className="md:col-span-3 lg:col-span-4 lg:row-span-1 group p-8 rounded-[2rem] bg-orange-500/10 border border-white/5 hover:border-orange-500/30 transition-all duration-500 relative overflow-hidden">
             <div className="relative z-10">
-              <h3 className="text-orange-400 font-black text-[10px] uppercase tracking-[0.3em] mb-1">Tus Estadísticas</h3>
-              <p className="text-lg font-bold text-white mb-2">Monitorea tu actividad.</p>
-              <p className="text-xs text-slate-400 leading-tight">Sigue tu progreso, revisa cuántos partidos has jugado y analiza detalladamente tu asistencia a los recintos deportivos.</p>
+              <h3 className="text-orange-400 font-black text-[10px] uppercase tracking-[0.3em] mb-1">Estadísticas y Logros</h3>
+              <p className="text-lg font-bold text-white mb-2">Mide tu rendimiento.</p>
+              <p className="text-xs text-slate-400 leading-tight">Revisa tu progreso, partidos jugados, goles, asistencias y logros desbloqueados. Compara tu evolución mes a mes.</p>
             </div>
           </div>
 
           {/* Equipos */}
           <div className="md:col-span-2 lg:col-span-3 lg:row-span-1 group p-8 rounded-[2rem] bg-indigo-500/10 border border-white/5 hover:border-indigo-500/30 transition-all duration-500 flex flex-col justify-between gap-4">
-            <h3 className="text-indigo-400 font-black text-[10px] uppercase tracking-[0.3em]">Organiza tu Equipo</h3>
-            <p className="text-xs text-slate-400 leading-tight">Crea grupos con tus amigos, comunícate a través de la app y coordinen los pagos o asistencias fácilmente.</p>
+            <h3 className="text-indigo-400 font-black text-[10px] uppercase tracking-[0.3em]">Equipos y Chat</h3>
+            <p className="text-xs text-slate-400 leading-tight">Crea tu equipo, invita jugadores y coordina los partidos con el chat interno. Ideal para torneos y ligas.</p>
           </div>
 
           {/* Ficha / Carta de Jugador */}
           <div className="md:col-span-2 lg:col-span-3 lg:row-span-1 group p-8 rounded-[2rem] bg-sky-500/10 border border-white/5 hover:border-sky-500/30 transition-all duration-500 flex flex-col justify-between gap-4">
-            <h3 className="text-sky-400 font-black text-[10px] uppercase tracking-[0.3em]">Comparte tus logros</h3>
-            <p className="text-xs text-slate-400 leading-tight">Crea y descarga tu propia carta de jugador personalizada y compártela en redes sociales con tu grupo de amigos.</p>
+            <h3 className="text-sky-400 font-black text-[10px] uppercase tracking-[0.3em]">Carta de Jugador</h3>
+            <p className="text-xs text-slate-400 leading-tight">Descarga tu MVP Card personalizada con tu foto, nivel, estadísticas y logros para compartir en redes sociales.</p>
           </div>
 
-          {/* Historial */}
+          {/* Buscar Rival */}
           <div className="md:col-span-2 lg:col-span-3 lg:row-span-1 group p-8 rounded-[2rem] bg-purple-500/10 border border-white/5 hover:border-purple-500/30 transition-all duration-500 flex flex-col justify-between gap-4">
-            <h3 className="text-purple-400 font-black text-[10px] uppercase tracking-[0.3em]">Tus Partidos</h3>
-            <p className="text-xs text-slate-400 leading-tight">Revisa tus reservas confirmadas, mira tus resultados pasados y califica la calidad del recinto donde jugaste.</p>
+            <h3 className="text-purple-400 font-black text-[10px] uppercase tracking-[0.3em]">Buscar Rival</h3>
+            <p className="text-xs text-slate-400 leading-tight">Encuentra oponentes para tu deporte favorito. Reta a otros jugadores, organiza partidos y lleva el registro de tus enfrentamientos.</p>
           </div>
 
           {/* CTA CARD JUGADORES */}
@@ -116,4 +114,3 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
     </section>
   );
 }
-

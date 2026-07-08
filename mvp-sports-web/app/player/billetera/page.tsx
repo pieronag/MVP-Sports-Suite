@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ShieldCheck, Clock, CreditCard, Landmark, MapPin } from "lucide-react";
+import { ChevronLeft, ShieldCheck, Clock, CreditCard } from "lucide-react";
 import { usePlayer } from "@/context/PlayerContext";
 import { bookingService, Booking } from "@/services/player/bookingService";
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
@@ -67,9 +67,7 @@ export default function BilleteraPage() {
   }, [profile]);
 
   const onlinePayments = bookings.filter(b => onlineMethods.includes(b.paymentMethod || ''));
-  const venuePayments = bookings.filter(b => !onlineMethods.includes(b.paymentMethod || ''));
   const totalOnline = onlinePayments.reduce((s, b) => s + b.amount, 0);
-  const totalVenue = venuePayments.reduce((s, b) => s + b.amount, 0);
 
   if (loading) {
     return (
@@ -104,43 +102,31 @@ export default function BilleteraPage() {
           </div>
         </GlowCard>
 
-        <div className="flex gap-3">
-          <GlowCard isDark={isDark} className="flex-1">
-            <div className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-[14px] flex items-center justify-center bg-emerald-500/10"><CreditCard size={14} className="text-emerald-500" /></div>
-                <span className={`text-[8px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Online</span>
+        <GlowCard isDark={isDark}>
+          <div className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-[14px] flex items-center justify-center bg-emerald-500/10"><CreditCard size={20} className="text-emerald-500" /></div>
+              <div>
+                <span className={`text-[8px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Pagos Online</span>
+                <p className={`text-xl font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{formatMoney(totalOnline)}</p>
               </div>
-              <p className={`text-lg font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{formatMoney(totalOnline)}</p>
-              <p className={`text-[7px] font-medium mt-0.5 ${isDark ? "text-slate-600" : "text-slate-400"}`}>TOTAL TRANSACCIONADO</p>
             </div>
-          </GlowCard>
-          <GlowCard isDark={isDark} className="flex-1">
-            <div className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-[14px] flex items-center justify-center bg-blue-500/10"><MapPin size={14} className="text-blue-500" /></div>
-                <span className={`text-[8px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Recinto</span>
-              </div>
-              <p className={`text-lg font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{formatMoney(totalVenue)}</p>
-              <p className={`text-[7px] font-medium mt-0.5 ${isDark ? "text-slate-600" : "text-slate-400"}`}>TOTAL POR RENDIR</p>
-            </div>
-          </GlowCard>
-        </div>
+          </div>
+        </GlowCard>
 
         <SectionPill label="Movimientos" />
         <GlowCard isDark={isDark}>
-          {bookings.length > 0 ? (
+          {onlinePayments.length > 0 ? (
             <div className="divide-y divide-emerald-500/5">
-              {bookings.map((b) => {
-                const isOnline = onlineMethods.includes(b.paymentMethod || '');
+              {onlinePayments.map((b) => {
                 const isNoShow = b.status === 'no-show' || b.paymentStatus === 'no-show' || b.noShow === true;
-                const badgeColor = isNoShow ? '#f43f5e' : isOnline ? '#10b981' : '#3b82f6';
-                const badgeBg = isNoShow ? '#f43f5e15' : isOnline ? '#10b98115' : '#3b82f615';
-                const badgeLabel = isNoShow ? 'RETENIDO' : isOnline ? 'ONLINE' : 'RECINTO';
+                const badgeColor = isNoShow ? '#f43f5e' : '#10b981';
+                const badgeBg = isNoShow ? '#f43f5e15' : '#10b98115';
+                const badgeLabel = isNoShow ? 'RETENIDO' : 'ONLINE';
                 return (
                   <div key={b.id} className="flex items-center gap-4 px-5 py-4">
                     <div className="w-10 h-10 rounded-[14px] flex items-center justify-center shrink-0" style={{ backgroundColor: badgeBg }}>
-                      {isNoShow || isOnline ? <CreditCard size={18} style={{ color: badgeColor }} /> : <Landmark size={18} style={{ color: badgeColor }} />}
+                      <CreditCard size={18} style={{ color: badgeColor }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm font-medium truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{b.tenantName || 'Reserva'}</p>
