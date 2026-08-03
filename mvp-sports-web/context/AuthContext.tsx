@@ -62,6 +62,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               foundUser = profileDoc.data();
             }
           }
+          // Normalizar rol a minúsculas para que coincida con las reglas de
+          // Firestore y la UI, sin importar la forma en que esté guardado (ej: "SuperAdmin").
+          if (foundRole && typeof foundRole === "string") {
+            foundRole = foundRole.trim().toLowerCase() as UserRole;
+          }
           setRole(foundRole);
           setFirestoreUser(foundUser);
         } catch (error: any) {

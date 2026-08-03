@@ -1,7 +1,7 @@
 ﻿"use client";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { db } from '@/services/firebase';
+import { db, auth } from '@/services/firebase';
 import { updateStaffPassword } from './actions';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
@@ -348,7 +348,8 @@ export default function StaffPage() {
 
     const handleUpdatePassword = async (newPassword: string) => {
         if (!passwordModal.member?.uid) return;
-        const res = await updateStaffPassword(passwordModal.member.uid, newPassword);
+        const idToken = await auth.currentUser?.getIdToken();
+        const res = await updateStaffPassword(passwordModal.member.uid, newPassword, idToken || '');
         if (res.success) { 
             notify("Clave actualizada", "success"); 
             setPasswordModal({ isOpen: false, member: null }); 

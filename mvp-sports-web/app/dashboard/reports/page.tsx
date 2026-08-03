@@ -152,7 +152,7 @@ export default function Page() {
         severity: selectedTicket.priority === 'Crítica' ? 'HIGH' : 'LOW',
         status: 'SUCCESS',
         actor: operatorName,
-        role: role || 'admin',
+        role: role || 'sin-rol',
         email: user?.email || 'anonimo@mvpsports.cl'
       });
 

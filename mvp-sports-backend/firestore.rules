@@ -11,21 +11,29 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // La FUENTE DE VERDAD del rol es Firestore (users/profiles/staff).
+    // El custom claim del token solo se usa como respaldo si no existe documento de rol.
+    // Motivo: owners/api y promociones escriben el rol en Firestore; si el token tiene un
+    // custom claim viejo (ej: 'owner'), este primaba sobre el rol real y bloqueaba acciones admin.
     function getRole() {
       let uid = request.auth.uid;
       let userDoc = /databases/$(database)/documents/users/$(uid);
       let profileDoc = /databases/$(database)/documents/profiles/$(uid);
       let staffDoc = /databases/$(database)/documents/staff/$(uid);
 
-      return request.auth.token.role != null 
-        ? request.auth.token.role 
-        : exists(userDoc) 
-          ? get(userDoc).data.role 
-          : exists(profileDoc) 
-            ? get(profileDoc).data.role 
-            : exists(staffDoc)
-              ? get(staffDoc).data.role
-              : null;
+      let firestoreRole = exists(userDoc)
+        ? get(userDoc).data.role
+        : exists(profileDoc)
+          ? get(profileDoc).data.role
+          : exists(staffDoc)
+            ? get(staffDoc).data.role
+            : null;
+
+      return firestoreRole != null
+        ? firestoreRole
+        : request.auth.token.role != null
+          ? request.auth.token.role
+          : null;
     }
 
     function isSuperAdmin() {

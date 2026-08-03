@@ -27,7 +27,7 @@ import {
     MapPinIcon
 } from '@heroicons/react/24/outline';
 import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, query, where, orderBy, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { db, auth } from '@/services/firebase';
 import { PanelGlass, TarjetaKpi, BotonAccion } from '@/components/ui/DashboardWidgets';
 
 // --- INTERFACES ---
@@ -141,7 +141,7 @@ export default function Page() {
         if (!ownerToDelete) return;
         setIsDeleting(true);
         try {
-            await fetch('/dashboard/owners/api', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'delete', uid: ownerToDelete.id }) });
+            await fetch('/dashboard/owners/api', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${await auth.currentUser?.getIdToken()}` }, body: JSON.stringify({ action: 'delete', uid: ownerToDelete.id }) });
             await deleteDoc(doc(db, "users", ownerToDelete.id));
             setOwners(prev => prev.filter(o => o.id !== ownerToDelete.id));
             setOwnerToDelete(null); addToast("Dueño y cuenta eliminados correctamente", 'success');
@@ -169,7 +169,7 @@ export default function Page() {
                 addToast("Actualizado", 'success'); handleCloseModal();
             } else {
                 if (!newOwner.password || newOwner.password.length < 6) throw new Error("Mínimo 6 caracteres.");
-                const response = await fetch('/dashboard/owners/api', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create', email: newOwner.email, password: newOwner.password, displayName: newOwner.name, role: 'owner' }) });
+                const response = await fetch('/dashboard/owners/api', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${await auth.currentUser?.getIdToken()}` }, body: JSON.stringify({ action: 'create', email: newOwner.email, password: newOwner.password, displayName: newOwner.name, role: 'owner' }) });
                 const result = await response.json();
                 if (!response.ok) throw new Error(result.error);
                 await setDoc(doc(db, "users", result.uid), { ...ownerData, status: 'active', createdAt: serverTimestamp(), paymentHistory: [] });
@@ -187,7 +187,7 @@ export default function Page() {
         try {
             const res = await fetch('/dashboard/owners/api', { 
                 method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${await auth.currentUser?.getIdToken()}` }, 
                 body: JSON.stringify({ action: 'updatePassword', uid: passwordOwnerId, password: manualPassword }) 
             });
             const data = await res.json();

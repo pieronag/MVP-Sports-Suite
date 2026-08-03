@@ -1,8 +1,16 @@
 import { NextResponse } from 'next/server';
 import { adminAuth as getAdminAuth } from '@/services/firebase-admin';
+import { isSuperAdminCaller } from '@/services/server-auth';
 
 export async function POST(request: Request) {
   try {
+    // Protección: solo administradores del sistema (admin/superadmin) pueden
+    // crear usuarios, cambiar contraseñas o eliminar cuentas.
+    const caller = await isSuperAdminCaller(request);
+    if (!caller) {
+      return NextResponse.json({ error: 'No autorizado.' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { action, email, password, uid, displayName, role } = body;
 
@@ -19,7 +27,8 @@ export async function POST(request: Request) {
         emailVerified: true,
       });
 
-      // Asignar rol 'owner'
+      // Asignar rol 'owner'. El claim del token queda como respaldo; la fuente
+      // de verdad del rol es el documento en Firestore (ver firestore.rules).
       await getAdminAuth().setCustomUserClaims(userRecord.uid, { role: role || 'owner' });
 
       return NextResponse.json({ 

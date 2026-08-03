@@ -78,7 +78,11 @@ export default function TenantSettingsPage() {
             }
 
             const userDoc = await getDoc(doc(db, "users", user.uid));
-            const role = userDoc.exists() ? (userDoc.data().role || '').toLowerCase() : '';
+            let role = userDoc.exists() ? (userDoc.data().role || '').toLowerCase() : '';
+            if (!role) {
+                const profileDoc = await getDoc(doc(db, "profiles", user.uid));
+                if (profileDoc.exists()) role = (profileDoc.data().role || '').toLowerCase();
+            }
             const isAdmin = ['admin', 'superadmin'].includes(role);
 
             let q;

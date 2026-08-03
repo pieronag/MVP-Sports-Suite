@@ -441,9 +441,10 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
 
       // Enviar correo electrónico confirmando el registro de manera asíncrona
       try {
+        const idToken = await auth.currentUser?.getIdToken();
         await fetch("/api/send-email", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken || ""}` },
           body: JSON.stringify({
             name: formData.displayName,
             email: formData.email,

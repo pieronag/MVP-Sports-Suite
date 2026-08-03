@@ -80,7 +80,7 @@ export default function SettingsPage() {
     const [modal, setModal] = useState<ModalConfig>({ show: false, title: '', message: '', type: 'confirm' });
 
     const actorName = firestoreUser?.fullName || user?.displayName || user?.email || 'Admin Sistema';
-    const actorRole = userRole || 'superadmin';
+    const actorRole = userRole || 'sin-rol';
     const actorEmail = user?.email || 'admin@mvpsports.cl';
 
     const showModal = (config: Partial<ModalConfig>) => setModal({ show: true, title: config.title || 'Atención', message: config.message || '', type: config.type || 'confirm', onConfirm: config.onConfirm, onCancel: () => setModal(prev => ({ ...prev, show: false })) });
