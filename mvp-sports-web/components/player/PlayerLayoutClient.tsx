@@ -106,14 +106,14 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
                         const a = isActive(tab.href);
                         return (
                             <Link key={tab.href} href={tab.href} aria-current={a ? 'page' : undefined}
-                                className={`flex flex-col items-center justify-center gap-1 text-[11px] font-bold uppercase tracking-wider ${a ? (isDark ? 'text-[#00df82]' : 'text-emerald-600') : 'text-slate-400'}`}>
-                                <tab.icon size={20} /> {tab.label}
+                                className={`flex flex-col items-center justify-center gap-1 text-[10px] font-semibold ${a ? (isDark ? 'text-[#00df82]' : 'text-emerald-600') : 'text-slate-400'}`}>
+                                <tab.icon size={22} /> {tab.label}
                             </Link>
                         );
                     })}
                     <button onClick={() => setMobileOpen(true)} aria-label="Abrir menú"
-                        className="flex flex-col items-center justify-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                        <Menu size={20} /> Más
+                        className="flex flex-col items-center justify-center gap-1 text-[10px] font-semibold text-slate-400">
+                        <Menu size={22} /> Más
                     </button>
                 </div>
             </nav>}

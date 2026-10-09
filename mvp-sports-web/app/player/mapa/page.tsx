@@ -153,7 +153,7 @@ export default function MapaPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.12em] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -216,7 +216,7 @@ export default function MapaPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 to-transparent" />
                     <div className="absolute top-4 left-4 flex flex-wrap gap-1.5">
                       {ds.slice(0, 3).map((s: string) => (
-                        <span key={s} className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold tracking-wider uppercase">{s}</span>
+                        <span key={s} className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold tracking-wide uppercase">{s}</span>
                       ))}
                       {ds.length > 3 && <span className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold">+{ds.length - 3}</span>}
                     </div>

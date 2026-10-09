@@ -129,7 +129,7 @@ export default function PlayerDashboard() {
                         : "bg-slate-100 text-slate-900 border-slate-200"
                     }`}
                   >
-                    {ovr} VALORACIÓN
+                    {ovr} OVR
                   </span>
                 </div>
 
@@ -148,7 +148,7 @@ export default function PlayerDashboard() {
         <div className="px-5 mt-8">
           <div className="flex items-center gap-3 mb-5">
             <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-            <span className="text-emerald-400 font-semibold text-[12px] tracking-[0.12em] uppercase">Acceso Rápido</span>
+            <span className="text-emerald-400 font-semibold text-[12px] tracking-[0.06em] uppercase">Acceso Rápido</span>
             <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
           </div>
 
@@ -168,7 +168,7 @@ export default function PlayerDashboard() {
                 >
                   <item.icon size={26} color={item.color} strokeWidth={1.5} />
                 </div>
-                <span className={`text-[11px] font-semibold uppercase tracking-[0.5px] text-center leading-tight ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                <span className={`text-[10px] font-medium text-center leading-tight whitespace-nowrap ${isDark ? "text-slate-300" : "text-slate-600"}`}>
                   {item.label}
                 </span>
               </Link>
@@ -180,7 +180,7 @@ export default function PlayerDashboard() {
         <div className="px-5 mt-8">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-            <span className="text-emerald-400 font-semibold text-[12px] tracking-[0.12em] uppercase">Tu Carta MVP</span>
+            <span className="text-emerald-400 font-semibold text-[12px] tracking-[0.06em] uppercase">Tu Carta MVP</span>
             <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
           </div>
 
@@ -210,14 +210,14 @@ export default function PlayerDashboard() {
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center gap-1.5">
                       <div className={`w-1.5 h-1.5 rounded-full ${isDark ? "bg-emerald-500" : "bg-emerald-600"}`} />
-                      <span className={`font-semibold text-[11px] tracking-[2px] uppercase ${isDark ? "text-emerald-400/80" : "text-emerald-600/80"}`}>VALORACIÓN MVP 2026</span>
+                      <span className={`font-semibold text-[11px] tracking-[0.06em] uppercase whitespace-nowrap ${isDark ? "text-emerald-400/80" : "text-emerald-600/80"}`}>Carta MVP 2026</span>
                     </div>
                     <p className={`text-[20px] font-semibold -tracking-[0.5px] ${isDark ? "text-white" : "text-slate-900"}`}>
                       {userName}
                     </p>
 
                     <p className={`text-[12px] font-medium leading-snug mt-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                      Genera y comparte tu carta de valoración oficial con <br />tu rendimiento, logros y estadísticas de la temporada.
+                      Genera y comparte tu carta con tu rendimiento, logros y estadísticas de la temporada.
                     </p>
                   </div>
                 </div>

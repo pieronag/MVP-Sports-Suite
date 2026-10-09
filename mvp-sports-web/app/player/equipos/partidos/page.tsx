@@ -264,7 +264,7 @@ export default function PartidosPage() {
           { id: "mis" as const, label: "Mis Chats", icon: MessageCircle },
         ].map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 h-10 rounded-md text-[11px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 ${activeTab === tab.id ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/25" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+            className={`flex-1 h-10 rounded-md text-[11px] font-semibold uppercase tracking-wide transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 ${activeTab === tab.id ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/25" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
             <tab.icon size={14} /> {tab.label}
           </button>
         ))}
@@ -331,7 +331,7 @@ export default function PartidosPage() {
           <>
             <div className="flex gap-2">
               <button onClick={() => setShowPublishTeam(true)}
-                className="flex-1 h-[52px] rounded-md font-semibold text-[12px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                className="flex-1 h-[52px] rounded-md font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                 style={{ backgroundColor: "#10b981", color: "white" }}>
                 <Swords size={16} /> Publicar mi Equipo
               </button>
@@ -359,7 +359,7 @@ export default function PartidosPage() {
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                           <div className="absolute bottom-3 left-4 right-4">
                             <div className="flex items-center gap-2">
-                              <span className="bg-emerald-500 px-2 py-0.5 rounded-md text-white font-semibold text-[11px] uppercase tracking-wider">{entry.sport.toUpperCase()}</span>
+                              <span className="bg-emerald-500 px-2 py-0.5 rounded-md text-white font-semibold text-[11px] uppercase tracking-wide">{entry.sport.toUpperCase()}</span>
                               <span className="bg-black/40 px-2 py-0.5 rounded-md text-white/80 text-[11px] font-medium">{entry.memberCount} jugadores</span>
                             </div>
                           </div>
@@ -377,7 +377,7 @@ export default function PartidosPage() {
                               </div>
                             </div>
                             <button onClick={async () => { setShowTeamDetail(entry); setTeamDetailData(null); try { const team = await teamService.getTeamById(entry.teamId!); if (team) { const p = await teamService.getMemberProfiles(team.members); setTeamDetailData({ team, profiles: p }); } } catch {} }}
-                              className={`px-4 h-9 rounded-md text-[11px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] shrink-0 ml-2 ${alreadyChallenged ? (isDark ? "bg-white/[0.06] text-slate-500" : "bg-slate-100 text-slate-400") : "bg-emerald-500 text-white"}`}>
+                              className={`px-4 h-9 rounded-md text-[11px] font-semibold uppercase tracking-wide transition-all active:scale-[0.98] shrink-0 ml-2 ${alreadyChallenged ? (isDark ? "bg-white/[0.06] text-slate-500" : "bg-slate-100 text-slate-400") : "bg-emerald-500 text-white"}`}>
                               {alreadyChallenged ? "Retado" : "Ver"}
                             </button>
                           </div>
@@ -396,7 +396,7 @@ export default function PartidosPage() {
         {activeTab === "jugadores" && (
           <>
             <button onClick={() => setShowPublishPlayer(true)}
-              className="w-full h-[52px] rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+              className="w-full h-[52px] rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
               <User size={16} /> Estoy Disponible
             </button>
 
@@ -441,7 +441,7 @@ export default function PartidosPage() {
                           </div>
                         </div>
                         <button onClick={() => setShowPlayerDetail(entry)} disabled={alreadyContacted}
-                          className={`w-full mt-3 h-10 rounded-md text-[11px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${alreadyContacted ? (isDark ? "bg-white/[0.06] text-slate-500 border border-white/[0.06]" : "bg-slate-100 text-slate-400 border border-slate-200") : "bg-emerald-500 text-white shadow-sm shadow-emerald-500/25"}`}>
+                          className={`w-full mt-3 h-10 rounded-md text-[11px] font-semibold uppercase tracking-wide transition-all active:scale-[0.98] ${alreadyContacted ? (isDark ? "bg-white/[0.06] text-slate-500 border border-white/[0.06]" : "bg-slate-100 text-slate-400 border border-slate-200") : "bg-emerald-500 text-white shadow-sm shadow-emerald-500/25"}`}>
                           {alreadyContacted ? "Contactado" : "Ver"}
                         </button>
                       </div>
@@ -520,13 +520,13 @@ export default function PartidosPage() {
                               </div>
                               {(c.status === "pending" || c.status === "active") && c.type === "team_vs_team" && (
                                 <button onClick={async () => { setShowChallengeDetail(c); setChallengeTeamData(null); try { const teamId = c.senderId === uid ? c.challengedTeamId : c.challengerTeamId; const team = teamId ? await teamService.getTeamById(teamId) : null; if (team) { const p = await teamService.getMemberProfiles(team.members); setChallengeTeamData({ team, profiles: p }); } } catch {} }}
-                                  className={`px-3 h-9 rounded-md text-[11px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>
+                                  className={`px-3 h-9 rounded-md text-[11px] font-semibold uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>
                                   Ver equipo
                                 </button>
                               )}
                               {c.status === "active" && (
                                 <button onClick={() => router.push(`/player/equipos/partidos/chat?id=${c.id}`)}
-                                  className="px-4 h-9 rounded-md bg-emerald-500 text-white text-[11px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98]">
+                                  className="px-4 h-9 rounded-md bg-emerald-500 text-white text-[11px] font-semibold uppercase tracking-wide transition-all active:scale-[0.98]">
                                   Chat
                                 </button>
                               )}
@@ -559,7 +559,7 @@ export default function PartidosPage() {
               <button aria-label="Cerrar" onClick={() => setShowPublishTeam(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
             </div>
             <div className="mb-4">
-              <label className={`text-[11px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipo</label>
+              <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipo</label>
               {availableTeams.length === 0 ? (
                 <div className={`w-full h-11 rounded-md flex items-center px-4 text-sm font-medium border ${isDark ? "bg-white/[0.04] text-slate-500 border-white/[0.06]" : "bg-slate-50 text-slate-400 border-slate-200"}`}>
                   {userTeams.length === 0 ? "No tienes equipos. Crea uno primero." : "Todos tus equipos ya están publicados"}
@@ -576,7 +576,7 @@ export default function PartidosPage() {
               )}
             </div>
             <div className="mb-4">
-              <label className={`text-[11px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
+              <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
               <div className="relative">
                 <select value={publishSport} onChange={e => setPublishSport(e.target.value)}
                   className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-900 border-slate-200/60"} backdrop-blur-xl`}
@@ -586,12 +586,12 @@ export default function PartidosPage() {
               </div>
             </div>
             <div className="mb-4">
-              <label className={`text-[11px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción (opcional)</label>
+              <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción (opcional)</label>
               <input value={publishDesc} onChange={e => setPublishDesc(e.target.value)} placeholder="Ej: Buscamos rival para este sábado"
                 className={`w-full h-11 rounded-md px-3 text-sm font-medium outline-none border ${isDark ? "bg-white/[0.06] text-slate-200 border-white/[0.06] placeholder-slate-500" : "bg-slate-50 text-slate-900 border-slate-200 placeholder-slate-400"}`} />
             </div>
             <div className="mb-4">
-              <label className={`text-[11px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Región</label>
+              <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Región</label>
               <div className="relative">
                 <select value={publishRegion} onChange={e => { setPublishRegion(e.target.value); setPublishCommunes([]); }}
                   className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-900 border-slate-200/60"} backdrop-blur-xl`}
@@ -603,7 +603,7 @@ export default function PartidosPage() {
             </div>
             {publishRegion && (
               <div className="mb-4">
-                <label className={`text-[11px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Comunas donde juegan</label>
+                <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Comunas donde juegan</label>
                 <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto">
                   {(REGIONS[publishRegion] || []).map(c => {
                     const selected = publishCommunes.includes(c);
@@ -644,7 +644,7 @@ export default function PartidosPage() {
               </div>
             </div>
             <div className="mb-4">
-              <label className={`text-[11px] font-semibold uppercase tracking-wider mb-2 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deportes</label>
+              <label className={`text-[11px] font-semibold uppercase tracking-wide mb-2 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deportes</label>
               <div className="flex flex-wrap gap-2">
                 {SPORTS.map(s => (
                   <button key={s} onClick={() => toggleSport(s)}
@@ -653,7 +653,7 @@ export default function PartidosPage() {
               </div>
             </div>
             <div className="mb-4">
-              <label className={`text-[11px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Región</label>
+              <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Región</label>
               <div className="relative">
                 <select value={publishRegion} onChange={e => { setPublishRegion(e.target.value); setPublishCommunes([]); }}
                   className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-900 border-slate-200/60"} backdrop-blur-xl`}
@@ -665,7 +665,7 @@ export default function PartidosPage() {
             </div>
             {publishRegion && (
               <div className="mb-4">
-                <label className={`text-[11px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Comunas donde juegan</label>
+                <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Comunas donde juegan</label>
                 <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto">
                   {(REGIONS[publishRegion] || []).map(c => {
                     const selected = publishCommunes.includes(c);
@@ -679,7 +679,7 @@ export default function PartidosPage() {
               </div>
             )}
             <div className="mb-4">
-              <label className={`text-[11px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Comentario (opcional)</label>
+              <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Comentario (opcional)</label>
               <input value={publishDesc} onChange={e => setPublishDesc(e.target.value)} placeholder="Ej: Busco partidos los fines de semana"
                 className={`w-full h-11 rounded-md px-3 text-sm font-medium outline-none border ${isDark ? "bg-white/[0.06] text-slate-200 border-white/[0.06] placeholder-slate-500" : "bg-slate-50 text-slate-900 border-slate-200 placeholder-slate-400"}`} />
             </div>
@@ -755,7 +755,7 @@ export default function PartidosPage() {
                     <span className={`text-[13px] font-semibold ${isDark ? "text-slate-200" : "text-slate-800"}`}>{challengeTeamData.team.members.length}</span>
                   </div>
                   <div className="space-y-1.5">
-                    <p className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>JUGADORES</p>
+                    <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>JUGADORES</p>
                     <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
                       {challengeTeamData.team.members.map((mid: string) => {
                         const p = challengeTeamData.profiles[mid] || {};
@@ -780,9 +780,9 @@ export default function PartidosPage() {
               {showChallengeDetail.status === "pending" && showChallengeDetail.receiverId === uid && (
                 <div className="flex gap-3 pt-2">
                   <button onClick={() => setConfirmAction({ challengeId: showChallengeDetail.id, action: "accept" })}
-                    className="flex-1 h-11 rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wider transition-all active:scale-[0.98] shadow-sm shadow-emerald-500/25">Aceptar</button>
+                    className="flex-1 h-11 rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wide transition-all active:scale-[0.98] shadow-sm shadow-emerald-500/25">Aceptar</button>
                   <button onClick={() => setConfirmAction({ challengeId: showChallengeDetail.id, action: "decline" })}
-                    className="flex-1 h-11 rounded-md bg-red-500 text-white font-semibold text-[12px] uppercase tracking-wider transition-all active:scale-[0.98]">Rechazar</button>
+                    className="flex-1 h-11 rounded-md bg-red-500 text-white font-semibold text-[12px] uppercase tracking-wide transition-all active:scale-[0.98]">Rechazar</button>
                 </div>
               )}
             </div>
@@ -855,7 +855,7 @@ export default function PartidosPage() {
                     const ownerName = ownerProfile?.displayName || "Capitán";
                     return (
                       <div className="space-y-1.5">
-                        <p className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>CAPITÁN</p>
+                        <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>CAPITÁN</p>
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-md overflow-hidden shrink-0" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
                             {ownerProfile?.photoURL ? <img src={ownerProfile.photoURL} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
@@ -878,7 +878,7 @@ export default function PartidosPage() {
                   })()}
                   {/* Member list */}
                   <div className="space-y-1.5">
-                    <p className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>JUGADORES ({teamDetailData.team.members.length})</p>
+                    <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>JUGADORES ({teamDetailData.team.members.length})</p>
                     <div className="space-y-1.5 max-h-[180px] overflow-y-auto">
                       {teamDetailData.team.members.map((mid: string) => {
                         const p = teamDetailData.profiles[mid] || {};
@@ -903,7 +903,7 @@ export default function PartidosPage() {
                 <div className="flex justify-center py-4"><div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
               )}
               <button onClick={() => { if (!teamDetailData) return; const e = showTeamDetail; setShowTeamDetail(null); setTeamDetailData(null); handleChallenge(e); }} disabled={actionLoading || !teamDetailData}
-                className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50">
+                className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50">
                 {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><Swords size={16} /> Retar a este equipo</>}
               </button>
             </div>
@@ -935,7 +935,7 @@ export default function PartidosPage() {
               {/* Detail rows */}
               {showPlayerDetail.sports && showPlayerDetail.sports.length > 0 && (
                 <div className="space-y-1.5">
-                  <p className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>DEPORTES</p>
+                  <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>DEPORTES</p>
                   <div className="flex flex-wrap gap-1.5">
                     {showPlayerDetail.sports.map(s => <span key={s} className={`text-[12px] font-medium px-2.5 py-1 rounded-md ${isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>{s}</span>)}
                   </div>
@@ -943,7 +943,7 @@ export default function PartidosPage() {
               )}
               {((showPlayerDetail.communes && showPlayerDetail.communes.length > 0) || showPlayerDetail.region) && (
                 <div className="space-y-1.5">
-                  <p className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>UBICACIÓN</p>
+                  <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>UBICACIÓN</p>
                   <div className="flex items-center gap-2">
                     <MapPin size={14} className="text-emerald-500 shrink-0" />
                     <span className={`text-[12px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>{showPlayerDetail.communes?.slice(0, 2).join(", ")} · {showPlayerDetail.region}</span>
@@ -952,12 +952,12 @@ export default function PartidosPage() {
               )}
               {showPlayerDetail.description && (
                 <div className="space-y-1.5">
-                  <p className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>COMENTARIO</p>
+                  <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>COMENTARIO</p>
                   <p className={`text-[12px] font-medium leading-snug ${isDark ? "text-slate-400" : "text-slate-500"}`}>{showPlayerDetail.description}</p>
                 </div>
               )}
               <button onClick={() => { const e = showPlayerDetail; setShowPlayerDetail(null); handleContact(e); }} disabled={actionLoading}
-                className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50">
+                className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50">
                 {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><MessageCircle size={16} /> Contactar Jugador</>}
               </button>
             </div>
@@ -980,7 +980,7 @@ export default function PartidosPage() {
             {/* Edit Sport for team */}
             {editEntry.type === "team" && (
               <div className="mb-4">
-                <label className={`text-[11px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
+                <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
                 <div className="relative">
                   <select value={editSport} onChange={e => setEditSport(e.target.value)}
                     className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-900 border-slate-200/60"} backdrop-blur-xl`}
@@ -993,7 +993,7 @@ export default function PartidosPage() {
             {/* Edit Sports for player */}
             {editEntry.type === "player" && (
               <div className="mb-4">
-                <label className={`text-[11px] font-semibold uppercase tracking-wider mb-2 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deportes</label>
+                <label className={`text-[11px] font-semibold uppercase tracking-wide mb-2 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deportes</label>
                 <div className="flex flex-wrap gap-2">
                   {SPORTS.map(s => (
                     <button key={s} onClick={() => setEditSports(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])}
@@ -1003,7 +1003,7 @@ export default function PartidosPage() {
               </div>
             )}
             <div className="mb-5">
-              <label className={`text-[11px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción</label>
+              <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción</label>
               <input value={editDesc} onChange={e => setEditDesc(e.target.value)} placeholder="Descripción de tu publicación"
                 className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06] placeholder-slate-500" : "bg-white/80 text-slate-900 border-slate-200/60 placeholder-slate-400"} backdrop-blur-xl`} />
             </div>

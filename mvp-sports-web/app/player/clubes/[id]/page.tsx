@@ -282,7 +282,7 @@ export default function VenueDetailPage() {
   const renderSportSelection = () => (
     <GlowCard isDark={isDark}>
       <div className="p-5">
-        <p className={`text-[12px] font-semibold uppercase tracking-wider mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige un deporte</p>
+        <p className={`text-[12px] font-semibold uppercase tracking-wide mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige un deporte</p>
         <div className="flex flex-wrap gap-3">
           {availableSports.map((sport: string) => {
             const info = getSportInfo(sport);
@@ -312,7 +312,7 @@ export default function VenueDetailPage() {
       <div className="p-5">
         <div className="flex items-center justify-between mb-4">
           {renderBackButton()}
-          <p className={`text-[12px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cancha y horario</p>
+          <p className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cancha y horario</p>
           <div className="w-12" />
         </div>
         {/* Selected date info */}
@@ -356,7 +356,7 @@ export default function VenueDetailPage() {
                       {courtData?.features && courtData.features.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1">
                           {courtData.features.slice(0, 4).map((f: string) => (
-                            <span key={f} className={`text-[11px] font-semibold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>{f}</span>
+                            <span key={f} className={`text-[11px] font-semibold px-1.5 py-0.5 rounded-md uppercase tracking-wide ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>{f}</span>
                           ))}
                           {courtData.features.length > 4 && <span className="text-[11px] text-slate-500">+{courtData.features.length - 4}</span>}
                         </div>
@@ -367,7 +367,7 @@ export default function VenueDetailPage() {
                   {/* Time slots for selected court */}
                   {isSelected && (
                     <div className={`mt-3 p-4 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
-                      <p className={`text-[11px] font-semibold uppercase tracking-wider mb-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Horarios disponibles ({currentDayHours})</p>
+                      <p className={`text-[11px] font-semibold uppercase tracking-wide mb-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Horarios disponibles ({currentDayHours})</p>
                       {loadingSlots ? (
                         <div className="flex justify-center py-4"><div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
                       ) : availableSlots.length === 0 ? (
@@ -380,7 +380,7 @@ export default function VenueDetailPage() {
                             const labels = { mañana: "Mañana (6-12)", tarde: "Tarde (12-18)", noche: "Noche (18-24)" };
                             return (
                               <div key={period}>
-                                <p className={`text-[11px] font-semibold uppercase tracking-wider mb-1.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{labels[period]}</p>
+                                <p className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{labels[period]}</p>
                                 <div className="flex flex-wrap gap-2">
                                   {slots.map(s => {
                                     const [h] = s.split(":").map(Number);
@@ -403,7 +403,7 @@ export default function VenueDetailPage() {
                       {selectedTime && (
                         <div className="mt-4">
                           <button onClick={() => setBookingStep(4)}
-                            className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                            className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
                             Continuar <ChevronRight size={16} />
                           </button>
                         </div>
@@ -452,7 +452,7 @@ export default function VenueDetailPage() {
       <div className="p-5">
         <div className="flex items-center justify-between mb-5">
           {renderBackButton()}
-          <p className={`text-[12px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige el día</p>
+          <p className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige el día</p>
           <div className="w-12" />
         </div>
         {/* Date selector card */}
@@ -464,7 +464,7 @@ export default function VenueDetailPage() {
             </button>
             <div className="flex flex-col items-center">
               <span className={`text-2xl font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{currentDateInfo.date.getDate()}</span>
-              <span className={`text-[12px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-400" : "text-slate-500"}`}>{currentDateInfo.date.toLocaleDateString("es-CL", { month: "long" })}</span>
+              <span className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-400" : "text-slate-500"}`}>{currentDateInfo.date.toLocaleDateString("es-CL", { month: "long" })}</span>
               <span className={`text-[12px] font-bold mt-0.5 ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>{dateLabel} • {dateDayName}</span>
             </div>
             <button aria-label="Siguiente" onClick={() => { setDateOffset(p => p + 1); }}
@@ -509,7 +509,7 @@ export default function VenueDetailPage() {
           </p>
         </div>
         <button onClick={() => setBookingStep(3)}
-          className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+          className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
           Ver canchas disponibles <ChevronRight size={16} />
         </button>
       </div>
@@ -527,7 +527,7 @@ export default function VenueDetailPage() {
         <div className="p-5">
           <div className="flex items-center justify-between mb-5">
             {renderBackButton()}
-            <p className={`text-[12px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Reserva</p>
+            <p className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Reserva</p>
             <div className="w-12" />
           </div>
           <div className="space-y-0 divide-y divide-emerald-500/5">
@@ -572,7 +572,7 @@ export default function VenueDetailPage() {
               </div>
             </div>
           </div>
-          <button onClick={handleConfirmBooking} className="w-full mt-5 h-14 rounded-md bg-emerald-500 text-white font-semibold text-base uppercase tracking-wider flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
+          <button onClick={handleConfirmBooking} className="w-full mt-5 h-14 rounded-md bg-emerald-500 text-white font-semibold text-base uppercase tracking-wide flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
             <Zap size={20} /> Confirmar y Reservar
           </button>
         </div>
@@ -584,7 +584,7 @@ export default function VenueDetailPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.12em] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -659,7 +659,7 @@ export default function VenueDetailPage() {
               {venueData?.isMercadopagoActive && (
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
                   <CreditCard size={11} className="text-emerald-500" />
-                  <span className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-600"}`}>Mercado Pago</span>
+                  <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-300" : "text-slate-600"}`}>Mercado Pago</span>
                 </div>
               )}
             </div>
@@ -736,7 +736,7 @@ export default function VenueDetailPage() {
           <GlowCard isDark={isDark}>
             <div className="py-8 flex flex-col items-center">
               <Star size={28} className={isDark ? "text-slate-600" : "text-slate-300"} />
-              <p className={`text-[12px] font-semibold uppercase tracking-wider mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin reseñas por el momento</p>
+              <p className={`text-[12px] font-semibold uppercase tracking-wide mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin reseñas por el momento</p>
             </div>
           </GlowCard>
         )}
@@ -744,7 +744,7 @@ export default function VenueDetailPage() {
         {/* Rules button */}
         {(venueData?.rules?.length > 0 || venueData?.cancellationPolicy) && (
           <button onClick={() => setShowRules(true)}
-            className="w-full h-[44px] rounded-md font-semibold text-[12px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] border"
+            className="w-full h-[44px] rounded-md font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] border"
             style={{ borderColor: isDark ? "rgba(255,255,255,0.08)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC", color: isDark ? "#94A3B8" : "#64748B" }}>
             <Ban size={14} /> Reglas del Recinto
           </button>
@@ -786,7 +786,7 @@ export default function VenueDetailPage() {
               ))}
               {venueData?.cancellationPolicy && (
                 <div className={`p-4 rounded-md border ${isDark ? "bg-amber-500/5 border-amber-500/10" : "bg-amber-50 border-amber-200"}`}>
-                  <p className={`text-[11px] font-semibold uppercase tracking-wider mb-1 ${isDark ? "text-amber-400" : "text-amber-600"}`}>Política de Cancelación</p>
+                  <p className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${isDark ? "text-amber-400" : "text-amber-600"}`}>Política de Cancelación</p>
                   <p className={`text-[12px] font-medium leading-snug ${isDark ? "text-slate-300" : "text-slate-700"}`}>{venueData.cancellationPolicy}</p>
                 </div>
               )}

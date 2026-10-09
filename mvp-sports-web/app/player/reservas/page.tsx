@@ -385,7 +385,7 @@ export default function ReservasPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={`text-[15px] font-semibold leading-tight truncate ${textClr}`}>{venueName || b.tenantName}</p>
-                      <span className={`inline-block text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md mt-1.5`} style={{ backgroundColor: sportInfo.color + "15", color: sportInfo.color }}>
+                      <span className={`inline-block text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md mt-1.5`} style={{ backgroundColor: sportInfo.color + "15", color: sportInfo.color }}>
                         {(b.sport || "").toUpperCase()}
                       </span>
                       <div className="flex items-center gap-1 mt-1">

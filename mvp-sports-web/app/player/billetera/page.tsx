@@ -58,7 +58,7 @@ export default function BilleteraPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.12em] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -77,7 +77,7 @@ export default function BilleteraPage() {
         <GlowCard isDark={isDark}>
           <div className="p-5 flex items-center justify-between">
             <div>
-              <p className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Estado de Cuenta</p>
+              <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Estado de Cuenta</p>
               <p className={`text-xl font-semibold tracking-tight ${isDark ? "text-slate-100" : "text-slate-900"}`}>Activa</p>
               <p className="text-emerald-500 text-[12px] font-medium mt-0.5">Historial verificado</p>
             </div>
@@ -92,7 +92,7 @@ export default function BilleteraPage() {
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-md flex items-center justify-center bg-emerald-500/10"><CreditCard size={20} className="text-emerald-500" /></div>
               <div>
-                <span className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Pagos Online</span>
+                <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Pagos Online</span>
                 <p className={`text-xl font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{formatMoney(totalOnline)}</p>
               </div>
             </div>
@@ -118,7 +118,7 @@ export default function BilleteraPage() {
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{formatDate(b.date)}</span>
                         <span className="w-0.5 h-0.5 rounded-full bg-slate-500/40" />
-                        <span className="text-[11px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded" style={{ backgroundColor: badgeBg, color: badgeColor }}>{badgeLabel}</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded" style={{ backgroundColor: badgeBg, color: badgeColor }}>{badgeLabel}</span>
                       </div>
                     </div>
                     <div className="text-right shrink-0">

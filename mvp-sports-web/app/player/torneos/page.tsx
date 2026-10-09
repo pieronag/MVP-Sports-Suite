@@ -21,10 +21,10 @@ function ComingSoonOverlay({ isDark, accent, title, subtitle, icon: Icon, onBack
         </div>
         <h1 className={`text-xl font-heading font-black text-center uppercase tracking-tight mb-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{title}</h1>
         <div className="px-4 py-1.5 rounded-md mb-5" style={{ backgroundColor: accent }}>
-          <span className="text-white font-semibold text-[11px] tracking-[0.12em] uppercase">Próximamente</span>
+          <span className="text-white font-semibold text-[11px] tracking-[0.06em] uppercase">Próximamente</span>
         </div>
         <p className={`text-sm font-medium text-center leading-relaxed max-w-xs mb-10 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{subtitle}</p>
-        <button onClick={onBack} className={`w-full h-14 rounded-md flex items-center justify-center border font-semibold text-sm uppercase tracking-wider transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] border-white/[0.06] text-slate-200 hover:bg-white/[0.1]" : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200"}`}>
+        <button onClick={onBack} className={`w-full h-14 rounded-md flex items-center justify-center border font-semibold text-sm uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] border-white/[0.06] text-slate-200 hover:bg-white/[0.1]" : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200"}`}>
           Volver
         </button>
       </div>
@@ -84,7 +84,7 @@ export default function TorneosPage() {
             <div className="w-10 h-10 rounded-md bg-white/20 flex items-center justify-center">
               <Trophy color="white" size={20} />
             </div>
-            <span className="bg-white/20 px-3 py-1 rounded-md text-white font-semibold text-[11px] tracking-wider uppercase">Temporada 2026</span>
+            <span className="bg-white/20 px-3 py-1 rounded-md text-white font-semibold text-[11px] tracking-wide uppercase">Temporada 2026</span>
           </div>
           <h2 className="text-white text-lg font-heading font-black uppercase">Gloria Máxima</h2>
           <p className="text-white/70 text-xs font-medium mt-1">Compite en la liga más prestigiosa.</p>
@@ -116,8 +116,8 @@ export default function TorneosPage() {
                   </div>
                   <div className="absolute bottom-4 left-5 right-5">
                     <div className="flex items-center gap-2 mb-1.5">
-                      <span className="px-2.5 py-1 rounded-md text-white font-semibold text-[11px] uppercase tracking-wider" style={{ backgroundColor: accent }}>{bg}</span>
-                      <span className="text-amber-400 font-semibold text-[11px] uppercase tracking-wider">{t.sport || "General"}</span>
+                      <span className="px-2.5 py-1 rounded-md text-white font-semibold text-[11px] uppercase tracking-wide" style={{ backgroundColor: accent }}>{bg}</span>
+                      <span className="text-amber-400 font-semibold text-[11px] uppercase tracking-wide">{t.sport || "General"}</span>
                       {t.category && <span className="text-white/50 font-medium text-[11px] uppercase">• {t.category}</span>}
                     </div>
                     <h3 className="text-white text-lg font-semibold uppercase">{t.name}</h3>
@@ -126,15 +126,15 @@ export default function TorneosPage() {
                 <div className="p-5">
                   <div className="flex items-center justify-between py-3 border-b" style={{ borderColor: isDark ? "rgba(255,255,255,0.04)" : "#E2E8F0" }}>
                     <div>
-                      <span className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Inicio</span>
+                      <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Inicio</span>
                       <p className={`text-sm font-medium mt-0.5 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{formatDate(t.tournamentStartDate || t.startDate)}</p>
                     </div>
                     <div className="text-center px-4 border-x" style={{ borderColor: isDark ? "rgba(255,255,255,0.04)" : "#E2E8F0" }}>
-                      <span className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipos</span>
+                      <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipos</span>
                       <p className={`text-sm font-medium mt-0.5 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{t.enrolledTeams || 0}/{t.maxTeams || "?"}</p>
                     </div>
                     <div className="text-right">
-                      <span className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Modalidad</span>
+                      <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Modalidad</span>
                       <p className={`text-xs font-medium mt-0.5 uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{t.type || "LIGA"}</p>
                     </div>
                   </div>
@@ -147,7 +147,7 @@ export default function TorneosPage() {
                     </button>
                     <button onClick={() => setShowComingSoon(true)} className="flex-1 h-11 rounded-md flex items-center justify-center gap-2 transition-all active:scale-[0.98]" style={{ backgroundColor: accent, boxShadow: `0 4px 15px ${accent}30` }}>
                       <Zap size={16} className="text-white" />
-                      <span className="text-white font-semibold text-xs uppercase tracking-wider">Inscribirse</span>
+                      <span className="text-white font-semibold text-xs uppercase tracking-wide">Inscribirse</span>
                     </button>
                   </div>
                 </div>

@@ -17,12 +17,12 @@ function ComingSoonOverlay({ isDark, onBack }: { isDark: boolean; onBack: () => 
         </div>
         <h1 className={`text-xl font-heading font-black text-center uppercase tracking-tight mb-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>Academias MVP</h1>
         <div className="px-4 py-1.5 rounded-md mb-5" style={{ backgroundColor: accent }}>
-          <span className="text-white font-semibold text-[11px] tracking-[0.12em] uppercase">Próximamente</span>
+          <span className="text-white font-semibold text-[11px] tracking-[0.06em] uppercase">Próximamente</span>
         </div>
         <p className={`text-sm font-medium text-center leading-relaxed max-w-xs mb-10 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
           Entrena como un profesional con los mejores instructores. Clases grupales, seguimiento personalizado y mucho más está por llegar.
         </p>
-        <button onClick={onBack} className={`w-full h-14 rounded-md flex items-center justify-center border font-semibold text-sm uppercase tracking-wider transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] border-white/[0.06] text-slate-200 hover:bg-white/[0.1]" : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200"}`}>
+        <button onClick={onBack} className={`w-full h-14 rounded-md flex items-center justify-center border font-semibold text-sm uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] border-white/[0.06] text-slate-200 hover:bg-white/[0.1]" : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200"}`}>
           Volver
         </button>
       </div>
@@ -57,7 +57,7 @@ export default function AcademiasPage() {
             <div className="w-10 h-10 rounded-md bg-white/20 flex items-center justify-center">
               <GraduationCap color="white" size={20} />
             </div>
-            <span className="bg-white/20 px-3 py-1 rounded-md text-white font-semibold text-[11px] tracking-wider uppercase">Próximamente</span>
+            <span className="bg-white/20 px-3 py-1 rounded-md text-white font-semibold text-[11px] tracking-wide uppercase">Próximamente</span>
           </div>
           <h2 className="text-white text-lg font-heading font-black uppercase">Academias MVP</h2>
           <p className="text-white/70 text-xs font-medium mt-1">Entrena como un profesional.</p>
