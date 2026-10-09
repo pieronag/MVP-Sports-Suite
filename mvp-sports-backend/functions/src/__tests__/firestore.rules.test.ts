@@ -10,7 +10,7 @@ import {
   initializeTestEnvironment,
   RulesTestEnvironment,
 } from "@firebase/rules-unit-testing";
-import {doc, getDoc, setDoc, updateDoc} from "firebase/firestore";
+import {deleteDoc, doc, getDoc, setDoc, updateDoc} from "firebase/firestore";
 
 let env: RulesTestEnvironment;
 
@@ -47,6 +47,10 @@ describe("roles", () => {
   });
   it("un jugador sí puede editar su nombre", async () => {
     await assertSucceeds(updateDoc(doc(as("player1"), "users/player1"), {displayName: "Nuevo"}));
+  });
+  it("un jugador puede eliminar su propia cuenta pero no la de otro", async () => {
+    await assertFails(deleteDoc(doc(as("player1"), "users/managerA")));
+    await assertSucceeds(deleteDoc(doc(as("player1"), "users/player1")));
   });
   it("registro propio solo como jugador", async () => {
     await assertFails(setDoc(doc(as("nuevo"), "users/nuevo"), {role: "owner"}));
