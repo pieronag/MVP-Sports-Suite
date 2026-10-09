@@ -504,6 +504,18 @@ export default function PreferenciasPage() {
 
       <p className={`text-center text-[11px] font-medium mt-10 mb-8 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
 
+      {/* Guardar visible solo con cambios pendientes, sobre la barra inferior */}
+      {hasChanges() && (
+        <div className="sticky bottom-[calc(84px+env(safe-area-inset-bottom))] z-30 px-5 pb-3">
+          <div className={`flex gap-2 p-2 rounded-md border shadow-lg ${isDark ? "bg-[#0A101D] border-white/[0.08] shadow-black/40" : "bg-white border-slate-200 shadow-slate-300/50"}`}>
+            <button onClick={() => setFormData(initialData!)} disabled={saving} className={`flex-1 h-11 rounded-md text-[13px] font-semibold ${isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-600"}`}>Descartar</button>
+            <button onClick={handleSave} disabled={saving} className="flex-[2] h-11 rounded-md text-[13px] font-semibold bg-emerald-500 text-white disabled:opacity-60 flex items-center justify-center">
+              {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Guardar cambios"}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Feedback Toast */}
       {showFeedback && (
         <div className="fixed bottom-8 left-5 right-5 z-50 animate-in slide-in-from-bottom-4 duration-300">

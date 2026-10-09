@@ -33,6 +33,7 @@ export default function CheckoutPage() {
   const [customAlert, setCustomAlert] = useState<{ visible: boolean; title: string; message: string; type: "success" | "error"; onClose?: () => void }>({ visible: false, title: "", message: "", type: "success" });
   const [userTeams, setUserTeams] = useState<any[]>([]);
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+  const [showCoupon, setShowCoupon] = useState(false);
   const [couponInput, setCouponInput] = useState("");
   const [validatingCoupon, setValidatingCoupon] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
@@ -255,13 +256,17 @@ export default function CheckoutPage() {
           </div>
         </GlowCard>
 
-        <SectionPill label="Código Promocional" />
+        {!showCoupon && !appliedCoupon ? (
+          <button onClick={() => setShowCoupon(true)} className="mt-4 mx-1 text-[13px] font-semibold text-emerald-500">¿Tienes un cupón?</button>
+        ) : (
+          <>
+        <SectionPill label="Cupón" />
         <GlowCard isDark={isDark}>
           <div className="p-5">
             <div className="flex items-center gap-2.5">
               <div className={`flex-1 h-12 rounded-md border flex items-center px-4 ${isDark ? "bg-white/[0.04] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
                 <input className="w-full bg-transparent text-xs font-medium tracking-wide uppercase outline-none" style={{ color: appliedCoupon ? "#10b981" : isDark ? "#F8FAFC" : "#0F172A" }}
-                  placeholder="Código" value={couponInput} onChange={(e) => setCouponInput(e.target.value.toUpperCase())} disabled={!!appliedCoupon || validatingCoupon} />
+                  placeholder="Código" autoFocus={!appliedCoupon} value={couponInput} onChange={(e) => setCouponInput(e.target.value.toUpperCase())} disabled={!!appliedCoupon || validatingCoupon} />
               </div>
               {appliedCoupon ? (
                 <button aria-label="Cerrar" onClick={() => setAppliedCoupon(null)} className="w-12 h-12 rounded-md bg-red-500 flex items-center justify-center transition-all active:scale-90"><X size={18} className="text-white" /></button>
@@ -275,6 +280,8 @@ export default function CheckoutPage() {
             </div>
           </div>
         </GlowCard>
+          </>
+        )}
 
         {!isTournament && (
           <>

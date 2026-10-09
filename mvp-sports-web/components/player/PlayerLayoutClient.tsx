@@ -8,7 +8,7 @@ import { PlayerProvider, usePlayer } from "@/context/PlayerContext";
 import PwaSupport from "@/components/player/PwaSupport";
 import BrandLogo from "@/components/BrandLogo";
 import VerifyEmailGate, { needsEmailVerification } from "@/components/player/VerifyEmailGate";
-import { Home, Calendar, MapPin, User, LogOut, Sun, Moon, Menu, X, Building2, Shield, TrendingUp, GraduationCap, Trophy, CreditCard, ClipboardList, Settings } from "@/components/player/icons";
+import { Home, Calendar, MapPin, User, LogOut, Sun, Moon, Menu, X, Building2, Shield, TrendingUp, GraduationCap, Trophy, CreditCard, ClipboardList, Settings, Swords } from "@/components/player/icons";
 
 // Ítem de menú con el estilo del dashboard (barra verde a la izquierda cuando está activo)
 function PlayerNavItem({ href, icon: Icon, active, isDark, children }: { href: string; icon: any; active: boolean; isDark: boolean; children: React.ReactNode }) {
@@ -41,15 +41,22 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
 
     // Pantallas con acción fija abajo (pagar, escribir): sin barra inferior
     const hideBottomNav = ['/player/checkout', '/player/equipos/chat', '/player/equipos/partidos/chat'].some(p => pathname.startsWith(p));
-    const secondaryLinks = [
-        { href: '/player/estadisticas', icon: TrendingUp, label: 'Estadísticas' },
+    // El menú Más no repite la barra inferior: solo lo que no cabe en ella
+    const playLinks = [
         { href: '/player/clubes', icon: Building2, label: 'Recintos' },
+        { href: '/player/equipos/partidos', icon: Swords, label: 'Partidos' },
         { href: '/player/equipos', icon: Shield, label: 'Equipos' },
         { href: '/player/torneos', icon: Trophy, label: 'Torneos' },
         { href: '/player/academias', icon: GraduationCap, label: 'Academias' },
+    ];
+    const accountLinks = [
+        { href: '/player/estadisticas', icon: TrendingUp, label: 'Estadísticas' },
         { href: '/player/billetera', icon: CreditCard, label: 'Pagos' },
+        { href: '/player/preferencias', icon: Settings, label: 'Ajustes' },
         { href: '/player/reporte', icon: ClipboardList, label: 'Soporte' },
     ];
+    // Partidos vive bajo /player/equipos: que Equipos no se marque activo ahí
+    const isMenuActive = (href: string) => href === '/player/equipos' ? pathname === '/player/equipos' || /^\/player\/equipos\/(?!partidos)/.test(pathname) : pathname.startsWith(href);
 
     const isActive = (href: string) => href === '/player' ? pathname === '/player' : pathname.startsWith(href);
     const handleLogout = async () => { await logout(); router.push('/login'); };
@@ -82,11 +89,10 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
                                 </div>
                             </Link>
                         )}
-                        <p className="px-4 pt-2 pb-2 text-xs font-black uppercase tracking-[0.15em] text-slate-400">Jugar</p>
-                        {tabs.map(tab => <PlayerNavItem key={tab.href} href={tab.href} icon={tab.icon} active={isActive(tab.href)} isDark={isDark}>{tab.label}</PlayerNavItem>)}
-                        <p className="px-4 pt-5 pb-2 text-xs font-black uppercase tracking-[0.15em] text-slate-400">Comunidad</p>
-                        {secondaryLinks.map(l => <PlayerNavItem key={l.href} href={l.href} icon={l.icon} active={isActive(l.href)} isDark={isDark}>{l.label}</PlayerNavItem>)}
-                        <PlayerNavItem href="/player/preferencias" icon={Settings} active={isActive('/player/preferencias')} isDark={isDark}>Ajustes</PlayerNavItem>
+                        <p className="px-4 pt-2 pb-2 text-[12px] font-semibold text-slate-400">Jugar</p>
+                        {playLinks.map(l => <PlayerNavItem key={l.href} href={l.href} icon={l.icon} active={isMenuActive(l.href)} isDark={isDark}>{l.label}</PlayerNavItem>)}
+                        <p className="px-4 pt-5 pb-2 text-[12px] font-semibold text-slate-400">Mi cuenta</p>
+                        {accountLinks.map(l => <PlayerNavItem key={l.href} href={l.href} icon={l.icon} active={isMenuActive(l.href)} isDark={isDark}>{l.label}</PlayerNavItem>)}
                     </nav>
                     <div className={`p-2.5 border-t pb-[calc(0.625rem+env(safe-area-inset-bottom))] ${isDark ? 'border-white/5' : 'border-slate-100'}`}>
                         <button onClick={handleLogout} className="flex items-center gap-3.5 w-full min-h-[48px] pl-4 pr-3 py-3 rounded-md text-[15px] font-semibold text-red-500 hover:bg-red-500/5"><LogOut size={22} /> Cerrar sesión</button>
