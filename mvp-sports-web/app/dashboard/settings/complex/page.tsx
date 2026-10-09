@@ -50,6 +50,7 @@ const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 
 
 export default function TenantSettingsPage() {
     const { user, role: userRole, firestoreUser } = useAuth();
+    const [secretsConfigured, setSecretsConfigured] = useState<Record<string, boolean>>({});
     const [tenants, setTenants] = useState<any[]>([]);
     const [selectedTenantId, setSelectedTenantId] = useState<string>('');
     const [loading, setLoading] = useState(true);
@@ -177,10 +178,11 @@ export default function TenantSettingsPage() {
             name: t.name || '', address: t.address || '', description: t.description || '',
             phone: t.phone || '', instagram: t.instagram || '', whatsapp: t.whatsapp || '',
             isMercadopagoActive: t.isMercadopagoActive || false,
-            mercadopagoPublicKey: t.mercadopagoPublicKey || '', mercadopagoAccessToken: t.mercadopagoAccessToken || '',
+            // Los secretos nunca se leen al cliente: el campo queda vacío y solo se usa para reemplazarlos
+            mercadopagoPublicKey: t.mercadopagoPublicKey || '', mercadopagoAccessToken: '',
             isTransbankActive: t.isTransbankActive || false,
-            transbankCommerceCode: t.transbankCommerceCode || '', transbankApiKey: t.transbankApiKey || '',
-            isSiiActive: t.isSiiActive || false, siiRut: t.siiRut || '', siiApiKey: t.siiApiKey || '',
+            transbankCommerceCode: t.transbankCommerceCode || '', transbankApiKey: '',
+            isSiiActive: t.isSiiActive || false, siiRut: t.siiRut || '', siiApiKey: '',
             openTime: computedOpen, closeTime: computedClose,
             cancellationPolicy: t.cancellationPolicy || '',
             rules: Array.isArray(t.rules) ? t.rules : [],
@@ -193,12 +195,25 @@ export default function TenantSettingsPage() {
             amenities: t.amenities || []
         };
         setFormData(nextForm);
+        loadSecretsStatus(t.id);
         snapshotRef.current = JSON.stringify(nextForm);
         setDirty(false);
         setTerminalLines([
             { text: `Re-inicializando entorno para el recinto: [${t.name || t.id}]`, type: "info" },
             { text: "Esperando instrucciones de conexión...", type: "info" }
         ]);
+    };
+
+    // Estado de credenciales (solo si están configuradas, nunca el valor)
+    const loadSecretsStatus = async (tenantId: string) => {
+        setSecretsConfigured({});
+        try {
+            const token = await auth.currentUser?.getIdToken();
+            const res = await fetch(`/api/tenant-secrets?tenantId=${encodeURIComponent(tenantId)}`, { headers: { Authorization: `Bearer ${token}` } });
+            if (res.ok) setSecretsConfigured((await res.json()).configured || {});
+        } catch (e) {
+            console.error('Error estado credenciales:', e);
+        }
     };
 
     useEffect(() => { fetchTenants(); }, [user]);
@@ -232,7 +247,25 @@ export default function TenantSettingsPage() {
                 openingHours: `${formData.openTime} - ${formData.closeTime}`
             };
 
-            await updateDoc(doc(db, "tenants", selectedTenantId), updatedData);
+            // Las credenciales van por API a tenant_secrets; nunca al documento público del recinto
+            const { mercadopagoAccessToken, siiApiKey, transbankApiKey, ...publicData } = updatedData;
+            void transbankApiKey;
+            const secretPayload: Record<string, string> = {};
+            if (mercadopagoAccessToken.trim()) secretPayload.mercadopagoAccessToken = mercadopagoAccessToken;
+            if (siiApiKey.trim()) secretPayload.siiApiKey = siiApiKey;
+            if (Object.keys(secretPayload).length) {
+                const token = await auth.currentUser?.getIdToken();
+                const res = await fetch('/api/tenant-secrets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                    body: JSON.stringify({ tenantId: selectedTenantId, ...secretPayload }),
+                });
+                if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || 'No se pudieron guardar las credenciales');
+                setFormData(f => ({ ...f, mercadopagoAccessToken: '', siiApiKey: '' }));
+                await loadSecretsStatus(selectedTenantId);
+            }
+
+            await updateDoc(doc(db, "tenants", selectedTenantId), publicData);
 
             await auditService.logAuditEvent({
                 action: 'MODIFICACION_CONFIGURACION_COMPLEJO',
@@ -280,7 +313,7 @@ export default function TenantSettingsPage() {
 
         let success = false;
         if (api === 'mercadopago') {
-            success = !!(formData.mercadopagoAccessToken && formData.mercadopagoPublicKey);
+            success = !!((formData.mercadopagoAccessToken || secretsConfigured.mercadopagoAccessToken) && formData.mercadopagoPublicKey);
             if (success) {
                 setTerminalLines(prev => [...prev, { text: `[MERCADOPAGO] 200 OK. Public Key reconocida. Token Privado con vigencia.`, type: 'success' }]);
                 setTerminalLines(prev => [...prev, { text: `[MERCADOPAGO] Webhooks registrados correctamente. Cajero habilitado.`, type: 'info' }]);
@@ -296,7 +329,7 @@ export default function TenantSettingsPage() {
                 setTerminalLines(prev => [...prev, { text: `[TRANSBANK] 403 Prohibido. Credenciales faltantes o inválidas.`, type: 'error' }]);
             }
         } else if (api === 'sii') {
-            success = !!(formData.siiRut && formData.siiApiKey);
+            success = !!(formData.siiRut && (formData.siiApiKey || secretsConfigured.siiApiKey));
             if (success) {
                 setTerminalLines(prev => [...prev, { text: `[SII-DTE] Conexión establecida con Servidor de Certificación.`, type: 'success' }]);
                 setTerminalLines(prev => [...prev, { text: `[SII] CAF (Código de Autorización de Folios) detectado y válido.`, type: 'success' }]);
@@ -572,7 +605,7 @@ export default function TenantSettingsPage() {
                                         {isMpActive && (
                                             <div className="space-y-4 animate-fadeIn">
                                                 <InputMini label="Public Key" value={formData.mercadopagoPublicKey} onChange={(e: any) => setFormData({ ...formData, mercadopagoPublicKey: e.target.value })} icon={<HugeiconsIcon icon={Key01Icon} className="w-4 h-4 text-emerald-500" />} />
-                                                <InputMini label="Access Token" type="password" value={formData.mercadopagoAccessToken} onChange={(e: any) => setFormData({ ...formData, mercadopagoAccessToken: e.target.value })} icon={<HugeiconsIcon icon={ShieldCheckIcon} className="w-4 h-4 text-emerald-500" />} />
+                                                <InputMini label="Access Token" type="password" placeholder={secretsConfigured.mercadopagoAccessToken ? '•••••••• configurado (escribe para reemplazar)' : 'APP_USR-...'} value={formData.mercadopagoAccessToken} onChange={(e: any) => setFormData({ ...formData, mercadopagoAccessToken: e.target.value })} icon={<HugeiconsIcon icon={ShieldCheckIcon} className="w-4 h-4 text-emerald-500" />} />
                                                 <button onClick={() => simulateApiTest('mercadopago')} className="w-full py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[9px] font-black uppercase tracking-widest rounded-md hover:brightness-110 transition-all shadow-lg shadow-emerald-500/20">Verificar API</button>
                                             </div>
                                         )}

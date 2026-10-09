@@ -37,7 +37,7 @@ export default function CheckoutPage() {
   const activeColor = searchParams.get("sportColor") || "#10b981";
 
   const [processing, setProcessing] = useState(false);
-  const [method, setMethod] = useState<"mercadopago" | "webpay">("mercadopago");
+  const method = "mercadopago" as const;
   const [customAlert, setCustomAlert] = useState<{ visible: boolean; title: string; message: string; type: "success" | "error"; onClose?: () => void }>({ visible: false, title: "", message: "", type: "success" });
   const [userTeams, setUserTeams] = useState<any[]>([]);
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
@@ -88,88 +88,24 @@ export default function CheckoutPage() {
     } finally { setValidatingCoupon(false); }
   };
 
+  // Único método de pago: Mercado Pago. El monto lo calcula el servidor.
   const handleConfirm = async () => {
     if (!profile) return;
     setProcessing(true);
     try {
-      const basePriceNum = Number(price);
-      if (isNaN(basePriceNum) || basePriceNum <= 0) throw new Error("Monto inválido");
-      const discountAmount = appliedCoupon ? (basePriceNum * appliedCoupon.discount / 100) : 0;
-      const priceNum = basePriceNum - discountAmount;
-      const userProfile = profile as any;
-      const clientName = userProfile?.displayName || userProfile?.fullName || userProfile?.name || "Jugador MVP";
-      const uid = userProfile?.uid;
-
-      if (isTournament) {
-        if (!tournamentId || !teamId) throw new Error("Datos incompletos");
-        const buyOrder = `TOR-${Date.now()}`;
-        const returnUrl = `https://mvpsports.cl/player/torneos`;
-        if (method === "mercadopago") {
-          const res = await walletService.createMercadoPagoTransaction(tournamentId, tenantId || "system", priceNum, buyOrder, undefined, returnUrl);
-          if (!res?.url) throw new Error("No se recibió URL de pago");
-          window.location.href = res.url;
-          return;
-        }
-        const res = await walletService.createWebpayTransaction(tournamentId, tenantId || "system", priceNum, buyOrder, undefined, returnUrl);
-        if (!res?.url) throw new Error("No se recibió URL de pago");
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = res.url;
-        form.style.display = "none";
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = "token_ws";
-        input.value = res.token;
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
-      } else {
-        const [sh, sm] = (startTime || "00:00").split(":").map(Number);
-        const endH = sh + 1;
-        const bookingDate = new Date(`${date}T00:00:00`);
-        bookingDate.setHours(sh, sm || 0, 0, 0);
-        if (sh < 6) bookingDate.setDate(bookingDate.getDate() + 1);
-
-        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        let id = bookingId || "";
-        if (!id) { for (let i = 0; i < 6; i++) id += chars.charAt(Math.floor(Math.random() * chars.length)); }
-        const buyOrder = `ORD-${Date.now()}`;
-        const returnUrl = `https://mvpsports.cl/player/ticket?bookingId=${id}&sport=${sport || ""}&sportColor=${encodeURIComponent(sportColor || "")}&tenantName=${encodeURIComponent((tenantName || "").toUpperCase())}&courtName=${encodeURIComponent((courtName || "").toUpperCase())}&startTime=${startTime || ""}&date=${date || ""}&price=${priceNum}`;
-        const bookingData = {
-          userId: uid, tenantId: tenantId || "", tenantName: tenantName || "Recinto",
-          courtId: courtId || "", courtName: courtName || "Cancha", clientName, clientPhone: userProfile?.phone || "+56900000000",
-          date: Timestamp.fromDate(bookingDate), startTime: startTime || "",
-          endTime: `${endH.toString().padStart(2, "0")}:${(sm || 0).toString().padStart(2, "0")}`,
-          totalPrice: priceNum, originalPrice: basePriceNum,
-          couponCode: appliedCoupon?.code || null, discountApplied: appliedCoupon?.discount || 0,
-          status: "confirmed", paymentStatus: "pending", source: "web_app",
-          createdBy: userProfile?.email || uid,
-          sport: sport || "futbol", createdAt: Timestamp.now(),
-          ...(selectedTeamId ? { teamId: selectedTeamId } : {}),
-        };
-        if (method === "mercadopago") {
-          const mpRes = await walletService.createMercadoPagoTransaction(id, tenantId || "", priceNum, buyOrder, bookingData, returnUrl);
-          if (!mpRes?.url) throw new Error("No se recibió URL de pago");
-          window.location.href = mpRes.url;
-          return;
-        }
-        const res = await walletService.createWebpayTransaction(id, tenantId || "", priceNum, buyOrder, bookingData, returnUrl);
-        if (!res?.url) throw new Error("No se recibió URL de pago");
-        const form = document.createElement("form");
-        form.method = "POST";
-        form.action = res.url;
-        form.style.display = "none";
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = "token_ws";
-        input.value = res.token;
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
-      }
+      if (isTournament) throw new Error("El pago online de torneos aún no está disponible. Coordina la inscripción con el recinto.");
+      if (!tenantId || !courtId || !date || !startTime || !sport) throw new Error("Datos de reserva incompletos");
+      const res = await walletService.createMercadoPagoBooking({
+        tenantId, courtId, sport, date, startTime,
+        couponCode: appliedCoupon?.code || undefined,
+        teamId: selectedTeamId || undefined,
+      });
+      if (!res?.url) throw new Error("No se recibió URL de pago");
+      window.location.href = res.url;
     } catch (error: any) {
       setCustomAlert({ visible: true, title: "Error de Pago", message: error.message || "Error al procesar.", type: "error" });
-    } finally { setProcessing(false); }
+      setProcessing(false);
+    }
   };
 
   const discountAmount = appliedCoupon ? (Number(price) * appliedCoupon.discount / 100) : 0;
@@ -303,12 +239,10 @@ export default function CheckoutPage() {
         <GlowCard isDark={isDark}>
           <div className="p-5 space-y-3">
             {[
-              { id: "mercadopago" as const, name: "Mercado Pago", sub: "Pago con tarjeta, débito o saldo · Recomendado", color: "#00B2E3" },
-              { id: "webpay" as const, name: "Webpay Plus", sub: "Pago con tarjeta de crédito o débito", color: "#0E2C5C" },
+              { id: "mercadopago" as const, name: "Mercado Pago", sub: "Tarjeta de crédito, débito o saldo Mercado Pago", color: "#00B2E3" },
             ].map((m) => (
               <button
                 key={m.id}
-                onClick={() => setMethod(m.id)}
                 className={`w-full flex items-center gap-4 p-4 rounded-md border transition-all text-left ${
                   method === m.id
                     ? "border-emerald-500 bg-emerald-500/5"
