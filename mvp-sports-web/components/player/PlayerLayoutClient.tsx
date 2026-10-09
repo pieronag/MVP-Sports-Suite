@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { PlayerProvider, usePlayer } from "@/context/PlayerContext";
 import PwaSupport from "@/components/player/PwaSupport";
-import { Home, Calendar, MapPin, User, LogOut, Sun, Moon, Menu, X, Building2, Shield, TrendingUp, GraduationCap, Trophy, CreditCard, ClipboardList, Settings } from "lucide-react";
+import { Home, Calendar, MapPin, User, LogOut, Sun, Moon, Menu, X, Building2, Shield, TrendingUp, GraduationCap, Trophy, CreditCard, ClipboardList, Settings } from "@/components/player/icons";
 
 function PlayerShell({ children }: { children: React.ReactNode }) {
     const { profile, theme, toggleTheme } = usePlayer();

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ShieldCheck, Clock, CreditCard } from "lucide-react";
+import { ChevronLeft, ShieldCheck, Clock, CreditCard } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { bookingService, Booking } from "@/services/player/bookingService";
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';

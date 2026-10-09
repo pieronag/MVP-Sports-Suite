@@ -6,7 +6,7 @@ import {
   Ruler, Weight, Footprints, Sparkles, TrendingUp, Calendar, Drill, CircleDot,
   Sword, Star, Info, AlertCircle, Users, Crosshair, ShieldCheck, Sun, Moon,
   Heart, Share2, Timer, Plus, Minus, MapPin, ChevronDown
-} from "lucide-react";
+} from "@/components/player/icons";
 import { doc, getDoc, onSnapshot, updateDoc, addDoc, collection, Timestamp } from 'firebase/firestore';
 import { db } from "@/services/firebase";
 import { usePlayer } from "@/context/PlayerContext";

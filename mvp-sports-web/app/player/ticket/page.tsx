@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle, MapPin, Share2, Clock, Trophy, AlertCircle, ChevronLeft, Receipt, X, FileText, Calendar } from "lucide-react";
+import { CheckCircle, MapPin, Share2, Clock, Trophy, AlertCircle, ChevronLeft, Receipt, X, FileText, Calendar } from "@/components/player/icons";
 import { QRCodeSVG } from "qrcode.react";
 import { usePlayer } from "@/context/PlayerContext";
 import { bookingService } from "@/services/player/bookingService";

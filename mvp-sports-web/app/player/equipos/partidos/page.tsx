@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Swords, Users, MessageCircle, CheckCircle2, X, Send, User, MapPin } from "lucide-react";
+import { ChevronLeft, Swords, Users, MessageCircle, CheckCircle2, X, Send, User, MapPin } from "@/components/player/icons";
+import { RefreshCw } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
 import { matchmakingService, MatchEntry, Challenge } from "@/services/player/matchmakingService";
@@ -351,7 +352,7 @@ export default function PartidosPage() {
                 <Swords size={16} /> Publicar mi Equipo
               </button>
               <button onClick={() => {}} className="w-[52px] h-[52px] rounded-md flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#94A3B8" : "#64748B"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                <RefreshCw size={18} color={isDark ? "#94A3B8" : "#64748B"} />
               </button>
             </div>
 

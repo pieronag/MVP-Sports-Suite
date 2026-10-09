@@ -5,13 +5,13 @@ import {
   ChevronLeft, Calendar, Clock, MapPin, CheckCircle2, AlertCircle,
   XCircle, ArrowRight, Navigation, Ticket, X, Share2, Stars, Timer,
   ShieldCheck, CalendarDays, Trophy, Medal, Star, Trash2, Loader, Receipt
-} from "lucide-react";
+} from "@/components/player/icons";
 import { QRCodeSVG } from "qrcode.react";
 import { usePlayer } from "@/context/PlayerContext";
 import { bookingService } from "@/services/player/bookingService";
 import { venueService } from "@/services/player/venueService";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/player/icons";
 
 const SPORT_CONFIG: Record<string, { color: string; icon: any }> = {
   futbol: { color: "#10b981", icon: FutbolIcon },

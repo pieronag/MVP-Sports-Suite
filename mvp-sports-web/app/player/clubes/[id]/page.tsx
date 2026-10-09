@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Clock, MapPin, Star, Info, ShieldCheck, CheckCircle2, X, Phone, MessageCircle, Navigation, Wifi, Tv, Car, Umbrella, Wind, CircleDot, Zap, Globe, Ban, CreditCard, Images } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, MapPin, Star, Info, ShieldCheck, CheckCircle2, X, Phone, MessageCircle, Navigation, Wifi, Tv, Car, Umbrella, Wind, CircleDot, Zap, Globe, Ban, CreditCard, Images } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { venueService, Tenant, Court } from "@/services/player/venueService";
 import { bookingService } from "@/services/player/bookingService";
 import { collection, query, where, onSnapshot, doc } from "firebase/firestore";
 import { db } from "@/services/firebase";
-import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon, CanchaFutbolIcon, CanchaPadelIcon, CanchaTenisIcon, CanchaBasquetbolIcon, CanchaVoleibolIcon } from "@/components/icons/SportsIcons";
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon, CanchaFutbolIcon, CanchaPadelIcon, CanchaTenisIcon, CanchaBasquetbolIcon, CanchaVoleibolIcon } from "@/components/player/icons";
 
 function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
   return (

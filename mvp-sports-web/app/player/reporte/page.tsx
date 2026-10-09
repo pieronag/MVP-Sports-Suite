@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
     ChevronLeft, Mail, AlertCircle, CheckCircle2,
     Shield, Activity, ArrowRight, Smartphone, User
-} from "lucide-react";
+} from "@/components/player/icons";
 import { collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from "@/services/firebase";
 import { usePlayer } from "@/context/PlayerContext";

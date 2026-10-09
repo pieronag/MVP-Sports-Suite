@@ -9,8 +9,8 @@ import { userService } from "@/services/player/userService";
 import { auth, db } from "@/services/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
-import { ChevronLeft, ChevronRight, Save, User, Phone, ShieldCheck, Calendar, Ruler, Weight, Lock, LogOut, Eye, EyeOff, AlertCircle, CheckCircle2, X, Shield, Award, Target, Sun, Moon, Activity, MapPin, Heart } from "lucide-react";
-import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
+import { ChevronLeft, ChevronRight, Save, User, Phone, ShieldCheck, Calendar, Ruler, Weight, Lock, LogOut, Eye, EyeOff, AlertCircle, CheckCircle2, X, Shield, Award, Target, Sun, Moon, Activity, MapPin, Heart } from "@/components/player/icons";
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/player/icons";
 
 const SPORT_POSITIONS: Record<string, string[]> = {
   "Fútbol": ["Arquero", "Defensa", "Lateral", "Volante", "Delantero"],

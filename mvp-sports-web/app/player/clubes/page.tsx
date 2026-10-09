@@ -1,10 +1,10 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Search, Star, MapPin, Navigation, Compass } from "lucide-react";
+import { ChevronLeft, Search, Star, MapPin, Navigation, Compass } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { venueService, Tenant } from "@/services/player/venueService";
-import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/player/icons";
 
 const SPORT_ICON_MAP: Record<string, any> = {
   futbol: FutbolIcon, "fútbol": FutbolIcon, futbolito: FutbolIcon,

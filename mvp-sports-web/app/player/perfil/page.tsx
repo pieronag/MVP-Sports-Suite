@@ -14,7 +14,7 @@ import {
   Medal, Sparkles, Download, Activity, User as UserIcon, MapPin, Zap,
   Shield, ShieldAlert, Award, Swords, Flame, Heart, Crosshair, CircleDot,
   Sunrise, GraduationCap, Cpu, TrendingUp, Users, Sword, Play, CalendarDays, X
-} from "lucide-react";
+} from "@/components/player/icons";
 
 const BADGE_DEFS: { id: string; name: string; icon: any; svg?: string; color: string; stat: string }[] = [
   { id: "scorer",  name: "Artillero",     icon: Target,       svg: "/icons/logros/artillero.svg", color: "#ef4444", stat: "goals" },

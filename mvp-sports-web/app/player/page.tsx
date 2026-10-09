@@ -10,7 +10,8 @@ import {
   Sun, Moon, MapPin, Trophy, CreditCard, Building2,
   Shield, TrendingUp, User, SlidersHorizontal, CalendarCheck,
   GraduationCap, Zap, ShieldCheck, Sparkles, ArrowRight
-} from "lucide-react";
+} from "@/components/player/icons";
+import { DownloadTray } from "@/components/player/icons";
 
 const quickItems = [
   { icon: CalendarCheck, label: "Reservas", color: "#3b82f6", href: "/player/reservas" },
@@ -278,9 +279,7 @@ export default function PlayerDashboard() {
                 : "bg-gradient-to-br from-white via-white to-[#f0fdf4]"
             }`}>
               <div className="w-11 h-11 rounded-md bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/25">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
+                <DownloadTray className={"w-5 h-5 text-white"} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Instalar App</p>
@@ -298,9 +297,7 @@ export default function PlayerDashboard() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowInstallGuide(false)}>
             <div className={`w-full max-w-sm rounded-md p-6 border shadow-2xl ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
               <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}>
-                <svg className={`w-8 h-8 ${isDark ? "text-emerald-400" : "text-emerald-600"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
+                <DownloadTray className={`w-8 h-8 ${isDark ? "text-emerald-400" : "text-emerald-600"}`} />
               </div>
               <p className={`font-semibold text-[15px] text-center mb-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>Instalar App</p>
               <div className="space-y-3 mb-5">

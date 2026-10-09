@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, GraduationCap, Sparkles, BookOpen, Award, Users } from "lucide-react";
+import { ChevronLeft, GraduationCap, Sparkles, BookOpen, Award, Users } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 
 function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {

@@ -2,11 +2,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, Plus, Users, X, ArrowRight, LogIn, Swords } from "lucide-react";
+import { ChevronLeft, Plus, Users, X, ArrowRight, LogIn, Swords } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
 import { teamService } from "@/services/player/teamService";
-import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/player/icons";
 
 const SPORTS_CONFIG = [
   { key: "futbol", label: "Fútbol", icon: FutbolIcon },

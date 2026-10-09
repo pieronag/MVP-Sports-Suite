@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Trophy, Calendar, Users, Zap, Info, CreditCard, GraduationCap, Sparkles } from "lucide-react";
+import { ChevronLeft, Trophy, Calendar, Users, Zap, Info, CreditCard, GraduationCap, Sparkles } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { tournamentService } from "@/services/player/tournamentService";
 

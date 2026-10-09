@@ -2,10 +2,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { ChevronLeft, Locate, Navigation, Star, Compass } from "lucide-react";
+import { ChevronLeft, Locate, Navigation, Star, Compass } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { venueService } from "@/services/player/venueService";
-import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/player/icons";
 
 const MapView = dynamic(() => import("./MapComponent"), { ssr: false });
 

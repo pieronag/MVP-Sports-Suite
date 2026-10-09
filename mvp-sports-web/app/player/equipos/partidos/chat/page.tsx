@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Send, User, Shield, X } from "lucide-react";
+import { ChevronLeft, Send, User, Shield, X } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
 import { matchmakingService, ChatMessage, Challenge } from "@/services/player/matchmakingService";
