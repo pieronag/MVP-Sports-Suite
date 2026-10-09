@@ -105,13 +105,20 @@ Verificado en localhost: manifest e íconos responden 200, el header del SW est�
 | C-11 `webpay/test` | ✅ Eliminado con todo Webpay/Oneclick | `f737704` |
 | P-1…P-8 solo Mercado Pago | ✅ Web, app y Functions; reembolsos vía MP | `f737704` |
 | Rendimiento | ✅ Imágenes a Storage, conteos agregados, carga diferida de jsPDF/html-to-image, sin splash fijo | `ca7d2d8` |
-| C-8 lectura abierta de `bookings`/`users` | ⏳ Pendiente (requiere `court_slots` + Function) | — |
-| C-12 `tournament_registrations` abierto | ⏳ Pendiente (junto con pago de torneos) | — |
-| Reglas sin probar en emulador | ⏳ Suite lista en `functions/src/__tests__/firestore.rules.test.ts` (requiere Java) | — |
+| C-8 lectura abierta de `bookings` | ✅ Solo titular, creador, participantes y personal; disponibilidad en `court_slots` y calificaciones en `booking_reviews` (Function `onBookingWritten` + backfill) | `7d10f46` |
+| C-12 `tournament_registrations` abierto | ✅ Inscripción en el servidor (`/api/tournaments/register`) con pago Mercado Pago | `8a4e71b` |
+| C-13 suplantación en equipos/matchmaking/desafíos/reseñas | ✅ Creación a nombre propio; unirse/salir de equipo ahora funciona | `f2032b2` |
+| C-15 (nuevo) `updateStaffPassword` cambiaba la clave de cualquier cuenta | ✅ Solo personal de recintos propios | `98e5270` |
+| C-16 (nuevo) `/api/send-email` a cualquier destinatario con HTML sin escapar | ✅ Solo al correo de la sesión, HTML escapado | `98e5270` |
+| F-2 Heroicons/Lucide restantes | ✅ Todo en Hugeicons (SVG propios de deportes se mantienen); librerías eliminadas | `80c7369` |
+| F-5 / F-6 avisos y archivos sobrantes | ✅ `data-scroll-behavior`; capturas viejas y logo Transbank eliminados | `80c7369` |
+| Reglas sin probar en emulador | ⏳ 17 casos listos en `functions/src/__tests__/firestore.rules.test.ts` (requiere Java 21) | — |
+| F-1 diseño del área jugador | ⏳ Decisión de diseño pendiente (hoy usa su propia paleta oscura) | — |
+| F-3 páginas de 50–130 KB | ⏳ Refactor gradual a servicios + react-query | — |
 
 ### Orden de publicación
-1. `node --env-file=mvp-sports-web/.env.local mvp-sports-web/scripts/migrate-tenant-secrets.mjs` (revisar) y luego con `--apply`.
+1. `node --env-file=mvp-sports-web/.env.local mvp-sports-web/scripts/migrate-tenant-secrets.mjs` (revisar) y luego con `--apply`. Igual con `scripts/backfill-court-slots.mjs`.
 2. Rotar tokens de Mercado Pago, API key de Resend y credenciales Transbank expuestas.
 3. Vercel: `MERCADOPAGO_WEBHOOK_SECRET`, `NEXT_PUBLIC_SITE_URL`; publicar web.
-4. `npx firebase-tools deploy --only functions,firestore:rules,storage --project mvp-sports-chile` (tras correr las pruebas de reglas).
+4. `npx firebase-tools deploy --only functions --project mvp-sports-chile` (crea `onBookingWritten`), luego el backfill, y al final `--only firestore:rules,storage` (tras correr las pruebas de reglas).
 5. Nueva versión de la app (EAS) con `EXPO_PUBLIC_API_URL`.
