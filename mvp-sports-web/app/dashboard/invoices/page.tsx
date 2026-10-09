@@ -771,7 +771,7 @@ f(true);
                             placeholder="Buscar recinto, dueño o email..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white placeholder:text-slate-400 transition-all shadow-sm"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-[10px] font-black outline-none text-slate-700 dark:text-white placeholder:text-slate-400 transition-all shadow-sm"
                         />
                     </div>
                     <div className="flex items-center rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 overflow-hidden">

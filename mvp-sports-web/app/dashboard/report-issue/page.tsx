@@ -335,22 +335,22 @@ export default function ReportIssuePage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                         <div>
                                             <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Asunto principal</label>
-                                            <input type="text" placeholder="EJ. ERROR AL CONFIRMAR ARRIENDO DE CANCHA" value={subject} onChange={(e) => setSubject(e.target.value)} className={`${inputCls} uppercase`} required />
+                                            <input type="text" placeholder="Ej. error al confirmar arriendo de cancha" value={subject} onChange={(e) => setSubject(e.target.value)} className={`${inputCls}`} required />
                                         </div>
                                         <div>
                                             <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Pantalla / módulo del error</label>
-                                            <input type="text" placeholder="EJ. CALENDARIO / DETALLE DE FACTURA" value={screen} onChange={(e) => setScreen(e.target.value)} className={`${inputCls} uppercase`} />
+                                            <input type="text" placeholder="Ej. calendario / detalle de factura" value={screen} onChange={(e) => setScreen(e.target.value)} className={`${inputCls}`} />
                                         </div>
                                     </div>
 
                                     <div>
                                         <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Descripción detallada del problema</label>
-                                        <textarea rows={4} placeholder="EXPLICA AQUÍ QUÉ PASÓ DETALLADAMENTE..." value={description} onChange={(e) => setDescription(e.target.value)} className={inputCls} required />
+                                        <textarea rows={4} placeholder="Explica aquí qué pasó detalladamente..." value={description} onChange={(e) => setDescription(e.target.value)} className={inputCls} required />
                                     </div>
 
                                     <div>
                                         <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Pasos para reproducir (opcional)</label>
-                                        <textarea rows={3} placeholder="EJ: 1. IR A AGENDA, 2. CLICK EN HORA 18:00, 3. ELEGIR CLIENTE Y DAR GUARDAR" value={steps} onChange={(e) => setSteps(e.target.value)} className={`${inputCls} uppercase`} />
+                                        <textarea rows={3} placeholder="Ej: 1. ir a agenda, 2. click en hora 18:00, 3. elegir cliente y dar guardar" value={steps} onChange={(e) => setSteps(e.target.value)} className={`${inputCls}`} />
                                     </div>
 
                                     <div className="pt-2">

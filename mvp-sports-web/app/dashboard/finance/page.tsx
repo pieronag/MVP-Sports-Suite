@@ -565,10 +565,10 @@ export default function FinancePage() {
                         <HugeiconsIcon icon={Search01Icon} className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
                             type="text"
-                            placeholder="BUSCAR CLIENTE, RECINTO O DETALLE..."
+                            placeholder="Buscar cliente, recinto o detalle..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-white dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md pl-10 pr-4 py-2.5 text-[11px] font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 uppercase tracking-tight"
+                            className="w-full bg-white dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md pl-10 pr-4 py-2.5 text-[11px] font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 tracking-tight"
                         />
                     </div>
                 </div>

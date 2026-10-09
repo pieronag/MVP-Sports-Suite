@@ -335,7 +335,7 @@ export default function ProfilePage() {
                     <SectionCard title="Datos personales" subtitle="Información básica de tu cuenta" icon={<HugeiconsIcon icon={IdentityCardIcon} className="w-5 h-5" strokeWidth={1.8} />} bodyClassName="p-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                             <Field label="Nombre completo" icon={<HugeiconsIcon icon={IdentityCardIcon} className="w-4 h-4" strokeWidth={1.8} />}>
-                                <input type="text" value={profile.displayName} onChange={(e) => { setProfile({ ...profile, displayName: e.target.value }); setDirty(true); }} placeholder="NOMBRE APELLIDO" className={inputCls} />
+                                <input type="text" value={profile.displayName} onChange={(e) => { setProfile({ ...profile, displayName: e.target.value }); setDirty(true); }} placeholder="Nombre apellido" className={inputCls} />
                             </Field>
                             <Field label="Cargo / puesto" icon={<HugeiconsIcon icon={Briefcase01Icon} className="w-4 h-4" strokeWidth={1.8} />}>
                                 <input type="text" value={profile.jobTitle} onChange={(e) => { setProfile({ ...profile, jobTitle: e.target.value }); setDirty(true); }} placeholder="GERENTE" className={inputCls} />
@@ -344,7 +344,7 @@ export default function ProfilePage() {
                                 <input type="email" value={profile.email} readOnly className={`${inputCls} bg-slate-50 dark:bg-white/5 text-slate-400 cursor-not-allowed`} />
                             </Field>
                             <Field label="Teléfono de contacto" icon={<HugeiconsIcon icon={PhoneIcon} className="w-4 h-4" strokeWidth={1.8} />}>
-                                <input type="tel" value={profile.phone} onChange={(e) => { setProfile({ ...profile, phone: e.target.value }); setDirty(true); }} placeholder="+56 9 XXXX XXXX" className={inputCls} />
+                                <input type="tel" value={profile.phone} onChange={(e) => { setProfile({ ...profile, phone: e.target.value }); setDirty(true); }} placeholder="+56 9 xxxx xxxx" className={inputCls} />
                             </Field>
                         </div>
                     </SectionCard>

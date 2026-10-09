@@ -995,7 +995,7 @@ const Separator = ({ isDark }: { isDark: boolean }) => (
     <View style={{ height: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.04)', marginHorizontal: 20 }} />
 );
 
-const RefinedRow = ({ icon: Icon, color, label, value, onChange, onBlur, onFocus, isDark, error, maxLength, autoCorrect = true, autoComplete = 'on', keyboardType = 'default', rightElement }: any) => {
+const RefinedRow = ({ icon: Icon, color, label, value, onChange, onBlur, onFocus, isDark, error, maxLength, autoCorrect = true, autoComplete = 'on', keyboardType = 'default', rightElement, autoCapitalize = 'words' }: any) => {
     const C = isDark ? COLORS.dark : COLORS.light;
     return (
         <View style={{ height: 80, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25, backgroundColor: error ? (isDark ? '#ef444411' : '#fef2f2') : 'transparent' }}>
@@ -1015,7 +1015,7 @@ const RefinedRow = ({ icon: Icon, color, label, value, onChange, onBlur, onFocus
                         onFocus={onFocus}
                         maxLength={maxLength}
                         keyboardType={keyboardType}
-                        autoCapitalize="characters"
+                        autoCapitalize={autoCapitalize}
                         autoCorrect={autoCorrect}
                         autoComplete={autoComplete}
                         style={{ flex: 1, color: error ? '#ef4444' : C.text, fontSize: 18, fontWeight: '800', padding: 0, marginTop: 2 }} 

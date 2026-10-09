@@ -374,14 +374,14 @@ export default function ReporteScreen() {
                         }
                     ]}>
                         <TextInput
-                            placeholder="EJ. ERROR AL CONFIRMAR PARTIDO"
+                            placeholder="Ej. error al confirmar partido"
                             placeholderTextColor={C.sub + '80'}
                             value={subject}
                             onChangeText={setSubject}
                             onFocus={() => setFocusedField('subject')}
                             onBlur={() => setFocusedField(null)}
                             style={[styles.textInput, { color: C.text }]}
-                            autoCapitalize="characters"
+                            autoCapitalize="sentences"
                         />
                     </View>
 
@@ -395,14 +395,14 @@ export default function ReporteScreen() {
                         }
                     ]}>
                         <TextInput
-                            placeholder="EJ. ESTADISTICAS / MENU PRINCIPAL"
+                            placeholder="Ej. estadísticas / menú principal"
                             placeholderTextColor={C.sub + '80'}
                             value={screen}
                             onChangeText={setScreen}
                             onFocus={() => setFocusedField('screen')}
                             onBlur={() => setFocusedField(null)}
                             style={[styles.textInput, { color: C.text }]}
-                            autoCapitalize="characters"
+                            autoCapitalize="sentences"
                         />
                     </View>
 
@@ -440,7 +440,7 @@ export default function ReporteScreen() {
                         }
                     ]}>
                         <TextInput
-                            placeholder="EJ: 1. IR A JUGAR, 2. CLICK EN EDITAR, 3. DAR CLICK EN GUARDAR Y VER ERROR..."
+                            placeholder="Ej: 1. Ir a jugar, 2. Clic en editar, 3. Guardar y ver el error..."
                             placeholderTextColor={C.sub + '80'}
                             value={steps}
                             onChangeText={setSteps}
@@ -449,7 +449,7 @@ export default function ReporteScreen() {
                             style={[styles.textArea, { color: C.text }]}
                             multiline
                             numberOfLines={3}
-                            autoCapitalize="characters"
+                            autoCapitalize="sentences"
                         />
                     </View>
 

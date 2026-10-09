@@ -257,7 +257,7 @@ export default function ManualBookingModal({ isOpen, onClose, tenantId, onSucces
                                 <div>
                                     <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Nombre del Cliente</label>
                                     <input type="text" required className="w-full mt-1.5 px-4 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-semibold outline-none placeholder:normal-case focus:border-emerald-500 transition-all shadow-sm"
-                                        value={formData.clientName} onChange={e => setFormData({ ...formData, clientName: e.target.value })} placeholder="EJ: JUAN PÉREZ" />
+                                        value={formData.clientName} onChange={e => setFormData({ ...formData, clientName: e.target.value })} placeholder="Ej: juan pérez" />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Teléfono Móvil</label>

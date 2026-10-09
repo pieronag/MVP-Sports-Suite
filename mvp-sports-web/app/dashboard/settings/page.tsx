@@ -727,7 +727,7 @@ export default function SettingsPage() {
                                     value={staffSearch}
                                     onChange={e => setStaffSearch(e.target.value)}
                                     placeholder="Buscar por nombre o correo..."
-                                    className="w-full pl-9 pr-3 py-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 rounded-md text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white placeholder:text-slate-400"
+                                    className="w-full pl-9 pr-3 py-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 rounded-md text-[10px] font-black outline-none text-slate-700 dark:text-white placeholder:text-slate-400"
                                 />
                             </div>
                         </div>

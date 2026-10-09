@@ -739,7 +739,7 @@ export default function ChampionshipsPage() {
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <label className="text-[8px] font-black uppercase tracking-widest text-slate-400">Descripción</label>
-                                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-none h-20 uppercase resize-none focus:border-amber-500 text-slate-700 dark:text-white" placeholder="Reglas y condiciones..." />
+                                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-none h-20 resize-none focus:border-amber-500 text-slate-700 dark:text-white" placeholder="Reglas y condiciones..." />
                                     </div>
                                 </div>
 
@@ -1425,7 +1425,7 @@ function InputGroupPremium({ label, value, onChange, placeholder, icon, readOnly
                 {type === 'select' ? (
                     <select value={value || ''} onChange={onChange} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold text-slate-700 dark:text-white focus:border-amber-500 outline-none transition-all appearance-none uppercase cursor-pointer`}>{children}</select>
                 ) : (
-                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2.5 rounded-md border text-[10px] font-bold transition-all outline-none uppercase ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white focus:border-amber-500'}`} />
+                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2.5 rounded-md border text-[10px] font-bold transition-all outline-none ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white focus:border-amber-500'}`} />
                 )}
                 {type === 'select' && <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"><HugeiconsIcon icon={ChevronDownIcon} className="w-3 h-3" /></div>}
             </div>

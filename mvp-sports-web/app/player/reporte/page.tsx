@@ -288,7 +288,7 @@ export default function ReportePage() {
                         <p className="text-[9px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94A3B8' }}>ASUNTO PRINCIPAL *</p>
                         <div className={inputClass('subject')} style={{ backgroundColor: '#0F172A' }}>
                             <input
-                                placeholder="EJ. ERROR AL CONFIRMAR PARTIDO"
+                                placeholder="Ej. error al confirmar partido"
                                 value={subject}
                                 onChange={e => setSubject(e.target.value)}
                                 onFocus={() => setFocusedField('subject')}
@@ -302,7 +302,7 @@ export default function ReportePage() {
                         <p className="text-[9px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94A3B8' }}>PANTALLA O SECCIÓN (OPCIONAL)</p>
                         <div className={inputClass('screen')} style={{ backgroundColor: '#0F172A' }}>
                             <input
-                                placeholder="EJ. ESTADISTICAS / MENU PRINCIPAL"
+                                placeholder="Ej. estadisticas / menu principal"
                                 value={screen}
                                 onChange={e => setScreen(e.target.value)}
                                 onFocus={() => setFocusedField('screen')}
@@ -317,7 +317,7 @@ export default function ReportePage() {
                         <p className="text-[9px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94A3B8' }}>DESCRIPCIÓN DETALLADA *</p>
                         <div className={textareaClass('description')} style={{ backgroundColor: '#0F172A' }}>
                             <textarea
-                                placeholder="EXPLICA AQUÍ DETALLADAMENTE QUÉ SUCEDIÓ..."
+                                placeholder="Explica aquí detalladamente qué sucedió..."
                                 value={description}
                                 onChange={e => setDescription(e.target.value)}
                                 onFocus={() => setFocusedField('description')}
@@ -332,7 +332,7 @@ export default function ReportePage() {
                         <p className="text-[9px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94A3B8' }}>PASOS PARA REPRODUCIR (OPCIONAL)</p>
                         <div className={textareaClass('steps')} style={{ backgroundColor: '#0F172A' }}>
                             <textarea
-                                placeholder="1. IR A JUGAR, 2. CLICK EN EDITAR, 3. DAR CLICK EN GUARDAR..."
+                                placeholder="1. ir a jugar, 2. click en editar, 3. dar click en guardar..."
                                 value={steps}
                                 onChange={e => setSteps(e.target.value)}
                                 onFocus={() => setFocusedField('steps')}

@@ -409,7 +409,7 @@ export default function PlayerAnalyticsPage() {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Buscar..."
-                                className="w-28 bg-transparent text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white placeholder:text-slate-400"
+                                className="w-28 bg-transparent text-[10px] font-black outline-none text-slate-700 dark:text-white placeholder:text-slate-400"
                             />
                         </div>
                         <select

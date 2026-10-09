@@ -539,7 +539,7 @@ export default function CouponsPage() {
                             </div>
                             <div>
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Descripción</label>
-                                <textarea required rows={2} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-none uppercase resize-none" placeholder="RESTRICCIONES..." />
+                                <textarea required rows={2} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-none resize-none" placeholder="Restricciones..." />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>

@@ -92,7 +92,7 @@ const PasswordModal = ({ isOpen, onClose, onConfirm, memberName }: any) => {
                         <label className="text-[10px] font-bold text-emerald-700 dark:text-[#00df82] uppercase tracking-wide block mb-1.5">Nueva Contraseña</label>
                         <div className="relative">
                             <HugeiconsIcon icon={LockIcon} className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2" />
-                            <input type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-9 pr-10 py-3 bg-white dark:bg-[#0B0F19] border border-emerald-200 dark:border-emerald-500/30 rounded-md text-xs font-bold outline-none" placeholder="MÍNIMO 6 CARACTERES" />
+                            <input type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-9 pr-10 py-3 bg-white dark:bg-[#0B0F19] border border-emerald-200 dark:border-emerald-500/30 rounded-md text-xs font-bold outline-none" placeholder="Mínimo 6 caracteres" />
                             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600">{showPassword ? <HugeiconsIcon icon={EyeOffIcon} className="w-5 h-5" /> : <HugeiconsIcon icon={EyeIcon} className="w-5 h-5" />}</button>
                         </div>
                     </div>
@@ -471,10 +471,10 @@ export default function StaffPage() {
                     <HugeiconsIcon icon={Search01Icon} className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input 
                         type="text" 
-                        placeholder="BUSCAR POR NOMBRE..." 
+                        placeholder="Buscar por nombre..." 
                         value={searchTerm} 
                         onChange={(e) => setSearchTerm(e.target.value)} 
-                        className="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-md text-[10px] font-bold outline-none uppercase placeholder:text-slate-400" 
+                        className="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-md text-[10px] font-bold outline-none placeholder:text-slate-400" 
                     />
                 </div>
             </div>
@@ -576,12 +576,12 @@ export default function StaffPage() {
                         <form onSubmit={handleSave} className="p-6 space-y-4">
                             <div>
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Nombre Completo</label>
-                                <input type="text" required value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} placeholder="Ej: Carlos Soto" className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-none uppercase focus:border-emerald-500 transition-all" />
+                                <input type="text" required value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} placeholder="Ej: Carlos Soto" className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-none focus:border-emerald-500 transition-all" />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Cargo</label>
-                                    <input type="text" value={formData.jobTitle} onChange={e => setFormData({ ...formData, jobTitle: e.target.value })} placeholder="Ej: Recepcionista" className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-none uppercase focus:border-emerald-500 transition-all" />
+                                    <input type="text" value={formData.jobTitle} onChange={e => setFormData({ ...formData, jobTitle: e.target.value })} placeholder="Ej: Recepcionista" className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-none focus:border-emerald-500 transition-all" />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">RUT</label>
@@ -603,7 +603,7 @@ export default function StaffPage() {
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Contraseña Inicial</label>
                                     <div className="relative">
                                         <HugeiconsIcon icon={LockIcon} className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.8} />
-                                        <input type={showPassword ? "text" : "password"} required minLength={6} value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder="MÍNIMO 6 CARACTERES" className="w-full pl-9 pr-10 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-md text-[11px] font-bold outline-none focus:border-emerald-500 transition-all" />
+                                        <input type={showPassword ? "text" : "password"} required minLength={6} value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder="Mínimo 6 caracteres" className="w-full pl-9 pr-10 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-md text-[11px] font-bold outline-none focus:border-emerald-500 transition-all" />
                                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-[#00df82]">
                                             {showPassword ? <HugeiconsIcon icon={EyeOffIcon} className="w-4 h-4" /> : <HugeiconsIcon icon={EyeIcon} className="w-4 h-4" />}
                                         </button>

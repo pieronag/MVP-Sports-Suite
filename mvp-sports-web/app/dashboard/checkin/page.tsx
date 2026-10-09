@@ -817,7 +817,7 @@ export default function CheckInPage() {
                     <input
                         type="text"
                         placeholder="Buscar por código de reserva o nombre..."
-                        className="w-full h-12 pl-10 pr-24 bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 uppercase placeholder:normal-case placeholder:font-medium shadow-sm transition-all text-slate-800 dark:text-white"
+                        className="w-full h-12 pl-10 pr-24 bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder:normal-case placeholder:font-medium shadow-sm transition-all text-slate-800 dark:text-white"
                         value={manualCode}
                         onChange={(e) => setManualCode(e.target.value)}
                     />

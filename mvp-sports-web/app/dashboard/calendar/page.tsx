@@ -669,7 +669,7 @@ export default function MasterCalendar() {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Nombre</label>
-                                            <input required type="text" value={newRes.clientName} onChange={e => setNewRes({ ...newRes, clientName: e.target.value })} placeholder="Nombre del jugador" className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase outline-none focus:border-emerald-500/40 transition-all" />
+                                            <input required type="text" value={newRes.clientName} onChange={e => setNewRes({ ...newRes, clientName: e.target.value })} placeholder="Nombre del jugador" className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-none focus:border-emerald-500/40 transition-all" />
                                         </div>
                                         <div>
                                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Teléfono</label>
@@ -678,7 +678,7 @@ export default function MasterCalendar() {
                                     </div>
                                     <div>
                                         <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Notas (opcional)</label>
-                                        <textarea rows={2} value={newRes.notes} onChange={e => setNewRes({ ...newRes, notes: e.target.value })} placeholder="Comentarios para el recinto..." className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase outline-none focus:border-emerald-500/40 transition-all resize-none" />
+                                        <textarea rows={2} value={newRes.notes} onChange={e => setNewRes({ ...newRes, notes: e.target.value })} placeholder="Comentarios para el recinto..." className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-none focus:border-emerald-500/40 transition-all resize-none" />
                                     </div>
                                 </div>
                             </div>

@@ -431,7 +431,7 @@ export default function AcademyPage() {
                                     </InputGroupPremium>
                                     <div className="flex flex-col gap-1">
                                         <label className="text-[8px] font-black uppercase tracking-widest text-slate-400">Descripción Ejecutiva</label>
-                                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-none h-24 uppercase resize-none focus:border-indigo-500 text-slate-700 dark:text-white" placeholder="Objetivos y metodología..." />
+                                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-none h-24 resize-none focus:border-indigo-500 text-slate-700 dark:text-white" placeholder="Objetivos y metodología..." />
                                     </div>
                                 </div>
 

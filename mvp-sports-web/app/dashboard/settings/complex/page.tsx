@@ -441,7 +441,7 @@ export default function TenantSettingsPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Reseña del Club</label>
-                                    <textarea rows={4} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-5 py-4 bg-slate-50 dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 resize-none transition-all uppercase" placeholder="Misión del complejo..." />
+                                    <textarea rows={4} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-5 py-4 bg-slate-50 dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 resize-none transition-all" placeholder="Misión del complejo..." />
                                 </div>
                             </div>
                         </PanelGlass>
@@ -519,7 +519,7 @@ export default function TenantSettingsPage() {
                                     </div>
                                     <div>
                                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-1.5">Política de Cancelación</label>
-                                        <textarea rows={3} value={formData.cancellationPolicy} onChange={e => setFormData({ ...formData, cancellationPolicy: e.target.value })} className="w-full px-4 py-3 bg-slate-50 dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-none resize-none uppercase" placeholder="Condiciones de cancelación..." />
+                                        <textarea rows={3} value={formData.cancellationPolicy} onChange={e => setFormData({ ...formData, cancellationPolicy: e.target.value })} className="w-full px-4 py-3 bg-slate-50 dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-none resize-none" placeholder="Condiciones de cancelación..." />
                                     </div>
                                 </div>
                                 <div>
@@ -675,7 +675,7 @@ function InputMini({ label, value, icon, onChange, type = "text", placeholder = 
                     placeholder={placeholder}
                     value={value}
                     onChange={onChange}
-                    className="w-full pl-12 pr-4 py-3.5 rounded-md border bg-white dark:bg-[#020611] border-slate-200 dark:border-white/10 text-xs font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all uppercase tracking-tight text-slate-700 dark:text-white"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-md border bg-white dark:bg-[#020611] border-slate-200 dark:border-white/10 text-xs font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all tracking-tight text-slate-700 dark:text-white"
                 />
             </div>
         </div>
