@@ -1,4 +1,5 @@
 "use client";
+import { uploadImage } from "@/services/imageUpload";
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db, auth } from '@/services/firebase';
@@ -168,7 +169,8 @@ export default function ProfilePage() {
         if (!imageToCrop || !croppedAreaPixels || !user || !profile) return;
         setUploadingImg(true);
         try {
-            const croppedImage = await getCroppedImg(imageToCrop, croppedAreaPixels);
+            const croppedData = await getCroppedImg(imageToCrop, croppedAreaPixels);
+            const croppedImage = croppedData ? await uploadImage(croppedData, { folder: "avatars", maxSize: 512 }) : null;
             if (croppedImage) {
                 await updateDoc(doc(db, "users", user.uid), { photoURL: croppedImage });
                 try { await updateProfile(user, { photoURL: croppedImage }); } catch (e) { console.error("Auth update failed:", e); }

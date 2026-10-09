@@ -1,4 +1,5 @@
 "use client";
+import { uploadImage } from "@/services/imageUpload";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -241,31 +242,8 @@ export default function CourtsPage() {
         setTimeout(() => setToast(null), 3000);
     };
 
-    const compressImage = (file: File): Promise<string> => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (event) => {
-                const img = new Image();
-                img.src = event.target?.result as string;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 800;
-                    const scaleSize = MAX_WIDTH / img.width;
-                    const newWidth = img.width > MAX_WIDTH ? MAX_WIDTH : img.width;
-                    const newHeight = img.width > MAX_WIDTH ? img.height * scaleSize : img.height;
-                    canvas.width = newWidth;
-                    canvas.height = newHeight;
-                    const ctx = canvas.getContext('2d');
-                    ctx?.drawImage(img, 0, 0, newWidth, newHeight);
-                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                    resolve(compressedDataUrl);
-                };
-                img.onerror = (error) => reject(error);
-            };
-            reader.onerror = (error) => reject(error);
-        });
-    };
+    // Comprime y sube a Storage; devuelve la URL (antes: base64 dentro de Firestore)
+    const compressImage = (file: File): Promise<string> => uploadImage(file, { folder: "courts", maxSize: 1200, quality: 0.75 });
 
     const fetchVenues = async () => {
         if (!user?.uid) return;

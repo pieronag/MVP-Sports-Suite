@@ -1,4 +1,5 @@
 "use client";
+import { uploadImage } from "@/services/imageUpload";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -8,7 +9,6 @@ import { useAuth } from "@/context/AuthContext";
 import { gamificationService } from "@/services/player/gamificationService";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
-import { toPng } from "html-to-image";
 import {
   ChevronLeft, Sun, Moon, Camera, Trophy, Target, Handshake, Star,
   Medal, Sparkles, Download, Activity, User as UserIcon, MapPin, Zap,
@@ -136,13 +136,9 @@ export default function PerfilPage() {
     if (!file || !user) return;
     setUploading(true);
     try {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64 = reader.result as string;
-        await updateDoc(doc(db, "users", user.uid), { photoURL: base64 });
-        await reloadProfile();
-      };
-      reader.readAsDataURL(file);
+      const url = await uploadImage(file, { folder: "avatars", maxSize: 512 });
+      await updateDoc(doc(db, "users", user.uid), { photoURL: url });
+      await reloadProfile();
     } catch (err) {
       console.error(err);
     } finally {
@@ -157,6 +153,7 @@ export default function PerfilPage() {
       // Wait a frame for rendering to settle (font loading, image rasterization)
       await new Promise((r) => requestAnimationFrame(r));
       await new Promise((r) => requestAnimationFrame(r));
+      const { toPng } = await import("html-to-image");
       const dataUrl = await toPng(cardRef.current, {
         quality: 1,
         pixelRatio: 2,

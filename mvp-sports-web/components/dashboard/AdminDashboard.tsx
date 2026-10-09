@@ -17,7 +17,7 @@ import {
 import AdminKpiSection from './AdminKpiSection';
 import RevenueChart from './RevenueChart';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { collection, query, orderBy, limit, onSnapshot, doc } from 'firebase/firestore';
+import { collection, query, orderBy, limit, onSnapshot, doc, getCountFromServer } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { SectionCard } from '@/components/ui/DashboardWidgets';
 
@@ -168,7 +168,13 @@ export default function AdminDashboard() {
             setRawBookings(bookingsSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
         }, (error: any) => console.error("Error bookings snapshot:", error));
 
-        const unsubUsers = onSnapshot(collection(db, "users"), (s: any) => setKpis(prev => ({ ...prev, users: s.size })), (error: any) => console.error("Error users snapshot:", error));
+        // Conteo agregado cada 60 s (antes: listener en vivo sobre TODOS los usuarios, con sus fotos)
+        const refreshUsers = () => getCountFromServer(collection(db, "users"))
+            .then(r => setKpis(prev => ({ ...prev, users: r.data().count })))
+            .catch((error: any) => console.error("Error users count:", error));
+        refreshUsers();
+        const usersTimer = setInterval(refreshUsers, 60_000);
+        const unsubUsers = () => clearInterval(usersTimer);
 
         const qAudit = query(collection(db, "audit"), orderBy("timestamp", "desc"), limit(10));
         const unsubAudit = onSnapshot(qAudit, (auditSnap: any) => {

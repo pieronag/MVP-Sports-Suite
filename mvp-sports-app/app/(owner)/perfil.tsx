@@ -90,13 +90,12 @@ export default function ProfileScreen() {
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 aspect: [1, 1],
-                quality: 0.5,
-                base64: true,
+                quality: 0.6,
             });
 
-            if (!result.canceled && result.assets[0].base64 && user) {
+            if (!result.canceled && result.assets[0]?.uri && user) {
                 setLoading(true);
-                const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+                const base64Image = await userService.uploadImage(user.uid, result.assets[0].uri, 'avatars');
                 
                 // 1. Actualizar Firestore (users)
                 await updateDoc(doc(db, 'users', user.uid), { 

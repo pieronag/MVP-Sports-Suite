@@ -32,7 +32,7 @@ import {
     ArrowUpRight01Icon,
     CreditCardIcon,
 } from '@hugeicons/core-free-icons';
-import { doc, getDoc, updateDoc, collection, query, where, getDocs, serverTimestamp, writeBatch, setDoc, orderBy, limit } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, query, where, getDocs, getCountFromServer, serverTimestamp, writeBatch, setDoc, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
 import { useAuth } from '@/context/AuthContext';
@@ -158,15 +158,13 @@ export default function SettingsPage() {
                 });
 
                 // Estado del sistema (Núcleo)
-                const [tSnap2, uSnap, bSnap, iSnap, rSnap, aSnap] = await Promise.all([
-                    getDocs(collection(db, 'tenants')),
-                    getDocs(collection(db, 'users')),
-                    getDocs(collection(db, 'bookings')),
-                    getDocs(collection(db, 'invoices')),
-                    getDocs(collection(db, 'reports')),
+                // Conteos agregados en el servidor (antes descargaba las 5 colecciones completas)
+                const count = (c: string) => getCountFromServer(collection(db, c)).then(r => r.data().count);
+                const [tenantsN, usersN, bookingsN, invoicesN, reportsN, aSnap] = await Promise.all([
+                    count('tenants'), count('users'), count('bookings'), count('invoices'), count('reports'),
                     getDocs(query(collection(db, 'audit'), orderBy('timestamp', 'desc'), limit(6))),
                 ]);
-                setSystemStats({ tenants: tSnap2.size, users: uSnap.size, bookings: bSnap.size, invoices: iSnap.size, reports: rSnap.size });
+                setSystemStats({ tenants: tenantsN, users: usersN, bookings: bookingsN, invoices: invoicesN, reports: reportsN });
                 setRecentAudit(aSnap.docs.map(d => ({ id: d.id, ...d.data() })));
             } catch (e) { console.error(e); } finally { setLoading(false); }
         };

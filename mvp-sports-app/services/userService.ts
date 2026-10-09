@@ -1,5 +1,5 @@
 import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 import { db, storage } from './firebase';
 import { UserProfile } from '../types/user';
 import { auditService } from './auditService';
@@ -26,19 +26,14 @@ export interface GamificationSettings {
 
 export const userService = {
     /**
-     * Uploads a base64 image to Firebase Storage and returns the URL
+     * Sube una imagen local (uri del ImagePicker) a Storage y devuelve su URL.
+     * Reemplaza guardar base64 dentro de Firestore (documentos pesados en cada lectura).
      */
-    async uploadProfileImage(uid: string, base64: string): Promise<string> {
-        try {
-            const storageRef = ref(storage, `avatars/${uid}.jpg`);
-            // uploadString handles the data_url format
-            await uploadString(storageRef, base64, 'data_url');
-            const downloadURL = await getDownloadURL(storageRef);
-            return downloadURL;
-        } catch (error) {
-            console.error('Error uploading image:', error);
-            throw error;
-        }
+    async uploadImage(uid: string, uri: string, folder: 'avatars' | 'teams'): Promise<string> {
+        const blob = await (await fetch(uri)).blob();
+        const storageRef = ref(storage, `images/${uid}/${folder}/${Date.now()}.jpg`);
+        await uploadBytes(storageRef, blob, { contentType: 'image/jpeg', cacheControl: 'public, max-age=31536000, immutable' });
+        return getDownloadURL(storageRef);
     },
     /**
      * Gets the global gamification settings

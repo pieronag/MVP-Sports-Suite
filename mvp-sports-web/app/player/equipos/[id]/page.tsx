@@ -1,4 +1,5 @@
 "use client";
+import { uploadImage } from "@/services/imageUpload";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ChevronLeft, Users, Trophy, Shield, MessageCircle, Crown, Copy, CheckCircle2, AlertCircle, X, User, Camera, MoreHorizontal, Edit, Trash2, LogOut, Star, Zap, Image as ImageIcon } from "@/components/player/icons";
@@ -158,13 +159,10 @@ export default function EquipoDetailPage() {
     if (!file || !team) return;
     setActionLoading(true);
     try {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        await teamService.updateTeam(team.id, { imageUrl: reader.result as string });
-        fetchTeam();
-        setFeedback({ type: "success", msg: "Foto actualizada." });
-      };
-      reader.readAsDataURL(file);
+      const url = await uploadImage(file, { folder: "teams", maxSize: 512 });
+      await teamService.updateTeam(team.id, { imageUrl: url });
+      fetchTeam();
+      setFeedback({ type: "success", msg: "Foto actualizada." });
     } catch { setFeedback({ type: "error", msg: "Error al subir foto." }); }
     finally { setActionLoading(false); }
   };

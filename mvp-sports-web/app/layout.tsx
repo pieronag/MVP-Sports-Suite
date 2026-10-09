@@ -7,7 +7,7 @@ import { QueryProvider } from "../context/QueryProvider";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const firaSans = Fira_Sans({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700", "800", "900"], variable: "--font-fira-sans", display: "swap" });
+const firaSans = Fira_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700", "900"], variable: "--font-fira-sans", display: "swap" });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-inter", display: "swap" });
 const firaCode = Fira_Code({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-fira-code", display: "swap" });
 

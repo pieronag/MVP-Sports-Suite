@@ -24,8 +24,11 @@ import {
 } from '@hugeicons/core-free-icons';
 import { collection, getDocs, query, orderBy, where, addDoc, serverTimestamp, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+// jsPDF (~400 KB) se carga solo al exportar
+const loadPdf = async () => {
+    const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([import('jspdf'), import('jspdf-autotable')]);
+    return { jsPDF, autoTable };
+};
 import { TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';
 
 const formatCLP = (amount: number) => {
@@ -238,6 +241,7 @@ export default function Page() {
     };
 
 const buildPdf = async (inv: Invoice) => {
+        const { jsPDF, autoTable } = await loadPdf();
         const docPDF = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
         const b = inv.breakdown || {};
         const corp = globalSettings?.corporateData || {

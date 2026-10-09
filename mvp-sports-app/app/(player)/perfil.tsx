@@ -116,14 +116,13 @@ export default function PerfilScreen() {
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 aspect: [1, 1],
-                quality: 0.5,
-                base64: true,
+                quality: 0.6,
                 legacy: true
             } as any);
-            if (!result.canceled && result.assets[0].base64 && user) {
+            if (!result.canceled && result.assets[0]?.uri && user) {
                 setUploading(true);
-                const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
-                await updateDoc(doc(db, 'users', user.uid), { photoURL: base64Image });
+                const photoURL = await userService.uploadImage(user.uid, result.assets[0].uri, 'avatars');
+                await updateDoc(doc(db, 'users', user.uid), { photoURL });
                 loadData();
             }
         } catch (error) {

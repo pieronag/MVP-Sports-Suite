@@ -160,16 +160,16 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
 export default function PlayerLayoutClient({ children }: { children: React.ReactNode }) {
     const { user, loading } = useAuth();
     const router = useRouter();
-    const [showSplash, setShowSplash] = useState(true);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         if (!loading && !user) router.replace('/login');
     }, [user, loading, router]);
 
-    useEffect(() => { setMounted(true); const t = setTimeout(() => setShowSplash(false), 1000); return () => clearTimeout(t); }, []);
+    // Sin espera artificial: el splash solo cubre la carga real de la sesión
+    useEffect(() => { setMounted(true); }, []);
 
-    if (loading || showSplash) {
+    if (loading) {
         return (
             <div className="min-h-screen bg-slate-950 flex items-center justify-center overflow-hidden relative">
                 {/* Glow Mesh */}

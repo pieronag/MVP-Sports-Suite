@@ -96,7 +96,8 @@ export default function Page() {
                 getDocs(collection(db, "courts")),
                 getDocs(collection(db, "staff")),
                 getDocs(collection(db, "reviews")),
-                getDocs(collection(db, "bookings")),
+                // Solo reservas calificadas (antes: toda la colección de reservas)
+                getDocs(query(collection(db, "bookings"), where("rating", ">", 0))),
             ]);
 
             // Agrupar por tenantId

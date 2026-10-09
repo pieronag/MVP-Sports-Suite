@@ -15,7 +15,7 @@ import {
 } from 'lucide-react-native';
 import { useAuth } from '../../../store/useAuth';
 import { LinearGradient } from 'expo-linear-gradient';
-import { db } from '../../../services/firebase';
+import { db, auth } from '../../../services/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { userService } from '../../../services/userService';
 import { teamService } from '../../../services/teamService';
@@ -268,15 +268,16 @@ export default function TeamDetailsScreen() {
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
             aspect: [1, 1],
-            quality: 0.5, // Reduced quality for base64 storage
-            base64: true,
+            quality: 0.6,
         });
 
-        if (!result.canceled && result.assets[0].base64) {
+        if (!result.canceled && result.assets[0]?.uri) {
             setActionLoading(true);
             try {
-                const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
-                await teamService.updateTeam(teamInfo.id as string, { imageUrl: base64Image });
+                const uid = auth.currentUser?.uid;
+                if (!uid) throw new Error('Sin sesión');
+                const imageUrl = await userService.uploadImage(uid, result.assets[0].uri, 'teams');
+                await teamService.updateTeam(teamInfo.id as string, { imageUrl });
                 fetchTeam();
                 showFeedback('success', '¡Foto del equipo actualizada!');
             } catch (error) {

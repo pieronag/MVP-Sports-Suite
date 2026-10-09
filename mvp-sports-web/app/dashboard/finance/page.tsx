@@ -23,8 +23,11 @@ import {
     TrophyIcon,
 } from '@hugeicons/core-free-icons';
 import { PanelGlass, TarjetaKpi } from '@/components/ui/DashboardWidgets';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+// jsPDF (~400 KB) se carga solo al exportar
+const loadPdf = async () => {
+    const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([import('jspdf'), import('jspdf-autotable')]);
+    return { jsPDF, autoTable };
+};
 
 // --- INTERFACES ---
 interface Transaction {
@@ -283,7 +286,8 @@ export default function FinancePage() {
     const sumVisible = visibleTransactions.reduce((acc, t) => acc + t.amount, 0);
 
     // 5. Exportaciones
-    const generatePDF = () => {
+    const generatePDF = async () => {
+        const { jsPDF, autoTable } = await loadPdf();
         const doc = new jsPDF();
         const venueName = selectedVenueId === 'all' ? 'Todos los Recintos' : myVenues.find(v => v.id === selectedVenueId)?.name || 'Recinto';
         const reportMonth = `${MONTHS[selectedMonth]} ${selectedYear}`;
