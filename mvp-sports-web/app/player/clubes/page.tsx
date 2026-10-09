@@ -130,7 +130,7 @@ export default function ExploreClubesPage() {
             const SportIcon = SPORT_ICON_MAP[sport.toLowerCase()];
             return (
               <button key={sport} onClick={() => setSelectedSport(sport)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-md text-[12px] font-semibold uppercase whitespace-nowrap transition-all active:scale-95 ${selectedSport === sport ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+                className={`flex items-center gap-1.5 h-10 px-4 rounded-md text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${selectedSport === sport ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
                 {SportIcon && <SportIcon color={selectedSport === sport ? "white" : isDark ? "#94a3b8" : "#64748b"} size={14} />}
                 {sport}
               </button>
@@ -140,7 +140,7 @@ export default function ExploreClubesPage() {
         <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-none">
           {communesList.map((commune) => (
             <button key={commune} onClick={() => setSelectedCommune(commune)}
-              className={`px-3.5 py-2 rounded-md text-[12px] font-semibold uppercase whitespace-nowrap transition-all active:scale-95 ${selectedCommune === commune ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+              className={`h-10 px-4 rounded-md text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${selectedCommune === commune ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
               {commune}
             </button>
           ))}

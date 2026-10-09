@@ -180,7 +180,7 @@ export default function MapaPage() {
             const CatIcon = cat.icon;
             return (
               <button key={cat.id} onClick={() => setActiveSport(cat.id)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-md text-[12px] font-semibold uppercase whitespace-nowrap transition-all active:scale-95 ${activeSport === cat.id ? "text-white" : isDark ? "text-slate-400 bg-white/[0.06] hover:bg-white/[0.1]" : "text-slate-500 bg-slate-100 hover:bg-slate-200"}`}
+                className={`flex items-center gap-1.5 h-10 px-4 rounded-md text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${activeSport === cat.id ? "text-white" : isDark ? "text-slate-400 bg-white/[0.06] hover:bg-white/[0.1]" : "text-slate-500 bg-slate-100 hover:bg-slate-200"}`}
                 style={activeSport === cat.id ? { backgroundColor: getSportColor(cat.id) } : {}}>
                 {CatIcon && <CatIcon color={activeSport === cat.id ? "white" : isDark ? "#94a3b8" : "#64748b"} size={14} />}
                 {cat.name}

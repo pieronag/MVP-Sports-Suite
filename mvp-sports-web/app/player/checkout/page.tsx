@@ -9,6 +9,9 @@ import { walletService } from "@/services/player/walletService";
 import { couponService } from "@/services/player/couponService";
 import { tournamentService } from "@/services/player/tournamentService";
 import { teamService } from "@/services/player/teamService";
+import { bookingService } from "@/services/player/bookingService";
+import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/services/firebase";
 
 
 
@@ -22,7 +25,11 @@ export default function CheckoutPage() {
   const activeColor = searchParams.get("sportColor") || "#10b981";
 
   const [processing, setProcessing] = useState(false);
-  const method = "mercadopago" as const;
+  // Métodos de pago: Mercado Pago (si el recinto lo tiene activo) o en el recinto
+  // (salvo inasistencia previa con pago en efectivo, o si el recinto exige pago online)
+  const [method, setMethod] = useState<"mercadopago" | "venue">("mercadopago");
+  const [tenantInfo, setTenantInfo] = useState<{ mpActive: boolean; requireOnline: boolean } | null>(null);
+  const [hasCashNoShow, setHasCashNoShow] = useState(false);
   const [customAlert, setCustomAlert] = useState<{ visible: boolean; title: string; message: string; type: "success" | "error"; onClose?: () => void }>({ visible: false, title: "", message: "", type: "success" });
   const [userTeams, setUserTeams] = useState<any[]>([]);
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
@@ -74,6 +81,56 @@ export default function CheckoutPage() {
   };
 
   // Único método de pago: Mercado Pago. El monto lo calcula el servidor.
+  useEffect(() => {
+    if (!tenantId) return;
+    getDoc(doc(db, "tenants", tenantId)).then(snap => {
+      const t: any = snap.data() || {};
+      const mpActive = t.isMercadopagoActive !== false && !!(t.isMercadopagoActive || t.mercadopagoPublicKey);
+      const requireOnline = t.requireOnlinePayment === true || searchParams.get("requireOnlinePayment") === "true";
+      setTenantInfo({ mpActive, requireOnline });
+      setMethod(mpActive ? "mercadopago" : "venue");
+    }).catch(() => setTenantInfo({ mpActive: true, requireOnline: false }));
+  }, [tenantId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const uid = (profile as any)?.uid;
+    if (!uid) return;
+    getDocs(query(collection(db, "bookings"), where("userId", "==", uid))).then(snap => {
+      setHasCashNoShow(snap.docs.some(d => {
+        const b: any = d.data();
+        const noShow = b.status === "no-show" || b.paymentStatus === "no-show" || b.noShow === true;
+        return noShow && (b.paymentMethod === "cash" || b.paymentMethod === "venue");
+      }));
+    }).catch(() => undefined);
+  }, [profile]);
+
+  const venueAllowed = !isTournament && !hasCashNoShow && !tenantInfo?.requireOnline;
+  const mpAllowed = isTournament || tenantInfo?.mpActive !== false;
+
+  // Reserva con pago en el recinto: queda pendiente y se cobra al llegar
+  const confirmVenueBooking = async () => {
+    const userProfile = profile as any;
+    // El horario puede haberse tomado mientras el jugador elegía
+    const slot = await getDoc(doc(db, "court_slots", `${courtId}_${date}`)).catch(() => null);
+    if ((slot?.data() as any)?.taken?.[startTime as string]) throw new Error("Ese horario acaba de ser reservado. Elige otro.");
+    const [sh, sm] = String(startTime).split(":").map(Number);
+    const when = new Date(`${date}T00:00:00`);
+    when.setHours(sh, sm || 0, 0, 0);
+    if (sh < 6) when.setDate(when.getDate() + 1);
+    const total = Math.max(0, Math.round(finalPrice));
+    const id = await bookingService.createBooking({
+      userId: userProfile.uid, tenantId: tenantId as string, tenantName: tenantName || "Recinto",
+      courtId: courtId as string, courtName: courtName || "Cancha", sport: sport || "futbol",
+      clientName: userProfile.displayName || userProfile.fullName || "Jugador MVP", clientPhone: userProfile.phone || "",
+      date: Timestamp.fromDate(when), startTime: startTime as string,
+      endTime: `${String((sh + 1) % 24).padStart(2, "0")}:${String(sm || 0).padStart(2, "0")}`,
+      price: total, totalPrice: total, originalPrice: Number(price), couponCode: appliedCoupon?.code || null,
+      discountApplied: appliedCoupon?.discount || 0, status: "confirmed", paymentStatus: "pending", paymentMethod: "cash",
+      createdBy: userProfile.email || userProfile.uid, ...(selectedTeamId ? { teamId: selectedTeamId } : {}),
+    } as any);
+    router.replace(`/player/ticket?bookingId=${id}`);
+  };
+
   const handleConfirm = async () => {
     if (!profile) return;
     setProcessing(true);
@@ -86,6 +143,7 @@ export default function CheckoutPage() {
         return;
       }
       if (!tenantId || !courtId || !date || !startTime || !sport) throw new Error("Datos de reserva incompletos");
+      if (method === "venue") { await confirmVenueBooking(); return; }
       const res = await walletService.createMercadoPagoBooking({
         tenantId, courtId, sport, date, startTime,
         couponCode: appliedCoupon?.code || undefined,
@@ -242,10 +300,12 @@ export default function CheckoutPage() {
         <GlowCard isDark={isDark}>
           <div className="p-5 space-y-3">
             {[
-              { id: "mercadopago" as const, name: "Mercado Pago", sub: "Tarjeta de crédito, débito o saldo Mercado Pago", color: "#00B2E3" },
+              ...(mpAllowed ? [{ id: "mercadopago" as const, name: "Mercado Pago", sub: "Tarjeta de crédito, débito o saldo Mercado Pago", color: "#00B2E3" }] : []),
+              ...(venueAllowed ? [{ id: "venue" as const, name: "Pagar en el recinto", sub: "Reserva ahora y paga al llegar a la cancha", color: "#10b981" }] : []),
             ].map((m) => (
               <button
                 key={m.id}
+                onClick={() => setMethod(m.id)}
                 className={`w-full flex items-center gap-4 p-4 rounded-md border transition-all text-left ${
                   method === m.id
                     ? "border-emerald-500 bg-emerald-500/5"
@@ -266,6 +326,12 @@ export default function CheckoutPage() {
                 </span>
               </button>
             ))}
+            {hasCashNoShow && !isTournament && (
+              <p className="text-xs text-amber-500">Por una inasistencia anterior, este recinto requiere pagar online para reservar.</p>
+            )}
+            {!mpAllowed && !venueAllowed && (
+              <p className="text-xs text-rose-500">Este recinto no tiene métodos de pago disponibles para tu cuenta.</p>
+            )}
           </div>
         </GlowCard>
 
@@ -276,10 +342,10 @@ export default function CheckoutPage() {
       </div>
 
       <div className={`fixed bottom-0 left-0 right-0 p-5 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-        <button onClick={handleConfirm} disabled={processing}
+        <button onClick={handleConfirm} disabled={processing || (!isTournament && !mpAllowed && !venueAllowed)}
           className="w-full h-14 rounded-md flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
           style={{ backgroundColor: activeColor, boxShadow: `0 4px 20px ${activeColor}40` }}>
-          {processing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><CreditCard size={20} className="text-white" /><span className="text-white font-semibold text-sm uppercase tracking-wide">{isTournament ? "Pagar Inscripción" : `Pagar $${formatMoney(finalPrice)}`}</span></>}
+          {processing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><CreditCard size={20} className="text-white" /><span className="text-white font-semibold text-sm uppercase tracking-wide">{isTournament ? "Pagar Inscripción" : method === "venue" ? "Reservar y pagar en el recinto" : `Pagar $${formatMoney(finalPrice)}`}</span></>}
         </button>
       </div>
 
