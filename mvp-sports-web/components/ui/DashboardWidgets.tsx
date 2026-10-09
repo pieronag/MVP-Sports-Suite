@@ -1,5 +1,10 @@
 import React from 'react';
-import { ArrowTrendingUpIcon, ArrowTrendingDownIcon } from '@heroicons/react/24/outline';
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowDownRight01Icon, ArrowUpRight01Icon } from "@hugeicons/core-free-icons";
+
+// Adaptadores: conservan los nombres del JSX sobre Hugeicons
+const ArrowTrendingUpIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={ArrowUpRight01Icon} className={className} strokeWidth={1.6} />;
+const ArrowTrendingDownIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={ArrowDownRight01Icon} className={className} strokeWidth={1.6} />;
 
 interface TarjetaKpiProps {
     titulo?: string;

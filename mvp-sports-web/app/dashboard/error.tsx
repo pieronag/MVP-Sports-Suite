@@ -1,7 +1,12 @@
 "use client";
 import { useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
-import { ExclamationTriangleIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert02Icon, RefreshIcon } from "@hugeicons/core-free-icons";
+
+// Adaptadores: conservan los nombres del JSX sobre Hugeicons
+const ExclamationTriangleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Alert02Icon} className={className} strokeWidth={1.6} />;
+const ArrowPathIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={RefreshIcon} className={className} strokeWidth={1.6} />;
 
 export default function DashboardError({
   error,

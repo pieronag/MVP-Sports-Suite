@@ -1,6 +1,10 @@
 "use client";
 import Link from "next/link";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { RefreshIcon } from "@hugeicons/core-free-icons";
+
+// Adaptadores: conservan los nombres del JSX sobre Hugeicons
+const ArrowPathIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={RefreshIcon} className={className} strokeWidth={1.6} />;
 
 export default function RootError({
   error,

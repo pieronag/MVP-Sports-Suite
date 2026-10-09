@@ -1,12 +1,17 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { 
-    XMarkIcon, ExclamationCircleIcon, ArrowPathIcon, CheckCircleIcon 
-} from '@heroicons/react/24/outline';
+import { HugeiconsIcon } from "@hugeicons/react";
+import { AlertCircleIcon, Cancel01Icon, CheckmarkCircle02Icon, RefreshIcon } from "@hugeicons/core-free-icons";
 import { 
     collection, query, where, getDocs, doc, getDoc, addDoc, Timestamp, setDoc 
 } from 'firebase/firestore';
 import { db } from '@/services/firebase';
+
+// Adaptadores: conservan los nombres del JSX sobre Hugeicons
+const XMarkIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Cancel01Icon} className={className} strokeWidth={1.6} />;
+const ExclamationCircleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={AlertCircleIcon} className={className} strokeWidth={1.6} />;
+const ArrowPathIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={RefreshIcon} className={className} strokeWidth={1.6} />;
+const CheckCircleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={CheckmarkCircle02Icon} className={className} strokeWidth={1.6} />;
 
 interface Court {
     id: string;

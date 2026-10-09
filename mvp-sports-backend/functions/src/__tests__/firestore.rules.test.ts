@@ -87,3 +87,29 @@ describe("reservas", () => {
     await assertSucceeds(updateDoc(doc(as("managerA"), "bookings/bA"), {paymentStatus: "paid"}));
   });
 });
+
+describe("equipos, reseñas y disponibilidad", () => {
+  beforeEach(async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "teams/t1"), {ownerId: "captain", members: ["captain", "player1"], joinRequests: []});
+    });
+  });
+  it("un jugador pide unirse pero no se agrega como miembro", async () => {
+    await assertSucceeds(updateDoc(doc(as("player2"), "teams/t1"), {joinRequests: ["player2"]}));
+    await assertFails(updateDoc(doc(as("player2"), "teams/t1"), {members: ["captain", "player1", "player2"]}));
+  });
+  it("un miembro puede salir del equipo", async () => {
+    await assertSucceeds(updateDoc(doc(as("player1"), "teams/t1"), {members: ["captain"]}));
+  });
+  it("no se crea un equipo a nombre de otro", async () => {
+    await assertFails(setDoc(doc(as("player1"), "teams/t2"), {ownerId: "captain", members: ["captain"]}));
+  });
+  it("solo el titular de la reserva la reseña", async () => {
+    await assertSucceeds(setDoc(doc(as("player1"), "reviews/r1"), {bookingId: "bA", userId: "player1", rating: 5}));
+    await assertFails(setDoc(doc(as("player2"), "reviews/r2"), {bookingId: "bA", userId: "player2", rating: 1}));
+  });
+  it("un jugador no lee reservas ajenas pero sí la disponibilidad", async () => {
+    await assertFails(getDoc(doc(as("player2"), "bookings/bA")));
+    await assertSucceeds(getDoc(doc(as("player2"), "court_slots/cA_2026-10-10")));
+  });
+});

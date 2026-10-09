@@ -1,6 +1,10 @@
 "use client";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert02Icon } from "@hugeicons/core-free-icons";
 import Link from "next/link";
+
+// Adaptadores: conservan los nombres del JSX sobre Hugeicons
+const ExclamationTriangleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Alert02Icon} className={className} strokeWidth={1.6} />;
 
 export default function LoginError({
   error,

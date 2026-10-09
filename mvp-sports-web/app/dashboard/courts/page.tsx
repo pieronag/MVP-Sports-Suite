@@ -51,7 +51,6 @@ import {
     Diamond01Icon,
 } from '@hugeicons/core-free-icons';
 import VenueCard from '@/components/courts/VenueCard';
-import CourtCard from '@/components/courts/CourtCard';
 import CourtModal from '@/components/courts/CourtModal';
 import MaintenanceModal from '@/components/courts/MaintenanceModal';
 import { PanelGlass, TarjetaKpi } from '@/components/ui/DashboardWidgets';

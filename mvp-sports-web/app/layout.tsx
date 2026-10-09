@@ -36,7 +36,7 @@ export default function RootLayout({
 }>) {
   // CORRECCIÓN: Eliminamos el comentario y espacios entre <html> y <body>
   return (
-    <html lang="es">
+    <html lang="es" data-scroll-behavior="smooth">
       <head>
         <link rel="preconnect" href="https://mvp-sports-chile.firebaseapp.com" />
         <link rel="preconnect" href="https://apis.google.com" />

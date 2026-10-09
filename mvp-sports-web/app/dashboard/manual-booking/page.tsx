@@ -3,7 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
 import { collection, query, where, getDocs, doc, setDoc, Timestamp } from 'firebase/firestore';
-import { PencilSquareIcon, CheckCircleIcon, UsersIcon, MapPinIcon, CalendarDaysIcon, ClockIcon, BuildingOfficeIcon, UserCircleIcon, PhoneIcon, ArrowPathIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Alert02Icon, Building03Icon, CheckmarkCircle02Icon, RefreshIcon, UserGroupIcon } from "@hugeicons/core-free-icons";
+
+// Adaptadores: conservan los nombres del JSX sobre Hugeicons
+const CheckCircleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={CheckmarkCircle02Icon} className={className} strokeWidth={1.6} />;
+const UsersIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={UserGroupIcon} className={className} strokeWidth={1.6} />;
+const BuildingOfficeIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Building03Icon} className={className} strokeWidth={1.6} />;
+const ArrowPathIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={RefreshIcon} className={className} strokeWidth={1.6} />;
+const ExclamationTriangleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Alert02Icon} className={className} strokeWidth={1.6} />;
 
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
