@@ -33,6 +33,35 @@ async function isAuthorizedManager(idToken: string): Promise<string | null> {
 }
 
 /**
+ * El objetivo debe ser personal (manager/staff) de un recinto que el llamador
+ * gestiona. Superadmin puede todo. Evita que un manager tome cuentas ajenas.
+ */
+async function canManageStaffMember(callerUid: string, targetUid: string): Promise<boolean> {
+    const db = adminDb();
+    const [callerDoc, targetDoc] = await Promise.all([
+        db.collection("users").doc(callerUid).get(),
+        db.collection("users").doc(targetUid).get(),
+    ]);
+    const callerRole = String(callerDoc.data()?.role || "").toLowerCase();
+    if (["admin", "superadmin"].includes(callerRole)) return true;
+
+    const target = targetDoc.data();
+    if (!target || !["manager", "staff"].includes(String(target.role || "").toLowerCase())) return false;
+    const targetTenants: string[] = target.tenantIds || (target.tenantId ? [target.tenantId] : []);
+    if (!targetTenants.length) return false;
+
+    // Recintos del llamador: asignados o de los que es dueño
+    const callerTenants = new Set<string>(callerDoc.data()?.tenantIds || (callerDoc.data()?.tenantId ? [callerDoc.data()?.tenantId] : []));
+    const owned = await db.collection("tenants").where("ownerId", "==", callerUid).get();
+    owned.docs.forEach((d) => callerTenants.add(d.id));
+    const ownedMulti = await db.collection("tenants").where("ownerIds", "array-contains", callerUid).get();
+    ownedMulti.docs.forEach((d) => callerTenants.add(d.id));
+    // Un manager solo gestiona staff; un owner también a sus managers
+    if (callerRole === "manager" && String(target.role).toLowerCase() !== "staff") return false;
+    return targetTenants.some((t) => callerTenants.has(t));
+}
+
+/**
  * Actualiza la contraseña de un miembro del staff desde el servidor.
  * Requiere un ID token válido de un usuario con rol de gestión.
  * @param uid UID del usuario en Firebase Auth
@@ -52,6 +81,10 @@ export async function updateStaffPassword(uid: string, newPassword: string, idTo
         const authorizedUid = await isAuthorizedManager(idToken);
         if (!authorizedUid) {
             return { success: false, error: "No tienes permisos para realizar esta acción" };
+        }
+
+        if (!(await canManageStaffMember(authorizedUid, uid))) {
+            return { success: false, error: "Solo puedes cambiar la contraseña de personal de tus recintos" };
         }
 
         await getAdminAuth().updateUser(uid, {

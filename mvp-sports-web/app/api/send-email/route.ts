@@ -8,16 +8,25 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No autorizado.' }, { status: 401 });
     }
     const token = authHeader.split('Bearer ')[1];
+    let callerEmail = '';
     try {
-      await getAdminAuth().verifyIdToken(token);
+      callerEmail = ((await getAdminAuth().verifyIdToken(token)).email || '').toLowerCase();
     } catch {
       return NextResponse.json({ error: 'Token inválido.' }, { status: 401 });
     }
 
-    const { name, email, rut, phone, sport, position } = await request.json();
+    const raw = await request.json();
+    // Escapa todo lo que viene del cliente antes de insertarlo en el HTML del correo
+    const esc = (v: unknown) => String(v ?? '').slice(0, 120).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+    const email = String(raw?.email || '').trim().toLowerCase();
+    const [name, rut, phone, sport, position] = [raw?.name, raw?.rut, raw?.phone, raw?.sport, raw?.position].map((v) => (v ? esc(v) : ''));
 
     if (!email || !name) {
       return NextResponse.json({ error: 'Email and Name are required.' }, { status: 400 });
+    }
+    // Solo el correo de bienvenida de la propia cuenta
+    if (email !== callerEmail) {
+      return NextResponse.json({ error: 'Solo puedes enviarte el correo a tu propia cuenta.' }, { status: 403 });
     }
 
     const resendApiKey = process.env.RESEND_API_KEY;
