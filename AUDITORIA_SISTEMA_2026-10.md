@@ -112,7 +112,7 @@ Verificado en localhost: manifest e íconos responden 200, el header del SW est�
 | C-16 (nuevo) `/api/send-email` a cualquier destinatario con HTML sin escapar | ✅ Solo al correo de la sesión, HTML escapado | `98e5270` |
 | F-2 Heroicons/Lucide restantes | ✅ Todo en Hugeicons (SVG propios de deportes se mantienen); librerías eliminadas | `80c7369` |
 | F-5 / F-6 avisos y archivos sobrantes | ✅ `data-scroll-behavior`; capturas viejas y logo Transbank eliminados | `80c7369` |
-| Reglas sin probar en emulador | ⏳ 17 casos listos en `functions/src/__tests__/firestore.rules.test.ts` (requiere Java 21) | — |
+| Reglas sin probar en emulador | ⏳ 15 casos listos en `functions/src/__tests__/firestore.rules.test.ts` (requiere Java 21) | — |
 | F-1 diseño del área jugador | ⏳ Decisión de diseño pendiente (hoy usa su propia paleta oscura) | — |
 | F-3 páginas de 50–130 KB | ⏳ Refactor gradual a servicios + react-query | — |
 
