@@ -23,6 +23,8 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
         { href: '/player/perfil', label: 'Perfil', icon: User },
     ];
 
+    // Pantallas con acción fija abajo (pagar, escribir): sin barra inferior
+    const hideBottomNav = ['/player/checkout', '/player/equipos/chat', '/player/equipos/partidos/chat'].some(p => pathname.startsWith(p));
     const isActive = (href: string) => href === '/player' ? pathname === '/player' : pathname.startsWith(href);
     const handleLogout = async () => { await logout(); router.push('/login'); };
 
@@ -126,11 +128,11 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="lg:pl-72">
-                <main className="pb-[calc(84px+env(safe-area-inset-bottom))] lg:pb-4">{children}</main>
+                <main className={hideBottomNav ? "pb-4" : "pb-[calc(84px+env(safe-area-inset-bottom))] lg:pb-4"}>{children}</main>
             </div>
 
             {/* Barra inferior móvil (navegación tipo app instalada) */}
-            <nav className={`lg:hidden fixed bottom-0 inset-x-0 z-40 border-t backdrop-blur-md pb-[env(safe-area-inset-bottom)] ${isDark ? 'bg-[#020617]/95 border-white/5' : 'bg-white/95 border-slate-200'}`}>
+            {!hideBottomNav && <nav className={`lg:hidden fixed bottom-0 inset-x-0 z-40 border-t backdrop-blur-md pb-[env(safe-area-inset-bottom)] ${isDark ? 'bg-[#020617]/95 border-white/5' : 'bg-white/95 border-slate-200'}`}>
                 <div className="grid grid-cols-5 h-16">
                     {tabs.map(tab => {
                         const a = isActive(tab.href);
@@ -146,7 +148,7 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
                         <Menu size={20} /> Más
                     </button>
                 </div>
-            </nav>
+            </nav>}
 
             <PwaSupport />
 
