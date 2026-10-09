@@ -2,6 +2,7 @@ import "server-only";
 import crypto from "crypto";
 import { adminDb } from "./firebase-admin";
 import { resolveMercadoPagoToken } from "./tenant-secrets";
+import { commitRegistration } from "./tournaments";
 
 // Flujo de pago Mercado Pago (único método de pago de la plataforma).
 // Reglas: el precio se calcula aquí, nunca se toma del cliente; un pago solo se
@@ -158,7 +159,8 @@ export async function createPreference(params: {
   uid: string;
   tenantId: string;
   bookingId: string;
-  bookingData: Record<string, unknown>;
+  bookingData?: Record<string, unknown>;
+  pendingRegistration?: Record<string, unknown>;
   amount: number;
   title: string;
   returnUrl: string;
@@ -196,7 +198,9 @@ export async function createPreference(params: {
     preferenceId: data.id,
     status: "pending",
     method: "mercadopago",
-    pendingBookingData: params.bookingData,
+    pendingBookingData: params.bookingData || null,
+    pendingRegistration: params.pendingRegistration || null,
+    kind: params.pendingRegistration ? "tournament" : "booking",
     returnUrl: params.returnUrl,
     createdAt: new Date(),
   });
@@ -243,10 +247,19 @@ export async function settlePayment(paymentRecordId: string, mpPaymentId: string
     return { result, returnUrl: pay.returnUrl };
   }
 
+  // Firestore exige todas las lecturas antes de cualquier escritura en la transacción
   await db.runTransaction(async (tx) => {
     const fresh = await tx.get(payRef);
     if (fresh.data()?.status === "approved") return;
     const data = fresh.data()!;
+    const couponId = data.pendingBookingData?.couponId;
+    const cRef = couponId ? db.collection("coupons").doc(couponId) : null;
+    const coupon = cRef ? await tx.get(cRef) : null;
+
+    // Inscripción a torneo: lee y escribe (sus lecturas siguen antes de las escrituras de abajo)
+    if (data.pendingRegistration) {
+      await commitRegistration(tx, data.pendingRegistration, { paymentStatus: "paid", method: "mercadopago", paymentRecordId });
+    }
     tx.update(payRef, { status: "approved", mercadopagoPaymentId: String(mpPaymentId), approvedAt: new Date() });
     if (data.bookingId && data.pendingBookingData) {
       tx.set(db.collection("bookings").doc(data.bookingId), {
@@ -259,12 +272,7 @@ export async function settlePayment(paymentRecordId: string, mpPaymentId: string
         updatedAt: new Date(),
       });
     }
-    const couponId = data.pendingBookingData?.couponId;
-    if (couponId) {
-      const cRef = db.collection("coupons").doc(couponId);
-      const c = await tx.get(cRef);
-      if (c.exists) tx.update(cRef, { usedCount: (c.data()?.usedCount || 0) + 1 });
-    }
+    if (cRef && coupon?.exists) tx.update(cRef, { usedCount: (coupon.data()?.usedCount || 0) + 1 });
   });
   return { result: "approved", returnUrl: pay.returnUrl };
 }

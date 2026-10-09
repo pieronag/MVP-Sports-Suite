@@ -1,5 +1,5 @@
 import { collection, query, where, getDocs, doc, getDoc, orderBy, addDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { db, auth } from './firebase';
 
 export interface Tournament {
     id: string;
@@ -78,10 +78,9 @@ export const tournamentService = {
 
     async isTeamRegistered(tournamentId: string, teamId: string): Promise<boolean> {
         try {
-            const regRef = collection(db, 'tournament_registrations');
-            const q = query(regRef, where('tournamentId', '==', tournamentId), where('teamId', '==', teamId));
-            const snap = await getDocs(q);
-            return !snap.empty;
+            // Lista pública de equipos del torneo (las inscripciones solo las lee su titular)
+            const tSnap = await getDoc(doc(db, 'tournaments', tournamentId));
+            return ((tSnap.data()?.teams || []) as any[]).some((t) => t.id === teamId);
         } catch (error) {
             console.error("Error checking registration:", error);
             return false;
@@ -100,51 +99,21 @@ export const tournamentService = {
         }
     },
 
-    async registerTeamInTournament(tournamentId: string, teamData: { id: string, name: string, logo?: string }, userId: string, userName: string, price: number) {
-        const tournamentRef = doc(db, 'tournaments', tournamentId);
-        
-        // 1. Verificar si ya existe el registro de pago (para no duplicar)
-        const regQ = query(
-            collection(db, 'tournament_registrations'),
-            where('tournamentId', '==', tournamentId),
-            where('teamId', '==', teamData.id)
-        );
-        const regSnap = await getDocs(regQ);
-        
-        if (regSnap.empty) {
-            await addDoc(collection(db, 'tournament_registrations'), {
-                tournamentId,
-                teamId: teamData.id,
-                teamName: teamData.name,
-                userId,
-                userName,
-                paidAmount: price,
-                status: 'confirmed',
-                paymentStatus: 'paid',
-                createdAt: serverTimestamp()
-            });
-        }
-
-        // 2. Actualizar el listado de equipos en el torneo de forma segura
-        const tDoc = await getDoc(tournamentRef);
-        if (tDoc.exists()) {
-            const currentData = tDoc.data();
-            const currentTeams = currentData.teams || [];
-            
-            // Solo añadir si el equipo NO está en el array
-            const alreadyIn = currentTeams.some((t: any) => t.id === teamData.id || t.userId === userId);
-            if (!alreadyIn) {
-                await updateDoc(tournamentRef, {
-                    teams: [...currentTeams, { 
-                        id: teamData.id, 
-                        name: teamData.name, 
-                        logo: teamData.logo || '',
-                        userId: userId, // Guardamos el ID del usuario para verificación
-                        registeredAt: new Date().toISOString()
-                    }],
-                    enrolledTeams: (currentData.enrolledTeams || 0) + 1
-                });
-            }
-        }
+    /**
+     * Inscripción vía servidor (valida capitán, cupos y duplicados; el estado de
+     * pago lo define el servidor). payOnline devuelve la URL de Mercado Pago.
+     */
+    async registerTeam(tournamentId: string, teamId: string, payOnline = false): Promise<{ ok?: boolean; url?: string; registrationId: string }> {
+        const token = await auth.currentUser?.getIdToken();
+        if (!token) throw new Error('INICIA SESIÓN PARA INSCRIBIRTE');
+        const base = (process.env.EXPO_PUBLIC_API_URL || 'https://mvpsports.cl').replace(/\/$/, '');
+        const res = await fetch(`${base}/api/tournaments/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ tournamentId, teamId, payOnline }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error((data.error || 'NO SE PUDO COMPLETAR LA INSCRIPCIÓN').toUpperCase());
+        return data;
     }
 };

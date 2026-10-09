@@ -102,15 +102,8 @@ export default function TorneosScreen() {
                 const regs = [];
                 for (const t of data) {
                     const isReg = await tournamentService.isUserRegistered(t.id, user.uid);
-                    if (isReg) {
-                        regs.push(t.id);
-                        // AUTO-REPARACIÓN: Si está registrado pero no aparece en el listado de teams
-                        const teamInList = t.teams?.some((team: any) => team.userId === user.uid || team.id === (teams.length > 0 ? teams[0].id : null));
-                        if (!teamInList && teams.length > 0) {
-                            const myTeam = teams[0]; // Usamos el primer equipo del usuario por defecto para la sincronización
-                            await tournamentService.registerTeamInTournament(t.id, { id: myTeam.id, name: myTeam.name, logo: myTeam.imageUrl }, user.uid, user.displayName || 'Usuario MVP', t.price);
-                        }
-                    }
+                    if (isReg) regs.push(t.id);
+                    // (La inscripción se sincroniza en el servidor; ya no se repara desde el cliente)
                 }
                 setUserRegistrations(regs);
             }

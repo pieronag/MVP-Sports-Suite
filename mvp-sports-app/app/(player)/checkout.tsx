@@ -193,16 +193,18 @@ export default function CheckoutScreen() {
                 if (!tournamentId || !teamId) throw new Error("Datos de torneo incompletos.");
                 
                 if (paymentMethod === 'card') {
-                    throw new Error('EL PAGO ONLINE DE TORNEOS AÚN NO ESTÁ DISPONIBLE. ELIGE PAGO EN EL RECINTO.');
+                    // PAGO ONLINE (MERCADO PAGO): el servidor confirma la inscripción al aprobarse el pago
+                    const reg = await tournamentService.registerTeam(tournamentId as string, teamId as string, true);
+                    if (reg.url) {
+                        setMpData({ url: reg.url, tournamentId, amount: Number(price) });
+                        setShowWebView(true);
+                        return;
+                    }
+                    // Torneo sin costo: el servidor ya dejó al equipo inscrito
+                    setCustomAlert({ visible: true, title: '¡INSCRIPCIÓN EXITOSA!', message: `TU EQUIPO ${teamName?.toString().toUpperCase()} HA SIDO INSCRITO.`, type: 'success', onClose: () => router.back() });
                 } else {
                     // PAGO EN EL RECINTO PARA TORNEO
-                    await tournamentService.registerTeamInTournament(
-                        tournamentId as string,
-                        { id: teamId as string, name: teamName as string },
-                        user.uid,
-                        clientName,
-                        priceNum
-                    );
+                    await tournamentService.registerTeam(tournamentId as string, teamId as string, false);
 
                     setCustomAlert({
                         visible: true,
@@ -600,7 +602,16 @@ export default function CheckoutScreen() {
                                 // El servidor (/api/mercadopago/commit) verifica el pago con Mercado Pago y
                                 // redirige: /player/ticket = aprobado; /player/billetera?... = pendiente o rechazado.
                                 const url = navState.url || '';
-                                if (url.includes('/player/ticket')) {
+                                if (isTournament && url.includes('/player/torneos')) {
+                                    setShowWebView(false);
+                                    setCustomAlert({
+                                        visible: true,
+                                        title: '¡INSCRIPCIÓN EXITOSA!',
+                                        message: `TU PAGO FUE APROBADO Y TU EQUIPO ${teamName?.toString().toUpperCase()} QUEDÓ INSCRITO.`,
+                                        type: 'success',
+                                        onClose: () => router.back()
+                                    });
+                                } else if (url.includes('/player/ticket')) {
                                     setShowWebView(false);
                                     setCustomAlert({
                                         visible: true,

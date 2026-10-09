@@ -346,9 +346,13 @@ service cloud.firestore {
       allow update, delete: if canManageScoped(resource.data);
     }
 
+    // Inscripciones: las crea el servidor (/api/tournaments/register) tras validar
+    // capitán, cupos y pago. El personal del recinto puede marcar cobros en el lugar.
     match /tournament_registrations/{id} {
-      allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow read: if isAuthenticated() && (resource.data.get('userId', '') == request.auth.uid || isStaff());
+      allow create: if false;
+      allow update: if worksAtTenant(resource.data.get('tenantId', '')) || isSuperAdmin();
+      allow delete: if canManageTenant(resource.data.get('tenantId', ''));
     }
 
     match /academy_classes/{id} {

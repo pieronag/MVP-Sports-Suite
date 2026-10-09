@@ -6,6 +6,7 @@ import { usePlayer } from "@/context/PlayerContext";
 import { Timestamp } from "firebase/firestore";
 import { walletService } from "@/services/player/walletService";
 import { couponService } from "@/services/player/couponService";
+import { tournamentService } from "@/services/player/tournamentService";
 import { teamService } from "@/services/player/teamService";
 
 function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
@@ -93,7 +94,13 @@ export default function CheckoutPage() {
     if (!profile) return;
     setProcessing(true);
     try {
-      if (isTournament) throw new Error("El pago online de torneos aún no está disponible. Coordina la inscripción con el recinto.");
+      if (isTournament) {
+        if (!tournamentId || !teamId) throw new Error("Datos de inscripción incompletos");
+        const reg = await tournamentService.registerTeam(tournamentId, teamId, true);
+        if (reg.url) { window.location.href = reg.url; return; }
+        router.push(`/player/torneos?registered=${encodeURIComponent(tournamentId)}`);
+        return;
+      }
       if (!tenantId || !courtId || !date || !startTime || !sport) throw new Error("Datos de reserva incompletos");
       const res = await walletService.createMercadoPagoBooking({
         tenantId, courtId, sport, date, startTime,
