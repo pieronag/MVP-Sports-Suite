@@ -101,14 +101,6 @@ import {
     Sword01Icon as HiSword01Icon,
     Ticket01Icon as HiTicket01Icon,
     Timer01Icon as HiTimer01Icon,
-    Basketball01Icon as HiBasketball01Icon,
-    BasketballHoopIcon as HiBasketballHoopIcon,
-    FootballIcon as HiFootballIcon,
-    FootballPitchIcon as HiFootballPitchIcon,
-    TableTennisBatIcon as HiTableTennisBatIcon,
-    TennisBallIcon as HiTennisBallIcon,
-    TennisRacketIcon as HiTennisRacketIcon,
-    VolleyballIcon as HiVolleyballIcon,
 } from "@hugeicons/core-free-icons";
 
 export interface PlayerIconProps {
@@ -237,18 +229,3 @@ export const Sword = make(HiSword01Icon, "Sword");
 export const Ticket = make(HiTicket01Icon, "Ticket");
 export const Timer = make(HiTimer01Icon, "Timer");
 
-// Deportes (reemplazan components/icons/SportsIcons en el área Jugador)
-export const FutbolIcon = make(HiFootballIcon, "FutbolIcon");
-export const PadelIcon = make(HiTableTennisBatIcon, "PadelIcon");
-export const TenisIcon = make(HiTennisBallIcon, "TenisIcon");
-export const BasquetbolIcon = make(HiBasketball01Icon, "BasquetbolIcon");
-export const VoleibolIcon = make(HiVolleyballIcon, "VoleibolIcon");
-export const CanchaFutbolIcon = make(HiFootballPitchIcon, "CanchaFutbolIcon");
-export const CanchaPadelIcon = make(HiTableTennisBatIcon, "CanchaPadelIcon");
-export const CanchaTenisIcon = make(HiTennisRacketIcon, "CanchaTenisIcon");
-export const CanchaBasquetbolIcon = make(HiBasketballHoopIcon, "CanchaBasquetbolIcon");
-export const CanchaVoleibolIcon = make(HiVolleyballIcon, "CanchaVoleibolIcon");
-export const SoccerIcon = make(HiFootballIcon, "SoccerIcon");
-export const TennisIcon = make(HiTennisBallIcon, "TennisIcon");
-export const BasketballIcon = make(HiBasketball01Icon, "BasketballIcon");
-export const VolleyballIcon = make(HiVolleyballIcon, "VolleyballIcon");

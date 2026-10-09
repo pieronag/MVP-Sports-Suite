@@ -11,7 +11,7 @@ import { usePlayer } from "@/context/PlayerContext";
 import { bookingService } from "@/services/player/bookingService";
 import { venueService } from "@/services/player/venueService";
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/player/icons";
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
 
 const SPORT_CONFIG: Record<string, { color: string; icon: any }> = {
   futbol: { color: "#10b981", icon: FutbolIcon },

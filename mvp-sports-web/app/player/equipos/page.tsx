@@ -6,7 +6,7 @@ import { ChevronLeft, Plus, Users, X, ArrowRight, LogIn, Swords } from "@/compon
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
 import { teamService } from "@/services/player/teamService";
-import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/player/icons";
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
 
 const SPORTS_CONFIG = [
   { key: "futbol", label: "Fútbol", icon: FutbolIcon },

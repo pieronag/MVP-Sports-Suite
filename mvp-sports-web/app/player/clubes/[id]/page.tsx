@@ -7,7 +7,7 @@ import { venueService, Tenant, Court } from "@/services/player/venueService";
 import { bookingService } from "@/services/player/bookingService";
 import { collection, query, where, onSnapshot, doc } from "firebase/firestore";
 import { db } from "@/services/firebase";
-import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon, CanchaFutbolIcon, CanchaPadelIcon, CanchaTenisIcon, CanchaBasquetbolIcon, CanchaVoleibolIcon } from "@/components/player/icons";
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon, CanchaFutbolIcon, CanchaPadelIcon, CanchaTenisIcon, CanchaBasquetbolIcon, CanchaVoleibolIcon } from "@/components/icons/SportsIcons";
 
 function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
   return (

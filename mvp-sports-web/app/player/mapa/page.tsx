@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { ChevronLeft, Locate, Navigation, Star, Compass } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { venueService } from "@/services/player/venueService";
-import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/player/icons";
+import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
 
 const MapView = dynamic(() => import("./MapComponent"), { ssr: false });
 
