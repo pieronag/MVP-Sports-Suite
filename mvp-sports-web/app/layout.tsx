@@ -23,6 +23,23 @@ export const metadata: Metadata = {
   ],
   manifest: "/manifest.json",
   icons: { apple: "/icons/apple-touch-icon.png" },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://mvpsports.cl"),
+  alternates: { canonical: "/" },
+  // Vista previa al compartir el enlace (WhatsApp, redes, buscadores)
+  openGraph: {
+    type: "website",
+    locale: "es_CL",
+    siteName: "MVP Sports",
+    title: "MVP Sports | Reserva canchas en segundos",
+    description: "Reserva canchas de pádel, futbolito y tenis, paga online con Mercado Pago y gestiona tu recinto deportivo.",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "MVP Sports" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MVP Sports | Reserva canchas en segundos",
+    description: "Reserva canchas de pádel, futbolito y tenis y gestiona tu recinto deportivo.",
+    images: ["/og-image.jpg"],
+  },
 };
 
 export const viewport: Viewport = {
