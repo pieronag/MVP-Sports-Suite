@@ -51,6 +51,38 @@ service cloud.firestore {
       return isAuthenticated() && (role == 'manager' || role == 'owner' || role == 'admin' || role == 'superadmin');
     }
 
+    // ==========================================
+    // 🔒 CAMPOS PRIVILEGIADOS DE USUARIO
+    // ==========================================
+    // Rol, recintos asignados, permisos y estado de cuenta: el propio usuario
+    // nunca puede escribirlos. Solo superadmin (cualquier valor) u owner
+    // (únicamente para dar de alta/editar managers).
+    function privilegedKeys() {
+      return ['role', 'tenantId', 'tenantIds', 'permissions', 'status', 'isAdmin'];
+    }
+
+    function touchesPrivileged() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny(privilegedKeys());
+    }
+
+    // Alta propia: solo como jugador, sin recintos ni permisos
+    function isSafeSelfCreate() {
+      let d = request.resource.data;
+      return (!('role' in d) || d.role in ['player', 'user'])
+        && !('tenantId' in d && d.tenantId != '')
+        && !('tenantIds' in d && d.tenantIds.size() > 0)
+        && !('permissions' in d)
+        && !('isAdmin' in d)
+        && (!('status' in d) || d.status == 'active');
+    }
+
+    // Owner gestionando a su personal: el rol resultante solo puede ser manager
+    function isOwnerManagingManager() {
+      return isOwner()
+        && request.resource.data.get('role', 'manager') == 'manager'
+        && (resource == null || resource.data.get('role', 'manager') in ['manager', 'player', 'user']);
+    }
+
     function isStaff() {
       let role = getRole();
       return isAuthenticated() && (role == 'staff' || role == 'manager' || role == 'owner' || role == 'admin' || role == 'superadmin');
@@ -63,11 +95,17 @@ service cloud.firestore {
     // Perfiles unificados (App y Web)
     match /profiles/{userId} {
       allow read: if isAuthenticated();
-      allow create, delete: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
-      allow update: if isAuthenticated() && (
-        request.auth.uid == userId || 
-        isStaff() || 
+      allow create: if isAuthenticated() && (
         isSuperAdmin() ||
+        (request.auth.uid == userId && isSafeSelfCreate()) ||
+        isOwnerManagingManager()
+      );
+      allow delete: if isSuperAdmin() || (isOwner() && resource.data.get('role', '') == 'manager');
+      allow update: if isAuthenticated() && (
+        isSuperAdmin() ||
+        (request.auth.uid == userId && !touchesPrivileged()) ||
+        isOwnerManagingManager() ||
+        (isStaff() && !touchesPrivileged()) ||
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stats', 'xp', 'ovr', 'tier', 'badges', 'badgeXpBonus', 'lastELOUpdate', 'lastBulkSync'])
       );
 
@@ -80,11 +118,17 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow create, delete: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
-      allow update: if isAuthenticated() && (
-        request.auth.uid == userId || 
-        isStaff() || 
+      allow create: if isAuthenticated() && (
         isSuperAdmin() ||
+        (request.auth.uid == userId && isSafeSelfCreate()) ||
+        isOwnerManagingManager()
+      );
+      allow delete: if isSuperAdmin() || (isOwner() && resource.data.get('role', '') == 'manager');
+      allow update: if isAuthenticated() && (
+        isSuperAdmin() ||
+        (request.auth.uid == userId && !touchesPrivileged()) ||
+        isOwnerManagingManager() ||
+        (isStaff() && !touchesPrivileged()) ||
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stats', 'xp', 'ovr', 'tier', 'badges', 'badgeXpBonus', 'lastELOUpdate', 'lastBulkSync'])
       );
       match /{subcollection=**} {
