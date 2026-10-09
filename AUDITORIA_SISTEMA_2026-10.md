@@ -122,3 +122,24 @@ Verificado en localhost: manifest e íconos responden 200, el header del SW est�
 3. Vercel: `MERCADOPAGO_WEBHOOK_SECRET`, `NEXT_PUBLIC_SITE_URL`; publicar web.
 4. `npx firebase-tools deploy --only functions --project mvp-sports-chile` (crea `onBookingWritten`), luego el backfill, y al final `--only firestore:rules,storage` (tras correr las pruebas de reglas).
 5. Nueva versión de la app (EAS) con `EXPO_PUBLIC_API_URL`.
+
+---
+
+## 8. Ronda de QA y mejoras — 09/10/2026
+
+| Área | Cambio | Commit |
+|---|---|---|
+| Agenda / Resumen | Cifras coherentes (cobrado, por cobrar, ocupación con horario real); "En uso" leía la duración en minutos | `b8c17cb`, `7919055` |
+| Agenda | Anular reserva (personal); bloque en curso para clientes sin reserva; superadmin ya no queda en "Iniciando agenda…" | `dd34eeb`, `fac1c56` |
+| Check-in | Cobro a cualquier hora (la ventana aplica solo al ingreso); anulaciones por recinto vs jugador | `cf4179f`, `c53f32e` |
+| Roles | Superadmin y co-dueños (`ownerIds`) ven sus recintos en todas las pantallas | `fac1c56`, `7523bb4` |
+| Canchas | "Desde" con el mínimo real; no se elimina una cancha con reservas vigentes | `7919055` |
+| Cuentas | Verificación de correo obligatoria para jugadores; eliminación de cuenta confiable | `cf4179f`, `aaeadb4` |
+| Formularios | Sin mayúsculas forzadas (web y app); script `normalize-uppercase-text.mjs` para datos antiguos | `44b5719`, `aeb9d92` |
+| Web | Encabezados de seguridad, robots/sitemap, vista previa al compartir | commit "Web: encabezados…" |
+| Firestore | 11 índices compuestos declarados en el repo | `b3b176d` |
+| Accesibilidad | 77 botones de solo ícono con etiqueta | `251af56` |
+
+### Antes de publicar (agregar al orden de la sección 7)
+- Exportar los índices actuales de producción y compararlos con `firestore.indexes.json` antes de `deploy --only firestore:indexes`.
+- Correr `scripts/normalize-uppercase-text.mjs` (simulación) y revisar el listado antes de `--apply`.
