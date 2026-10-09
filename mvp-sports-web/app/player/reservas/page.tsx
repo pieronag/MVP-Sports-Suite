@@ -331,9 +331,7 @@ export default function ReservasPage() {
     <div className={`min-h-screen ${baseBg}`}>
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-        <button aria-label="Volver" onClick={() => router.push("/player")} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
-          <ChevronLeft size={20} className="text-emerald-500" />
-        </button>
+        <div className="w-10" aria-hidden />
         <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Mis Reservas</h1>
         <div className="w-10" />
       </div>

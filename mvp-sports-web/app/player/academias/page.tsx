@@ -150,6 +150,8 @@ export default function AcademiasPage() {
           <div className="py-14 flex flex-col items-center text-center">
             <GraduationCap size={32} className={isDark ? "text-slate-600" : "text-slate-300"} />
             <p className={`text-sm font-medium mt-3 ${sub}`}>No hay clases publicadas por ahora</p>
+            <p className={`text-[13px] mt-1 ${sub}`}>Vuelve pronto o reserva una cancha para entrenar.</p>
+            <a href="/player/clubes" className="mt-4 px-5 h-10 inline-flex items-center rounded-md text-[13px] font-semibold bg-emerald-500 text-white">Reservar cancha</a>
           </div>
         ) : (
           visible.map(c => <ClassCard key={c.id} c={c} />)

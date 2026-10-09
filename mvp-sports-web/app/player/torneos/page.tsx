@@ -142,6 +142,8 @@ export default function TorneosPage() {
           <div className="py-14 flex flex-col items-center text-center">
             <Trophy size={32} className={isDark ? "text-slate-600" : "text-slate-300"} />
             <p className={`text-sm font-medium mt-3 ${sub}`}>No hay torneos con inscripciones abiertas</p>
+            <p className={`text-[13px] mt-1 ${sub}`}>Mientras tanto, arma un partido con otro equipo.</p>
+            <a href="/player/equipos/partidos" className="mt-4 px-5 h-10 inline-flex items-center rounded-md text-[13px] font-semibold bg-emerald-500 text-white">Buscar rival</a>
           </div>
         ) : active.map(t => <Card key={t.id} t={t} />)}
 

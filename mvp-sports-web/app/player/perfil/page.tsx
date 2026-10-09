@@ -177,11 +177,11 @@ export default function PerfilPage() {
   }, [previewUri, displayName]);
 
   const statRows = [
-    { icon: CalendarCheck, color: "#3b82f6", label: "Partidos Jugados", value: stats.matchesPlayed ?? 0 },
-    { icon: Trophy, color: "#f59e0b", label: "Victorias Totales", value: stats.matchesWon ?? 0 },
+    { icon: CalendarCheck, color: "#3b82f6", label: "Partidos", value: stats.matchesPlayed ?? 0 },
+    { icon: Trophy, color: "#f59e0b", label: "Victorias", value: stats.matchesWon ?? 0 },
     { icon: Target, color: "#ef4444", label: "Goles", value: stats.goals ?? 0 },
     { icon: Handshake, color: "#10b981", label: "Asistencias", value: stats.assists ?? 0 },
-    { icon: Star, color: "#8b5cf6", label: "Premios MVP", value: stats.mvps ?? 0 },
+    { icon: Star, color: "#8b5cf6", label: "MVP", value: stats.mvps ?? 0 },
   ];
 
   const statMap: Record<string, number> = {
@@ -205,9 +205,7 @@ export default function PerfilPage() {
     <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-        <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
-          <ChevronLeft size={20} className="text-emerald-500" />
-        </button>
+        <div className="w-10" aria-hidden />
         <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Perfil</h1>
         <button onClick={toggleTheme} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           {isDark ? <Moon size={18} className="text-amber-400" /> : <Sun size={18} className="text-slate-600" />}
@@ -258,9 +256,9 @@ export default function PerfilPage() {
                 <p className="text-emerald-500 text-lg font-semibold">{tierInfo.name}</p>
               </div>
               <div className="text-right">
-                <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Próximo Rango</p>
-                <p className={`text-base font-medium opacity-50 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                  {tierInfo.index < TIERS.length - 1 ? TIERS[tierInfo.index + 1].toUpperCase() : "LÍMITE"}
+                <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{tierInfo.index < TIERS.length - 1 ? "Próximo rango" : "Rango máximo"}</p>
+                <p className={`text-base font-medium ${tierInfo.index < TIERS.length - 1 ? "opacity-50" : "text-emerald-500"} ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                  {tierInfo.index < TIERS.length - 1 ? TIERS[tierInfo.index + 1] : "Alcanzado"}
                 </p>
               </div>
             </div>
@@ -292,17 +290,19 @@ export default function PerfilPage() {
                 <Medal size={22} className="text-emerald-500" />
               </div>
             </div>
-            {statRows.map((row, i) => (
-              <div key={row.label} className="flex items-center gap-4 px-5 py-4">
-                <div className="w-9 h-9 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: `${row.color}20` }}>
-                  <row.icon size={18} style={{ color: row.color }} strokeWidth={1.8} />
+            <div className="grid grid-cols-2">
+              {statRows.map((row, i) => (
+                <div key={row.label} className={`flex items-center gap-3 px-4 py-4 ${i % 2 === 0 ? (isDark ? "border-r border-emerald-500/5" : "border-r border-slate-100") : ""} ${i > 1 ? (isDark ? "border-t border-emerald-500/5" : "border-t border-slate-100") : ""}`}>
+                  <div className="w-9 h-9 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: `${row.color}20` }}>
+                    <row.icon size={18} style={{ color: row.color }} strokeWidth={1.8} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className={`text-[18px] font-semibold leading-tight ${isDark ? "text-slate-100" : "text-slate-900"}`}>{row.value}</p>
+                    <p className={`text-[12px] font-medium truncate ${isDark ? "text-slate-500" : "text-slate-400"}`}>{row.label}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{row.label}</p>
-                  <p className={`text-base font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{row.value}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </GlowCard>
       </div>
