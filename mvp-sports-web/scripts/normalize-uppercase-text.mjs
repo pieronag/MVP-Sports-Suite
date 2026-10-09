@@ -2,12 +2,13 @@
 // Nombres → "Nombre Propio"; descripciones/notas → "Formato de oración".
 // Solo toca valores totalmente en mayúsculas (no cambia textos con mayúsculas/minúsculas mezcladas).
 // Uso: node --env-file=.env.local scripts/normalize-uppercase-text.mjs [--apply]
-import admin from "firebase-admin";
+import { initializeApp, cert } from "firebase-admin/app";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 
 const apply = process.argv.includes("--apply");
 const key = (process.env.FIREBASE_PRIVATE_KEY || "").replace(/^["']+|["']+$/g, "").split("\\n").join("\n");
-admin.initializeApp({ credential: admin.credential.cert({ projectId: process.env.FIREBASE_PROJECT_ID, clientEmail: process.env.FIREBASE_CLIENT_EMAIL, privateKey: key }) });
-const db = admin.firestore();
+initializeApp({ credential: cert({ projectId: process.env.FIREBASE_PROJECT_ID, clientEmail: process.env.FIREBASE_CLIENT_EMAIL, privateKey: key }) });
+const db = getFirestore();
 
 // Colección → campos tipo nombre (title) y tipo texto libre (sentence)
 const TARGETS = {

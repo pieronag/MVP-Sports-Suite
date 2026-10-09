@@ -1,8 +1,10 @@
 import "server-only";
-import admin from 'firebase-admin';
+import { initializeApp, getApps, getApp, cert } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
+import { getFirestore } from 'firebase-admin/firestore';
 
 function ensureAdmin() {
-  if (!admin.apps.length) {
+  if (!getApps().length) {
     // Parser robusto: tolera espacios alrededor del "=", comillas simples/dobles
     // envolventes (incluso repetidas) y saltos de línea escapados como \\n.
     const cleanVar = (v: string | undefined) => {
@@ -22,21 +24,19 @@ function ensureAdmin() {
 
     if (privateKey && clientEmail && projectId) {
       try {
-        admin.initializeApp({
-          credential: admin.credential.cert({ projectId, clientEmail, privateKey }),
-        });
+        initializeApp({ credential: cert({ projectId, clientEmail, privateKey }) });
       } catch (e) {
         console.error('❌ Firebase Admin init error:', e);
       }
     }
   }
-  return admin;
+  return getApp(); // sin credenciales lanza un error claro en la ruta que lo use
 }
 
 export function adminAuth() {
-  return ensureAdmin().auth();
+  return getAuth(ensureAdmin());
 }
 
 export function adminDb() {
-  return ensureAdmin().firestore();
+  return getFirestore(ensureAdmin());
 }

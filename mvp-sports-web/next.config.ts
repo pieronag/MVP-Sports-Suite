@@ -52,14 +52,13 @@ const nextConfig = {
   },
 }
 
-const { withSentryConfig } = require("@sentry/nextjs");
+const { withSentryConfig } = require("@sentry/nextjs/config");
 module.exports = withSentryConfig(nextConfig, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   silent: !process.env.CI,
   widenClientFileUpload: true,
   tunnelRoute: "/monitoring",
-  hideSourceMaps: true,
   webpack: {
     treeshake: {
       removeDebugLogging: true,
