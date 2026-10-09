@@ -8,6 +8,7 @@ import {
   Sword, Star, Info, AlertCircle, Users, Crosshair, ShieldCheck, Sun, Moon,
   Heart, Share2, Timer, Plus, Minus, MapPin, ChevronDown
 } from "@/components/player/icons";
+import { BADGE_ICONS } from "@/components/player/badgeIcons";
 import { doc, getDoc, onSnapshot, updateDoc, addDoc, collection, Timestamp } from 'firebase/firestore';
 import { db } from "@/services/firebase";
 import { usePlayer } from "@/context/PlayerContext";
@@ -44,13 +45,6 @@ const BADGE_DESCRIPTIONS: Record<string, string> = {
   invictus: 'Racha invicta', rivalry: 'Clásicos ganados', morning_player: 'Matutino',
   night_player: 'Nocturno', loyal: 'Meses fidelidad', weekend_warrior: 'Finde',
   stamina: 'Minutos', social: 'Invitados'
-};
-const BADGE_ICONS: Record<string, React.ElementType> = {
-  scorer: Target, playmaker: Zap, defender: Shield, wins: Trophy, mvp: Star, experience: Timer,
-  multi_sport: Drill, captaincy: Users, comeback: TrendingUp, precision: Crosshair,
-  clutch: Zap, tournaments: Medal, invictus: ShieldCheck, rivalry: Sword,
-  morning_player: Sun, night_player: Moon, loyal: Heart, weekend_warrior: Calendar,
-  stamina: Activity, social: Share2,
 };
 
 
