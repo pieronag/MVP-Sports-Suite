@@ -14,53 +14,53 @@ import {
   ChevronLeft, Sun, Moon, Camera, Trophy, Target, Handshake, Star,
   Medal, Sparkles, Download, Activity, User as UserIcon, MapPin, Zap,
   Shield, ShieldAlert, Award, Swords, Flame, Heart, Crosshair, CircleDot,
-  Sunrise, GraduationCap, Cpu, TrendingUp, Users, Sword, Play, CalendarDays, X
+  Sunrise, GraduationCap, TrendingUp, Users, Sword, CalendarDays, X, Crown, Timer, CalendarCheck
 } from "@/components/player/icons";
 
-const BADGE_DEFS: { id: string; name: string; icon: any; svg?: string; color: string; stat: string }[] = [
-  { id: "scorer",  name: "Artillero",     icon: Target,       svg: "/icons/logros/artillero.svg", color: "#ef4444", stat: "goals" },
-  { id: "playmaker", name: "Maestro",     icon: GraduationCap, svg: "/icons/logros/maestro.svg", color: "#8b5cf6", stat: "assists" },
-  { id: "defender", name: "Muralla",      icon: ShieldAlert,  svg: "/icons/logros/muralla.svg", color: "#14b8a6", stat: "clean_sheets" },
-  { id: "wins",    name: "Ganador",       icon: Trophy,       svg: "/icons/logros/ganador.svg", color: "#f59e0b", stat: "won" },
-  { id: "mvp",     name: "Estrella",      icon: Award,        svg: "/icons/logros/estrella.svg", color: "#10b981", stat: "mvps" },
-  { id: "experience", name: "Leyenda",    icon: Play,         svg: "/icons/logros/legend.svg", color: "#3b82f6", stat: "played" },
-  { id: "multi_sport", name: "Atleta Total", icon: Activity,  svg: "/icons/logros/atleta.svg", color: "#ec4899", stat: "sports_played" },
-  { id: "captaincy", name: "Capitán",     icon: Shield,       svg: "/icons/logros/capitan.svg", color: "#f97316", stat: "captain_matches" },
-  { id: "comeback", name: "Ave Fénix",    icon: Flame,        svg: "/icons/logros/fenix.svg", color: "#f43f5e", stat: "comebacks" },
-  { id: "precision", name: "Francotirador", icon: Crosshair,  svg: "/icons/logros/francotirador.svg", color: "#06b6d4", stat: "precision_matches" },
-  { id: "clutch",  name: "Clutch",        icon: Zap,          svg: "/icons/logros/clutch.svg", color: "#f59e0b", stat: "clutch_goals" },
-  { id: "tournaments", name: "Competidor", icon: Swords,      svg: "/icons/logros/competidor.svg", color: "#8b5cf6", stat: "tournaments_played" },
-  { id: "invictus", name: "Invicto",      icon: Flame,        svg: "/icons/logros/invicto.svg", color: "#10b981", stat: "longest_win_streak" },
-  { id: "rivalry", name: "Verdugo",       icon: Sword,        svg: "/icons/logros/verdugo.svg", color: "#ef4444", stat: "rivalries_won" },
-  { id: "morning_player", name: "Madrugador", icon: Sunrise,  svg: "/icons/logros/madrugador.svg", color: "#f59e0b", stat: "morning_matches" },
-  { id: "night_player", name: "Nocturno", icon: Moon,         svg: "/icons/logros/nocturno.svg", color: "#3b82f6", stat: "night_matches" },
+const BADGE_DEFS: { id: string; name: string; icon: any; color: string; stat: string }[] = [
+  { id: "scorer",  name: "Artillero",     icon: Target, color: "#ef4444", stat: "goals" },
+  { id: "playmaker", name: "Maestro",     icon: GraduationCap, color: "#8b5cf6", stat: "assists" },
+  { id: "defender", name: "Muralla",      icon: ShieldAlert, color: "#14b8a6", stat: "clean_sheets" },
+  { id: "wins",    name: "Ganador",       icon: Trophy, color: "#f59e0b", stat: "won" },
+  { id: "mvp",     name: "Estrella",      icon: Award, color: "#10b981", stat: "mvps" },
+  { id: "experience", name: "Leyenda",    icon: Crown, color: "#3b82f6", stat: "played" },
+  { id: "multi_sport", name: "Atleta Total", icon: Activity, color: "#ec4899", stat: "sports_played" },
+  { id: "captaincy", name: "Capitán",     icon: Shield, color: "#f97316", stat: "captain_matches" },
+  { id: "comeback", name: "Ave Fénix",    icon: Flame, color: "#f43f5e", stat: "comebacks" },
+  { id: "precision", name: "Francotirador", icon: Crosshair, color: "#06b6d4", stat: "precision_matches" },
+  { id: "clutch",  name: "Clutch",        icon: Zap, color: "#f59e0b", stat: "clutch_goals" },
+  { id: "tournaments", name: "Competidor", icon: Swords, color: "#8b5cf6", stat: "tournaments_played" },
+  { id: "invictus", name: "Invicto",      icon: Medal, color: "#10b981", stat: "longest_win_streak" },
+  { id: "rivalry", name: "Verdugo",       icon: Sword, color: "#ef4444", stat: "rivalries_won" },
+  { id: "morning_player", name: "Madrugador", icon: Sunrise, color: "#f59e0b", stat: "morning_matches" },
+  { id: "night_player", name: "Nocturno", icon: Moon, color: "#3b82f6", stat: "night_matches" },
   { id: "loyal",   name: "Fiel",          icon: Heart,        color: "#ec4899", stat: "loyalty" },
   { id: "weekend_warrior", name: "Guerrero FDS", icon: CalendarDays, color: "#14b8a6", stat: "weekend_matches" },
-  { id: "stamina", name: "Motor",         icon: Cpu,          svg: "/icons/logros/motor.svg", color: "#f97316", stat: "minutes_played" },
-  { id: "social",  name: "Sociable",      icon: Users,        svg: "/icons/logros/sociable.svg", color: "#3b82f6", stat: "invited_players" },
+  { id: "stamina", name: "Motor",         icon: Timer, color: "#f97316", stat: "minutes_played" },
+  { id: "social",  name: "Sociable",      icon: Users, color: "#3b82f6", stat: "invited_players" },
 ];
 
 const BADGE_GLOSSARY_DATA = [
-  { id: "scorer", icon: Target, svg: "/icons/logros/artillero.svg", name: "Artillero", desc: "Anota puntos o goles en tus partidos", unit: "Goles", dbKey: "goals" },
-  { id: "playmaker", icon: GraduationCap, svg: "/icons/logros/maestro.svg", name: "Maestro", desc: "Suma asistencias y pases clave", unit: "Asistencias", dbKey: "assists" },
-  { id: "defender", icon: ShieldAlert, svg: "/icons/logros/muralla.svg", name: "Muralla", desc: "Logra defensas o vallas invictas", unit: "Defensas", dbKey: "clean_sheets" },
-  { id: "wins", icon: Trophy, svg: "/icons/logros/ganador.svg", name: "Ganador", desc: "Acumula partidos ganados", unit: "Victorias", dbKey: "won" },
-  { id: "mvp", icon: Award, svg: "/icons/logros/estrella.svg", name: "Estrella", desc: "Sé elegido Mejor Jugador del partido", unit: "MVPs", dbKey: "mvps" },
-  { id: "experience", icon: Play, svg: "/icons/logros/legend.svg", name: "Leyenda", desc: "Disputa la mayor cantidad de partidos", unit: "Partidos", dbKey: "played" },
-  { id: "multi_sport", icon: Activity, svg: "/icons/logros/atleta.svg", name: "Atleta Total", desc: "Juega partidos en diferentes deportes", unit: "Deportes", dbKey: "sports_played" },
-  { id: "captaincy", icon: Shield, svg: "/icons/logros/capitan.svg", name: "Capitán", desc: "Lidera a tu equipo como capitán", unit: "Partidos", dbKey: "captain_matches" },
-  { id: "comeback", icon: Flame, svg: "/icons/logros/fenix.svg", name: "Ave Fénix", desc: "Gana partidos remontando marcador", unit: "Remontadas", dbKey: "comebacks" },
-  { id: "precision", icon: Crosshair, svg: "/icons/logros/francotirador.svg", name: "Francotirador", desc: "Mantén alta efectividad o precisión", unit: "Partidos", dbKey: "precision_matches" },
-  { id: "clutch", icon: Zap, svg: "/icons/logros/clutch.svg", name: "Clutch", desc: "Anota puntos decisivos al final", unit: "Puntos", dbKey: "clutch_goals" },
-  { id: "tournaments", icon: Swords, svg: "/icons/logros/competidor.svg", name: "Competidor", desc: "Participa en torneos y ligas", unit: "Torneos", dbKey: "tournaments_played" },
-  { id: "invictus", icon: Flame, svg: "/icons/logros/invicto.svg", name: "Invicto", desc: "Logra rachas de victorias consecutivas", unit: "Racha", dbKey: "longest_win_streak" },
-  { id: "rivalry", icon: Sword, svg: "/icons/logros/verdugo.svg", name: "Verdugo", desc: "Gana clásicos o revanchas", unit: "Partidos", dbKey: "rivalries_won" },
-  { id: "morning_player", icon: Sunrise, svg: "/icons/logros/madrugador.svg", name: "Madrugador", desc: "Juega partidos en horario matutino", unit: "Partidos", dbKey: "morning_matches" },
-  { id: "night_player", icon: Moon, svg: "/icons/logros/nocturno.svg", name: "Nocturno", desc: "Juega partidos en horario nocturno", unit: "Partidos", dbKey: "night_matches" },
+  { id: "scorer", icon: Target, name: "Artillero", desc: "Anota puntos o goles en tus partidos", unit: "Goles", dbKey: "goals" },
+  { id: "playmaker", icon: GraduationCap, name: "Maestro", desc: "Suma asistencias y pases clave", unit: "Asistencias", dbKey: "assists" },
+  { id: "defender", icon: ShieldAlert, name: "Muralla", desc: "Logra defensas o vallas invictas", unit: "Defensas", dbKey: "clean_sheets" },
+  { id: "wins", icon: Trophy, name: "Ganador", desc: "Acumula partidos ganados", unit: "Victorias", dbKey: "won" },
+  { id: "mvp", icon: Award, name: "Estrella", desc: "Sé elegido Mejor Jugador del partido", unit: "MVPs", dbKey: "mvps" },
+  { id: "experience", icon: Crown, name: "Leyenda", desc: "Disputa la mayor cantidad de partidos", unit: "Partidos", dbKey: "played" },
+  { id: "multi_sport", icon: Activity, name: "Atleta Total", desc: "Juega partidos en diferentes deportes", unit: "Deportes", dbKey: "sports_played" },
+  { id: "captaincy", icon: Shield, name: "Capitán", desc: "Lidera a tu equipo como capitán", unit: "Partidos", dbKey: "captain_matches" },
+  { id: "comeback", icon: Flame, name: "Ave Fénix", desc: "Gana partidos remontando marcador", unit: "Remontadas", dbKey: "comebacks" },
+  { id: "precision", icon: Crosshair, name: "Francotirador", desc: "Mantén alta efectividad o precisión", unit: "Partidos", dbKey: "precision_matches" },
+  { id: "clutch", icon: Zap, name: "Clutch", desc: "Anota puntos decisivos al final", unit: "Puntos", dbKey: "clutch_goals" },
+  { id: "tournaments", icon: Swords, name: "Competidor", desc: "Participa en torneos y ligas", unit: "Torneos", dbKey: "tournaments_played" },
+  { id: "invictus", icon: Medal, name: "Invicto", desc: "Logra rachas de victorias consecutivas", unit: "Racha", dbKey: "longest_win_streak" },
+  { id: "rivalry", icon: Sword, name: "Verdugo", desc: "Gana clásicos o revanchas", unit: "Partidos", dbKey: "rivalries_won" },
+  { id: "morning_player", icon: Sunrise, name: "Madrugador", desc: "Juega partidos en horario matutino", unit: "Partidos", dbKey: "morning_matches" },
+  { id: "night_player", icon: Moon, name: "Nocturno", desc: "Juega partidos en horario nocturno", unit: "Partidos", dbKey: "night_matches" },
   { id: "loyal", icon: Heart, name: "Fiel", desc: "Mantente activo mes a mes", unit: "Meses", dbKey: "loyalty" },
   { id: "weekend_warrior", icon: CalendarDays, name: "Guerrero FDS", desc: "Juega partidos los fines de semana", unit: "Partidos", dbKey: "weekend_matches" },
-  { id: "stamina", icon: Cpu, svg: "/icons/logros/motor.svg", name: "Motor", desc: "Acumula minutos jugados en cancha", unit: "Minutos", dbKey: "minutes_played" },
-  { id: "social", icon: Users, svg: "/icons/logros/sociable.svg", name: "Sociable", desc: "Invita amigos a jugar contigo", unit: "Invitados", dbKey: "invited_players" },
+  { id: "stamina", icon: Timer, name: "Motor", desc: "Acumula minutos jugados en cancha", unit: "Minutos", dbKey: "minutes_played" },
+  { id: "social", icon: Users, name: "Sociable", desc: "Invita amigos a jugar contigo", unit: "Invitados", dbKey: "invited_players" },
 ];
 
 const TIERS = ["bronce", "plata", "oro", "platino", "diamante", "elite", "leyenda"];
@@ -176,11 +176,11 @@ export default function PerfilPage() {
   }, [previewUri, displayName]);
 
   const statRows = [
-    { src: "/icons/partidos.svg", color: "#3b82f6", label: "Partidos Jugados", value: stats.matchesPlayed ?? 0 },
-    { src: "/icons/victoria.svg", color: "#f59e0b", label: "Victorias Totales", value: stats.matchesWon ?? 0 },
-    { src: "/icons/gol.svg", color: "#ef4444", label: "Goles", value: stats.goals ?? 0 },
-    { src: "/icons/asistencia.svg", color: "#10b981", label: "Asistencias", value: stats.assists ?? 0 },
-    { src: "/icons/mvp.svg", color: "#8b5cf6", label: "Premios MVP", value: stats.mvps ?? 0 },
+    { icon: CalendarCheck, color: "#3b82f6", label: "Partidos Jugados", value: stats.matchesPlayed ?? 0 },
+    { icon: Trophy, color: "#f59e0b", label: "Victorias Totales", value: stats.matchesWon ?? 0 },
+    { icon: Target, color: "#ef4444", label: "Goles", value: stats.goals ?? 0 },
+    { icon: Handshake, color: "#10b981", label: "Asistencias", value: stats.assists ?? 0 },
+    { icon: Star, color: "#8b5cf6", label: "Premios MVP", value: stats.mvps ?? 0 },
   ];
 
   const statMap: Record<string, number> = {
@@ -294,12 +294,7 @@ export default function PerfilPage() {
             {statRows.map((row, i) => (
               <div key={row.label} className="flex items-center gap-4 px-5 py-4">
                 <div className="w-9 h-9 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: `${row.color}20` }}>
-                  <div style={{
-                    width: 18, height: 18,
-                    backgroundColor: row.color,
-                    mask: `url(${row.src}) center/contain no-repeat`,
-                    WebkitMask: `url(${row.src}) center/contain no-repeat`,
-                  }} />
+                  <row.icon size={18} style={{ color: row.color }} strokeWidth={1.8} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-[9px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>{row.label}</p>
@@ -352,11 +347,7 @@ export default function PerfilPage() {
                       <div key={badge.id} className="p-3.5 rounded-md flex flex-col items-center border-2 transition-all"
                         style={{ backgroundColor: `${c}18`, borderColor: `${c}35` }}>
                         <div className="mb-2.5 w-9 h-9 rounded-md flex items-center justify-center">
-                          {badge.svg ? (
-                            <div style={{ width: 24, height: 24, backgroundColor: c, mask: `url(${badge.svg}) center/contain no-repeat`, WebkitMask: `url(${badge.svg}) center/contain no-repeat` }} />
-                          ) : (
-                            <badge.icon size={24} style={{ color: c }} strokeWidth={1.5} />
-                          )}
+                          <badge.icon size={24} style={{ color: c }} strokeWidth={1.5} />
                         </div>
                         <p className={`text-[8px] font-semibold uppercase text-center mb-1.5 leading-tight ${isDark ? "text-slate-200" : "text-slate-800"}`}>{badge.name}</p>
                         <span className="text-[6px] font-semibold tracking-[1px] px-2 py-0.5 rounded-md" style={{ backgroundColor: `${c}25`, color: c }}>{tierNames[badge.tier!]}</span>
@@ -613,11 +604,7 @@ export default function PerfilPage() {
                     <div className="p-4">
                       <div className="flex items-center gap-3.5">
                         <div className={`w-[50px] h-[50px] rounded-md flex items-center justify-center shrink-0 border ${isDark ? "border-white/[0.06]" : "border-slate-200"}`} style={{ backgroundColor: `${progressColor}12` }}>
-                          {b.svg ? (
-                            <div style={{ width: 24, height: 24, backgroundColor: progressColor, mask: `url(${b.svg}) center/contain no-repeat`, WebkitMask: `url(${b.svg}) center/contain no-repeat` }} />
-                          ) : (
-                            <b.icon size={24} style={{ color: progressColor }} strokeWidth={1.5} />
-                          )}
+                          <b.icon size={24} style={{ color: progressColor }} strokeWidth={1.5} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">

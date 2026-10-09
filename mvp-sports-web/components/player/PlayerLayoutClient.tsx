@@ -55,9 +55,12 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
     const handleLogout = async () => { await logout(); router.push('/login'); };
 
     return (
-        // PWA siempre en formato celular a pantalla completa: sin menú lateral ni
-        // variantes de escritorio; barra de navegación siempre fija abajo.
-        <div className={`min-h-[100dvh] ${isDark ? 'bg-[#020611] text-slate-200' : 'bg-[#F8FAFC] text-slate-900'} transition-colors duration-300`}>
+        // PWA siempre en formato celular: ancho estándar de móvil (430 px) centrado y alto completo.
+        // El marco exterior no hace scroll y su transform contiene los elementos 'fixed'
+        // (barra inferior, modales, botón de pago), que así quedan pegados a sus bordes.
+        <div className={`min-h-[100dvh] ${isDark ? 'bg-[#01040A]' : 'bg-slate-200'}`}>
+        <div className={`relative mx-auto w-full max-w-[430px] h-[100dvh] overflow-hidden [transform:translateZ(0)] ${isDark ? 'bg-[#020611] text-slate-200' : 'bg-[#F8FAFC] text-slate-900'} transition-colors duration-300`}>
+        <div className="h-full overflow-y-auto overflow-x-hidden no-scrollbar">
             {mobileOpen && (
                 <div className={` fixed inset-0 z-50 flex flex-col ${isDark ? 'bg-[#0A101D] text-slate-300' : 'bg-white text-slate-700'}`}>
                     <div className={`shrink-0 px-4 py-3.5 border-b flex items-center justify-between ${isDark ? 'border-white/5' : 'border-slate-100'}`}>
@@ -95,6 +98,7 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
                 <main className={hideBottomNav ? "pb-4" : "pb-[calc(84px+env(safe-area-inset-bottom))]"}>{children}</main>
             </div>
 
+        </div>
             {/* Barra inferior móvil (navegación tipo app instalada) */}
             {!hideBottomNav && <nav className={` fixed bottom-0 inset-x-0 z-40 border-t backdrop-blur-md pb-[env(safe-area-inset-bottom)] ${isDark ? 'bg-[#020611]/95 border-white/5' : 'bg-white/95 border-slate-200'}`}>
                 <div className="grid grid-cols-5 h-16">
@@ -115,8 +119,7 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
             </nav>}
 
             <PwaSupport />
-
-
+        </div>
         </div>
     );
 }
