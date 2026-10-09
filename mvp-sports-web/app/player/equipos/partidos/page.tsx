@@ -1,9 +1,9 @@
 "use client";
-import { GlowCard, SectionPill } from "@/components/player/ui";
+import { GlowCard, SectionPill, SegmentedTabs } from "@/components/player/ui";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Swords, Users, MessageCircle, CheckCircle2, X, Send, User, MapPin } from "@/components/player/icons";
-import { RefreshCw } from "@/components/player/icons";
+import { ChevronDown } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
 import { matchmakingService, MatchEntry, Challenge } from "@/services/player/matchmakingService";
@@ -52,6 +52,7 @@ export default function PartidosPage() {
   const [positionFilter, setPositionFilter] = useState("");
   const [regionFilter, setRegionFilter] = useState("");
   const [communeFilters, setCommuneFilters] = useState<string[]>([]);
+  const [showZone, setShowZone] = useState(false);
 
   // Publish modals
   const [showPublishTeam, setShowPublishTeam] = useState(false);
@@ -92,6 +93,23 @@ export default function PartidosPage() {
   const playerOvr = (profile as any)?.ovr || 40;
   const playerTier = (profile as any)?.tier || "Bronce";
 
+  // Filtros iniciales desde las preferencias del jugador (deporte principal y su comuna/región)
+  const [prefsApplied, setPrefsApplied] = useState(false);
+  useEffect(() => {
+    if (prefsApplied || !profile) return;
+    const norm = (v: string) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+    const sport = SPORTS.find(x => norm(x) === norm((profile as any).mainSport));
+    if (sport) { setSportFilter(sport); setPublishSport(sport); setPublishSports([sport]); }
+    const city = norm((profile as any).city);
+    if (city) {
+      for (const [region, communes] of Object.entries(REGIONS)) {
+        const c = communes.find(x => norm(x) === city);
+        if (c) { setRegionFilter(region); setCommuneFilters([c]); setPublishRegion(region); setPublishCommunes([c]); break; }
+      }
+    }
+    setPrefsApplied(true);
+  }, [profile, prefsApplied]);
+
   // Real-time subscriptions
   useEffect(() => {
     if (!uid) return;
@@ -129,6 +147,16 @@ export default function PartidosPage() {
 
   // El deporte publicado es el del equipo (no se puede elegir otro)
   const teamSport = (t?: { sport?: string }) => SPORTS.find(s => s.toLowerCase() === String(t?.sport || "").toLowerCase());
+
+  // Abre "Publicar equipo" con lo obvio ya elegido: el único equipo disponible y la zona del filtro
+  const openPublishTeam = () => {
+    if (availableTeams.length === 1) {
+      setSelectedTeam(availableTeams[0].id);
+      const sp = teamSport(availableTeams[0]); if (sp) setPublishSport(sp);
+    }
+    if (regionFilter && !publishRegion) { setPublishRegion(regionFilter); setPublishCommunes(communeFilters); }
+    setShowPublishTeam(true);
+  };
 
   const handlePublishTeam = async () => {
     if (!selectedTeam) return;
@@ -262,95 +290,93 @@ export default function PartidosPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 px-5 pt-3">
-        {[
-          { id: "rival" as const, label: "Buscar Rival", icon: Swords },
-          { id: "jugadores" as const, label: "Jugadores", icon: Users },
-          { id: "mis" as const, label: "Mis Chats", icon: MessageCircle },
-        ].map(tab => (
-          <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 h-10 rounded-md text-[11px] font-semibold uppercase tracking-wide transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 ${activeTab === tab.id ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/25" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
-            <tab.icon size={14} /> {tab.label}
-          </button>
-        ))}
+      <div className="px-5 pt-3">
+        <SegmentedTabs isDark={isDark} value={activeTab} onChange={setActiveTab} options={[
+          { id: "rival", label: "Buscar rival", icon: Swords },
+          { id: "jugadores", label: "Jugadores", icon: Users },
+          { id: "mis", label: "Mis partidos", icon: MessageCircle },
+        ]} />
       </div>
 
       <div className="px-5 pt-4 pb-8 space-y-4">
-        {/* Filters */}
+        {/* Filtros: deporte en chips de un toque; zona plegada */}
         {(activeTab === "rival" || activeTab === "jugadores") && (
           <div className="space-y-2">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5">
+              {["", ...SPORTS].map(s => {
+                const on = sportFilter === s;
+                return (
+                  <button key={s || "all"} aria-pressed={on} onClick={() => { setSportFilter(s); setPositionFilter(""); }}
+                    className={`px-4 h-10 rounded-md text-[13px] font-semibold whitespace-nowrap shrink-0 transition-all active:scale-[0.97] ${on ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-300" : "bg-white text-slate-700 border border-slate-200"}`}>
+                    {s || "Todos"}
+                  </button>
+                );
+              })}
+            </div>
             <div className="flex gap-2">
-              <div className={`flex-1 relative`}>
-                <select value={sportFilter} onChange={e => { setSportFilter(e.target.value); if (activeTab === "jugadores") setPositionFilter(""); }}
-                  className={`w-full h-11 rounded-md px-4 text-[12px] font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-700 border-slate-200/60"} backdrop-blur-xl shadow-sm`}
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
-                  <option value="">Todos los deportes</option>
-                  {SPORTS.map(s => <option key={s} value={s}>{s}</option>)}
+              <button onClick={() => setShowZone(v => !v)} aria-expanded={showZone}
+                className={`flex-1 h-11 rounded-md px-4 text-[13px] font-semibold flex items-center justify-between gap-2 border ${regionFilter ? "border-emerald-500/40 text-emerald-500" : isDark ? "bg-[#0A101D] text-slate-300 border-white/[0.06]" : "bg-white text-slate-700 border-slate-200"}`}>
+                <span className="flex items-center gap-2 min-w-0"><MapPin size={15} /><span className="truncate">{regionFilter ? `${regionFilter}${communeFilters.length ? ` · ${communeFilters.length} comuna${communeFilters.length > 1 ? "s" : ""}` : ""}` : "Todo Chile"}</span></span>
+                <ChevronDown size={15} className={`shrink-0 transition-transform ${showZone ? "rotate-180" : ""}`} />
+              </button>
+              {activeTab === "jugadores" && sportFilter && (POSITIONS_BY_SPORT[sportFilter] || []).length > 0 && (
+                <select value={positionFilter} onChange={e => setPositionFilter(e.target.value)} aria-label="Posición"
+                  className={`flex-1 h-11 rounded-md px-3 text-[13px] font-semibold outline-none border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/[0.06]" : "bg-white text-slate-700 border-slate-200"}`}>
+                  <option value="">Cualquier posición</option>
+                  {(POSITIONS_BY_SPORT[sportFilter] || []).map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
-              </div>
-              {activeTab === "jugadores" && sportFilter && (
-                <div className={`flex-1 relative`}>
-                  <select value={positionFilter} onChange={e => setPositionFilter(e.target.value)}
-                    className={`w-full h-11 rounded-md px-4 text-[12px] font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-700 border-slate-200/60"} backdrop-blur-xl shadow-sm`}
-                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
-                    <option value="">Todas las posiciones</option>
-                    {(POSITIONS_BY_SPORT[sportFilter] || []).map(p => <option key={p} value={p}>{p}</option>)}
-                  </select>
-                </div>
-              )}
-              {activeTab === "jugadores" && !sportFilter && (
-                <div className={`flex-1 h-11 rounded-md flex items-center justify-center px-4 text-[12px] font-medium border ${isDark ? "bg-[#0A101D]/50 text-slate-500 border-white/[0.04]" : "bg-slate-50 text-slate-400 border-slate-200"}`}>
-                  Primero elige un deporte
-                </div>
               )}
             </div>
-            <div className="space-y-2">
-              <select value={regionFilter} onChange={e => { setRegionFilter(e.target.value); setCommuneFilters([]); }}
-                className={`w-full h-11 rounded-md px-4 text-[12px] font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-700 border-slate-200/60"} backdrop-blur-xl shadow-sm`}
-                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
-                <option value="">Todas las regiones</option>
-                {Object.keys(REGIONS).map(r => <option key={r} value={r}>{r}</option>)}
-              </select>
-              {regionFilter && (
-                <div>
+            {showZone && (
+              <div className={`rounded-md p-3 space-y-3 border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`}>
+                <select value={regionFilter} onChange={e => { setRegionFilter(e.target.value); setCommuneFilters([]); }} aria-label="Región"
+                  className={`w-full h-11 rounded-md px-3 text-[13px] font-semibold outline-none border ${isDark ? "bg-[#020611] text-slate-200 border-white/[0.06]" : "bg-slate-50 text-slate-700 border-slate-200"}`}>
+                  <option value="">Todo Chile</option>
+                  {Object.keys(REGIONS).map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+                {regionFilter && (
                   <div className="flex flex-wrap gap-1.5">
                     {(REGIONS[regionFilter] || []).map(c => {
                       const selected = communeFilters.includes(c);
                       return (
-                        <button key={c} onClick={() => setCommuneFilters(prev => selected ? prev.filter(x => x !== c) : [...prev, c])}
-                          className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${selected ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{c}</button>
+                        <button key={c} aria-pressed={selected} onClick={() => setCommuneFilters(prev => selected ? prev.filter(x => x !== c) : [...prev, c])}
+                          className={`px-3 h-9 rounded-md text-[12px] font-medium transition-all ${selected ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-600"}`}>{c}</button>
                       );
                     })}
                   </div>
-                  {communeFilters.length > 0 && (
-                    <button onClick={() => setCommuneFilters([])} className={`text-[11px] font-medium mt-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Limpiar filtro ({communeFilters.length})</button>
+                )}
+                <div className="flex gap-2">
+                  {(regionFilter || communeFilters.length > 0) && (
+                    <button onClick={() => { setRegionFilter(""); setCommuneFilters([]); }} className={`flex-1 h-10 rounded-md text-[12px] font-semibold ${isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-600"}`}>Quitar zona</button>
                   )}
+                  <button onClick={() => setShowZone(false)} className="flex-1 h-10 rounded-md text-[12px] font-semibold bg-emerald-500 text-white">Listo</button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* Tab: Buscar Rival */}
         {activeTab === "rival" && (
           <>
-            <div className="flex gap-2">
-              <button onClick={() => setShowPublishTeam(true)}
-                className="flex-1 h-[52px] rounded-md font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+            <button onClick={openPublishTeam}
+                className="w-full h-[52px] rounded-md font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                 style={{ backgroundColor: "#10b981", color: "white" }}>
                 <Swords size={16} /> Publicar mi Equipo
-              </button>
-              <button aria-label="Actualizar" onClick={() => {}} className="w-[52px] h-[52px] rounded-md flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
-                <RefreshCw size={18} color={isDark ? "#94A3B8" : "#64748B"} />
-              </button>
-            </div>
+            </button>
 
             {loading ? (
               <div className="flex justify-center py-10"><div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
             ) : teams.filter(e => e.userId !== uid).length === 0 ? (
               <div className="py-16 flex flex-col items-center">
                 <Swords size={40} className={isDark ? "text-slate-600" : "text-slate-300"} strokeWidth={1} />
-                <p className={`text-sm font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay equipos buscando rival por ahora</p>
+                <p className={`text-sm font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay equipos buscando rival</p>
+                {(sportFilter || regionFilter) && (
+                  <button onClick={() => { setCommuneFilters([]); if (communeFilters.length === 0) { setRegionFilter(""); if (!regionFilter) setSportFilter(""); } }}
+                    className="mt-4 px-5 h-10 rounded-md text-[13px] font-semibold bg-emerald-500 text-white">
+                    {communeFilters.length > 0 ? "Buscar en toda la región" : regionFilter ? "Buscar en todo Chile" : "Ver todos los deportes"}
+                  </button>
+                )}
               </div>
             ) : (
               <div className="space-y-3">
@@ -410,7 +436,13 @@ export default function PartidosPage() {
             ) : players.filter(e => e.userId !== uid).length === 0 ? (
               <div className="py-16 flex flex-col items-center">
                 <Users size={40} className={isDark ? "text-slate-600" : "text-slate-300"} strokeWidth={1} />
-                <p className={`text-sm font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay jugadores disponibles por ahora</p>
+                <p className={`text-sm font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay jugadores disponibles</p>
+                {(sportFilter || regionFilter) && (
+                  <button onClick={() => { setCommuneFilters([]); if (communeFilters.length === 0) { setRegionFilter(""); if (!regionFilter) setSportFilter(""); } }}
+                    className="mt-4 px-5 h-10 rounded-md text-[13px] font-semibold bg-emerald-500 text-white">
+                    {communeFilters.length > 0 ? "Buscar en toda la región" : regionFilter ? "Buscar en todo Chile" : "Ver todos los deportes"}
+                  </button>
+                )}
               </div>
             ) : (
               <div className="space-y-3">
@@ -557,7 +589,7 @@ export default function PartidosPage() {
 
       {/* Publish Team Modal */}
       {showPublishTeam && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowPublishTeam(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowPublishTeam(false)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Publicar mi Equipo</p>
@@ -572,7 +604,7 @@ export default function PartidosPage() {
               ) : (
                 <div className="relative">
                   <select value={selectedTeam} onChange={e => { setSelectedTeam(e.target.value); const s = teamSport(userTeams.find(t => t.id === e.target.value)); if (s) setPublishSport(s); }}
-                    className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-900 border-slate-200/60"} backdrop-blur-xl`}
+                    className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`}
                     style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
                     <option value="">Seleccionar equipo</option>
                     {availableTeams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
@@ -585,7 +617,7 @@ export default function PartidosPage() {
               <div className="relative">
                 <select value={publishSport} onChange={e => setPublishSport(e.target.value)}
                   disabled={!!teamSport(userTeams.find(t => t.id === selectedTeam))}
-                  className={`w-full h-11 disabled:opacity-60 disabled:cursor-not-allowed rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-900 border-slate-200/60"} backdrop-blur-xl`}
+                  className={`w-full h-11 disabled:opacity-60 disabled:cursor-not-allowed rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`}
                   style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
                   {SPORTS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
@@ -600,7 +632,7 @@ export default function PartidosPage() {
               <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Región</label>
               <div className="relative">
                 <select value={publishRegion} onChange={e => { setPublishRegion(e.target.value); setPublishCommunes([]); }}
-                  className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-900 border-slate-200/60"} backdrop-blur-xl`}
+                  className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`}
                   style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
                   <option value="">Seleccionar región</option>
                   {Object.keys(REGIONS).map(r => <option key={r} value={r}>{r}</option>)}
@@ -632,7 +664,7 @@ export default function PartidosPage() {
 
       {/* Publish Player Modal */}
       {showPublishPlayer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowPublishPlayer(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowPublishPlayer(false)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Estoy Disponible</p>
@@ -662,7 +694,7 @@ export default function PartidosPage() {
               <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Región</label>
               <div className="relative">
                 <select value={publishRegion} onChange={e => { setPublishRegion(e.target.value); setPublishCommunes([]); }}
-                  className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-900 border-slate-200/60"} backdrop-blur-xl`}
+                  className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`}
                   style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
                   <option value="">Seleccionar región</option>
                   {Object.keys(REGIONS).map(r => <option key={r} value={r}>{r}</option>)}
@@ -699,7 +731,7 @@ export default function PartidosPage() {
 
       {/* Team Selector Modal */}
       {showTeamSelector && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowTeamSelector(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowTeamSelector(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Retar a {showTeamSelector.teamName}</p>
@@ -709,7 +741,7 @@ export default function PartidosPage() {
             <div className="space-y-2 mb-5">
               {userCaptainTeams.map(t => (
                 <button key={t.id} onClick={async () => { setShowTeamSelector(null); setConfirmChallenge({ entry: showTeamSelector, team: t }); }}
-                  className={`w-full p-4 rounded-md border text-left transition-all active:scale-[0.98] ${isDark ? "bg-[#0A101D]/90 border-white/[0.06] hover:bg-white/[0.04]" : "bg-white/80 border-slate-200/60 hover:bg-slate-50"}`}>
+                  className={`w-full p-4 rounded-md border text-left transition-all active:scale-[0.98] ${isDark ? "bg-[#0A101D] border-white/[0.06] hover:bg-white/[0.04]" : "bg-white border-slate-200 hover:bg-slate-50"}`}>
                   <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{t.name}</p>
                   <p className={`text-[11px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{(t.sport || "").charAt(0).toUpperCase() + (t.sport || "").slice(1)} · {t.members?.length || 1} jugadores</p>
                 </button>
@@ -722,7 +754,7 @@ export default function PartidosPage() {
 
       {/* Confirm Challenge Modal */}
       {confirmChallenge && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setConfirmChallenge(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setConfirmChallenge(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
               <Swords size={28} className="text-emerald-500" />
@@ -743,7 +775,7 @@ export default function PartidosPage() {
 
       {/* Challenge Detail Modal */}
       {showChallengeDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => { setShowChallengeDetail(null); setChallengeTeamData(null); }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => { setShowChallengeDetail(null); setChallengeTeamData(null); }}>
           <div className={`w-full max-w-sm rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="h-[100px] relative bg-gradient-to-br from-emerald-800 to-slate-900">
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
@@ -798,7 +830,7 @@ export default function PartidosPage() {
 
       {/* Confirm Action Modal (accept/decline challenge) */}
       {confirmAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setConfirmAction(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setConfirmAction(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 ${confirmAction.action === "accept" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
               {confirmAction.action === "accept" ? <CheckCircle2 size={28} className="text-emerald-500" /> : <X size={28} className="text-red-500" />}
@@ -827,7 +859,7 @@ export default function PartidosPage() {
 
       {/* Team Detail Modal */}
       {showTeamDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => { setShowTeamDetail(null); setTeamDetailData(null); }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => { setShowTeamDetail(null); setTeamDetailData(null); }}>
           <div className={`w-full max-w-sm rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="h-[130px] relative" style={{ background: showTeamDetail.teamImageUrl ? `url(${showTeamDetail.teamImageUrl}) center/cover` : `linear-gradient(135deg, #059669, #047857)` }}>
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
@@ -919,7 +951,7 @@ export default function PartidosPage() {
 
       {/* Player Detail Modal */}
       {showPlayerDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowPlayerDetail(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowPlayerDetail(null)}>
           <div className={`w-full max-w-sm rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             {/* Photo 1:1 */}
             <div className="relative w-full" style={{ aspectRatio: "1/1", background: showPlayerDetail.photoURL ? `url(${showPlayerDetail.photoURL}) center/cover` : `linear-gradient(135deg, #059669, #047857)` }}>
@@ -998,7 +1030,7 @@ export default function PartidosPage() {
 
       {/* Edit Entry Modal */}
       {editEntry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setEditEntry(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setEditEntry(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar Publicación</p>
@@ -1014,7 +1046,7 @@ export default function PartidosPage() {
                 <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
                 <div className="relative">
                   <select value={editSport} onChange={e => setEditSport(e.target.value)}
-                    className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-900 border-slate-200/60"} backdrop-blur-xl`}
+                    className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`}
                     style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
                     {SPORTS.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
@@ -1036,7 +1068,7 @@ export default function PartidosPage() {
             <div className="mb-5">
               <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción</label>
               <input value={editDesc} onChange={e => setEditDesc(e.target.value)} placeholder="Descripción de tu publicación"
-                className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06] placeholder-slate-500" : "bg-white/80 text-slate-900 border-slate-200/60 placeholder-slate-400"} backdrop-blur-xl`} />
+                className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/[0.06] placeholder-slate-500" : "bg-white text-slate-900 border-slate-200 placeholder-slate-400"}`} />
             </div>
             <button onClick={handleEditSave} disabled={actionLoading}
               className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
@@ -1048,7 +1080,7 @@ export default function PartidosPage() {
 
       {/* Feedback */}
       {feedback && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6" onClick={() => setFeedback(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setFeedback(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className={`w-14 h-14 rounded-md flex items-center justify-center mx-auto mb-4 ${feedback.type === "success" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
               {feedback.type === "success" ? <CheckCircle2 size={28} className="text-emerald-500" /> : <X size={28} className="text-red-500" />}

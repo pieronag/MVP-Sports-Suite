@@ -23,7 +23,7 @@ const SPORTS_CONFIG = [
 function Modal({ isOpen, onClose, children, isDark }: { isOpen: boolean; onClose: () => void; children: React.ReactNode; isDark: boolean }) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={onClose}>
       <div className={`w-full max-w-md rounded-md p-6 ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
@@ -93,7 +93,7 @@ export default function EquiposExplorePage() {
       <div className="px-5 pt-3 pb-8 space-y-2">
         {/* Action Buttons */}
         <button onClick={() => setShowCreateModal(true)} className="w-full group">
-          <div className={`rounded-md overflow-hidden transition-all duration-200 group-hover:scale-[1.01] active:scale-[0.99] ${isDark ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+          <div className={`rounded-md overflow-hidden transition-all duration-200 group-hover:scale-[1.01] active:scale-[0.99] ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
             <div className="p-4 flex items-center gap-4">
               <div className="w-[46px] h-[46px] rounded-md bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shrink-0">
                 <Plus color="white" size={22} strokeWidth={2.5} />
@@ -107,7 +107,7 @@ export default function EquiposExplorePage() {
           </div>
         </button>
         <button onClick={() => setShowJoinModal(true)} className="w-full group">
-          <div className={`rounded-md overflow-hidden transition-all duration-200 group-hover:scale-[1.01] active:scale-[0.99] ${isDark ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+          <div className={`rounded-md overflow-hidden transition-all duration-200 group-hover:scale-[1.01] active:scale-[0.99] ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
             <div className="p-4 flex items-center gap-4">
               <div className="w-[46px] h-[46px] rounded-md bg-blue-600 flex items-center justify-center shrink-0">
                 <LogIn color="white" size={22} strokeWidth={2.5} />
@@ -123,7 +123,7 @@ export default function EquiposExplorePage() {
 
         {/* Partidos Button */}
         <button onClick={() => router.push("/player/equipos/partidos")} className="w-full group">
-          <div className={`rounded-md overflow-hidden transition-all duration-200 group-hover:scale-[1.01] active:scale-[0.99] ${isDark ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+          <div className={`rounded-md overflow-hidden transition-all duration-200 group-hover:scale-[1.01] active:scale-[0.99] ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
             <div className="p-4 flex items-center gap-4">
               <div className="w-[46px] h-[46px] rounded-md bg-gradient-to-br from-amber-500 to-rose-500 flex items-center justify-center shrink-0">
                 <Swords color="white" size={22} strokeWidth={2.5} />
@@ -233,7 +233,7 @@ export default function EquiposExplorePage() {
       {/* Feedback Toast */}
       {feedback && (
         <div className="fixed bottom-8 left-5 right-5 z-50 animate-in slide-in-from-bottom-4 duration-300">
-          <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 backdrop-blur-xl ${feedback.type === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
+          <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 ${feedback.type === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
             <span className="flex-1 text-sm font-medium">{feedback.msg}</span>
             <button aria-label="Cerrar" onClick={() => setFeedback(null)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
           </div>

@@ -100,7 +100,7 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
 
         </div>
             {/* Barra inferior móvil (navegación tipo app instalada) */}
-            {!hideBottomNav && <nav className={` fixed bottom-0 inset-x-0 z-40 border-t backdrop-blur-md pb-[env(safe-area-inset-bottom)] ${isDark ? 'bg-[#020611]/95 border-white/5' : 'bg-white/95 border-slate-200'}`}>
+            {!hideBottomNav && <nav className={` fixed bottom-0 inset-x-0 z-40 border-t pb-[env(safe-area-inset-bottom)] ${isDark ? 'bg-[#020611]/95 border-white/5' : 'bg-white/95 border-slate-200'}`}>
                 <div className="grid grid-cols-5 h-16">
                     {tabs.map(tab => {
                         const a = isActive(tab.href);
@@ -158,7 +158,7 @@ export default function PlayerLayoutClient({ children }: { children: React.React
                         <div className="absolute inset-4 border border-emerald-500/10 rounded-full animate-[spin_6s_linear_infinite_reverse]" />
                         <div className="absolute inset-[30%] bg-emerald-500/30 rounded-full blur-2xl animate-pulse" />
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-slate-900/80 backdrop-blur-3xl border border-white/20 flex items-center justify-center overflow-hidden">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-slate-900/80 border border-white/20 flex items-center justify-center overflow-hidden">
                                 <Image src="/Logo.png" alt="MVP" width={80} height={80} className="w-full h-full object-cover object-center scale-[1.1] animate-pulse" />
                             </div>
                         </div>

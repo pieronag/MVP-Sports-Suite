@@ -262,6 +262,21 @@ html {
 .player-shell {
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
+  caret-color: #00df82;
+  font-variant-numeric: tabular-nums;
+}
+.player-shell ::selection {
+  background: rgba(0, 223, 130, 0.3);
+}
+/* Foco visible solo con teclado, en el verde de marca */
+.player-shell :focus-visible {
+  outline: 2px solid #00df82;
+  outline-offset: 2px;
+}
+.player-shell input:focus-visible,
+.player-shell textarea:focus-visible,
+.player-shell select:focus-visible {
+  outline-offset: 0;
 }
 
 /* 12. Respect reduced-motion preferences */

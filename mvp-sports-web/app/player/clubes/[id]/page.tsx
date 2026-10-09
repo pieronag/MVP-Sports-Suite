@@ -755,7 +755,7 @@ export default function VenueDetailPage() {
 
       {feedback && (
         <div className="fixed bottom-8 left-5 right-5 z-50 animate-in slide-in-from-bottom-4 duration-300">
-          <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 backdrop-blur-xl ${feedback.type === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
+          <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 ${feedback.type === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
             <span className="flex-1 text-sm font-medium">{feedback.msg}</span>
             <button aria-label="Cerrar" onClick={() => setFeedback(null)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
           </div>
@@ -764,7 +764,7 @@ export default function VenueDetailPage() {
 
       {/* Rules Modal */}
       {showRules && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowRules(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowRules(false)}>
           <div className={`w-full max-w-sm rounded-md border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className={`flex items-center justify-between px-5 py-4 border-b ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
               <div className="flex items-center gap-3">

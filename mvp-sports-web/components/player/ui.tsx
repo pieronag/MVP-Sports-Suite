@@ -24,3 +24,26 @@ export function SectionPill({ label, className = "" }: { label: string; classNam
     </div>
   );
 }
+
+// Control segmentado para elegir función/vista dentro de una pantalla
+export function SegmentedTabs<T extends string>({ isDark, value, onChange, options, className = "" }: {
+  isDark: boolean;
+  value: T;
+  onChange: (v: T) => void;
+  options: { id: T; label: ReactNode; icon?: React.ElementType }[];
+  className?: string;
+}) {
+  return (
+    <div role="tablist" className={`flex p-1 rounded-md ${isDark ? "bg-white/[0.04]" : "bg-slate-100"} ${className}`}>
+      {options.map(({ id, label, icon: Icon }) => {
+        const on = value === id;
+        return (
+          <button key={id} role="tab" aria-selected={on} onClick={() => onChange(id)}
+            className={`flex-1 min-w-0 h-9 px-2 rounded-md text-[12px] font-semibold transition-all flex items-center justify-center gap-1.5 ${on ? (isDark ? "bg-[#0A101D] text-emerald-400" : "bg-white text-emerald-600 shadow-sm") : isDark ? "text-slate-400" : "text-slate-500"}`}>
+            {Icon && <Icon size={14} className="shrink-0" />}<span className="truncate">{label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}

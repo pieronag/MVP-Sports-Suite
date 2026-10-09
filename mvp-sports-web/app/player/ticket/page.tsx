@@ -205,7 +205,7 @@ export default function TicketPage() {
 
       {/* Claim Modal */}
       {showClaimModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-5" onClick={() => setShowClaimModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-5" onClick={() => setShowClaimModal(false)}>
           <div className={`w-full max-w-sm rounded-md overflow-hidden ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="p-5 flex items-center justify-between" style={{ backgroundColor: "#ef4444" }}>
               <div className="flex items-center gap-3">

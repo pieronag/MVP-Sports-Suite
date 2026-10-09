@@ -210,7 +210,7 @@ export default function MapaPage() {
             const ds = v.displaySports.split(" • ");
             return (
               <button key={v.id} onClick={() => router.push(`/player/clubes/${v.id}`)} className="w-full text-left">
-                <div className={`relative rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D]/90 backdrop-blur-xl border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border-slate-200/60"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+                <div className={`relative rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
                   <div className="h-[160px] relative">
                     <img src={getVenueImage(v)} alt={v.name} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 to-transparent" />

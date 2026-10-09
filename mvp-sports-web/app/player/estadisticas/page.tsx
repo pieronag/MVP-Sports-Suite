@@ -1,5 +1,5 @@
 "use client";
-import { GlowCard, SectionPill } from "@/components/player/ui";
+import { GlowCard, SectionPill, SegmentedTabs } from "@/components/player/ui";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -404,15 +404,10 @@ export default function EstadisticasPage() {
           </div>
         </GlowCard>
 
-        {/* Tabs */}
-        <div className="flex gap-2.5">
-          {(['partidos', 'logros'] as const).map(tab => (
-            <button key={tab} onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-3 rounded-md text-[12px] font-semibold uppercase tracking-wide transition-all active:scale-[0.98] ${activeTab === tab ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
-              {tab === 'partidos' ? `Partidos (${analytics.bitacora.filter((h: any) => !h.isBadge).length})` : `Logros (${analytics.bitacora.filter((h: any) => h.isBadge).length})`}
-            </button>
-          ))}
-        </div>
+        <SegmentedTabs isDark={isDark} value={activeTab} onChange={setActiveTab} options={[
+          { id: 'partidos', label: `Partidos (${analytics.bitacora.filter((h: any) => !h.isBadge).length})` },
+          { id: 'logros', label: `Logros (${analytics.bitacora.filter((h: any) => h.isBadge).length})` },
+        ]} />
 
         {/* Feed */}
         <GlowCard isDark={isDark}>

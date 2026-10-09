@@ -377,8 +377,8 @@ export default function PerfilPage() {
       <div className="px-5 mb-8">
         <div className={`relative rounded-md overflow-hidden transition-all active:scale-[0.99] ${
           isDark
-            ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]"
-            : "bg-white/80 backdrop-blur-xl border border-slate-200/60"
+            ? "bg-[#0A101D] border border-white/[0.06]"
+            : "bg-white border border-slate-200"
         } ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
           <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : "bg-gradient-to-br from-emerald-50/50 to-transparent"}`} />
           <div className={`p-5 bg-gradient-to-br ${
@@ -406,7 +406,7 @@ export default function PerfilPage() {
             </div>
 
             {/* Stats Grid */}
-            <div className={`grid grid-cols-4 gap-2 pt-4 border-t ${isDark ? "border-white/[0.06]" : "border-slate-200/60"}`}>
+            <div className={`grid grid-cols-4 gap-2 pt-4 border-t ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
               {[
                 { label: "PARTIDOS", value: stats.matchesPlayed },
                 { label: "VICTORIAS", value: stats.matchesWon },
@@ -551,7 +551,7 @@ export default function PerfilPage() {
 
       {/* Glossary Modal */}
       {showGlossary && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-5" onClick={() => setShowGlossary(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-5" onClick={() => setShowGlossary(false)}>
           <div className={`w-full max-w-md max-h-[85vh] flex flex-col rounded-md border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className={`flex items-center justify-between px-5 py-4 border-b shrink-0 ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
@@ -601,7 +601,7 @@ export default function PerfilPage() {
                 const progress = nextThreshold > 0 ? Math.min(1, val / nextThreshold) : 0;
 
                 return (
-                  <div key={b.id} className={`rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D]/90 border-white/[0.06]" : "bg-white border-slate-200"} shadow-sm`}>
+                  <div key={b.id} className={`rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"} shadow-sm`}>
                     <div className="p-4">
                       <div className="flex items-center gap-3.5">
                         <div className={`w-[50px] h-[50px] rounded-md flex items-center justify-center shrink-0 border ${isDark ? "border-white/[0.06]" : "border-slate-200"}`} style={{ backgroundColor: `${progressColor}12` }}>

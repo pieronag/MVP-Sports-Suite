@@ -164,7 +164,7 @@ function SelectRow({ icon: Icon, color, label, value, options, onSelect, disable
 function Modal({ isOpen, onClose, children, isDark }: { isOpen: boolean; onClose: () => void; children: React.ReactNode; isDark: boolean }) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6 animate-in fade-in duration-200" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6 animate-in fade-in duration-200" onClick={onClose}>
       <div className={`w-full max-w-md rounded-md p-6 ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
@@ -507,7 +507,7 @@ export default function PreferenciasPage() {
       {/* Feedback Toast */}
       {showFeedback && (
         <div className="fixed bottom-8 left-5 right-5 z-50 animate-in slide-in-from-bottom-4 duration-300">
-          <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 backdrop-blur-xl ${feedbackType === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
+          <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 ${feedbackType === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
             {feedbackType === "error" ? <AlertCircle size={20} /> : <CheckCircle2 size={20} />}
             <span className="flex-1 text-sm font-medium">{feedbackMsg}</span>
             <button aria-label="Cerrar" onClick={() => setShowFeedback(false)} className="opacity-70 hover:opacity-100"><X size={18} /></button>

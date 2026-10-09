@@ -75,8 +75,8 @@ export default function PlayerDashboard() {
             href="/player/perfil"
             className={`relative block rounded-md overflow-hidden transition-all active:scale-[0.99] ${
               isDark
-                ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]"
-                : "bg-white/80 backdrop-blur-xl border border-slate-200/60"
+                ? "bg-[#0A101D] border border-white/[0.06]"
+                : "bg-white border border-slate-200"
             } ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}
           >
             <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : ""}`} />
@@ -188,8 +188,8 @@ export default function PlayerDashboard() {
             href="/player/perfil"
             className={`relative block rounded-md overflow-hidden transition-all active:scale-[0.99] group ${
               isDark
-                ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]"
-                : "bg-white/80 backdrop-blur-xl border border-slate-200/60"
+                ? "bg-[#0A101D] border border-white/[0.06]"
+                : "bg-white border border-slate-200"
             } ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}
           >
             <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : "bg-gradient-to-br from-emerald-50/50 to-transparent"}`} />

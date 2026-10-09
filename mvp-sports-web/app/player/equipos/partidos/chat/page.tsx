@@ -132,7 +132,7 @@ export default function PartidosChatPage() {
 
       {/* Close Confirmation Modal */}
       {showCloseModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6" onClick={() => setShowCloseModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setShowCloseModal(false)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 bg-red-500/10`}>
               <X size={28} className="text-red-500" />

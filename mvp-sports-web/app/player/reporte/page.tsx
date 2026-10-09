@@ -1,4 +1,5 @@
 "use client";
+import { SegmentedTabs } from "@/components/player/ui";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -146,16 +147,8 @@ export default function ReportePage() {
                 <div className="w-10" />
             </div>
 
-            {/* TABS */}
-            <div className="flex gap-2.5 px-5 pt-3 pb-4">
-                <button onClick={() => setActiveTab('nuevo')}
-                    className={`flex-1 h-11 rounded-md text-[12px] font-semibold uppercase tracking-wide transition-all active:scale-[0.98] ${activeTab === 'nuevo' ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
-                    NUEVO REPORTE
-                </button>
-                <button onClick={() => setActiveTab('historial')}
-                    className={`flex-1 h-11 rounded-md text-[12px] font-semibold uppercase tracking-wide transition-all active:scale-[0.98] ${activeTab === 'historial' ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
-                    MIS REPORTES
-                </button>
+            <div className="px-5 pt-3 pb-4">
+                <SegmentedTabs isDark={isDark} value={activeTab} onChange={setActiveTab} options={[{ id: 'nuevo', label: 'Nuevo reporte' }, { id: 'historial', label: 'Mis reportes' }]} />
             </div>
 
             <div className="max-w-2xl mx-auto px-5">
@@ -195,7 +188,7 @@ export default function ReportePage() {
                         ) : (
                             <div className="space-y-4">
                                 {myReports.map(report => (
-                                    <div key={report.id} className={`relative rounded-md ${isDark ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+                                    <div key={report.id} className={`relative rounded-md ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
                                         <div className="p-5">
                                             <div className="flex justify-between items-center mb-3">
                                                 <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wide border"

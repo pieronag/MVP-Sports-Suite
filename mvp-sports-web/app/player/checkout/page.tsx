@@ -350,7 +350,7 @@ export default function CheckoutPage() {
       </div>
 
       {customAlert.visible && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6" onClick={() => { setCustomAlert({ ...customAlert, visible: false }); if (customAlert.onClose) customAlert.onClose(); }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => { setCustomAlert({ ...customAlert, visible: false }); if (customAlert.onClose) customAlert.onClose(); }}>
           <div className={`w-full max-w-sm rounded-md p-6 ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"} text-center`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: (customAlert.type === "success" ? "#10b981" : "#ef4444") + "15" }}>
               {customAlert.type === "success" ? <CheckCircle2 size={32} className="text-emerald-500" /> : <XCircle size={32} className="text-red-500" />}
