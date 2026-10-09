@@ -1,4 +1,5 @@
 "use client";
+import { getOwnedTenantsSnap } from "@/services/ownedTenants";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -127,12 +128,13 @@ export default function FinancePage() {
     // 1. Cargar recintos del dueño
     useEffect(() => {
         if (!user?.uid) return;
-        const q = query(collection(db, "tenants"), or(where("ownerId", "==", user.uid), where("ownerIds", "array-contains", user.uid)));
-        const unsubscribe = onSnapshot(q, (snap) => {
+        let active = true;
+        getOwnedTenantsSnap(user.uid).then((snap) => {
+            if (!active) return;
             const list = snap.docs.map(d => ({ id: d.id, name: d.data().name, features: d.data().features || {} } as Venue));
             setMyVenues(list);
         });
-        return () => unsubscribe();
+        return () => { active = false; };
     }, [user]);
 
     // 2. Cargar transacciones (todas, se filtran por mes en cliente)

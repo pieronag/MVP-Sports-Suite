@@ -205,7 +205,8 @@ export default function CouponsPage() {
             setIsModalOpen(false);
             fetchData();
         } catch (e: any) { 
-            setNotification({ msg: "Error al procesar", type: 'error' }); 
+            console.error("Error al guardar cupón:", e);
+            setNotification({ msg: e?.code === 'permission-denied' ? "No tienes permisos para gestionar cupones de este recinto" : "Error al procesar", type: 'error' }); 
             await auditService.logAuditEvent({
                 action: editingId ? 'CUPÓN_EDITAR' : 'CUPÓN_CREAR',
                 module: 'Marketing/Cupones',

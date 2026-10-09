@@ -1,4 +1,5 @@
 "use client";
+import { getOwnedTenantsSnap } from "@/services/ownedTenants";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     Alert02Icon,
@@ -62,8 +63,7 @@ export default function FeedbackPage() {
         if (!user?.uid) return;
         setLoading(true);
         try {
-            const qVenues = query(collection(db, "tenants"), or(where("ownerId", "==", user.uid), where("ownerIds", "array-contains", user.uid)));
-            const snapVenues = await getDocs(qVenues);
+            const snapVenues = await getOwnedTenantsSnap(user.uid);
             const venueList = snapVenues.docs.map(d => ({ id: d.id, name: d.data().name }));
             setVenues(venueList);
             const venueIds = venueList.map(v => v.id);

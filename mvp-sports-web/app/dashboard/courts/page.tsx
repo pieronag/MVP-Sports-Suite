@@ -1,4 +1,5 @@
 "use client";
+import { getOwnedTenantsSnap } from "@/services/ownedTenants";
 import { uploadImage } from "@/services/imageUpload";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useRef } from 'react';
@@ -263,8 +264,7 @@ export default function CourtsPage() {
                     snapTenantsDocs = results.flat();
                 }
             } else {
-                const qTenants = query(collection(db, "tenants"), or(where("ownerId", "==", user.uid), where("ownerIds", "array-contains", user.uid)));
-                const snapTenants = await getDocs(qTenants);
+                const snapTenants = await getOwnedTenantsSnap(user.uid);
                 snapTenantsDocs = snapTenants.docs;
             }
             const venuesList: Venue[] = [];

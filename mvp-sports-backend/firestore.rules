@@ -29,10 +29,11 @@ service cloud.firestore {
             ? get(staffDoc).data.role
             : null;
 
-      return firestoreRole != null
-        ? firestoreRole
-        : request.auth.token.role != null
-          ? request.auth.token.role
+      // Normalizado a minúsculas: el resto del sistema compara 'superadmin', 'owner', etc.
+      return firestoreRole is string
+        ? firestoreRole.lower()
+        : request.auth.token.role is string
+          ? request.auth.token.role.lower()
           : null;
     }
 
