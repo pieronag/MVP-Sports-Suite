@@ -73,6 +73,18 @@ export default function ExploreClubesPage() {
     return Array.from(c);
   }, [venues]);
 
+  // Arranca con las preferencias del jugador (deporte principal y su comuna), solo si hay recintos que calcen
+  const [prefsApplied, setPrefsApplied] = useState(false);
+  useEffect(() => {
+    if (prefsApplied || !profile || venues.length === 0) return;
+    const n = (v: string) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+    const sp = sportsList.find(x => x !== "Todos" && n(x) === n((profile as any).mainSport));
+    if (sp) setSelectedSport(sp);
+    const com = communesList.find(x => x !== "Todas" && n(x) === n((profile as any).city));
+    if (com) setSelectedCommune(com);
+    setPrefsApplied(true);
+  }, [profile, venues, sportsList, communesList, prefsApplied]);
+
   const filteredVenues = useMemo(() => {
     const norm = (s: string) => s ? s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
     const ns = norm(selectedSport);
@@ -179,7 +191,7 @@ export default function ExploreClubesPage() {
                   </div>
                   <div className="flex items-center gap-1 bg-emerald-500/10 px-2.5 py-1.5 rounded-md shrink-0">
                     <Star size={12} className="text-emerald-500" fill="currentColor" />
-                    <span className="text-emerald-500 font-semibold text-xs">{Number(venue.rating || 0).toFixed(1)}</span>
+                    <span className="text-emerald-500 font-semibold text-xs">{Number(venue.rating) > 0 ? Number(venue.rating).toFixed(1) : "Nuevo"}</span>
                   </div>
                 </div>
                 <div className={`flex items-center justify-between pt-4 border-t ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
@@ -199,7 +211,11 @@ export default function ExploreClubesPage() {
         {filteredVenues.length === 0 && (
           <div className="py-16 flex flex-col items-center">
             <Compass size={32} className={isDark ? "text-slate-600" : "text-slate-300"} />
-            <p className={`text-sm font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin recintos detectados</p>
+            <p className={`text-sm font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay recintos con estos filtros</p>
+            {(selectedSport !== "Todos" || selectedCommune !== "Todas" || search) && (
+              <button onClick={() => { setSelectedSport("Todos"); setSelectedCommune("Todas"); setSearch(""); }}
+                className="mt-4 px-5 h-10 rounded-md text-[13px] font-semibold bg-emerald-500 text-white">Ver todos los recintos</button>
+            )}
           </div>
         )}
         <p className={`text-center text-[11px] font-medium pt-2 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>

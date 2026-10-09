@@ -52,7 +52,7 @@ export default function TicketPage() {
 
   const displayDate = useMemo(() => {
     if (!booking?.date) return "—";
-    try { const d = (booking.date as any).toDate ? (booking.date as any).toDate() : new Date(); return d.toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" }); }
+    try { const raw: any = booking.date; const d = raw?.toDate ? raw.toDate() : raw?.seconds ? new Date(raw.seconds * 1000) : /^\d{4}-\d{2}-\d{2}$/.test(String(raw)) ? new Date(`${raw}T12:00:00`) : new Date(raw); return d.toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" }); }
     catch { return "—"; }
   }, [booking?.date]);
 

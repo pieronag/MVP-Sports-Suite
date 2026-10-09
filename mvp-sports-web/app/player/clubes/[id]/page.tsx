@@ -87,7 +87,7 @@ const formatDistance = (lat1: number, lon1: number, lat2: number, lon2: number) 
 export default function VenueDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const { theme } = usePlayer();
+  const { theme, profile } = usePlayer();
   const isDark = theme === "dark";
 
   const [venue, setVenue] = useState<Tenant | null>(null);
@@ -137,6 +137,21 @@ export default function VenueDetailPage() {
       finally { setLoadingSlots(false); }
     })();
   }, [id, selectedCourtId, selectedDate]);
+
+  // Horarios de todas las canchas del deporte para el día elegido (paso 3)
+  const [slotsByCourt, setSlotsByCourt] = useState<Record<string, string[]>>({});
+  const [loadingAllSlots, setLoadingAllSlots] = useState(false);
+  useEffect(() => {
+    if (!id || bookingStep !== 3 || !selectedSport || !selectedDate) return;
+    let alive = true;
+    const sel = getSportKey(selectedSport);
+    const list = courts.filter((c: any) => { const cs = getSportKey(c.sport || ""); return (cs.includes(sel) || sel.includes(cs)) && c.status !== "maintenance" && c.status !== "occupied"; });
+    setLoadingAllSlots(true);
+    Promise.all(list.map((c) => bookingService.getAvailableTimeSlots(id as string, c.id, selectedDate).then((t) => [c.id, t] as const).catch(() => [c.id, [] as string[]] as const)))
+      .then((pairs) => { if (alive) setSlotsByCourt(Object.fromEntries(pairs)); })
+      .finally(() => { if (alive) setLoadingAllSlots(false); });
+    return () => { alive = false; };
+  }, [id, bookingStep, selectedSport, selectedDate, courts]);
 
   const handleBack = useCallback(() => { if (bookingStep > 1) setBookingStep(p => p - 1); else router.back(); }, [bookingStep, router]);
 
@@ -266,17 +281,31 @@ export default function VenueDetailPage() {
     router.push(`/player/checkout?${params}`);
   };
 
+  // Si el recinto tiene un solo deporte, o el deporte principal del jugador, se elige solo
+  const [autoSport, setAutoSport] = useState(false);
+  useEffect(() => {
+    if (autoSport || availableSports.length === 0) return;
+    const n = (v: string) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+    const pick = availableSports.length === 1 ? availableSports[0] : availableSports.find((sp: string) => n(sp) === n((profile as any)?.mainSport));
+    if (pick) { setSelectedSport(pick); setBookingStep(2); }
+    setAutoSport(true);
+  }, [availableSports, profile, autoSport]);
+
+  const STEP_LABELS = ["Deporte", "Día", "Cancha y hora", "Confirmar"];
   const StepIndicator = () => (
-    <div className="flex items-center justify-center gap-1 mb-4">
-      {[1, 2, 3, 4].map((s, i) => (
-        <div key={s} className="flex items-center">
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-semibold transition-all shrink-0 ${bookingStep >= s ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/30" : isDark ? "bg-white/[0.06] text-slate-500" : "bg-slate-100 text-slate-400"}`}>
-            <span>{bookingStep >= s ? "✓" : s}</span>
-          </div>
-          {i < 3 && <div className={`w-8 h-[2px] mx-0.5 ${bookingStep > s ? "bg-emerald-500" : isDark ? "bg-white/[0.06]" : "bg-slate-100"}`} />}
-        </div>
-      ))}
-    </div>
+    <ol className="grid grid-cols-4 gap-1 mb-4" aria-label="Pasos de la reserva">
+      {STEP_LABELS.map((label, i) => {
+        const s = i + 1, done = bookingStep > s, current = bookingStep === s;
+        return (
+          <li key={s} aria-current={current ? "step" : undefined} className="flex flex-col items-center gap-1.5">
+            <div className={`h-1 w-full rounded-full ${done || current ? "bg-emerald-500" : isDark ? "bg-white/[0.08]" : "bg-slate-200"}`} />
+            <span className={`text-[11px] font-semibold flex items-center gap-1 ${current ? (isDark ? "text-slate-100" : "text-slate-900") : done ? "text-emerald-500" : isDark ? "text-slate-500" : "text-slate-400"}`}>
+              {done && <CheckCircle2 size={12} />}{label}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
   );
 
   const renderSportSelection = () => (
@@ -307,117 +336,99 @@ export default function VenueDetailPage() {
     </button>
   );
 
-  const renderCourtSelection = () => (
-    <GlowCard isDark={isDark}>
-      <div className="p-5">
-        <div className="flex items-center justify-between mb-4">
-          {renderBackButton()}
-          <p className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cancha y horario</p>
-          <div className="w-12" />
-        </div>
-        {/* Selected date info */}
-        <div className={`flex items-center gap-2 mb-4 p-3 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
-          <Clock size={14} className="text-emerald-500" />
-          <span className={`text-xs font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-            {dateLabel} • {dateDayName} {currentDateInfo.date.toLocaleDateString("es-CL", { day: "numeric", month: "long" })}
-          </span>
-          <button onClick={() => setBookingStep(2)} className="ml-auto text-emerald-500 text-[11px] font-semibold uppercase">Cambiar</button>
-        </div>
-        <div className="space-y-3">
-          {filteredCourts.length === 0 ? (
+  // Paso 3: primero la hora (todas las canchas del deporte), luego la cancha libre se asigna sola
+  const bookableCourts = filteredCourts.filter((c: any) => c.status !== "maintenance" && c.status !== "occupied");
+  const slotOrder = (t: string) => { const [h, m] = t.split(":").map(Number); return h < 6 ? (h + 24) * 60 + m : h * 60 + m; };
+  const allTimes = Array.from(new Set(Object.values(slotsByCourt).flat())).sort((a, b) => slotOrder(a) - slotOrder(b));
+  const courtsAt = (t: string) => bookableCourts.filter((c) => (slotsByCourt[c.id] || []).includes(t));
+  const pickTime = (t: string) => {
+    setSelectedTime(t);
+    const free = courtsAt(t);
+    if (!free.some((c) => c.id === selectedCourtId)) setSelectedCourtId(free[0]?.id || null);
+  };
+  const renderCourtSelection = () => {
+    const isPastSlot = (t: string) => { const [h] = t.split(":").map(Number); return isToday && h >= 6 && h <= currentHour; };
+    const periods: Record<string, string> = { manana: "Mañana", tarde: "Tarde", noche: "Noche" };
+    const periodOf = (t: string) => { const h = Number(t.split(":")[0]); return h >= 6 && h < 12 ? "manana" : h >= 12 && h < 18 ? "tarde" : "noche"; };
+    const freeCourts = selectedTime ? courtsAt(selectedTime) : [];
+    return (
+      <GlowCard isDark={isDark}>
+        <div className="p-5">
+          <div className="flex items-center justify-between mb-4">
+            {renderBackButton()}
+            <p className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige la hora</p>
+            <div className="w-12" />
+          </div>
+          <div className={`flex items-center gap-2 mb-4 p-3 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
+            <Clock size={14} className="text-emerald-500" />
+            <span className={`text-xs font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+              {dateLabel} · {dateDayName} {currentDateInfo.date.toLocaleDateString("es-CL", { day: "numeric", month: "long" })}
+            </span>
+            <button onClick={() => setBookingStep(2)} className="ml-auto text-emerald-500 text-[12px] font-semibold">Cambiar día</button>
+          </div>
+
+          {bookableCourts.length === 0 ? (
             <p className={`text-sm font-medium py-6 text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay canchas disponibles para este deporte</p>
+          ) : loadingAllSlots ? (
+            <div className="flex justify-center py-8"><div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
+          ) : allTimes.filter((t) => !isPastSlot(t)).length === 0 ? (
+            <div className="py-6 text-center">
+              <p className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>No quedan horarios este día</p>
+              <button onClick={() => setDateOffset((d) => d + 1)} className="mt-3 px-5 h-10 rounded-md text-[13px] font-semibold bg-emerald-500 text-white">Ver el día siguiente</button>
+            </div>
           ) : (
-            filteredCourts.map((court) => {
-              const info = getSportInfo(court.sport || "");
-              const CourtIcon = info.courtIcon;
-              const courtData = court as any;
-              const isUnavailable = courtData?.status === "maintenance" || courtData?.status === "occupied";
-              const isSelected = selectedCourtId === court.id;
-              return (
-                <div key={court.id}>
-                  <button onClick={() => { if (!isUnavailable) { setSelectedCourtId(court.id); setSelectedTime(null); } }}
-                    className={`w-full flex items-start gap-4 p-4 rounded-md border transition-all active:scale-[0.98] ${isUnavailable ? "opacity-50" : isSelected ? "border-emerald-500 bg-emerald-500/5" : isDark ? "border-white/[0.06] hover:bg-white/[0.02]" : "border-slate-200 hover:bg-slate-50"}`}
-                    disabled={isUnavailable}>
-                    <div className="w-12 h-12 rounded-md flex items-center justify-center shrink-0 mt-0.5" style={{ backgroundColor: `${info.color}20` }}>
-                      <CourtIcon color={info.color} size={26} />
-                    </div>
-                    <div className="flex-1 text-left min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className={`text-sm font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{court.name}</p>
-                        {courtData?.category && <span className={`text-[11px] font-medium px-2 py-0.5 rounded bg-white/[0.06] ${isDark ? "text-slate-400" : "text-slate-500"}`}>{courtData.category}</span>}
-                        {isUnavailable && <span className="text-[11px] font-semibold text-red-400 uppercase">No disponible</span>}
-                        {courtData?.status === "available" && <CircleDot size={8} className="text-emerald-500" />}
-                      </div>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className={`text-[12px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{court.sport}</span>
-                        <span className="text-emerald-500 text-[12px] font-semibold">${Number(getCourtPrice(court.id, selectedSport || court.sport, selectedDate, selectedTime || "12:00")).toLocaleString("es-CL")}</span>
-                      </div>
-                      {courtData?.surface && <p className={`text-[11px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Superficie: {courtData.surface}</p>}
-                      {courtData?.features && courtData.features.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {courtData.features.slice(0, 4).map((f: string) => (
-                            <span key={f} className={`text-[11px] font-semibold px-1.5 py-0.5 rounded-md uppercase tracking-wide ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>{f}</span>
-                          ))}
-                          {courtData.features.length > 4 && <span className="text-[11px] text-slate-500">+{courtData.features.length - 4}</span>}
-                        </div>
-                      )}
-                    </div>
-                    {isSelected && <CheckCircle2 size={18} className="text-emerald-500 shrink-0 mt-1" />}
-                  </button>
-                  {/* Time slots for selected court */}
-                  {isSelected && (
-                    <div className={`mt-3 p-4 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
-                      <p className={`text-[11px] font-semibold uppercase tracking-wide mb-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Horarios disponibles ({currentDayHours})</p>
-                      {loadingSlots ? (
-                        <div className="flex justify-center py-4"><div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
-                      ) : availableSlots.length === 0 ? (
-                        <p className={`text-sm font-medium py-4 text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin horarios disponibles</p>
-                      ) : (
-                        <div className="space-y-3">
-                          {(["mañana", "tarde", "noche"] as const).map(period => {
-                            const slots = groupedSlots[period];
-                            if (!slots.length) return null;
-                            const labels = { mañana: "Mañana (6-12)", tarde: "Tarde (12-18)", noche: "Noche (18-24)" };
-                            return (
-                              <div key={period}>
-                                <p className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{labels[period]}</p>
-                                <div className="flex flex-wrap gap-2">
-                                  {slots.map(s => {
-                                    const [h] = s.split(":").map(Number);
-                                    const isPast = isToday && (h < currentHour || (h === currentHour && 0 <= currentMin));
-                                    return (
-                                      <button key={s} onClick={() => { if (!isPast) { setSelectedTime(selectedTime === s ? null : s); } }}
-                                        className={`px-4 py-2.5 rounded-md text-xs font-semibold transition-all active:scale-95 ${isPast ? (isDark ? "text-slate-700 bg-white/[0.02] line-through cursor-not-allowed" : "text-slate-300 bg-slate-50 line-through cursor-not-allowed") : selectedTime === s ? "bg-emerald-500 text-white shadow-sm" : isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}
-                                        disabled={isPast}>
-                                        {s}
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                      {/* Continue button when time selected */}
-                      {selectedTime && (
-                        <div className="mt-4">
-                          <button onClick={() => setBookingStep(4)}
-                            className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
-                            Continuar <ChevronRight size={16} />
+            <div className="space-y-4">
+              {Object.keys(periods).map((pk) => {
+                const times = allTimes.filter((t) => periodOf(t) === pk && !isPastSlot(t));
+                if (!times.length) return null;
+                return (
+                  <div key={pk}>
+                    <p className={`text-[12px] font-semibold mb-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{periods[pk]}</p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {times.map((t) => {
+                        const on = selectedTime === t;
+                        return (
+                          <button key={t} aria-pressed={on} onClick={() => pickTime(t)}
+                            className={`h-11 rounded-md text-[14px] font-semibold transition-all active:scale-95 ${on ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-100" : "bg-slate-100 text-slate-800"}`}>
+                            {t}
                           </button>
-                        </div>
-                      )}
+                        );
+                      })}
                     </div>
-                  )}
+                  </div>
+                );
+              })}
+
+              {selectedTime && freeCourts.length > 0 && (
+                <div className={`pt-4 border-t ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+                  <p className={`text-[12px] font-semibold mb-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                    {freeCourts.length === 1 ? "Cancha disponible" : `Cancha · ${freeCourts.length} libres a las ${selectedTime}`}
+                  </p>
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5">
+                    {freeCourts.map((c: any) => {
+                      const on = selectedCourtId === c.id;
+                      return (
+                        <button key={c.id} aria-pressed={on} onClick={() => setSelectedCourtId(c.id)}
+                          className={`shrink-0 text-left px-4 py-2.5 rounded-md border transition-all ${on ? "border-emerald-500 bg-emerald-500/10" : isDark ? "border-white/[0.08]" : "border-slate-200"}`}>
+                          <p className={`text-[13px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{c.name}</p>
+                          <p className="text-[12px] font-semibold text-emerald-500">${Number(getCourtPrice(c.id, selectedSport || c.sport, selectedDate, selectedTime)).toLocaleString("es-CL")}</p>
+                          {c.surface && <p className={`text-[11px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>{c.surface}</p>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <button onClick={() => setBookingStep(4)} disabled={!selectedCourtId}
+                    className="mt-4 w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50">
+                    Continuar <ChevronRight size={16} />
+                  </button>
                 </div>
-              );
-            })
+              )}
+            </div>
           )}
         </div>
-      </div>
-    </GlowCard>
-  );
+      </GlowCard>
+    );
+  };
 
   const [dateOffset, setDateOffset] = useState(0);
 
@@ -557,7 +568,7 @@ export default function VenueDetailPage() {
                 <Clock size={22} className="text-blue-500" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-base font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{dateDayName} {new Date(selectedDate).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}</p>
+                <p className={`text-base font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{dateDayName} {new Date(`${selectedDate}T12:00:00`).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}</p>
                 <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{selectedTime} HRS</p>
               </div>
             </div>
@@ -614,7 +625,7 @@ export default function VenueDetailPage() {
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1 bg-emerald-500/10 px-3 py-1.5 rounded-md">
                   <Star size={13} className="text-emerald-500" fill="currentColor" />
-                  <span className="text-emerald-500 font-semibold text-sm">{Number(venue?.rating || 0).toFixed(1)}</span>
+                  <span className="text-emerald-500 font-semibold text-sm">{Number(venue?.rating) > 0 ? Number(venue?.rating).toFixed(1) : "Nuevo"}</span>
                 </div>
                 {distanceLabel && (
                   <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-emerald-500/5">

@@ -66,7 +66,7 @@ const getBookingDateTimeChile = (bookingDate: Date, startTime: string) => {
 const getFormattedDate = (date: any) => {
   try {
     if (!date) return { day: "--", month: "---", full: "-- --- ----" };
-    const d = date.toDate ? date.toDate() : date.seconds ? new Date(date.seconds * 1000) : new Date(date);
+    const d = date.toDate ? date.toDate() : date.seconds ? new Date(date.seconds * 1000) : /^\d{4}-\d{2}-\d{2}$/.test(String(date)) ? new Date(`${date}T12:00:00`) : new Date(date);
     return {
       day: d.getDate().toString().padStart(2, "0"),
       month: d.toLocaleDateString("es-CL", { month: "short" }).toUpperCase().replace(".", ""),

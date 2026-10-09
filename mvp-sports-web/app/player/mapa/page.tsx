@@ -55,7 +55,7 @@ const normalizeSport = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f
 
 export default function MapaPage() {
   const router = useRouter();
-  const { theme } = usePlayer();
+  const { theme, profile } = usePlayer();
   const isDark = theme === "dark";
 
   const [activeSport, setActiveSport] = useState("todo");
@@ -133,6 +133,16 @@ export default function MapaPage() {
     });
     return CATEGORIAS.filter((c) => c.id === "todo" || a.has(c.id));
   }, [rawVenues]);
+
+  // Arranca en el deporte principal del jugador cuando hay recintos de ese deporte
+  const [prefsApplied, setPrefsApplied] = useState(false);
+  useEffect(() => {
+    if (prefsApplied || !profile || !rawVenues.length) return;
+    const n = normalizeSport(String((profile as any).mainSport || ""));
+    const id = n.includes("futbolito") ? "futbolito" : n.includes("futbol") ? "futbol" : n.includes("padel") ? "padel" : n.includes("tenis") ? "tenis" : (n.includes("basquet") || n.includes("basket")) ? "basquet" : n.includes("voley") ? "voley" : "";
+    if (id && activeCategories.some((c) => c.id === id)) setActiveSport(id);
+    setPrefsApplied(true);
+  }, [profile, rawVenues, activeCategories, prefsApplied]);
 
   const handleLocate = () => {
     if (!navigator.geolocation) return;
@@ -227,7 +237,7 @@ export default function MapaPage() {
                           <div className="flex items-center gap-2 mt-1.5">
                             <div className="flex items-center gap-1 bg-emerald-500/20 px-2 py-0.5 rounded-md">
                               <Star size={10} className="text-emerald-500" fill="currentColor" />
-                              <span className="text-emerald-500 text-[11px] font-semibold">{Number(v.rating || 0).toFixed(1)}</span>
+                              <span className="text-emerald-500 text-[11px] font-semibold">{Number(v.rating) > 0 ? Number(v.rating).toFixed(1) : "Nuevo"}</span>
                             </div>
                           </div>
                         </div>
