@@ -11,7 +11,6 @@ import {
   Shield, TrendingUp, User, SlidersHorizontal, CalendarCheck,
   GraduationCap, Zap, ShieldCheck, Sparkles, ArrowRight
 } from "@/components/player/icons";
-import { DownloadTray } from "@/components/player/icons";
 
 const quickItems = [
   { icon: CalendarCheck, label: "Reservas", color: "#3b82f6", href: "/player/reservas" },
@@ -54,33 +53,6 @@ export default function PlayerDashboard() {
     ? gamificationService.calculateTier(xp, gamification)
     : { name: "Bronce", index: 0 };
   const ovr = gamification ? gamificationService.calculateOVR(xp, gamification) : 40;
-
-  const [installPrompt, setInstallPrompt] = useState<any>(null);
-  const [isInstalled, setIsInstalled] = useState(false);
-  const [showInstallGuide, setShowInstallGuide] = useState(false);
-
-  useEffect(() => {
-    // Check if already installed (display-mode: standalone)
-    if (typeof window !== "undefined" && window.matchMedia("(display-mode: standalone)").matches) {
-      setIsInstalled(true);
-    }
-    // Listen for install prompt
-    const onPrompt = (e: any) => { e.preventDefault(); setInstallPrompt(e); };
-    window.addEventListener("beforeinstallprompt", onPrompt);
-    // Listen for installed
-    const onInstalled = () => { setInstallPrompt(null); setIsInstalled(true); };
-    window.addEventListener("appinstalled", onInstalled);
-    return () => { window.removeEventListener("beforeinstallprompt", onPrompt); window.removeEventListener("appinstalled", onInstalled); };
-  }, []);
-
-  const handleInstallClick = () => {
-    if (installPrompt) {
-      installPrompt.prompt();
-      installPrompt.userChoice.then(() => setInstallPrompt(null));
-    } else {
-      setShowInstallGuide(true);
-    }
-  };
 
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
@@ -259,62 +231,6 @@ export default function PlayerDashboard() {
           </Link>
         </div>
 
-        {/* Install App Button */}
-        <div className="px-5 mt-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-            <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">App Móvil</span>
-            <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
-          </div>
-          <button onClick={handleInstallClick}
-            className={`relative w-full block rounded-md overflow-hidden transition-all active:scale-[0.99] group text-left ${
-              isDark
-                ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]"
-                : "bg-white/80 backdrop-blur-xl border border-slate-200/60"
-            } ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
-            <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : "bg-gradient-to-br from-emerald-50/50 to-transparent"}`} />
-            <div className={`p-4 flex items-center gap-4 ${
-              isDark
-                ? "bg-gradient-to-br from-[#0F172A] via-[#0F172A] to-[#064e3b]"
-                : "bg-gradient-to-br from-white via-white to-[#f0fdf4]"
-            }`}>
-              <div className="w-11 h-11 rounded-md bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shrink-0">
-                <DownloadTray className={"w-5 h-5 text-white"} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Instalar App</p>
-                <p className={`text-[9px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                  {installPrompt ? "Toca para instalar en tu dispositivo" : "Aprende cómo instalar en tu dispositivo"}
-                </p>
-              </div>
-              <ArrowRight size={16} className="text-emerald-500 shrink-0" />
-            </div>
-          </button>
-        </div>
-
-        {/* Install Guide Modal */}
-        {showInstallGuide && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowInstallGuide(false)}>
-            <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-              <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}>
-                <DownloadTray className={`w-8 h-8 ${isDark ? "text-emerald-400" : "text-emerald-600"}`} />
-              </div>
-              <p className={`font-semibold text-[15px] text-center mb-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>Instalar App</p>
-              <div className="space-y-3 mb-5">
-                <div className={`p-3 rounded-md border ${isDark ? "border-white/[0.06] bg-white/[0.03]" : "border-slate-200 bg-slate-50"}`}>
-                  <p className={`font-semibold text-[12px] ${isDark ? "text-slate-200" : "text-slate-800"}`}>Chrome (Android)</p>
-                  <p className={`text-[10px] font-medium mt-1 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Menú ⋮ → "Agregar a pantalla de inicio"</p>
-                </div>
-                <div className={`p-3 rounded-md border ${isDark ? "border-white/[0.06] bg-white/[0.03]" : "border-slate-200 bg-slate-50"}`}>
-                  <p className={`font-semibold text-[12px] ${isDark ? "text-slate-200" : "text-slate-800"}`}>Safari (iPhone/iPad)</p>
-                  <p className={`text-[10px] font-medium mt-1 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Compartir → "Agregar a pantalla de inicio"</p>
-                </div>
-              </div>
-              <button onClick={() => setShowInstallGuide(false)}
-                className="w-full py-3.5 rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98]">Entendido</button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
