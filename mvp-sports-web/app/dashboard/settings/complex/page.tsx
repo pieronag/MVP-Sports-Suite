@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { auditService } from '@/services/auditService';
 import { db, auth, storage } from '@/services/firebase';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
-import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc, increment } from 'firebase/firestore';
+import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc, increment, or } from 'firebase/firestore';
 import {
     Alert02Icon,
     Briefcase01Icon,
@@ -129,7 +129,7 @@ export default function TenantSettingsPage() {
             if (isAdmin) {
                 q = query(collection(db, "tenants"));
             } else {
-                q = query(collection(db, "tenants"), where("ownerId", "==", user.uid));
+                q = query(collection(db, "tenants"), or(where("ownerId", "==", user.uid), where("ownerIds", "array-contains", user.uid)));
             }
 
             const snap = await getDocs(q);

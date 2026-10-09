@@ -4,7 +4,7 @@ import { Html5Qrcode } from 'html5-qrcode';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
 import { auditService } from '@/services/auditService';
-import { collection, query, where, getDocs, getDoc, orderBy, doc, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, orderBy, doc, updateDoc, Timestamp, or } from 'firebase/firestore';
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     Alert02Icon,
@@ -151,7 +151,7 @@ export default function CheckInPage() {
                         list = results.flat();
                     }
                 } else {
-                    const q = query(collection(db, "tenants"), where("ownerId", "==", user.uid));
+                    const q = query(collection(db, "tenants"), or(where("ownerId", "==", user.uid), where("ownerIds", "array-contains", user.uid)));
                     const snap = await getDocs(q);
                     list = snap.docs.map(d => ({ id: d.id, name: d.data().name }));
                 }

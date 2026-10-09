@@ -17,7 +17,7 @@ import {
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
-import { collection, getDocs, query, where, orderBy, doc, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy, doc, updateDoc, Timestamp, or } from 'firebase/firestore';
 import { TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';
 
 const inputCls = "w-full px-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-none text-slate-800 dark:text-white focus:border-emerald-500/40 transition-all";
@@ -62,7 +62,7 @@ export default function FeedbackPage() {
         if (!user?.uid) return;
         setLoading(true);
         try {
-            const qVenues = query(collection(db, "tenants"), where("ownerId", "==", user.uid));
+            const qVenues = query(collection(db, "tenants"), or(where("ownerId", "==", user.uid), where("ownerIds", "array-contains", user.uid)));
             const snapVenues = await getDocs(qVenues);
             const venueList = snapVenues.docs.map(d => ({ id: d.id, name: d.data().name }));
             setVenues(venueList);

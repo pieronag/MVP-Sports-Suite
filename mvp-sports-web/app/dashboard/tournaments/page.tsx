@@ -1,4 +1,5 @@
 "use client";
+import { getOwnedTenantsSnap } from "@/services/ownedTenants";
 import { uploadImage } from "@/services/imageUpload";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useRef } from 'react';
@@ -304,7 +305,7 @@ export default function ChampionshipsPage() {
             const snap = await getDocs(collection(db, "tournaments"));
             const list = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter((t: any) => t.ownerId === user.uid || !t.ownerId);
             setTournaments(list);
-            const snapT = await getDocs(query(collection(db, "tenants"), where("ownerId", "==", user.uid)));
+            const snapT = await getOwnedTenantsSnap(user.uid);
             setTenants(snapT.docs.map(d => ({ id: d.id, ...d.data() })));
         } catch (e) { console.error(e); } finally { setLoading(false); }
     };

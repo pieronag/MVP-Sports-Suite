@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
-import { collection, addDoc, serverTimestamp, getDocs, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDocs, query, where, onSnapshot, or } from 'firebase/firestore';
 import { auditService } from '@/services/auditService';
 import { SectionCard } from '@/components/ui/DashboardWidgets';
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -73,7 +73,7 @@ export default function ReportIssuePage() {
                         return;
                     }
                 }
-                const qOwner = query(collection(db, "tenants"), where("ownerId", "==", user.uid));
+                const qOwner = query(collection(db, "tenants"), or(where("ownerId", "==", user.uid), where("ownerIds", "array-contains", user.uid)));
                 const snapOwner = await getDocs(qOwner);
                 if (!snapOwner.empty) {
                     setTenantInfo({ id: snapOwner.docs[0].id, name: snapOwner.docs[0].data().name || 'Mi Recinto', features: snapOwner.docs[0].data().features || {} });

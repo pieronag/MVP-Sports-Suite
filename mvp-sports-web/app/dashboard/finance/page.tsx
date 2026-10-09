@@ -3,7 +3,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
-import { collection, getDocs, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, query, where, onSnapshot, or } from 'firebase/firestore';
 import Link from 'next/link';
 import {
     ArrowLeft01Icon,
@@ -127,7 +127,7 @@ export default function FinancePage() {
     // 1. Cargar recintos del dueño
     useEffect(() => {
         if (!user?.uid) return;
-        const q = query(collection(db, "tenants"), where("ownerId", "==", user.uid));
+        const q = query(collection(db, "tenants"), or(where("ownerId", "==", user.uid), where("ownerIds", "array-contains", user.uid)));
         const unsubscribe = onSnapshot(q, (snap) => {
             const list = snap.docs.map(d => ({ id: d.id, name: d.data().name, features: d.data().features || {} } as Venue));
             setMyVenues(list);

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import { useState, useEffect } from "react";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { collection, query, where, onSnapshot, or } from "firebase/firestore";
 import { db } from "../services/firebase";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -45,7 +45,7 @@ export default function Sidebar() {
 
     useEffect(() => {
         if (!user?.uid || role !== 'owner') return;
-        const q = query(collection(db, "tenants"), where("ownerId", "==", user.uid));
+        const q = query(collection(db, "tenants"), or(where("ownerId", "==", user.uid), where("ownerIds", "array-contains", user.uid)));
         const unsubscribe = onSnapshot(q, (snap) => {
             if (!snap.empty) setActiveTenant(snap.docs[0].data());
         });

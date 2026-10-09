@@ -23,7 +23,7 @@ import {
     UserGroupIcon,
     Wrench01Icon,
 } from '@hugeicons/core-free-icons';
-import { collection, query, where, orderBy, Timestamp, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, orderBy, Timestamp, onSnapshot, or } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { PanelGlass, TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';
@@ -99,7 +99,7 @@ export default function OwnerDashboard() {
         if (!user?.uid) return;
 
         setLoading(true);
-        const qTenants = query(collection(db, "tenants"), where("ownerId", "==", user.uid));
+        const qTenants = query(collection(db, "tenants"), or(where("ownerId", "==", user.uid), where("ownerIds", "array-contains", user.uid)));
         const unsubscribeTenants = onSnapshot(qTenants, (snap) => {
             const venuesList = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Venue));
             setMyVenues(venuesList);

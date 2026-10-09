@@ -1,4 +1,5 @@
 "use client";
+import { getOwnedTenantsSnap } from "@/services/ownedTenants";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
@@ -38,7 +39,7 @@ export default function ManualBookingPage() {
         if (!user?.uid) return;
         setLoading(true);
         try {
-            const snap = await getDocs(query(collection(db, "tenants"), where("ownerId", "==", user.uid)));
+            const snap = await getOwnedTenantsSnap(user.uid);
             const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             setTenants(list);
             if (list.length > 0) setFormData(prev => ({ ...prev, tenantId: list[0].id }));

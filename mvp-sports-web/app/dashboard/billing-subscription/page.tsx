@@ -1,4 +1,5 @@
 "use client";
+import { getOwnedTenantsSnap } from "@/services/ownedTenants";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { LifebuoyIcon } from '@hugeicons/core-free-icons';
 import React, { useState, useEffect } from 'react';
@@ -94,7 +95,7 @@ export default function BillingPage() {
                         setPlans(loadedPlans);
                     }
                 }
-                const snapTenants = await getDocs(query(collection(db, "tenants"), where("ownerId", "==", user.uid)));
+                const snapTenants = await getOwnedTenantsSnap(user.uid);
                 const tenantsList = snapTenants.docs.map(d => {
                     const tenantData = d.data();
                     const rawPlan = (tenantData.planId || tenantData.plan || '').toString();

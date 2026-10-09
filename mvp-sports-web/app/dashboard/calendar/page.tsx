@@ -148,11 +148,22 @@ export default function MasterCalendar() {
                         const results = await Promise.all(promises);
                         list = results.flat();
                     }
-                } else {
-                    const snap = await getDocs(query(collection(db, "tenants"), where("ownerId", "==", user.uid)));
+                } else if (role === 'admin' || role === 'superadmin') {
+                    // Superadmin: todos los recintos (antes buscaba por ownerId y quedaba cargando)
+                    const snap = await getDocs(query(collection(db, "tenants"), orderBy("name")));
                     list = snap.docs.map(d => ({ id: d.id, ...d.data() } as Venue));
+                } else {
+                    // Owner: dueño principal (ownerId) o co-dueño (ownerIds)
+                    const [byOwner, byOwners] = await Promise.all([
+                        getDocs(query(collection(db, "tenants"), where("ownerId", "==", user.uid))),
+                        getDocs(query(collection(db, "tenants"), where("ownerIds", "array-contains", user.uid))),
+                    ]);
+                    const map = new Map<string, Venue>();
+                    [...byOwner.docs, ...byOwners.docs].forEach(d => map.set(d.id, { id: d.id, ...d.data() } as Venue));
+                    list = Array.from(map.values());
                 }
                 setVenues(list);
+                if (list.length === 0) setLoading(false);
                 if (list.length > 0) {
                     setSelectedVenueId(list[0].id);
                     setNewRes(prev => ({ ...prev, tenantId: list[0].id }));
@@ -380,6 +391,7 @@ export default function MasterCalendar() {
     };
 
     if (loading && venues.length === 0) return <div className="text-center py-20 text-[10px] font-black uppercase text-slate-400 animate-pulse">Iniciando agenda...</div>;
+    if (!loading && venues.length === 0) return <div className="text-center py-20 text-[10px] font-black uppercase text-slate-400">No tienes recintos asignados. Pide al administrador que te asigne uno.</div>;
 
     return (
         <div className="flex flex-col h-[calc(100vh-2rem)] w-full gap-4 text-left relative">

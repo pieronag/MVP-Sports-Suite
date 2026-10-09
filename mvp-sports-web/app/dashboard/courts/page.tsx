@@ -4,7 +4,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
-import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc } from 'firebase/firestore';
+import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc, or } from 'firebase/firestore';
 import { auditService } from '@/services/auditService';
 import {
     Add01Icon,
@@ -263,7 +263,7 @@ export default function CourtsPage() {
                     snapTenantsDocs = results.flat();
                 }
             } else {
-                const qTenants = query(collection(db, "tenants"), where("ownerId", "==", user.uid));
+                const qTenants = query(collection(db, "tenants"), or(where("ownerId", "==", user.uid), where("ownerIds", "array-contains", user.uid)));
                 const snapTenants = await getDocs(qTenants);
                 snapTenantsDocs = snapTenants.docs;
             }
