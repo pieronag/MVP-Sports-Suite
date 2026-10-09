@@ -52,17 +52,6 @@ const BADGE_ICONS: Record<string, React.ElementType> = {
   morning_player: Sun, night_player: Moon, loyal: Heart, weekend_warrior: Calendar,
   stamina: Activity, social: Share2,
 };
-const BADGE_SVGS: Record<string, string> = {
-  scorer: "/icons/logros/artillero.svg", playmaker: "/icons/logros/maestro.svg",
-  defender: "/icons/logros/muralla.svg", wins: "/icons/logros/ganador.svg",
-  mvp: "/icons/logros/estrella.svg", experience: "/icons/logros/legend.svg",
-  multi_sport: "/icons/logros/atleta.svg", captaincy: "/icons/logros/capitan.svg",
-  comeback: "/icons/logros/fenix.svg", precision: "/icons/logros/francotirador.svg",
-  clutch: "/icons/logros/clutch.svg", tournaments: "/icons/logros/competidor.svg",
-  invictus: "/icons/logros/invicto.svg", rivalry: "/icons/logros/verdugo.svg",
-  morning_player: "/icons/logros/madrugador.svg", night_player: "/icons/logros/nocturno.svg",
-  stamina: "/icons/logros/motor.svg", social: "/icons/logros/sociable.svg",
-};
 
 
 
@@ -454,17 +443,12 @@ export default function EstadisticasPage() {
                     seen.add(uniqueKey);
                     if (item.isBadge) {
                       const BIcon = BADGE_ICONS[item.id] || Trophy;
-                      const bSvg = BADGE_SVGS[item.id];
                       return (
                         <div key={uniqueKey} className={`rounded-md p-4 border`} style={{ borderColor: `${item.badgeColor}30`, backgroundColor: `${item.badgeColor}08` }}>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3 flex-1 min-w-0">
                               <div className="w-11 h-11 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: `${item.badgeColor}15`, border: `1px solid ${item.badgeColor}25` }}>
-                                {bSvg ? (
-                                  <div style={{ width: 22, height: 22, backgroundColor: item.badgeColor, mask: `url(${bSvg}) center/contain no-repeat`, WebkitMask: `url(${bSvg}) center/contain no-repeat` }} />
-                                ) : (
-                                  <BIcon size={20} color={item.badgeColor} strokeWidth={1.25} />
-                                )}
+                                <BIcon size={20} color={item.badgeColor} strokeWidth={1.25} />
                               </div>
                               <div className="min-w-0">
                                 <div className="flex items-center gap-2">
