@@ -595,3 +595,5 @@ export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (reque
     throw new HttpsError("internal", error.message || "Error interno al enviar correo.");
   }
 });
+
+export {onBookingWritten} from "./publicProjections";

@@ -99,41 +99,9 @@ export const bookingService = {
             }
             slots = dynamicSlots;
 
-            const startOfDay = new Date(y, m - 1, d, 0, 0, 0);
-            const endOfDay = new Date(y, m - 1, d, 23, 59, 59);
-
-            const bookingsRef = collection(db, 'bookings');
-            const qByDate = query(
-                bookingsRef,
-                where('tenantId', '==', tenantId),
-                where('courtId', '==', courtId),
-                where('date', '>=', Timestamp.fromDate(startOfDay)),
-                where('date', '<=', Timestamp.fromDate(endOfDay))
-            );
-
-            const qByStartTime = query(
-                bookingsRef,
-                where('tenantId', '==', tenantId),
-                where('courtId', '==', courtId),
-                where('startTime', '>=', Timestamp.fromDate(startOfDay)),
-                where('startTime', '<=', Timestamp.fromDate(endOfDay))
-            );
-
-            const [snapDate, snapStart] = await Promise.all([
-                getDocs(qByDate).catch(() => ({ docs: [] as any[] })),
-                getDocs(qByStartTime).catch(() => ({ docs: [] as any[] })),
-            ]);
-
-            const allDocsMap = new Map<string, any>();
-            [...snapDate.docs, ...snapStart.docs].forEach((d) => {
-                if (!allDocsMap.has(d.id)) allDocsMap.set(d.id, d);
-            });
-
-            const occupiedTimes = Array.from(allDocsMap.values())
-                .map((d) => d.data() as any)
-                .filter((b) => b.status !== 'cancelled')
-                .map((b) => (typeof b.startTime === 'string' ? b.startTime : null))
-                .filter(Boolean) as string[];
+            // Horarios ocupados desde la proyección pública (bookings ya no es legible por jugadores)
+            const slotSnap = await getDoc(doc(db, 'court_slots', `${courtId}_${dateStr}`)).catch(() => null);
+            const occupiedTimes = Object.keys((slotSnap?.data() as any)?.taken || {});
 
             return slots.filter((slot) => !occupiedTimes.includes(slot));
         } catch (error) {

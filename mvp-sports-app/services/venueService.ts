@@ -316,10 +316,10 @@ export const venueService = {
             const snapReviews = await getDocs(qReviews);
             const reviewsList = snapReviews.docs.map(d => ({ id: d.id, ...d.data() }));
 
-            const qBookings = query(collection(db, 'bookings'), where('tenantId', '==', tenantId));
-            const snapBookings = await getDocs(qBookings);
+            // Calificaciones de reservas desde la proyección pública (sin datos personales)
+            const snapBookings = await getDocs(query(collection(db, 'booking_reviews'), where('tenantId', '==', tenantId)));
             const bookingsList = snapBookings.docs
-                .map(d => ({ id: d.id, ...d.data() }))
+                .map(d => ({ id: d.id, ...d.data(), clientName: (d.data() as any).displayName }))
                 .filter((b: any) => b.rating > 0);
 
             const allEvals = this.processFeedbackData(tenantId, reviewsList, bookingsList);
@@ -351,14 +351,10 @@ export const venueService = {
             const snapReviews = await getDocs(qReviews);
             const reviewsList = snapReviews.docs.map(d => ({ id: d.id, ...d.data() }));
 
-            const qBookings = query(
-                collection(db, 'bookings'),
-                where('tenantId', '==', tenantId),
-                orderBy('date', 'desc')
-            );
-            const snapBookings = await getDocs(qBookings);
+            // Calificaciones de reservas desde la proyección pública (sin datos personales)
+            const snapBookings = await getDocs(query(collection(db, 'booking_reviews'), where('tenantId', '==', tenantId)));
             const bookingsList = snapBookings.docs
-                .map(d => ({ id: d.id, ...d.data() }))
+                .map(d => ({ id: d.id, ...d.data(), clientName: (d.data() as any).displayName }))
                 .filter((b: any) => b.rating > 0);
 
             return this.processFeedbackData(tenantId, reviewsList, bookingsList);

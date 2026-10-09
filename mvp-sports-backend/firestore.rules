@@ -230,8 +230,27 @@ service cloud.firestore {
       return ['paymentStatus', 'paymentMethod', 'paymentRecordId', 'totalPrice', 'price', 'originalPrice', 'deposit', 'discountApplied', 'refundAmount', 'refundDetails', 'tenantId', 'courtId'];
     }
 
+    // Proyecciones públicas de reservas (sin datos personales), escritas por la Function onBookingWritten
+    match /court_slots/{slotId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /booking_reviews/{bookingId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     match /bookings/{bookingId} {
-      allow read: if isAuthenticated();
+      // Datos personales: el titular, quien la creó y el personal de recintos.
+      // La disponibilidad pública se lee desde court_slots.
+      allow read: if isAuthenticated() && (
+        resource.data.get('userId', '') == request.auth.uid ||
+        resource.data.get('createdBy', '') == request.auth.uid ||
+        resource.data.get('createdBy', '') == request.auth.token.get('email', '') ||
+        request.auth.uid in resource.data.get('participantIds', []) ||
+        isStaff()
+      );
       // Un jugador solo crea reservas a su nombre y sin pago confirmado: las reservas
       // pagadas online las crea el servidor tras verificar el pago en Mercado Pago.
       allow create: if worksAtTenant(request.resource.data.get('tenantId', '')) || (

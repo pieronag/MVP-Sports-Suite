@@ -66,12 +66,9 @@ export const bookingService = {
             if (adjustedClose <= openHour) adjustedClose += 24;
             for (let i = openHour; i < adjustedClose; i++) dynamicSlots.push(`${(i % 24).toString().padStart(2, '0')}:00`);
             slots = dynamicSlots;
-            const startOfDay = new Date(y, m - 1, d, 0, 0, 0);
-            const endOfDay = new Date(y, m - 1, d, 23, 59, 59);
-            const bookingsRef = collection(db, 'bookings');
-            const q = query(bookingsRef, where('tenantId', '==', tenantId), where('courtId', '==', courtId), where('date', '>=', Timestamp.fromDate(startOfDay)), where('date', '<=', Timestamp.fromDate(endOfDay)));
-            const snap = await getDocs(q).catch(() => ({ docs: [] as any[] }));
-            const occupiedTimes = Array.from(snap.docs.values()).map(d => d.data() as any).filter(b => b.status !== 'cancelled').map(b => b.startTime).filter(Boolean) as string[];
+            // Horarios ocupados desde la proyección pública (bookings ya no es legible por jugadores)
+            const slotSnap = await getDoc(doc(db, 'court_slots', `${courtId}_${dateStr}`)).catch(() => null);
+            const occupiedTimes = Object.keys((slotSnap?.data() as any)?.taken || {});
             return slots.filter(slot => !occupiedTimes.includes(slot));
         } catch { return slots; }
     },
