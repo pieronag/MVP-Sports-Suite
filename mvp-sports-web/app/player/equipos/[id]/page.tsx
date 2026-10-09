@@ -1,4 +1,5 @@
 "use client";
+import { GlowCard, SectionPill } from "@/components/player/ui";
 import { uploadImage } from "@/services/imageUpload";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -7,24 +8,7 @@ import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
 import { teamService, Team } from "@/services/player/teamService";
 
-function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`relative rounded-md ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"} ${className}`}>
-      <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : ""}`} />
-      {children}
-    </div>
-  );
-}
 
-function SectionPill({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3 px-6 mb-4 mt-6">
-      <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-      <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">{label}</span>
-      <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
-    </div>
-  );
-}
 
 export default function EquipoDetailPage() {
   const router = useRouter();
@@ -181,7 +165,7 @@ export default function EquipoDetailPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
         <p className="text-emerald-400 text-[10px] font-semibold tracking-[3px] uppercase animate-pulse">Cargando</p>
       </div>
@@ -190,18 +174,18 @@ export default function EquipoDetailPage() {
 
   if (!team) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+      <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <p className={`text-sm font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipo no encontrado</p>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+    <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Hero with optional photo */}
       <div className="h-[200px] relative overflow-hidden" style={{ background: (team as any).imageUrl ? `url(${(team as any).imageUrl}) center/cover` : undefined }}>
         {!((team as any).imageUrl) && <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/60 to-slate-900" />}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#020611] via-black/30 to-transparent" />
         <div className="absolute top-0 left-0 right-0 px-5 pt-12 flex justify-between">
           <button aria-label="Volver" onClick={() => router.back()} className="w-10 h-10 rounded-md bg-black/30 border border-white/10 flex items-center justify-center">
             <ChevronLeft color="white" size={20} />
@@ -224,7 +208,7 @@ export default function EquipoDetailPage() {
           <div className="flex items-center gap-2 mb-2">
             <span className="bg-emerald-500 px-3 py-1 rounded-md text-white font-semibold text-[8px] uppercase tracking-wider border border-white/10">{team.sport?.toUpperCase() || "GENERAL"}</span>
           </div>
-          <h1 className="text-white text-xl font-semibold uppercase">{team.name}</h1>
+          <h1 className="text-white text-xl font-heading font-black uppercase">{team.name}</h1>
         </div>
       </div>
 
@@ -259,7 +243,7 @@ export default function EquipoDetailPage() {
         {/* Action Button */}
         {isMember ? (
           <button onClick={() => router.push(`/player/equipos/chat?teamId=${team.id}&teamName=${encodeURIComponent(team.name || "")}`)}
-            className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25">
+            className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 transition-all active:scale-[0.98]">
             <MessageCircle size={18} /> Chat del Equipo
           </button>
         ) : hasPendingRequest ? (
@@ -269,7 +253,7 @@ export default function EquipoDetailPage() {
           </div>
         ) : (
           <button onClick={handleJoin} disabled={actionLoading}
-            className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25 disabled:opacity-50">
+            className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] disabled:opacity-50">
             {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><Shield size={18} /> Solicitar Ingreso</>}
           </button>
         )}
@@ -313,7 +297,7 @@ export default function EquipoDetailPage() {
                 <div key={memberId} className="flex items-center gap-3 px-5 py-4">
                   <div className="w-11 h-11 rounded-md overflow-hidden shrink-0 relative" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
                     {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User size={20} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
-                    {isMemberOwner && <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center border-2" style={{ borderColor: isDark ? "#0F172A" : "white" }}><Crown color="white" size={8} /></div>}
+                    {isMemberOwner && <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center border-2" style={{ borderColor: isDark ? "#0A101D" : "white" }}><Crown color="white" size={8} /></div>}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -342,7 +326,7 @@ export default function EquipoDetailPage() {
       {/* Options Menu Modal */}
       {showMenu && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm" onClick={() => setShowMenu(false)}>
-          <div className="absolute bottom-0 left-0 right-0 rounded-t-md overflow-hidden" style={{ backgroundColor: isDark ? "#0F172A" : "white" }} onClick={(e) => e.stopPropagation()}>
+          <div className="absolute bottom-0 left-0 right-0 rounded-t-md overflow-hidden" style={{ backgroundColor: isDark ? "#0A101D" : "white" }} onClick={(e) => e.stopPropagation()}>
             <div className="px-5 py-4 border-b" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0" }}>
               <p className={`font-semibold text-center ${isDark ? "text-slate-100" : "text-slate-900"}`}>Opciones del Equipo</p>
             </div>
@@ -372,18 +356,18 @@ export default function EquipoDetailPage() {
       {/* Edit Modal */}
       {showEditModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowEditModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <p className={`font-semibold text-base ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar Equipo</p>
               <button aria-label="Cerrar" onClick={() => setShowEditModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} /></button>
             </div>
             <div className="mb-4">
               <label className={`text-[10px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nombre</label>
-              <input value={editName} onChange={e => setEditName(e.target.value)} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-none ${isDark ? "bg-[#0F172A] text-slate-100 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`} />
+              <input value={editName} onChange={e => setEditName(e.target.value)} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-none ${isDark ? "bg-[#0A101D] text-slate-100 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`} />
             </div>
             <div className="mb-4">
               <label className={`text-[10px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción</label>
-              <textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} rows={2} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-none resize-none ${isDark ? "bg-[#0F172A] text-slate-100 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`} />
+              <textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} rows={2} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-none resize-none ${isDark ? "bg-[#0A101D] text-slate-100 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`} />
             </div>
             <div className="mb-6">
               <label className={`text-[10px] font-semibold uppercase tracking-wider mb-2 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
@@ -393,7 +377,7 @@ export default function EquipoDetailPage() {
                 ))}
               </div>
             </div>
-            <button onClick={handleEditSave} disabled={actionLoading || !editName.trim()} className="w-full py-3.5 rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-emerald-500/25">
+            <button onClick={handleEditSave} disabled={actionLoading || !editName.trim()} className="w-full py-3.5 rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50">
               {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" /> : "Guardar Cambios"}
             </button>
           </div>
@@ -403,7 +387,7 @@ export default function EquipoDetailPage() {
       {/* Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6" onClick={() => setShowDeleteModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-red-500/10 flex items-center justify-center mx-auto mb-4"><Trash2 size={32} className="text-red-500" /></div>
             <p className={`text-base font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Eliminar Equipo?</p>
             <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Esta acción es irreversible. Se perderán todos los datos del equipo.</p>
@@ -420,7 +404,7 @@ export default function EquipoDetailPage() {
       {/* Leave Modal */}
       {showLeaveModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6" onClick={() => setShowLeaveModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-red-500/10 flex items-center justify-center mx-auto mb-4"><LogOut size={32} className="text-red-500" /></div>
             <p className={`text-base font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Abandonar Equipo?</p>
             <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Si abandonas, necesitarás que el capitán te acepte de nuevo.</p>
@@ -437,7 +421,7 @@ export default function EquipoDetailPage() {
       {/* Remove Member Modal */}
       {showRemoveModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6" onClick={() => setShowRemoveModal(null)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-red-500/10 flex items-center justify-center mx-auto mb-4"><X size={32} className="text-red-500" /></div>
             <p className={`text-base font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Eliminar miembro?</p>
             <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Esta acción no se puede deshacer.</p>
@@ -454,7 +438,7 @@ export default function EquipoDetailPage() {
       {/* Feedback */}
       {feedback && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6" onClick={() => setFeedback(null)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 ${feedback.type === "success" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
               {feedback.type === "success" ? <CheckCircle2 size={32} className="text-emerald-500" /> : <AlertCircle size={32} className="text-red-500" />}
             </div>

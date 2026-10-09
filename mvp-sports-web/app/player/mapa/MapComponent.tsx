@@ -17,9 +17,9 @@ const getSportColor = (sportId: string) => {
 };
 
 const DARK_MAP_STYLE = [
-  { elementType: "geometry", stylers: [{ color: "#020617" }] },
+  { elementType: "geometry", stylers: [{ color: "#020611" }] },
   { elementType: "labels.text.fill", stylers: [{ color: "#64748B" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#020617" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#020611" }] },
   { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#1e293b" }] },
   { featureType: "poi", stylers: [{ visibility: "off" }] },
   { featureType: "road", elementType: "geometry", stylers: [{ color: "#0f172a" }] },

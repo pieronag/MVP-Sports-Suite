@@ -1,4 +1,5 @@
 "use client";
+import { GlowCard, SectionPill } from "@/components/player/ui";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Trophy, Calendar, Users, Zap, Info, CreditCard, GraduationCap, Sparkles } from "@/components/player/icons";
@@ -9,24 +10,7 @@ const statusMap: Record<string, string> = {
   upcoming: "PRÓXIMAMENTE", active: "EN CURSO", completed: "FINALIZADO", open: "ABIERTO",
 };
 
-function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`relative rounded-md ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"} ${className}`}>
-      <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : ""}`} />
-      {children}
-    </div>
-  );
-}
 
-function SectionPill({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3 px-6 mb-4 mt-6">
-      <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-      <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">{label}</span>
-      <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
-    </div>
-  );
-}
 
 function ComingSoonOverlay({ isDark, accent, title, subtitle, icon: Icon, onBack }: { isDark: boolean; accent: string; title: string; subtitle: string; icon: any; onBack: () => void }) {
   return (
@@ -35,7 +19,7 @@ function ComingSoonOverlay({ isDark, accent, title, subtitle, icon: Icon, onBack
         <div className="w-28 h-28 rounded-md flex items-center justify-center mb-6 border-2" style={{ backgroundColor: accent + "18", borderColor: accent + "30" }}>
           <Icon size={56} strokeWidth={1.5} style={{ color: accent }} />
         </div>
-        <h1 className={`text-xl font-semibold text-center uppercase tracking-tight mb-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{title}</h1>
+        <h1 className={`text-xl font-heading font-black text-center uppercase tracking-tight mb-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{title}</h1>
         <div className="px-4 py-1.5 rounded-md mb-5" style={{ backgroundColor: accent }}>
           <span className="text-white font-semibold text-[9px] tracking-[3px] uppercase">Próximamente</span>
         </div>
@@ -79,17 +63,17 @@ export default function TorneosPage() {
   };
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+    <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {showComingSoon && (
         <ComingSoonOverlay isDark={isDark} accent={accent} title="Torneos MVP" subtitle="Estamos preparando las ligas y copas más competitivas con premios exclusivos y seguimiento de estadísticas en tiempo real. ¡Prepárate para la gloria!" icon={Trophy} onBack={() => router.back()} />
       )}
 
       {/* Header */}
-      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Torneos</h1>
+        <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Torneos</h1>
         <div className="w-10" />
       </div>
 
@@ -102,7 +86,7 @@ export default function TorneosPage() {
             </div>
             <span className="bg-white/20 px-3 py-1 rounded-md text-white font-semibold text-[7px] tracking-wider uppercase">Temporada 2026</span>
           </div>
-          <h2 className="text-white text-lg font-semibold uppercase">Gloria Máxima</h2>
+          <h2 className="text-white text-lg font-heading font-black uppercase">Gloria Máxima</h2>
           <p className="text-white/70 text-xs font-medium mt-1">Compite en la liga más prestigiosa.</p>
         </div>
 
@@ -161,7 +145,7 @@ export default function TorneosPage() {
                     <button aria-label="Más información" className={`w-11 h-11 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
                       <Info size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
                     </button>
-                    <button onClick={() => setShowComingSoon(true)} className="flex-1 h-11 rounded-md flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg" style={{ backgroundColor: accent, boxShadow: `0 4px 15px ${accent}30` }}>
+                    <button onClick={() => setShowComingSoon(true)} className="flex-1 h-11 rounded-md flex items-center justify-center gap-2 transition-all active:scale-[0.98]" style={{ backgroundColor: accent, boxShadow: `0 4px 15px ${accent}30` }}>
                       <Zap size={16} className="text-white" />
                       <span className="text-white font-semibold text-xs uppercase tracking-wider">Inscribirse</span>
                     </button>

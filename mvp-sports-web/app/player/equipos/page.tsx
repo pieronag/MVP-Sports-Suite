@@ -1,4 +1,5 @@
 "use client";
+import { GlowCard, SectionPill } from "@/components/player/ui";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -17,30 +18,13 @@ const SPORTS_CONFIG = [
   { key: "voleibol", label: "Voleibol", icon: VoleibolIcon },
 ];
 
-function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`relative rounded-md ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"} ${className}`}>
-      <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : ""}`} />
-      {children}
-    </div>
-  );
-}
 
-function SectionPill({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3 px-6 mb-4 mt-6">
-      <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-      <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">{label}</span>
-      <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
-    </div>
-  );
-}
 
 function Modal({ isOpen, onClose, children, isDark }: { isOpen: boolean; onClose: () => void; children: React.ReactNode; isDark: boolean }) {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6" onClick={onClose}>
-      <div className={`w-full max-w-md rounded-md p-6 ${isDark ? "bg-[#0F172A] border border-white/[0.06]" : "bg-white border border-slate-200"} shadow-2xl`} onClick={(e) => e.stopPropagation()}>
+      <div className={`w-full max-w-md rounded-md p-6 ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
     </div>
@@ -97,21 +81,21 @@ export default function EquiposExplorePage() {
   };
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
-      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+    <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
+      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <button aria-label="Volver" onClick={() => router.push("/player")} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Equipos</h1>
+        <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Equipos</h1>
         <div className="w-10" />
       </div>
 
       <div className="px-5 pt-3 pb-8 space-y-2">
         {/* Action Buttons */}
         <button onClick={() => setShowCreateModal(true)} className="w-full group">
-          <div className={`rounded-md overflow-hidden transition-all duration-200 group-hover:scale-[1.01] active:scale-[0.99] ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+          <div className={`rounded-md overflow-hidden transition-all duration-200 group-hover:scale-[1.01] active:scale-[0.99] ${isDark ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
             <div className="p-4 flex items-center gap-4">
-              <div className="w-[46px] h-[46px] rounded-md bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/25">
+              <div className="w-[46px] h-[46px] rounded-md bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shrink-0">
                 <Plus color="white" size={22} strokeWidth={2.5} />
               </div>
               <div className="text-left flex-1">
@@ -123,9 +107,9 @@ export default function EquiposExplorePage() {
           </div>
         </button>
         <button onClick={() => setShowJoinModal(true)} className="w-full group">
-          <div className={`rounded-md overflow-hidden transition-all duration-200 group-hover:scale-[1.01] active:scale-[0.99] ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+          <div className={`rounded-md overflow-hidden transition-all duration-200 group-hover:scale-[1.01] active:scale-[0.99] ${isDark ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
             <div className="p-4 flex items-center gap-4">
-              <div className="w-[46px] h-[46px] rounded-md bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/25">
+              <div className="w-[46px] h-[46px] rounded-md bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shrink-0">
                 <LogIn color="white" size={22} strokeWidth={2.5} />
               </div>
               <div className="text-left flex-1">
@@ -139,9 +123,9 @@ export default function EquiposExplorePage() {
 
         {/* Partidos Button */}
         <button onClick={() => router.push("/player/equipos/partidos")} className="w-full group">
-          <div className={`rounded-md overflow-hidden transition-all duration-200 group-hover:scale-[1.01] active:scale-[0.99] ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+          <div className={`rounded-md overflow-hidden transition-all duration-200 group-hover:scale-[1.01] active:scale-[0.99] ${isDark ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
             <div className="p-4 flex items-center gap-4">
-              <div className="w-[46px] h-[46px] rounded-md bg-gradient-to-br from-amber-500 to-rose-500 flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/25">
+              <div className="w-[46px] h-[46px] rounded-md bg-gradient-to-br from-amber-500 to-rose-500 flex items-center justify-center shrink-0">
                 <Swords color="white" size={22} strokeWidth={2.5} />
               </div>
               <div className="text-left">
@@ -200,7 +184,7 @@ export default function EquiposExplorePage() {
       {/* Create Team Modal */}
       <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} isDark={isDark}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-lg uppercase">Nuevo Equipo</h2>
+          <h2 className="font-heading font-black text-lg uppercase">Nuevo Equipo</h2>
           <button aria-label="Cerrar" onClick={() => setShowCreateModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/[0.06] transition-colors">
             <X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
           </button>
@@ -223,7 +207,7 @@ export default function EquiposExplorePage() {
           })}
         </div>
         <button onClick={handleCreateTeam} disabled={actionLoading || !newTeamName.trim()}
-          className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wider transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25 disabled:opacity-50 flex items-center justify-center">
+          className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wider transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
           {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Crear Equipo"}
         </button>
       </Modal>
@@ -231,7 +215,7 @@ export default function EquiposExplorePage() {
       {/* Join by Code Modal */}
       <Modal isOpen={showJoinModal} onClose={() => setShowJoinModal(false)} isDark={isDark}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-lg uppercase">Unirse a Equipo</h2>
+          <h2 className="font-heading font-black text-lg uppercase">Unirse a Equipo</h2>
           <button aria-label="Cerrar" onClick={() => setShowJoinModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/[0.06] transition-colors">
             <X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
           </button>
@@ -241,7 +225,7 @@ export default function EquiposExplorePage() {
           className={`w-full h-12 rounded-md px-4 text-lg font-semibold tracking-widest text-center uppercase outline-none border mb-5 ${isDark ? "bg-white/[0.04] text-slate-100 placeholder-slate-600 border-white/[0.06]" : "bg-slate-50 text-slate-900 placeholder-slate-400 border-slate-200"}`}
         />
         <button onClick={handleJoinByCode} disabled={actionLoading || joinCode.trim().length < 4}
-          className="w-full h-12 rounded-md bg-indigo-500 text-white font-semibold text-sm uppercase tracking-wider transition-all active:scale-[0.98] shadow-lg shadow-indigo-500/25 disabled:opacity-50 flex items-center justify-center">
+          className="w-full h-12 rounded-md bg-indigo-500 text-white font-semibold text-sm uppercase tracking-wider transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
           {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Unirme"}
         </button>
       </Modal>
@@ -249,7 +233,7 @@ export default function EquiposExplorePage() {
       {/* Feedback Toast */}
       {feedback && (
         <div className="fixed bottom-8 left-5 right-5 z-50 animate-in slide-in-from-bottom-4 duration-300">
-          <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 shadow-2xl backdrop-blur-xl ${feedback.type === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
+          <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 backdrop-blur-xl ${feedback.type === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
             <span className="flex-1 text-sm font-medium">{feedback.msg}</span>
             <button aria-label="Cerrar" onClick={() => setFeedback(null)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
           </div>

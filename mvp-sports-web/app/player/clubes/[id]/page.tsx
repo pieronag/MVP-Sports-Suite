@@ -1,4 +1,5 @@
 "use client";
+import { GlowCard, SectionPill } from "@/components/player/ui";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Clock, MapPin, Star, Info, ShieldCheck, CheckCircle2, X, Phone, MessageCircle, Navigation, Wifi, Tv, Car, Umbrella, Wind, CircleDot, Zap, Globe, Ban, CreditCard, Images } from "@/components/player/icons";
@@ -9,24 +10,7 @@ import { collection, query, where, onSnapshot, doc } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon, CanchaFutbolIcon, CanchaPadelIcon, CanchaTenisIcon, CanchaBasquetbolIcon, CanchaVoleibolIcon } from "@/components/icons/SportsIcons";
 
-function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`relative rounded-md ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"} ${className}`}>
-      <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : ""}`} />
-      {children}
-    </div>
-  );
-}
 
-function SectionPill({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3 px-6 mb-4 mt-6">
-      <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-      <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">{label}</span>
-      <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
-    </div>
-  );
-}
 
 const SPORT_ICONS: Record<string, any> = {
   futbol: FutbolIcon, fútbol: FutbolIcon, futbolito: FutbolIcon,
@@ -419,7 +403,7 @@ export default function VenueDetailPage() {
                       {selectedTime && (
                         <div className="mt-4">
                           <button onClick={() => setBookingStep(4)}
-                            className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25">
+                            className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
                             Continuar <ChevronRight size={16} />
                           </button>
                         </div>
@@ -525,7 +509,7 @@ export default function VenueDetailPage() {
           </p>
         </div>
         <button onClick={() => setBookingStep(3)}
-          className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25">
+          className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
           Ver canchas disponibles <ChevronRight size={16} />
         </button>
       </div>
@@ -588,7 +572,7 @@ export default function VenueDetailPage() {
               </div>
             </div>
           </div>
-          <button onClick={handleConfirmBooking} className="w-full mt-5 h-14 rounded-md bg-emerald-500 text-white font-semibold text-base uppercase tracking-wider flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/30">
+          <button onClick={handleConfirmBooking} className="w-full mt-5 h-14 rounded-md bg-emerald-500 text-white font-semibold text-base uppercase tracking-wider flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
             <Zap size={20} /> Confirmar y Reservar
           </button>
         </div>
@@ -598,7 +582,7 @@ export default function VenueDetailPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
         <p className="text-emerald-400 text-[10px] font-semibold tracking-[3px] uppercase animate-pulse">Cargando</p>
       </div>
@@ -608,7 +592,7 @@ export default function VenueDetailPage() {
   const venueData = venue as any;
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+    <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Hero */}
       <div className="h-[220px] relative overflow-hidden">
         <img src={venueData?.imageURL || venueData?.imageUrl || "https://images.unsplash.com/photo-1574629810360-7efbbe195018"} alt={venue?.name} className="w-full h-full object-cover" />
@@ -617,7 +601,7 @@ export default function VenueDetailPage() {
           <ChevronLeft size={20} className="text-white" />
         </button>
         <div className="absolute bottom-6 left-6 right-6">
-          <h1 className="text-white text-2xl font-bold uppercase">{venue?.name}</h1>
+          <h1 className="text-white text-2xl font-heading font-black uppercase">{venue?.name}</h1>
           {venueData?.description && <p className="text-white/60 text-xs font-medium mt-1 line-clamp-2">{venueData.description}</p>}
         </div>
       </div>
@@ -771,7 +755,7 @@ export default function VenueDetailPage() {
 
       {feedback && (
         <div className="fixed bottom-8 left-5 right-5 z-50 animate-in slide-in-from-bottom-4 duration-300">
-          <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 shadow-2xl backdrop-blur-xl ${feedback.type === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
+          <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 backdrop-blur-xl ${feedback.type === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
             <span className="flex-1 text-sm font-medium">{feedback.msg}</span>
             <button aria-label="Cerrar" onClick={() => setFeedback(null)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
           </div>
@@ -781,7 +765,7 @@ export default function VenueDetailPage() {
       {/* Rules Modal */}
       {showRules && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowRules(false)}>
-          <div className={`w-full max-w-sm rounded-md border shadow-2xl ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className={`flex items-center justify-between px-5 py-4 border-b ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-md flex items-center justify-center bg-red-500/10">

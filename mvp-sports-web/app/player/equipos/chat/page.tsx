@@ -70,14 +70,14 @@ export default function ChatEquiposPage() {
   const grouped = groupMessagesByDate(messages);
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+    <div className={`min-h-screen flex flex-col ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
       <div className={`px-5 pt-12 pb-4 flex items-center gap-3 border-b ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
         <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <div className="flex-1 min-w-0">
-          <h1 className={`font-semibold text-base truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{teamName || team?.name || "Chat"}</h1>
+          <h1 className={`font-heading font-black text-base truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{teamName || team?.name || "Chat"}</h1>
           <div className="flex items-center gap-1.5 mt-0.5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             <span className={`text-[9px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{team?.members?.length || 0} jugadores</span>
@@ -141,7 +141,7 @@ export default function ChatEquiposPage() {
             />
           </div>
           <button aria-label="Enviar mensaje" onClick={handleSend} disabled={!newMessage.trim() || sending}
-            className={`w-12 h-12 rounded-md flex items-center justify-center shrink-0 transition-all active:scale-90 ${newMessage.trim() ? "bg-emerald-500 shadow-lg shadow-emerald-500/25" : isDark ? "bg-white/[0.04]" : "bg-slate-100"}`}>
+            className={`w-12 h-12 rounded-md flex items-center justify-center shrink-0 transition-all active:scale-90 ${newMessage.trim() ? "bg-emerald-500" : isDark ? "bg-white/[0.04]" : "bg-slate-100"}`}>
             {sending ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Send size={18} color={newMessage.trim() ? "white" : isDark ? "#94A3B8" : "#64748B"} />}
           </button>
         </div>

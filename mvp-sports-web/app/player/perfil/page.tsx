@@ -1,4 +1,5 @@
 "use client";
+import { GlowCard, SectionPill } from "@/components/player/ui";
 import { uploadImage } from "@/services/imageUpload";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -64,24 +65,7 @@ const BADGE_GLOSSARY_DATA = [
 
 const TIERS = ["bronce", "plata", "oro", "platino", "diamante", "elite", "leyenda"];
 
-function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`relative rounded-md ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"} ${className}`}>
-      <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : ""}`} />
-      {children}
-    </div>
-  );
-}
 
-function SectionPill({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3 px-6 mb-4 mt-8">
-      <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-      <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">{label}</span>
-      <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
-    </div>
-  );
-}
 
 export default function PerfilPage() {
   const router = useRouter();
@@ -158,7 +142,7 @@ export default function PerfilPage() {
         quality: 1,
         pixelRatio: 2,
         cacheBust: true,
-        backgroundColor: "#020617",
+        backgroundColor: "#020611",
       });
       setPreviewUri(dataUrl);
       setShowPreview(true);
@@ -217,13 +201,13 @@ export default function PerfilPage() {
   const initials = displayName.split(" ").map((w: string) => w.charAt(0).toUpperCase()).slice(0, 2).join("");
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+    <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
-      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Perfil</h1>
+        <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Perfil</h1>
         <button onClick={toggleTheme} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           {isDark ? <Moon size={18} className="text-amber-400" /> : <Sun size={18} className="text-slate-600" />}
         </button>
@@ -234,7 +218,7 @@ export default function PerfilPage() {
       {/* Avatar Section */}
       <div className="flex flex-col items-center py-2 mb-4">
         <div className="relative mb-4">
-          <div className={`w-28 h-28 rounded-md overflow-hidden border-[3px] ${isDark ? "border-white/[0.08]" : "border-white"} shadow-xl ${isDark ? "shadow-black/30" : "shadow-slate-200"}`}>
+          <div className={`w-28 h-28 rounded-md overflow-hidden border-[3px] ${isDark ? "border-white/[0.08]" : "border-white"} ${isDark ? "shadow-black/30" : "shadow-slate-200"}`}>
             {photoURL ? (
               <Image src={photoURL} alt={displayName} width={112} height={112} className="object-cover w-full h-full" />
             ) : (
@@ -243,7 +227,7 @@ export default function PerfilPage() {
               </div>
             )}
           </div>
-          <button onClick={handlePickImage} className="absolute -bottom-0.5 -right-0.5 w-10 h-10 rounded-md bg-emerald-500 flex items-center justify-center border-[4px] border-[#020617] hover:bg-emerald-600 transition-colors shadow-lg">
+          <button onClick={handlePickImage} className="absolute -bottom-0.5 -right-0.5 w-10 h-10 rounded-md bg-emerald-500 flex items-center justify-center border-[4px] border-[#020611] hover:bg-emerald-600 transition-colors">
             {uploading ? (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
@@ -252,7 +236,7 @@ export default function PerfilPage() {
           </button>
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
         </div>
-        <h2 className={`text-xl font-semibold uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{displayName}</h2>
+        <h2 className={`text-xl font-heading font-black uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{displayName}</h2>
         <p className={`text-[10px] font-medium tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>{userEmail}</p>
         {city && (
           <div className="flex items-center gap-1 mt-1">
@@ -284,7 +268,7 @@ export default function PerfilPage() {
               <div className="absolute top-1/2 -translate-y-1/2 h-[3px] rounded bg-emerald-500 transition-all" style={{ width: `${(tierInfo.index / (TIERS.length - 1)) * 100}%` }} />
               <div className="flex justify-between absolute w-full top-0">
                 {TIERS.map((t, i) => (
-                  <div key={t} className={`w-3.5 h-3.5 rounded-full border-[3px] ${i <= tierInfo.index ? "bg-emerald-500 border-[#020617]" : isDark ? "bg-[#1e293b] border-[#020617]" : "bg-slate-200 border-white"}`} />
+                  <div key={t} className={`w-3.5 h-3.5 rounded-full border-[3px] ${i <= tierInfo.index ? "bg-emerald-500 border-[#020611]" : isDark ? "bg-[#1e293b] border-[#020611]" : "bg-slate-200 border-white"}`} />
                 ))}
               </div>
             </div>
@@ -401,9 +385,9 @@ export default function PerfilPage() {
       <div className="px-5 mb-8">
         <div className={`relative rounded-md overflow-hidden transition-all active:scale-[0.99] ${
           isDark
-            ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]"
+            ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]"
             : "bg-white/80 backdrop-blur-xl border border-slate-200/60"
-        } shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+        } ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
           <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : "bg-gradient-to-br from-emerald-50/50 to-transparent"}`} />
           <div className={`p-5 bg-gradient-to-br ${
             isDark
@@ -412,7 +396,7 @@ export default function PerfilPage() {
           }`}>
             {/* Top row: OVR + Info */}
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-[58px] h-[76px] bg-gradient-to-b from-amber-400 to-amber-600 rounded-md flex flex-col items-center justify-center shadow-xl -rotate-[4deg] shrink-0">
+              <div className="w-[58px] h-[76px] bg-gradient-to-b from-amber-400 to-amber-600 rounded-md flex flex-col items-center justify-center -rotate-[4deg] shrink-0">
                 <span className="text-black/60 font-medium text-[7px] tracking-[1px]">OVR</span>
                 <span className="text-black font-bold text-[22px] leading-none mt-0.5">{ovr}</span>
               </div>
@@ -446,7 +430,7 @@ export default function PerfilPage() {
 
             {/* Generate CTA */}
             <button onClick={handleGenerateCard} disabled={generatingCard}
-              className="w-full mt-4 h-[46px] rounded-md bg-emerald-500 text-white font-semibold text-[10px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600 disabled:opacity-60 shadow-lg shadow-emerald-500/25">
+              className="w-full mt-4 h-[46px] rounded-md bg-emerald-500 text-white font-semibold text-[10px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600 disabled:opacity-60">
               {generatingCard ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
@@ -461,7 +445,7 @@ export default function PerfilPage() {
 
       {/* Hidden MVP Card for Capture */}
       <div style={{ position: "fixed", top: 0, left: 0, width: 0, height: 0, overflow: "hidden", zIndex: -999 }}>
-        <div ref={cardRef} style={{ width: 750, height: 1250, backgroundColor: "#020617", overflow: "hidden", position: "relative" }}>
+        <div ref={cardRef} style={{ width: 750, height: 1250, backgroundColor: "#020611", overflow: "hidden", position: "relative" }}>
           {/* Player Image Background */}
           {photoURL ? (
             <img src={photoURL} alt="" crossOrigin="anonymous" className="absolute inset-0 w-full h-full object-cover" />
@@ -522,7 +506,7 @@ export default function PerfilPage() {
 
             {/* Dark Info Bar (Full Width Banner) */}
             <div style={{
-              backgroundColor: "#020617",
+              backgroundColor: "#020611",
               width: "100%",
               height: 90,
               marginTop: -20,
@@ -556,7 +540,7 @@ export default function PerfilPage() {
       {showPreview && previewUri && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 px-6" onClick={() => setShowPreview(false)}>
           <div className="w-full max-w-[340px]" onClick={(e) => e.stopPropagation()}>
-            <div className="overflow-hidden border-2 border-emerald-500/40 shadow-2xl" style={{ borderRadius: 5, aspectRatio: "3/5", maxHeight: "76vh" }}>
+            <div className="overflow-hidden border-2 border-emerald-500/40" style={{ borderRadius: 5, aspectRatio: "3/5", maxHeight: "76vh" }}>
               <img src={previewUri} alt="MVP Card" className="w-full h-full object-contain" />
             </div>
             <div className="flex gap-3 mt-6">
@@ -565,7 +549,7 @@ export default function PerfilPage() {
                 Cerrar
               </button>
               <button onClick={handleDownloadCard}
-                className="flex-[2] h-[54px] rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600 shadow-lg shadow-emerald-500/25">
+                className="flex-[2] h-[54px] rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600">
                 <Download size={16} /> Descargar Carta
               </button>
             </div>
@@ -576,7 +560,7 @@ export default function PerfilPage() {
       {/* Glossary Modal */}
       {showGlossary && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-5" onClick={() => setShowGlossary(false)}>
-          <div className={`w-full max-w-md max-h-[85vh] flex flex-col rounded-md border shadow-2xl ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-md max-h-[85vh] flex flex-col rounded-md border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className={`flex items-center justify-between px-5 py-4 border-b shrink-0 ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
               <div className="flex items-center gap-3">
@@ -625,7 +609,7 @@ export default function PerfilPage() {
                 const progress = nextThreshold > 0 ? Math.min(1, val / nextThreshold) : 0;
 
                 return (
-                  <div key={b.id} className={`rounded-md overflow-hidden border ${isDark ? "bg-[#0F172A]/90 border-white/[0.06]" : "bg-white border-slate-200"} shadow-sm`}>
+                  <div key={b.id} className={`rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D]/90 border-white/[0.06]" : "bg-white border-slate-200"} shadow-sm`}>
                     <div className="p-4">
                       <div className="flex items-center gap-3.5">
                         <div className={`w-[50px] h-[50px] rounded-md flex items-center justify-center shrink-0 border ${isDark ? "border-white/[0.06]" : "border-slate-200"}`} style={{ backgroundColor: `${progressColor}12` }}>

@@ -49,7 +49,7 @@ export default function VerifyEmailGate({ user, onVerified }: { user: User; onVe
     };
 
     return (
-        <div className="min-h-screen bg-[#020617] text-slate-200 flex items-center justify-center px-6">
+        <div className="min-h-screen bg-[#020611] text-slate-200 flex items-center justify-center px-6">
             <div className="w-full max-w-sm text-center space-y-5">
                 <div className="w-16 h-16 mx-auto rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                     <Mail size={30} className="text-emerald-400" />

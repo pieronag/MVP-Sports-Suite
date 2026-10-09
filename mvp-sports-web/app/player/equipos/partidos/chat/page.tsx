@@ -63,9 +63,9 @@ export default function PartidosChatPage() {
   const otherRole = challenge?.type === "team_vs_team" ? "Capitán" : "Jugador";
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+    <div className={`min-h-screen flex flex-col ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
-      <div className={`sticky top-0 z-10 px-5 pt-12 pb-4 flex items-center gap-3 border-b ${isDark ? "bg-[#020617] border-white/[0.06]" : "bg-[#F8FAFC] border-slate-200"}`}>
+      <div className={`sticky top-0 z-10 px-5 pt-12 pb-4 flex items-center gap-3 border-b ${isDark ? "bg-[#020611] border-white/[0.06]" : "bg-[#F8FAFC] border-slate-200"}`}>
         <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
@@ -107,7 +107,7 @@ export default function PartidosChatPage() {
                     {msg.senderPhoto ? <img src={msg.senderPhoto} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
                   </div>
                 )}
-                <div className={`rounded-md px-4 py-2.5 ${isMe ? "bg-emerald-500 text-white" : isDark ? "bg-[#0F172A] border border-white/[0.06] text-slate-200" : "bg-white border border-slate-200 text-slate-800"}`}>
+                <div className={`rounded-md px-4 py-2.5 ${isMe ? "bg-emerald-500 text-white" : isDark ? "bg-[#0A101D] border border-white/[0.06] text-slate-200" : "bg-white border border-slate-200 text-slate-800"}`}>
                   {!isMe && <p className="text-[9px] font-semibold opacity-70 mb-0.5">{msg.senderName}</p>}
                   <p className="text-[13px] leading-snug">{msg.text}</p>
                 </div>
@@ -122,9 +122,9 @@ export default function PartidosChatPage() {
       <div className={`px-4 py-3 border-t ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
         <div className="flex gap-2">
           <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="Escribe un mensaje..."
-            className={`flex-1 h-[46px] rounded-md px-4 text-sm font-medium outline-none border ${isDark ? "bg-[#0F172A] text-slate-100 border-white/[0.06] placeholder-slate-500" : "bg-white text-slate-900 border-slate-200 placeholder-slate-400"}`} />
+            className={`flex-1 h-[46px] rounded-md px-4 text-sm font-medium outline-none border ${isDark ? "bg-[#0A101D] text-slate-100 border-white/[0.06] placeholder-slate-500" : "bg-white text-slate-900 border-slate-200 placeholder-slate-400"}`} />
           <button aria-label="Enviar mensaje" onClick={handleSend} disabled={!input.trim() || sending}
-            className="w-[46px] h-[46px] rounded-md bg-emerald-500 flex items-center justify-center transition-all active:scale-90 disabled:opacity-50 shadow-lg shadow-emerald-500/25">
+            className="w-[46px] h-[46px] rounded-md bg-emerald-500 flex items-center justify-center transition-all active:scale-90 disabled:opacity-50">
             {sending ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Send size={18} className="text-white" />}
           </button>
         </div>
@@ -133,7 +133,7 @@ export default function PartidosChatPage() {
       {/* Close Confirmation Modal */}
       {showCloseModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6" onClick={() => setShowCloseModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 bg-red-500/10`}>
               <X size={28} className="text-red-500" />
             </div>

@@ -1,4 +1,5 @@
 "use client";
+import { GlowCard, SectionPill } from "@/components/player/ui";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -63,24 +64,7 @@ const BADGE_SVGS: Record<string, string> = {
   stamina: "/icons/logros/motor.svg", social: "/icons/logros/sociable.svg",
 };
 
-function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`relative rounded-md ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"} ${className}`}>
-      <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : ""}`} />
-      {children}
-    </div>
-  );
-}
 
-function SectionPill({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3 px-6 mb-4 mt-6">
-      <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-      <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">{label}</span>
-      <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
-    </div>
-  );
-}
 
 export default function EstadisticasPage() {
   const router = useRouter();
@@ -339,7 +323,7 @@ export default function EstadisticasPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
         <p className="text-emerald-400 text-[10px] font-semibold tracking-[3px] uppercase animate-pulse">Cargando</p>
       </div>
@@ -347,13 +331,13 @@ export default function EstadisticasPage() {
   }
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+    <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
-      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Estadísticas</h1>
+        <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Estadísticas</h1>
         <div className="w-10" />
       </div>
 
@@ -441,7 +425,7 @@ export default function EstadisticasPage() {
         <div className="flex gap-2.5">
           {(['partidos', 'logros'] as const).map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-3 rounded-md text-[10px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${activeTab === tab ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+              className={`flex-1 py-3 rounded-md text-[10px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${activeTab === tab ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
               {tab === 'partidos' ? `Partidos (${analytics.bitacora.filter((h: any) => !h.isBadge).length})` : `Logros (${analytics.bitacora.filter((h: any) => h.isBadge).length})`}
             </button>
           ))}
@@ -563,10 +547,10 @@ export default function EstadisticasPage() {
 
       {/* Stats Modal */}
       {showStatsModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto" style={{ backgroundColor: '#020617' }}>
+        <div className="fixed inset-0 z-50 overflow-y-auto" style={{ backgroundColor: '#020611' }}>
           <div className="min-h-screen p-5 pt-12">
             <div className="flex items-center justify-between mb-6">
-              <h2 className={`text-base font-semibold uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedMatch ? 'EDITAR' : 'REGISTRAR'} PARTIDO</h2>
+              <h2 className={`text-base font-heading font-black uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedMatch ? 'EDITAR' : 'REGISTRAR'} PARTIDO</h2>
               <button aria-label="Cerrar" onClick={() => setShowStatsModal(false)} className="w-9 h-9 rounded-md flex items-center justify-center bg-white/[0.06]">
                 <ChevronLeft size={18} className="text-slate-400" style={{ transform: 'rotate(-90deg)' }} />
               </button>
@@ -719,7 +703,7 @@ export default function EstadisticasPage() {
 
                   {selectedMatch && selectedMatch.id && (
                     <div className="flex gap-3">
-                      <button onClick={() => setShowConfirmModal(true)} className="flex-1 h-12 rounded-md bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wider transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25">
+                      <button onClick={() => setShowConfirmModal(true)} className="flex-1 h-12 rounded-md bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wider transition-all active:scale-[0.98]">
                         {savingStats ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" /> : 'Guardar'}
                       </button>
                     </div>

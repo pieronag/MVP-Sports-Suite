@@ -1,4 +1,5 @@
 "use client";
+import { GlowCard, SectionPill } from "@/components/player/ui";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -80,24 +81,7 @@ type FormData = {
   bio: string; city: string; gender: string;
 };
 
-function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`relative rounded-md ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"} ${className}`}>
-      <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : ""}`} />
-      {children}
-    </div>
-  );
-}
 
-function SectionPill({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3 px-8 mb-5 mt-8">
-      <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-      <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">{label}</span>
-      <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
-    </div>
-  );
-}
 
 function InputRow({ icon: Icon, color, label, value, onChange, error, maxLength, type = "text" }: {
   icon: any; color: string; label: string; value: string;
@@ -163,7 +147,7 @@ function SelectRow({ icon: Icon, color, label, value, options, onSelect, disable
             const ic = OptIcon ? <OptIcon color={value === opt ? "white" : isDark ? "#94a3b8" : "#64748b"} size={16} /> : null;
             return (
               <button key={opt} type="button" onClick={() => { onSelect(opt); setOpen(false); }}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200 active:scale-95 ${value === opt ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25" : isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200 active:scale-95 ${value === opt ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
                 {ic}{opt}
               </button>
             );
@@ -178,7 +162,7 @@ function Modal({ isOpen, onClose, children, isDark }: { isOpen: boolean; onClose
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6 animate-in fade-in duration-200" onClick={onClose}>
-      <div className={`w-full max-w-md rounded-md p-6 ${isDark ? "bg-[#0F172A] border border-white/[0.06]" : "bg-white border border-slate-200"} shadow-2xl`} onClick={(e) => e.stopPropagation()}>
+      <div className={`w-full max-w-md rounded-md p-6 ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
     </div>
@@ -340,7 +324,7 @@ export default function PreferenciasPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+      <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
           <p className="text-emerald-400 text-[10px] font-semibold tracking-[3px] uppercase animate-pulse">Cargando</p>
@@ -350,15 +334,15 @@ export default function PreferenciasPage() {
   }
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+    <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
-      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <button aria-label="Volver" onClick={handleBack} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Ajustes</h1>
+        <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Ajustes</h1>
         <button aria-label="Guardar cambios" onClick={handleSave} disabled={saving}
-          className="w-10 h-10 rounded-md flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 transition-all active:scale-90 shadow-lg shadow-emerald-500/25">
+          className="w-10 h-10 rounded-md flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 transition-all active:scale-90">
           {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save size={18} className="text-white" />}
         </button>
       </div>
@@ -388,7 +372,7 @@ export default function PreferenciasPage() {
               {profile?.photoURL ? <Image src={profile.photoURL} alt="" width={64} height={64} className="object-cover w-full h-full" /> : <User size={28} className="text-emerald-500" />}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-semibold text-lg truncate">{formData.displayName || "Jugador"}</h2>
+              <h2 className="font-heading font-black text-lg truncate">{formData.displayName || "Jugador"}</h2>
               <p className={`text-xs font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{user?.email}</p>
             </div>
             <div className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-emerald-500/10">
@@ -515,7 +499,7 @@ export default function PreferenciasPage() {
       {/* Feedback Toast */}
       {showFeedback && (
         <div className="fixed bottom-8 left-5 right-5 z-50 animate-in slide-in-from-bottom-4 duration-300">
-          <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 shadow-2xl backdrop-blur-xl ${feedbackType === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
+          <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 backdrop-blur-xl ${feedbackType === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
             {feedbackType === "error" ? <AlertCircle size={20} /> : <CheckCircle2 size={20} />}
             <span className="flex-1 text-sm font-medium">{feedbackMsg}</span>
             <button aria-label="Cerrar" onClick={() => setShowFeedback(false)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
@@ -526,7 +510,7 @@ export default function PreferenciasPage() {
       {/* Password Modal */}
       <Modal isOpen={showPasswordModal} onClose={() => { setShowPasswordModal(false); setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword(""); }} isDark={isDark}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-semibold text-lg">Cambiar Contraseña</h2>
+          <h2 className="font-heading font-black text-lg">Cambiar Contraseña</h2>
           <button aria-label="Cerrar" onClick={() => { setShowPasswordModal(false); setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword(""); }}
             className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/[0.06] transition-colors">
             <X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
@@ -539,7 +523,7 @@ export default function PreferenciasPage() {
         ].map((f) => (
           <div key={f.label} className="mb-4">
             <label className={`text-[10px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>{f.label}</label>
-            <div className={`flex items-center rounded-md border transition-colors focus-within:border-emerald-500/50 ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`}>
+            <div className={`flex items-center rounded-md border transition-colors focus-within:border-emerald-500/50 ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`}>
               <input type={f.show ? "text" : "password"} value={f.value} onChange={(e) => f.set(e.target.value)} placeholder="••••••••"
                 className={`flex-1 p-3.5 text-sm font-medium bg-transparent outline-none ${isDark ? "text-slate-100" : "text-slate-900"}`}
               />
@@ -551,7 +535,7 @@ export default function PreferenciasPage() {
           <button onClick={() => { setShowPasswordModal(false); setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword(""); }}
             className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
           <button onClick={handleChangePassword} disabled={passwordLoading}
-            className="flex-[2] py-3.5 rounded-md font-semibold text-sm bg-emerald-500 text-white hover:bg-emerald-600 transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25 flex items-center justify-center">
+            className="flex-[2] py-3.5 rounded-md font-semibold text-sm bg-emerald-500 text-white hover:bg-emerald-600 transition-all active:scale-[0.98] flex items-center justify-center">
             {passwordLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Actualizar"}
           </button>
         </div>
@@ -563,10 +547,10 @@ export default function PreferenciasPage() {
           <div className="w-14 h-14 rounded-md bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
             <AlertCircle size={28} className="text-emerald-500" />
           </div>
-          <h2 className="font-semibold text-lg mb-2">¿Guardar cambios?</h2>
+          <h2 className="font-heading font-black text-lg mb-2">¿Guardar cambios?</h2>
           <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Tienes modificaciones sin guardar.</p>
           <div className="space-y-2.5">
-            <button onClick={() => { setShowUnsavedModal(false); handleSave(); }} className="w-full py-3.5 rounded-md font-semibold text-sm bg-emerald-500 text-white hover:bg-emerald-600 transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25">Guardar y Salir</button>
+            <button onClick={() => { setShowUnsavedModal(false); handleSave(); }} className="w-full py-3.5 rounded-md font-semibold text-sm bg-emerald-500 text-white hover:bg-emerald-600 transition-all active:scale-[0.98]">Guardar y Salir</button>
             <button onClick={() => { setShowUnsavedModal(false); setFormData(initialData!); router.back(); }} className="w-full py-3.5 rounded-md font-semibold text-sm bg-red-500/10 text-red-400 border border-red-500/20 transition-all active:scale-[0.98]">Descartar Cambios</button>
             <button onClick={() => setShowUnsavedModal(false)} className={`text-xs font-medium py-2 ${isDark ? "text-slate-500" : "text-slate-400"} hover:underline`}>Seguir Editando</button>
           </div>
@@ -579,11 +563,11 @@ export default function PreferenciasPage() {
           <div className="w-14 h-14 rounded-md bg-rose-500/10 flex items-center justify-center mx-auto mb-4">
             <LogOut size={28} className="text-rose-400" />
           </div>
-          <h2 className="font-semibold text-lg mb-2">¿Cerrar Sesión?</h2>
+          <h2 className="font-heading font-black text-lg mb-2">¿Cerrar Sesión?</h2>
           <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>¿Estás seguro de que deseas salir?</p>
           <div className="flex gap-3">
             <button onClick={() => setShowSignOutModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
-            <button onClick={() => { setShowSignOutModal(false); logout(); router.push("/login"); }} className="flex-1 py-3.5 rounded-md font-semibold text-sm bg-rose-500 text-white hover:bg-rose-600 transition-all active:scale-[0.98] shadow-lg shadow-rose-500/25">Sí, Salir</button>
+            <button onClick={() => { setShowSignOutModal(false); logout(); router.push("/login"); }} className="flex-1 py-3.5 rounded-md font-semibold text-sm bg-rose-500 text-white hover:bg-rose-600 transition-all active:scale-[0.98]">Sí, Salir</button>
           </div>
         </div>
       </Modal>
@@ -594,7 +578,7 @@ export default function PreferenciasPage() {
           <div className="w-14 h-14 rounded-md bg-rose-500/10 flex items-center justify-center mx-auto mb-4">
             <AlertCircle size={28} className="text-rose-400" />
           </div>
-          <h2 className="font-semibold text-lg text-rose-500 mb-2">¿Eliminar tu cuenta?</h2>
+          <h2 className="font-heading font-black text-lg text-rose-500 mb-2">¿Eliminar tu cuenta?</h2>
           <p className={`text-sm font-medium mb-4 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Esta acción es irreversible.</p>
           <div className={`text-left p-4 rounded-md mb-6 space-y-2 text-xs font-medium ${isDark ? "bg-white/[0.03] text-slate-400" : "bg-slate-50 text-slate-500"}`}>
             <p>• Tu carta y perfil de jugador MVP.</p>
@@ -605,7 +589,7 @@ export default function PreferenciasPage() {
             className={`w-full mb-4 px-4 py-3 rounded-md border text-sm outline-none ${isDark ? "bg-white/[0.04] border-white/10 text-slate-100" : "bg-white border-slate-200 text-slate-900"}`} />
           <div className="flex gap-3">
             <button onClick={() => { setShowDeleteModal(false); setDeletePassword(""); }} className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
-            <button onClick={handleDeleteAccount} disabled={loadingDelete || !deletePassword} className="flex-1 py-3.5 rounded-md font-semibold text-sm bg-rose-500 text-white hover:bg-rose-600 transition-all active:scale-[0.98] shadow-lg shadow-rose-500/25 flex items-center justify-center">
+            <button onClick={handleDeleteAccount} disabled={loadingDelete || !deletePassword} className="flex-1 py-3.5 rounded-md font-semibold text-sm bg-rose-500 text-white hover:bg-rose-600 transition-all active:scale-[0.98] flex items-center justify-center">
               {loadingDelete ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Eliminar"}
             </button>
           </div>

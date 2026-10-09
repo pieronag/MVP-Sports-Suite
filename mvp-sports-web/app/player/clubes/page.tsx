@@ -1,4 +1,5 @@
 "use client";
+import { GlowCard, SectionPill } from "@/components/player/ui";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Search, Star, MapPin, Navigation, Compass } from "@/components/player/icons";
@@ -14,14 +15,6 @@ const SPORT_ICON_MAP: Record<string, any> = {
   voley: VoleibolIcon, "vóley": VoleibolIcon, voleibol: VoleibolIcon,
 };
 
-function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`relative rounded-md ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"} ${className}`}>
-      <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : ""}`} />
-      {children}
-    </div>
-  );
-}
 
 const formatDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 6371;
@@ -44,15 +37,6 @@ const getVenueImage = (venue: any) => {
   return "https://images.unsplash.com/photo-1574629810360-7efbbe195018";
 };
 
-function SectionPill({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3 px-6 mb-4 mt-4">
-      <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-      <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">{label}</span>
-      <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
-    </div>
-  );
-}
 
 const getSportEmoji = (sportName: string) => {
   const s = (sportName || "").toLowerCase();
@@ -114,7 +98,7 @@ export default function ExploreClubesPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
         <p className="text-emerald-400 text-[10px] font-semibold tracking-[3px] uppercase animate-pulse">Cargando</p>
       </div>
@@ -122,13 +106,13 @@ export default function ExploreClubesPage() {
   }
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
-      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+    <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
+      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="flex items-center justify-between mb-4">
           <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
             <ChevronLeft size={20} className="text-emerald-500" />
           </button>
-          <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Recintos</h1>
+          <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Recintos</h1>
           <div className="w-10" />
         </div>
         <div className={`flex items-center gap-3 px-4 h-12 rounded-md border ${isDark ? "bg-white/[0.04] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
@@ -204,7 +188,7 @@ export default function ExploreClubesPage() {
                     <span className={`text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{distance || "Cerca de ti"}</span>
                   </div>
                   <button onClick={() => router.push(`/player/clubes/${venue.id}`)}
-                    className="bg-emerald-500 hover:bg-emerald-600 transition-all px-5 h-10 rounded-md font-semibold text-xs text-white shadow-lg shadow-emerald-500/30 active:scale-[0.98]">
+                    className="bg-emerald-500 hover:bg-emerald-600 transition-all px-5 h-10 rounded-md font-semibold text-xs text-white active:scale-[0.98]">
                     RESERVAR
                   </button>
                 </div>

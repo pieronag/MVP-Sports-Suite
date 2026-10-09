@@ -136,24 +136,24 @@ export default function ReportePage() {
         }`;
 
     return (
-        <div className={`min-h-screen pb-32 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+        <div className={`min-h-screen pb-32 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
             {/* HEADER */}
-            <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+            <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
                 <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
                     <ChevronLeft size={20} className="text-emerald-500" />
                 </button>
-                <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Soporte</h1>
+                <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Soporte</h1>
                 <div className="w-10" />
             </div>
 
             {/* TABS */}
             <div className="flex gap-2.5 px-5 pt-3 pb-4">
                 <button onClick={() => setActiveTab('nuevo')}
-                    className={`flex-1 h-11 rounded-md text-[10px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${activeTab === 'nuevo' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+                    className={`flex-1 h-11 rounded-md text-[10px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${activeTab === 'nuevo' ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
                     NUEVO REPORTE
                 </button>
                 <button onClick={() => setActiveTab('historial')}
-                    className={`flex-1 h-11 rounded-md text-[10px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${activeTab === 'historial' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+                    className={`flex-1 h-11 rounded-md text-[10px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${activeTab === 'historial' ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
                     MIS REPORTES
                 </button>
             </div>
@@ -164,13 +164,13 @@ export default function ReportePage() {
                         <div className="w-[100px] h-[100px] rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: '#10b98115', border: '2px solid #10b98130' }}>
                             <CheckCircle2 size={52} strokeWidth={1.5} style={{ color: '#10b981' }} />
                         </div>
-                        <h2 className="text-lg font-semibold mb-2" style={{ color: isDark ? '#F8FAFC' : '#0F172A' }}>¡Reporte Recibido!</h2>
+                        <h2 className="text-lg font-heading font-black mb-2" style={{ color: isDark ? '#F8FAFC' : '#0F172A' }}>¡Reporte Recibido!</h2>
                         <span className="px-3 py-1.5 rounded-md text-[8px] font-semibold tracking-widest mb-4" style={{ backgroundColor: '#10b981', color: 'white' }}>SOPORTE ACTIVO</span>
                         <p className="text-[12px] font-medium text-center leading-5 max-w-[280px] mb-8" style={{ color: isDark ? '#94A3B8' : '#64748B' }}>
                             Tu ticket se ha ingresado con éxito. Nuestro equipo de soporte lo atenderá con prioridad.
                         </p>
                         <button onClick={() => setSuccess(false)}
-                            className="w-full h-[52px] rounded-md font-semibold uppercase tracking-wider text-white text-[11px] flex items-center justify-center gap-2 mb-3 transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25"
+                            className="w-full h-[52px] rounded-md font-semibold uppercase tracking-wider text-white text-[11px] flex items-center justify-center gap-2 mb-3 transition-all active:scale-[0.98]"
                             style={{ backgroundColor: '#10b981' }}>
                             Reportar otro Problema <ArrowRight size={15} />
                         </button>
@@ -195,7 +195,7 @@ export default function ReportePage() {
                         ) : (
                             <div className="space-y-4">
                                 {myReports.map(report => (
-                                    <div key={report.id} className={`relative rounded-md ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+                                    <div key={report.id} className={`relative rounded-md ${isDark ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
                                         <div className="p-5">
                                             <div className="flex justify-between items-center mb-3">
                                                 <span className="px-2.5 py-1 rounded-md text-[8px] font-semibold uppercase tracking-wider border"

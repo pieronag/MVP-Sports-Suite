@@ -1,4 +1,5 @@
 "use client";
+import { GlowCard, SectionPill } from "@/components/player/ui";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -94,24 +95,7 @@ const getStatusInfo = (booking: any, C: any) => {
   return { label: "PENDIENTE", color: "#f59e0b" };
 };
 
-function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`relative rounded-md ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"} ${className}`}>
-      <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : ""}`} />
-      {children}
-    </div>
-  );
-}
 
-function SectionPill({ label, className = "" }: { label: string; className?: string }) {
-  return (
-    <div className={`flex items-center gap-3 px-6 mb-4 mt-6 ${className}`}>
-      <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-      <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">{label}</span>
-      <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
-    </div>
-  );
-}
 
 export default function ReservasPage() {
   const { profile, theme } = usePlayer();
@@ -146,8 +130,8 @@ export default function ReservasPage() {
     setHistoryLimit(10);
   }, [activeTab]);
 
-  const baseBg = isDark ? "bg-[#020617]" : "bg-[#F8FAFC]";
-  const cardBg = isDark ? "bg-[#0F172A]" : "bg-white";
+  const baseBg = isDark ? "bg-[#020611]" : "bg-[#F8FAFC]";
+  const cardBg = isDark ? "bg-[#0A101D]" : "bg-white";
   const borderClr = isDark ? "border-white/5" : "border-slate-200";
   const textClr = isDark ? "text-[#F8FAFC]" : "text-[#0F172A]";
   const subClr = isDark ? "text-[#94A3B8]" : "text-[#64748B]";
@@ -346,20 +330,20 @@ export default function ReservasPage() {
   return (
     <div className={`min-h-screen ${baseBg}`}>
       {/* Header */}
-      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+      <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <button aria-label="Volver" onClick={() => router.push("/player")} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Mis Reservas</h1>
+        <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Mis Reservas</h1>
         <div className="w-10" />
       </div>
 
       {/* Tabs */}
       <div className="flex gap-2.5 px-5 pt-3">
-        <button onClick={() => setActiveTab("activas")} className={`flex-1 h-12 rounded-md font-semibold text-[10px] uppercase tracking-[1px] transition-all active:scale-[0.98] ${activeTab === "activas" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25" : isDark ? "bg-white/[0.06] text-[#94A3B8] hover:bg-white/[0.1]" : "bg-slate-100 text-[#64748B] hover:bg-slate-200"}`}>
+        <button onClick={() => setActiveTab("activas")} className={`flex-1 h-12 rounded-md font-semibold text-[10px] uppercase tracking-[1px] transition-all active:scale-[0.98] ${activeTab === "activas" ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-[#94A3B8] hover:bg-white/[0.1]" : "bg-slate-100 text-[#64748B] hover:bg-slate-200"}`}>
           ACTIVAS
         </button>
-        <button onClick={() => setActiveTab("historial")} className={`flex-1 h-12 rounded-md font-semibold text-[10px] uppercase tracking-[1px] transition-all active:scale-[0.98] ${activeTab === "historial" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25" : isDark ? "bg-white/[0.06] text-[#94A3B8] hover:bg-white/[0.1]" : "bg-slate-100 text-[#64748B] hover:bg-slate-200"}`}>
+        <button onClick={() => setActiveTab("historial")} className={`flex-1 h-12 rounded-md font-semibold text-[10px] uppercase tracking-[1px] transition-all active:scale-[0.98] ${activeTab === "historial" ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-[#94A3B8] hover:bg-white/[0.1]" : "bg-slate-100 text-[#64748B] hover:bg-slate-200"}`}>
           HISTORIAL
         </button>
       </div>
@@ -442,12 +426,12 @@ export default function ReservasPage() {
                   {/* Actions */}
                   <div className="flex gap-2 pt-3.5" style={{ borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0"}` }}>
                     {isConfirmed && !b.checkIn && (
-                      <button onClick={() => handleCheckIn(b)} className="flex-1 h-[46px] rounded-md bg-emerald-500 flex items-center justify-center gap-2 text-white font-semibold text-[10px] uppercase shadow-lg shadow-emerald-500/25 transition-all active:scale-[0.98]">
+                      <button onClick={() => handleCheckIn(b)} className="flex-1 h-[46px] rounded-md bg-emerald-500 flex items-center justify-center gap-2 text-white font-semibold text-[10px] uppercase transition-all active:scale-[0.98]">
                         <ShieldCheck size={15} /> INGRESAR
                       </button>
                     )}
                     {isActive && !b.checkOut && (
-                      <button onClick={() => handleCheckOut(b)} className="flex-1 h-[46px] rounded-md flex items-center justify-center gap-2 text-white font-semibold text-[10px] uppercase shadow-lg transition-all active:scale-[0.98]" style={{ backgroundColor: "#f59e0b" }}>
+                      <button onClick={() => handleCheckOut(b)} className="flex-1 h-[46px] rounded-md flex items-center justify-center gap-2 text-white font-semibold text-[10px] uppercase transition-all active:scale-[0.98]" style={{ backgroundColor: "#f59e0b" }}>
                         <CheckCircle2 size={15} /> CHECK-OUT
                       </button>
                     )}
@@ -464,7 +448,7 @@ export default function ReservasPage() {
                     {showMapsAndTicket && !isActive && (!isConfirmed || b.checkIn || b.paymentStatus === "refund_failed") && (
                       <button
                         onClick={() => { setSelectedBooking(b); setShowTicket(true); }}
-                        className={b.paymentStatus === "refund_failed" ? "flex-1 h-[46px] rounded-md bg-red-500 flex items-center justify-center gap-2 text-white font-semibold text-[9px] uppercase shadow-lg transition-all active:scale-[0.98]" : "w-[46px] h-[46px] rounded-md flex items-center justify-center transition-all active:scale-[0.98]"}
+                        className={b.paymentStatus === "refund_failed" ? "flex-1 h-[46px] rounded-md bg-red-500 flex items-center justify-center gap-2 text-white font-semibold text-[9px] uppercase transition-all active:scale-[0.98]" : "w-[46px] h-[46px] rounded-md flex items-center justify-center transition-all active:scale-[0.98]"}
                         style={{ backgroundColor: b.paymentStatus === "refund_failed" ? undefined : isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9" }}
                       >
                         {b.paymentStatus === "refund_failed" ? (
@@ -495,7 +479,7 @@ export default function ReservasPage() {
       {showTicket && selectedBooking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-5" onClick={() => setShowTicket(false)}>
           {selectedBooking.paymentStatus === "refund_failed" ? (
-            <div className={`w-full max-w-sm rounded-md border overflow-hidden ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+            <div className={`w-full max-w-sm rounded-md border overflow-hidden ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
               <div className={`p-5 border-b flex justify-between items-center ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
                 <span className={`text-base font-semibold uppercase tracking-tight ${textClr}`}>Devolución Pendiente</span>
                 <button aria-label="Cerrar" onClick={() => setShowTicket(false)} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9" }}>
@@ -555,7 +539,7 @@ export default function ReservasPage() {
                       alert("No se pudo copiar el texto.");
                     }
                   }}
-                  className="w-full h-[55px] rounded-md flex items-center justify-center gap-2 text-white font-semibold text-xs uppercase shadow-lg"
+                  className="w-full h-[55px] rounded-md flex items-center justify-center gap-2 text-white font-semibold text-xs uppercase"
                   style={{ backgroundColor: "#25D366" }}
                 >
                   <Share2 size={16} /> COMPARTIR COMPROBANTE
@@ -563,7 +547,7 @@ export default function ReservasPage() {
               </div>
             </div>
           ) : (
-            <div className={`w-full max-w-sm rounded-md overflow-hidden border ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+            <div className={`w-full max-w-sm rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
               <div className={`p-7 border-b-2 border-dashed ${isDark ? "border-white/10" : "border-slate-200"}`}>
                 <div className="flex justify-between items-center mb-5">
                   <div className="w-12 h-12 rounded-md flex items-center justify-center" style={{ backgroundColor: modalSportInfo.color + "15" }}>
@@ -612,7 +596,7 @@ export default function ReservasPage() {
       {/* Feedback Modal */}
       {fbVisible && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-10" onClick={() => setFbVisible(false)}>
-          <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-[70px] h-[70px] rounded-full flex items-center justify-center mb-5" style={{ backgroundColor: fbType === "error" ? "#ef444422" : "#10b98122" }}>
               {fbType === "error" ? <XCircle color="#ef4444" size={35} /> : <CheckCircle2 color="#10b981" size={35} />}
             </div>
@@ -628,7 +612,7 @@ export default function ReservasPage() {
       {/* Survey Modal */}
       {showSurveyModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowSurveyModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-7 border ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-7 border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col items-center mb-6">
               <div className="w-[60px] h-[60px] rounded-md flex items-center justify-center mb-4" style={{ backgroundColor: "#10b98115" }}>
                 <Star color="#10b981" size={30} fill="#10b981" />
@@ -644,7 +628,7 @@ export default function ReservasPage() {
               ))}
             </div>
             <textarea
-              className={`w-full min-h-[100px] rounded-md p-5 text-sm border mb-6 resize-none outline-none ${isDark ? "bg-[#0F172A] text-[#F8FAFC] border-white/[0.06]" : "bg-white text-[#0F172A] border-slate-200"}`}
+              className={`w-full min-h-[100px] rounded-md p-5 text-sm border mb-6 resize-none outline-none ${isDark ? "bg-[#0A101D] text-[#F8FAFC] border-white/[0.06]" : "bg-white text-[#0F172A] border-slate-200"}`}
               placeholder="Comentarios adicionales (opcional)..."
               value={surveyFeedback}
               onChange={(e) => setSurveyFeedback(e.target.value)}
@@ -655,7 +639,7 @@ export default function ReservasPage() {
               </button>
               <button
                 onClick={() => handleSaveSurvey(surveyRating, surveyFeedback)}
-                className="flex-[2] h-[60px] rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25"
+                className="flex-[2] h-[60px] rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98]"
               >
                 FINALIZAR PARTIDO
               </button>
@@ -667,7 +651,7 @@ export default function ReservasPage() {
       {/* Cancel Modal */}
       {showCancelModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-10" onClick={() => setShowCancelModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-20 h-20 rounded-full flex items-center justify-center mb-5" style={{ backgroundColor: (cancelModalInfo.danger ? "#ef4444" : "#10b981") + "15" }}>
               <Trash2 size={40} color={cancelModalInfo.danger ? "#ef4444" : "#f59e0b"} />
             </div>
@@ -688,7 +672,7 @@ export default function ReservasPage() {
       {/* CheckIn Modal */}
       {showCheckInModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-10" onClick={() => setShowCheckInModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-20 h-20 rounded-full flex items-center justify-center mb-5" style={{ backgroundColor: "#10b98115" }}>
               <ShieldCheck color="#10b981" size={40} />
             </div>
@@ -698,7 +682,7 @@ export default function ReservasPage() {
               <button onClick={() => setShowCheckInModal(false)} className={`flex-1 h-[55px] rounded-md font-semibold text-xs border transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-[#94A3B8] border-white/[0.06]" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
                 VOLVER
               </button>
-              <button onClick={confirmCheckIn} className="flex-1 h-[55px] rounded-md font-semibold text-xs text-white bg-emerald-500 transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25">
+              <button onClick={confirmCheckIn} className="flex-1 h-[55px] rounded-md font-semibold text-xs text-white bg-emerald-500 transition-all active:scale-[0.98]">
                 SÍ, INGRESAR
               </button>
             </div>

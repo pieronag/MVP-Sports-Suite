@@ -83,12 +83,12 @@ export default function PlayerDashboard() {
   };
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+    <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       <div className="pb-32">
         {/* HEADER */}
         <div className="px-5 pt-12 pb-5">
           <div>
-            <h1 className={`text-[22px] font-semibold -tracking-[1.5px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+            <h1 className={`text-[22px] font-heading font-black -tracking-[1.5px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>
               Bienvenido
             </h1>
             <p className="text-emerald-500 font-semibold text-[10px] tracking-[1.5px] -mt-0.5">
@@ -103,9 +103,9 @@ export default function PlayerDashboard() {
             href="/player/perfil"
             className={`relative block rounded-md overflow-hidden transition-all active:scale-[0.99] ${
               isDark
-                ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]"
+                ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]"
                 : "bg-white/80 backdrop-blur-xl border border-slate-200/60"
-            } shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}
+            } ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}
           >
             <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : ""}`} />
             <div className={`p-6 flex items-center gap-5 bg-gradient-to-br ${
@@ -116,7 +116,7 @@ export default function PlayerDashboard() {
               {/* Avatar */}
               <div className="relative shrink-0">
                 <div
-                  className={`w-[90px] h-[90px] rounded-md overflow-hidden border-[3px] shadow-xl flex items-center justify-center ${
+                  className={`w-[90px] h-[90px] rounded-md overflow-hidden border-[3px] flex items-center justify-center ${
                     isDark ? "border-[#1E293B]" : "border-white"
                   } ${photoURL ? "" : "bg-emerald-500/10"}`}
                 >
@@ -132,7 +132,7 @@ export default function PlayerDashboard() {
                     <span className="text-xl font-semibold text-emerald-500">{initials}</span>
                   )}
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-[28px] h-[28px] bg-emerald-500 rounded-md flex items-center justify-center border-[3px] border-[#020617]">
+                <div className="absolute -bottom-0.5 -right-0.5 w-[28px] h-[28px] bg-emerald-500 rounded-md flex items-center justify-center border-[3px] border-[#020611]">
                   <ShieldCheck color="white" size={13} />
                 </div>
               </div>
@@ -142,7 +142,7 @@ export default function PlayerDashboard() {
                 <p className={`text-[8px] font-semibold tracking-[1.5px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                   JUGADOR
                 </p>
-                <h2 className={`text-[20px] font-semibold -tracking-[1.5px] mb-2.5 truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                <h2 className={`text-[20px] font-heading font-black -tracking-[1.5px] mb-2.5 truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>
                   {userName}
                 </h2>
 
@@ -216,9 +216,9 @@ export default function PlayerDashboard() {
             href="/player/perfil"
             className={`relative block rounded-md overflow-hidden transition-all active:scale-[0.99] group ${
               isDark
-                ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]"
+                ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]"
                 : "bg-white/80 backdrop-blur-xl border border-slate-200/60"
-            } shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}
+            } ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}
           >
             <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : "bg-gradient-to-br from-emerald-50/50 to-transparent"}`} />
             <div className={`p-6 bg-gradient-to-br ${
@@ -229,7 +229,7 @@ export default function PlayerDashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-5 flex-1">
                   {/* OVR Badge */}
-                  <div className="w-[68px] h-[88px] bg-gradient-to-b from-amber-400 to-amber-600 rounded-md flex flex-col items-center justify-center shadow-xl -rotate-[4deg] shrink-0">
+                  <div className="w-[68px] h-[88px] bg-gradient-to-b from-amber-400 to-amber-600 rounded-md flex flex-col items-center justify-center -rotate-[4deg] shrink-0">
                     <span className="text-black/60 font-medium text-[7px] tracking-[1px]">OVR</span>
                     <span className="text-black font-bold text-[26px] leading-none mt-0.5">{ovr}</span>
                   </div>
@@ -269,16 +269,16 @@ export default function PlayerDashboard() {
           <button onClick={handleInstallClick}
             className={`relative w-full block rounded-md overflow-hidden transition-all active:scale-[0.99] group text-left ${
               isDark
-                ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]"
+                ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]"
                 : "bg-white/80 backdrop-blur-xl border border-slate-200/60"
-            } shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+            } ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
             <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : "bg-gradient-to-br from-emerald-50/50 to-transparent"}`} />
             <div className={`p-4 flex items-center gap-4 ${
               isDark
                 ? "bg-gradient-to-br from-[#0F172A] via-[#0F172A] to-[#064e3b]"
                 : "bg-gradient-to-br from-white via-white to-[#f0fdf4]"
             }`}>
-              <div className="w-11 h-11 rounded-md bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/25">
+              <div className="w-11 h-11 rounded-md bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shrink-0">
                 <DownloadTray className={"w-5 h-5 text-white"} />
               </div>
               <div className="flex-1 min-w-0">
@@ -295,7 +295,7 @@ export default function PlayerDashboard() {
         {/* Install Guide Modal */}
         {showInstallGuide && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setShowInstallGuide(false)}>
-            <div className={`w-full max-w-sm rounded-md p-6 border shadow-2xl ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+            <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
               <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}>
                 <DownloadTray className={`w-8 h-8 ${isDark ? "text-emerald-400" : "text-emerald-600"}`} />
               </div>
@@ -311,7 +311,7 @@ export default function PlayerDashboard() {
                 </div>
               </div>
               <button onClick={() => setShowInstallGuide(false)}
-                className="w-full py-3.5 rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25">Entendido</button>
+                className="w-full py-3.5 rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98]">Entendido</button>
             </div>
           </div>
         )}

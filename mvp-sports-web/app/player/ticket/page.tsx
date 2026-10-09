@@ -1,4 +1,5 @@
 "use client";
+import { GlowCard, SectionPill } from "@/components/player/ui";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle, MapPin, Share2, Clock, Trophy, AlertCircle, ChevronLeft, Receipt, X, FileText, Calendar } from "@/components/player/icons";
@@ -6,24 +7,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { usePlayer } from "@/context/PlayerContext";
 import { bookingService } from "@/services/player/bookingService";
 
-function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`relative rounded-md ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"} ${className}`}>
-      <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : ""}`} />
-      {children}
-    </div>
-  );
-}
 
-function SectionPill({ label }: { label: string }) {
-  return (
-    <div className="flex items-center gap-3 px-6 mb-4 mt-6">
-      <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-      <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">{label}</span>
-      <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
-    </div>
-  );
-}
 
 const SPORT_CONFIG: Record<string, { color: string }> = {
   futbol: { color: "#10b981" }, padel: { color: "#3b82f6" }, tenis: { color: "#f59e0b" },
@@ -84,7 +68,7 @@ export default function TicketPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
         <p className="text-emerald-400 text-[10px] font-semibold tracking-[3px] uppercase animate-pulse">Cargando</p>
       </div>
@@ -93,7 +77,7 @@ export default function TicketPage() {
 
   if (!booking) {
     return (
-      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center ${isDark ? "bg-[#020617] text-slate-200" : "bg-[#F8FAFC] text-slate-900"}`}>
+      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center ${isDark ? "bg-[#020611] text-slate-200" : "bg-[#F8FAFC] text-slate-900"}`}>
         <AlertCircle size={36} className="text-amber-500" />
         <p className="font-bold uppercase tracking-wider text-sm">Reserva no encontrada</p>
         <p className="text-xs text-slate-400 max-w-xs">El enlace no corresponde a una reserva de tu cuenta. Revisa tus reservas activas.</p>
@@ -112,7 +96,7 @@ export default function TicketPage() {
   };
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
+    <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Hero Banner */}
       <div className="h-56 relative flex items-start justify-center pt-10" style={{ background: `linear-gradient(180deg, ${activeColor}, ${activeColor}70, transparent)` }}>
         <div className="w-20 h-20 rounded-md flex items-center justify-center mt-2" style={{ backgroundColor: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.3)" }}>
@@ -206,12 +190,12 @@ export default function TicketPage() {
         <div className="space-y-3 pt-2">
           {isRefundFailed && (
             <button onClick={() => setShowClaimModal(true)}
-              className="w-full h-14 rounded-md bg-red-500 text-white font-semibold text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] shadow-lg shadow-red-500/25">
+              className="w-full h-14 rounded-md bg-red-500 text-white font-semibold text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 transition-all active:scale-[0.98]">
               <Receipt size={18} /> Comprobante Devolución
             </button>
           )}
           <button onClick={() => router.replace("/player")}
-            className={`w-full h-14 rounded-md flex items-center justify-center gap-2.5 font-semibold text-sm uppercase tracking-wider transition-all active:scale-[0.98] shadow-lg ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
+            className={`w-full h-14 rounded-md flex items-center justify-center gap-2.5 font-semibold text-sm uppercase tracking-wider transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
             <ChevronLeft size={18} /> Volver a Inicio
           </button>
         </div>
@@ -222,7 +206,7 @@ export default function TicketPage() {
       {/* Claim Modal */}
       {showClaimModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-5" onClick={() => setShowClaimModal(false)}>
-          <div className={`w-full max-w-sm rounded-md overflow-hidden ${isDark ? "bg-[#0F172A] border border-white/[0.06]" : "bg-white border border-slate-200"} shadow-2xl`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md overflow-hidden ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="p-5 flex items-center justify-between" style={{ backgroundColor: "#ef4444" }}>
               <div className="flex items-center gap-3">
                 <Receipt size={20} className="text-white" />
@@ -274,7 +258,7 @@ export default function TicketPage() {
               </div>
             </div>
             <div className={`p-5 flex gap-3 border-t ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
-              <button onClick={handleShare} className="flex-1 h-12 rounded-md bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25">
+              <button onClick={handleShare} className="flex-1 h-12 rounded-md bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
                 <Share2 size={16} /> Compartir
               </button>
               <button onClick={() => setShowClaimModal(false)} className={`h-12 px-5 rounded-md font-semibold text-xs uppercase tracking-wider transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cerrar</button>
