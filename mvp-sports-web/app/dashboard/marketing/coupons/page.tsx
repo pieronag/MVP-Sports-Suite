@@ -351,7 +351,7 @@ export default function CouponsPage() {
                                 <span className="w-6 h-[2px] bg-pink-500 rounded-full"></span>
                             </div>
                             <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">
-                                HERRAMIENTAS DE <span className="bg-gradient-to-r from-pink-500 via-rose-500 to-amber-500 bg-clip-text text-transparent">MARKETING & CUPONES</span>
+                                HERRAMIENTAS DE <span className="text-emerald-500 dark:text-[#00df82]">MARKETING & CUPONES</span>
                             </h2>
                             <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase max-w-sm mx-auto leading-relaxed">
                                 Fideliza a tus jugadores, crea códigos de descuento personalizados y aumenta las reservas de tus canchas. Módulo habilitado a partir del plan Básico.

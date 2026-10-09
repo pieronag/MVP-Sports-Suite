@@ -242,8 +242,8 @@ export default function AcademyPage() {
         'Fútbol': { gradient: 'from-emerald-500 to-teal-600', chip: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-[#00df82] border-emerald-100 dark:border-emerald-500/20' },
         'Pádel': { gradient: 'from-orange-500 to-amber-600', chip: 'bg-orange-50 dark:bg-orange-500/10 text-orange-600 border-orange-100 dark:border-orange-500/20' },
         'Tenis': { gradient: 'from-sky-500 to-blue-600', chip: 'bg-sky-50 dark:bg-sky-500/10 text-sky-600 border-sky-100 dark:border-sky-500/20' },
-        'Básquetbol': { gradient: 'from-indigo-500 to-violet-600', chip: 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 border-indigo-100 dark:border-indigo-500/20' },
-        'Vóleibol': { gradient: 'from-purple-500 to-fuchsia-600', chip: 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 border-purple-100 dark:border-purple-500/20' },
+        'Básquetbol': { gradient: 'from-red-500 to-rose-600', chip: 'bg-red-50 dark:bg-red-500/10 text-red-600 border-red-100 dark:border-red-500/20' },
+        'Vóleibol': { gradient: 'from-yellow-500 to-amber-600', chip: 'bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 border-yellow-100 dark:border-yellow-500/20' },
     };
     const sportStyle = (sport: string) => SPORT_STYLE[sport] || { gradient: 'from-slate-500 to-slate-700', chip: 'bg-slate-50 dark:bg-white/5 text-slate-500 border-slate-200 dark:border-white/10' };
 
@@ -286,7 +286,7 @@ export default function AcademyPage() {
                         <span className="w-6 h-[2px] bg-indigo-500 rounded-md"></span>
                         <p className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 tracking-[0.2em] uppercase">Módulo Educativo</p>
                     </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">Gestión de <span className="text-indigo-500 dark:text-indigo-400">Academias</span></h1>
+                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">Gestión de <span className="text-emerald-500 dark:text-[#00df82]">Academias</span></h1>
                 </div>
                 <div className="flex items-center gap-2.5">
                     <button onClick={seedDemoClasses} disabled={saving} title="Insertar clases de ejemplo para todos los deportes" className="px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[10px] font-black uppercase tracking-widest hover:border-indigo-400/40 hover:text-indigo-500 transition-all active:scale-95">
@@ -387,7 +387,7 @@ export default function AcademyPage() {
                                             <button onClick={() => openStudents(c)} className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 font-mono hover:underline">{c.enrolledStudents || 0} / {c.maxStudents} · {occupancy}% · Ver alumnos</button>
                                         </div>
                                         <div className="w-full h-1.5 bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                                            <div className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-1000" style={{ width: `${occupancy}%` }} />
+                                            <div className="h-full bg-emerald-500 dark:bg-[#00df82] transition-all duration-1000" style={{ width: `${occupancy}%` }} />
                                         </div>
                                         <div className="flex items-center justify-between pt-0.5">
                                             <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Temporada</span>

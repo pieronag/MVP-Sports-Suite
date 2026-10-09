@@ -149,14 +149,7 @@ html {
 }
 
 .text-gradient {
-  background: linear-gradient(to right, #00df82, #10b981, #0ea5e9);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  /* inline-block + padding (compensado con margen negativo) para que el
-     gradiente cubra ascenders/descenders y el punto final en TODAS las
-     líneas, evitando que se corten las colas de las letras con leading
-     ajustado (leading-[0.9]). */
+  color: #00df82;
   display: inline-block;
   padding: 0.1em 0.16em 0.3em;
   margin: -0.1em -0.16em -0.3em;

@@ -377,10 +377,10 @@ export default function MasterCalendar() {
     const getCardStyle = (paymentStatus: string, status: string) => {
         if (status === 'cancelled') return 'bg-slate-50 dark:bg-slate-800/60 border-slate-300 dark:border-white/10 text-slate-500 dark:text-slate-400 opacity-60';
         switch (paymentStatus) {
-            case 'paid': return 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-500 dark:border-[#00df82] text-emerald-800 dark:text-emerald-300';
-            case 'pending': return 'bg-sky-50 dark:bg-sky-500/15 border-sky-500 text-sky-800 dark:text-sky-300';
-            case 'partial': return 'bg-amber-50 dark:bg-amber-500/15 border-amber-500 text-amber-800 dark:text-amber-300';
-            default: return 'bg-indigo-50 dark:bg-indigo-500/15 border-indigo-500 text-indigo-800 dark:text-indigo-300';
+            case 'paid': return 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-500/40 dark:border-[#00df82]/40 text-emerald-800 dark:text-emerald-300';
+            case 'pending': return 'bg-sky-50 dark:bg-sky-500/15 border-sky-500/40 text-sky-800 dark:text-sky-300';
+            case 'partial': return 'bg-amber-50 dark:bg-amber-500/15 border-amber-500/40 text-amber-800 dark:text-amber-300';
+            default: return 'bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/15 text-slate-700 dark:text-slate-200';
         }
     };
 
@@ -464,7 +464,7 @@ export default function MasterCalendar() {
                                     const cIndex = dashboardCourts.findIndex(c => c.name === b.courtName);
                                     if (cIndex === -1) return null;
                                     return (
-                                        <div key={b.id} onClick={() => setSelectedBooking(b)} className={`absolute z-10 p-2 mx-1 rounded-md border-l-4 shadow-sm cursor-pointer flex flex-col justify-between overflow-hidden transition-all hover:brightness-95 ${getCardStyle(b.paymentStatus, b.status)}`} style={{ top: (b.extractedHour - calendarConfig.startHour) * HOUR_HEIGHT + 2, height: HOUR_HEIGHT - 4, left: cIndex * COLUMN_WIDTH, width: COLUMN_WIDTH - 8 }}>
+                                        <div key={b.id} onClick={() => setSelectedBooking(b)} className={`absolute z-10 p-2 mx-1 rounded-md border shadow-sm cursor-pointer flex flex-col justify-between overflow-hidden transition-all hover:brightness-95 ${getCardStyle(b.paymentStatus, b.status)}`} style={{ top: (b.extractedHour - calendarConfig.startHour) * HOUR_HEIGHT + 2, height: HOUR_HEIGHT - 4, left: cIndex * COLUMN_WIDTH, width: COLUMN_WIDTH - 8 }}>
                                             <div className="flex justify-between items-start gap-1">
                                                 <div className="min-w-0">
                                                     <p className="text-[7px] font-black uppercase opacity-40 mb-0.5">#{b.id.slice(-4).toUpperCase()}</p>

@@ -109,7 +109,7 @@ export default function EquiposExplorePage() {
         <button onClick={() => setShowJoinModal(true)} className="w-full group">
           <div className={`rounded-md overflow-hidden transition-all duration-200 group-hover:scale-[1.01] active:scale-[0.99] ${isDark ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
             <div className="p-4 flex items-center gap-4">
-              <div className="w-[46px] h-[46px] rounded-md bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center shrink-0">
+              <div className="w-[46px] h-[46px] rounded-md bg-blue-600 flex items-center justify-center shrink-0">
                 <LogIn color="white" size={22} strokeWidth={2.5} />
               </div>
               <div className="text-left flex-1">

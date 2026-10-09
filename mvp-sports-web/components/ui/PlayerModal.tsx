@@ -382,7 +382,7 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
                                 <button
                                     key={t.id}
                                     onClick={() => setTab(t.id as any)}
-                                    className={`inline-flex items-center gap-2 px-4 py-2.5 -mb-px rounded-t-md text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer border-b-2 ${tab === t.id ? 'text-emerald-700 dark:text-[#00df82] border-emerald-500 dark:border-[#00df82]' : 'text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-white'}`}
+                                    className={`inline-flex items-center gap-2 px-4 py-2.5 -mb-px text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer border-b-2 ${tab === t.id ? 'text-emerald-700 dark:text-[#00df82] border-emerald-500 dark:border-[#00df82]' : 'text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-white'}`}
                                 >
                                     <HugeiconsIcon icon={t.icon} className="w-4 h-4" strokeWidth={1.8} />
                                     {t.label}

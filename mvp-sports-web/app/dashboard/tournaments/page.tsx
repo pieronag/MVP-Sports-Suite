@@ -112,8 +112,8 @@ const sportStyle = (sport: string) => {
         'Futbolito': { gradient: 'from-emerald-500 to-lime-600', chip: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-[#00df82] border-emerald-100 dark:border-emerald-500/20' },
         'Pádel': { gradient: 'from-orange-500 to-amber-600', chip: 'bg-orange-50 dark:bg-orange-500/10 text-orange-600 border-orange-100 dark:border-orange-500/20' },
         'Tenis': { gradient: 'from-sky-500 to-blue-600', chip: 'bg-sky-50 dark:bg-sky-500/10 text-sky-600 border-sky-100 dark:border-sky-500/20' },
-        'Básquetbol': { gradient: 'from-indigo-500 to-violet-600', chip: 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 border-indigo-100 dark:border-indigo-500/20' },
-        'Vóleibol': { gradient: 'from-purple-500 to-fuchsia-600', chip: 'bg-purple-50 dark:bg-purple-500/10 text-purple-600 border-purple-100 dark:border-purple-500/20' },
+        'Básquetbol': { gradient: 'from-red-500 to-rose-600', chip: 'bg-red-50 dark:bg-red-500/10 text-red-600 border-red-100 dark:border-red-500/20' },
+        'Vóleibol': { gradient: 'from-yellow-500 to-amber-600', chip: 'bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 border-yellow-100 dark:border-yellow-500/20' },
     };
     return map[sport] || { gradient: 'from-amber-500 to-orange-600', chip: 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 border-amber-100 dark:border-amber-500/20' };
 };
