@@ -62,6 +62,26 @@ export default function AcademyPage() {
 
     // ESTADOS
     const [classes, setClasses] = useState<any[]>([]);
+    // Alumnos inscritos desde la app (academy_enrollments)
+    const [studentsModal, setStudentsModal] = useState<{ cls: any; list: any[]; loading: boolean } | null>(null);
+    const openStudents = async (cls: any) => {
+        setStudentsModal({ cls, list: [], loading: true });
+        try {
+            const snap = await getDocs(query(collection(db, "academy_enrollments"), where("classId", "==", cls.id)));
+            setStudentsModal({ cls, loading: false, list: snap.docs.map(d => ({ id: d.id, ...d.data() })).filter((e: any) => e.status !== 'cancelled') });
+        } catch (e) {
+            console.error(e);
+            setStudentsModal({ cls, loading: false, list: [] });
+            addToast("No se pudieron cargar los alumnos", 'error');
+        }
+    };
+    const markPaid = async (enrollment: any) => {
+        try {
+            await updateDoc(doc(db, "academy_enrollments", enrollment.id), { paymentStatus: 'paid', paymentMethod: enrollment.paymentMethod === 'mercadopago' ? 'mercadopago' : 'venue', paidAt: serverTimestamp() });
+            setStudentsModal(m => m && ({ ...m, list: m.list.map(x => x.id === enrollment.id ? { ...x, paymentStatus: 'paid' } : x) }));
+            addToast("Pago registrado", 'success');
+        } catch (e) { addToast("No se pudo registrar el pago", 'error'); }
+    };
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [notification, setNotification] = useState<{ msg: string, type: 'success' | 'error' } | null>(null);
@@ -229,6 +249,34 @@ export default function AcademyPage() {
 
     return (
         <div className="w-full space-y-6 pb-12 animate-fadeIn relative">
+            {studentsModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setStudentsModal(null)}>
+                    <div className="w-full max-w-lg rounded-md border bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
+                        <div className="px-5 py-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
+                            <div>
+                                <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Alumnos inscritos</p>
+                                <h3 className="text-sm font-black text-slate-900 dark:text-white font-heading">{studentsModal.cls.name}</h3>
+                            </div>
+                            <button aria-label="Cerrar" onClick={() => setStudentsModal(null)} className="p-2 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white">✕</button>
+                        </div>
+                        <div className="p-4 overflow-y-auto space-y-2">
+                            {studentsModal.loading ? <p className="text-xs text-slate-400 text-center py-6">Cargando…</p>
+                                : studentsModal.list.length === 0 ? <p className="text-xs text-slate-400 text-center py-6">Aún no hay alumnos inscritos desde la app.</p>
+                                : studentsModal.list.map((e: any) => (
+                                    <div key={e.id} className="flex items-center justify-between gap-3 p-3 rounded-md border border-slate-100 dark:border-white/5">
+                                        <div className="min-w-0">
+                                            <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{e.userName || 'Jugador'}</p>
+                                            <p className="text-[11px] text-slate-400 truncate">{e.userEmail || ''}</p>
+                                        </div>
+                                        {e.paymentStatus === 'paid'
+                                            ? <span className="px-2 py-1 rounded-md text-[10px] font-black uppercase bg-emerald-500/10 text-emerald-600 dark:text-[#00df82]">Pagado</span>
+                                            : <button onClick={() => markPaid(e)} className="px-2.5 py-1.5 rounded-md text-[10px] font-black uppercase bg-amber-500 text-white">Marcar pagado</button>}
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                </div>
+            )}
             {notification && <Toast message={notification.msg} type={notification.type} onClose={() => setNotification(null)} />}
 
             {/* HEADER */}
@@ -336,7 +384,7 @@ export default function AcademyPage() {
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Alumnos</span>
-                                            <span className="text-[10px] font-black text-slate-900 dark:text-white font-mono">{c.enrolledStudents || 0} / {c.maxStudents} · {occupancy}%</span>
+                                            <button onClick={() => openStudents(c)} className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 font-mono hover:underline">{c.enrolledStudents || 0} / {c.maxStudents} · {occupancy}% · Ver alumnos</button>
                                         </div>
                                         <div className="w-full h-1.5 bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
                                             <div className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-1000" style={{ width: `${occupancy}%` }} />

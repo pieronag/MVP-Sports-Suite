@@ -381,6 +381,15 @@ service cloud.firestore {
       allow delete: if canManageTenant(resource.data.get('tenantId', ''));
     }
 
+    // Inscripciones a academias: las crea el servidor (/api/academies/enroll)
+    match /academy_enrollments/{id} {
+      allow read: if isAuthenticated() && (resource.data.get('userId', '') == request.auth.uid || isStaff());
+      allow create: if false;
+      allow update: if isSuperAdmin() || (isStaff() && (
+        canManageScoped(resource.data) || resource.data.get('ownerId', '') == request.auth.uid));
+      allow delete: if isSuperAdmin();
+    }
+
     match /academy_classes/{id} {
       allow read: if true;
       allow create: if canManageScoped(request.resource.data);

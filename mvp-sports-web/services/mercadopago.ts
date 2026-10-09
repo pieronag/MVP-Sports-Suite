@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { adminDb } from "./firebase-admin";
 import { resolveMercadoPagoToken } from "./tenant-secrets";
 import { commitRegistration } from "./tournaments";
+import { commitEnrollment } from "./academies";
 
 // Flujo de pago Mercado Pago (único método de pago de la plataforma).
 // Reglas: el precio se calcula aquí, nunca se toma del cliente; un pago solo se
@@ -161,6 +162,7 @@ export async function createPreference(params: {
   bookingId: string;
   bookingData?: Record<string, unknown>;
   pendingRegistration?: Record<string, unknown>;
+  pendingEnrollment?: Record<string, unknown>;
   amount: number;
   title: string;
   returnUrl: string;
@@ -200,7 +202,8 @@ export async function createPreference(params: {
     method: "mercadopago",
     pendingBookingData: params.bookingData || null,
     pendingRegistration: params.pendingRegistration || null,
-    kind: params.pendingRegistration ? "tournament" : "booking",
+    pendingEnrollment: params.pendingEnrollment || null,
+    kind: params.pendingEnrollment ? "academy" : params.pendingRegistration ? "tournament" : "booking",
     returnUrl: params.returnUrl,
     createdAt: new Date(),
   });
@@ -259,6 +262,9 @@ export async function settlePayment(paymentRecordId: string, mpPaymentId: string
     // Inscripción a torneo: lee y escribe (sus lecturas siguen antes de las escrituras de abajo)
     if (data.pendingRegistration) {
       await commitRegistration(tx, data.pendingRegistration, { paymentStatus: "paid", method: "mercadopago", paymentRecordId });
+    }
+    if (data.pendingEnrollment) {
+      await commitEnrollment(tx, data.pendingEnrollment, { paymentStatus: "paid", method: "mercadopago", paymentRecordId }, false);
     }
     tx.update(payRef, { status: "approved", mercadopagoPaymentId: String(mpPaymentId), approvedAt: new Date() });
     if (data.bookingId && data.pendingBookingData) {
