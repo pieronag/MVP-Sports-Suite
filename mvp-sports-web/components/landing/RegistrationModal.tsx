@@ -152,19 +152,27 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
     return digits.length === 11 && digits.startsWith("569");
   };
 
+  // Requisitos pendientes del paso actual (se muestran bajo el botón para que el
+  // usuario sepa por qué no puede avanzar)
+  const stepIssues = (): string[] => {
+    if (step !== 1) return [];
+    const issues: string[] = [];
+    const sameEmail = formData.email.trim().toLowerCase() === formData.confirmEmail.trim().toLowerCase();
+    if (formData.displayName.trim().length < 2) issues.push("Nombre");
+    if (!validateRut(formData.rut)) issues.push("RUT válido");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) issues.push("Email válido");
+    else if (!sameEmail) issues.push("Los emails no coinciden");
+    if (formData.password.length < 6) issues.push("Contraseña de 6+ caracteres");
+    else if (formData.password !== formData.confirmPassword) issues.push("Las contraseñas no coinciden");
+    if (!validatePhone(formData.phone)) issues.push("Teléfono válido");
+    if (formData.city.trim().length <= 2) issues.push("Ciudad");
+    return issues;
+  };
+
   const isStepValid = () => {
     switch (step) {
       case 1:
-        return (
-          formData.displayName.trim().length > 3 &&
-          formData.email.includes("@") &&
-          formData.email === formData.confirmEmail &&
-          validatePhone(formData.phone) &&
-          validateRut(formData.rut) &&
-          formData.password.length >= 6 &&
-          formData.password === formData.confirmPassword &&
-          formData.city.trim().length > 2
-        );
+        return stepIssues().length === 0;
       case 2:
         return (
           formData.mainSport &&
@@ -710,6 +718,11 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
                     </button>
                   )}
                 </div>
+                {step === 1 && stepIssues().length > 0 && (formData.displayName || formData.email || formData.rut) && (
+                  <p className="mt-3 text-right text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Falta: {stepIssues().join(" · ")}
+                  </p>
+                )}
               </div>
             </form>
           </div>

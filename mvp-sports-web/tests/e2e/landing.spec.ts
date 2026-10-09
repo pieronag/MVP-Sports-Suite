@@ -10,14 +10,17 @@ test.describe("Landing Page", () => {
   });
 
   test("loads supported sports", async ({ page }) => {
-    await expect(page.locator("text=Fútbol").or(page.locator("text=Pádel"))).toBeVisible();
+    await expect(page.getByText("Fútbol", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Pádel", { exact: true }).first()).toBeVisible();
   });
 
   test("has registration modal trigger", async ({ page }) => {
     const registerButton = page.locator("text=REGISTRARME").or(page.locator("text=Registrarme")).first();
     if (await registerButton.isVisible()) {
       await registerButton.click();
-      await expect(page.locator("text=REGISTRO").or(page.locator("text=Registro"))).toBeVisible({ timeout: 5000 });
+      await expect(page.getByText(/paso 1 de 3/i)).toBeVisible({ timeout: 5000 });
+      // Sin datos el botón queda deshabilitado (no se crea ninguna cuenta)
+      await expect(page.getByRole("button", { name: /siguiente/i })).toBeDisabled();
     }
   });
 

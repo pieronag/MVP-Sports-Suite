@@ -362,15 +362,16 @@ export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (reque
 
   const cleanEmail = email.trim().toLowerCase();
 
-  // "Olvidé mi contraseña" funciona sin sesión; la verificación exige sesión
-  if (!request.auth && type !== "reset") {
-    throw new HttpsError("unauthenticated", "Debes estar autenticado.");
+  // Funciona sin sesión: ambos enlaces se envían solo al buzón indicado (nunca se
+  // devuelven), y el límite por correo evita usarlo para spam.
+  if (type !== "reset" && type !== "verify") {
+    throw new HttpsError("invalid-argument", "Tipo de correo inválido.");
   }
   // Límite por usuario y, sin sesión, por correo destino (evita spam a terceros)
   await checkRateLimit("sendAuthEmail", request.auth?.uid || `anon:${cleanEmail}`);
 
-  // Verificación: solo para el propio correo de la sesión
-  if (type === "verify" && cleanEmail !== (request.auth?.token.email || "").toLowerCase()) {
+  // Con sesión, la verificación solo aplica al propio correo
+  if (type === "verify" && request.auth && cleanEmail !== (request.auth.token.email || "").toLowerCase()) {
     throw new HttpsError("permission-denied", "Solo puedes verificar tu propio correo.");
   }
 
@@ -409,7 +410,14 @@ export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (reque
     const adminAuth = admin.auth();
 
     if (type === "verify") {
-      actionLink = await adminAuth.generateEmailVerificationLink(cleanEmail, actionCodeSettings);
+      try {
+        actionLink = await adminAuth.generateEmailVerificationLink(cleanEmail, actionCodeSettings);
+      } catch (e: any) {
+        if (e?.code === "auth/user-not-found" || e?.code === "auth/email-not-found") {
+          return {success: true, method: "resend"};
+        }
+        throw e;
+      }
       subject = "Verifica tu correo electrónico - MVP Sports";
       title = "Activa tu Cuenta";
       description = `Hola, ${name}. Gracias por unirte a MVP Sports. Para activar tu cuenta y poder iniciar sesión en la aplicación móvil y el panel de control, haz clic en el botón de abajo:`;

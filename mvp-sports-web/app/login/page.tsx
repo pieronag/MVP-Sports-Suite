@@ -103,8 +103,29 @@ export default function LoginPage() {
       const target = userRole && userRole !== "player" ? "/dashboard" : "/player";
       router.push(target);
     } catch (err: any) {
-      setError("Credenciales incorrectas.");
+      const code = err?.code || "";
+      setError(
+        code === "auth/too-many-requests" ? "Demasiados intentos. Espera unos minutos o restablece tu contraseña."
+        : code === "auth/network-request-failed" ? "Sin conexión. Revisa tu internet e inténtalo de nuevo."
+        : code === "auth/user-disabled" ? "Tu cuenta está deshabilitada. Contacta a soporte."
+        : "Credenciales incorrectas."
+      );
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) { setError("Escribe tu correo para enviarte el enlace."); return; }
+    setResending(true);
+    setResendStatus("");
+    try {
+      await httpsCallable(functions, "sendAuthEmail")({ email: email.trim(), type: "reset" });
+      setError("");
+      setResendStatus("Si el correo está registrado, te enviamos un enlace para restablecer tu contraseña.");
+    } catch {
+      setResendStatus("No se pudo enviar el correo. Inténtalo más tarde.");
+    } finally {
+      setResending(false);
     }
   };
 
@@ -227,6 +248,17 @@ export default function LoginPage() {
                     </button>
                   }
                 />
+
+                <div className="flex justify-end -mt-1">
+                  <button type="button" onClick={handleForgotPassword} disabled={resending}
+                    className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] disabled:opacity-50">
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                </div>
+
+                {!error && resendStatus && (
+                  <span role="status" className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide">{resendStatus}</span>
+                )}
 
                 {error && (
                   <div role="alert" className="space-y-2">
