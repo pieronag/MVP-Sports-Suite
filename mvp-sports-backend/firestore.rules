@@ -52,6 +52,43 @@ service cloud.firestore {
     }
 
     // ==========================================
+    // 🏟️ ALCANCE POR RECINTO
+    // ==========================================
+    // El rol (manager/owner/staff) no basta: además debe estar asignado al recinto
+    // (users.tenantId / users.tenantIds) o ser su dueño (tenants.ownerId / ownerIds).
+    function isMemberOfTenant(tid) {
+      let userPath = /databases/$(database)/documents/users/$(request.auth.uid);
+      let tenantPath = /databases/$(database)/documents/tenants/$(tid);
+      return tid is string && tid != '' && (
+        (exists(userPath) && (
+          get(userPath).data.get('tenantId', '') == tid ||
+          tid in get(userPath).data.get('tenantIds', [])
+        )) ||
+        (exists(tenantPath) && (
+          get(tenantPath).data.get('ownerId', '') == request.auth.uid ||
+          request.auth.uid in get(tenantPath).data.get('ownerIds', [])
+        ))
+      );
+    }
+
+    // Configuración del recinto (canchas, cupones, torneos, mantenciones)
+    function canManageTenant(tid) {
+      return isSuperAdmin() || (isManager() && isMemberOfTenant(tid));
+    }
+
+    // Operación diaria (check-in, cobros, agenda)
+    function worksAtTenant(tid) {
+      return isSuperAdmin() || (isStaff() && isMemberOfTenant(tid));
+    }
+
+    // Documentos con tenantId opcional: sin recinto, solo su creador (ownerId)
+    function canManageScoped(data) {
+      return data.get('tenantId', '') != ''
+        ? canManageTenant(data.tenantId)
+        : (isSuperAdmin() || (isManager() && data.get('ownerId', '') == request.auth.uid));
+    }
+
+    // ==========================================
     // 🔒 CAMPOS PRIVILEGIADOS DE USUARIO
     // ==========================================
     // Rol, recintos asignados, permisos y estado de cuenta: el propio usuario
@@ -150,7 +187,7 @@ service cloud.firestore {
       allow read: if true;
       // Las credenciales nunca se guardan aquí (lectura pública): van a tenant_secrets
       allow create: if isSuperAdmin() && !hasTenantSecretFields();
-      allow update: if !hasTenantSecretFields() && (isManager() || isSuperAdmin() || (isAuthenticated() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'totalFeedbacks'])));
+      allow update: if !hasTenantSecretFields() && (canManageTenant(tenantId) || (isAuthenticated() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'totalFeedbacks'])));
       allow delete: if isSuperAdmin();
     }
 
@@ -160,7 +197,9 @@ service cloud.firestore {
     
     match /courts/{courtId} {
       allow read: if true;
-      allow write: if isManager() || isSuperAdmin();
+      allow create: if canManageTenant(request.resource.data.tenantId);
+      allow update: if canManageTenant(resource.data.tenantId) && request.resource.data.tenantId == resource.data.tenantId;
+      allow delete: if canManageTenant(resource.data.tenantId);
     }
 
     // Credenciales de pasarelas y facturación: solo Admin SDK (API routes / Functions)
@@ -195,40 +234,25 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       // Un jugador solo crea reservas a su nombre y sin pago confirmado: las reservas
       // pagadas online las crea el servidor tras verificar el pago en Mercado Pago.
-      allow create: if isStaff() || isSuperAdmin() || (
+      allow create: if worksAtTenant(request.resource.data.get('tenantId', '')) || (
         isAuthenticated() &&
         request.resource.data.userId == request.auth.uid &&
         request.resource.data.get('paymentStatus', 'pending') == 'pending' &&
         !request.resource.data.keys().hasAny(['paymentRecordId', 'refundAmount', 'refundDetails'])
       );
       allow update: if isAuthenticated() && (
-        isStaff() ||
-        isSuperAdmin() ||
-        ((resource.data.userId == request.auth.uid || resource.data.userEmail == request.auth.token.email) &&
-          !request.resource.data.diff(resource.data).affectedKeys().hasAny(bookingPaymentKeys())) ||
-        // Fallback: Si el usuario tiene acceso al recinto (tenantId o tenantIds)
-        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && (
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.tenantId == resource.data.tenantId ||
-          resource.data.tenantId in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.tenantIds ||
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'manager'
-        )) ||
-        (exists(/databases/$(database)/documents/profiles/$(request.auth.uid)) && (
-          get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.tenantId == resource.data.tenantId ||
-          resource.data.tenantId in get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.tenantIds ||
-          get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'manager'
-        )) ||
-        (exists(/databases/$(database)/documents/staff/$(request.auth.uid)) && (
-          get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.tenantId == resource.data.tenantId ||
-          resource.data.tenantId in get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.tenantIds ||
-          get(/databases/$(database)/documents/staff/$(request.auth.uid)).data.role == 'manager'
-        ))
+        (worksAtTenant(resource.data.get('tenantId', '')) &&
+          request.resource.data.get('tenantId', '') == resource.data.get('tenantId', '')) ||
+        ((resource.data.userId == request.auth.uid || resource.data.get('userEmail', '') == request.auth.token.email) &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(bookingPaymentKeys()))
       );
-      allow delete: if isManager() || isSuperAdmin();
+      allow delete: if canManageTenant(resource.data.get('tenantId', ''));
     }
 
     match /maintenance/{mId} {
       allow read: if isManager() || isSuperAdmin();
-      allow write: if isManager() || isSuperAdmin();
+      allow create: if canManageTenant(request.resource.data.get('tenantId', ''));
+      allow update, delete: if canManageTenant(resource.data.get('tenantId', ''));
     }
 
     // ==========================================
@@ -253,7 +277,8 @@ service cloud.firestore {
 
     match /coupons/{couponId} {
       allow read: if true;
-      allow write: if isManager() || isSuperAdmin();
+      allow create: if canManageScoped(request.resource.data);
+      allow update, delete: if canManageScoped(resource.data);
     }
 
     // ==========================================
@@ -296,9 +321,10 @@ service cloud.firestore {
       }
     }
 
-    match /tournaments/{id} { 
-      allow read: if true; 
-      allow write: if isManager() || isSuperAdmin(); 
+    match /tournaments/{id} {
+      allow read: if true;
+      allow create: if canManageScoped(request.resource.data);
+      allow update, delete: if canManageScoped(resource.data);
     }
 
     match /tournament_registrations/{id} {
@@ -306,9 +332,10 @@ service cloud.firestore {
       allow write: if isAuthenticated();
     }
 
-    match /academy_classes/{id} { 
-      allow read: if true; 
-      allow write: if isManager() || isSuperAdmin(); 
+    match /academy_classes/{id} {
+      allow read: if true;
+      allow create: if canManageScoped(request.resource.data);
+      allow update, delete: if canManageScoped(resource.data);
     }
 
     // ==========================================
