@@ -781,7 +781,7 @@ export default function PartidosPage() {
                               {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : <User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-[11px] font-medium truncate ${isDark ? "text-slate-200" : "text-slate-700"}`}>{p.displayName || mid.slice(0, 8)}{mid === challengeTeamData.team.ownerId ? " (C)" : ""}</p>
+                              <p className={`text-[11px] font-medium truncate ${isDark ? "text-slate-200" : "text-slate-700"}`}>{p.displayName || "Jugador MVP"}{mid === challengeTeamData.team.ownerId ? " (C)" : ""}</p>
                             </div>
                             <span className="text-emerald-500 text-[11px] font-semibold shrink-0">OVR {p.ovr || 40}</span>
                           </div>
@@ -868,7 +868,7 @@ export default function PartidosPage() {
                   {/* Captain */}
                   {(() => {
                     const ownerProfile = teamDetailData.profiles[teamDetailData.team.ownerId];
-                    const ownerName = ownerProfile?.displayName || teamDetailData.team.ownerId.slice(0, 8);
+                    const ownerName = ownerProfile?.displayName || "Capitán";
                     return (
                       <div className="space-y-1.5">
                         <p className={`text-[8px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>CAPITÁN</p>
@@ -905,7 +905,7 @@ export default function PartidosPage() {
                               {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : <User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-[11px] font-medium truncate ${isDark ? "text-slate-200" : "text-slate-700"}`}>{p.displayName || mid.slice(0, 8)}{isOwner ? " (C)" : ""}</p>
+                              <p className={`text-[11px] font-medium truncate ${isDark ? "text-slate-200" : "text-slate-700"}`}>{p.displayName || "Jugador MVP"}{isOwner ? " (C)" : ""}</p>
                             </div>
                             <span className="text-emerald-500 text-[11px] font-semibold shrink-0">OVR {p.ovr || 40}</span>
                           </div>

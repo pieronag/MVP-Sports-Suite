@@ -62,6 +62,22 @@ const getChileDateISO = () => {
     return now.getFullYear() + '-' + (now.getMonth() + 1).toString().padStart(2, '0') + '-' + now.getDate().toString().padStart(2, '0');
 };
 
+// Teléfono chileno a formato wa.me (solo dígitos, con prefijo 56 una sola vez)
+const toWhatsAppNumber = (phone: string = ''): string => {
+    const digits = String(phone).replace(/\D/g, '');
+    return digits.startsWith('56') ? digits : `56${digits}`;
+};
+
+// Monto efectivamente cobrado: pagado = total, abono = lo abonado, pendiente o
+// devuelto = 0. Una reserva anulada ya cobrada sigue sumando hasta que se devuelva.
+const collectedAmount = (b: any): number => {
+    const ps = String(b.paymentStatus || '').toLowerCase();
+    if (ps === 'refunded') return 0;
+    if (ps === 'paid') return Number(b.finalPrice) || 0;
+    if (ps === 'partial') return Number(b.deposit) || 0;
+    return 0;
+};
+
 export default function MasterCalendar() {
     const { user, firestoreUser, role } = useAuth();
     const [loading, setLoading] = useState(true);
@@ -208,6 +224,36 @@ export default function MasterCalendar() {
 
     useEffect(() => { loadDashboardData(); }, [selectedVenueId, selectedDate]);
 
+    // Anular una reserva (cliente cancela o ingreso por error). Libera el horario
+    // sin marcar inasistencia ni penalizar al jugador.
+    const requestCancelBooking = (b: any) => {
+        setConfirmData({
+            isOpen: true,
+            title: "Anular reserva",
+            message: `¿Anular la reserva #${b.id} de ${b.clientName || 'cliente'} (${b.startTime})? El horario quedará disponible.` +
+                (collectedAmount(b) > 0 ? ` Ya se cobraron ${formatCLP(collectedAmount(b))}: la devolución al cliente se gestiona aparte.` : ''),
+            isDestructive: true,
+            showCancel: true,
+            action: async () => {
+                setConfirmData(prev => ({ ...prev, isOpen: false }));
+                try {
+                    await updateDoc(doc(db, "bookings", b.id), {
+                        status: 'cancelled',
+                        cancelledBy: 'staff',
+                        cancelledByUser: user?.email || user?.uid || null,
+                        cancelledAt: Timestamp.now(),
+                        updatedAt: Timestamp.now(),
+                    });
+                    await auditService.logAuditEvent({ action: 'RESERVA_ANULAR', module: 'Operación/Agenda', details: `Reserva ${b.id} anulada por personal (${b.clientName || ''} ${b.startTime})`, severity: 'MEDIUM', status: 'SUCCESS' });
+                    setSelectedBooking(null);
+                    loadDashboardData();
+                } catch (e: any) {
+                    setConfirmData({ isOpen: true, title: "No se pudo anular", message: e?.code === 'permission-denied' ? 'Tu cuenta no tiene permisos sobre esta reserva.' : 'Inténtalo nuevamente.', isDestructive: false, showCancel: false, action: () => setConfirmData(prev => ({ ...prev, isOpen: false })) });
+                }
+            },
+        });
+    };
+
     useEffect(() => {
         const fetchModalCourts = async () => {
             if (!newRes.tenantId) return setModalCourts([]);
@@ -291,7 +337,9 @@ export default function MasterCalendar() {
             for (let i = 0; i < 6; i++) {
                 bookingId += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-            await setDoc(doc(db, "bookings", bookingId), { tenantId: newRes.tenantId, tenantName: venues.find(v => v.id === newRes.tenantId)?.name, courtId: newRes.courtId, courtName: selectedCourt?.name || 'Cancha', sport: selectedCourt?.sport || 'General', clientName: newRes.clientName, clientPhone: newRes.clientPhone, date: Timestamp.fromDate(bookingDate), startTime: newRes.startTime, endTime: `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`, duration: parseFloat(newRes.duration), price: Number(newRes.price), totalPrice: Number(newRes.price), deposit: Number(newRes.deposit), remainingBalance: Number(newRes.price) - Number(newRes.deposit), status: 'confirmed', paymentStatus: newRes.paymentStatus, paymentMethod: newRes.paymentMethod, notes: newRes.notes, source: 'manual_dashboard', ownerId: user.uid, createdAt: Timestamp.now(), createdBy: user.displayName || user.email });
+            // Coherencia del cobro: pagado = total, pendiente = 0, abono = lo ingresado
+            const paidNow = newRes.paymentStatus === 'paid' ? Number(newRes.price) : newRes.paymentStatus === 'pending' ? 0 : Number(newRes.deposit) || 0;
+            await setDoc(doc(db, "bookings", bookingId), { tenantId: newRes.tenantId, tenantName: venues.find(v => v.id === newRes.tenantId)?.name, courtId: newRes.courtId, courtName: selectedCourt?.name || 'Cancha', sport: selectedCourt?.sport || 'General', clientName: newRes.clientName, clientPhone: newRes.clientPhone, date: Timestamp.fromDate(bookingDate), startTime: newRes.startTime, endTime: `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`, duration: parseFloat(newRes.duration), price: Number(newRes.price), totalPrice: Number(newRes.price), deposit: paidNow, remainingBalance: Math.max(0, Number(newRes.price) - paidNow), status: 'confirmed', paymentStatus: newRes.paymentStatus, paymentMethod: newRes.paymentMethod, notes: newRes.notes, source: 'manual_dashboard', ownerId: user.uid, createdAt: Timestamp.now(), createdBy: user.displayName || user.email });
             setIsAddModalOpen(false);
             if (newRes.date === selectedDate && newRes.tenantId === selectedVenueId) loadDashboardData();
             await auditService.logAuditEvent({
@@ -377,8 +425,8 @@ export default function MasterCalendar() {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                 <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Hoy</p><h3 className="text-lg font-black text-slate-900 dark:text-white leading-none font-mono">{bookings.filter(b => b.status !== 'cancelled').length}</h3></div>
                 <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20"><p className="text-[9px] font-black text-red-500 uppercase mb-0.5">Canceladas</p><h3 className="text-lg font-black text-red-600 dark:text-red-400 leading-none font-mono">{bookings.filter(b => b.status === 'cancelled').length}</h3></div>
-                <div className="p-3 rounded-md bg-emerald-500/10 border border-emerald-500/20"><p className="text-[9px] font-black text-emerald-600 dark:text-[#00df82] uppercase mb-0.5">Recaudado</p><h3 className="text-lg font-black text-emerald-600 dark:text-[#00df82] leading-none font-mono">{formatCLP(bookings.filter(b => b.status !== 'cancelled').reduce((acc, b) => acc + (b.finalPrice || 0), 0))}</h3></div>
-                <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Ocupación</p><h3 className="text-lg font-black text-slate-900 dark:text-white leading-none font-mono">{dashboardCourts.length > 0 ? Math.round((bookings.length / (dashboardCourts.length * 14)) * 100) : 0}%</h3></div>
+                <div className="p-3 rounded-md bg-emerald-500/10 border border-emerald-500/20"><p className="text-[9px] font-black text-emerald-600 dark:text-[#00df82] uppercase mb-0.5">Recaudado</p><h3 className="text-lg font-black text-emerald-600 dark:text-[#00df82] leading-none font-mono">{formatCLP(bookings.reduce((acc, b) => acc + collectedAmount(b), 0))}</h3></div>
+                <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Ocupación</p><h3 className="text-lg font-black text-slate-900 dark:text-white leading-none font-mono">{dashboardCourts.length > 0 ? Math.round((bookings.filter(b => b.status !== 'cancelled').length / (dashboardCourts.length * 14)) * 100) : 0}%</h3></div>
                 <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Canchas</p><h3 className="text-lg font-black text-emerald-600 dark:text-[#00df82] leading-none font-mono">{dashboardCourts.length}</h3></div>
             </div>
 
@@ -458,7 +506,7 @@ export default function MasterCalendar() {
                                     <p className="text-sm font-black text-slate-900 dark:text-white uppercase truncate">{selectedBooking.clientName}</p>
                                     <p className="text-[10px] text-emerald-600 dark:text-[#00df82] font-bold">{selectedBooking.clientPhone}</p>
                                 </div>
-                                <a href={`https://wa.me/56${selectedBooking.clientPhone}`} target="_blank" rel="noreferrer" className="p-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md active:scale-90 transition-all hover:brightness-110" title="Contactar por WhatsApp">
+                                <a href={`https://wa.me/${toWhatsAppNumber(selectedBooking.clientPhone)}`} target="_blank" rel="noreferrer" className="p-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md active:scale-90 transition-all hover:brightness-110" title="Contactar por WhatsApp">
                                     <HugeiconsIcon icon={Message02Icon} className="w-4 h-4" strokeWidth={2} />
                                 </a>
                             </div>
@@ -541,6 +589,13 @@ export default function MasterCalendar() {
                                 <p className="text-[8px] font-black text-slate-400 uppercase">Registrado por</p>
                                 <p className="text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase">{selectedBooking.createdBy || 'Sistema'}</p>
                             </div>
+
+                            {selectedBooking.status !== 'cancelled' && (
+                                <button onClick={() => requestCancelBooking(selectedBooking)}
+                                    className="w-full py-3 rounded-md border border-red-500/30 text-red-600 dark:text-red-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-500/5 transition-all">
+                                    Anular reserva
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

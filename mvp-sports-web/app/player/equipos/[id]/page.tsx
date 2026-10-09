@@ -175,7 +175,7 @@ export default function EquipoDetailPage() {
     setShowEditModal(true);
   };
 
-  const getProfile = (uid: string) => profiles[uid] || { uid, displayName: uid.slice(0, 8), photoURL: null, tier: "Bronce", ovr: 40 };
+  const getProfile = (uid: string) => profiles[uid] || { uid, displayName: "Jugador MVP", photoURL: null, tier: "Bronce", ovr: 40 };
 
   const SPORTS = ["Fútbol", "Pádel", "Tenis", "Básquetbol", "Voleibol", "Futbolito"];
 
@@ -203,18 +203,18 @@ export default function EquipoDetailPage() {
         {!((team as any).imageUrl) && <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/60 to-slate-900" />}
         <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-black/30 to-transparent" />
         <div className="absolute top-0 left-0 right-0 px-5 pt-12 flex justify-between">
-          <button onClick={() => router.back()} className="w-10 h-10 rounded-md bg-black/30 border border-white/10 flex items-center justify-center">
+          <button aria-label="Volver" onClick={() => router.back()} className="w-10 h-10 rounded-md bg-black/30 border border-white/10 flex items-center justify-center">
             <ChevronLeft color="white" size={20} />
           </button>
           {isMember && (
-            <button onClick={() => setShowMenu(true)} className="w-10 h-10 rounded-md bg-black/30 border border-white/10 flex items-center justify-center">
+            <button aria-label="Opciones del equipo" onClick={() => setShowMenu(true)} className="w-10 h-10 rounded-md bg-black/30 border border-white/10 flex items-center justify-center">
               <MoreHorizontal color="white" size={20} />
             </button>
           )}
         </div>
         {isOwner && (
           <>
-            <button onClick={() => fileInputRef.current?.click()} className="absolute bottom-16 right-6 w-10 h-10 rounded-md bg-black/40 border border-white/10 flex items-center justify-center z-10">
+            <button aria-label="Cambiar foto del equipo" onClick={() => fileInputRef.current?.click()} className="absolute bottom-16 right-6 w-10 h-10 rounded-md bg-black/40 border border-white/10 flex items-center justify-center z-10">
               <Camera color="white" size={18} />
             </button>
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
@@ -288,10 +288,10 @@ export default function EquipoDetailPage() {
                         {reqProfile.photoURL ? <img src={reqProfile.photoURL} alt="" className="w-full h-full object-cover" /> : <User size={18} className={isDark ? "text-slate-400" : "text-slate-500"} />}
                       </div>
                       <span className={`text-sm font-medium flex-1 ${isDark ? "text-slate-200" : "text-slate-800"}`}>{reqProfile.displayName}</span>
-                      <button onClick={() => handleAcceptRequest(reqUid)} disabled={actionLoading} className="w-9 h-9 rounded-md bg-emerald-500/10 flex items-center justify-center">
+                      <button aria-label="Aceptar solicitud" onClick={() => handleAcceptRequest(reqUid)} disabled={actionLoading} className="w-9 h-9 rounded-md bg-emerald-500/10 flex items-center justify-center">
                         <CheckCircle2 size={16} className="text-emerald-500" />
                       </button>
-                      <button onClick={() => handleRejectRequest(reqUid)} disabled={actionLoading} className="w-9 h-9 rounded-md bg-red-500/10 flex items-center justify-center">
+                      <button aria-label="Rechazar solicitud" onClick={() => handleRejectRequest(reqUid)} disabled={actionLoading} className="w-9 h-9 rounded-md bg-red-500/10 flex items-center justify-center">
                         <X size={16} className="text-red-500" />
                       </button>
                     </div>
@@ -317,7 +317,7 @@ export default function EquipoDetailPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className={`text-sm font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{p.displayName || memberId.slice(0, 8)}</p>
+                      <p className={`text-sm font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{p.displayName || "Jugador MVP"}</p>
                       {isMemberOwner && <span className="text-[7px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-500">Capitán</span>}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -326,7 +326,7 @@ export default function EquipoDetailPage() {
                     </div>
                   </div>
                   {isOwner && !isMemberOwner && (
-                    <button onClick={() => setShowRemoveModal(memberId)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F1F5F9" }}>
+                    <button aria-label="Quitar del equipo" onClick={() => setShowRemoveModal(memberId)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F1F5F9" }}>
                       <X size={14} className="text-red-400" />
                     </button>
                   )}
@@ -375,7 +375,7 @@ export default function EquipoDetailPage() {
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <p className={`font-semibold text-base ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar Equipo</p>
-              <button onClick={() => setShowEditModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} /></button>
+              <button aria-label="Cerrar" onClick={() => setShowEditModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} /></button>
             </div>
             <div className="mb-4">
               <label className={`text-[10px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nombre</label>

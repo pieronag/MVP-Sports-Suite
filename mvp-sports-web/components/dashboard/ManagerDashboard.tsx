@@ -415,8 +415,8 @@ export default function ManagerDashboard() {
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex flex-col items-end">
                                                     <span className="font-black text-slate-900 dark:text-white text-xs">{formatMoney(b.totalPrice || b.price || 0)}</span>
-                                                    {b.deposit && b.paymentStatus === 'partial' && (
-                                                        <span className="text-[7px] font-bold text-amber-500 uppercase">Seña: {formatMoney(b.deposit)}</span>
+                                                    {Number(b.deposit) > 0 && b.paymentStatus === 'partial' && (
+                                                        <span className="text-[7px] font-bold text-amber-500 uppercase">Seña: {formatMoney(b.deposit || 0)}</span>
                                                     )}
                                                 </div>
                                             </td>

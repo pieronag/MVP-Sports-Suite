@@ -135,11 +135,13 @@ export const teamService = {
             const q = query(collection(db, 'users'), where('__name__', 'in', chunk));
             const snap = await getDocs(q);
             snap.docs.forEach(d => {
-                result[d.id] = { uid: d.id, ...d.data() };
+                const data = d.data() as any;
+                // Nombre legible siempre (algunas cuentas solo tienen fullName)
+                result[d.id] = { uid: d.id, ...data, displayName: data.displayName || data.fullName || 'Jugador MVP' };
             });
-            // Fill missing UIDs with default data
+            // UIDs sin documento: nombre genérico (nunca mostrar el ID)
             chunk.forEach(uid => {
-                if (!result[uid]) result[uid] = { uid, displayName: uid.slice(0, 8), photoURL: null, tier: 'Bronce', ovr: 40 };
+                if (!result[uid]) result[uid] = { uid, displayName: 'Jugador MVP', photoURL: null, tier: 'Bronce', ovr: 40 };
             });
         }
         return result;

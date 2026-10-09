@@ -580,7 +580,7 @@ export default function AdminDashboard() {
                                         <td className="px-6 py-4 text-center">
                                             <div className="flex flex-col items-center gap-1">
                                                 <span className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{formatCLP(b.totalPrice || b.price || 0)}</span>
-                                                {b.deposit && b.paymentStatus === 'partial' && (
+                                                {Number(b.deposit) > 0 && b.paymentStatus === 'partial' && (
                                                     <span className="text-[9px] font-bold text-amber-500 uppercase">Seña: {formatCLP(b.deposit)}</span>
                                                 )}
                                             </div>
