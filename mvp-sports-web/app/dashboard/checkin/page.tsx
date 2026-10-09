@@ -78,6 +78,7 @@ const StatusModal = ({ isOpen, title, message, type, onClose }: any) => {
 interface Booking {
     id: string;
     courtId?: string;
+    cancelledBy?: string;
     courtName: string;
     sport?: string;
     clientName: string;
@@ -792,7 +793,7 @@ export default function CheckInPage() {
                     </div>
                     <div className="flex items-baseline justify-between">
                         <p className="text-2xl font-black text-slate-500 tracking-tighter">{stats.cancelled}</p>
-                        <p className="text-[8px] font-black text-slate-400 uppercase">Cancelado por Jugador</p>
+                        <p className="text-[8px] font-black text-slate-400 uppercase">Jugador o recinto</p>
                     </div>
                 </div>
             </div>
@@ -878,7 +879,7 @@ export default function CheckInPage() {
                                     ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 shadow-md'
                                     : 'bg-white dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/10 hover:border-slate-300'}`}
                             >
-                                {f === 'all' ? `Todos (${stats.total})` : f === 'pending' ? `Pendientes (${stats.pending})` : f === 'completed' ? `Listos (${stats.in})` : f === 'cancelled' ? `Por Jugador (${stats.cancelled})` : `Por Inasistencia (${stats.noShow})`}
+                                {f === 'all' ? `Todos (${stats.total})` : f === 'pending' ? `Pendientes (${stats.pending})` : f === 'completed' ? `Listos (${stats.in})` : f === 'cancelled' ? `Anuladas (${stats.cancelled})` : `Por Inasistencia (${stats.noShow})`}
                             </button>
                         ))}
                     </div>
@@ -935,7 +936,7 @@ export default function CheckInPage() {
                                                         <span className="px-1.5 py-0.5 bg-red-500/10 text-red-500 text-[7px] font-black uppercase rounded border border-red-500/20">Cancelado por No-Show</span>
                                                     )
                                                 ) : (
-                                                    <span className="px-1.5 py-0.5 bg-slate-500/10 text-slate-500 text-[7px] font-black uppercase rounded border border-slate-500/20">Cancelado por Jugador</span>
+                                                    <span className="px-1.5 py-0.5 bg-slate-500/10 text-slate-500 text-[7px] font-black uppercase rounded border border-slate-500/20">{booking.cancelledBy === 'staff' ? 'Anulada por recinto' : 'Cancelado por jugador'}</span>
                                                 )
                                             ) : null}
                                         </div>
@@ -1000,7 +1001,7 @@ export default function CheckInPage() {
                                                     <span className="text-[7px] font-bold text-slate-400 uppercase mr-1">
                                                         {isNoShow 
                                                             ? (booking.paymentStatus === 'paid' ? 'No-Show Pagado' : booking.paymentStatus === 'partial' ? 'Seña Retenida' : 'No-Show')
-                                                            : 'Por Jugador'
+                                                            : (booking.cancelledBy === 'staff' ? 'Por Recinto' : 'Por Jugador')
                                                         }
                                                     </span>
                                                 </div>
