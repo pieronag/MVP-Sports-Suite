@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
 import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc } from 'firebase/firestore';
-import { collectedAmount } from '@/utils/bookingMath';
+import { collectedAmount, durationHours } from '@/utils/bookingMath';
 import { auditService } from '@/services/auditService';
 import {
     Add01Icon,
@@ -433,7 +433,7 @@ export default function MasterCalendar() {
                 <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Hoy</p><h3 className="text-lg font-black text-slate-900 dark:text-white leading-none font-mono">{bookings.filter(b => b.status !== 'cancelled').length}</h3></div>
                 <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20"><p className="text-[9px] font-black text-red-500 uppercase mb-0.5">Canceladas</p><h3 className="text-lg font-black text-red-600 dark:text-red-400 leading-none font-mono">{bookings.filter(b => b.status === 'cancelled').length}</h3></div>
                 <div className="p-3 rounded-md bg-emerald-500/10 border border-emerald-500/20"><p className="text-[9px] font-black text-emerald-600 dark:text-[#00df82] uppercase mb-0.5">Recaudado</p><h3 className="text-lg font-black text-emerald-600 dark:text-[#00df82] leading-none font-mono">{formatCLP(bookings.reduce((acc, b) => acc + collectedAmount(b), 0))}</h3></div>
-                <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Ocupación</p><h3 className="text-lg font-black text-slate-900 dark:text-white leading-none font-mono">{dashboardCourts.length > 0 ? Math.round((bookings.filter(b => b.status !== 'cancelled').length / (dashboardCourts.length * 14)) * 100) : 0}%</h3></div>
+                <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Ocupación</p><h3 className="text-lg font-black text-slate-900 dark:text-white leading-none font-mono">{dashboardCourts.length > 0 ? Math.round((bookings.filter(b => b.status !== 'cancelled').reduce((a, b) => a + durationHours(b), 0) / (dashboardCourts.length * Math.max(1, calendarConfig.timeSlots.length))) * 100) : 0}%</h3></div>
                 <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Canchas</p><h3 className="text-lg font-black text-emerald-600 dark:text-[#00df82] leading-none font-mono">{dashboardCourts.length}</h3></div>
             </div>
 

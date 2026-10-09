@@ -29,7 +29,7 @@ const ChartBarIcon = ({ className }: { className?: string }) => <HugeiconsIcon i
 const BoltIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={FlashIcon} className={className} strokeWidth={1.6} />;
 const SparklesIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={SparklesIconHi} className={className} strokeWidth={1.6} />;
 const TicketIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Ticket01Icon} className={className} strokeWidth={1.6} />;
-import { collectedAmount, pendingAmount, durationHours } from '@/utils/bookingMath';
+import { collectedAmount, pendingAmount, durationHours, dayOpenHours } from '@/utils/bookingMath';
 import Link from 'next/link';
 import MetricCard from './MetricCard';
 import ManualBookingModal from './ManualBookingModal';
@@ -69,7 +69,7 @@ export default function ManagerDashboard() {
     // ESTADOS
     const [loading, setLoading] = useState(true);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
-    const [myVenues, setMyVenues] = useState<{ id: string, name: string }[]>([]);
+    const [myVenues, setMyVenues] = useState<{ id: string, name: string, [k: string]: any }[]>([]);
     const [selectedTenantId, setSelectedTenantId] = useState<string>('');
     const [selectedTenantName, setSelectedTenantName] = useState<string>('Cargando...');
 
@@ -103,7 +103,7 @@ export default function ManagerDashboard() {
                     const promises = chunkArray(tenantIds, 10).map(async (chunk) => {
                         const q = query(collection(db, "tenants"), where("__name__", "in", chunk));
                         const snap = await getDocs(q);
-                        return snap.docs.map(d => ({ id: d.id, name: d.data().name }));
+                        return snap.docs.map(d => ({ id: d.id, ...d.data(), name: d.data().name }));
                     });
 
                     const results = await Promise.all(promises);
@@ -190,8 +190,9 @@ export default function ManagerDashboard() {
                 const revenue = todayDocs.reduce((acc, curr) => acc + collectedAmount(curr), 0);
                 const pending = todayDocs.reduce((acc, curr) => acc + pendingAmount(curr), 0);
                 const totalHoursBooked = todayDocs.reduce((acc, curr) => acc + (curr.status !== 'cancelled' ? durationHours(curr) : 0), 0);
-                // 14 bloques diarios (09:00–22:00), igual que la Agenda
-                const totalCapacityHours = Math.max(1, courtsList.length * 14);
+                // Capacidad según el horario real del recinto ese día (igual que la Agenda)
+                const venue = myVenues.find(v => v.id === selectedTenantId);
+                const totalCapacityHours = Math.max(1, courtsList.length * dayOpenHours(venue, selectedDate).slots.length);
                 const occupancy = Math.round((totalHoursBooked / totalCapacityHours) * 100);
 
                 setStats({
@@ -229,7 +230,7 @@ export default function ManagerDashboard() {
         });
 
         return () => unsubscribeCourts();
-    }, [selectedTenantId, selectedDate, refreshTrigger]);
+    }, [selectedTenantId, selectedDate, refreshTrigger, myVenues]);
 
     const formatMoney = (amount: number) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }).format(amount);
     const formatTime = (ts: Timestamp | Date | string) => {

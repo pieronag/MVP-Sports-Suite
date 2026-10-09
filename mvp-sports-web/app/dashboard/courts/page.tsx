@@ -614,6 +614,25 @@ export default function CourtsPage() {
     };
     const handleDeleteCourt = async (courtId: string) => {
         const courtToDelete = courts.find(c => c.id === courtId);
+        // No dejar reservas huérfanas: bloquear si hay reservas vigentes desde hoy
+        try {
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            // Solo filtro por cancha (no requiere índice compuesto); la fecha se filtra aquí
+            const snap = await getDocs(query(collection(db, "bookings"), where("courtId", "==", courtId)));
+            const active = snap.docs.filter(d => {
+                const b = d.data();
+                const when = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+                return b.status !== 'cancelled' && when >= today;
+            }).length;
+            if (active > 0) {
+                showToast(`No se puede eliminar: tiene ${active} reserva(s) vigente(s). Ponla en mantenimiento o reubica esas reservas primero.`, 'error');
+                return;
+            }
+        } catch (e) {
+            console.error("Error verificando reservas de la cancha:", e);
+            showToast("No se pudo verificar si la cancha tiene reservas. Intenta nuevamente.", 'error');
+            return;
+        }
         setConfirmData({
             isOpen: true,
             title: "Eliminar Activo",
@@ -775,8 +794,9 @@ export default function CourtsPage() {
 
     const courtBasePrice = (sport: string) => {
         const anyPricing = pricingMatrix[sport] || {};
-        const all = { ...(anyPricing.weekday || {}), ...(anyPricing.weekend || {}) };
-        const prices = Object.values(all).filter(p => p > 0);
+        // Ambas tablas por separado: al mezclarlas como objeto, el fin de semana
+        // pisaba los precios de semana del mismo horario y el "Desde" salía mal.
+        const prices = [...Object.values(anyPricing.weekday || {}), ...Object.values(anyPricing.weekend || {})].map(Number).filter(p => p > 0);
         return prices.length > 0 ? Math.min(...prices) : 0;
     };
 
