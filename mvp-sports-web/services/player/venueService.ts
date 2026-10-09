@@ -1,5 +1,5 @@
 import { collection, query, where, getDocs, documentId, doc, getDoc, addDoc, updateDoc, Timestamp, orderBy } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 
 export interface Tenant {
     id: string;
@@ -111,7 +111,7 @@ export const venueService = {
         const tenantData = tenantSnap.data();
         const reviewsRef = collection(db, 'reviews');
         await addDoc(reviewsRef, {
-            venueId: tenantId, venueName: tenantData.name || 'Recinto', bookingId, rating, comment, userName,
+            venueId: tenantId, venueName: tenantData.name || 'Recinto', bookingId, rating, comment, userName, userId: auth.currentUser?.uid || null,
             ownerId: tenantData.ownerId || null, date: Timestamp.now(),
             sport: extraInfo?.sport || null, bookingDate: extraInfo?.bookingDate || null, bookingTime: extraInfo?.bookingTime || null
         });

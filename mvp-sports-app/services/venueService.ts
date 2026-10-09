@@ -1,5 +1,5 @@
 import { collection, query, where, getDocs, GeoPoint, documentId, doc, getDoc, addDoc, updateDoc, Timestamp, orderBy, limit } from 'firebase/firestore';
-import { db } from './firebase';
+import { db, auth } from './firebase';
 import { courtSchema, tenantSchema } from './schemas';
 
 export interface Tenant {
@@ -243,6 +243,7 @@ export const venueService = {
                 venueId: tenantId,
                 venueName: tenantData.name || 'Recinto',
                 bookingId,
+                userId: auth.currentUser?.uid || null,
                 rating,
                 comment,
                 userName,
