@@ -17,7 +17,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { auth, functions, db } from "../../services/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { httpsCallable } from "firebase/functions";
+import { emailService } from "@/services/emailService";
 import { doc, getDoc } from "firebase/firestore";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
@@ -54,8 +54,7 @@ export default function LoginPage() {
     setResending(true);
     setResendStatus("");
     try {
-      const sendAuthEmailFn = httpsCallable(functions, "sendAuthEmail");
-      await sendAuthEmailFn({ email: email.trim(), type: "verify" });
+      await emailService.sendAuthEmail(email.trim(), "verify");
       setResendStatus("Enlace enviado con éxito. Revisa tu bandeja de entrada.");
     } catch (err) {
       console.error(err);
@@ -120,7 +119,7 @@ export default function LoginPage() {
     setResending(true);
     setResendStatus("");
     try {
-      await httpsCallable(functions, "sendAuthEmail")({ email: email.trim(), type: "reset" });
+      await emailService.sendAuthEmail(email.trim(), "reset");
       setError("");
       setResendStatus("Si el correo está registrado, te enviamos un enlace para restablecer tu contraseña.");
     } catch {

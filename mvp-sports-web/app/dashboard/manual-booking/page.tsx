@@ -1,4 +1,5 @@
 "use client";
+import { syncBookingSlots } from "@/services/apiClient";
 import { getOwnedTenantsSnap } from "@/services/ownedTenants";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -81,6 +82,7 @@ export default function ManualBookingPage() {
                 bookingId += chars.charAt(Math.floor(Math.random() * chars.length));
             }
             await setDoc(doc(db, "bookings", bookingId), { tenantId: formData.tenantId, courtId: formData.courtId, clientName: formData.clientName.toUpperCase(), clientPhone: formData.clientPhone, date: formData.date, time: formData.time, datetime: Timestamp.fromDate(bookingDate), paymentStatus: formData.paymentStatus, status: 'confirmed', type: 'manual', createdAt: Timestamp.now(), createdBy: user?.uid });
+            await syncBookingSlots(bookingId);
             setNotification({ msg: "Reserva Confirmada", type: 'success' });
             setFormData(prev => ({ ...prev, date: '', time: '', clientName: '', clientPhone: '', paymentStatus: 'pending' }));
         } catch (e) { setNotification({ msg: "Error al crear", type: 'error' }); } finally { setSaving(false); }

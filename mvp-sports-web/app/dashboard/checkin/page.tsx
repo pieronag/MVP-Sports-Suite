@@ -1,4 +1,5 @@
 "use client";
+import { syncBookingSlots } from "@/services/apiClient";
 import { getOwnedTenantsSnap } from "@/services/ownedTenants";
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -450,6 +451,7 @@ export default function CheckInPage() {
                 updateData.paymentMethod = selectedPaymentMethod;
                 
                 await updateDoc(doc(db, "bookings", booking.id), updateData);
+                await syncBookingSlots(booking.id);
                 setBookings(prev => prev.map(b => b.id === booking.id ? { ...b, paymentStatus: 'paid', paymentMethod: selectedPaymentMethod, remainingBalance: 0 } : b));
                 
                 await auditService.logAuditEvent({
@@ -467,6 +469,7 @@ export default function CheckInPage() {
                 updateData.status = 'active';
                 
                 await updateDoc(doc(db, "bookings", booking.id), updateData);
+                await syncBookingSlots(booking.id);
                 setBookings(prev => prev.map(b => b.id === booking.id ? { ...b, checkIn: true, status: 'active' } : b));
                 
                 await auditService.logAuditEvent({
@@ -514,6 +517,7 @@ export default function CheckInPage() {
 
             // 1. Actualizar Reserva
             await updateDoc(doc(db, "bookings", booking.id), batchData);
+            await syncBookingSlots(booking.id);
 
             await auditService.logAuditEvent({
                 action: 'RESERVA_NOSHOW',

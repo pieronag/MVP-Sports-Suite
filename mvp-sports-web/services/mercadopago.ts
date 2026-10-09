@@ -1,5 +1,6 @@
 import "server-only";
 import crypto from "crypto";
+import { syncBooking } from "./bookingProjections";
 import { adminDb } from "./firebase-admin";
 import { resolveMercadoPagoToken } from "./tenant-secrets";
 import { commitRegistration } from "./tournaments";
@@ -280,6 +281,7 @@ export async function settlePayment(paymentRecordId: string, mpPaymentId: string
     }
     if (cRef && coupon?.exists) tx.update(cRef, { usedCount: (coupon.data()?.usedCount || 0) + 1 });
   });
+  if (pay.bookingId) await syncBooking(String(pay.bookingId)).catch((e) => console.error("syncBooking", e));
   return { result: "approved", returnUrl: pay.returnUrl };
 }
 

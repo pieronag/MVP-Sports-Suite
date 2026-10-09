@@ -1,4 +1,5 @@
 "use client";
+import { syncBookingSlots } from "@/services/apiClient";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -247,6 +248,7 @@ export default function MasterCalendar() {
                         cancelledAt: Timestamp.now(),
                         updatedAt: Timestamp.now(),
                     });
+                    await syncBookingSlots(b.id);
                     await auditService.logAuditEvent({ action: 'RESERVA_ANULAR', module: 'Operación/Agenda', details: `Reserva ${b.id} anulada por personal (${b.clientName || ''} ${b.startTime})`, severity: 'MEDIUM', status: 'SUCCESS' });
                     setSelectedBooking(null);
                     loadDashboardData();
@@ -346,6 +348,7 @@ export default function MasterCalendar() {
             // Coherencia del cobro: pagado = total, pendiente = 0, abono = lo ingresado
             const paidNow = newRes.paymentStatus === 'paid' ? Number(newRes.price) : newRes.paymentStatus === 'pending' ? 0 : Number(newRes.deposit) || 0;
             await setDoc(doc(db, "bookings", bookingId), { tenantId: newRes.tenantId, tenantName: venues.find(v => v.id === newRes.tenantId)?.name, courtId: newRes.courtId, courtName: selectedCourt?.name || 'Cancha', sport: selectedCourt?.sport || 'General', clientName: newRes.clientName, clientPhone: newRes.clientPhone, date: Timestamp.fromDate(bookingDate), startTime: newRes.startTime, endTime: `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`, duration: parseFloat(newRes.duration), price: Number(newRes.price), totalPrice: Number(newRes.price), deposit: paidNow, remainingBalance: Math.max(0, Number(newRes.price) - paidNow), status: 'confirmed', paymentStatus: newRes.paymentStatus, paymentMethod: newRes.paymentMethod, notes: newRes.notes, source: 'manual_dashboard', ownerId: user.uid, createdAt: Timestamp.now(), createdBy: user.displayName || user.email });
+            await syncBookingSlots(bookingId);
             setIsAddModalOpen(false);
             if (newRes.date === selectedDate && newRes.tenantId === selectedVenueId) loadDashboardData();
             await auditService.logAuditEvent({

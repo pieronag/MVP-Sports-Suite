@@ -1,8 +1,7 @@
 "use client";
 import { useState } from "react";
-import { httpsCallable } from "firebase/functions";
 import type { User } from "firebase/auth";
-import { functions } from "@/services/firebase";
+import { emailService } from "@/services/emailService";
 import { useAuth } from "@/context/AuthContext";
 import { Mail, LogOut, CheckCircle } from "@/components/player/icons";
 
@@ -23,7 +22,7 @@ export default function VerifyEmailGate({ user, onVerified }: { user: User; onVe
         setBusy(true);
         setStatus("");
         try {
-            await httpsCallable(functions, "sendAuthEmail")({ email: user.email, type: "verify" });
+            await emailService.sendAuthEmail(user.email || "", "verify");
             setStatus("Te enviamos un nuevo enlace. Revisa tu bandeja de entrada y spam.");
         } catch {
             setStatus("No se pudo enviar el correo. Inténtalo en unos minutos.");

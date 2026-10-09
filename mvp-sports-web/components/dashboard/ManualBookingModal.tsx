@@ -1,4 +1,5 @@
 "use client";
+import { syncBookingSlots } from "@/services/apiClient";
 import React, { useState, useEffect } from 'react';
 import { HugeiconsIcon } from "@hugeicons/react";
 import { AlertCircleIcon, Cancel01Icon, CheckmarkCircle02Icon, RefreshIcon } from "@hugeicons/core-free-icons";
@@ -205,6 +206,7 @@ export default function ManualBookingModal({ isOpen, onClose, tenantId, onSucces
                 source: 'manual_manager',
                 createdAt: new Date()
             });
+            await syncBookingSlots(bookingId);
             onSuccess();
             onClose();
         } catch (e) { alert("Error al guardar reserva."); }

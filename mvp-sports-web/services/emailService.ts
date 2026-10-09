@@ -1,5 +1,5 @@
-import { auth, functions } from './firebase';
-import { httpsCallable } from 'firebase/functions';
+import { auth } from './firebase';
+import { postApi } from './apiClient';
 import { sendEmailVerification, sendPasswordResetEmail } from 'firebase/auth';
 
 export const emailService = {
@@ -11,25 +11,15 @@ export const emailService = {
     const cleanEmail = email.trim().toLowerCase();
 
     try {
-      console.log(`[EmailService] Intentando enviar correo de tipo: ${type} a ${cleanEmail} usando Cloud Function...`);
-
-      const sendEmailFn = httpsCallable(functions, 'sendAuthEmail');
-      const response = await sendEmailFn({
-        email: cleanEmail,
-        type,
-        name: displayName
-      });
-
-      const data = response.data as any;
+            const data: any = await postApi('/api/auth/email', { email: cleanEmail, type, name: displayName });
 
       if (data && data.success) {
-        console.log(`[EmailService] Correo enviado exitosamente vía Cloud Function. Método: ${data.method}`);
         return { success: true, method: 'custom' };
       } else {
-        throw new Error((data && data.error) || 'Respuesta no exitosa de la Cloud Function.');
+        throw new Error((data && data.error) || 'No se pudo enviar el correo.');
       }
     } catch (error: any) {
-      console.warn('[EmailService] La Cloud Function falló o no está desplegada. Aplicando fallback a Firebase Auth nativo:', error.message || error);
+      console.warn('[EmailService] Envío propio no disponible; uso el correo nativo de Firebase Auth:', error.message || error);
 
       if (type === 'verify') {
         const currentUser = auth.currentUser;

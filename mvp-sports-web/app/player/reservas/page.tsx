@@ -11,7 +11,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { usePlayer } from "@/context/PlayerContext";
 import { bookingService } from "@/services/player/bookingService";
 import { venueService } from "@/services/player/venueService";
-import { getFunctions, httpsCallable } from "firebase/functions";
+import { postApi } from "@/services/apiClient";
 import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
 
 const SPORT_CONFIG: Record<string, { color: string; icon: any }> = {
@@ -237,10 +237,7 @@ export default function ReservasPage() {
     }
     try {
       if (isPaid && !isLessThan4Hours) {
-        const functions = getFunctions(undefined, "southamerica-west1");
-        const refundFn = httpsCallable(functions, "refundBookingPayment");
-        const res = await refundFn({ bookingId: bookingToCancel });
-        const resultData = res.data as { success: boolean; refundAmount: number; fee: number; error?: string };
+        const resultData = await postApi<{ success: boolean; refundAmount: number; fee: number; error?: string }>("/api/bookings/refund", { bookingId: bookingToCancel });
         loadData();
         setShowCancelModal(false);
         setFbType("success");
