@@ -99,9 +99,9 @@ Verificado en localhost: manifest e íconos responden 200, el header del SW est�
 | C-3 commit confiaba en `status` de la URL | ✅ Siempre verifica contra la API de MP | `3ee8b84` |
 | C-4 monto definido por el cliente | ✅ Precio, cupón y disponibilidad calculados en el servidor | `3ee8b84` |
 | C-5 webhook sin firma | ✅ Valida `x-signature` (si hay secreto) y usa solo el token del recinto | `3ee8b84` |
-| C-7 roles globales | ✅ Alcance por recinto (`canManageTenant` / `worksAtTenant`) | reglas |
+| C-7 roles globales | ✅ Alcance por recinto (`canManageTenant` / `worksAtTenant`) | `af971fe` |
 | C-9 / C-14 jugador crea o marca reservas pagadas | ✅ Solo crea reservas pendientes a su nombre; no toca campos de cobro | `f737704` |
-| C-10 `send-auth-email` público | ✅ Eliminado. **Nuevo crítico:** devolvía el enlace de reset (toma de cuentas); la Function `sendAuthEmail` tampoco lo devuelve ahora | correos |
+| C-10 `send-auth-email` público | ✅ Eliminado. **Nuevo crítico:** devolvía el enlace de reset (toma de cuentas); la Function `sendAuthEmail` tampoco lo devuelve ahora | `1a1977a` |
 | C-11 `webpay/test` | ✅ Eliminado con todo Webpay/Oneclick | `f737704` |
 | P-1…P-8 solo Mercado Pago | ✅ Web, app y Functions; reembolsos vía MP | `f737704` |
 | Rendimiento | ✅ Imágenes a Storage, conteos agregados, carga diferida de jsPDF/html-to-image, sin splash fijo | `ca7d2d8` |
