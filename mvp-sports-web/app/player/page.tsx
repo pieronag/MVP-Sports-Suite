@@ -37,7 +37,7 @@ export default function PlayerDashboard() {
     gamificationService.getSettings().then(setGamification);
   }, []);
 
-  const rawName = profile?.displayName || user?.displayName || "Jugador";
+  const rawName = profile?.displayName || (profile as any)?.fullName || user?.displayName || "Jugador";
   const userName = rawName
     .split(" ")
     .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())

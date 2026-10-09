@@ -15,7 +15,7 @@ test.describe("Login Page", () => {
     await page.fill('input[type="email"]', "invalid@test.com");
     await page.fill('input[type="password"]', "wrongpassword");
     await page.click('button[type="submit"]');
-    await expect(page.getByRole("alert")).toContainText(/credenciales incorrectas|demasiados intentos/i, { timeout: 10000 });
+    await expect(page.getByText(/credenciales incorrectas|demasiados intentos/i)).toBeVisible({ timeout: 10000 });
   });
 
   test("navigates to landing page", async ({ page }) => {

@@ -55,7 +55,8 @@ export default function TicketPage() {
   useEffect(() => {
     (async () => {
       if (!bookingId) { setLoading(false); return; }
-      const b = await bookingService.getBooking(bookingId);
+      // Reserva ajena o inexistente: getBooking lanza por permisos → "no encontrada"
+      const b = await bookingService.getBooking(bookingId).catch(() => null);
       setBooking(b);
       setLoading(false);
     })();
@@ -90,6 +91,19 @@ export default function TicketPage() {
     );
   }
 
+  if (!booking) {
+    return (
+      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center ${isDark ? "bg-[#020617] text-slate-200" : "bg-[#F8FAFC] text-slate-900"}`}>
+        <AlertCircle size={36} className="text-amber-500" />
+        <p className="font-bold uppercase tracking-wider text-sm">Reserva no encontrada</p>
+        <p className="text-xs text-slate-400 max-w-xs">El enlace no corresponde a una reserva de tu cuenta. Revisa tus reservas activas.</p>
+        <button onClick={() => router.replace("/player/reservas")} className="mt-2 px-5 py-3 rounded-md bg-emerald-500 text-white text-xs font-semibold uppercase tracking-wider">Ver mis reservas</button>
+      </div>
+    );
+  }
+
+  const isCancelled = booking.status === "cancelled";
+
   const statusBadge = (status: string) => {
     const colors: Record<string, string> = { paid: "#10b981", refunded: "#10b981", refund_failed: "#ef4444", pending: "#f59e0b", "no-show": "#f43f5e" };
     const labels: Record<string, string> = { paid: "Pagado", refunded: "Devuelto", refund_failed: "Dev. Fallida", pending: "Pendiente", "no-show": "No Show" };
@@ -106,8 +120,8 @@ export default function TicketPage() {
         </div>
         <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-12">
           <div className="text-center">
-            <p className="text-white/90 font-semibold text-sm">{isRefundFailed ? "Reversa de Pago" : "Reserva Exitosa"}</p>
-            <p className="text-white/50 text-[9px] font-semibold uppercase tracking-wider mt-1">{isRefundFailed ? "El pago fue revertido" : "Tu reserva está confirmada"}</p>
+            <p className="text-white/90 font-semibold text-sm">{isRefundFailed ? "Reversa de Pago" : isCancelled ? "Reserva Cancelada" : booking.paymentStatus === "paid" ? "Reserva Exitosa" : "Reserva Registrada"}</p>
+            <p className="text-white/50 text-[9px] font-semibold uppercase tracking-wider mt-1">{isRefundFailed ? "El pago fue revertido" : isCancelled ? "Esta reserva fue cancelada" : booking.paymentStatus === "paid" ? "Tu reserva está confirmada" : "Pago pendiente en el recinto"}</p>
           </div>
         </div>
       </div>

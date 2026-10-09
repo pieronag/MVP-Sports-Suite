@@ -16,12 +16,13 @@ test.describe("Landing Page", () => {
 
   test("has registration modal trigger", async ({ page }) => {
     const registerButton = page.locator("text=REGISTRARME").or(page.locator("text=Registrarme")).first();
-    if (await registerButton.isVisible()) {
+    // Reintenta el clic hasta que React hidrate y el modal (next/dynamic) aparezca
+    await expect(async () => {
       await registerButton.click();
-      await expect(page.getByText(/paso 1 de 3/i)).toBeVisible({ timeout: 5000 });
-      // Sin datos el botón queda deshabilitado (no se crea ninguna cuenta)
-      await expect(page.getByRole("button", { name: /siguiente/i })).toBeDisabled();
-    }
+      await expect(page.getByText(/paso 1 de 3/i)).toBeVisible({ timeout: 3000 });
+    }).toPass({ timeout: 25000 });
+    // Sin datos el botón queda deshabilitado (no se crea ninguna cuenta)
+    await expect(page.getByRole("button", { name: /siguiente/i })).toBeDisabled();
   });
 
   test("footer has terms and privacy links", async ({ page }) => {

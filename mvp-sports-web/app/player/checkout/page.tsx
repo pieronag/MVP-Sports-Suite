@@ -10,6 +10,7 @@ import { tournamentService } from "@/services/player/tournamentService";
 import { teamService } from "@/services/player/teamService";
 
 function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: React.ReactNode; className?: string }) {
+
   return (
     <div className={`relative rounded-md ${isDark ? "bg-[#0F172A]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} shadow-lg ${isDark ? "shadow-black/20" : "shadow-slate-200/50"} ${className}`}>
       <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : ""}`} />
@@ -118,6 +119,18 @@ export default function CheckoutPage() {
   const discountAmount = appliedCoupon ? (Number(price) * appliedCoupon.discount / 100) : 0;
   const finalPrice = Number(price) - discountAmount;
 
+  // Sin datos de reserva (enlace incompleto o acceso directo): no mostrar un checkout vacío
+  const missingData = isTournament ? !tournamentId || !teamId : !tenantId || !courtId || !date || !startTime || !price;
+  if (missingData) {
+    return (
+      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center ${isDark ? "bg-[#020617] text-slate-200" : "bg-[#F8FAFC] text-slate-900"}`}>
+        <XCircle size={36} className="text-amber-500" />
+        <p className="font-bold uppercase tracking-wider text-sm">Nada que pagar</p>
+        <p className="text-xs text-slate-400 max-w-xs">Elige un recinto, cancha y horario para iniciar una reserva.</p>
+        <button onClick={() => router.replace("/player/clubes")} className="mt-2 px-5 py-3 rounded-md bg-emerald-500 text-white text-xs font-semibold uppercase tracking-wider">Buscar recintos</button>
+      </div>
+    );
+  }
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
