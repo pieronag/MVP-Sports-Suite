@@ -85,7 +85,7 @@ const PasswordModal = ({ isOpen, onClose, onConfirm, memberName }: any) => {
                         <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase">Cambiar Clave</h3>
                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Usuario: {memberName}</p>
                     </div>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-white"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" /></button>
+                    <button aria-label="Cerrar" onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-white"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" /></button>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="bg-emerald-50 dark:bg-emerald-500/10 p-4 rounded-md border border-emerald-100 dark:border-emerald-500/20">
@@ -569,7 +569,7 @@ export default function StaffPage() {
                                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none font-heading">{editingId ? 'Editar Staff' : 'Crear y Dar Acceso'}</h3>
                                 </div>
                             </div>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-100 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shrink-0">
+                            <button aria-label="Cerrar" onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-100 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shrink-0">
                                 <HugeiconsIcon icon={Cancel01Icon} className="w-4 h-4" strokeWidth={2} />
                             </button>
                         </div>

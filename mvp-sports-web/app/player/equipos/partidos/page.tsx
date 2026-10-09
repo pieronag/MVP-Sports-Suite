@@ -265,7 +265,7 @@ export default function PartidosPage() {
     <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
-        <button onClick={() => router.push("/player/equipos")} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button aria-label="Volver" onClick={() => router.push("/player/equipos")} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Partidos</h1>
@@ -351,7 +351,7 @@ export default function PartidosPage() {
                 style={{ backgroundColor: "#10b981", color: "white" }}>
                 <Swords size={16} /> Publicar mi Equipo
               </button>
-              <button onClick={() => {}} className="w-[52px] h-[52px] rounded-md flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
+              <button aria-label="Actualizar" onClick={() => {}} className="w-[52px] h-[52px] rounded-md flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
                 <RefreshCw size={18} color={isDark ? "#94A3B8" : "#64748B"} />
               </button>
             </div>
@@ -572,7 +572,7 @@ export default function PartidosPage() {
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Publicar mi Equipo</p>
-              <button onClick={() => setShowPublishTeam(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
+              <button aria-label="Cerrar" onClick={() => setShowPublishTeam(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
             </div>
             <div className="mb-4">
               <label className={`text-[9px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipo</label>
@@ -646,7 +646,7 @@ export default function PartidosPage() {
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Estoy Disponible</p>
-              <button onClick={() => setShowPublishPlayer(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
+              <button aria-label="Cerrar" onClick={() => setShowPublishPlayer(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
             </div>
             <div className={`p-4 rounded-md mb-4 ${isDark ? "bg-white/[0.04]" : "bg-slate-50"}`}>
               <div className="flex items-center gap-3">
@@ -713,7 +713,7 @@ export default function PartidosPage() {
           <div className={`w-full max-w-sm rounded-md p-6 border shadow-2xl ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Retar a {showTeamSelector.teamName}</p>
-              <button onClick={() => setShowTeamSelector(null)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
+              <button aria-label="Cerrar" onClick={() => setShowTeamSelector(null)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
             </div>
             <p className={`text-[10px] font-medium mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Selecciona con qué equipo quieres retar:</p>
             <div className="space-y-2 mb-5">
@@ -757,7 +757,7 @@ export default function PartidosPage() {
           <div className={`w-full max-w-sm rounded-md overflow-hidden border shadow-2xl ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="h-[100px] relative bg-gradient-to-br from-emerald-800 to-slate-900">
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-              <button onClick={() => { setShowChallengeDetail(null); setChallengeTeamData(null); }} className="absolute top-4 right-4 w-8 h-8 rounded-md bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
+              <button aria-label="Cerrar" onClick={() => { setShowChallengeDetail(null); setChallengeTeamData(null); }} className="absolute top-4 right-4 w-8 h-8 rounded-md bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
               <div className="absolute bottom-4 left-5 right-5">
                 <p className="text-white text-base font-semibold">{showChallengeDetail.type === "team_vs_team" ? (showChallengeDetail.senderId === uid ? showChallengeDetail.challengedTeamName : showChallengeDetail.challengerTeamName) : ""}</p>
                 <p className="text-white/70 text-[10px] font-medium mt-0.5">{showChallengeDetail.sport} · {showChallengeDetail.status === "pending" ? "Challenge pendiente" : showChallengeDetail.status === "active" ? "Challenge activo" : "Challenge cerrado"}</p>
@@ -841,7 +841,7 @@ export default function PartidosPage() {
           <div className={`w-full max-w-sm rounded-md overflow-hidden border shadow-2xl ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="h-[130px] relative" style={{ background: showTeamDetail.teamImageUrl ? `url(${showTeamDetail.teamImageUrl}) center/cover` : `linear-gradient(135deg, #059669, #047857)` }}>
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-              <button onClick={() => { setShowTeamDetail(null); setTeamDetailData(null); }} className="absolute top-4 right-4 w-8 h-8 rounded-md bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
+              <button aria-label="Cerrar" onClick={() => { setShowTeamDetail(null); setTeamDetailData(null); }} className="absolute top-4 right-4 w-8 h-8 rounded-md bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
               <div className="absolute bottom-4 left-5 right-5">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="bg-emerald-500 px-2.5 py-1 rounded-md text-white font-semibold text-[8px] uppercase">{showTeamDetail.sport.toUpperCase()}</span>
@@ -934,7 +934,7 @@ export default function PartidosPage() {
             {/* Photo 1:1 */}
             <div className="relative w-full" style={{ aspectRatio: "1/1", background: showPlayerDetail.photoURL ? `url(${showPlayerDetail.photoURL}) center/cover` : `linear-gradient(135deg, #059669, #047857)` }}>
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-              <button onClick={() => setShowPlayerDetail(null)} className="absolute top-4 right-4 w-8 h-8 rounded-md bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
+              <button aria-label="Cerrar" onClick={() => setShowPlayerDetail(null)} className="absolute top-4 right-4 w-8 h-8 rounded-md bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
               <div className="absolute bottom-5 left-5 right-5">
                 <p className="text-white text-xl font-semibold">{showPlayerDetail.displayName}</p>
               </div>
@@ -987,7 +987,7 @@ export default function PartidosPage() {
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar Publicación</p>
-              <button onClick={() => setEditEntry(null)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
+              <button aria-label="Cerrar" onClick={() => setEditEntry(null)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
             </div>
             <div className={`p-4 rounded-md mb-4 ${isDark ? "bg-white/[0.04]" : "bg-slate-50"}`}>
               <p className={`font-semibold text-sm ${isDark ? "text-slate-100" : "text-slate-900"}`}>{editEntry.type === "team" ? editEntry.teamName : "Disponible como jugador"}</p>

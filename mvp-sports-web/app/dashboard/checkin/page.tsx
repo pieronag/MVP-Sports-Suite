@@ -660,7 +660,7 @@ export default function CheckInPage() {
                         <span className="text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_red]"></span> Escaneando QR
                         </span>
-                        <button onClick={stopCamera} className="p-2 bg-white/20 rounded-full text-white backdrop-blur-md active:scale-95 transition-transform">
+                        <button aria-label="Cerrar" onClick={stopCamera} className="p-2 bg-white/20 rounded-full text-white backdrop-blur-md active:scale-95 transition-transform">
                             <XMarkIcon className="w-6 h-6" />
                         </button>
                     </div>

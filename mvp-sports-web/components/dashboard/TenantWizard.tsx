@@ -340,7 +340,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                         {showDropdown && ownerSearch && (
                                             <div className="absolute z-20 w-full mt-1 bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 rounded-md shadow-2xl max-h-52 overflow-y-auto no-scrollbar">
                                                 {filteredOwners.length > 0 ? filteredOwners.map((o) => (
-                                                    <button type="button" key={o.id} onClick={() => addOwner(o)} className="w-full px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer border-b border-slate-100 dark:border-white/5 last:border-0 flex justify-between items-center text-left">
+                                                    <button aria-label="Agregar" type="button" key={o.id} onClick={() => addOwner(o)} className="w-full px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer border-b border-slate-100 dark:border-white/5 last:border-0 flex justify-between items-center text-left">
                                                         <div className="min-w-0">
                                                             <p className="text-[12px] font-bold text-slate-900 dark:text-white truncate">{o.name}</p>
                                                             <p className="text-[10px] text-slate-400 truncate">{o.email}</p>
@@ -403,7 +403,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                                     </p>
                                                 </div>
                                             </div>
-                                            <button type="button" onClick={geocode} disabled={geoLoading} className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-slate-900 dark:bg-[#00df82] text-white dark:text-slate-950 text-[10px] font-black uppercase tracking-wider active:scale-95 transition-all disabled:opacity-60 cursor-pointer shrink-0">
+                                            <button aria-label="Actualizar" type="button" onClick={geocode} disabled={geoLoading} className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-slate-900 dark:bg-[#00df82] text-white dark:text-slate-950 text-[10px] font-black uppercase tracking-wider active:scale-95 transition-all disabled:opacity-60 cursor-pointer shrink-0">
                                                 <HugeiconsIcon icon={geoLoading ? RefreshIcon : MapPinIcon} className={`w-4 h-4 ${geoLoading ? "animate-spin" : ""}`} strokeWidth={2} />
                                                 <span className="hidden sm:inline">{hasCoords ? "Verificar" : "Geolocalizar"}</span>
                                             </button>
@@ -516,7 +516,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                     <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4" strokeWidth={2} />
                                 </button>
                             ) : (
-                                <button type="button" onClick={() => onSubmit(form)} disabled={isSubmitting || !step1Valid || !step2Valid} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md bg-[#00df82] text-slate-950 text-[11px] font-black uppercase tracking-wider shadow-[0_0_25px_-8px_rgba(0,223,130,0.7)] hover:bg-[#3affa0] transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
+                                <button aria-label="Editar" type="button" onClick={() => onSubmit(form)} disabled={isSubmitting || !step1Valid || !step2Valid} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md bg-[#00df82] text-slate-950 text-[11px] font-black uppercase tracking-wider shadow-[0_0_25px_-8px_rgba(0,223,130,0.7)] hover:bg-[#3affa0] transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
                                     <HugeiconsIcon icon={isSubmitting ? RefreshIcon : (mode === "edit" ? PencilEdit02Icon : SecurityCheckIcon)} className={`w-4 h-4 ${isSubmitting ? "animate-spin" : ""}`} strokeWidth={2} />
                                     {mode === "edit" ? "Guardar cambios" : "Crear recinto"}
                                 </button>

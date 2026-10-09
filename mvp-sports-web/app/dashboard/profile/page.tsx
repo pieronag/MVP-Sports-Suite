@@ -384,7 +384,7 @@ export default function ProfilePage() {
                     <div className="w-full max-w-xl rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0B0F19] shadow-2xl flex flex-col h-[650px] max-h-[90vh] overflow-hidden">
                         <div className="p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center">
                             <h3 className="text-sm font-black uppercase tracking-tighter font-heading">Ajustar imagen</h3>
-                            <button onClick={() => { setShowCropper(false); setImageToCrop(null); }} className="p-2 hover:text-red-500 transition-all text-slate-400"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" strokeWidth={2} /></button>
+                            <button aria-label="Cerrar" onClick={() => { setShowCropper(false); setImageToCrop(null); }} className="p-2 hover:text-red-500 transition-all text-slate-400"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" strokeWidth={2} /></button>
                         </div>
                         <div className="relative flex-1 bg-slate-900 overflow-hidden">
                             <Cropper image={imageToCrop} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={onCropComplete} onZoomChange={setZoom} />
@@ -410,7 +410,7 @@ export default function ProfilePage() {
                     <div className="w-full max-w-sm rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0B0F19] shadow-2xl">
                         <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-white/5">
                             <h3 className="text-[10px] font-black uppercase tracking-widest font-heading">Actualizar seguridad</h3>
-                            <button onClick={() => setIsPassModalOpen(false)} className="text-slate-400 hover:text-red-500 transition-colors"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" strokeWidth={2} /></button>
+                            <button aria-label="Cerrar" onClick={() => setIsPassModalOpen(false)} className="text-slate-400 hover:text-red-500 transition-colors"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" strokeWidth={2} /></button>
                         </div>
                         <form onSubmit={handlePasswordUpdate} className="p-6 space-y-5">
                             <Field label="Contraseña actual" icon={<HugeiconsIcon icon={Key01Icon} className="w-4 h-4" strokeWidth={1.8} />}>

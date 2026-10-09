@@ -350,7 +350,7 @@ export default function EstadisticasPage() {
     <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
-        <button onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Estadísticas</h1>
@@ -567,7 +567,7 @@ export default function EstadisticasPage() {
           <div className="min-h-screen p-5 pt-12">
             <div className="flex items-center justify-between mb-6">
               <h2 className={`text-base font-semibold uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedMatch ? 'EDITAR' : 'REGISTRAR'} PARTIDO</h2>
-              <button onClick={() => setShowStatsModal(false)} className="w-9 h-9 rounded-md flex items-center justify-center bg-white/[0.06]">
+              <button aria-label="Cerrar" onClick={() => setShowStatsModal(false)} className="w-9 h-9 rounded-md flex items-center justify-center bg-white/[0.06]">
                 <ChevronLeft size={18} className="text-slate-400" style={{ transform: 'rotate(-90deg)' }} />
               </button>
             </div>
@@ -706,9 +706,9 @@ export default function EstadisticasPage() {
                             </div>
                             {!isScorelessSport && teamAssignments[m.uid] !== 'N' && (
                               <div className="flex items-center gap-1">
-                                <button onClick={() => setMemberGoals(prev => ({ ...prev, [m.uid]: Math.max(0, (prev[m.uid] || 0) - 1) }))} className="w-7 h-7 rounded-md flex items-center justify-center bg-white/[0.06]"><Minus size={12} className="text-slate-400" /></button>
+                                <button aria-label="Restar gol" onClick={() => setMemberGoals(prev => ({ ...prev, [m.uid]: Math.max(0, (prev[m.uid] || 0) - 1) }))} className="w-7 h-7 rounded-md flex items-center justify-center bg-white/[0.06]"><Minus size={12} className="text-slate-400" /></button>
                                 <span className={`w-6 text-center text-sm font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{memberGoals[m.uid] || 0}</span>
-                                <button onClick={() => setMemberGoals(prev => ({ ...prev, [m.uid]: (prev[m.uid] || 0) + 1 }))} className="w-7 h-7 rounded-md flex items-center justify-center bg-white/[0.06]"><Plus size={12} className="text-slate-400" /></button>
+                                <button aria-label="Sumar gol" onClick={() => setMemberGoals(prev => ({ ...prev, [m.uid]: (prev[m.uid] || 0) + 1 }))} className="w-7 h-7 rounded-md flex items-center justify-center bg-white/[0.06]"><Plus size={12} className="text-slate-400" /></button>
                               </div>
                             )}
                           </div>

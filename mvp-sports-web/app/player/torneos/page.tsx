@@ -86,7 +86,7 @@ export default function TorneosPage() {
 
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
-        <button onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Torneos</h1>
@@ -158,7 +158,7 @@ export default function TorneosPage() {
                     <button className={`w-11 h-11 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
                       <Users size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
                     </button>
-                    <button className={`w-11 h-11 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+                    <button aria-label="Más información" className={`w-11 h-11 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
                       <Info size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
                     </button>
                     <button onClick={() => setShowComingSoon(true)} className="flex-1 h-11 rounded-md flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg" style={{ backgroundColor: accent, boxShadow: `0 4px 15px ${accent}30` }}>

@@ -291,7 +291,7 @@ export default function BadgesConfigModal({ isOpen, onClose }: { isOpen: boolean
                                 >
                                     Cancelar
                                 </button>
-                                <button
+                                <button aria-label="Actualizar"
                                     onClick={handleSave}
                                     disabled={saving || loading || hasInvalid}
                                     className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md bg-[#00df82] text-slate-950 text-[11px] font-black uppercase tracking-wider shadow-[0_0_25px_-8px_rgba(0,223,130,0.7)] hover:bg-[#3affa0] active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"

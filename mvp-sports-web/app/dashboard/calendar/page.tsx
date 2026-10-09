@@ -500,7 +500,7 @@ export default function MasterCalendar() {
                                     <p className="text-[9px] font-bold uppercase opacity-80 tracking-wider">{selectedBooking.status === 'cancelled' ? 'Anulada' : 'Confirmada'}</p>
                                 </div>
                             </div>
-                            <button onClick={() => setSelectedBooking(null)} className="p-1.5 text-white/80 hover:text-white dark:text-black/60 hover:bg-white/10 rounded-md transition-all"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" strokeWidth={2} /></button>
+                            <button aria-label="Cerrar" onClick={() => setSelectedBooking(null)} className="p-1.5 text-white/80 hover:text-white dark:text-black/60 hover:bg-white/10 rounded-md transition-all"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" strokeWidth={2} /></button>
                         </div>
 
                         <div className="p-6 space-y-5 overflow-y-auto custom-scrollbar">
@@ -621,7 +621,7 @@ export default function MasterCalendar() {
                                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Registro directo en la agenda</p>
                                 </div>
                             </div>
-                            <button onClick={() => setIsAddModalOpen(false)} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-all"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" strokeWidth={2} /></button>
+                            <button aria-label="Cerrar" onClick={() => setIsAddModalOpen(false)} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-all"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" strokeWidth={2} /></button>
                         </div>
 
                         <form onSubmit={handleAddBooking} className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto custom-scrollbar">

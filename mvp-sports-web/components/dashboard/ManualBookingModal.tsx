@@ -221,7 +221,7 @@ export default function ManualBookingModal({ isOpen, onClose, tenantId, onSucces
                         <h3 className="text-xs font-black uppercase text-slate-900 dark:text-white">RESERVA MANUAL</h3>
                         <p className="text-[9px] text-slate-400 mt-0.5 uppercase font-bold">COMPLETA LOS DATOS — EL PRECIO SE ASIGNA AUTOMÁTICAMENTE</p>
                     </div>
-                    <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"><XMarkIcon className="w-5 h-5" /></button>
+                    <button aria-label="Cerrar" onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"><XMarkIcon className="w-5 h-5" /></button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

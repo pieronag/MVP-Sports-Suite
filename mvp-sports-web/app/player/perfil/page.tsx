@@ -220,7 +220,7 @@ export default function PerfilPage() {
     <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
-        <button onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Perfil</h1>
@@ -588,7 +588,7 @@ export default function PerfilPage() {
                   <p className={`text-[7px] font-medium uppercase tracking-wider mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cómo ganar cada insignia</p>
                 </div>
               </div>
-              <button onClick={() => setShowGlossary(false)} className="w-8 h-8 rounded-md flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
+              <button aria-label="Cerrar" onClick={() => setShowGlossary(false)} className="w-8 h-8 rounded-md flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
                 <X size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />
               </button>
             </div>

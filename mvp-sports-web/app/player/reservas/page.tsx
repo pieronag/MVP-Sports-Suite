@@ -347,7 +347,7 @@ export default function ReservasPage() {
     <div className={`min-h-screen ${baseBg}`}>
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
-        <button onClick={() => router.push("/player")} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button aria-label="Volver" onClick={() => router.push("/player")} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Mis Reservas</h1>
@@ -452,12 +452,12 @@ export default function ReservasPage() {
                       </button>
                     )}
                     {showMapsAndTicket && !isActive && (
-                      <button onClick={() => handleOpenMaps(b)} className="w-[46px] h-[46px] rounded-md flex items-center justify-center transition-all active:scale-[0.98]" style={{ backgroundColor: "#3b82f610" }}>
+                      <button aria-label="Cómo llegar" onClick={() => handleOpenMaps(b)} className="w-[46px] h-[46px] rounded-md flex items-center justify-center transition-all active:scale-[0.98]" style={{ backgroundColor: "#3b82f610" }}>
                         <Navigation size={18} color="#3b82f6" />
                       </button>
                     )}
                     {!isCompleted && !isCancelled && !isActive && !b.checkIn && (
-                      <button onClick={() => b.id && handleCancel(b.id)} className="w-[46px] h-[46px] rounded-md flex items-center justify-center transition-all active:scale-[0.98]" style={{ backgroundColor: "#ef444410" }}>
+                      <button aria-label="Cancelar reserva" onClick={() => b.id && handleCancel(b.id)} className="w-[46px] h-[46px] rounded-md flex items-center justify-center transition-all active:scale-[0.98]" style={{ backgroundColor: "#ef444410" }}>
                         <XCircle size={18} color="#ef4444" />
                       </button>
                     )}
@@ -498,7 +498,7 @@ export default function ReservasPage() {
             <div className={`w-full max-w-sm rounded-md border overflow-hidden ${isDark ? "bg-[#0F172A] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
               <div className={`p-5 border-b flex justify-between items-center ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
                 <span className={`text-base font-semibold uppercase tracking-tight ${textClr}`}>Devolución Pendiente</span>
-                <button onClick={() => setShowTicket(false)} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9" }}>
+                <button aria-label="Cerrar" onClick={() => setShowTicket(false)} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9" }}>
                   <X size={18} className={textClr} />
                 </button>
               </div>
@@ -569,7 +569,7 @@ export default function ReservasPage() {
                   <div className="w-12 h-12 rounded-md flex items-center justify-center" style={{ backgroundColor: modalSportInfo.color + "15" }}>
                     <Trophy size={24} color={modalSportInfo.color} />
                   </div>
-                  <button onClick={() => setShowTicket(false)} className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "#F1F5F9" }}>
+                  <button aria-label="Cerrar" onClick={() => setShowTicket(false)} className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.1)" : "#F1F5F9" }}>
                     <X size={20} className={textClr} />
                   </button>
                 </div>

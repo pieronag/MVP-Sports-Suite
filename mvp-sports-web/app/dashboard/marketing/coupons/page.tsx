@@ -506,7 +506,7 @@ export default function CouponsPage() {
                                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none font-heading">{editingId ? 'Editar Cupón' : 'Emitir Cupón'}</h3>
                                 </div>
                             </div>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-100 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shrink-0">
+                            <button aria-label="Cerrar" onClick={() => setIsModalOpen(false)} className="p-2 bg-slate-100 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shrink-0">
                                 <HugeiconsIcon icon={Cancel01Icon} className="w-4 h-4" strokeWidth={2} />
                             </button>
                         </div>

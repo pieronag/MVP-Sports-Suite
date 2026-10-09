@@ -327,7 +327,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                    <button
+                    <button aria-label={isHistorical ? "Ver periodo actual" : "Ver histórico"}
                         onClick={() => setIsHistorical(!isHistorical)}
                         className={`flex items-center gap-2 px-4 py-2.5 rounded-md text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer ${
                             isHistorical

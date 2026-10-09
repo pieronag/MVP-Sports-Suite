@@ -313,7 +313,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                                         <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4" strokeWidth={2} />
                                     </button>
                                 ) : (
-                                    <button type="button" onClick={() => onSubmit(form)} disabled={isSubmitting || !step1Valid || !step2Valid || !step3Valid} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md bg-[#00df82] text-slate-950 text-[11px] font-black uppercase tracking-wider shadow-[0_0_25px_-8px_rgba(0,223,130,0.7)] hover:bg-[#3affa0] transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
+                                    <button aria-label="Editar" type="button" onClick={() => onSubmit(form)} disabled={isSubmitting || !step1Valid || !step2Valid || !step3Valid} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-md bg-[#00df82] text-slate-950 text-[11px] font-black uppercase tracking-wider shadow-[0_0_25px_-8px_rgba(0,223,130,0.7)] hover:bg-[#3affa0] transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer">
                                         <HugeiconsIcon icon={isSubmitting ? RefreshIcon : (mode === "edit" ? PencilEdit02Icon : SecurityCheckIcon)} className={`w-4 h-4 ${isSubmitting ? "animate-spin" : ""}`} strokeWidth={2} />
                                         {mode === "edit" ? "Guardar cambios" : "Crear dueño"}
                                     </button>

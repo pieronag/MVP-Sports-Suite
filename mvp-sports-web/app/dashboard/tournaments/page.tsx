@@ -676,7 +676,7 @@ export default function ChampionshipsPage() {
                                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none font-heading">{isEditing ? 'Configurar Competición' : 'Lanzar Torneo'}</h3>
                                 </div>
                             </div>
-                            <button onClick={handleCloseModal} className="p-2 bg-slate-100 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shrink-0">
+                            <button aria-label="Cerrar" onClick={handleCloseModal} className="p-2 bg-slate-100 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shrink-0">
                                 <HugeiconsIcon icon={Cancel01Icon} className="w-4 h-4" strokeWidth={2} />
                             </button>
                         </div>
@@ -854,7 +854,7 @@ export default function ChampionshipsPage() {
                                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none font-heading">{fixtureModal.tournament?.name}</h3>
                                 </div>
                             </div>
-                            <button onClick={() => setFixtureModal({ ...fixtureModal, isOpen: false })} className="p-2 bg-slate-100 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shrink-0">
+                            <button aria-label="Cerrar" onClick={() => setFixtureModal({ ...fixtureModal, isOpen: false })} className="p-2 bg-slate-100 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shrink-0">
                                 <HugeiconsIcon icon={Cancel01Icon} className="w-4 h-4" strokeWidth={2} />
                             </button>
                         </div>
@@ -1240,13 +1240,13 @@ export default function ChampionshipsPage() {
                                                     ))}
                                                 </div>
                                                 <div className="flex items-center justify-center gap-5 pt-6 border-t border-slate-100 dark:border-white/5 shrink-0">
-                                                    <button onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: Math.max(1, p.selectedRound - 1) }))} className="p-3 rounded-md bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 disabled:opacity-20" disabled={fixtureModal.selectedRound <= 1}><HugeiconsIcon icon={ChevronLeftIcon} className="w-5 h-5 text-slate-900 dark:text-white" /></button>
+                                                    <button aria-label="Anterior" onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: Math.max(1, p.selectedRound - 1) }))} className="p-3 rounded-md bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 disabled:opacity-20" disabled={fixtureModal.selectedRound <= 1}><HugeiconsIcon icon={ChevronLeftIcon} className="w-5 h-5 text-slate-900 dark:text-white" /></button>
                                                     <div className="flex items-center gap-2">
                                                         {Array.from({ length: totalRounds }).map((_, i) => (
                                                             <button key={i} onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: i + 1 }))} className={`w-9 h-9 rounded-md text-[11px] font-black uppercase transition-all ${fixtureModal.selectedRound === i + 1 ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/25' : 'bg-slate-100 dark:bg-white/5 text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10'}`}>{i + 1}</button>
                                                         ))}
                                                     </div>
-                                                    <button onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: Math.min(totalRounds, p.selectedRound + 1) }))} className="p-3 rounded-md bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 disabled:opacity-20" disabled={fixtureModal.selectedRound >= totalRounds}><HugeiconsIcon icon={ChevronRightIcon} className="w-5 h-5 text-slate-900 dark:text-white" /></button>
+                                                    <button aria-label="Siguiente" onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: Math.min(totalRounds, p.selectedRound + 1) }))} className="p-3 rounded-md bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 disabled:opacity-20" disabled={fixtureModal.selectedRound >= totalRounds}><HugeiconsIcon icon={ChevronRightIcon} className="w-5 h-5 text-slate-900 dark:text-white" /></button>
                                                 </div>
                                             </>
                                         )}
@@ -1304,7 +1304,7 @@ export default function ChampionshipsPage() {
                                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none font-heading">Emparejamientos</h3>
                                 </div>
                             </div>
-                            <button onClick={() => setIsPairsModalOpen(false)} className="p-2 bg-slate-100 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shrink-0">
+                            <button aria-label="Cerrar" onClick={() => setIsPairsModalOpen(false)} className="p-2 bg-slate-100 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all shrink-0">
                                 <HugeiconsIcon icon={Cancel01Icon} className="w-4 h-4" strokeWidth={2} />
                             </button>
                         </div>
@@ -1375,7 +1375,7 @@ export default function ChampionshipsPage() {
                                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] mt-0.5">{participantsModal.tournament?.name}</p>
                                 </div>
                             </div>
-                            <button onClick={() => setParticipantsModal({ isOpen: false, tournament: null })} className="p-2 text-slate-400 hover:text-black dark:hover:text-white transition-colors"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" /></button>
+                            <button aria-label="Cerrar" onClick={() => setParticipantsModal({ isOpen: false, tournament: null })} className="p-2 text-slate-400 hover:text-black dark:hover:text-white transition-colors"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" /></button>
                         </div>
                         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
                             {!participantsModal.tournament?.teams || participantsModal.tournament?.teams.length === 0 ? (

@@ -134,7 +134,7 @@ export default function CheckoutPage() {
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
-        <button onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">{isTournament ? "Inscripción" : "Checkout"}</h1>
@@ -223,7 +223,7 @@ export default function CheckoutPage() {
                   placeholder="Código" value={couponInput} onChange={(e) => setCouponInput(e.target.value.toUpperCase())} disabled={!!appliedCoupon || validatingCoupon} />
               </div>
               {appliedCoupon ? (
-                <button onClick={() => setAppliedCoupon(null)} className="w-12 h-12 rounded-md bg-red-500 flex items-center justify-center transition-all active:scale-90"><X size={18} className="text-white" /></button>
+                <button aria-label="Cerrar" onClick={() => setAppliedCoupon(null)} className="w-12 h-12 rounded-md bg-red-500 flex items-center justify-center transition-all active:scale-90"><X size={18} className="text-white" /></button>
               ) : (
                 <button onClick={handleApplyCoupon} disabled={validatingCoupon || !couponInput.trim()}
                   className="h-12 px-5 rounded-md flex items-center justify-center text-white font-semibold text-xs uppercase tracking-wider transition-all active:scale-[0.98] disabled:opacity-50"

@@ -160,7 +160,7 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
                                 <span className="hidden sm:inline">Contraseña</span>
                             </button>
                             {onToggleStatus && (
-                                <button onClick={() => onToggleStatus(owner)} className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md text-[11px] font-black uppercase tracking-wider border transition-all cursor-pointer ${isActive ? "border-amber-200 text-amber-600 hover:bg-amber-50 dark:border-amber-500/30 dark:text-amber-400 dark:hover:bg-amber-500/10" : "border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-500/30 dark:text-[#00df82] dark:hover:bg-emerald-500/10"}`}>
+                                <button aria-label={isActive ? "Suspender dueño" : "Activar dueño"} onClick={() => onToggleStatus(owner)} className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md text-[11px] font-black uppercase tracking-wider border transition-all cursor-pointer ${isActive ? "border-amber-200 text-amber-600 hover:bg-amber-50 dark:border-amber-500/30 dark:text-amber-400 dark:hover:bg-amber-500/10" : "border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-500/30 dark:text-[#00df82] dark:hover:bg-emerald-500/10"}`}>
                                     <HugeiconsIcon icon={isActive ? Alert02Icon : CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={2} />
                                     {isActive ? "Suspender" : "Activar"}
                                 </button>

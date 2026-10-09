@@ -231,7 +231,7 @@ export default function TicketPage() {
                   <p className="text-white/70 text-[8px] font-medium uppercase tracking-wider">Solicitud de Reembolso</p>
                 </div>
               </div>
-              <button onClick={() => setShowClaimModal(false)} className="w-8 h-8 rounded-md bg-white/20 flex items-center justify-center">
+              <button aria-label="Cerrar" onClick={() => setShowClaimModal(false)} className="w-8 h-8 rounded-md bg-white/20 flex items-center justify-center">
                 <X size={14} className="text-white" />
               </button>
             </div>

@@ -474,7 +474,7 @@ export default function VenueDetailPage() {
         {/* Date selector card */}
         <div className={`p-5 rounded-md border mb-5 ${isDark ? "bg-emerald-500/5 border-emerald-500/10" : "bg-emerald-50 border-emerald-200"}`}>
           <div className="flex items-center justify-between mb-4">
-            <button onClick={() => { if (dateOffset > 0) setDateOffset(p => p - 1); }} disabled={dateOffset === 0}
+            <button aria-label="Volver" onClick={() => { if (dateOffset > 0) setDateOffset(p => p - 1); }} disabled={dateOffset === 0}
               className={`w-12 h-12 rounded-md flex items-center justify-center transition-all active:scale-90 ${dateOffset === 0 ? "opacity-30" : isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-white hover:bg-slate-100 shadow-sm"}`}>
               <ChevronLeft size={18} className="text-emerald-500" />
             </button>
@@ -483,7 +483,7 @@ export default function VenueDetailPage() {
               <span className={`text-[10px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-400" : "text-slate-500"}`}>{currentDateInfo.date.toLocaleDateString("es-CL", { month: "long" })}</span>
               <span className={`text-[11px] font-bold mt-0.5 ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>{dateLabel} • {dateDayName}</span>
             </div>
-            <button onClick={() => { setDateOffset(p => p + 1); }}
+            <button aria-label="Siguiente" onClick={() => { setDateOffset(p => p + 1); }}
               className={`w-12 h-12 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-white hover:bg-slate-100 shadow-sm"}`}>
               <ChevronRight size={18} className="text-emerald-500" />
             </button>
@@ -613,7 +613,7 @@ export default function VenueDetailPage() {
       <div className="h-[220px] relative overflow-hidden">
         <img src={venueData?.imageURL || venueData?.imageUrl || "https://images.unsplash.com/photo-1574629810360-7efbbe195018"} alt={venue?.name} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
-        <button onClick={() => router.back()} className="absolute top-12 left-5 w-10 h-10 rounded-md bg-black/40 border border-white/10 flex items-center justify-center z-10">
+        <button aria-label="Volver" onClick={() => router.back()} className="absolute top-12 left-5 w-10 h-10 rounded-md bg-black/40 border border-white/10 flex items-center justify-center z-10">
           <ChevronLeft size={20} className="text-white" />
         </button>
         <div className="absolute bottom-6 left-6 right-6">
@@ -773,7 +773,7 @@ export default function VenueDetailPage() {
         <div className="fixed bottom-8 left-5 right-5 z-50 animate-in slide-in-from-bottom-4 duration-300">
           <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 shadow-2xl backdrop-blur-xl ${feedback.type === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
             <span className="flex-1 text-sm font-medium">{feedback.msg}</span>
-            <button onClick={() => setFeedback(null)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
+            <button aria-label="Cerrar" onClick={() => setFeedback(null)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
           </div>
         </div>
       )}
@@ -789,7 +789,7 @@ export default function VenueDetailPage() {
                 </div>
                 <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Reglas del Recinto</p>
               </div>
-              <button onClick={() => setShowRules(false)} className="w-8 h-8 rounded-md flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
+              <button aria-label="Cerrar" onClick={() => setShowRules(false)} className="w-8 h-8 rounded-md flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
                 <X size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />
               </button>
             </div>
@@ -814,7 +814,7 @@ export default function VenueDetailPage() {
       {/* Gallery Lightbox */}
       {showGallery && venueData?.gallery && (
         <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center" onClick={() => setShowGallery(false)}>
-          <button onClick={() => setShowGallery(false)} className="absolute top-14 right-5 z-10 w-10 h-10 rounded-md bg-white/10 border border-white/20 flex items-center justify-center">
+          <button aria-label="Cerrar" onClick={() => setShowGallery(false)} className="absolute top-14 right-5 z-10 w-10 h-10 rounded-md bg-white/10 border border-white/20 flex items-center justify-center">
             <X size={20} className="text-white" />
           </button>
           <div className="w-full max-w-lg px-5" onClick={(e) => e.stopPropagation()}>
@@ -823,12 +823,12 @@ export default function VenueDetailPage() {
             </div>
             {venueData.gallery.length > 1 && (
               <div className="flex items-center justify-center gap-4 mt-5">
-                <button onClick={() => setGalleryIndex(i => (i - 1 + venueData.gallery.length) % venueData.gallery.length)}
+                <button aria-label="Volver" onClick={() => setGalleryIndex(i => (i - 1 + venueData.gallery.length) % venueData.gallery.length)}
                   className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
                   <ChevronLeft size={16} className="text-white" />
                 </button>
                 <span className="text-white/60 text-[10px] font-medium">{galleryIndex + 1} / {venueData.gallery.length}</span>
-                <button onClick={() => setGalleryIndex(i => (i + 1) % venueData.gallery.length)}
+                <button aria-label="Siguiente" onClick={() => setGalleryIndex(i => (i + 1) % venueData.gallery.length)}
                   className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
                   <ChevronRight size={16} className="text-white" />
                 </button>

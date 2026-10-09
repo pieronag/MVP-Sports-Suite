@@ -99,7 +99,7 @@ export default function EquiposExplorePage() {
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
-        <button onClick={() => router.push("/player")} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button aria-label="Volver" onClick={() => router.push("/player")} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Equipos</h1>
@@ -201,7 +201,7 @@ export default function EquiposExplorePage() {
       <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} isDark={isDark}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-lg uppercase">Nuevo Equipo</h2>
-          <button onClick={() => setShowCreateModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/[0.06] transition-colors">
+          <button aria-label="Cerrar" onClick={() => setShowCreateModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/[0.06] transition-colors">
             <X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
           </button>
         </div>
@@ -232,7 +232,7 @@ export default function EquiposExplorePage() {
       <Modal isOpen={showJoinModal} onClose={() => setShowJoinModal(false)} isDark={isDark}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-lg uppercase">Unirse a Equipo</h2>
-          <button onClick={() => setShowJoinModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/[0.06] transition-colors">
+          <button aria-label="Cerrar" onClick={() => setShowJoinModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/[0.06] transition-colors">
             <X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
           </button>
         </div>
@@ -251,7 +251,7 @@ export default function EquiposExplorePage() {
         <div className="fixed bottom-8 left-5 right-5 z-50 animate-in slide-in-from-bottom-4 duration-300">
           <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 shadow-2xl backdrop-blur-xl ${feedback.type === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
             <span className="flex-1 text-sm font-medium">{feedback.msg}</span>
-            <button onClick={() => setFeedback(null)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
+            <button aria-label="Cerrar" onClick={() => setFeedback(null)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
           </div>
         </div>
       )}

@@ -34,7 +34,7 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
             {mobileOpen && (
                 <div className={`lg:hidden fixed inset-0 z-50 ${isDark ? 'bg-[#020617]/95' : 'bg-white/95'} backdrop-blur-md flex flex-col`}>
                     <div className="shrink-0 pt-6 px-4 flex justify-end">
-                        <button onClick={() => setMobileOpen(false)} className="p-3"><X size={28} className="text-emerald-500" /></button>
+                        <button aria-label="Cerrar" onClick={() => setMobileOpen(false)} className="p-3"><X size={28} className="text-emerald-500" /></button>
                     </div>
                     <div className="flex-1 px-6 pb-8 overflow-y-auto">
                         {profile && (

@@ -217,7 +217,7 @@ export default function FeedbackPage() {
                 <div className="flex bg-white dark:bg-white/5 p-1 rounded-md border border-slate-200 dark:border-white/10">
                     <button onClick={() => setFilterRating('all')} className={`px-3 py-1.5 text-[9px] font-black uppercase rounded-md transition-all ${filterRating === 'all' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>Todas</button>
                     {[5, 4, 3, 2, 1].map(star => (
-                        <button key={star} onClick={() => setFilterRating(star)} className={`flex items-center gap-1 px-2.5 py-1.5 text-[9px] font-black rounded-md transition-all ${filterRating === star ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
+                        <button aria-label={`Filtrar ${star} estrellas`} key={star} onClick={() => setFilterRating(star)} className={`flex items-center gap-1 px-2.5 py-1.5 text-[9px] font-black rounded-md transition-all ${filterRating === star ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
                             {star} <HugeiconsIcon icon={StarIcon} className="w-3 h-3 text-amber-500" strokeWidth={2} />
                         </button>
                     ))}
@@ -315,7 +315,7 @@ export default function FeedbackPage() {
                                                 <div className="mt-3 space-y-2">
                                                     <textarea rows={2} value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Escribe tu respuesta..." className={inputCls} autoFocus />
                                                     <div className="flex gap-2">
-                                                        <button onClick={() => handleReply(review.id)} disabled={isSubmittingReply || !replyText.trim()} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[8px] font-black uppercase tracking-wider disabled:opacity-40 active:scale-95 transition-all">
+                                                        <button aria-label="Enviar" onClick={() => handleReply(review.id)} disabled={isSubmittingReply || !replyText.trim()} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[8px] font-black uppercase tracking-wider disabled:opacity-40 active:scale-95 transition-all">
                                                             <HugeiconsIcon icon={SendIcon} className="w-3 h-3" strokeWidth={2} /> {isSubmittingReply ? 'Enviando...' : 'Publicar'}
                                                         </button>
                                                         <button onClick={() => { setReplyingId(null); setReplyText(''); }} className="px-3 py-1.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 text-[8px] font-black uppercase tracking-wider transition-all">Cancelar</button>

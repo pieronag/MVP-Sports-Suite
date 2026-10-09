@@ -305,7 +305,7 @@ export default function ManagerDashboard() {
                         </div>
                     </div>
                     
-                    <button onClick={() => setRefreshTrigger(p => p + 1)} className="p-2 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950 rounded-md active:scale-90 transition-all">
+                    <button aria-label="Actualizar" onClick={() => setRefreshTrigger(p => p + 1)} className="p-2 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950 rounded-md active:scale-90 transition-all">
                         <ArrowPathIcon className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                     </button>
                 </div>

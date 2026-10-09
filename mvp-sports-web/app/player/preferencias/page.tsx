@@ -518,7 +518,7 @@ export default function PreferenciasPage() {
           <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 shadow-2xl backdrop-blur-xl ${feedbackType === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
             {feedbackType === "error" ? <AlertCircle size={20} /> : <CheckCircle2 size={20} />}
             <span className="flex-1 text-sm font-medium">{feedbackMsg}</span>
-            <button onClick={() => setShowFeedback(false)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
+            <button aria-label="Cerrar" onClick={() => setShowFeedback(false)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
           </div>
         </div>
       )}
@@ -527,7 +527,7 @@ export default function PreferenciasPage() {
       <Modal isOpen={showPasswordModal} onClose={() => { setShowPasswordModal(false); setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword(""); }} isDark={isDark}>
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-semibold text-lg">Cambiar Contraseña</h2>
-          <button onClick={() => { setShowPasswordModal(false); setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword(""); }}
+          <button aria-label="Cerrar" onClick={() => { setShowPasswordModal(false); setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword(""); }}
             className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/[0.06] transition-colors">
             <X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
           </button>

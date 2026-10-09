@@ -1026,7 +1026,7 @@ return (
                                             <div key={idx} className="relative w-28 h-16 shrink-0 rounded-md overflow-hidden group border border-slate-200 dark:border-white/5 shadow-md">
                                                 <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
                                                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <button onClick={() => handleRemoveGalleryImage(idx)} className="p-1.5 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors shadow-lg">
+                                                    <button aria-label="Eliminar" onClick={() => handleRemoveGalleryImage(idx)} className="p-1.5 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors shadow-lg">
                                                         <HugeiconsIcon icon={TrashIcon} className="w-3.5 h-3.5" strokeWidth={1.8} />
                                                     </button>
                                                 </div>
