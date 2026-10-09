@@ -79,15 +79,15 @@ export default function PwaSupport() {
                 <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold uppercase tracking-wider">Instala MVP Sports</p>
                     {showIosHint ? (
-                        <p className="text-[11px] text-slate-400 leading-snug">
+                        <p className="text-[12px] text-slate-400 leading-snug">
                             Toca <Share size={12} className="inline -mt-0.5" /> y luego «Agregar a inicio».
                         </p>
                     ) : (
-                        <p className="text-[11px] text-slate-400 leading-snug">Acceso directo, pantalla completa y modo sin conexión.</p>
+                        <p className="text-[12px] text-slate-400 leading-snug">Acceso directo, pantalla completa y modo sin conexión.</p>
                     )}
                 </div>
                 {!showIosHint && deferred && (
-                    <button onClick={install} className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#00df82] text-slate-950 text-[10px] font-black uppercase tracking-wider">
+                    <button onClick={install} className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-md bg-[#00df82] text-slate-950 text-[12px] font-black uppercase tracking-wider">
                         <Download size={14} /> Instalar
                     </button>
                 )}

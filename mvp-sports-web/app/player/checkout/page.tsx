@@ -136,7 +136,7 @@ export default function CheckoutPage() {
                 <p className={`text-base font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>
                   {isTournament ? (tournamentName || "").toUpperCase() : (tenantName || "").toUpperCase()}
                 </p>
-                <p className={`text-[10px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                <p className={`text-[12px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                   {isTournament ? `${sport || ""}` : `${sport || ""} • ${(courtName || "").toUpperCase()}`}
                 </p>
               </div>
@@ -148,7 +148,7 @@ export default function CheckoutPage() {
                   <div key={r.label} className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       <r.icon size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                      <span className={`text-[10px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>{r.label}</span>
+                      <span className={`text-[12px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>{r.label}</span>
                     </div>
                     <span className={`text-xs font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{r.val}</span>
                   </div>
@@ -159,21 +159,21 @@ export default function CheckoutPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <Calendar size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                    <span className={`text-[10px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Fecha</span>
+                    <span className={`text-[12px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Fecha</span>
                   </div>
                   <span className={`text-xs font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{date ? new Date(date + "T12:00:00").toLocaleDateString("es-CL", { day: "numeric", month: "long" }) : ""}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <Clock size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                    <span className={`text-[10px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Horario</span>
+                    <span className={`text-[12px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Horario</span>
                   </div>
                   <span className={`text-xs font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{startTime} HRS</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <MapPin size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                    <span className={`text-[10px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Recinto</span>
+                    <span className={`text-[12px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Recinto</span>
                   </div>
                   <span className={`text-xs font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{tenantName || ""}</span>
                 </div>
@@ -182,7 +182,7 @@ export default function CheckoutPage() {
             <div className={`h-px ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`} />
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-[9px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>{appliedCoupon ? "Subtotal" : "Total"}</p>
+                <p className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>{appliedCoupon ? "Subtotal" : "Total"}</p>
                 {appliedCoupon ? (
                   <>
                     <p className={`text-sm font-semibold line-through ${isDark ? "text-slate-500" : "text-slate-400"}`}>${formatMoney(Number(price))}</p>
@@ -192,7 +192,7 @@ export default function CheckoutPage() {
                   <p className={`text-lg font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>${formatMoney(Number(price))}</p>
                 )}
               </div>
-              {appliedCoupon && <span className="text-[9px] font-semibold px-2.5 py-1 rounded-md" style={{ backgroundColor: `${activeColor}15`, color: activeColor }}>-{appliedCoupon.discount}%</span>}
+              {appliedCoupon && <span className="text-[11px] font-semibold px-2.5 py-1 rounded-md" style={{ backgroundColor: `${activeColor}15`, color: activeColor }}>-{appliedCoupon.discount}%</span>}
             </div>
           </div>
         </GlowCard>
@@ -257,7 +257,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex-1">
                   <p className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{m.name}</p>
-                  <p className="text-[9px] font-medium text-slate-400">{m.sub}</p>
+                  <p className="text-[11px] font-medium text-slate-400">{m.sub}</p>
                 </div>
                 <span
                   className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${method === m.id ? "border-emerald-500" : "border-slate-300 dark:border-white/20"}`}
@@ -271,7 +271,7 @@ export default function CheckoutPage() {
 
         <div className="flex items-center justify-center gap-2 opacity-60 pt-2">
           <ShieldCheck size={14} style={{ color: activeColor }} />
-          <span className={`text-[8px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Transacción Protegida PCI-DSS</span>
+          <span className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Transacción Protegida PCI-DSS</span>
         </div>
       </div>
 

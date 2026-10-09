@@ -167,7 +167,7 @@ export default function EquipoDetailPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[10px] font-semibold tracking-[3px] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.12em] uppercase animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -206,7 +206,7 @@ export default function EquipoDetailPage() {
         )}
         <div className="absolute bottom-6 left-6 right-6">
           <div className="flex items-center gap-2 mb-2">
-            <span className="bg-emerald-500 px-3 py-1 rounded-md text-white font-semibold text-[8px] uppercase tracking-wider border border-white/10">{team.sport?.toUpperCase() || "GENERAL"}</span>
+            <span className="bg-emerald-500 px-3 py-1 rounded-md text-white font-semibold text-[11px] uppercase tracking-wider border border-white/10">{team.sport?.toUpperCase() || "GENERAL"}</span>
           </div>
           <h1 className="text-white text-xl font-heading font-black uppercase">{team.name}</h1>
         </div>
@@ -219,14 +219,14 @@ export default function EquipoDetailPage() {
             <div className="p-4 flex flex-col items-center text-center">
               <Users size={20} className="text-emerald-500" />
               <p className={`text-lg font-semibold mt-1.5 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{team.members?.length || 1}</p>
-              <p className={`text-[7px] font-semibold uppercase tracking-wider mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>MIEMBROS</p>
+              <p className={`text-[11px] font-semibold uppercase tracking-wider mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>MIEMBROS</p>
             </div>
           </GlowCard>
           <GlowCard isDark={isDark} className="flex-1">
             <div className="p-4 flex flex-col items-center text-center">
               <Trophy size={20} className="text-amber-500" />
               <p className={`text-sm font-semibold mt-2 uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{(((team as any).trophies || 0)).toString()}</p>
-              <p className={`text-[7px] font-semibold uppercase tracking-wider mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>TROFEOS</p>
+              <p className={`text-[11px] font-semibold uppercase tracking-wider mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>TROFEOS</p>
             </div>
           </GlowCard>
           <button onClick={() => { if (team.inviteCode) { navigator.clipboard.writeText(team.inviteCode); setFeedback({ type: "success", msg: "¡Código copiado!" }); } }} className="flex-1">
@@ -234,7 +234,7 @@ export default function EquipoDetailPage() {
               <div className="p-4 flex flex-col items-center text-center">
                 <Copy size={18} className="text-emerald-500" />
                 <p className="text-emerald-500 text-sm font-semibold mt-1.5 tracking-wide">{team.inviteCode || "----"}</p>
-                <p className={`text-[7px] font-semibold uppercase tracking-wider mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>CÓDIGO</p>
+                <p className={`text-[11px] font-semibold uppercase tracking-wider mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>CÓDIGO</p>
               </div>
             </GlowCard>
           </button>
@@ -302,11 +302,11 @@ export default function EquipoDetailPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className={`text-sm font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{p.displayName || "Jugador MVP"}</p>
-                      {isMemberOwner && <span className="text-[7px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-500">Capitán</span>}
+                      {isMemberOwner && <span className="text-[11px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-500">Capitán</span>}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className={`text-[8px] font-medium px-1.5 py-0.5 rounded-md ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>{p.tier || "Bronce"}</span>
-                      <span className="text-emerald-500 text-[8px] font-semibold">OVR {p.ovr || 40}</span>
+                      <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-md ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>{p.tier || "Bronce"}</span>
+                      <span className="text-emerald-500 text-[11px] font-semibold">OVR {p.ovr || 40}</span>
                     </div>
                   </div>
                   {isOwner && !isMemberOwner && (
@@ -320,7 +320,7 @@ export default function EquipoDetailPage() {
           </div>
         </GlowCard>
 
-        <p className={`text-center text-[8px] font-medium pt-2 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
+        <p className={`text-center text-[11px] font-medium pt-2 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
       </div>
 
       {/* Options Menu Modal */}
@@ -362,15 +362,15 @@ export default function EquipoDetailPage() {
               <button aria-label="Cerrar" onClick={() => setShowEditModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} /></button>
             </div>
             <div className="mb-4">
-              <label className={`text-[10px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nombre</label>
+              <label className={`text-[12px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nombre</label>
               <input value={editName} onChange={e => setEditName(e.target.value)} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-none ${isDark ? "bg-[#0A101D] text-slate-100 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`} />
             </div>
             <div className="mb-4">
-              <label className={`text-[10px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción</label>
+              <label className={`text-[12px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción</label>
               <textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} rows={2} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-none resize-none ${isDark ? "bg-[#0A101D] text-slate-100 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`} />
             </div>
             <div className="mb-6">
-              <label className={`text-[10px] font-semibold uppercase tracking-wider mb-2 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
+              <label className={`text-[12px] font-semibold uppercase tracking-wider mb-2 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
               <div className="flex flex-wrap gap-2">
                 {SPORTS.map(s => (
                   <button key={s} onClick={() => setEditSport(s)} className={`px-4 py-2 rounded-md text-xs font-semibold transition-all ${editSport === s ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-600"}`}>{s}</button>

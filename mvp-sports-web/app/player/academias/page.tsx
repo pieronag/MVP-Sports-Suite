@@ -17,7 +17,7 @@ function ComingSoonOverlay({ isDark, onBack }: { isDark: boolean; onBack: () => 
         </div>
         <h1 className={`text-xl font-heading font-black text-center uppercase tracking-tight mb-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>Academias MVP</h1>
         <div className="px-4 py-1.5 rounded-md mb-5" style={{ backgroundColor: accent }}>
-          <span className="text-white font-semibold text-[9px] tracking-[3px] uppercase">Próximamente</span>
+          <span className="text-white font-semibold text-[11px] tracking-[0.12em] uppercase">Próximamente</span>
         </div>
         <p className={`text-sm font-medium text-center leading-relaxed max-w-xs mb-10 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
           Entrena como un profesional con los mejores instructores. Clases grupales, seguimiento personalizado y mucho más está por llegar.
@@ -57,7 +57,7 @@ export default function AcademiasPage() {
             <div className="w-10 h-10 rounded-md bg-white/20 flex items-center justify-center">
               <GraduationCap color="white" size={20} />
             </div>
-            <span className="bg-white/20 px-3 py-1 rounded-md text-white font-semibold text-[7px] tracking-wider uppercase">Próximamente</span>
+            <span className="bg-white/20 px-3 py-1 rounded-md text-white font-semibold text-[11px] tracking-wider uppercase">Próximamente</span>
           </div>
           <h2 className="text-white text-lg font-heading font-black uppercase">Academias MVP</h2>
           <p className="text-white/70 text-xs font-medium mt-1">Entrena como un profesional.</p>
@@ -78,7 +78,7 @@ export default function AcademiasPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm font-medium ${isDark ? "text-slate-100" : "text-slate-900"}`}>{f.label}</p>
-                  <p className={`text-[10px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{f.sub}</p>
+                  <p className={`text-[12px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{f.sub}</p>
                 </div>
               </div>
             ))}
@@ -100,7 +100,7 @@ export default function AcademiasPage() {
           </GlowCard>
         </button>
 
-        <p className={`text-center text-[8px] font-medium pt-2 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
+        <p className={`text-center text-[11px] font-medium pt-2 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
       </div>
     </div>
   );

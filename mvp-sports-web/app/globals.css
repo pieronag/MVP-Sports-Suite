@@ -258,6 +258,19 @@ html {
   animation: marquee 20s linear infinite;
 }
 
+/* PWA jugador: estándares móviles.
+   - Campos con letra >= 16px: con menos, iOS hace zoom automático al enfocar.
+   - Sin resaltado azul al tocar; desplazamiento con inercia. */
+.player-shell input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.player-shell textarea,
+.player-shell select {
+  font-size: max(16px, 1em) !important;
+}
+.player-shell {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
 /* 12. Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
   html {

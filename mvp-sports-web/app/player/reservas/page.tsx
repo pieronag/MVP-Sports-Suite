@@ -340,16 +340,16 @@ export default function ReservasPage() {
 
       {/* Tabs */}
       <div className="flex gap-2.5 px-5 pt-3">
-        <button onClick={() => setActiveTab("activas")} className={`flex-1 h-12 rounded-md font-semibold text-[10px] uppercase tracking-[1px] transition-all active:scale-[0.98] ${activeTab === "activas" ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-[#94A3B8] hover:bg-white/[0.1]" : "bg-slate-100 text-[#64748B] hover:bg-slate-200"}`}>
+        <button onClick={() => setActiveTab("activas")} className={`flex-1 h-12 rounded-md font-semibold text-[12px] uppercase tracking-[0.06em] transition-all active:scale-[0.98] ${activeTab === "activas" ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-[#94A3B8] hover:bg-white/[0.1]" : "bg-slate-100 text-[#64748B] hover:bg-slate-200"}`}>
           ACTIVAS
         </button>
-        <button onClick={() => setActiveTab("historial")} className={`flex-1 h-12 rounded-md font-semibold text-[10px] uppercase tracking-[1px] transition-all active:scale-[0.98] ${activeTab === "historial" ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-[#94A3B8] hover:bg-white/[0.1]" : "bg-slate-100 text-[#64748B] hover:bg-slate-200"}`}>
+        <button onClick={() => setActiveTab("historial")} className={`flex-1 h-12 rounded-md font-semibold text-[12px] uppercase tracking-[0.06em] transition-all active:scale-[0.98] ${activeTab === "historial" ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-[#94A3B8] hover:bg-white/[0.1]" : "bg-slate-100 text-[#64748B] hover:bg-slate-200"}`}>
           HISTORIAL
         </button>
       </div>
 
       {/* List */}
-      <div className="px-0.5 pb-28">
+      <div className="px-0.5 pb-4">
         <SectionPill label={activeTab === "activas" ? "Próximos Partidos" : "Partidos Finalizados"} />
 
         {paginatedList.length === 0 && (
@@ -385,15 +385,15 @@ export default function ReservasPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={`text-[15px] font-semibold leading-tight truncate ${textClr}`}>{venueName || b.tenantName}</p>
-                      <span className={`inline-block text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md mt-1.5`} style={{ backgroundColor: sportInfo.color + "15", color: sportInfo.color }}>
+                      <span className={`inline-block text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md mt-1.5`} style={{ backgroundColor: sportInfo.color + "15", color: sportInfo.color }}>
                         {(b.sport || "").toUpperCase()}
                       </span>
                       <div className="flex items-center gap-1 mt-1">
                         <MapPin size={8} className={subClr} />
-                        <span className={`text-[9px] font-medium ${subClr}`}>{b.courtName}</span>
+                        <span className={`text-[11px] font-medium ${subClr}`}>{b.courtName}</span>
                       </div>
                     </div>
-                    <span className="text-[7px] font-semibold tracking-[0.5px] px-2.5 py-1.5 rounded-md text-center leading-tight shrink-0" style={{ backgroundColor: status.color + "15", border: `1px solid ${status.color}20`, color: status.color }}>
+                    <span className="text-[11px] font-semibold tracking-[0.5px] px-2.5 py-1.5 rounded-md text-center leading-tight shrink-0" style={{ backgroundColor: status.color + "15", border: `1px solid ${status.color}20`, color: status.color }}>
                       {status.label}
                     </span>
                   </div>
@@ -401,22 +401,22 @@ export default function ReservasPage() {
                   {/* Detail Grid */}
                   <div className="grid grid-cols-2 gap-2.5 mb-4">
                     <div className={`p-3 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
-                      <span className={`text-[7px] font-semibold uppercase tracking-[1px] ${subClr}`}>FECHA</span>
-                      <p className={`text-[11px] font-semibold mt-0.5 ${textClr}`}>{dateInfo.full}</p>
+                      <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${subClr}`}>FECHA</span>
+                      <p className={`text-[12px] font-semibold mt-0.5 ${textClr}`}>{dateInfo.full}</p>
                     </div>
                     <div className={`p-3 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
-                      <span className={`text-[7px] font-semibold uppercase tracking-[1px] ${subClr}`}>HORARIO</span>
-                      <p className={`text-[11px] font-semibold mt-0.5 ${textClr}`}>{b.startTime} HRS</p>
+                      <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${subClr}`}>HORARIO</span>
+                      <p className={`text-[12px] font-semibold mt-0.5 ${textClr}`}>{b.startTime} HRS</p>
                     </div>
                     <div className={`p-3 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
-                      <span className={`text-[7px] font-semibold uppercase tracking-[1px] ${subClr}`}>VALOR</span>
+                      <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${subClr}`}>VALOR</span>
                       <p className={`text-[13px] font-semibold mt-0.5 ${textClr}`}>${new Intl.NumberFormat("es-CL").format(b.totalPrice || b.price || 0)}</p>
                     </div>
                     <div className={`p-3 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
-                      <span className={`text-[7px] font-semibold uppercase tracking-[1px] ${subClr}`}>PAGO</span>
+                      <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${subClr}`}>PAGO</span>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: b.paymentStatus === "paid" ? "#10b981" : b.paymentStatus === "refunded" ? "#10b981" : b.paymentStatus === "refund_failed" ? "#ef4444" : "#f59e0b" }} />
-                        <span className="text-[10px] font-semibold" style={{ color: b.paymentStatus === "paid" ? "#10b981" : b.paymentStatus === "refunded" ? "#10b981" : b.paymentStatus === "refund_failed" ? "#ef4444" : "#f59e0b" }}>
+                        <span className="text-[12px] font-semibold" style={{ color: b.paymentStatus === "paid" ? "#10b981" : b.paymentStatus === "refunded" ? "#10b981" : b.paymentStatus === "refund_failed" ? "#ef4444" : "#f59e0b" }}>
                           {b.paymentStatus === "paid" ? "PAGADO" : b.paymentStatus === "refunded" ? "REEMBOLSADO" : b.paymentStatus === "refund_failed" ? "ERROR REEMBOLSO" : "PENDIENTE"}
                         </span>
                       </div>
@@ -426,12 +426,12 @@ export default function ReservasPage() {
                   {/* Actions */}
                   <div className="flex gap-2 pt-3.5" style={{ borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0"}` }}>
                     {isConfirmed && !b.checkIn && (
-                      <button onClick={() => handleCheckIn(b)} className="flex-1 h-[46px] rounded-md bg-emerald-500 flex items-center justify-center gap-2 text-white font-semibold text-[10px] uppercase transition-all active:scale-[0.98]">
+                      <button onClick={() => handleCheckIn(b)} className="flex-1 h-[46px] rounded-md bg-emerald-500 flex items-center justify-center gap-2 text-white font-semibold text-[12px] uppercase transition-all active:scale-[0.98]">
                         <ShieldCheck size={15} /> INGRESAR
                       </button>
                     )}
                     {isActive && !b.checkOut && (
-                      <button onClick={() => handleCheckOut(b)} className="flex-1 h-[46px] rounded-md flex items-center justify-center gap-2 text-white font-semibold text-[10px] uppercase transition-all active:scale-[0.98]" style={{ backgroundColor: "#f59e0b" }}>
+                      <button onClick={() => handleCheckOut(b)} className="flex-1 h-[46px] rounded-md flex items-center justify-center gap-2 text-white font-semibold text-[12px] uppercase transition-all active:scale-[0.98]" style={{ backgroundColor: "#f59e0b" }}>
                         <CheckCircle2 size={15} /> CHECK-OUT
                       </button>
                     )}
@@ -448,7 +448,7 @@ export default function ReservasPage() {
                     {showMapsAndTicket && !isActive && (!isConfirmed || b.checkIn || b.paymentStatus === "refund_failed") && (
                       <button
                         onClick={() => { setSelectedBooking(b); setShowTicket(true); }}
-                        className={b.paymentStatus === "refund_failed" ? "flex-1 h-[46px] rounded-md bg-red-500 flex items-center justify-center gap-2 text-white font-semibold text-[9px] uppercase transition-all active:scale-[0.98]" : "w-[46px] h-[46px] rounded-md flex items-center justify-center transition-all active:scale-[0.98]"}
+                        className={b.paymentStatus === "refund_failed" ? "flex-1 h-[46px] rounded-md bg-red-500 flex items-center justify-center gap-2 text-white font-semibold text-[11px] uppercase transition-all active:scale-[0.98]" : "w-[46px] h-[46px] rounded-md flex items-center justify-center transition-all active:scale-[0.98]"}
                         style={{ backgroundColor: b.paymentStatus === "refund_failed" ? undefined : isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9" }}
                       >
                         {b.paymentStatus === "refund_failed" ? (
@@ -470,7 +470,7 @@ export default function ReservasPage() {
             onClick={() => setHistoryLimit((prev) => prev + 10)}
             className={`mx-6 mt-4 mb-6 h-[55px] rounded-md flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] border border-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 border border-slate-200 hover:bg-slate-200"}`}
           >
-            <span className="text-emerald-500 font-semibold text-[11px] uppercase tracking-[0.5px]">Cargar más reservas</span>
+            <span className="text-emerald-500 font-semibold text-[12px] uppercase tracking-[0.5px]">Cargar más reservas</span>
           </button>
         )}
       </div>
@@ -488,9 +488,9 @@ export default function ReservasPage() {
               </div>
               <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div className="text-center">
-                  <p className="text-red-500 text-[10px] font-semibold tracking-[1.5px] uppercase mb-1.5">Reversa Automática Fallida</p>
+                  <p className="text-red-500 text-[12px] font-semibold tracking-[1.5px] uppercase mb-1.5">Reversa Automática Fallida</p>
                   <p className={`text-xl font-semibold tracking-tight ${textClr}`}>${new Intl.NumberFormat("es-CL").format(Number(selectedBooking.totalPrice || selectedBooking.price || 0))}</p>
-                  <p className={`text-[10px] font-semibold ${subClr}`}>Monto Pendiente de Devolución</p>
+                  <p className={`text-[12px] font-semibold ${subClr}`}>Monto Pendiente de Devolución</p>
                 </div>
                 <div className="space-y-3 pt-5 border-t" style={{ borderColor: isDark ? "rgba(255,255,255,0.08)" : "#E2E8F0" }}>
                   <DetailRow label="Jugador" value={selectedBooking.clientName || "—"} subClr={subClr} textClr={textClr} />
@@ -501,19 +501,19 @@ export default function ReservasPage() {
                   <DetailRow label="Horario" value={`${selectedBooking.startTime} HRS`} subClr={subClr} textClr={textClr} />
                   <DetailRow label="Método Pago" value="Online (Mercado Pago)" subClr={subClr} textClr={textClr} />
                   <div className="flex justify-between items-center py-0.5">
-                    <span className={`text-[10px] font-semibold uppercase tracking-[0.5px] ${subClr}`}>Estado Reclamación</span>
-                    <span className="text-red-500 text-[11px] font-semibold">Manual Pendiente</span>
+                    <span className={`text-[12px] font-semibold uppercase tracking-[0.5px] ${subClr}`}>Estado Reclamación</span>
+                    <span className="text-red-500 text-[12px] font-semibold">Manual Pendiente</span>
                   </div>
                   <div className="h-px border-t" style={{ borderColor: isDark ? "rgba(255,255,255,0.08)" : "#E2E8F0" }} />
                   <DetailRow label="ID Reserva" value={selectedBooking.id || "—"} subClr={subClr} textClr={textClr} />
                   <div className="flex justify-between items-center py-0.5">
-                    <span className={`text-[10px] font-semibold uppercase tracking-[0.5px] ${subClr}`}>Código Validación</span>
-                    <span className="text-red-500 text-[11px] font-semibold">MVP-REFUND-{(selectedBooking.id || "").substring(0, 8).toUpperCase()}</span>
+                    <span className={`text-[12px] font-semibold uppercase tracking-[0.5px] ${subClr}`}>Código Validación</span>
+                    <span className="text-red-500 text-[12px] font-semibold">MVP-REFUND-{(selectedBooking.id || "").substring(0, 8).toUpperCase()}</span>
                   </div>
                 </div>
                 <div className={`p-5 rounded-md border space-y-2 ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
-                  <p className="text-red-500 text-[10px] font-semibold tracking-[0.5px] uppercase">Instrucciones para Devolución</p>
-                  <p className={`text-[10px] font-semibold leading-[14px] ${subClr}`}>
+                  <p className="text-red-500 text-[12px] font-semibold tracking-[0.5px] uppercase">Instrucciones para Devolución</p>
+                  <p className={`text-[12px] font-semibold leading-[14px] ${subClr}`}>
                     Debido a una desconexión temporal con la pasarela de pagos, el sistema automático no pudo reversar tu dinero. Presenta este comprobante de validación digital directamente al administrador o dueño del recinto deportivo para solicitar tu transferencia manual por el monto total indicado arriba.
                   </p>
                 </div>
@@ -557,15 +557,15 @@ export default function ReservasPage() {
                     <X size={20} className={textClr} />
                   </button>
                 </div>
-                <p className={`text-[10px] font-semibold uppercase tracking-[1.5px] mb-1 ${subClr}`}>RECINTO</p>
+                <p className={`text-[12px] font-semibold uppercase tracking-[1.5px] mb-1 ${subClr}`}>RECINTO</p>
                 <p className={`text-xl font-semibold mb-5 ${textClr}`}>{selectedBooking.tenantName}</p>
                 <div className="flex gap-8">
                   <div>
-                    <p className={`text-[9px] font-semibold uppercase tracking-[1px] mb-1 ${subClr}`}>CANCHA</p>
+                    <p className={`text-[11px] font-semibold uppercase tracking-[0.06em] mb-1 ${subClr}`}>CANCHA</p>
                     <p className={`text-sm font-semibold ${textClr}`}>{selectedBooking.courtName}</p>
                   </div>
                   <div>
-                    <p className={`text-[9px] font-semibold uppercase tracking-[1px] mb-1 ${subClr}`}>ESTADO</p>
+                    <p className={`text-[11px] font-semibold uppercase tracking-[0.06em] mb-1 ${subClr}`}>ESTADO</p>
                     <p className="text-sm font-semibold" style={{ color: modalStatus.color }}>{modalStatus.label}</p>
                   </div>
                 </div>
@@ -574,7 +574,7 @@ export default function ReservasPage() {
                 <div className="bg-white p-5 rounded-md shadow-sm">
                   {selectedBooking.id && <QRCodeSVG value={selectedBooking.id} size={150} fgColor="#0F172A" bgColor="white" />}
                 </div>
-                <p className={`text-[9px] font-semibold uppercase tracking-[4px] mt-6 ${subClr}`}>ID: {(selectedBooking.id as string)?.slice(-8).toUpperCase()}</p>
+                <p className={`text-[11px] font-semibold uppercase tracking-[4px] mt-6 ${subClr}`}>ID: {(selectedBooking.id as string)?.slice(-8).toUpperCase()}</p>
               </div>
               <div className="p-7">
                 <div className="flex gap-2">
@@ -695,7 +695,7 @@ export default function ReservasPage() {
 
 const DetailRow = ({ label, value, subClr, textClr }: any) => (
   <div className="flex justify-between items-center py-0.5">
-    <span className={`text-[10px] font-semibold uppercase tracking-[0.5px] ${subClr}`}>{label}</span>
-    <span className={`text-[11px] font-semibold ${textClr}`}>{value}</span>
+    <span className={`text-[12px] font-semibold uppercase tracking-[0.5px] ${subClr}`}>{label}</span>
+    <span className={`text-[12px] font-semibold ${textClr}`}>{value}</span>
   </div>
 );

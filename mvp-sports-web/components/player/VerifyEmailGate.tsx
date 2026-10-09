@@ -69,7 +69,7 @@ export default function VerifyEmailGate({ user, onVerified }: { user: User; onVe
                     Reenviar enlace
                 </button>
                 {status && <p role="status" className="text-xs text-slate-400">{status}</p>}
-                <button onClick={() => logout()} className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500 hover:text-red-400">
+                <button onClick={() => logout()} className="inline-flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-slate-500 hover:text-red-400">
                     <LogOut size={14} /> Usar otra cuenta
                 </button>
             </div>

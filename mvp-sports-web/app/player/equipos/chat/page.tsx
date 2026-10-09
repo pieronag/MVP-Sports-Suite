@@ -80,7 +80,7 @@ export default function ChatEquiposPage() {
           <h1 className={`font-heading font-black text-base truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{teamName || team?.name || "Chat"}</h1>
           <div className="flex items-center gap-1.5 mt-0.5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span className={`text-[9px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{team?.members?.length || 0} jugadores</span>
+            <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{team?.members?.length || 0} jugadores</span>
           </div>
         </div>
         <div className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 bg-emerald-500/10`}>
@@ -105,7 +105,7 @@ export default function ChatEquiposPage() {
           grouped.map((g, gi) => (
             <div key={`g-${gi}`}>
               <div className="flex justify-center my-4">
-                <span className={`px-3 py-1 rounded-md text-[9px] font-semibold uppercase ${isDark ? "bg-white/[0.06] text-slate-500" : "bg-slate-100 text-slate-500"}`}>{g.dateLabel}</span>
+                <span className={`px-3 py-1 rounded-md text-[11px] font-semibold uppercase ${isDark ? "bg-white/[0.06] text-slate-500" : "bg-slate-100 text-slate-500"}`}>{g.dateLabel}</span>
               </div>
               {g.messages.map((msg) => {
                 const isMe = msg.senderId === user?.uid;
@@ -117,10 +117,10 @@ export default function ChatEquiposPage() {
                       </div>
                     )}
                     <div className={`max-w-[75%] ${isMe ? "items-end" : "items-start"} flex flex-col`}>
-                      {!isMe && <span className={`text-[9px] font-medium mb-0.5 ml-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{msg.senderName}</span>}
+                      {!isMe && <span className={`text-[11px] font-medium mb-0.5 ml-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{msg.senderName}</span>}
                       <div className={`px-3.5 py-2.5 rounded-md flex items-end flex-wrap gap-1 text-sm font-medium leading-5 ${isMe ? "bg-emerald-500 text-white rounded-md" : isDark ? "bg-[#1E293B] text-slate-100 rounded-md" : "bg-white text-slate-900 rounded-md border border-slate-200"}`}>
                         <span>{msg.text}</span>
-                        <span className={`text-[8px] font-semibold shrink-0 ${isMe ? "text-white/70" : isDark ? "text-slate-500" : "text-slate-400"}`}>{formatTime(msg.createdAt)}</span>
+                        <span className={`text-[11px] font-semibold shrink-0 ${isMe ? "text-white/70" : isDark ? "text-slate-500" : "text-slate-400"}`}>{formatTime(msg.createdAt)}</span>
                       </div>
                     </div>
                   </div>

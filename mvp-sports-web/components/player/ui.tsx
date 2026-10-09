@@ -20,7 +20,7 @@ export function SectionPill({ label, className = "" }: { label: string; classNam
   return (
     <div className={`flex items-center gap-2 px-6 mb-3 mt-6 ${className}`}>
       <span className="w-6 h-[2px] bg-emerald-500 rounded-md" />
-      <span className="text-[11px] font-black text-emerald-500 tracking-[0.2em] uppercase">{label}</span>
+      <span className="text-[12px] font-black text-emerald-500 tracking-[0.2em] uppercase">{label}</span>
     </div>
   );
 }

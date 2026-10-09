@@ -75,7 +75,7 @@ export default function PartidosChatPage() {
           </div>
           <div className="min-w-0">
             <p className={`font-semibold text-[14px] truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{otherName || "Chat"}</p>
-            <p className={`text-[9px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{otherRole} · {challenge?.sport}</p>
+            <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{otherRole} · {challenge?.sport}</p>
           </div>
         </div>
         {challenge?.status === "active" && (
@@ -108,7 +108,7 @@ export default function PartidosChatPage() {
                   </div>
                 )}
                 <div className={`rounded-md px-4 py-2.5 ${isMe ? "bg-emerald-500 text-white" : isDark ? "bg-[#0A101D] border border-white/[0.06] text-slate-200" : "bg-white border border-slate-200 text-slate-800"}`}>
-                  {!isMe && <p className="text-[9px] font-semibold opacity-70 mb-0.5">{msg.senderName}</p>}
+                  {!isMe && <p className="text-[11px] font-semibold opacity-70 mb-0.5">{msg.senderName}</p>}
                   <p className="text-[13px] leading-snug">{msg.text}</p>
                 </div>
               </div>

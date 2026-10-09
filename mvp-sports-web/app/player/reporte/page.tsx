@@ -136,7 +136,7 @@ export default function ReportePage() {
         }`;
 
     return (
-        <div className={`min-h-screen pb-32 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
+        <div className={`min-h-screen pb-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
             {/* HEADER */}
             <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
                 <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
@@ -149,11 +149,11 @@ export default function ReportePage() {
             {/* TABS */}
             <div className="flex gap-2.5 px-5 pt-3 pb-4">
                 <button onClick={() => setActiveTab('nuevo')}
-                    className={`flex-1 h-11 rounded-md text-[10px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${activeTab === 'nuevo' ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+                    className={`flex-1 h-11 rounded-md text-[12px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${activeTab === 'nuevo' ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
                     NUEVO REPORTE
                 </button>
                 <button onClick={() => setActiveTab('historial')}
-                    className={`flex-1 h-11 rounded-md text-[10px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${activeTab === 'historial' ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+                    className={`flex-1 h-11 rounded-md text-[12px] font-semibold uppercase tracking-wider transition-all active:scale-[0.98] ${activeTab === 'historial' ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
                     MIS REPORTES
                 </button>
             </div>
@@ -165,17 +165,17 @@ export default function ReportePage() {
                             <CheckCircle2 size={52} strokeWidth={1.5} style={{ color: '#10b981' }} />
                         </div>
                         <h2 className="text-lg font-heading font-black mb-2" style={{ color: isDark ? '#F8FAFC' : '#0F172A' }}>¡Reporte Recibido!</h2>
-                        <span className="px-3 py-1.5 rounded-md text-[8px] font-semibold tracking-widest mb-4" style={{ backgroundColor: '#10b981', color: 'white' }}>SOPORTE ACTIVO</span>
+                        <span className="px-3 py-1.5 rounded-md text-[11px] font-semibold tracking-widest mb-4" style={{ backgroundColor: '#10b981', color: 'white' }}>SOPORTE ACTIVO</span>
                         <p className="text-[12px] font-medium text-center leading-5 max-w-[280px] mb-8" style={{ color: isDark ? '#94A3B8' : '#64748B' }}>
                             Tu ticket se ha ingresado con éxito. Nuestro equipo de soporte lo atenderá con prioridad.
                         </p>
                         <button onClick={() => setSuccess(false)}
-                            className="w-full h-[52px] rounded-md font-semibold uppercase tracking-wider text-white text-[11px] flex items-center justify-center gap-2 mb-3 transition-all active:scale-[0.98]"
+                            className="w-full h-[52px] rounded-md font-semibold uppercase tracking-wider text-white text-[12px] flex items-center justify-center gap-2 mb-3 transition-all active:scale-[0.98]"
                             style={{ backgroundColor: '#10b981' }}>
                             Reportar otro Problema <ArrowRight size={15} />
                         </button>
                         <button onClick={() => setActiveTab('historial')}
-                            className={`w-full h-[52px] rounded-md font-semibold uppercase tracking-wider text-[11px] flex items-center justify-center border transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-[#94A3B8] border-white/[0.06]" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
+                            className={`w-full h-[52px] rounded-md font-semibold uppercase tracking-wider text-[12px] flex items-center justify-center border transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-[#94A3B8] border-white/[0.06]" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
                             Ver mis Reportes
                         </button>
                     </div>
@@ -184,13 +184,13 @@ export default function ReportePage() {
                         {loadingReports ? (
                             <div className="py-16 flex flex-col items-center justify-center">
                                 <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3" />
-                                <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cargando reportes...</p>
+                                <p className={`text-[12px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cargando reportes...</p>
                             </div>
                         ) : myReports.length === 0 ? (
                             <div className="py-16 flex flex-col items-center justify-center">
                                 <AlertCircle size={36} className={isDark ? "text-slate-600" : "text-slate-300"} />
                                 <p className={`text-sm font-semibold mt-4 ${isDark ? "text-slate-300" : "text-slate-700"}`}>No hay reportes</p>
-                                <p className={`text-[11px] font-medium mt-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Aún no has enviado ningún reporte.</p>
+                                <p className={`text-[12px] font-medium mt-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Aún no has enviado ningún reporte.</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -198,7 +198,7 @@ export default function ReportePage() {
                                     <div key={report.id} className={`relative rounded-md ${isDark ? "bg-[#0A101D]/90 backdrop-blur-xl border border-white/[0.06]" : "bg-white/80 backdrop-blur-xl border border-slate-200/60"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
                                         <div className="p-5">
                                             <div className="flex justify-between items-center mb-3">
-                                                <span className="px-2.5 py-1 rounded-md text-[8px] font-semibold uppercase tracking-wider border"
+                                                <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wider border"
                                                     style={{
                                                         backgroundColor: report.status === 'Resuelto' ? '#10b98115' : '#3b82f615',
                                                         borderColor: report.status === 'Resuelto' ? '#10b98130' : '#3b82f630',
@@ -206,7 +206,7 @@ export default function ReportePage() {
                                                     }}>
                                                     {report.status}
                                                 </span>
-                                                <span className={`text-[10px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                                                <span className={`text-[12px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                                                     {report.createdAt?.toLocaleDateString?.() || ''}
                                                 </span>
                                             </div>
@@ -216,7 +216,7 @@ export default function ReportePage() {
                                                 <div className={`mt-3.5 p-4 rounded-md border ${isDark ? "bg-emerald-500/5 border-emerald-500/20" : "bg-emerald-50 border-emerald-200"}`}>
                                                     <div className="flex items-center gap-2 mb-2 pb-2" style={{ borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "#E2E8F0"}` }}>
                                                         <Shield size={14} style={{ color: '#10b981' }} />
-                                                        <span className="text-[9px] font-semibold tracking-wider" style={{ color: '#10b981' }}>SOPORTE MVP ({report.repliedBy || 'Oficial'})</span>
+                                                        <span className="text-[11px] font-semibold tracking-wider" style={{ color: '#10b981' }}>SOPORTE MVP ({report.repliedBy || 'Oficial'})</span>
                                                     </div>
                                                     <p className={`text-[12px] font-medium leading-5 ${isDark ? "text-[#F8FAFC]" : "text-[#0F172A]"}`}>{report.response}</p>
                                                 </div>
@@ -242,18 +242,18 @@ export default function ReportePage() {
                                 <div className="w-[38px] h-[38px] rounded-md flex items-center justify-center" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
                                     <Mail size={20} style={{ color: 'white' }} />
                                 </div>
-                                <span className="text-[8px] font-semibold text-white px-2 py-1 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}>
+                                <span className="text-[11px] font-semibold text-white px-2 py-1 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}>
                                     SLA GARANTIZADO
                                 </span>
                             </div>
                             <p className="text-[22px] font-semibold tracking-tight text-white">Centro de Ayuda MVP</p>
-                            <p className="text-[11px] font-semibold mt-1.5 leading-4 text-white/85">
+                            <p className="text-[12px] font-semibold mt-1.5 leading-4 text-white/85">
                                 Reporta bugs o incidencias en la app directamente a nuestro equipo de desarrollo.
                             </p>
                         </div>
 
                         {/* CATEGORY */}
-                        <p className="text-[11px] font-semibold uppercase tracking-wider mb-3" style={{ color: '#10b981' }}>Categoría del Problema</p>
+                        <p className="text-[12px] font-semibold uppercase tracking-wider mb-3" style={{ color: '#10b981' }}>Categoría del Problema</p>
                         <div className="flex flex-wrap gap-2 mb-6">
                             {CATEGORIES.map(cat => (
                                 <button key={cat.id} onClick={() => setCategory(cat.id)}
@@ -269,7 +269,7 @@ export default function ReportePage() {
                         </div>
 
                         {/* PRIORITY */}
-                        <p className="text-[11px] font-semibold uppercase tracking-wider mb-3" style={{ color: '#10b981' }}>Gravedad / Prioridad</p>
+                        <p className="text-[12px] font-semibold uppercase tracking-wider mb-3" style={{ color: '#10b981' }}>Gravedad / Prioridad</p>
                         <div className="flex flex-wrap gap-2 mb-6">
                             {PRIORITIES.map(prio => (
                                 <button key={prio.id} onClick={() => setPriority(prio.id)}
@@ -285,7 +285,7 @@ export default function ReportePage() {
                         </div>
 
                         {/* SUBJECT */}
-                        <p className="text-[9px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94A3B8' }}>ASUNTO PRINCIPAL *</p>
+                        <p className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94A3B8' }}>ASUNTO PRINCIPAL *</p>
                         <div className={inputClass('subject')} style={{ backgroundColor: '#0F172A' }}>
                             <input
                                 placeholder="Ej. error al confirmar partido"
@@ -299,7 +299,7 @@ export default function ReportePage() {
                         </div>
 
                         {/* SCREEN */}
-                        <p className="text-[9px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94A3B8' }}>PANTALLA O SECCIÓN (OPCIONAL)</p>
+                        <p className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94A3B8' }}>PANTALLA O SECCIÓN (OPCIONAL)</p>
                         <div className={inputClass('screen')} style={{ backgroundColor: '#0F172A' }}>
                             <input
                                 placeholder="Ej. estadisticas / menu principal"
@@ -314,7 +314,7 @@ export default function ReportePage() {
                         </div>
 
                         {/* DESCRIPTION */}
-                        <p className="text-[9px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94A3B8' }}>DESCRIPCIÓN DETALLADA *</p>
+                        <p className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94A3B8' }}>DESCRIPCIÓN DETALLADA *</p>
                         <div className={textareaClass('description')} style={{ backgroundColor: '#0F172A' }}>
                             <textarea
                                 placeholder="Explica aquí detalladamente qué sucedió..."
@@ -329,7 +329,7 @@ export default function ReportePage() {
                         </div>
 
                         {/* STEPS */}
-                        <p className="text-[9px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94A3B8' }}>PASOS PARA REPRODUCIR (OPCIONAL)</p>
+                        <p className="text-[11px] font-semibold uppercase tracking-wider mb-2" style={{ color: '#94A3B8' }}>PASOS PARA REPRODUCIR (OPCIONAL)</p>
                         <div className={textareaClass('steps')} style={{ backgroundColor: '#0F172A' }}>
                             <textarea
                                 placeholder="1. ir a jugar, 2. click en editar, 3. dar click en guardar..."
@@ -350,7 +350,7 @@ export default function ReportePage() {
                                 <Smartphone size={16} style={{ color: '#10b981' }} />
                                 <p className="text-[13px] font-semibold uppercase ml-2 tracking-tight" style={{ color: '#F8FAFC' }}>Información de Diagnóstico</p>
                             </div>
-                            <p className="text-[11px] font-semibold leading-4 mb-4" style={{ color: '#94A3B8' }}>
+                            <p className="text-[12px] font-semibold leading-4 mb-4" style={{ color: '#94A3B8' }}>
                                 Los siguientes metadatos se enviarán automáticamente en segundo plano.
                             </p>
                             {[
@@ -361,9 +361,9 @@ export default function ReportePage() {
                                 <div key={i} className="flex justify-between items-center py-2.5" style={{ borderTop: '1px solid rgba(100,116,139,0.08)' }}>
                                     <div className="flex items-center">
                                         <row.icon size={12} style={{ color: '#94A3B8' }} />
-                                        <span className="text-[11px] font-semibold ml-1.5" style={{ color: '#94A3B8' }}>{row.label}</span>
+                                        <span className="text-[12px] font-semibold ml-1.5" style={{ color: '#94A3B8' }}>{row.label}</span>
                                     </div>
-                                    <span className="text-[11px] font-semibold truncate max-w-[50%]" style={{ color: row.accent ? '#10b981' : '#F8FAFC' }}>{row.value}</span>
+                                    <span className="text-[12px] font-semibold truncate max-w-[50%]" style={{ color: row.accent ? '#10b981' : '#F8FAFC' }}>{row.value}</span>
                                 </div>
                             ))}
                         </div>

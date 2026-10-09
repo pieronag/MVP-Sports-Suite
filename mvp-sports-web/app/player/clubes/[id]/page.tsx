@@ -270,7 +270,7 @@ export default function VenueDetailPage() {
     <div className="flex items-center justify-center gap-1 mb-4">
       {[1, 2, 3, 4].map((s, i) => (
         <div key={s} className="flex items-center">
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold transition-all shrink-0 ${bookingStep >= s ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/30" : isDark ? "bg-white/[0.06] text-slate-500" : "bg-slate-100 text-slate-400"}`}>
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-semibold transition-all shrink-0 ${bookingStep >= s ? "bg-emerald-500 text-white shadow-sm shadow-emerald-500/30" : isDark ? "bg-white/[0.06] text-slate-500" : "bg-slate-100 text-slate-400"}`}>
             <span>{bookingStep >= s ? "✓" : s}</span>
           </div>
           {i < 3 && <div className={`w-8 h-[2px] mx-0.5 ${bookingStep > s ? "bg-emerald-500" : isDark ? "bg-white/[0.06]" : "bg-slate-100"}`} />}
@@ -282,7 +282,7 @@ export default function VenueDetailPage() {
   const renderSportSelection = () => (
     <GlowCard isDark={isDark}>
       <div className="p-5">
-        <p className={`text-[10px] font-semibold uppercase tracking-wider mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige un deporte</p>
+        <p className={`text-[12px] font-semibold uppercase tracking-wider mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige un deporte</p>
         <div className="flex flex-wrap gap-3">
           {availableSports.map((sport: string) => {
             const info = getSportInfo(sport);
@@ -312,7 +312,7 @@ export default function VenueDetailPage() {
       <div className="p-5">
         <div className="flex items-center justify-between mb-4">
           {renderBackButton()}
-          <p className={`text-[10px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cancha y horario</p>
+          <p className={`text-[12px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cancha y horario</p>
           <div className="w-12" />
         </div>
         {/* Selected date info */}
@@ -321,7 +321,7 @@ export default function VenueDetailPage() {
           <span className={`text-xs font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
             {dateLabel} • {dateDayName} {currentDateInfo.date.toLocaleDateString("es-CL", { day: "numeric", month: "long" })}
           </span>
-          <button onClick={() => setBookingStep(2)} className="ml-auto text-emerald-500 text-[9px] font-semibold uppercase">Cambiar</button>
+          <button onClick={() => setBookingStep(2)} className="ml-auto text-emerald-500 text-[11px] font-semibold uppercase">Cambiar</button>
         </div>
         <div className="space-y-3">
           {filteredCourts.length === 0 ? (
@@ -344,21 +344,21 @@ export default function VenueDetailPage() {
                     <div className="flex-1 text-left min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className={`text-sm font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{court.name}</p>
-                        {courtData?.category && <span className={`text-[9px] font-medium px-2 py-0.5 rounded bg-white/[0.06] ${isDark ? "text-slate-400" : "text-slate-500"}`}>{courtData.category}</span>}
-                        {isUnavailable && <span className="text-[9px] font-semibold text-red-400 uppercase">No disponible</span>}
+                        {courtData?.category && <span className={`text-[11px] font-medium px-2 py-0.5 rounded bg-white/[0.06] ${isDark ? "text-slate-400" : "text-slate-500"}`}>{courtData.category}</span>}
+                        {isUnavailable && <span className="text-[11px] font-semibold text-red-400 uppercase">No disponible</span>}
                         {courtData?.status === "available" && <CircleDot size={8} className="text-emerald-500" />}
                       </div>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className={`text-[10px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{court.sport}</span>
-                        <span className="text-emerald-500 text-[11px] font-semibold">${Number(getCourtPrice(court.id, selectedSport || court.sport, selectedDate, selectedTime || "12:00")).toLocaleString("es-CL")}</span>
+                        <span className={`text-[12px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{court.sport}</span>
+                        <span className="text-emerald-500 text-[12px] font-semibold">${Number(getCourtPrice(court.id, selectedSport || court.sport, selectedDate, selectedTime || "12:00")).toLocaleString("es-CL")}</span>
                       </div>
-                      {courtData?.surface && <p className={`text-[9px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Superficie: {courtData.surface}</p>}
+                      {courtData?.surface && <p className={`text-[11px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Superficie: {courtData.surface}</p>}
                       {courtData?.features && courtData.features.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1">
                           {courtData.features.slice(0, 4).map((f: string) => (
-                            <span key={f} className={`text-[7px] font-semibold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>{f}</span>
+                            <span key={f} className={`text-[11px] font-semibold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>{f}</span>
                           ))}
-                          {courtData.features.length > 4 && <span className="text-[7px] text-slate-500">+{courtData.features.length - 4}</span>}
+                          {courtData.features.length > 4 && <span className="text-[11px] text-slate-500">+{courtData.features.length - 4}</span>}
                         </div>
                       )}
                     </div>
@@ -367,7 +367,7 @@ export default function VenueDetailPage() {
                   {/* Time slots for selected court */}
                   {isSelected && (
                     <div className={`mt-3 p-4 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
-                      <p className={`text-[9px] font-semibold uppercase tracking-wider mb-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Horarios disponibles ({currentDayHours})</p>
+                      <p className={`text-[11px] font-semibold uppercase tracking-wider mb-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Horarios disponibles ({currentDayHours})</p>
                       {loadingSlots ? (
                         <div className="flex justify-center py-4"><div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
                       ) : availableSlots.length === 0 ? (
@@ -380,7 +380,7 @@ export default function VenueDetailPage() {
                             const labels = { mañana: "Mañana (6-12)", tarde: "Tarde (12-18)", noche: "Noche (18-24)" };
                             return (
                               <div key={period}>
-                                <p className={`text-[7px] font-semibold uppercase tracking-wider mb-1.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{labels[period]}</p>
+                                <p className={`text-[11px] font-semibold uppercase tracking-wider mb-1.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{labels[period]}</p>
                                 <div className="flex flex-wrap gap-2">
                                   {slots.map(s => {
                                     const [h] = s.split(":").map(Number);
@@ -452,7 +452,7 @@ export default function VenueDetailPage() {
       <div className="p-5">
         <div className="flex items-center justify-between mb-5">
           {renderBackButton()}
-          <p className={`text-[10px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige el día</p>
+          <p className={`text-[12px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige el día</p>
           <div className="w-12" />
         </div>
         {/* Date selector card */}
@@ -464,8 +464,8 @@ export default function VenueDetailPage() {
             </button>
             <div className="flex flex-col items-center">
               <span className={`text-2xl font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{currentDateInfo.date.getDate()}</span>
-              <span className={`text-[10px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-400" : "text-slate-500"}`}>{currentDateInfo.date.toLocaleDateString("es-CL", { month: "long" })}</span>
-              <span className={`text-[11px] font-bold mt-0.5 ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>{dateLabel} • {dateDayName}</span>
+              <span className={`text-[12px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-400" : "text-slate-500"}`}>{currentDateInfo.date.toLocaleDateString("es-CL", { month: "long" })}</span>
+              <span className={`text-[12px] font-bold mt-0.5 ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>{dateLabel} • {dateDayName}</span>
             </div>
             <button aria-label="Siguiente" onClick={() => { setDateOffset(p => p + 1); }}
               className={`w-12 h-12 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-white hover:bg-slate-100 shadow-sm"}`}>
@@ -483,7 +483,7 @@ export default function VenueDetailPage() {
               return (
                 <button key={offset} onClick={() => { if (!isPastOffset) setDateOffset(offset); }} disabled={isPastOffset}
                   className={`flex-1 py-2.5 rounded-md flex flex-col items-center transition-all active:scale-95 ${isActive ? "bg-emerald-500 text-white shadow-md" : isPastOffset ? (isDark ? "text-slate-600" : "text-slate-300") : isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"}`}>
-                  <span className="text-[7px] font-semibold uppercase">{labels[d.getDay()]}</span>
+                  <span className="text-[11px] font-semibold uppercase">{labels[d.getDay()]}</span>
                   <span className="text-xs font-bold mt-0.5">{d.getDate()}</span>
                 </button>
               );
@@ -527,7 +527,7 @@ export default function VenueDetailPage() {
         <div className="p-5">
           <div className="flex items-center justify-between mb-5">
             {renderBackButton()}
-            <p className={`text-[10px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Reserva</p>
+            <p className={`text-[12px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Reserva</p>
             <div className="w-12" />
           </div>
           <div className="space-y-0 divide-y divide-emerald-500/5">
@@ -538,7 +538,7 @@ export default function VenueDetailPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-base font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedSport}</p>
-                <p className={`text-[9px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</p>
+                <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</p>
               </div>
             </div>
             {/* Court */}
@@ -548,7 +548,7 @@ export default function VenueDetailPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-base font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedCourt?.name || "Cancha"}</p>
-                <p className={`text-[9px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cancha {(selectedCourt as any)?.surface ? `• ${(selectedCourt as any).surface}` : ""}</p>
+                <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cancha {(selectedCourt as any)?.surface ? `• ${(selectedCourt as any).surface}` : ""}</p>
               </div>
             </div>
             {/* Date & Time */}
@@ -558,7 +558,7 @@ export default function VenueDetailPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-base font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{dateDayName} {new Date(selectedDate).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}</p>
-                <p className={`text-[9px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{selectedTime} HRS</p>
+                <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{selectedTime} HRS</p>
               </div>
             </div>
             {/* Price */}
@@ -566,7 +566,7 @@ export default function VenueDetailPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Valor de la reserva</p>
-                  <p className={`text-[9px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Pago único • Sin cargos adicionales</p>
+                  <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Pago único • Sin cargos adicionales</p>
                 </div>
                 <p className="text-2xl font-bold text-emerald-500">${Number(confirmationData.price).toLocaleString("es-CL")}</p>
               </div>
@@ -584,7 +584,7 @@ export default function VenueDetailPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[10px] font-semibold tracking-[3px] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.12em] uppercase animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -625,32 +625,32 @@ export default function VenueDetailPage() {
               </div>
               <div className="flex items-center gap-1.5">
                 <Clock size={12} className="text-emerald-500" />
-                <span className={`text-[10px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Hoy: {currentDayHours}</span>
+                <span className={`text-[12px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Hoy: {currentDayHours}</span>
               </div>
             </div>
             <div className="flex items-center gap-4">
               {venueData?.phone && (
                 <a href={`tel:${venueData.phone}`} className="flex items-center gap-1.5">
                   <Phone size={12} className="text-emerald-500" />
-                  <span className={`text-[10px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{venueData.phone}</span>
+                  <span className={`text-[12px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{venueData.phone}</span>
                 </a>
               )}
               {venueData?.whatsapp && (
                 <a href={`https://wa.me/${venueData.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
                   <MessageCircle size={12} className="text-emerald-500" />
-                  <span className={`text-[10px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>WhatsApp</span>
+                  <span className={`text-[12px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>WhatsApp</span>
                 </a>
               )}
               {venueData?.instagram && (
                 <a href={`https://instagram.com/${venueData.instagram.replace(/^@/, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
                   <Globe size={12} className="text-emerald-500" />
-                  <span className={`text-[10px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Instagram</span>
+                  <span className={`text-[12px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Instagram</span>
                 </a>
               )}
               {venueData?.website && (
                 <a href={venueData.website.startsWith("http") ? venueData.website : `https://${venueData.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
                   <Globe size={12} className="text-emerald-500" />
-                  <span className={`text-[10px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Web</span>
+                  <span className={`text-[12px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Web</span>
                 </a>
               )}
             </div>
@@ -659,7 +659,7 @@ export default function VenueDetailPage() {
               {venueData?.isMercadopagoActive && (
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
                   <CreditCard size={11} className="text-emerald-500" />
-                  <span className={`text-[8px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-600"}`}>Mercado Pago</span>
+                  <span className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-600"}`}>Mercado Pago</span>
                 </div>
               )}
             </div>
@@ -667,7 +667,7 @@ export default function VenueDetailPage() {
             <div className="flex gap-2">
               {venueData?.gallery && venueData.gallery.length > 0 && (
                 <button onClick={() => setShowGallery(true)}
-                  className="flex-1 h-10 rounded-md border text-[10px] font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="flex-1 h-10 rounded-md border text-[12px] font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                   style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
                   <Images size={13} className="text-emerald-500" />
                   <span className={isDark ? "text-slate-300" : "text-slate-600"}>Galería</span>
@@ -675,7 +675,7 @@ export default function VenueDetailPage() {
               )}
               {venueCoords && (
                 <button onClick={handleOpenMaps}
-                  className="flex-1 h-10 rounded-md border text-[10px] font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="flex-1 h-10 rounded-md border text-[12px] font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                   style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
                   <Navigation size={13} className="text-emerald-500" />
                   <span className={isDark ? "text-slate-300" : "text-slate-600"}>Cómo llegar</span>
@@ -690,7 +690,7 @@ export default function VenueDetailPage() {
                 return (
                   <div key={sport} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border" style={{ backgroundColor: `${info.color}10`, borderColor: `${info.color}20` }}>
                     <Icon color={info.color} size={14} />
-                    <span className="text-[10px] font-semibold" style={{ color: info.color }}>{sport}</span>
+                    <span className="text-[12px] font-semibold" style={{ color: info.color }}>{sport}</span>
                   </div>
                 );
               })}
@@ -700,7 +700,7 @@ export default function VenueDetailPage() {
               <div className="flex flex-wrap gap-2">
                 {venueData.amenities.map((a: string) => (
                   <div key={a} className={`px-3 py-1.5 rounded-md border ${isDark ? "border-white/[0.06] bg-white/[0.03]" : "border-slate-200 bg-slate-50"}`}>
-                    <span className={`text-[9px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{a}</span>
+                    <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{a}</span>
                   </div>
                 ))}
               </div>
@@ -725,7 +725,7 @@ export default function VenueDetailPage() {
                 <div key={r.id} className="p-4">
                   <div className="flex items-center gap-2 mb-1">
                     {[1,2,3,4,5].map(s => <Star key={s} size={10} className={s <= (r.rating || 0) ? "text-amber-500" : isDark ? "text-slate-600" : "text-slate-200"} fill={s <= (r.rating || 0) ? "currentColor" : "none"} />)}
-                    <span className={`text-[10px] font-medium ml-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{r.userName || "Jugador"}</span>
+                    <span className={`text-[12px] font-medium ml-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{r.userName || "Jugador"}</span>
                   </div>
                   {r.comment && <p className={`text-xs font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>{r.comment}</p>}
                 </div>
@@ -736,7 +736,7 @@ export default function VenueDetailPage() {
           <GlowCard isDark={isDark}>
             <div className="py-8 flex flex-col items-center">
               <Star size={28} className={isDark ? "text-slate-600" : "text-slate-300"} />
-              <p className={`text-[10px] font-semibold uppercase tracking-wider mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin reseñas por el momento</p>
+              <p className={`text-[12px] font-semibold uppercase tracking-wider mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin reseñas por el momento</p>
             </div>
           </GlowCard>
         )}
@@ -744,13 +744,13 @@ export default function VenueDetailPage() {
         {/* Rules button */}
         {(venueData?.rules?.length > 0 || venueData?.cancellationPolicy) && (
           <button onClick={() => setShowRules(true)}
-            className="w-full h-[44px] rounded-md font-semibold text-[10px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] border"
+            className="w-full h-[44px] rounded-md font-semibold text-[12px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] border"
             style={{ borderColor: isDark ? "rgba(255,255,255,0.08)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC", color: isDark ? "#94A3B8" : "#64748B" }}>
             <Ban size={14} /> Reglas del Recinto
           </button>
         )}
 
-        <p className={`text-center text-[8px] font-medium pt-2 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
+        <p className={`text-center text-[11px] font-medium pt-2 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
       </div>
 
       {feedback && (
@@ -786,8 +786,8 @@ export default function VenueDetailPage() {
               ))}
               {venueData?.cancellationPolicy && (
                 <div className={`p-4 rounded-md border ${isDark ? "bg-amber-500/5 border-amber-500/10" : "bg-amber-50 border-amber-200"}`}>
-                  <p className={`text-[8px] font-semibold uppercase tracking-wider mb-1 ${isDark ? "text-amber-400" : "text-amber-600"}`}>Política de Cancelación</p>
-                  <p className={`text-[11px] font-medium leading-snug ${isDark ? "text-slate-300" : "text-slate-700"}`}>{venueData.cancellationPolicy}</p>
+                  <p className={`text-[11px] font-semibold uppercase tracking-wider mb-1 ${isDark ? "text-amber-400" : "text-amber-600"}`}>Política de Cancelación</p>
+                  <p className={`text-[12px] font-medium leading-snug ${isDark ? "text-slate-300" : "text-slate-700"}`}>{venueData.cancellationPolicy}</p>
                 </div>
               )}
             </div>
@@ -811,7 +811,7 @@ export default function VenueDetailPage() {
                   className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
                   <ChevronLeft size={16} className="text-white" />
                 </button>
-                <span className="text-white/60 text-[10px] font-medium">{galleryIndex + 1} / {venueData.gallery.length}</span>
+                <span className="text-white/60 text-[12px] font-medium">{galleryIndex + 1} / {venueData.gallery.length}</span>
                 <button aria-label="Siguiente" onClick={() => setGalleryIndex(i => (i + 1) % venueData.gallery.length)}
                   className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
                   <ChevronRight size={16} className="text-white" />

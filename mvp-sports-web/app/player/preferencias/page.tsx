@@ -96,8 +96,8 @@ function InputRow({ icon: Icon, color, label, value, onChange, error, maxLength,
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <label className={`text-[10px] font-semibold uppercase tracking-wider ${error ? "text-red-500" : (isDark ? "text-slate-500" : "text-slate-400")}`}>{label}</label>
-          {error && <span className="text-[8px] font-bold text-red-500 tracking-wider">INVÁLIDO</span>}
+          <label className={`text-[12px] font-semibold uppercase tracking-wider ${error ? "text-red-500" : (isDark ? "text-slate-500" : "text-slate-400")}`}>{label}</label>
+          {error && <span className="text-[11px] font-bold text-red-500 tracking-wider">INVÁLIDO</span>}
         </div>
         <input type={type} value={value} onChange={(e) => onChange(e.target.value)} maxLength={maxLength}
           className={`w-full bg-transparent text-base font-medium outline-none mt-0.5 transition-colors ${error ? "text-red-500 placeholder-red-300" : (isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400")}`}
@@ -129,7 +129,7 @@ function SelectRow({ icon: Icon, color, label, value, options, onSelect, disable
           {renderIcon()}
         </div>
         <div className="flex-1 text-left min-w-0">
-          <p className={`text-[10px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>{label}</p>
+          <p className={`text-[12px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>{label}</p>
           <p className={`text-[15px] font-medium truncate ${disabled ? (isDark ? "text-slate-600" : "text-slate-400") : (isDark ? "text-slate-100" : "text-slate-900")}`}>
             {disabled ? "Elige deporte primero..." : (value || "Toca para elegir")}
           </p>
@@ -327,7 +327,7 @@ export default function PreferenciasPage() {
       <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-emerald-400 text-[10px] font-semibold tracking-[3px] uppercase animate-pulse">Cargando</p>
+          <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.12em] uppercase animate-pulse">Cargando</p>
         </div>
       </div>
     );
@@ -355,11 +355,11 @@ export default function PreferenciasPage() {
             <span className="text-red-400 font-semibold text-xs uppercase tracking-wider">Perfil Incompleto</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {!formData.displayName && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[9px] font-semibold uppercase tracking-wider">Nombre</span>}
-            {!formData.phone && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[9px] font-semibold uppercase tracking-wider">Teléfono</span>}
-            {!formData.rut && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[9px] font-semibold uppercase tracking-wider">RUT</span>}
-            {(!formData.birthDate || !validateAge(formData.birthDate)) && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[9px] font-semibold uppercase tracking-wider">F. Nacimiento (18+)</span>}
-            {!formData.mainSport && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[9px] font-semibold uppercase tracking-wider">Deporte</span>}
+            {!formData.displayName && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[11px] font-semibold uppercase tracking-wider">Nombre</span>}
+            {!formData.phone && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[11px] font-semibold uppercase tracking-wider">Teléfono</span>}
+            {!formData.rut && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[11px] font-semibold uppercase tracking-wider">RUT</span>}
+            {(!formData.birthDate || !validateAge(formData.birthDate)) && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[11px] font-semibold uppercase tracking-wider">F. Nacimiento (18+)</span>}
+            {!formData.mainSport && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[11px] font-semibold uppercase tracking-wider">Deporte</span>}
           </div>
         </div>
       )}
@@ -494,7 +494,7 @@ export default function PreferenciasPage() {
         </button>
       </div>
 
-      <p className={`text-center text-[9px] font-medium mt-10 mb-8 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
+      <p className={`text-center text-[11px] font-medium mt-10 mb-8 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
 
       {/* Feedback Toast */}
       {showFeedback && (
@@ -522,7 +522,7 @@ export default function PreferenciasPage() {
           { label: "Confirmar Nueva", value: confirmNewPassword, set: setConfirmNewPassword, show: showConfirm, toggle: () => setShowConfirm(!showConfirm) },
         ].map((f) => (
           <div key={f.label} className="mb-4">
-            <label className={`text-[10px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>{f.label}</label>
+            <label className={`text-[12px] font-semibold uppercase tracking-wider mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>{f.label}</label>
             <div className={`flex items-center rounded-md border transition-colors focus-within:border-emerald-500/50 ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`}>
               <input type={f.show ? "text" : "password"} value={f.value} onChange={(e) => f.set(e.target.value)} placeholder="••••••••"
                 className={`flex-1 p-3.5 text-sm font-medium bg-transparent outline-none ${isDark ? "text-slate-100" : "text-slate-900"}`}

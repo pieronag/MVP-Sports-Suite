@@ -237,11 +237,11 @@ export default function PerfilPage() {
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
         </div>
         <h2 className={`text-xl font-heading font-black uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{displayName}</h2>
-        <p className={`text-[10px] font-medium tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>{userEmail}</p>
+        <p className={`text-[12px] font-medium tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>{userEmail}</p>
         {city && (
           <div className="flex items-center gap-1 mt-1">
             <MapPin size={10} className="text-emerald-500" />
-            <span className={`text-[9px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{city}</span>
+            <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{city}</span>
           </div>
         )}
       </div>
@@ -253,11 +253,11 @@ export default function PerfilPage() {
           <div className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <p className={`text-[9px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Rango Actual</p>
+                <p className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Rango Actual</p>
                 <p className="text-emerald-500 text-lg font-semibold">{tierInfo.name}</p>
               </div>
               <div className="text-right">
-                <p className={`text-[9px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Próximo Rango</p>
+                <p className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Próximo Rango</p>
                 <p className={`text-base font-medium opacity-50 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
                   {tierInfo.index < TIERS.length - 1 ? TIERS[tierInfo.index + 1].toUpperCase() : "LÍMITE"}
                 </p>
@@ -284,8 +284,8 @@ export default function PerfilPage() {
             {/* OVR */}
             <div className="flex items-center justify-between px-5 py-5">
               <div>
-                <p className={`text-[9px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nivel General</p>
-                <p className={`text-2xl font-bold -tracking-[1px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{ovr}</p>
+                <p className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nivel General</p>
+                <p className={`text-2xl font-bold -tracking-[0.06em] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{ovr}</p>
               </div>
               <div className="w-10 h-10 rounded-md bg-emerald-500/15 flex items-center justify-center">
                 <Medal size={22} className="text-emerald-500" />
@@ -297,7 +297,7 @@ export default function PerfilPage() {
                   <row.icon size={18} style={{ color: row.color }} strokeWidth={1.8} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-[9px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>{row.label}</p>
+                  <p className={`text-[11px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-400"}`}>{row.label}</p>
                   <p className={`text-base font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{row.value}</p>
                 </div>
               </div>
@@ -334,7 +334,7 @@ export default function PerfilPage() {
                 return (
                   <div className="py-8 flex flex-col items-center">
                     <Medal size={36} className={isDark ? "text-slate-600" : "text-slate-300"} />
-                    <p className={`text-[10px] font-semibold uppercase tracking-wider mt-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Juega más para desbloquear insignias</p>
+                    <p className={`text-[12px] font-semibold uppercase tracking-wider mt-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Juega más para desbloquear insignias</p>
                   </div>
                 );
               }
@@ -349,8 +349,8 @@ export default function PerfilPage() {
                         <div className="mb-2.5 w-9 h-9 rounded-md flex items-center justify-center">
                           <badge.icon size={24} style={{ color: c }} strokeWidth={1.5} />
                         </div>
-                        <p className={`text-[8px] font-semibold uppercase text-center mb-1.5 leading-tight ${isDark ? "text-slate-200" : "text-slate-800"}`}>{badge.name}</p>
-                        <span className="text-[6px] font-semibold tracking-[1px] px-2 py-0.5 rounded-md" style={{ backgroundColor: `${c}25`, color: c }}>{tierNames[badge.tier!]}</span>
+                        <p className={`text-[11px] font-semibold uppercase text-center mb-1.5 leading-tight ${isDark ? "text-slate-200" : "text-slate-800"}`}>{badge.name}</p>
+                        <span className="text-[11px] font-semibold tracking-[0.06em] px-2 py-0.5 rounded-md" style={{ backgroundColor: `${c}25`, color: c }}>{tierNames[badge.tier!]}</span>
                       </div>
                     );
                   })}
@@ -360,7 +360,7 @@ export default function PerfilPage() {
           </div>
         </GlowCard>
         <button onClick={() => setShowGlossary(true)}
-          className="w-full mt-3 h-[44px] rounded-md font-semibold text-[10px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] border"
+          className="w-full mt-3 h-[44px] rounded-md font-semibold text-[12px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] border"
           style={{ borderColor: isDark ? "rgba(255,255,255,0.08)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC", color: isDark ? "#94A3B8" : "#64748B" }}>
           <Medal size={14} /> Ver Logros Disponibles
         </button>
@@ -369,7 +369,7 @@ export default function PerfilPage() {
       {/* Tu Carta MVP */}
       <div className="flex items-center gap-3 px-6 mb-4 mt-2">
         <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-        <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">Tu Carta MVP</span>
+        <span className="text-emerald-400 font-semibold text-[12px] tracking-[0.12em] uppercase">Tu Carta MVP</span>
         <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
       </div>
 
@@ -388,18 +388,18 @@ export default function PerfilPage() {
             {/* Top row: OVR + Info */}
             <div className="flex items-center gap-4 mb-4">
               <div className="w-[58px] h-[76px] bg-gradient-to-b from-amber-400 to-amber-600 rounded-md flex flex-col items-center justify-center -rotate-[4deg] shrink-0">
-                <span className="text-black/60 font-medium text-[7px] tracking-[1px]">OVR</span>
+                <span className="text-black/60 font-medium text-[11px] tracking-[0.06em]">OVR</span>
                 <span className="text-black font-bold text-[22px] leading-none mt-0.5">{ovr}</span>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 mb-0.5">
                   <div className={`w-1.5 h-1.5 rounded-full ${isDark ? "bg-emerald-500" : "bg-emerald-600"}`} />
-                  <span className={`font-semibold text-[7px] tracking-[2px] uppercase ${isDark ? "text-emerald-400/80" : "text-emerald-600/80"}`}>Valoración MVP 2026</span>
+                  <span className={`font-semibold text-[11px] tracking-[2px] uppercase ${isDark ? "text-emerald-400/80" : "text-emerald-600/80"}`}>Valoración MVP 2026</span>
                 </div>
                 <p className={`font-semibold text-[16px] ${isDark ? "text-white" : "text-slate-900"}`}>{displayName}</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[8px] font-medium px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-500">{tierInfo.name.toUpperCase()}</span>
-                  <span className={`text-[8px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{xp.toLocaleString("es-CL")} XP</span>
+                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-500">{tierInfo.name.toUpperCase()}</span>
+                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{xp.toLocaleString("es-CL")} XP</span>
                 </div>
               </div>
             </div>
@@ -414,14 +414,14 @@ export default function PerfilPage() {
               ].map((s) => (
                 <div key={s.label} className="text-center">
                   <p className={`font-semibold text-[13px] ${isDark ? "text-white" : "text-slate-900"}`}>{s.value}</p>
-                  <p className={`font-medium text-[6px] tracking-[1px] uppercase mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{s.label}</p>
+                  <p className={`font-medium text-[11px] tracking-[0.06em] uppercase mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{s.label}</p>
                 </div>
               ))}
             </div>
 
             {/* Generate CTA */}
             <button onClick={handleGenerateCard} disabled={generatingCard}
-              className="w-full mt-4 h-[46px] rounded-md bg-emerald-500 text-white font-semibold text-[10px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600 disabled:opacity-60">
+              className="w-full mt-4 h-[46px] rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600 disabled:opacity-60">
               {generatingCard ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
@@ -432,7 +432,7 @@ export default function PerfilPage() {
         </div>
       </div>
 
-      <p className={`text-center text-[9px] font-medium mb-8 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
+      <p className={`text-center text-[11px] font-medium mb-8 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
 
       {/* Hidden MVP Card for Capture */}
       <div style={{ position: "fixed", top: 0, left: 0, width: 0, height: 0, overflow: "hidden", zIndex: -999 }}>
@@ -536,11 +536,11 @@ export default function PerfilPage() {
             </div>
             <div className="flex gap-3 mt-6">
               <button onClick={() => setShowPreview(false)}
-                className={`flex-1 h-[54px] rounded-md font-semibold text-[11px] uppercase tracking-wider transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.08] text-slate-300 hover:bg-white/[0.12]" : "bg-slate-200 text-slate-700 hover:bg-slate-300"}`}>
+                className={`flex-1 h-[54px] rounded-md font-semibold text-[12px] uppercase tracking-wider transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.08] text-slate-300 hover:bg-white/[0.12]" : "bg-slate-200 text-slate-700 hover:bg-slate-300"}`}>
                 Cerrar
               </button>
               <button onClick={handleDownloadCard}
-                className="flex-[2] h-[54px] rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600">
+                className="flex-[2] h-[54px] rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600">
                 <Download size={16} /> Descargar Carta
               </button>
             </div>
@@ -560,7 +560,7 @@ export default function PerfilPage() {
                 </div>
                 <div>
                   <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Galería de Insignias</p>
-                  <p className={`text-[7px] font-medium uppercase tracking-wider mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cómo ganar cada insignia</p>
+                  <p className={`text-[11px] font-medium uppercase tracking-wider mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cómo ganar cada insignia</p>
                 </div>
               </div>
               <button aria-label="Cerrar" onClick={() => setShowGlossary(false)} className="w-8 h-8 rounded-md flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
@@ -610,9 +610,9 @@ export default function PerfilPage() {
                           <div className="flex items-center justify-between gap-2">
                             <div className="min-w-0">
                               <p className={`text-[13px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{b.name}</p>
-                              <p className={`text-[8px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{b.desc}</p>
+                              <p className={`text-[11px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{b.desc}</p>
                             </div>
-                            <span className="text-[7px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md text-white shrink-0 leading-none" style={{ backgroundColor: progressColor }}>
+                            <span className="text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md text-white shrink-0 leading-none" style={{ backgroundColor: progressColor }}>
                               {currentTierLabel}
                             </span>
                           </div>
@@ -621,8 +621,8 @@ export default function PerfilPage() {
                               <div className="h-full rounded-full transition-all duration-500" style={{ width: `${progress * 100}%`, backgroundColor: progressColor }} />
                             </div>
                             <div className="flex items-center justify-between mt-1">
-                              <span className={`text-[8px] font-semibold ${isDark ? "text-slate-200" : "text-slate-700"}`}>{val} {b.unit}</span>
-                              <span className={`text-[7px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{Math.floor(progress * 100)}%</span>
+                              <span className={`text-[11px] font-semibold ${isDark ? "text-slate-200" : "text-slate-700"}`}>{val} {b.unit}</span>
+                              <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{Math.floor(progress * 100)}%</span>
                             </div>
                           </div>
                         </div>
@@ -636,8 +636,8 @@ export default function PerfilPage() {
                             <div key={t} className="flex items-center gap-1.5" style={{ opacity: isActive ? 1 : 0.2 }}>
                               <div className="w-[6px] h-[6px] rounded-full" style={{ backgroundColor: milestoneColors[t] }} />
                               <div>
-                                <p className={`text-[7px] font-semibold leading-tight ${isDark ? "text-slate-200" : "text-slate-700"}`}>{milestoneNames[t]}</p>
-                                <p className={`text-[6px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{config[t]} {b.unit}</p>
+                                <p className={`text-[11px] font-semibold leading-tight ${isDark ? "text-slate-200" : "text-slate-700"}`}>{milestoneNames[t]}</p>
+                                <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{config[t]} {b.unit}</p>
                               </div>
                             </div>
                           );

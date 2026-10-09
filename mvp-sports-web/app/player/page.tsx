@@ -56,14 +56,14 @@ export default function PlayerDashboard() {
 
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-      <div className="pb-32">
+      <div className="pb-4">
         {/* HEADER */}
         <div className="px-5 pt-12 pb-5">
           <div>
             <h1 className={`text-[22px] font-heading font-black -tracking-[1.5px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>
               Bienvenido
             </h1>
-            <p className="text-emerald-500 font-semibold text-[10px] tracking-[1.5px] -mt-0.5">
+            <p className="text-emerald-500 font-semibold text-[12px] tracking-[1.5px] -mt-0.5">
               {userName.toUpperCase()}
             </p>
           </div>
@@ -111,7 +111,7 @@ export default function PlayerDashboard() {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className={`text-[8px] font-semibold tracking-[1.5px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                <p className={`text-[11px] font-semibold tracking-[1.5px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                   JUGADOR
                 </p>
                 <h2 className={`text-[20px] font-heading font-black -tracking-[1.5px] mb-2.5 truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>
@@ -119,11 +119,11 @@ export default function PlayerDashboard() {
                 </h2>
 
                 <div className="flex items-center gap-2">
-                  <span className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold text-[9px] px-2.5 py-1 rounded-md">
+                  <span className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold text-[11px] px-2.5 py-1 rounded-md">
                     {tier.name.toUpperCase()}
                   </span>
                   <span
-                    className={`font-semibold text-[9px] px-2.5 py-1 rounded-md border ${
+                    className={`font-semibold text-[11px] px-2.5 py-1 rounded-md border ${
                       isDark
                         ? "bg-white/5 text-slate-100 border-white/5"
                         : "bg-slate-100 text-slate-900 border-slate-200"
@@ -135,7 +135,7 @@ export default function PlayerDashboard() {
 
                 <div className="flex items-center gap-1.5 mt-3">
                   <Zap size={10} color="#10b981" fill="#10b981" />
-                  <span className={`text-[9px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                     {xp.toLocaleString("es-CL")} XP
                   </span>
                 </div>
@@ -148,7 +148,7 @@ export default function PlayerDashboard() {
         <div className="px-5 mt-8">
           <div className="flex items-center gap-3 mb-5">
             <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-            <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">Acceso Rápido</span>
+            <span className="text-emerald-400 font-semibold text-[12px] tracking-[0.12em] uppercase">Acceso Rápido</span>
             <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
           </div>
 
@@ -168,7 +168,7 @@ export default function PlayerDashboard() {
                 >
                   <item.icon size={26} color={item.color} strokeWidth={1.5} />
                 </div>
-                <span className={`text-[7px] font-semibold uppercase tracking-[0.5px] text-center leading-tight ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                <span className={`text-[11px] font-semibold uppercase tracking-[0.5px] text-center leading-tight ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                   {item.label}
                 </span>
               </Link>
@@ -180,7 +180,7 @@ export default function PlayerDashboard() {
         <div className="px-5 mt-8">
           <div className="flex items-center gap-3 mb-4">
             <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-            <span className="text-emerald-400 font-semibold text-[10px] tracking-[3px] uppercase">Tu Carta MVP</span>
+            <span className="text-emerald-400 font-semibold text-[12px] tracking-[0.12em] uppercase">Tu Carta MVP</span>
             <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
           </div>
 
@@ -202,7 +202,7 @@ export default function PlayerDashboard() {
                 <div className="flex items-center gap-5 flex-1">
                   {/* OVR Badge */}
                   <div className="w-[68px] h-[88px] bg-gradient-to-b from-amber-400 to-amber-600 rounded-md flex flex-col items-center justify-center -rotate-[4deg] shrink-0">
-                    <span className="text-black/60 font-medium text-[7px] tracking-[1px]">OVR</span>
+                    <span className="text-black/60 font-medium text-[11px] tracking-[0.06em]">OVR</span>
                     <span className="text-black font-bold text-[26px] leading-none mt-0.5">{ovr}</span>
                   </div>
 
@@ -210,13 +210,13 @@ export default function PlayerDashboard() {
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex items-center gap-1.5">
                       <div className={`w-1.5 h-1.5 rounded-full ${isDark ? "bg-emerald-500" : "bg-emerald-600"}`} />
-                      <span className={`font-semibold text-[7px] tracking-[2px] uppercase ${isDark ? "text-emerald-400/80" : "text-emerald-600/80"}`}>VALORACIÓN MVP 2026</span>
+                      <span className={`font-semibold text-[11px] tracking-[2px] uppercase ${isDark ? "text-emerald-400/80" : "text-emerald-600/80"}`}>VALORACIÓN MVP 2026</span>
                     </div>
                     <p className={`text-[20px] font-semibold -tracking-[0.5px] ${isDark ? "text-white" : "text-slate-900"}`}>
                       {userName}
                     </p>
 
-                    <p className={`text-[10px] font-medium leading-snug mt-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                    <p className={`text-[12px] font-medium leading-snug mt-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                       Genera y comparte tu carta de valoración oficial con <br />tu rendimiento, logros y estadísticas de la temporada.
                     </p>
                   </div>

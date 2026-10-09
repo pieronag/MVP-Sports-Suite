@@ -100,7 +100,7 @@ export default function ExploreClubesPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[10px] font-semibold tracking-[3px] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.12em] uppercase animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -130,7 +130,7 @@ export default function ExploreClubesPage() {
             const SportIcon = SPORT_ICON_MAP[sport.toLowerCase()];
             return (
               <button key={sport} onClick={() => setSelectedSport(sport)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-md text-[10px] font-semibold uppercase whitespace-nowrap transition-all active:scale-95 ${selectedSport === sport ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-md text-[12px] font-semibold uppercase whitespace-nowrap transition-all active:scale-95 ${selectedSport === sport ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
                 {SportIcon && <SportIcon color={selectedSport === sport ? "white" : isDark ? "#94a3b8" : "#64748b"} size={14} />}
                 {sport}
               </button>
@@ -140,7 +140,7 @@ export default function ExploreClubesPage() {
         <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-none">
           {communesList.map((commune) => (
             <button key={commune} onClick={() => setSelectedCommune(commune)}
-              className={`px-3.5 py-2 rounded-md text-[10px] font-semibold uppercase whitespace-nowrap transition-all active:scale-95 ${selectedCommune === commune ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+              className={`px-3.5 py-2 rounded-md text-[12px] font-semibold uppercase whitespace-nowrap transition-all active:scale-95 ${selectedCommune === commune ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
               {commune}
             </button>
           ))}
@@ -162,9 +162,9 @@ export default function ExploreClubesPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute top-4 left-4 flex flex-wrap gap-1.5">
                     {allSports.slice(0, 3).map((s: string) => (
-                      <span key={s} className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[8px] font-semibold tracking-wider uppercase">{s}</span>
+                      <span key={s} className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold tracking-wider uppercase">{s}</span>
                     ))}
-                    {allSports.length > 3 && <span className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[8px] font-semibold">+{allSports.length - 3}</span>}
+                    {allSports.length > 3 && <span className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold">+{allSports.length - 3}</span>}
                   </div>
                 </div>
               </button>
@@ -202,7 +202,7 @@ export default function ExploreClubesPage() {
             <p className={`text-sm font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin recintos detectados</p>
           </div>
         )}
-        <p className={`text-center text-[8px] font-medium pt-2 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
+        <p className={`text-center text-[11px] font-medium pt-2 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
       </div>
     </div>
   );

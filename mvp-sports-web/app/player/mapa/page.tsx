@@ -153,7 +153,7 @@ export default function MapaPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[10px] font-semibold tracking-[3px] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.12em] uppercase animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -172,7 +172,7 @@ export default function MapaPage() {
           </button>
         </div>
         {geoError && (
-          <p className="text-amber-400 text-[9px] font-medium text-center mb-2">No se pudo obtener tu ubicación. Usando Santiago por defecto.</p>
+          <p className="text-amber-400 text-[11px] font-medium text-center mb-2">No se pudo obtener tu ubicación. Usando Santiago por defecto.</p>
         )}
         {/* Filters */}
         <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-none">
@@ -180,7 +180,7 @@ export default function MapaPage() {
             const CatIcon = cat.icon;
             return (
               <button key={cat.id} onClick={() => setActiveSport(cat.id)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-md text-[10px] font-semibold uppercase whitespace-nowrap transition-all active:scale-95 ${activeSport === cat.id ? "text-white" : isDark ? "text-slate-400 bg-white/[0.06] hover:bg-white/[0.1]" : "text-slate-500 bg-slate-100 hover:bg-slate-200"}`}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-md text-[12px] font-semibold uppercase whitespace-nowrap transition-all active:scale-95 ${activeSport === cat.id ? "text-white" : isDark ? "text-slate-400 bg-white/[0.06] hover:bg-white/[0.1]" : "text-slate-500 bg-slate-100 hover:bg-slate-200"}`}
                 style={activeSport === cat.id ? { backgroundColor: getSportColor(cat.id) } : {}}>
                 {CatIcon && <CatIcon color={activeSport === cat.id ? "white" : isDark ? "#94a3b8" : "#64748b"} size={14} />}
                 {cat.name}
@@ -216,9 +216,9 @@ export default function MapaPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 to-transparent" />
                     <div className="absolute top-4 left-4 flex flex-wrap gap-1.5">
                       {ds.slice(0, 3).map((s: string) => (
-                        <span key={s} className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[8px] font-semibold tracking-wider uppercase">{s}</span>
+                        <span key={s} className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold tracking-wider uppercase">{s}</span>
                       ))}
-                      {ds.length > 3 && <span className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[8px] font-semibold">+{ds.length - 3}</span>}
+                      {ds.length > 3 && <span className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold">+{ds.length - 3}</span>}
                     </div>
                     <div className="absolute bottom-4 left-5 right-5">
                       <div className="flex items-center justify-between">
@@ -227,13 +227,13 @@ export default function MapaPage() {
                           <div className="flex items-center gap-2 mt-1.5">
                             <div className="flex items-center gap-1 bg-emerald-500/20 px-2 py-0.5 rounded-md">
                               <Star size={10} className="text-emerald-500" fill="currentColor" />
-                              <span className="text-emerald-500 text-[9px] font-semibold">{Number(v.rating || 0).toFixed(1)}</span>
+                              <span className="text-emerald-500 text-[11px] font-semibold">{Number(v.rating || 0).toFixed(1)}</span>
                             </div>
                           </div>
                         </div>
                         <div className="bg-white/15 px-3 py-2 rounded-md flex items-center gap-1.5 border border-white/10 shrink-0 ml-3">
                           <Navigation size={11} className="text-white" />
-                          <span className="text-white text-[10px] font-semibold">{v.distance}</span>
+                          <span className="text-white text-[12px] font-semibold">{v.distance}</span>
                         </div>
                       </div>
                     </div>
@@ -243,7 +243,7 @@ export default function MapaPage() {
             );
           })
         )}
-        <p className={`text-center text-[8px] font-medium pt-2 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
+        <p className={`text-center text-[11px] font-medium pt-2 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
       </div>
     </div>
   );
