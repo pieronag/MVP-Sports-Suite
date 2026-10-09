@@ -170,7 +170,7 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
               Las reservas se efectúan mediante un flujo progresivo de 3 pasos (Deporte, Cancha, Fecha/Hora). Admitimos dos modalidades de pago:
             </p>
             <ul className="list-disc pl-5 space-y-1.5">
-              <li><strong>Pago Online:</strong> A través de Transbank Webpay Plus integrado en un WebView móvil seguro. No almacenamos datos de tarjetas físicas en base de datos.</li>
+              <li><strong>Pago Online:</strong> A través de Mercado Pago integrado en un WebView móvil seguro. No almacenamos datos de tarjetas físicas en base de datos.</li>
               <li><strong>Pago en Recinto:</strong> Selección presencial ante el administrador si no hay pasarela en línea activa.</li>
             </ul>
           </div>
@@ -190,7 +190,7 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
               <div className="flex justify-between border-b border-white/5 pb-2.5">
                 <div>
                   <span className="font-bold text-white block">Cancelaciones con más de 4 horas de anticipación:</span>
-                  Reembolso del dinero descontando un 3% por gastos de comisión y procesamiento de Transbank + IVA.
+                  Reembolso del dinero descontando un 3% por gastos de comisión y procesamiento de Mercado Pago + IVA.
                 </div>
                 <span className="text-[#00df82] font-black flex-shrink-0 ml-4">97% Reembolsado</span>
               </div>
@@ -204,7 +204,7 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
             </div>
             <div className="p-4 bg-amber-950/10 border border-amber-900/20 rounded-md">
               <span className="font-bold text-amber-400 uppercase tracking-wider text-[11px] block mb-1">
-                Falla en pasarela Transbank
+                Falla en pasarela de pagos
               </span>
               Si la devolución automática por API falla, el sistema liberará la cancha y creará un estado <code className="text-white">refund_failed</code>. La app del jugador generará un comprobante digital único con formato <code className="text-white">MVP-REFUND-[ID_RESERVA_8]</code>. El jugador deberá presentarlo al recinto para que la administración ejecute la devolución de forma manual (transferencia).
             </div>

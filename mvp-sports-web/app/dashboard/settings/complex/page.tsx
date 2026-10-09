@@ -79,8 +79,6 @@ export default function TenantSettingsPage() {
         instagram: '', whatsapp: '',
         isMercadopagoActive: false,
         mercadopagoPublicKey: '', mercadopagoAccessToken: '',
-        isTransbankActive: false,
-        transbankCommerceCode: '', transbankApiKey: '',
         isSiiActive: false, siiRut: '', siiApiKey: '',
         // Elementos Operativos
         openTime: '08:00', closeTime: '23:00',
@@ -180,8 +178,6 @@ export default function TenantSettingsPage() {
             isMercadopagoActive: t.isMercadopagoActive || false,
             // Los secretos nunca se leen al cliente: el campo queda vacío y solo se usa para reemplazarlos
             mercadopagoPublicKey: t.mercadopagoPublicKey || '', mercadopagoAccessToken: '',
-            isTransbankActive: t.isTransbankActive || false,
-            transbankCommerceCode: t.transbankCommerceCode || '', transbankApiKey: '',
             isSiiActive: t.isSiiActive || false, siiRut: t.siiRut || '', siiApiKey: '',
             openTime: computedOpen, closeTime: computedClose,
             cancellationPolicy: t.cancellationPolicy || '',
@@ -238,18 +234,15 @@ export default function TenantSettingsPage() {
 
         try {
             const isMpGloballyDisabled = globalSettings && globalSettings.paymentGateways && globalSettings.paymentGateways.mercadoPago === false;
-            const isTbGloballyDisabled = globalSettings && globalSettings.paymentGateways && globalSettings.paymentGateways.webpay === false;
 
             const updatedData = {
                 ...formData,
                 isMercadopagoActive: isMpGloballyDisabled ? false : formData.isMercadopagoActive,
-                isTransbankActive: isTbGloballyDisabled ? false : formData.isTransbankActive,
                 openingHours: `${formData.openTime} - ${formData.closeTime}`
             };
 
             // Las credenciales van por API a tenant_secrets; nunca al documento público del recinto
-            const { mercadopagoAccessToken, siiApiKey, transbankApiKey, ...publicData } = updatedData;
-            void transbankApiKey;
+            const { mercadopagoAccessToken, siiApiKey, ...publicData } = updatedData;
             const secretPayload: Record<string, string> = {};
             if (mercadopagoAccessToken.trim()) secretPayload.mercadopagoAccessToken = mercadopagoAccessToken;
             if (siiApiKey.trim()) secretPayload.siiApiKey = siiApiKey;
@@ -320,14 +313,6 @@ export default function TenantSettingsPage() {
             } else {
                 setTerminalLines(prev => [...prev, { text: `[MERCADOPAGO] 401 No Autorizado. Faltan credenciales.`, type: 'error' }]);
             }
-        } else if (api === 'transbank') {
-            success = !!(formData.transbankCommerceCode && formData.transbankApiKey);
-            if (success) {
-                setTerminalLines(prev => [...prev, { text: `[TRANSBANK] 200 OK. Conexión Webpay Plus REST exitosa.`, type: 'success' }]);
-                setTerminalLines(prev => [...prev, { text: `[TRANSBANK] Integración certificada. Ambiente Producción respondido en 142ms.`, type: 'info' }]);
-            } else {
-                setTerminalLines(prev => [...prev, { text: `[TRANSBANK] 403 Prohibido. Credenciales faltantes o inválidas.`, type: 'error' }]);
-            }
         } else if (api === 'sii') {
             success = !!(formData.siiRut && (formData.siiApiKey || secretsConfigured.siiApiKey));
             if (success) {
@@ -344,17 +329,15 @@ export default function TenantSettingsPage() {
     };
 
     const isMpGloballyDisabled = globalSettings && globalSettings.paymentGateways && globalSettings.paymentGateways.mercadoPago === false;
-    const isTbGloballyDisabled = globalSettings && globalSettings.paymentGateways && globalSettings.paymentGateways.webpay === false;
 
     const isMpActive = formData.isMercadopagoActive && !isMpGloballyDisabled;
-    const isTbActive = formData.isTransbankActive && !isTbGloballyDisabled;
 
     const sectionStatus: any = {
         identidad: formData.name && formData.address ? 'done' : 'pending',
         legal: formData.legalName && formData.rut ? 'done' : 'pending',
         contacto: (formData.whatsapp || formData.instagram || formData.website || formData.contactEmail) ? 'done' : 'pending',
         operacion: formData.openTime && formData.closeTime ? 'done' : 'pending',
-        integraciones: (isMpActive || isTbActive) ? 'done' : 'pending',
+        integraciones: isMpActive ? 'done' : 'pending',
     };
 
     const scrollToSection = (id: string) => {
@@ -611,26 +594,6 @@ export default function TenantSettingsPage() {
                                         )}
                                     </div>
 
-                                    {/* TRANSBANK */}
-                                    <div className={`p-6 bg-white dark:bg-[#020611] rounded-md border transition-all ${isTbGloballyDisabled ? 'opacity-40 grayscale' : isTbActive ? 'border-pink-500/40 shadow-lg shadow-pink-500/5' : 'border-slate-200 dark:border-white/10 opacity-60'}`}>
-                                        <div className="flex items-center justify-between mb-6">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-11 h-11 rounded-md bg-pink-500/10 flex items-center justify-center text-pink-500 border border-pink-500/20"><HugeiconsIcon icon={Building01Icon} className="w-6 h-6" /></div>
-                                                <div>
-                                                    <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest leading-none">Transbank</h4>
-                                                    {isTbGloballyDisabled && <p className="text-[7px] font-black text-red-500 uppercase tracking-widest mt-1">Desactivado por Plataforma</p>}
-                                                </div>
-                                            </div>
-                                            <ToggleMini enabled={isTbActive} onChange={() => setFormData({ ...formData, isTransbankActive: !formData.isTransbankActive })} disabled={isTbGloballyDisabled} color="bg-pink-500 shadow-pink-500/20" />
-                                        </div>
-                                        {isTbActive && (
-                                            <div className="space-y-4 animate-fadeIn">
-                                                <InputMini label="Commerce Code" value={formData.transbankCommerceCode} onChange={(e: any) => setFormData({ ...formData, transbankCommerceCode: e.target.value })} icon={<HugeiconsIcon icon={Key01Icon} className="w-4 h-4 text-pink-500" />} />
-                                                <InputMini label="API Key" type="password" value={formData.transbankApiKey} onChange={(e: any) => setFormData({ ...formData, transbankApiKey: e.target.value })} icon={<HugeiconsIcon icon={ShieldCheckIcon} className="w-4 h-4 text-pink-500" />} />
-                                                <button onClick={() => simulateApiTest('transbank')} className="w-full py-3 bg-pink-500 text-white text-[9px] font-black uppercase tracking-widest rounded-md hover:bg-pink-600 transition-all shadow-lg shadow-pink-500/20">Verificar API</button>
-                                            </div>
-                                        )}
-                                    </div>
                                 </div>
 
                                 {/* TERMINAL DE DIAGNÓSTICO */}

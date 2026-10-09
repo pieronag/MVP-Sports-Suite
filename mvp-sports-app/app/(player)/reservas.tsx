@@ -536,7 +536,7 @@ export default function MisReservasScreen() {
                                     <LargeDetailRow label="Deporte" value={(selectedBooking?.sport || '—').toUpperCase()} C={C} />
                                     <LargeDetailRow label="Fecha Partido" value={getFormattedDate(selectedBooking?.date).full} C={C} />
                                     <LargeDetailRow label="Horario" value={`${selectedBooking?.startTime} HRS`} C={C} />
-                                    <LargeDetailRow label="Método Pago" value="Online (Webpay Plus)" C={C} />
+                                    <LargeDetailRow label="Método Pago" value="Online (Mercado Pago)" C={C} />
                                     <LargeDetailRow label="Estado Reclamación" value="Manual Pendiente" highlightColor="#ef4444" C={C} />
                                     <View style={{ height: 1, backgroundColor: C.border, marginVertical: 4 }} />
                                     <LargeDetailRow label="ID Reserva" value={selectedBooking?.id} C={C} />
@@ -548,7 +548,7 @@ export default function MisReservasScreen() {
                                         Instrucciones para Devolución
                                     </Text>
                                     <Text style={{ color: C.sub, fontSize: 10, fontWeight: '600', lineHeight: 14 }}>
-                                        Debido a una desconexión temporal con la pasarela de pagos de Transbank, el sistema automático no pudo reversar tu dinero. Presenta este comprobante de validación digital directamente al administrador o dueño del recinto deportivo para solicitar tu transferencia manual por el monto total indicado arriba.
+                                        Debido a una desconexión temporal con la pasarela de pagos, el sistema automático no pudo reversar tu dinero. Presenta este comprobante de validación digital directamente al administrador o dueño del recinto deportivo para solicitar tu transferencia manual por el monto total indicado arriba.
                                     </Text>
                                 </View>
 
@@ -558,7 +558,7 @@ export default function MisReservasScreen() {
                                         const displayD = getFormattedDate(selectedBooking.date).full;
                                         const shareText = `*COMPROBANTE DE DEVOLUCIÓN DE PAGO - MVP SPORTS*\n\n` +
                                             `Estimado Administrador de *${selectedBooking.tenantName}*,\n\n` +
-                                            `Presento el ticket oficial de solicitud de reembolso debido a una reversa automática fallida de Transbank. A continuación se detallan los datos de la transacción para su validación manual:\n\n` +
+                                            `Presento el ticket oficial de solicitud de reembolso debido a una reversa automática fallida de la pasarela de pagos. A continuación se detallan los datos de la transacción para su validación manual:\n\n` +
                                             `• *Código de Validación:* MVP-REFUND-${selectedBooking.id?.substring(0, 8).toUpperCase()}\n` +
                                             `• *ID de Reserva:* ${selectedBooking.id}\n` +
                                             `• *Jugador:* ${selectedBooking.clientName}\n` +

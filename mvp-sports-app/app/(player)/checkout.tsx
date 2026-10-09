@@ -69,7 +69,7 @@ export default function CheckoutScreen() {
     const [showWebView, setShowWebView] = useState(false);
     const [tenant, setTenant] = useState<Tenant | null>(null);
     const [loadingTenant, setLoadingTenant] = useState(true);
-    const [webpayData, setWebpayData] = useState<any>(null);
+    const [mpData, setMpData] = useState<any>(null);
     const [isNewBookingCreated, setIsNewBookingCreated] = useState(false);
     const [pendingBooking, setPendingBooking] = useState<any>(null);
     const [hasCashNoShow, setHasCashNoShow] = useState(false);
@@ -109,8 +109,8 @@ export default function CheckoutScreen() {
     const isPaymentApiActive = 
         (tenant as any)?.paymentApiActive === true || 
         (tenant as any)?.isPaymentApiActive === true || 
-        ((tenant as any)?.transbankCommerceCode !== undefined && (tenant as any)?.transbankCommerceCode !== '') ||
-        ((tenant as any)?.availableGateways?.webpay === true || (tenant as any)?.availableGateways?.mercadoPago === true);
+        (tenant as any)?.isMercadopagoActive === true ||
+        (tenant as any)?.availableGateways?.mercadoPago === true;
 
     // Si la API del recinto no está configurada, forzar pago en recinto
     useEffect(() => {
@@ -193,24 +193,7 @@ export default function CheckoutScreen() {
                 if (!tournamentId || !teamId) throw new Error("Datos de torneo incompletos.");
                 
                 if (paymentMethod === 'card') {
-                    // PAGO ONLINE EXTERNO DIRECTO PARA TORNEO
-                    const buyOrder = `TOR-${Date.now()}`;
-                    const webpayRes = await walletService.createWebpayTransaction(
-                        tournamentId as string,
-                        tenantId as string || 'system',
-                        priceNum,
-                        buyOrder
-                    );
-
-                    setWebpayData({
-                        url: webpayRes.url,
-                        token: webpayRes.token,
-                        tournamentId: tournamentId as string,
-                        teamId: teamId as string,
-                        teamName: teamName as string,
-                        price: priceNum
-                    });
-                    setShowWebView(true);
+                    throw new Error('EL PAGO ONLINE DE TORNEOS AÚN NO ESTÁ DISPONIBLE. ELIGE PAGO EN EL RECINTO.');
                 } else {
                     // PAGO EN EL RECINTO PARA TORNEO
                     await tournamentService.registerTeamInTournament(
@@ -271,37 +254,18 @@ export default function CheckoutScreen() {
                 let finalBookingId = bookingId as string;
 
                 if (paymentMethod === 'card') {
-                    // RESERVA PAGO ONLINE: No se crea el documento en Firestore antes de que el pago esté confirmado.
-                    // Generamos un ID de documento único localmente en memoria
-                    if (!finalBookingId) {
-                        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-                        let generatedId = '';
-                        for (let i = 0; i < 6; i++) {
-                            generatedId += chars.charAt(Math.floor(Math.random() * chars.length));
-                        }
-                        finalBookingId = generatedId;
-                        setIsNewBookingCreated(true);
-                    } else {
-                        setIsNewBookingCreated(false);
-                    }
-
-                    setPendingBooking(bookingData);
-
-                    // AHORA LLAMAMOS AL SISTEMA EXTERNO PARA INICIAR EL PAGO, PASANDO EL bookingData COMPLETO
-                    const buyOrder = `ORD-${Date.now()}`;
-                    const webpayRes = await walletService.createWebpayTransaction(
-                        finalBookingId,
-                        tenantId as string,
-                        priceNum,
-                        buyOrder,
-                        bookingData // Enviamos la data completa para crear la reserva solo al confirmarse el pago
-                    );
-
-                    setWebpayData({
-                        url: webpayRes.url,
-                        token: webpayRes.token,
-                        bookingId: finalBookingId
+                    // PAGO ONLINE (MERCADO PAGO): el servidor calcula el monto y crea la
+                    // reserva solo cuando Mercado Pago confirma el pago.
+                    const mp = await walletService.createMercadoPagoBooking({
+                        tenantId: tenantId as string,
+                        courtId: courtId as string,
+                        sport: (sport as string) || 'futbol',
+                        date: date as string,
+                        startTime: startTime as string,
+                        couponCode: appliedCoupon?.code,
+                        teamId: selectedTeamId || undefined,
                     });
+                    setMpData({ url: mp.url, bookingId: mp.bookingId, amount: mp.amount });
                     setShowWebView(true);
                 } else {
                     // PAGO EN RECINTO: REGISTRO DIRECTO Y RUTA DE TICKET
@@ -551,7 +515,7 @@ export default function CheckoutScreen() {
                             </View>
                             <View style={{ marginLeft: 15, flex: 1 }}>
                                 <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase' }}>Pago Online con Tarjeta</Text>
-                                <Text style={{ color: activeColor, fontSize: 10, fontWeight: '700' }}>PAGO SEGURO CON WEBPAY / REDCOMPRA</Text>
+                                <Text style={{ color: activeColor, fontSize: 10, fontWeight: '700' }}>PAGO SEGURO CON MERCADO PAGO</Text>
                             </View>
                             {paymentMethod === 'card' && <CheckCircle2 color={activeColor} size={20} />}
                         </TouchableOpacity>
@@ -612,19 +576,12 @@ export default function CheckoutScreen() {
                 </TouchableOpacity>
             </View>
 
-            {/* WEBVIEW TRANSBANK DIRECT ONLINE PAYMENT */}
+            {/* WEBVIEW MERCADO PAGO */}
             <Modal 
                 visible={showWebView} 
                 animationType="slide"
                 onRequestClose={async () => {
                     setShowWebView(false);
-                    if (webpayData?.bookingId && !isTournament && isNewBookingCreated) {
-                        try {
-                            await deleteDoc(doc(db, 'bookings', webpayData.bookingId));
-                        } catch (e) {
-                            console.error("Error deleting back-closed booking:", e);
-                        }
-                    }
                 }}
             >
                 <View style={{ flex: 1, backgroundColor: C.bg }}>
@@ -632,110 +589,52 @@ export default function CheckoutScreen() {
                         <Text style={{ fontSize: 18, fontWeight: '900', color: C.text, letterSpacing: -0.5 }}>PAGO ONLINE SEGURO</Text>
                         <TouchableOpacity onPress={async () => {
                             setShowWebView(false);
-                            if (webpayData?.bookingId && !isTournament && isNewBookingCreated) {
-                                try {
-                                    await deleteDoc(doc(db, 'bookings', webpayData.bookingId));
-                                } catch (e) {
-                                    console.error("Error deleting closed booking:", e);
-                                }
-                            }
                         }}>
                             <X color={C.text} size={24} />
                         </TouchableOpacity>
                     </View>
-                    {webpayData && (
+                    {mpData && (
                         <WebView
-                            source={{ uri: webpayData.url, method: 'POST', body: `token_ws=${webpayData.token}` }}
-                            onNavigationStateChange={async (navState) => {
-                                if (navState.url.includes('checkout/success')) {
+                            source={{ uri: mpData.url }}
+                            onNavigationStateChange={(navState) => {
+                                // El servidor (/api/mercadopago/commit) verifica el pago con Mercado Pago y
+                                // redirige: /player/ticket = aprobado; /player/billetera?... = pendiente o rechazado.
+                                const url = navState.url || '';
+                                if (url.includes('/player/ticket')) {
                                     setShowWebView(false);
-                                    if (!user) return;
-                                    if (isTournament) {
-                                        setProcessing(true);
-                                        try {
-                                            const priceNum = Number(price);
-                                            const userProfile = profile as any;
-                                            const clientName = userProfile?.displayName || userProfile?.fullName || user.displayName || 'Jugador MVP';
-                                            
-                                            await tournamentService.registerTeamInTournament(
-                                                tournamentId as string,
-                                                { id: teamId as string, name: teamName as string },
-                                                user.uid,
-                                                clientName,
-                                                priceNum
-                                            );
-                                            
-                                            setCustomAlert({
-                                                visible: true,
-                                                title: '¡INSCRIPCIÓN EXITOSA!',
-                                                message: `TU EQUIPO ${teamName?.toString().toUpperCase()} HA SIDO INSCRITO EN EL TORNEO ${(tournamentName as string).toUpperCase()}.`,
-                                                type: 'success',
-                                                onClose: () => router.back()
-                                            });
-                                        } catch (err: any) {
-                                            setCustomAlert({
-                                                visible: true,
-                                                title: 'ERROR INSCRIPCIÓN',
-                                                message: 'PAGO APROBADO PERO HUBO UN ERROR AL REGISTRAR EL EQUIPO.',
-                                                type: 'error'
-                                            });
-                                        } finally {
-                                            setProcessing(false);
+                                    setCustomAlert({
+                                        visible: true,
+                                        title: '¡RESERVA CONFIRMADA!',
+                                        message: 'TU PAGO FUE APROBADO Y TU RESERVA ESTÁ CONFIRMADA.',
+                                        type: 'success',
+                                        onClose: () => {
+                                            router.replace({
+                                                pathname: '/ticket',
+                                                params: {
+                                                    bookingId: mpData.bookingId, sport, sportColor,
+                                                    tenantName: (tenantName as string || '').toUpperCase(),
+                                                    courtName: (courtName as string || '').toUpperCase(),
+                                                    startTime, date, price: String(mpData.amount ?? price)
+                                                }
+                                            } as any);
                                         }
-                                    } else {
-                                        // CREAR LA RESERVA AHORA EN FIRESTORE EN EL CLIENTE COMO CAPA DE SEGURIDAD
-                                        try {
-                                            const { doc: fsDoc, setDoc: fsSetDoc, serverTimestamp: fsServerTimestamp } = require('firebase/firestore');
-                                            const finalData = {
-                                                ...pendingBooking,
-                                                paymentStatus: 'paid',
-                                                status: 'confirmed',
-                                                updatedAt: fsServerTimestamp()
-                                            };
-                                            await fsSetDoc(fsDoc(db, 'bookings', webpayData.bookingId), finalData);
-
-                                            if (appliedCoupon) {
-                                                await couponService.incrementCouponUsage(appliedCoupon.id);
-                                            }
-                                        } catch (err) {
-                                            console.error("Error creating booking in success callback:", err);
-                                        }
-
-                                        setCustomAlert({
-                                            visible: true,
-                                            title: '¡RESERVA CONFIRMADA!',
-                                            message: 'TU PAGO ONLINE HA SIDO PROCESADO Y TU RESERVA ESTÁ COMPLETADA.',
-                                            type: 'success',
-                                            onClose: () => {
-                                                router.replace({
-                                                    pathname: '/ticket',
-                                                    params: { 
-                                                        bookingId: webpayData.bookingId, sport, sportColor, 
-                                                        tenantName: (tenantName as string || '').toUpperCase(), 
-                                                        courtName: (courtName as string || '').toUpperCase(), 
-                                                        startTime, date, price: price.toString() 
-                                                    }
-                                                } as any);
-                                            }
-                                        });
-                                    }
-                                } else if (navState.url.includes('checkout/error')) {
+                                    });
+                                } else if (url.includes('/player/billetera') && url.includes('payment=pending')) {
                                     setShowWebView(false);
-                                    
-                                    // Borrar la reserva si el pago falló o fue cancelado
-                                    if (webpayData?.bookingId && !isTournament && isNewBookingCreated) {
-                                        try {
-                                            await deleteDoc(doc(db, 'bookings', webpayData.bookingId));
-                                        } catch (e) {
-                                            console.error("Error deleting failed booking:", e);
-                                        }
-                                    }
-                                    
-                                    setCustomAlert({ 
-                                        visible: true, 
-                                        title: 'PAGO CANCELADO', 
-                                        message: 'EL PAGO ONLINE CON TARJETA FUE CANCELADO O RECHAZADO POR EL BANCO.', 
-                                        type: 'error' 
+                                    setCustomAlert({
+                                        visible: true,
+                                        title: 'PAGO PENDIENTE',
+                                        message: 'MERCADO PAGO AÚN NO CONFIRMA TU PAGO. TE AVISAREMOS CUANDO TU RESERVA QUEDE CONFIRMADA.',
+                                        type: 'success',
+                                        onClose: () => router.back()
+                                    });
+                                } else if (url.includes('/player/billetera') && url.includes('error=')) {
+                                    setShowWebView(false);
+                                    setCustomAlert({
+                                        visible: true,
+                                        title: 'PAGO NO COMPLETADO',
+                                        message: 'EL PAGO FUE CANCELADO O RECHAZADO. NO SE REALIZÓ NINGÚN COBRO NI RESERVA.',
+                                        type: 'error'
                                     });
                                 }
                             }}

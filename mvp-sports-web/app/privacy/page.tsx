@@ -152,7 +152,7 @@ export default function PrivacyPage() {
                   <div className="p-5 bg-slate-900/40 border border-white/5 rounded-md">
                     <h4 className="font-bold text-[#00df82] uppercase tracking-wider text-xs mb-2">Seguridad transaccional (cero tarjetas físicas)</h4>
                     <p className="text-slate-400 text-xs">
-                      Para garantizar la máxima seguridad financiera, <strong>MVP Sports Suite no recopila ni almacena números físicos de tarjetas bancarias, claves ni códigos CVV</strong>. Todas las transacciones se realizan directamente mediante la pasarela segura <strong>Transbank Webpay Plus</strong> dentro de un WebView in-app. Solo almacenamos metadatos de las transacciones (ID de reserva, fecha, monto total y estado de pago).
+                      Para garantizar la máxima seguridad financiera, <strong>MVP Sports Suite no recopila ni almacena números físicos de tarjetas bancarias, claves ni códigos CVV</strong>. Todas las transacciones se realizan directamente mediante la pasarela segura <strong>Mercado Pago</strong> dentro de un WebView in-app. Solo almacenamos metadatos de las transacciones (ID de reserva, fecha, monto total y estado de pago).
                     </p>
                   </div>
                 </div>
@@ -214,7 +214,7 @@ export default function PrivacyPage() {
                   <div className="p-5 bg-slate-900/30 border border-white/5 rounded-md">
                     <h4 className="font-bold text-white uppercase tracking-wider text-xs mb-2">Proveedores e integraciones</h4>
                     <p className="text-slate-400 text-xs leading-relaxed">
-                      <strong>Transbank</strong> (procesamiento y reversa de fondos), <strong>Google Cloud/Firebase</strong> (almacenamiento y Cloud Functions locales en Sudamérica) y <strong>Vercel</strong> (hosting de dashboard Next.js).
+                      <strong>Mercado Pago</strong> (procesamiento y reversa de fondos), <strong>Google Cloud/Firebase</strong> (almacenamiento y Cloud Functions locales en Sudamérica) y <strong>Vercel</strong> (hosting de dashboard Next.js).
                     </p>
                   </div>
                 </div>

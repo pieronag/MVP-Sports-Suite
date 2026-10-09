@@ -12,8 +12,6 @@ interface RateLimitConfig {
 
 const DEFAULTS: Record<string, RateLimitConfig> = {
   awardPlayerXp: {maxCalls: 5, windowMs: 60_000},
-  createWebpayTransaction: {maxCalls: 10, windowMs: 60_000},
-  authorizeOneclickPayment: {maxCalls: 10, windowMs: 60_000},
   sendAuthEmail: {maxCalls: 3, windowMs: 60_000},
   refundBookingPayment: {maxCalls: 3, windowMs: 60_000},
 };

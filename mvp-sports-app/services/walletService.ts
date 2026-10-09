@@ -1,6 +1,5 @@
 import { collection, doc, addDoc, getDocs, deleteDoc, updateDoc, Timestamp, getDoc } from 'firebase/firestore';
-import { db } from './firebase';
-import { getFunctions, httpsCallable } from 'firebase/functions';
+import { db, auth } from './firebase';
 import { auditService } from './auditService';
 
 export interface PaymentCard {
@@ -292,70 +291,20 @@ export const walletService = {
     },
 
     /**
-     * TRANSBANK WEBPAY PLUS: Iniciar transacción de pago directo
+     * MERCADO PAGO: crea la preferencia en el servidor (calcula el monto y la reserva).
      */
-    async createWebpayTransaction(bookingId: string, tenantId: string, amount: number, buyOrder: string, bookingData?: any): Promise<{ url: string; token: string }> {
-        const functions = getFunctions(undefined, 'southamerica-west1');
-        const startFn = httpsCallable(functions, 'createWebpayTransaction');
-        const result = await startFn({ bookingId, tenantId, amount, buyOrder, bookingData });
-        return result.data as any;
-    },
-
-    /**
-     * TRANSBANK ONECLICK: Iniciar proceso de inscripción de tarjeta
-     */
-    async startInscription(userId: string, email: string, cardData?: any): Promise<{ url: string; token: string; isMock?: boolean }> {
-        const functions = getFunctions(undefined, 'southamerica-west1');
-        const startFn = httpsCallable(functions, 'startOneclickInscription');
-        const result = await startFn({ 
-            email, 
-            cardNumber: cardData?.cardNumber?.replace(/\s/g, ''),
-            holderName: cardData?.holderName,
-            expiryMonth: cardData?.expiryMonth,
-            expiryYear: cardData?.expiryYear
+    async createMercadoPagoBooking(input: { tenantId: string; courtId: string; sport: string; date: string; startTime: string; couponCode?: string; teamId?: string }): Promise<{ url: string; preferenceId: string; bookingId: string; amount: number }> {
+        const token = await auth.currentUser?.getIdToken();
+        if (!token) throw new Error('INICIA SESIÓN PARA PAGAR');
+        const base = (process.env.EXPO_PUBLIC_API_URL || 'https://mvpsports.cl').replace(/\/$/, '');
+        const res = await fetch(`${base}/api/mercadopago/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify(input),
         });
-        return result.data as any;
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'ERROR AL INICIAR EL PAGO');
+        return data;
     },
-
-    /**
-     * TRANSBANK ONECLICK: Autorizar un pago con tarjeta guardada
-     */
-    async authorizePayment(userId: string, amount: number, bookingId: string, tenantId: string, cardId?: string): Promise<{ success: boolean; error?: string }> {
-        const functions = getFunctions(undefined, 'southamerica-west1');
-        const authFn = httpsCallable(functions, 'authorizeOneclickPayment');
-        try {
-            const result = await authFn({ amount, bookingId, tenantId, cardId });
-            const data = result.data as any;
-
-            if (data.success) {
-                await auditService.logAuditEvent({
-                    action: 'BILLETERA_TRANSACCION',
-                    module: 'Billetera/Móvil',
-                    details: `Pago autorizado con Oneclick exitosamente. Usuario: ${userId}, Monto: $${amount} CLP, Reserva: ${bookingId}, Recinto: ${tenantId}.`,
-                    severity: 'LOW',
-                    status: 'SUCCESS'
-                });
-            } else {
-                await auditService.logAuditEvent({
-                    action: 'BILLETERA_TRANSACCION',
-                    module: 'Billetera/Móvil',
-                    details: `Falla en autorización de pago con Oneclick para el usuario ${userId}. Monto: $${amount} CLP, Reserva: ${bookingId}.`,
-                    severity: 'LOW',
-                    status: 'WARNING'
-                });
-            }
-
-            return { success: data.success };
-        } catch (error: any) {
-            await auditService.logAuditEvent({
-                action: 'BILLETERA_TRANSACCION',
-                module: 'Billetera/Móvil',
-                details: `Falla técnica al autorizar pago Oneclick para el usuario ${userId}. Reserva: ${bookingId}. Error: ${error.message || error}`,
-                severity: 'LOW',
-                status: 'FAILED'
-            });
-            return { success: false, error: error.message };
-        }
-    }
 };
 

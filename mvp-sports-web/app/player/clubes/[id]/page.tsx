@@ -672,12 +672,6 @@ export default function VenueDetailPage() {
             </div>
             {/* Payment Methods */}
             <div className="flex flex-wrap gap-2">
-              {(venueData?.isTransbankActive || venueData?.transbankCommerceCode) && (
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
-                  <CreditCard size={11} className="text-emerald-500" />
-                  <span className={`text-[8px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-300" : "text-slate-600"}`}>Webpay Plus</span>
-                </div>
-              )}
               {venueData?.isMercadopagoActive && (
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
                   <CreditCard size={11} className="text-emerald-500" />

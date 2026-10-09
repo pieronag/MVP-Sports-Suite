@@ -892,7 +892,7 @@ export default function AuthScreen() {
                                 </Text>
                             </View>
                             <Text className="text-xs text-slate-400 font-semibold mb-4 leading-relaxed">
-                                Las transacciones online se procesan de manera aislada y segura mediante <Text className="text-white font-bold">Transbank Webpay Plus</Text> integrado en un WebView seguro in-app. La plataforma no almacena credenciales ni información financiera bancaria.
+                                Las transacciones online se procesan de manera aislada y segura mediante <Text className="text-white font-bold">Mercado Pago</Text> integrado en un WebView seguro in-app. La plataforma no almacena credenciales ni información financiera bancaria.
                             </Text>
                         </View>
 
@@ -1054,7 +1054,7 @@ export default function AuthScreen() {
                                 • <Text className="text-white font-bold">Identidad:</Text> Nombre completo, RUT, correo, teléfono e imágenes codificadas en Base64.{'\n\n'}
                                 • <Text className="text-white font-bold">Ubicación:</Text> Datos GPS para mapeo del buscador de recintos (sin almacenamiento histórico permanente).{'\n\n'}
                                 • <Text className="text-white font-bold">Actividad:</Text> Reservas, partidas, puntos de experiencia (XP), nivel ELO, y chats grupales tácticos de Squads.{'\n\n'}
-                                • <Text className="text-white font-bold">Financieros:</Text> Logs de transacciones Webpay sin almacenar información de tarjetas bancarias.
+                                • <Text className="text-white font-bold">Financieros:</Text> Logs de transacciones Mercado Pago sin almacenar información de tarjetas bancarias.
                             </Text>
                         </View>
 
@@ -1090,7 +1090,7 @@ export default function AuthScreen() {
                                 </Text>
                             </View>
                             <Text className="text-xs text-slate-400 font-semibold mb-4 leading-relaxed">
-                                MVP Sports Chile no vende datos personales. La información se comparte únicamente con los recintos deportivos donde el jugador concreta reservas para validación del check-in, Transbank para procesar pagos y Google Firebase para alojamiento seguro en la nube.
+                                MVP Sports Chile no vende datos personales. La información se comparte únicamente con los recintos deportivos donde el jugador concreta reservas para validación del check-in, Mercado Pago para procesar pagos y Google Firebase para alojamiento seguro en la nube.
                             </Text>
                         </View>
 

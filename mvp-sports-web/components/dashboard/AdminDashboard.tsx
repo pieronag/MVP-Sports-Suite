@@ -59,7 +59,7 @@ function getMethodBadge(b: any) {
 
     if (isNoShowBooking(b)) return { label: 'No-Show', style: 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400' };
     if (method === 'card' || method === 'webpay' || method === 'oneclick')
-        return { label: method === 'oneclick' ? 'Oneclick' : 'Webpay', style: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' };
+        return { label: method === 'oneclick' ? 'Oneclick (hist.)' : 'Webpay (hist.)', style: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400' };
     if (method === 'cash' || method === 'efectivo') return { label: 'Efectivo', style: 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400' };
     if (method === 'transfer' || method === 'transferencia') return { label: 'Transferencia', style: 'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400' };
     if (source === 'mobile_app' && b.paymentStatus === 'paid') return { label: 'Online App', style: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' };

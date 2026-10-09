@@ -189,7 +189,7 @@ export default function TicketScreen() {
                             <LargeDetailRow label="Deporte" value={(booking?.sport || '—').toUpperCase()} C={C} />
                             <LargeDetailRow label="Fecha Partido" value={displayDate} C={C} />
                             <LargeDetailRow label="Horario" value={`${booking?.startTime} HRS`} C={C} />
-                            <LargeDetailRow label="Método Pago" value="Online (Webpay Plus)" C={C} />
+                            <LargeDetailRow label="Método Pago" value="Online (Mercado Pago)" C={C} />
                             <LargeDetailRow label="Estado Reclamación" value="Manual Pendiente" highlightColor="#ef4444" C={C} />
                             <View style={{ height: 1, backgroundColor: C.border, marginVertical: 4 }} />
                             <LargeDetailRow label="ID Reserva" value={bookingId} C={C} />
@@ -202,7 +202,7 @@ export default function TicketScreen() {
                                 Instrucciones para Devolución
                             </Text>
                             <Text style={{ color: C.sub, fontSize: 10, fontWeight: '600', lineHeight: 14 }}>
-                                Debido a una desconexión temporal con la pasarela de pagos de Transbank, el sistema automático no pudo reversar tu dinero. Presenta este comprobante de validación digital directamente al administrador o dueño del recinto deportivo para solicitar tu transferencia manual por el monto total indicado arriba.
+                                Debido a una desconexión temporal con la pasarela de pagos, el sistema automático no pudo reversar tu dinero. Presenta este comprobante de validación digital directamente al administrador o dueño del recinto deportivo para solicitar tu transferencia manual por el monto total indicado arriba.
                             </Text>
                         </View>
                     </View>
@@ -214,7 +214,7 @@ export default function TicketScreen() {
                                 if (!booking) return;
                                 const shareText = `*COMPROBANTE DE DEVOLUCIÓN DE PAGO - MVP SPORTS*\n\n` +
                                     `Estimado Administrador de *${booking?.tenantName}*,\n\n` +
-                                    `Presento el ticket oficial de solicitud de reembolso debido a una reversa automática fallida de Transbank. A continuación se detallan los datos de la transacción para su validación manual:\n\n` +
+                                    `Presento el ticket oficial de solicitud de reembolso debido a una reversa automática fallida de la pasarela de pagos. A continuación se detallan los datos de la transacción para su validación manual:\n\n` +
                                     `• *Código de Validación:* MVP-REFUND-${bookingId?.toUpperCase()}\n` +
                                     `• *ID de Reserva:* ${bookingId}\n` +
                                     `• *Jugador:* ${booking?.clientName}\n` +
@@ -418,7 +418,7 @@ export default function TicketScreen() {
                                 <View style={{ marginTop: 10, padding: 20, backgroundColor: '#ef444410', borderRadius: 25, borderWidth: 1, borderColor: '#ef444430', flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                                     <AlertCircle color="#ef4444" size={20} />
                                     <Text style={{ color: '#ef4444', fontSize: 11, fontWeight: '800', flex: 1, textTransform: 'uppercase', letterSpacing: 0.5, lineHeight: 14 }}>
-                                        Reversa Transbank automática fallida. Solicita tu devolución manual al administrador del recinto.
+                                        Reversa automática fallida. Solicita tu devolución manual al administrador del recinto.
                                     </Text>
                                 </View>
                             )}
@@ -536,7 +536,7 @@ export default function TicketScreen() {
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 10, fontWeight: '700' }}>MEDIO PAGO ORIG.</Text>
-                                    <Text style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontSize: 10, fontWeight: '900', textTransform: 'uppercase' }}>TARJETA ONLINE (WEBPAY)</Text>
+                                    <Text style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontSize: 10, fontWeight: '900', textTransform: 'uppercase' }}>TARJETA ONLINE (MERCADO PAGO)</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Text style={{ color: isDark ? '#ef4444' : '#b91c1c', fontSize: 10, fontWeight: '800' }}>CÓDIGO VALIDACIÓN</Text>
@@ -555,7 +555,7 @@ export default function TicketScreen() {
                                     </Text>
                                 </View>
                                 <Text style={{ color: isDark ? '#64748B' : '#94A3B8', fontSize: 9, fontWeight: '600', lineHeight: 13 }}>
-                                    Este comprobante oficial certifica que la reserva fue cancelada bajo el reglamento de anticipación del recinto. Debido a una interrupción en la pasarela automatizada de Transbank, la reversa electrónica directa no pudo ser procesada. El administrador del recinto deberá realizar una transferencia electrónica manual al jugador para liquidar este reintegro, utilizando el ID de Reserva para la validación interna en su panel.
+                                    Este comprobante oficial certifica que la reserva fue cancelada bajo el reglamento de anticipación del recinto. Debido a una interrupción en la pasarela automatizada de pagos, la reversa electrónica directa no pudo ser procesada. El administrador del recinto deberá realizar una transferencia electrónica manual al jugador para liquidar este reintegro, utilizando el ID de Reserva para la validación interna en su panel.
                                 </Text>
                             </View>
                         </ScrollView>
@@ -567,7 +567,7 @@ export default function TicketScreen() {
                                     if (!booking) return;
                                     const shareText = `*COMPROBANTE DE DEVOLUCIÓN DE PAGO - MVP SPORTS*\n\n` +
                                         `Estimado Administrador de *${booking?.tenantName}*,\n\n` +
-                                        `Presento el ticket oficial de solicitud de reembolso debido a una reversa automática fallida de Transbank. A continuación se detallan los datos de la transacción para su validación manual:\n\n` +
+                                        `Presento el ticket oficial de solicitud de reembolso debido a una reversa automática fallida de la pasarela de pagos. A continuación se detallan los datos de la transacción para su validación manual:\n\n` +
                                         `• *Código de Validación:* MVP-REFUND-${bookingId?.toUpperCase()}\n` +
                                         `• *ID de Reserva:* ${bookingId}\n` +
                                         `• *Jugador:* ${booking?.clientName}\n` +

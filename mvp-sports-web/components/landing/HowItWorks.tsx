@@ -17,7 +17,7 @@ const steps = [
     icon: CreditCardIcon,
     title: "Reserva y paga online",
     description:
-      "Confirma tu horario y paga con Webpay Plus: débito, crédito o Redcompra. Recibes la confirmación al instante.",
+      "Confirma tu horario y paga con Mercado Pago: débito, crédito o saldo. Recibes la confirmación al instante.",
     accent: "text-blue-400",
   },
   {

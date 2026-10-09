@@ -23,7 +23,7 @@ import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 import BrandLogo from "../../components/BrandLogo";
 
-const TRUST_POINTS = ["Reserva canchas en segundos", "Paga online con Webpay", "Gestiona tu complejo"];
+const TRUST_POINTS = ["Reserva canchas en segundos", "Paga online con Mercado Pago", "Gestiona tu complejo"];
 
 export default function LoginPage() {
   const router = useRouter();

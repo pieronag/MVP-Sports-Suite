@@ -102,7 +102,7 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
               <HugeiconsIcon icon={CreditCardIcon} className="w-8 h-8 text-emerald-400" strokeWidth={1.6} />
               <h3 className="text-base font-black text-white">Pago 100% online.</h3>
               <p className="text-xs text-slate-400 leading-snug">
-                Webpay Plus con débito, crédito o Redcompra, sin efectivo.
+                Mercado Pago con débito, crédito o saldo, sin efectivo.
               </p>
             </div>
           </div>

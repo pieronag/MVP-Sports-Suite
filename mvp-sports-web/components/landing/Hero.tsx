@@ -4,7 +4,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Tick02Icon } from "@hugeicons/core-free-icons";
 import BrandLogo from "../BrandLogo";
 
-const trustPoints = ["Pago online con Webpay", "Confirmación instantánea", "Acceso con QR"];
+const trustPoints = ["Pago online con Mercado Pago", "Confirmación instantánea", "Acceso con QR"];
 
 const ORBIT_OUTER = [0, 45, 90, 135, 180, 225, 270, 315];
 const ORBIT_INNER = [22, 96, 170, 244, 318];

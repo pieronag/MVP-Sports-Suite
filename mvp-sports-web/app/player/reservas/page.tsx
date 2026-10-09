@@ -515,7 +515,7 @@ export default function ReservasPage() {
                   <DetailRow label="Deporte" value={(selectedBooking.sport || "—").toUpperCase()} subClr={subClr} textClr={textClr} />
                   <DetailRow label="Fecha Partido" value={getFormattedDate(selectedBooking.date).full} subClr={subClr} textClr={textClr} />
                   <DetailRow label="Horario" value={`${selectedBooking.startTime} HRS`} subClr={subClr} textClr={textClr} />
-                  <DetailRow label="Método Pago" value="Online (Webpay Plus)" subClr={subClr} textClr={textClr} />
+                  <DetailRow label="Método Pago" value="Online (Mercado Pago)" subClr={subClr} textClr={textClr} />
                   <div className="flex justify-between items-center py-0.5">
                     <span className={`text-[10px] font-semibold uppercase tracking-[0.5px] ${subClr}`}>Estado Reclamación</span>
                     <span className="text-red-500 text-[11px] font-semibold">Manual Pendiente</span>
@@ -530,7 +530,7 @@ export default function ReservasPage() {
                 <div className={`p-5 rounded-md border space-y-2 ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
                   <p className="text-red-500 text-[10px] font-semibold tracking-[0.5px] uppercase">Instrucciones para Devolución</p>
                   <p className={`text-[10px] font-semibold leading-[14px] ${subClr}`}>
-                    Debido a una desconexión temporal con la pasarela de pagos de Transbank, el sistema automático no pudo reversar tu dinero. Presenta este comprobante de validación digital directamente al administrador o dueño del recinto deportivo para solicitar tu transferencia manual por el monto total indicado arriba.
+                    Debido a una desconexión temporal con la pasarela de pagos, el sistema automático no pudo reversar tu dinero. Presenta este comprobante de validación digital directamente al administrador o dueño del recinto deportivo para solicitar tu transferencia manual por el monto total indicado arriba.
                   </p>
                 </div>
                 <button
@@ -539,7 +539,7 @@ export default function ReservasPage() {
                     const displayD = getFormattedDate(selectedBooking.date).full;
                     const shareText = `*COMPROBANTE DE DEVOLUCIÓN DE PAGO - MVP SPORTS*\n\n` +
                       `Estimado Administrador de *${selectedBooking.tenantName}*,\n\n` +
-                      `Presento el ticket oficial de solicitud de reembolso debido a una reversa automática fallida de Transbank. A continuación se detallan los datos de la transacción para su validación manual:\n\n` +
+                      `Presento el ticket oficial de solicitud de reembolso debido a una reversa automática fallida de la pasarela de pagos. A continuación se detallan los datos de la transacción para su validación manual:\n\n` +
                       `• *Código de Validación:* MVP-REFUND-${(selectedBooking.id || "").substring(0, 8).toUpperCase()}\n` +
                       `• *ID de Reserva:* ${selectedBooking.id}\n` +
                       `• *Jugador:* ${selectedBooking.clientName}\n` +

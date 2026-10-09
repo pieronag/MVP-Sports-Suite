@@ -42,12 +42,11 @@ import { auditService } from '@/services/auditService';
 interface SettingsData {
     platformName: string; supportEmail: string; maintenanceMode: boolean;
     corporateData: { rut: string; razonSocial: string; direccion: string; giro: string; representante: string; emailFacturacion: string; };
-    plans: any[]; paymentGateways: { mercadoPago: boolean; webpay: boolean }; legal: { terms: string; privacy: string };
+    plans: any[]; paymentGateways: { mercadoPago: boolean }; legal: { terms: string; privacy: string };
     sii: { enabled: boolean; testMode: boolean; taxRate: number; rutEmpresa: string; enableForTenants: boolean; };
 }
 
 interface AdminUser { uid: string; fullName?: string; email: string; role: string; status: string; }
-interface TransbankMaster { commerceCode: string; apiKey: string; }
 interface ModalConfig { show: boolean; title: string; message: string; type: 'confirm' | 'alert' | 'success' | 'danger'; confirmText?: string; onConfirm?: () => void; onCancel?: () => void; }
 
 const DEFAULT_SETTINGS: SettingsData = {
@@ -59,7 +58,7 @@ const DEFAULT_SETTINGS: SettingsData = {
         { id: 'pro', name: 'Pro', price: 59990, commission: 2.0, priorityScore: 60, features: { topPosition: true, multiRecinto: true, analytics: true, marketing: true } },
         { id: 'elite', name: 'Elite', price: 99990, commission: 0, priorityScore: 100, features: { topPosition: true, multiRecinto: true, analytics: true, marketing: true, support: true } }
     ],
-    paymentGateways: { mercadoPago: true, webpay: true },
+    paymentGateways: { mercadoPago: true },
     legal: { terms: 'Términos y condiciones de uso de la plataforma...', privacy: 'Política de privacidad y tratamiento de datos...' },
     sii: { enabled: false, testMode: true, taxRate: 19, rutEmpresa: '76.123.456-7', enableForTenants: false }
 };
@@ -102,7 +101,6 @@ export default function SettingsPage() {
     const [saving, setSaving] = useState(false);
     const [dirty, setDirty] = useState(false);
     const [adminTeam, setAdminTeam] = useState<AdminUser[]>([]);
-    const [transbankMaster, setTransbankMaster] = useState<TransbankMaster>({ commerceCode: '', apiKey: '' });
     const [isExecuting, setIsExecuting] = useState(false);
     const [promoEmail, setPromoEmail] = useState('');
     const [staffSearch, setStaffSearch] = useState('');
@@ -145,8 +143,6 @@ export default function SettingsPage() {
                     const ref = (t.planId || t.plan || '').toString().trim().toLowerCase();
                     return ref ? activePlans.find((p: any) => (p.id || '').toLowerCase() === ref || (p.name || '').toLowerCase() === ref) : undefined;
                 };
-                const tbSnap = await getDoc(doc(db, 'settings', 'transbank_master'));
-                if (tbSnap.exists()) setTransbankMaster(tbSnap.data() as TransbankMaster);
                 await loadTeam();
                 const tSnap = await getDocs(collection(db, 'tenants'));
                 const tenants = tSnap.docs.map(d => d.data());
@@ -238,7 +234,6 @@ export default function SettingsPage() {
         setSaving(true);
         try {
             await updateDoc(doc(db, 'settings', 'global'), { ...settings, updatedAt: serverTimestamp() });
-            await setDoc(doc(db, 'settings', 'transbank_master'), transbankMaster);
             const updated = await syncTenantsToPlans(true);
             await auditService.logAuditEvent({
                 action: 'NÚCLEO_UPDATE',
@@ -439,7 +434,6 @@ export default function SettingsPage() {
 
     const inputCls = "w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-4 py-2.5 text-xs font-bold outline-none text-slate-800 dark:text-white focus:border-emerald-500/40 transition-all";
     const panelCls = "rounded-md bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-6";
-    const oneclickConfigured = !!(transbankMaster.commerceCode && transbankMaster.apiKey);
 
     if (loading) {
         return (
@@ -614,7 +608,7 @@ export default function SettingsPage() {
                                 <div className="space-y-4">
                                     {[
                                         { label: 'Facturación automática', desc: 'Emitir boleta y factura electrónica (SII)', key: 'enabled', color: 'bg-emerald-500 dark:bg-[#00df82]' },
-                                        { label: 'Modo de pruebas', desc: 'Usar el entorno de certificación de Transbank', key: 'testMode', color: 'bg-amber-500' },
+                                        { label: 'Modo de pruebas', desc: 'Usar el entorno de pruebas (sandbox) de Mercado Pago', key: 'testMode', color: 'bg-amber-500' },
                                         { label: 'Facturar a todos tus recintos', desc: 'Habilita el envío de DTE a cada sede', key: 'enableForTenants', color: 'bg-emerald-500 dark:bg-[#00df82]' },
                                     ].map(row => (
                                         <div key={row.key} className="flex items-center justify-between bg-white dark:bg-white/5 p-4 rounded-md border border-slate-200 dark:border-white/10">
@@ -648,7 +642,7 @@ export default function SettingsPage() {
                                     <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest leading-none font-heading">Medios de pago</h4>
                                 </div>
                                 <div className="space-y-3">
-                                    {[['mercadoPago', 'Mercado Pago'], ['webpay', 'Transbank Webpay']].map(([id, label]) => (
+                                    {[['mercadoPago', 'Mercado Pago']].map(([id, label]) => (
                                         <div key={id} className="flex items-center justify-between p-5 bg-white dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-md bg-slate-100 dark:bg-white/5 flex items-center justify-center text-indigo-500"><HugeiconsIcon icon={MoneyBag01Icon} className="w-5 h-5" strokeWidth={1.6} /></div>
@@ -663,29 +657,6 @@ export default function SettingsPage() {
                                 </div>
                             </div>
 
-                            <div className={`${panelCls} space-y-5`}>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-md bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-500"><HugeiconsIcon icon={Key01Icon} className="w-5 h-5" strokeWidth={1.6} /></div>
-                                    <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest leading-none font-heading">Pago Oneclick (Transbank)</h4>
-                                </div>
-                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[8px] font-black uppercase border ${oneclickConfigured ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-[#00df82]' : 'bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-400'}`}>
-                                    <span className={`w-1.5 h-1.5 rounded-full ${oneclickConfigured ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                                    {oneclickConfigured ? 'Credenciales configuradas' : 'No configurado'}
-                                </span>
-                                <p className="text-[8px] font-black text-slate-400 uppercase leading-relaxed">
-                                    Pago con tarjeta guardada en 1 clic. Cada recinto usa su propio código de comercio.
-                                </p>
-                                <div className="space-y-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Código de comercio</label>
-                                        <input type="text" value={transbankMaster.commerceCode} onChange={e => { setTransbankMaster(prev => ({ ...prev, commerceCode: e.target.value })); markDirty(); }} placeholder="5970123456" className={`${inputCls} font-mono`} />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">API Key</label>
-                                        <input type="password" value={transbankMaster.apiKey} onChange={e => { setTransbankMaster(prev => ({ ...prev, apiKey: e.target.value })); markDirty(); }} placeholder="API Key de Transbank" className={`${inputCls} font-mono`} />
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 )}

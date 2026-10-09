@@ -5,8 +5,8 @@ import { Shield01Icon, MapPinIcon, SquareLock01Icon } from "@hugeicons/core-free
 const integrations = [
   {
     icon: Shield01Icon,
-    name: "Transbank",
-    detail: "Pagos Webpay Plus y Oneclick",
+    name: "Mercado Pago",
+    detail: "Pagos online y reembolsos",
   },
   {
     icon: MapPinIcon,

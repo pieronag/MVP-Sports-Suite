@@ -44,6 +44,13 @@ if (g?.mercadopago?.accessToken) {
   }
 }
 
+// Credenciales maestras de Transbank (integración eliminada): borrar
+const tbm = await db.collection("settings").doc("transbank_master").get();
+if (tbm.exists) {
+  console.log("settings/transbank_master: credenciales Transbank (se elimina)");
+  if (apply) await tbm.ref.delete();
+}
+
 console.log(`\n${moved} recintos con credenciales ${apply ? "migrados" : "por migrar (ejecuta con --apply)"}.`);
 console.log("Recuerda ROTAR los tokens en Mercado Pago: estuvieron expuestos públicamente.");
 process.exit(0);

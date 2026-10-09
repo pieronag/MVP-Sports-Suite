@@ -140,7 +140,7 @@ export default function TicketPage() {
             {[
               { label: "ID Reserva", val: bookingId || "—" },
               { label: "Estado", val: statusBadge(booking?.paymentStatus || "") },
-              { label: "Método", val: ["card", "webpay", "online"].includes((booking as any)?.paymentMethod || "") ? "Tarjeta Online" : "Pago Recinto" },
+              { label: "Método", val: ["card", "webpay", "online", "mercadopago"].includes((booking as any)?.paymentMethod || "") ? "Tarjeta Online" : "Pago Recinto" },
               { label: "Código", val: `#${(bookingId || "").slice(-6).toUpperCase()}` },
             ].map((r) => (
               <div key={r.label} className="flex items-center justify-between">
@@ -255,7 +255,7 @@ export default function TicketPage() {
                   <p className={`text-[9px] font-semibold uppercase tracking-wider ${isDark ? "text-slate-400" : "text-slate-500"}`}>Instrucciones</p>
                 </div>
                 <p className={`text-[8px] font-medium leading-relaxed ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                  Comprobante oficial de cancelación. La reversa automática de Transbank falló. El administrador del recinto debe realizar la transferencia manual usando el ID de Reserva.
+                  Comprobante oficial de cancelación. La reversa automática de la pasarela de pagos falló. El administrador del recinto debe realizar la transferencia manual usando el ID de Reserva.
                 </p>
               </div>
             </div>

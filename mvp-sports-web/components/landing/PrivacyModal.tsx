@@ -118,7 +118,7 @@ export default function PrivacyModal({ isOpen, onClose }: PrivacyModalProps) {
               </div>
               <div className="p-4 bg-slate-950/40 border border-white/5 rounded-md">
                 <span className="font-bold text-[#00df82] uppercase tracking-wider block mb-1">Seguridad Financiera</span>
-                <strong>No almacenamos números de tarjetas de débito/crédito</strong> en base de datos. Los pagos online se transaccionan de forma externa y segura en la API de <strong>Transbank Webpay Plus</strong> dentro de un WebView in-app.
+                <strong>No almacenamos números de tarjetas de débito/crédito</strong> en base de datos. Los pagos online se transaccionan de forma externa y segura en la API de <strong>Mercado Pago</strong> dentro de un WebView in-app.
               </div>
             </div>
           </div>
@@ -155,7 +155,7 @@ export default function PrivacyModal({ isOpen, onClose }: PrivacyModalProps) {
             </p>
             <ul className="list-disc pl-5 space-y-1.5">
               <li>Con recintos deportivos donde reservas (para el ingreso).</li>
-              <li>Con Transbank Webpay Plus (para cobros y reembolsos automáticos).</li>
+              <li>Con Mercado Pago (para cobros y reembolsos automáticos).</li>
               <li>Con infraestructura de base de datos segura de Google Firebase / Google Cloud en Sudamérica.</li>
             </ul>
           </div>

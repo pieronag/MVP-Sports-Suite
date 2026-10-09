@@ -186,14 +186,26 @@ service cloud.firestore {
     // 📅 RESERVAS Y OPERATIVA
     // ==========================================
     
+    // Campos de cobro de una reserva: solo personal del recinto o el servidor
+    function bookingPaymentKeys() {
+      return ['paymentStatus', 'paymentMethod', 'paymentRecordId', 'totalPrice', 'price', 'originalPrice', 'deposit', 'discountApplied', 'refundAmount', 'refundDetails', 'tenantId', 'courtId'];
+    }
+
     match /bookings/{bookingId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
+      // Un jugador solo crea reservas a su nombre y sin pago confirmado: las reservas
+      // pagadas online las crea el servidor tras verificar el pago en Mercado Pago.
+      allow create: if isStaff() || isSuperAdmin() || (
+        isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.get('paymentStatus', 'pending') == 'pending' &&
+        !request.resource.data.keys().hasAny(['paymentRecordId', 'refundAmount', 'refundDetails'])
+      );
       allow update: if isAuthenticated() && (
         isStaff() ||
         isSuperAdmin() ||
-        resource.data.userId == request.auth.uid || 
-        resource.data.userEmail == request.auth.token.email ||
+        ((resource.data.userId == request.auth.uid || resource.data.userEmail == request.auth.token.email) &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(bookingPaymentKeys())) ||
         // Fallback: Si el usuario tiene acceso al recinto (tenantId o tenantIds)
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && (
           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.tenantId == resource.data.tenantId ||

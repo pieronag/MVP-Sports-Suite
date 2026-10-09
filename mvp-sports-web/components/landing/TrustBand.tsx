@@ -9,7 +9,7 @@ import {
 
 const stats = [
   { icon: TrophyIcon, value: "6", label: "Deportes en una sola app" },
-  { icon: CreditCardIcon, value: "100%", label: "Pagos online con Transbank" },
+  { icon: CreditCardIcon, value: "100%", label: "Pagos online con Mercado Pago" },
   { icon: Clock01Icon, value: "24/7", label: "Reserva desde tu celular" },
   { icon: QrCode01Icon, value: "QR", label: "Acceso sin contacto al recinto" },
 ];
@@ -37,7 +37,7 @@ export default function TrustBand() {
 
         <p className="mt-10 text-center text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-500">
           Construido con tecnología de{" "}
-          <span className="text-slate-300 font-black">Transbank</span>,{" "}
+          <span className="text-slate-300 font-black">Mercado Pago</span>,{" "}
           <span className="text-slate-300 font-black">Google Maps</span> y{" "}
           <span className="text-slate-300 font-black">Firebase</span>
         </p>

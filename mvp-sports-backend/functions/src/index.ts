@@ -1,33 +1,23 @@
-import {onCall, onRequest, HttpsError} from "firebase-functions/v2/https";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
 import {onSchedule} from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 import * as logger from "firebase-functions/logger";
-import {transbank} from "./transbank";
 import {checkRateLimit} from "./rateLimiter";
-import {IntegrationCommerceCodes} from "transbank-sdk";
 
 admin.initializeApp();
 
 const db = admin.firestore();
 
-function withTimeout<T>(promise: Promise<T>, ms: number, msg: string): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(`Timeout: ${msg} (${ms}ms)`)), ms)
-    ),
-  ]);
-}
-
-// Configura estas variables de entorno con las URLs reales después del deploy:
-// CF_BASE_URL → URL de commitWebpayTransaction (HTTP onRequest)
-// ONECLICK_BASE_URL → URL de finishOneclickInscription (HTTP onRequest)
-function getBaseUrl(): string {
-  return process.env.CF_BASE_URL || "https://commitwebpaytransaction-i6cn7w2g5a-tl.a.run.app";
-}
-
-function getOneclickBaseUrl(): string {
-  return process.env.ONECLICK_BASE_URL || "https://finishoneclickinscription-i6cn7w2g5a-tl.a.run.app";
+// Token Mercado Pago del recinto (tenant_secrets) o de la plataforma (settings_private)
+async function resolveMercadoPagoToken(tenantId?: string): Promise<string | undefined> {
+  if (tenantId && tenantId !== "system") {
+    const sec = (await db.collection("tenant_secrets").doc(tenantId).get()).data();
+    if (sec?.mercadopagoAccessToken) return sec.mercadopagoAccessToken;
+    const legacy = (await db.collection("tenants").doc(tenantId).get()).data();
+    if (legacy?.mercadopagoAccessToken) return legacy.mercadopagoAccessToken;
+  }
+  const priv = (await db.collection("settings_private").doc("global").get()).data();
+  return priv?.mercadopagoAccessToken || process.env.MERCADOPAGO_ACCESS_TOKEN || undefined;
 }
 
 interface GamificationSettings {
@@ -126,442 +116,6 @@ export const awardPlayerXp = onCall(async (request) => {
     throw new HttpsError("internal", "Error al procesar la recompensa.");
   }
 });
-
-/**
- * WEBPAY PLUS: Iniciar Transacción
- */
-export const createWebpayTransaction = onCall(
-  {region: "southamerica-west1"},
-  async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Debes estar autenticado.");
-    }
-
-    const uid = request.auth.uid;
-    await checkRateLimit("createWebpayTransaction", uid);
-
-    const {bookingId, tenantId, amount, buyOrder, bookingData, returnUrl} = request.data;
-
-    try {
-      const tenantDoc = await db.collection("tenants").doc(tenantId).get();
-      const tenantData = tenantDoc.data();
-
-      const commerceCode = tenantData?.transbankCommerceCode;
-      const apiKey = tenantData?.transbankApiKey;
-
-      const baseUrl = getBaseUrl();
-      const commitUrl = `${baseUrl}?tenantId=${tenantId}`;
-
-      const response = await withTimeout(
-        transbank.createWebpay(
-          buyOrder || `ORD-${Date.now()}`,
-          uid,
-          amount,
-          commitUrl,
-          commerceCode,
-          apiKey,
-        ),
-        15000,
-        "Transbank.createWebpay",
-      );
-
-      await db.collection("payments").add({
-        userId: uid,
-        bookingId,
-        tenantId,
-        amount,
-        buyOrder: buyOrder || `ORD-${Date.now()}`,
-        token: response.token,
-        status: "pending",
-        method: "webpay_plus",
-        pendingBookingData: bookingData || null,
-        returnUrl: returnUrl || null,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-
-      return {
-        url: response.url,
-        token: response.token,
-      };
-    } catch (error: any) {
-      logger.error("Webpay Create Error:", error);
-      throw new HttpsError(
-        "internal",
-        error.message || "Error al iniciar pago con Webpay.",
-      );
-    }
-  });
-
-/**
- * WEBPAY PLUS: Confirmar Transacción (Webhook)
- */
-export const commitWebpayTransaction = onRequest(
-  {region: "southamerica-west1"},
-  async (req, res) => {
-    const requestToken = req.query._token as string;
-    const settingsDoc = await db.collection("settings").doc("webhook_secret").get();
-    const webhookSecret = settingsDoc.data()?.secret;
-    if (webhookSecret && requestToken !== webhookSecret) {
-      logger.error("Webhook commit: invalid secret token");
-      return res.redirect("mvpdeportes://checkout/error?reason=invalid_webhook");
-    }
-
-    const token = req.body.token_ws || req.query.token_ws || req.body.TBK_TOKEN || req.query.TBK_TOKEN;
-    const tenantId = req.query.tenantId as string;
-    const fallbackUrl = req.query.fallbackUrl as string;
-
-    if (!token) return res.redirect(fallbackUrl || "mvpdeportes://checkout/error?reason=no_token");
-
-    try {
-      let commerceCode;
-      let apiKey;
-
-      if (tenantId) {
-        const tDoc = await db.collection("tenants").doc(tenantId).get();
-        commerceCode = tDoc.data()?.transbankCommerceCode;
-        apiKey = tDoc.data()?.transbankApiKey;
-      }
-
-      const result = await transbank.commitWebpay(
-        token as string,
-        commerceCode,
-        apiKey,
-      );
-
-      if (result.vci === "TSY" || result.response_code === 0) {
-        const paySnap = await db.collection("payments")
-          .where("token", "==", token).limit(1).get();
-        let redirectUrl: string | undefined;
-
-        if (!paySnap.empty) {
-          const payDoc = paySnap.docs[0];
-          const payData = payDoc.data();
-          redirectUrl = payData.returnUrl;
-
-          if (payData.status === "approved") {
-            logger.info(`Webpay commit: payment already processed for token ${token}`);
-            return res.redirect(redirectUrl || `mvpdeportes://checkout/success?token=${token}`);
-          }
-
-          const bookingId = payData.bookingId;
-          const pendingBookingData = payData.pendingBookingData;
-
-      const batch = db.batch();
-      batch.update(payDoc.ref, {status: "approved", result});
-      if (bookingId) {
-          if (pendingBookingData) {
-          const rawDate = pendingBookingData.date;
-          let finalDate = admin.firestore.FieldValue.serverTimestamp();
-          if (rawDate) {
-            if (typeof rawDate?.toDate === "function") {
-              finalDate = rawDate;
-            } else if (typeof rawDate === "string") {
-              finalDate = admin.firestore.Timestamp.fromDate(new Date(rawDate));
-            } else if (rawDate?._seconds != null) {
-              finalDate = new admin.firestore.Timestamp(rawDate._seconds, rawDate._nanoseconds || 0);
-            } else if (rawDate?.seconds != null) {
-              finalDate = new admin.firestore.Timestamp(rawDate.seconds, rawDate.nanoseconds || 0);
-            }
-          }
-          batch.set(db.collection("bookings").doc(bookingId), {
-            ...pendingBookingData,
-            date: finalDate,
-            paymentStatus: "paid",
-            status: "confirmed",
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          });
-        } else {
-          batch.set(db.collection("bookings").doc(bookingId), {
-            paymentStatus: "paid",
-            status: "confirmed",
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          }, {merge: true});
-        }
-      }
-      await batch.commit();
-    }
-    return res.redirect(redirectUrl || `mvpdeportes://checkout/success?token=${token}`);
-  } else {
-    return res.redirect(fallbackUrl || `mvpdeportes://checkout/error?token=${token}&code=${result.response_code}`);
-  }
-} catch (error: any) {
-  logger.error("Webpay Commit Error:", error.message || error);
-  return res.redirect(fallbackUrl || `mvpdeportes://checkout/error?err=${encodeURIComponent(error.message || "unknown")}`);
-}
-  });
-
-/**
- * ONECLICK: Iniciar Inscripción de Tarjeta
- */
-export const startOneclickInscription = onCall(
-  {region: "southamerica-west1"},
-  async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Debes estar autenticado.");
-    }
-
-    const uid = request.auth.uid;
-    await checkRateLimit("createWebpayTransaction", uid);
-
-    const {email, cardNumber, holderName, expiryMonth, expiryYear} = request.data;
-    const cleanEmail = email || request.auth.token.email || `user_${uid}@mvpsports.cl`;
-
-    logger.info(`Starting Inscription for UID: ${uid} | Email: ${cleanEmail}`);
-
-    try {
-      // MODO RÁPIDO PARA PRUEBAS: Si es la tarjeta de Transbank, vinculamos directo
-      const cleanCard = (cardNumber || "").replace(/\s/g, "");
-      if (cleanCard === "597087654321" || cleanCard === "597011112222") {
-        logger.info(`Fast Mock Card Detected (${cleanCard}) - Bypassing Transbank`);
-        const isRejectedMock = cleanCard === "597011112222";
-        const userRef = db.collection("profiles").doc(uid);
-        const userSnap = await userRef.get();
-        const userData = userSnap.data();
-        const realName = userData?.displayName || userData?.fullName || holderName || "JUGADOR MVP";
-
-        await userRef.collection("cards").add({
-          tbkUser: isRejectedMock ? `MOCK_USER_REJECT_${uid}` : `MOCK_USER_SUCCESS_${uid}`,
-          authorizationCode: "123456",
-          last4: isRejectedMock ? "2222" : "4321",
-          brand: "Visa",
-          holderName: realName.toUpperCase(),
-          expiryMonth: expiryMonth || "12",
-          expiryYear: expiryYear || "2030",
-          isDefault: true,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-        
-        return { 
-          url: null, 
-          token: "MOCK_SUCCESS",
-          isMock: true 
-        };
-      }
-
-      const resUrl = getOneclickBaseUrl();
-      
-      // Intentar cargar llaves maestras globales
-      const masterDoc = await db.collection("settings").doc("transbank_master").get();
-      const mData = masterDoc.data();
-      const commerceCode = mData?.commerceCode;
-      const apiKey = mData?.apiKey;
-
-      logger.info(`Oneclick Mall Start - CC: ${commerceCode || "DEFAULT"} | resUrl: ${resUrl}`);
-
-      const response = await transbank.startInscription(uid, cleanEmail, resUrl, commerceCode, apiKey);
-
-      return {
-        url: response.url_webpay,
-        token: response.token,
-      };
-    } catch (error: any) {
-      logger.error("Oneclick Inscription Start Error Detail:", {
-        message: error.message,
-        code: error.code,
-        stack: error.stack
-      });
-      throw new HttpsError(
-        "internal",
-        `Error Transbank: ${error.message || "No se pudo iniciar la inscripción"}`,
-      );
-    }
-  });
-
-/**
- * ONECLICK: Finalizar Inscripción (Webhook/Redirect)
- */
-export const finishOneclickInscription = onRequest(
-  {region: "southamerica-west1"},
-  async (req, res) => {
-    const requestToken = req.query._token as string;
-    const settingsDoc = await db.collection("settings").doc("webhook_secret").get();
-    const webhookSecret = settingsDoc.data()?.secret;
-    if (webhookSecret && requestToken !== webhookSecret) {
-      logger.error("Oneclick finish: invalid secret token");
-      return res.redirect("https://mvpsports.cl/player/billetera?error=invalid_webhook");
-    }
-
-    const token = req.body.TBK_TOKEN || req.query.TBK_TOKEN || req.body.token_ws || req.query.token_ws;
-
-    logger.info(`Finish Inscription Check - Method: ${req.method} | Token: ${token}`);
-
-    if (!token) {
-      logger.error("No token received from Transbank");
-      return res.redirect("https://mvpsports.cl/player/billetera?error=no_token");
-    }
-
-    try {
-      const masterDoc = await db.collection("settings").doc("transbank_master").get();
-      const mData = masterDoc.data();
-      const commerceCode = mData?.commerceCode;
-      const apiKey = mData?.apiKey;
-
-      // Idempotency: check if this token was already processed
-      const existingCard = await db.collection("settings").doc(`inscription_${token}`).get();
-      if (existingCard.exists) {
-        logger.info(`Oneclick finish: inscription ${token} already processed`);
-        return res.redirect("https://mvpsports.cl/player/billetera?card=already");
-      }
-
-      const result = await transbank.finishInscription(token as string, commerceCode, apiKey);
-      logger.info("Oneclick Finish Result:", JSON.stringify(result));
-
-      if (result.response_code === 0) {
-        const uid = result.username;
-        const userRef = db.collection("profiles").doc(uid);
-
-        await userRef.collection("cards").add({
-          tbkUser: result.tbk_user,
-          authorizationCode: result.authorization_code,
-          last4: result.card_number,
-          brand: result.card_type,
-          isDefault: true,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-
-        // Mark as processed for idempotency
-        await db.collection("settings").doc(`inscription_${token}`).set({
-          processed: true,
-          uid,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-
-        return res.redirect(`https://mvpsports.cl/player/billetera?card=${result.card_number}`);
-      } else {
-        logger.warn(`Oneclick rejected code: ${result.response_code}`);
-        return res.redirect(`https://mvpsports.cl/player/billetera?error=rejected&code=${result.response_code}`);
-      }
-    } catch (error: any) {
-      logger.error("Oneclick Finish Error:", error.message || error);
-      return res.redirect(`https://mvpsports.cl/player/billetera?error=unknown&err=${encodeURIComponent(error.message || "unknown")}`);
-    }
-  });
-
-/**
- * ONECLICK: Autorizar Pago (Cargar a tarjeta guardada)
- */
-export const authorizeOneclickPayment = onCall(
-  {region: "southamerica-west1"},
-  async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Debes estar autenticado.");
-    }
-
-    const uid = request.auth.uid;
-    await checkRateLimit("authorizeOneclickPayment", uid);
-
-    const {amount, bookingId, tenantId, cardId} = request.data;
-
-    try {
-      // Determinar qué tarjeta usar
-      let cardDoc;
-      if (cardId) {
-        cardDoc = await db.collection("profiles").doc(uid)
-          .collection("cards").doc(cardId).get();
-      } else {
-        const cardsSnap = await db.collection("profiles").doc(uid)
-          .collection("cards").where("isDefault", "==", true)
-          .limit(1).get();
-        cardDoc = cardsSnap.empty ? null : cardsSnap.docs[0];
-      }
-
-      if (!cardDoc || !cardDoc.exists) {
-        throw new Error("No se encontró la tarjeta seleccionada.");
-      }
-
-      const card = cardDoc.data() || {};
-      const tenantDoc = await db.collection("tenants").doc(tenantId).get();
-      const tenantData = tenantDoc.data();
-
-      // 1. CARGAR LLAVES MAESTRAS PRIMERO
-      const masterDoc = await db.collection("settings").doc("transbank_master").get();
-      const mData = masterDoc.data();
-      const masterCommerceCode = (mData?.commerceCode || "").toString().trim();
-      const masterApiKey = mData?.apiKey;
-      
-      // 2. DETERMINAR HIJO (Recinto)
-      let childCommerceCode = (tenantData?.transbankCommerceCode || "").toString().trim();
-      
-      // Si el hijo es igual al padre o está vacío, usamos el de pruebas
-      if (!childCommerceCode || childCommerceCode === masterCommerceCode) {
-        childCommerceCode = IntegrationCommerceCodes.ONECLICK_MALL_CHILD1;
-      }
-      
-      const buyOrder = `PAY-${Date.now()}`;
-      logger.info(`AUTORIZANDO PAGO - Padre: ${masterCommerceCode} | Hijo: ${childCommerceCode}`);
-
-      const tbkUser = (card.tbkUser || "").toString();
-      if (!tbkUser) {
-        throw new HttpsError("failed-precondition",
-          "Esta tarjeta no está registrada para Oneclick. Usa Webpay Plus.");
-      }
-
-      // MOCK mode para tarjetas de prueba registradas vía Oneclick
-      if (tbkUser.toUpperCase().includes("MOCK_USER")) {
-        if (tbkUser.toUpperCase().includes("REJECT")) {
-          return { success: false, error: "Transacción rechazada (Simulado)", response_code: 1 };
-        }
-        logger.info("Simulando éxito de pago Oneclick (Modo Prueba)");
-        const batch = db.batch();
-        const paymentRef = db.collection("payments").doc();
-        batch.set(paymentRef, {
-          userId: uid, bookingId, amount, buyOrder,
-          authorizationCode: "123456", status: "approved", method: "oneclick_mock",
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-        if (bookingId) {
-          batch.update(db.collection("bookings").doc(bookingId), { paymentStatus: "paid", status: "confirmed" });
-        }
-        await batch.commit();
-        return { success: true, buy_order: buyOrder, authorization_code: "123456", amount, response_code: 0 };
-      }
-
-      const response = await transbank.authorizeOneclickPayment(
-        uid,
-        tbkUser,
-        buyOrder,
-        amount,
-        masterCommerceCode,
-        masterApiKey,
-        childCommerceCode
-      );
-
-      if (response.details[0].response_code === 0) {
-        const batch = db.batch();
-
-        const paymentRef = db.collection("payments").doc();
-        batch.set(paymentRef, {
-          userId: uid,
-          bookingId,
-          amount,
-          buyOrder,
-          authorizationCode: response.details[0].authorization_code,
-          status: "approved",
-          method: "oneclick",
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-
-        if (bookingId) {
-          const bookingRef = db.collection("bookings").doc(bookingId);
-          batch.update(bookingRef, {
-            paymentStatus: "paid",
-            status: "confirmed",
-          });
-        }
-
-        await batch.commit();
-        return {success: true, buyOrder};
-      } else {
-        return {success: false, error: "Transacción rechazada por el banco."};
-      }
-    } catch (error: any) {
-      logger.error("Oneclick Authorize Error:", error);
-      throw new HttpsError(
-        "internal",
-        error.message || "Error al procesar el pago.",
-      );
-    }
-  });
 
 /**
  * Handle No-Shows: Cancel bookings that passed their start time without check-in
@@ -710,90 +264,55 @@ export const refundBookingPayment = onCall({region: "southamerica-west1"}, async
       originalAmount = paymentData?.amount || originalAmount;
     }
 
-    // Calcular reembolso parcial descontando el 3% de comisión (Transbank + IVA)
+    // Reembolso parcial: se descuenta el 3% de comisión de la pasarela
     const fee = Math.round(originalAmount * 0.03);
     const refundAmount = Math.max(0, originalAmount - fee);
 
-    let refundResult: any = {
-      type: "NULLIFIED_FALLBACK",
-      response_code: 0,
-      authorization_code: "123456",
-      nullified_amount: refundAmount,
-      isMock: true,
-    };
+    let refundResult: any;
+    const mpPaymentId = paymentData?.mercadopagoPaymentId;
+    const paidOnline = paymentData?.method === "mercadopago" && paymentData?.status === "approved" && mpPaymentId;
 
-    if (paymentData) {
-      const isMock = paymentData.token === "MOCK_SUCCESS" || 
-                     (paymentData.tbkUser && paymentData.tbkUser.toUpperCase().includes("MOCK_USER")) ||
-                     (paymentData.buyOrder && paymentData.buyOrder.startsWith("PAY-") && paymentData.authorizationCode === "123456") ||
-                     paymentData.status === "pending";
-
-      if (isMock) {
-        logger.info(`Simulando REEMBOLSO PARCIAL exitoso (Modo Prueba) por $${refundAmount}`);
-        refundResult = {
-          type: "NULLIFIED",
-          response_code: 0,
-          authorization_code: "654321",
-          nullified_amount: refundAmount,
-          isMock: true,
-        };
-      } else {
-        // Cargar llaves del Recinto (Tenant)
-        const tenantDoc = await db.collection("tenants").doc(bookingData.tenantId).get();
-        const tenantData = tenantDoc.data();
-        const commerceCode = tenantData?.transbankCommerceCode;
-        const apiKey = tenantData?.transbankApiKey;
-
-        try {
-          if (paymentData.method === "webpay_plus") {
-            refundResult = await transbank.refundWebpay(
-              paymentData.token,
-              refundAmount,
-              commerceCode,
-              apiKey
-            );
-          } else if (paymentData.method === "oneclick") {
-            const masterDoc = await db.collection("settings").doc("transbank_master").get();
-            const masterCC = masterDoc.data()?.commerceCode;
-            
-            let childCC = commerceCode;
-            if (!childCC || childCC === masterCC) {
-              childCC = IntegrationCommerceCodes.ONECLICK_MALL_CHILD1;
-            }
-
-            refundResult = await transbank.refundOneclick(
-              paymentData.buyOrder,
-              childCC,
-              paymentData.buyOrder, // Se usa como childBuyOrder
-              refundAmount,
-              commerceCode,
-              apiKey
-            );
-          } else {
-            throw new Error("Método de pago no soportado para reembolso automático.");
-          }
-        } catch (apiError: any) {
-          logger.error(`Transbank physical refund failed for booking ${bookingId}:`, apiError.message || apiError);
-          refundResult = {
-            type: "FAILED_PHYSICAL_REFUND",
-            error: apiError.message || String(apiError),
-            response_code: -99,
-            nullified_amount: 0,
-            isMock: false,
-          };
-        }
+    if (paidOnline) {
+      const accessToken = await resolveMercadoPagoToken(paymentData.tenantId || bookingData.tenantId);
+      try {
+        if (!accessToken) throw new Error("Recinto sin credenciales de Mercado Pago.");
+        const resp = await fetch(`https://api.mercadopago.com/v1/payments/${mpPaymentId}/refunds`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+            "X-Idempotency-Key": `refund-${bookingId}`,
+          },
+          body: JSON.stringify({amount: refundAmount}),
+        });
+        const data: any = await resp.json();
+        if (!resp.ok) throw new Error(data?.message || `Mercado Pago respondió ${resp.status}`);
+        refundResult = {type: "REFUNDED", mercadopagoRefundId: data.id, nullified_amount: refundAmount, response_code: 0};
+      } catch (apiError: any) {
+        logger.error(`Mercado Pago refund failed for booking ${bookingId}:`, apiError.message || apiError);
+        refundResult = {type: "FAILED_PHYSICAL_REFUND", error: apiError.message || String(apiError), response_code: -99, nullified_amount: 0};
       }
+    } else if (paymentData && paymentData.status === "approved") {
+      // Pagos históricos (Webpay/Oneclick): Transbank ya no está integrado
+      refundResult = {
+        type: "FAILED_PHYSICAL_REFUND",
+        error: "Pago histórico con Transbank: el reembolso debe hacerse manualmente desde el portal de Transbank.",
+        response_code: -98,
+        nullified_amount: 0,
+      };
     } else {
-      logger.info(`No se encontró registro de pago físico para la reserva ${bookingId}. Procediendo con reembolso simulado.`);
+      // Sin pago online aprobado (pago en recinto o pendiente): solo se cancela
+      refundResult = {type: "NO_ONLINE_PAYMENT", nullified_amount: 0, response_code: 0};
     }
 
     // Registrar en Firestore el resultado de la anulación parcial
     const batch = db.batch();
     batch.update(bookingDoc.ref, {
-      paymentStatus: refundResult.type === "FAILED_PHYSICAL_REFUND" ? "refund_failed" : "refunded",
+      paymentStatus: refundResult.type === "FAILED_PHYSICAL_REFUND" ? "refund_failed" :
+        refundResult.type === "NO_ONLINE_PAYMENT" ? (bookingData.paymentStatus || "pending") : "refunded",
       status: "cancelled",
-      refundAmount: refundResult.type === "FAILED_PHYSICAL_REFUND" ? 0 : refundAmount,
-      refundFee: fee,
+      refundAmount: refundResult.nullified_amount || 0,
+      refundFee: refundResult.nullified_amount ? fee : 0,
       refundedAt: admin.firestore.FieldValue.serverTimestamp(),
       refundDetails: refundResult,
     });
@@ -801,8 +320,8 @@ export const refundBookingPayment = onCall({region: "southamerica-west1"}, async
     if (paymentDoc) {
       batch.update(paymentDoc.ref, {
         status: refundResult.type === "FAILED_PHYSICAL_REFUND" ? "refund_failed" : "refunded",
-        refundAmount: refundResult.type === "FAILED_PHYSICAL_REFUND" ? 0 : refundAmount,
-        refundFee: fee,
+        refundAmount: refundResult.nullified_amount || 0,
+        refundFee: refundResult.nullified_amount ? fee : 0,
         refundDetails: refundResult,
         isRefundProcessing: false,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -822,7 +341,7 @@ export const refundBookingPayment = onCall({region: "southamerica-west1"}, async
 
   } catch (error: any) {
     logger.error("Error al procesar reembolso:", error);
-    throw new HttpsError("internal", error.message || "Error al procesar el reembolso parcial en Transbank.");
+    throw new HttpsError("internal", error.message || "Error al procesar el reembolso.");
   }
 });
 

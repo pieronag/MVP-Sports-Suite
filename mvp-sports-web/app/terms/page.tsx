@@ -265,7 +265,7 @@ export default function TermsPage() {
                   <div className="p-5 bg-slate-900/30 border border-white/5 rounded-md">
                     <h4 className="font-bold text-white uppercase tracking-wider text-xs mb-2">Pago seguro online</h4>
                     <p className="text-slate-400 text-xs leading-relaxed">
-                      Procesado en un WebView seguro mediante <strong>Transbank Webpay Plus</strong>. Para resguardar la seguridad del usuario, <strong>no almacenamos números físicos de tarjetas bancarias</strong> en la base de datos Firestore.
+                      Procesado en un WebView seguro mediante <strong>Mercado Pago</strong>. Para resguardar la seguridad del usuario, <strong>no almacenamos números físicos de tarjetas bancarias</strong> en la base de datos Firestore.
                     </p>
                   </div>
                   <div className="p-5 bg-slate-900/30 border border-white/5 rounded-md">
@@ -299,7 +299,7 @@ export default function TermsPage() {
                       </span>
                       <h4 className="font-bold text-white text-xs uppercase tracking-wider">Devolución permitida (deducción 3%)</h4>
                       <p className="text-slate-400 text-xs">
-                        Se devolverá el dinero descontando un 3% del total cobrado para mitigar las tarifas de adquirencia e impuestos de la pasarela Transbank.
+                        Se devolverá el dinero descontando un 3% del total cobrado para mitigar las tarifas de adquirencia e impuestos de la pasarela Mercado Pago.
                       </p>
                     </div>
                     <div className="text-left md:text-right flex-shrink-0">
@@ -325,7 +325,7 @@ export default function TermsPage() {
 
                 <div className="p-5 bg-amber-950/20 border border-amber-900/30 rounded-md space-y-2">
                   <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs">
-                    Procedimiento ante fallas del reembolso en Transbank:
+                    Procedimiento ante fallas del reembolso en Mercado Pago:
                   </h4>
                   <p className="text-slate-400 text-xs">
                     Si el reembolso automático por API falla, la plataforma liberará el bloque horario en el calendario pero guardará el estado <code className="text-white">refund_failed</code>. La app del jugador desplegará un ticket especial con un código de reclamo legal: <strong><code className="text-white">MVP-REFUND-[ID_RESERVA_8]</code></strong>. El jugador deberá presentar este código al administrador del recinto, quien está obligado por contrato comercial a realizar la devolución manual correspondiente.
@@ -356,7 +356,7 @@ export default function TermsPage() {
                   <li className="flex items-start gap-3">
                     <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4 text-[#00df82] shrink-0 mt-0.5" strokeWidth={2} />
                     <span>
-                      <strong>Retención del pago:</strong> Si la reserva ya estaba pagada en línea (Transbank Webpay Plus), el pago se marca de manera definitiva como <strong>Pago Retenido</strong>. No se permite reprogramar el bloque ni solicitar reintegros.
+                      <strong>Retención del pago:</strong> Si la reserva ya estaba pagada en línea (Mercado Pago), el pago se marca de manera definitiva como <strong>Pago Retenido</strong>. No se permite reprogramar el bloque ni solicitar reintegros.
                     </span>
                   </li>
                   <li className="flex items-start gap-3">

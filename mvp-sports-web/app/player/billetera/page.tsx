@@ -42,7 +42,8 @@ export default function BilleteraPage() {
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState<(Booking & { amount: number })[]>([]);
 
-  const onlineMethods = ['card', 'webpay', 'online', 'webpay_plus', 'oneclick'];
+  // webpay/oneclick: pagos históricos anteriores a Mercado Pago
+  const onlineMethods = ['card', 'mercadopago', 'online', 'webpay', 'webpay_plus', 'oneclick'];
 
   useEffect(() => {
     const loadData = async () => {
