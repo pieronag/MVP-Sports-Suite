@@ -44,6 +44,16 @@ if (g?.mercadopago?.accessToken) {
   }
 }
 
+// API Key de Resend (settings/email es de lectura pública)
+const em = await db.collection("settings").doc("email").get();
+if (em.exists && em.data()?.resendApiKey) {
+  console.log("settings/email: resendApiKey → settings_private/email");
+  if (apply) {
+    await db.collection("settings_private").doc("email").set(em.data(), { merge: true });
+    await em.ref.update({ resendApiKey: del });
+  }
+}
+
 // Credenciales maestras de Transbank (integración eliminada): borrar
 const tbm = await db.collection("settings").doc("transbank_master").get();
 if (tbm.exists) {

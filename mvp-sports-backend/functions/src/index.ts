@@ -350,12 +350,6 @@ export const refundBookingPayment = onCall({region: "southamerica-west1"}, async
  * utilizando Resend y plantillas HTML modernas.
  */
 export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Debes estar autenticado.");
-  }
-
-  await checkRateLimit("sendAuthEmail", request.auth.uid);
-
   const { email, type, name: providedName } = request.data as {
     email: string;
     type: "verify" | "reset";
@@ -367,6 +361,18 @@ export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (reque
   }
 
   const cleanEmail = email.trim().toLowerCase();
+
+  // "Olvidé mi contraseña" funciona sin sesión; la verificación exige sesión
+  if (!request.auth && type !== "reset") {
+    throw new HttpsError("unauthenticated", "Debes estar autenticado.");
+  }
+  // Límite por usuario y, sin sesión, por correo destino (evita spam a terceros)
+  await checkRateLimit("sendAuthEmail", request.auth?.uid || `anon:${cleanEmail}`);
+
+  // Verificación: solo para el propio correo de la sesión
+  if (type === "verify" && cleanEmail !== (request.auth?.token.email || "").toLowerCase()) {
+    throw new HttpsError("permission-denied", "Solo puedes verificar tu propio correo.");
+  }
 
   try {
     // 1. Resolver el nombre real del usuario desde Firestore si no está provisto
@@ -382,8 +388,9 @@ export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (reque
     }
 
     // 2. Cargar configuraciones de correo desde Firestore
-    const emailSettingsDoc = await db.collection("settings").doc("email").get();
-    const emailSettings = emailSettingsDoc.data() || {};
+    // settings_private/email (sin acceso cliente); settings/email es heredado y público
+    const privateEmailDoc = await db.collection("settings_private").doc("email").get();
+    const emailSettings = privateEmailDoc.data() || (await db.collection("settings").doc("email").get()).data() || {};
     const resendApiKey = emailSettings.resendApiKey || process.env.RESEND_API_KEY;
     const fromEmail = emailSettings.fromEmail || process.env.RESEND_FROM_EMAIL || "MVP Sports <noreply@mvpsports.cl>";
 
@@ -408,7 +415,15 @@ export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (reque
       description = `Hola, ${name}. Gracias por unirte a MVP Sports. Para activar tu cuenta y poder iniciar sesión en la aplicación móvil y el panel de control, haz clic en el botón de abajo:`;
       buttonText = "Verificar Cuenta";
     } else if (type === "reset") {
-      actionLink = await adminAuth.generatePasswordResetLink(cleanEmail, actionCodeSettings);
+      try {
+        actionLink = await adminAuth.generatePasswordResetLink(cleanEmail, actionCodeSettings);
+      } catch (e: any) {
+        // Respuesta idéntica exista o no la cuenta (evita enumerar correos)
+        if (e?.code === "auth/user-not-found" || e?.code === "auth/email-not-found") {
+          return {success: true, method: "resend"};
+        }
+        throw e;
+      }
       subject = "Restablece tu contraseña - MVP Sports";
       title = "Restablece tu Contraseña";
       description = `Hola, ${name}. Hemos recibido una solicitud para restablecer tu contraseña. Si no realizaste esta solicitud, puedes ignorar este correo. De lo contrario, haz clic en el siguiente botón para continuar:`;
@@ -538,12 +553,9 @@ export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (reque
 `;
 
     if (!resendApiKey) {
-      logger.warn("RESEND_API_KEY no configurada. Retornando enlace en modo Mock.");
-      return {
-        success: true,
-        method: "mock",
-        actionLink,
-      };
+      // Nunca devolver el enlace al cliente: permitiría tomar cuentas ajenas
+      logger.error("RESEND_API_KEY no configurada: no se pudo enviar el correo.");
+      return {success: false, error: "El envío de correos no está configurado."};
     }
 
     // Enviar correo vía Resend
@@ -567,8 +579,7 @@ export const sendAuthEmail = onCall({region: "southamerica-west1"}, async (reque
       logger.error("Error de Resend API:", resData);
       return {
         success: false,
-        error: resData.message || "Error al enviar el correo con Resend.",
-        actionLink,
+        error: "No se pudo enviar el correo.",
       };
     }
 
