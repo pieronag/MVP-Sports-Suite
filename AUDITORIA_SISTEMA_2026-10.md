@@ -87,3 +87,31 @@ Verificado en localhost: manifest e íconos responden 200, el header del SW est�
 2. **Esta semana**: rehacer el flujo Mercado Pago (P-3, P-4, P-5) y eliminar Webpay/Oneclick (P-1, P-2, P-8).
 3. **Siguiente**: modelo de membresía por recinto + `court_slots` (sección 3), lo que resuelve el `permission-denied` del manager sin abrir los datos.
 4. Después: migración visual del área del jugador (F-1) y push notifications de la PWA.
+
+---
+
+## 7. Estado al 08/10/2026 (corregido en código, pendiente de publicar)
+
+| Hallazgo | Estado | Commit |
+|---|---|---|
+| C-1 rol editable por el propio usuario | ✅ Corregido en reglas | `3de7bd5` |
+| C-2 tokens MP/SII/Transbank/Resend públicos | ✅ Movidos a `tenant_secrets` / `settings_private` + script de migración. **Rotar tokens.** | `3ee8b84`, `f737704` |
+| C-3 commit confiaba en `status` de la URL | ✅ Siempre verifica contra la API de MP | `3ee8b84` |
+| C-4 monto definido por el cliente | ✅ Precio, cupón y disponibilidad calculados en el servidor | `3ee8b84` |
+| C-5 webhook sin firma | ✅ Valida `x-signature` (si hay secreto) y usa solo el token del recinto | `3ee8b84` |
+| C-7 roles globales | ✅ Alcance por recinto (`canManageTenant` / `worksAtTenant`) | reglas |
+| C-9 / C-14 jugador crea o marca reservas pagadas | ✅ Solo crea reservas pendientes a su nombre; no toca campos de cobro | `f737704` |
+| C-10 `send-auth-email` público | ✅ Eliminado. **Nuevo crítico:** devolvía el enlace de reset (toma de cuentas); la Function `sendAuthEmail` tampoco lo devuelve ahora | correos |
+| C-11 `webpay/test` | ✅ Eliminado con todo Webpay/Oneclick | `f737704` |
+| P-1…P-8 solo Mercado Pago | ✅ Web, app y Functions; reembolsos vía MP | `f737704` |
+| Rendimiento | ✅ Imágenes a Storage, conteos agregados, carga diferida de jsPDF/html-to-image, sin splash fijo | `ca7d2d8` |
+| C-8 lectura abierta de `bookings`/`users` | ⏳ Pendiente (requiere `court_slots` + Function) | — |
+| C-12 `tournament_registrations` abierto | ⏳ Pendiente (junto con pago de torneos) | — |
+| Reglas sin probar en emulador | ⏳ Suite lista en `functions/src/__tests__/firestore.rules.test.ts` (requiere Java) | — |
+
+### Orden de publicación
+1. `node --env-file=mvp-sports-web/.env.local mvp-sports-web/scripts/migrate-tenant-secrets.mjs` (revisar) y luego con `--apply`.
+2. Rotar tokens de Mercado Pago, API key de Resend y credenciales Transbank expuestas.
+3. Vercel: `MERCADOPAGO_WEBHOOK_SECRET`, `NEXT_PUBLIC_SITE_URL`; publicar web.
+4. `npx firebase-tools deploy --only functions,firestore:rules,storage --project mvp-sports-chile` (tras correr las pruebas de reglas).
+5. Nueva versión de la app (EAS) con `EXPO_PUBLIC_API_URL`.
