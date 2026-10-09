@@ -56,7 +56,12 @@ export const teamService = {
         await updateDoc(ref, data);
     },
 
-    async deleteTeam(teamId: string): Promise<void> {
+    async deleteTeam(teamId: string, ownerId?: string): Promise<void> {
+        // Retira primero las publicaciones del equipo en Partidos para no dejarlas huérfanas
+        if (ownerId) {
+            const pubs = await getDocs(query(collection(db, 'matchmaking'), where('userId', '==', ownerId), where('teamId', '==', teamId)));
+            await Promise.all(pubs.docs.map(d => deleteDoc(d.ref)));
+        }
         const ref = doc(db, 'teams', teamId);
         await deleteDoc(ref);
     },

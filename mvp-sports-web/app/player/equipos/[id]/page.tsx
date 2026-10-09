@@ -118,7 +118,7 @@ export default function EquipoDetailPage() {
     if (!team) return;
     setActionLoading(true);
     try {
-      await teamService.deleteTeam(team.id);
+      await teamService.deleteTeam(team.id, user?.uid);
       setFeedback({ type: "success", msg: "Equipo eliminado." });
       setShowDeleteModal(false);
       setTimeout(() => router.push("/player/equipos"), 1000);

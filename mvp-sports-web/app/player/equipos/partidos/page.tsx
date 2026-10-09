@@ -971,6 +971,31 @@ export default function PartidosPage() {
         </div>
       )}
 
+      {/* Confirmar retiro de publicación */}
+      {showCloseConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowCloseConfirm(null)}>
+          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+            <div className="w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 bg-red-500/10"><X size={28} className="text-red-500" /></div>
+            <p className={`font-semibold text-[15px] mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Retirar publicación?</p>
+            <p className={`text-[12px] font-medium mb-6 break-words ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+              {showCloseConfirm.type === "team" ? showCloseConfirm.teamName : "Tu disponibilidad como jugador"} dejará de aparecer en Partidos.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowCloseConfirm(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-700"}`}>Volver</button>
+              <button disabled={actionLoading} onClick={async () => {
+                const e = showCloseConfirm; setActionLoading(true);
+                try {
+                  await matchmakingService.closeEntry(e.id!);
+                  setMyEntries(prev => prev.filter(x => x.id !== e.id));
+                  setShowCloseConfirm(null);
+                } catch { setShowCloseConfirm(null); setFeedback({ type: "error", msg: "No se pudo retirar la publicación." }); }
+                finally { setActionLoading(false); }
+              }} className="flex-1 py-3.5 rounded-md font-semibold text-sm text-white bg-red-500 disabled:opacity-50">Retirar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Edit Entry Modal */}
       {editEntry && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6" onClick={() => setEditEntry(null)}>
