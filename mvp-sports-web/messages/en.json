@@ -1,0 +1,50 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "retry": "Retry",
+    "back": "Back"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "academy": "Academy",
+    "audit": "Audit",
+    "calendar": "Calendar",
+    "checkin": "Check-In",
+    "courts": "Courts",
+    "feedback": "Feedback",
+    "finance": "Finance",
+    "gamification": "Gamification",
+    "invoices": "Invoices",
+    "bookings": "Bookings",
+    "marketing": "Marketing",
+    "metrics": "Metrics",
+    "owners": "Owners",
+    "profile": "Profile",
+    "reports": "Reports",
+    "settings": "Settings",
+    "staff": "Staff",
+    "tenants": "Venues",
+    "tournaments": "Tournaments",
+    "users": "Users"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "kpi_revenue": "Revenue",
+    "kpi_tenants": "Venues",
+    "kpi_users": "Users",
+    "kpi_bookings": "Bookings",
+    "kpi_occupancy": "Occupancy"
+  },
+  "errors": {
+    "generic": "An unexpected error occurred",
+    "not_found": "Not found",
+    "unauthorized": "Unauthorized",
+    "network": "Connection error"
+  }
+}
