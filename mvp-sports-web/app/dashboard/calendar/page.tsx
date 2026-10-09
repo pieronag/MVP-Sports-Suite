@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/firebase';
 import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc } from 'firebase/firestore';
+import { collectedAmount } from '@/utils/bookingMath';
 import { auditService } from '@/services/auditService';
 import {
     Add01Icon,
@@ -68,15 +69,6 @@ const toWhatsAppNumber = (phone: string = ''): string => {
     return digits.startsWith('56') ? digits : `56${digits}`;
 };
 
-// Monto efectivamente cobrado: pagado = total, abono = lo abonado, pendiente o
-// devuelto = 0. Una reserva anulada ya cobrada sigue sumando hasta que se devuelva.
-const collectedAmount = (b: any): number => {
-    const ps = String(b.paymentStatus || '').toLowerCase();
-    if (ps === 'refunded') return 0;
-    if (ps === 'paid') return Number(b.finalPrice) || 0;
-    if (ps === 'partial') return Number(b.deposit) || 0;
-    return 0;
-};
 
 export default function MasterCalendar() {
     const { user, firestoreUser, role } = useAuth();
@@ -325,7 +317,10 @@ export default function MasterCalendar() {
         if (bh < 6) {
             bookingDate.setDate(bookingDate.getDate() + 1);
         }
-        if (bookingDate < getChileNow()) { setOverlapError("No puedes reservar en el pasado."); return; }
+        // Se permite el bloque en curso (cliente que llega a jugar ahora); solo se
+        // bloquean bloques que ya terminaron.
+        const blockEnd = new Date(bookingDate.getTime() + (parseFloat(newRes.duration) || 1) * 3600000);
+        if (blockEnd <= getChileNow()) { setOverlapError("Ese horario ya terminó."); return; }
 
         setCreatingBooking(true);
         try {

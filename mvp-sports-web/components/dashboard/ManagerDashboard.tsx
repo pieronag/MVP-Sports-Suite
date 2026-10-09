@@ -29,6 +29,7 @@ const ChartBarIcon = ({ className }: { className?: string }) => <HugeiconsIcon i
 const BoltIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={FlashIcon} className={className} strokeWidth={1.6} />;
 const SparklesIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={SparklesIconHi} className={className} strokeWidth={1.6} />;
 const TicketIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Ticket01Icon} className={className} strokeWidth={1.6} />;
+import { collectedAmount, pendingAmount, durationHours } from '@/utils/bookingMath';
 import Link from 'next/link';
 import MetricCard from './MetricCard';
 import ManualBookingModal from './ManualBookingModal';
@@ -172,36 +173,25 @@ export default function ManagerDashboard() {
                         const hourStart = parseInt(b.startTime.split(':')[0]) || 0;
                         const start = new Date(startOfDay.getTime());
                         start.setHours(hourStart, 0, 0);
-                        const end = new Date(start.getTime() + (b.duration || 60) * 60000);
+                        const end = new Date(start.getTime() + durationHours(b) * 3600000);
                         return nowTime >= start && nowTime < end;
                     });
                     if (activeBooking) {
                         activeNowCount++;
                         const hourStart = parseInt(activeBooking.startTime.split(':')[0]) || 0;
                         const bookingEnd = new Date(startOfDay.getTime());
-                        bookingEnd.setHours(hourStart + 1, 0, 0);
+                        bookingEnd.setTime(bookingEnd.getTime() + (hourStart + durationHours(activeBooking)) * 3600000);
                         return { ...court, isOccupied: true, currentBooking: activeBooking.clientName, endTime: bookingEnd };
                     }
                     return court;
                 });
 
-                const revenue = todayDocs.reduce((acc, curr) => {
-                    if (curr.status === 'cancelled') return acc;
-                    if (curr.paymentStatus === 'paid') return acc + (Number(curr.totalPrice || curr.price) || 0);
-                    if (curr.paymentStatus === 'partial') return acc + (Number(curr.deposit) || 0);
-                    return acc;
-                }, 0);
-
-                const pending = todayDocs.reduce((acc, curr) => {
-                    if (curr.status === 'cancelled' || curr.paymentStatus === 'paid') return acc;
-                    const total = Number(curr.totalPrice || curr.price) || 0;
-                    if (curr.paymentStatus === 'pending') return acc + total;
-                    if (curr.paymentStatus === 'partial') return acc + (total - (Number(curr.deposit) || 0));
-                    return acc;
-                }, 0);
-
-                const totalHoursBooked = todayDocs.reduce((acc, curr) => acc + (curr.status !== 'cancelled' ? (curr.duration || 60) / 60 : 0), 0);
-                const totalCapacityHours = Math.max(1, courtsList.length * 12);
+                // Mismas reglas que Agenda (utils/bookingMath)
+                const revenue = todayDocs.reduce((acc, curr) => acc + collectedAmount(curr), 0);
+                const pending = todayDocs.reduce((acc, curr) => acc + pendingAmount(curr), 0);
+                const totalHoursBooked = todayDocs.reduce((acc, curr) => acc + (curr.status !== 'cancelled' ? durationHours(curr) : 0), 0);
+                // 14 bloques diarios (09:00–22:00), igual que la Agenda
+                const totalCapacityHours = Math.max(1, courtsList.length * 14);
                 const occupancy = Math.round((totalHoursBooked / totalCapacityHours) * 100);
 
                 setStats({
