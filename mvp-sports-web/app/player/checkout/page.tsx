@@ -275,7 +275,7 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <div className={`fixed bottom-0 left-0 right-0 p-5 lg:pl-72 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
+      <div className={`fixed bottom-0 left-0 right-0 p-5 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <button onClick={handleConfirm} disabled={processing}
           className="w-full h-14 rounded-md flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
           style={{ backgroundColor: activeColor, boxShadow: `0 4px 20px ${activeColor}40` }}>

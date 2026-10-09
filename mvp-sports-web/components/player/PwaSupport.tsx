@@ -73,7 +73,7 @@ export default function PwaSupport() {
     if (hidden) return null;
 
     return (
-        <div className="lg:hidden fixed inset-x-3 z-40 bottom-[calc(76px+env(safe-area-inset-bottom))] animate-fadeIn">
+        <div className="fixed inset-x-3 z-40 bottom-[calc(76px+env(safe-area-inset-bottom))] animate-fadeIn">
             <div className="flex items-center gap-3 p-3 rounded-md border border-emerald-500/20 bg-[#0A101D]/95 backdrop-blur-md text-slate-200">
                 <Image src="/icons/pwa-192.png" alt="" width={40} height={40} className="rounded-md shrink-0" />
                 <div className="flex-1 min-w-0">
