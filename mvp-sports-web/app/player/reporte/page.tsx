@@ -229,13 +229,6 @@ export default function ReportePage() {
                     </div>
                 ) : (
                     <div className="pt-8">
-                        {errorMsg && (
-                            <div className="flex items-center gap-2.5 p-4 rounded-md border mb-5" style={{ backgroundColor: '#ef444415', borderColor: '#ef444430' }}>
-                                <AlertCircle size={20} style={{ color: '#ef4444' }} />
-                                <span className="text-[12px] font-semibold flex-1" style={{ color: '#ef4444' }}>{errorMsg}</span>
-                            </div>
-                        )}
-
                         {/* BANNER */}
                         <div className="rounded-md p-6 mb-8" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
                             <div className="flex items-center justify-between mb-4">
@@ -290,7 +283,7 @@ export default function ReportePage() {
                             <input
                                 placeholder="Ej. error al confirmar partido"
                                 value={subject}
-                                onChange={e => setSubject(e.target.value)}
+                                maxLength={120} onChange={e => setSubject(e.target.value)}
                                 onFocus={() => setFocusedField('subject')}
                                 onBlur={() => setFocusedField(null)}
                                 className="w-full bg-transparent text-[15px] font-semibold outline-none"
@@ -304,7 +297,7 @@ export default function ReportePage() {
                             <input
                                 placeholder="Ej. estadisticas / menu principal"
                                 value={screen}
-                                onChange={e => setScreen(e.target.value)}
+                                maxLength={80} onChange={e => setScreen(e.target.value)}
                                 onFocus={() => setFocusedField('screen')}
                                 onBlur={() => setFocusedField(null)}
                                 className="w-full bg-transparent text-[15px] font-semibold outline-none"
@@ -319,7 +312,7 @@ export default function ReportePage() {
                             <textarea
                                 placeholder="Explica aquí detalladamente qué sucedió..."
                                 value={description}
-                                onChange={e => setDescription(e.target.value)}
+                                maxLength={3000} onChange={e => setDescription(e.target.value)}
                                 onFocus={() => setFocusedField('description')}
                                 onBlur={() => setFocusedField(null)}
                                 className="w-full bg-transparent text-[15px] font-semibold outline-none resize-none h-full"
@@ -334,7 +327,7 @@ export default function ReportePage() {
                             <textarea
                                 placeholder="1. ir a jugar, 2. click en editar, 3. dar click en guardar..."
                                 value={steps}
-                                onChange={e => setSteps(e.target.value)}
+                                maxLength={2000} onChange={e => setSteps(e.target.value)}
                                 onFocus={() => setFocusedField('steps')}
                                 onBlur={() => setFocusedField(null)}
                                 className="w-full bg-transparent text-[15px] font-semibold outline-none resize-none h-full"
@@ -369,6 +362,13 @@ export default function ReportePage() {
                         </div>
 
                         {/* SUBMIT */}
+                        {errorMsg && (
+                            <div role="alert" className="flex items-center gap-2.5 p-4 rounded-md border mb-5" style={{ backgroundColor: '#ef444415', borderColor: '#ef444430' }}>
+                                <AlertCircle size={20} style={{ color: '#ef4444' }} />
+                                <span className="text-[12px] font-semibold flex-1" style={{ color: '#ef4444' }}>{errorMsg}</span>
+                            </div>
+                        )}
+
                         <button onClick={handleSubmit} disabled={submitting}
                             className="w-full h-[60px] rounded-md font-semibold uppercase tracking-wide text-white text-sm flex items-center justify-center gap-2.5"
                             style={{ backgroundColor: COLORS.accent, opacity: submitting ? 0.6 : 1, boxShadow: '0 10px 20px rgba(16,185,129,0.2)' }}>

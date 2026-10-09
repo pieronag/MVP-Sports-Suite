@@ -90,6 +90,8 @@ export const matchmakingService = {
         sport: string; memberCount: number; description?: string;
         region?: string; communes?: string[];
     }, userId: string): Promise<string> {
+        const mine = await getDocs(query(collection(db, 'matchmaking'), where('userId', '==', userId), where('teamId', '==', data.teamId), where('status', '==', 'active')));
+        if (!mine.empty) throw new Error('Este equipo ya está publicado');
         const clean: any = { type: 'team', teamId: data.teamId, teamName: data.teamName, sport: data.sport, memberCount: data.memberCount, userId, status: 'active', createdAt: Timestamp.now() };
         if (data.teamImageUrl) clean.teamImageUrl = data.teamImageUrl;
         if (data.description) clean.description = data.description;
@@ -105,6 +107,8 @@ export const matchmakingService = {
         sports: string[]; city?: string; description?: string;
         region?: string; communes?: string[];
     }): Promise<string> {
+        const mine = await getDocs(query(collection(db, 'matchmaking'), where('userId', '==', data.userId), where('type', '==', 'player'), where('status', '==', 'active')));
+        if (!mine.empty) throw new Error('Ya tienes tu disponibilidad publicada');
         const clean: any = {
             type: 'player',
             userId: data.userId,

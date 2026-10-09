@@ -75,8 +75,8 @@ export default function EquiposExplorePage() {
       if (!team) { setFeedback({ type: "error", msg: "Código inválido. Verifica e intenta de nuevo." }); return; }
       await teamService.joinTeam(team.id, user.uid);
       setShowJoinModal(false); setJoinCode(""); fetchTeams();
-      setFeedback({ type: "success", msg: `¡Te has unido a ${team.name}!` });
-    } catch { setFeedback({ type: "error", msg: "No pudimos procesar la solicitud." }); }
+      setFeedback({ type: "success", msg: `Solicitud enviada a ${team.name}. El capitán debe aceptarte.` });
+    } catch (e: any) { setFeedback({ type: "error", msg: e?.message || "No pudimos procesar la solicitud." }); }
     finally { setActionLoading(false); }
   };
 
@@ -190,7 +190,7 @@ export default function EquiposExplorePage() {
           </button>
         </div>
         <p className={`text-sm font-medium mb-5 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Funda tu propio escuadrón y comienza a reclutar.</p>
-        <input placeholder="Nombre del equipo" value={newTeamName} onChange={(e) => setNewTeamName(e.target.value)}
+        <input placeholder="Nombre del equipo" maxLength={40} value={newTeamName} onChange={(e) => setNewTeamName(e.target.value)}
           className={`w-full h-12 rounded-md px-4 text-base font-medium outline-none border mb-5 ${isDark ? "bg-white/[0.04] text-slate-100 placeholder-slate-600 border-white/[0.06]" : "bg-slate-50 text-slate-900 placeholder-slate-400 border-slate-200"}`}
         />
         <p className={`text-[12px] font-semibold uppercase tracking-wide mb-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</p>

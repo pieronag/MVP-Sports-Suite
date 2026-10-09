@@ -127,6 +127,9 @@ export default function PartidosPage() {
     return () => unsubs.forEach(u => u());
   }, [uid, sportFilter, positionFilter, regionFilter, communeFilters, activeTab]);
 
+  // El deporte publicado es el del equipo (no se puede elegir otro)
+  const teamSport = (t?: { sport?: string }) => SPORTS.find(s => s.toLowerCase() === String(t?.sport || "").toLowerCase());
+
   const handlePublishTeam = async () => {
     if (!selectedTeam) return;
     setActionLoading(true);
@@ -135,11 +138,13 @@ export default function PartidosPage() {
       if (!team) return;
       await matchmakingService.publishTeam({
         teamId: team.id, teamName: team.name, teamImageUrl: (team as any).imageUrl,
-        sport: publishSport, memberCount: team.members?.length || 1,
+        sport: teamSport(team) || publishSport, memberCount: team.members?.length || 1,
         description: publishDesc, region: publishRegion, communes: publishCommunes,
       }, uid);
       setFeedback({ type: "success", msg: "¡Equipo publicado! Ahora otros capitanes pueden retarte." });
       setShowPublishTeam(false);
+      setSelectedTeam(""); setPublishDesc(""); setPublishRegion(""); setPublishCommunes([]);
+      if (uid) matchmakingService.getMyEntries(uid).then(setMyEntries).catch(() => {});
     } catch (e: any) { setFeedback({ type: "error", msg: e?.message || "Error al publicar el equipo." }); }
     finally { setActionLoading(false); }
   };
@@ -566,7 +571,7 @@ export default function PartidosPage() {
                 </div>
               ) : (
                 <div className="relative">
-                  <select value={selectedTeam} onChange={e => setSelectedTeam(e.target.value)}
+                  <select value={selectedTeam} onChange={e => { setSelectedTeam(e.target.value); const s = teamSport(userTeams.find(t => t.id === e.target.value)); if (s) setPublishSport(s); }}
                     className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-900 border-slate-200/60"} backdrop-blur-xl`}
                     style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
                     <option value="">Seleccionar equipo</option>
@@ -579,7 +584,8 @@ export default function PartidosPage() {
               <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
               <div className="relative">
                 <select value={publishSport} onChange={e => setPublishSport(e.target.value)}
-                  className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-900 border-slate-200/60"} backdrop-blur-xl`}
+                  disabled={!!teamSport(userTeams.find(t => t.id === selectedTeam))}
+                  className={`w-full h-11 disabled:opacity-60 disabled:cursor-not-allowed rounded-md px-4 text-sm font-semibold outline-none appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D]/90 text-slate-200 border-white/[0.06]" : "bg-white/80 text-slate-900 border-slate-200/60"} backdrop-blur-xl`}
                   style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
                   {SPORTS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>

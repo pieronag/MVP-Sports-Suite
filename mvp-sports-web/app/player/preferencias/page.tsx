@@ -25,6 +25,8 @@ const SPORT_ICONS: Record<string, any> = {
   "Fútbol": FutbolIcon, "Pádel": PadelIcon, "Tenis": TenisIcon, "Básquetbol": BasquetbolIcon, "Voleibol": VoleibolIcon,
 };
 
+const digits3 = (v: string) => v.replace(/\D/g, "").slice(0, 3);
+
 const validateAge = (birthDateStr: string) => {
   if (!birthDateStr) return false;
   const parts = birthDateStr.split("/");
@@ -32,6 +34,7 @@ const validateAge = (birthDateStr: string) => {
   const d = parseInt(parts[0], 10), m = parseInt(parts[1], 10) - 1, y = parseInt(parts[2], 10);
   if (isNaN(d) || isNaN(m) || isNaN(y) || d < 1 || d > 31 || m < 0 || m > 11 || y < 1900 || y > new Date().getFullYear()) return false;
   const birth = new Date(y, m, d);
+  if (birth.getDate() !== d || birth.getMonth() !== m) return false; // p. ej. 31/02
   const today = new Date();
   let age = today.getFullYear() - birth.getFullYear();
   const mon = today.getMonth() - birth.getMonth();
@@ -234,13 +237,17 @@ export default function PreferenciasPage() {
 
   const handleSave = async () => {
     if (!user) return;
+    if (formData.displayName.trim().length < 2) { showFeedbackMsg("error", "Ingresa tu nombre."); return; }
+    const h = Number(formData.height), w = Number(formData.weight);
+    if (formData.height && (h < 100 || h > 230)) { showFeedbackMsg("error", "La altura debe estar entre 100 y 230 cm."); return; }
+    if (formData.weight && (w < 30 || w > 200)) { showFeedbackMsg("error", "El peso debe estar entre 30 y 200 kg."); return; }
     const rutClean = cleanRut(formData.rut);
     if (formData.rut && !validateChileanRut(rutClean)) { showFeedbackMsg("error", "El RUT ingresado no es válido."); return; }
     if (!formData.birthDate) { showFeedbackMsg("error", "La Fecha de Nacimiento es obligatoria."); return; }
     if (!validateAge(formData.birthDate)) { showFeedbackMsg("error", "Debes ser mayor de edad (18+)."); return; }
     setSaving(true);
     try {
-      const toSave: any = { ...formData, rut: rutClean, height: formData.height ? Number(formData.height) : undefined, weight: formData.weight ? Number(formData.weight) : undefined, updatedAt: new Date().toISOString() };
+      const toSave: any = { ...formData, displayName: formData.displayName.trim(), rut: rutClean, height: formData.height ? Number(formData.height) : undefined, weight: formData.weight ? Number(formData.weight) : undefined, updatedAt: new Date().toISOString() };
       Object.keys(toSave).forEach((k) => toSave[k] === undefined && delete toSave[k]);
       await userService.updateUserProfile(user.uid, toSave);
       await reloadProfile();
@@ -307,16 +314,16 @@ export default function PreferenciasPage() {
   const inputFields = (section: string) => {
     const fields: Record<string, Array<{ icon: any; color: string; label: string; key: keyof FormData; mask?: (v: string) => string; max?: number; err?: boolean; t?: string }>> = {
       personal: [
-        { icon: User, color: "#3b82f6", label: "Nombre Completo", key: "displayName" },
+        { icon: User, color: "#3b82f6", label: "Nombre Completo", key: "displayName", max: 60 },
         { icon: Phone, color: "#10b981", label: "Teléfono", key: "phone", mask: maskPhone, max: 13 },
         { icon: ShieldCheck, color: "#6366f1", label: "RUT", key: "rut", mask: maskRut, max: 12, err: formData.rut.length > 3 && !validateChileanRut(formData.rut) },
         { icon: Calendar, color: "#ec4899", label: "Fecha de Nacimiento (DD/MM/AAAA)", key: "birthDate", mask: maskBirthDate, max: 10, err: formData.birthDate.length === 10 && !validateAge(formData.birthDate) },
-        { icon: MapPin, color: "#f59e0b", label: "Ciudad", key: "city" },
-        { icon: Heart, color: "#f43f5e", label: "Género", key: "gender" },
+        { icon: MapPin, color: "#f59e0b", label: "Ciudad", key: "city", max: 40 },
+        { icon: Heart, color: "#f43f5e", label: "Género", key: "gender", max: 20 },
       ],
       physique: [
-        { icon: Ruler, color: "#f59e0b", label: "Altura (cm)", key: "height" },
-        { icon: Weight, color: "#ef4444", label: "Peso (kg)", key: "weight" },
+        { icon: Ruler, color: "#f59e0b", label: "Altura (cm)", key: "height", mask: digits3, max: 3, t: "tel" },
+        { icon: Weight, color: "#ef4444", label: "Peso (kg)", key: "weight", mask: digits3, max: 3, t: "tel" },
       ],
     };
     return fields[section] || [];
@@ -406,7 +413,8 @@ export default function PreferenciasPage() {
             {inputFields("physique").map((f) => (
               <InputRow key={f.key} icon={f.icon} color={f.color} label={f.label}
                 value={formData[f.key] as string}
-                onChange={(v) => setFormData((fd) => ({ ...fd, [f.key]: v }))}
+                onChange={(v) => setFormData((fd) => ({ ...fd, [f.key]: f.mask ? f.mask(v) : v }))}
+                maxLength={f.max} type={f.t || "text"}
               />
             ))}
           </div>

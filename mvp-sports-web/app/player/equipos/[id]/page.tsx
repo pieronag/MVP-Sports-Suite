@@ -208,7 +208,7 @@ export default function EquipoDetailPage() {
           <div className="flex items-center gap-2 mb-2">
             <span className="bg-emerald-500 px-3 py-1 rounded-md text-white font-semibold text-[11px] uppercase tracking-wide border border-white/10">{team.sport?.toUpperCase() || "GENERAL"}</span>
           </div>
-          <h1 className="text-white text-xl font-heading font-black uppercase">{team.name}</h1>
+          <h1 className="text-white text-xl font-heading font-black uppercase line-clamp-2 break-words [overflow-wrap:anywhere]">{team.name}</h1>
         </div>
       </div>
 
@@ -363,7 +363,7 @@ export default function EquipoDetailPage() {
             </div>
             <div className="mb-4">
               <label className={`text-[12px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nombre</label>
-              <input value={editName} onChange={e => setEditName(e.target.value)} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-none ${isDark ? "bg-[#0A101D] text-slate-100 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`} />
+              <input maxLength={40} value={editName} onChange={e => setEditName(e.target.value)} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-none ${isDark ? "bg-[#0A101D] text-slate-100 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`} />
             </div>
             <div className="mb-4">
               <label className={`text-[12px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción</label>

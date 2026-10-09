@@ -109,7 +109,7 @@ export default function PartidosChatPage() {
                 )}
                 <div className={`rounded-md px-4 py-2.5 ${isMe ? "bg-emerald-500 text-white" : isDark ? "bg-[#0A101D] border border-white/[0.06] text-slate-200" : "bg-white border border-slate-200 text-slate-800"}`}>
                   {!isMe && <p className="text-[11px] font-semibold opacity-70 mb-0.5">{msg.senderName}</p>}
-                  <p className="text-[13px] leading-snug">{msg.text}</p>
+                  <p className="text-[13px] leading-snug break-words [overflow-wrap:anywhere] whitespace-pre-wrap">{msg.text}</p>
                 </div>
               </div>
             </div>
@@ -121,7 +121,7 @@ export default function PartidosChatPage() {
       {/* Input */}
       <div className={`px-4 py-3 border-t ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
         <div className="flex gap-2">
-          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="Escribe un mensaje..."
+          <input maxLength={1000} value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="Escribe un mensaje..."
             className={`flex-1 h-[46px] rounded-md px-4 text-sm font-medium outline-none border ${isDark ? "bg-[#0A101D] text-slate-100 border-white/[0.06] placeholder-slate-500" : "bg-white text-slate-900 border-slate-200 placeholder-slate-400"}`} />
           <button aria-label="Enviar mensaje" onClick={handleSend} disabled={!input.trim() || sending}
             className="w-[46px] h-[46px] rounded-md bg-emerald-500 flex items-center justify-center transition-all active:scale-90 disabled:opacity-50">

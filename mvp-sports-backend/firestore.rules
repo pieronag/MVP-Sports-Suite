@@ -325,7 +325,8 @@ service cloud.firestore {
       // Se crea a nombre propio y con el creador como único miembro inicial
       allow create: if isAuthenticated() &&
         request.resource.data.ownerId == request.auth.uid &&
-        request.resource.data.get('members', [request.auth.uid]).toSet() == [request.auth.uid].toSet();
+        request.resource.data.get('members', [request.auth.uid]).toSet() == [request.auth.uid].toSet() &&
+        request.resource.data.name is string && request.resource.data.name.size() <= 60;
       allow update: if isAuthenticated() && (
         resource.data.ownerId == request.auth.uid || isSuperAdmin() ||
         // Cualquier jugador: pedir unirse / retirar su solicitud
@@ -337,9 +338,17 @@ service cloud.firestore {
 
       // Chat de equipo (Solo miembros)
       match /messages/{messageId} {
-        allow read, write: if isAuthenticated() && (
-          request.auth.uid in get(/databases/$(database)/documents/teams/$(teamId)).data.members
-        );
+        function isTeamMember() {
+          return isAuthenticated() &&
+            request.auth.uid in get(/databases/$(database)/documents/teams/$(teamId)).data.members;
+        }
+        allow read: if isTeamMember();
+        // Solo a nombre propio y con texto acotado; nadie edita mensajes ajenos
+        allow create: if isTeamMember() &&
+          request.resource.data.senderId == request.auth.uid &&
+          request.resource.data.text is string &&
+          request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000;
+        allow update, delete: if isAuthenticated() && (resource.data.senderId == request.auth.uid || isSuperAdmin());
       }
     }
 
@@ -360,9 +369,16 @@ service cloud.firestore {
       allow update: if isAuthenticated() && (resource.data.senderId == request.auth.uid || resource.data.receiverId == request.auth.uid || isSuperAdmin());
 
       match /messages/{messageId} {
-        allow read, write: if isAuthenticated() && (
-          request.auth.uid in [get(/databases/$(database)/documents/challenges/$(challengeId)).data.senderId, get(/databases/$(database)/documents/challenges/$(challengeId)).data.receiverId]
-        );
+        function isParticipant() {
+          let ch = get(/databases/$(database)/documents/challenges/$(challengeId)).data;
+          return isAuthenticated() && request.auth.uid in [ch.senderId, ch.receiverId];
+        }
+        allow read: if isParticipant();
+        allow create: if isParticipant() &&
+          request.resource.data.senderId == request.auth.uid &&
+          request.resource.data.text is string &&
+          request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000;
+        allow update, delete: if isAuthenticated() && (resource.data.senderId == request.auth.uid || isSuperAdmin());
       }
     }
 
