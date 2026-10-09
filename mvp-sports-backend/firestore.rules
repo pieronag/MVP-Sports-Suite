@@ -137,7 +137,8 @@ service cloud.firestore {
         (request.auth.uid == userId && isSafeSelfCreate()) ||
         isOwnerManagingManager()
       );
-      allow delete: if isSuperAdmin() || (isOwner() && resource.data.get('role', '') == 'manager');
+      // El propio usuario puede eliminar su cuenta (requisito de las tiendas de apps)
+      allow delete: if request.auth != null && (request.auth.uid == userId || isSuperAdmin() || (isOwner() && resource.data.get('role', '') == 'manager'));
       allow update: if isAuthenticated() && (
         isSuperAdmin() ||
         (request.auth.uid == userId && !touchesPrivileged()) ||
@@ -160,7 +161,8 @@ service cloud.firestore {
         (request.auth.uid == userId && isSafeSelfCreate()) ||
         isOwnerManagingManager()
       );
-      allow delete: if isSuperAdmin() || (isOwner() && resource.data.get('role', '') == 'manager');
+      // El propio usuario puede eliminar su cuenta (requisito de las tiendas de apps)
+      allow delete: if request.auth != null && (request.auth.uid == userId || isSuperAdmin() || (isOwner() && resource.data.get('role', '') == 'manager'));
       allow update: if isAuthenticated() && (
         isSuperAdmin() ||
         (request.auth.uid == userId && !touchesPrivileged()) ||

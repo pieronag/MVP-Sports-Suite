@@ -382,6 +382,16 @@ export default function SettingsScreen() {
 
     const handleDeleteAccount = async () => {
         if (!user) return;
+        // Firebase exige un inicio de sesión reciente para borrar la cuenta. Se verifica
+        // ANTES de borrar el perfil para no dejar una cuenta con acceso pero sin datos.
+        const lastSignIn = Date.parse(user.metadata?.lastSignInTime || '') || 0;
+        if (Date.now() - lastSignIn > 5 * 60 * 1000) {
+            Alert.alert(
+                "Confirma tu identidad",
+                "Por seguridad, cierra sesión e inicia sesión nuevamente; luego podrás eliminar tu cuenta."
+            );
+            return;
+        }
         setLoadingDelete(true);
         try {
             // 1. Eliminar documento del usuario en Firestore

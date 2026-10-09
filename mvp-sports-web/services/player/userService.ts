@@ -55,13 +55,12 @@ export const userService = {
         await updateDoc(ref, cleanData as any);
     },
 
+    // Requiere un inicio de sesión reciente (reautenticar antes de llamar).
+    // Orden: anonimizar reservas (mientras aún es el titular) → borrar perfil → borrar acceso.
     async deleteAccount(uid: string): Promise<void> {
-        const ref = doc(db, 'users', uid);
-        await deleteDoc(ref);
-        const bookingsRef = collection(db, 'bookings');
-        const q = query(bookingsRef, where('userId', '==', uid));
-        const snap = await getDocs(q);
-        await Promise.all(snap.docs.map(d => updateDoc(doc(db, 'bookings', d.id), { userId: null, clientName: 'Usuario eliminado' })));
+        const snap = await getDocs(query(collection(db, 'bookings'), where('userId', '==', uid)));
+        await Promise.all(snap.docs.map(d => updateDoc(doc(db, 'bookings', d.id), { userId: null, clientName: 'Usuario eliminado', clientPhone: '' })));
+        await deleteDoc(doc(db, 'users', uid));
         if (auth.currentUser) await deleteUser(auth.currentUser);
     },
 

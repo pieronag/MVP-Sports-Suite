@@ -204,6 +204,7 @@ export default function PreferenciasPage() {
 
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [showUnsavedModal, setShowUnsavedModal] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -292,8 +293,19 @@ export default function PreferenciasPage() {
 
   const handleDeleteAccount = async () => {
     if (!user) return;
+    const cu = auth.currentUser;
+    if (!cu?.email || !deletePassword) { showFeedbackMsg("error", "Ingresa tu contraseña para confirmar."); return; }
     setLoadingDelete(true);
     try {
+      // Firebase exige un inicio de sesión reciente para borrar la cuenta: se confirma
+      // la contraseña ANTES de borrar datos, para no dejar una cuenta a medias.
+      try {
+        await reauthenticateWithCredential(cu, EmailAuthProvider.credential(cu.email, deletePassword));
+      } catch {
+        showFeedbackMsg("error", "La contraseña no es correcta.");
+        setLoadingDelete(false);
+        return;
+      }
       await userService.deleteAccount(user.uid);
       setShowDeleteModal(false);
       showFeedbackMsg("success", "Cuenta eliminada.");
@@ -341,11 +353,11 @@ export default function PreferenciasPage() {
     <div className={`min-h-screen ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020617]" : "bg-[#F8FAFC]"}`}>
-        <button onClick={handleBack} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button aria-label="Volver" onClick={handleBack} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <h1 className="font-semibold text-base tracking-widest uppercase flex-1 text-center">Ajustes</h1>
-        <button onClick={handleSave} disabled={saving}
+        <button aria-label="Guardar cambios" onClick={handleSave} disabled={saving}
           className="w-10 h-10 rounded-md flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 transition-all active:scale-90 shadow-lg shadow-emerald-500/25">
           {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save size={18} className="text-white" />}
         </button>
@@ -585,13 +597,15 @@ export default function PreferenciasPage() {
           <h2 className="font-semibold text-lg text-rose-500 mb-2">¿Eliminar tu cuenta?</h2>
           <p className={`text-sm font-medium mb-4 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Esta acción es irreversible.</p>
           <div className={`text-left p-4 rounded-md mb-6 space-y-2 text-xs font-medium ${isDark ? "bg-white/[0.03] text-slate-400" : "bg-slate-50 text-slate-500"}`}>
-            <p>• Ficha de Jugador Topps Now 2026.</p>
+            <p>• Tu carta y perfil de jugador MVP.</p>
             <p>• Credenciales de acceso Firebase Auth.</p>
             <p>• Reservas e historial se conservan anónimos.</p>
           </div>
+          <input type="password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} placeholder="Tu contraseña" aria-label="Contraseña para confirmar"
+            className={`w-full mb-4 px-4 py-3 rounded-md border text-sm outline-none ${isDark ? "bg-white/[0.04] border-white/10 text-slate-100" : "bg-white border-slate-200 text-slate-900"}`} />
           <div className="flex gap-3">
-            <button onClick={() => setShowDeleteModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
-            <button onClick={handleDeleteAccount} disabled={loadingDelete} className="flex-1 py-3.5 rounded-md font-semibold text-sm bg-rose-500 text-white hover:bg-rose-600 transition-all active:scale-[0.98] shadow-lg shadow-rose-500/25 flex items-center justify-center">
+            <button onClick={() => { setShowDeleteModal(false); setDeletePassword(""); }} className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
+            <button onClick={handleDeleteAccount} disabled={loadingDelete || !deletePassword} className="flex-1 py-3.5 rounded-md font-semibold text-sm bg-rose-500 text-white hover:bg-rose-600 transition-all active:scale-[0.98] shadow-lg shadow-rose-500/25 flex items-center justify-center">
               {loadingDelete ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Eliminar"}
             </button>
           </div>
