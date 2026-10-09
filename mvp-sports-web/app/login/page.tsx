@@ -90,7 +90,8 @@ export default function LoginPage() {
         console.error("Error al obtener rol del usuario durante login:", dbErr);
       }
 
-      const exemptRoles = ["manager", "owner", "admin", "superadmin", "player"];
+      // Los jugadores deben verificar su correo; las cuentas de personal las crea un administrador
+      const exemptRoles = ["manager", "owner", "admin", "superadmin", "staff"];
       const isExempt = userRole && exemptRoles.includes(userRole);
 
       if (!user.emailVerified && !isExempt) {

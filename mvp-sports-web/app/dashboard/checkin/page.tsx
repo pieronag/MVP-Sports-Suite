@@ -401,8 +401,10 @@ export default function CheckInPage() {
         return { valid: true, message: "", isLate: now > startChile };
     };
 
-    const handleCheckInAction = (booking: Booking) => {
-        const validation = validateCheckInTime(booking);
+    // El cobro se registra en cualquier momento (prepago en mesón, durante o al
+    // final del partido); la ventana horaria aplica solo al ingreso a la cancha.
+    const handleCheckInAction = (booking: Booking, action: 'pay' | 'checkin' = 'checkin') => {
+        const validation = action === 'pay' ? { valid: true, message: '', isLate: false } : validateCheckInTime(booking);
         if (!validation.valid) {
             setStatusModal({ isOpen: true, title: "Acceso Denegado", message: validation.message, type: 'error' });
             return;
@@ -1008,7 +1010,7 @@ export default function CheckInPage() {
                                             ) : (
                                                 <div className="flex items-center gap-2">
                                                     <button
-                                                        onClick={() => { setConfirmActionType(isPaid ? 'checkin' : 'pay'); handleCheckInAction(booking); }}
+                                                        onClick={() => { setConfirmActionType(isPaid ? 'checkin' : 'pay'); handleCheckInAction(booking, isPaid ? 'checkin' : 'pay'); }}
                                                         className={`h-9 px-4 rounded-md text-[9px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95
                                                             ${isPaid
                                                                 ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-105 shadow-slate-900/10'

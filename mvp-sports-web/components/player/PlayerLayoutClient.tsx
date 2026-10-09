@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { PlayerProvider, usePlayer } from "@/context/PlayerContext";
 import PwaSupport from "@/components/player/PwaSupport";
+import VerifyEmailGate, { needsEmailVerification } from "@/components/player/VerifyEmailGate";
 import { Home, Calendar, MapPin, User, LogOut, Sun, Moon, Menu, X, Building2, Shield, TrendingUp, GraduationCap, Trophy, CreditCard, ClipboardList, Settings } from "@/components/player/icons";
 
 function PlayerShell({ children }: { children: React.ReactNode }) {
@@ -158,9 +159,10 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
 }
 
 export default function PlayerLayoutClient({ children }: { children: React.ReactNode }) {
-    const { user, loading } = useAuth();
+    const { user, loading, role } = useAuth();
     const router = useRouter();
     const [mounted, setMounted] = useState(false);
+    const [, setVerifiedTick] = useState(0);
 
     useEffect(() => {
         if (!loading && !user) router.replace('/login');
@@ -202,6 +204,11 @@ export default function PlayerLayoutClient({ children }: { children: React.React
     }
 
     if (!user) return null;
+
+    // Jugadores con contraseña deben verificar su correo antes de usar la app
+    if (needsEmailVerification(user, role)) {
+        return <VerifyEmailGate user={user} onVerified={() => setVerifiedTick((t) => t + 1)} />;
+    }
 
     return (
         <PlayerProvider>
