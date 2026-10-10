@@ -102,12 +102,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           {/* Torneos */}
           <div className="md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-orange-500/[0.07] border border-white/5 hover:border-orange-500/30 transition-all duration-300 relative overflow-hidden">
             <div className="relative z-10 space-y-1.5">
-              <span className="flex items-center gap-2">
-                <HugeiconsIcon icon={TrophyIcon} className="w-8 h-8 text-orange-400" strokeWidth={1.6} />
-                <span className="text-[9px] bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded-md font-black uppercase tracking-wide">
-                  Próximamente
-                </span>
-              </span>
+              <HugeiconsIcon icon={TrophyIcon} className="w-8 h-8 text-orange-400" strokeWidth={1.6} />
               <h3 className="text-base font-black text-white">Ligas y campeonatos.</h3>
               <p className="text-xs text-slate-400 leading-snug">
                 Torneos con grupos y eliminación, fixture y tabla de posiciones.
@@ -118,12 +113,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           {/* Academia */}
           <div className="md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-sky-500/[0.07] border border-white/5 hover:border-sky-500/30 transition-all duration-300 relative overflow-hidden">
             <div className="relative z-10 space-y-1.5">
-              <span className="flex items-center gap-2">
-                <HugeiconsIcon icon={Mortarboard01Icon} className="w-8 h-8 text-sky-400" strokeWidth={1.6} />
-                <span className="text-[9px] bg-sky-500/20 text-sky-300 px-2 py-0.5 rounded-md font-black uppercase tracking-wide">
-                  Próximamente
-                </span>
-              </span>
+              <HugeiconsIcon icon={Mortarboard01Icon} className="w-8 h-8 text-sky-400" strokeWidth={1.6} />
               <h3 className="text-base font-black text-white">Clases y alumnos.</h3>
               <p className="text-xs text-slate-400 leading-snug">
                 Horarios de clases, lista de alumnos y control de asistencias.
