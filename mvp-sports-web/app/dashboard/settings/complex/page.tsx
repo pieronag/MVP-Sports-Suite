@@ -258,7 +258,9 @@ export default function TenantSettingsPage() {
                 await loadSecretsStatus(selectedTenantId);
             }
 
-            await updateDoc(doc(db, "tenants", selectedTenantId), publicData);
+            // Firestore rechaza toda la escritura si un campo viene undefined
+            const cleanPublic = Object.fromEntries(Object.entries(publicData).filter(([, v]) => v !== undefined));
+            await updateDoc(doc(db, "tenants", selectedTenantId), cleanPublic);
 
             await auditService.logAuditEvent({
                 action: 'MODIFICACION_CONFIGURACION_COMPLEJO',
@@ -291,8 +293,15 @@ export default function TenantSettingsPage() {
                 role: actorRole,
                 email: actorEmail
             });
-            setNotification({ msg: "Error al guardar en base de datos", type: 'error' });
-            setTerminalLines(prev => [...prev, { text: `[SISTEMA] Fallo en escritura a Firestore (500 Error).`, type: 'error' }]);
+            const e: any = error;
+            const reason = e?.code === 'permission-denied'
+                ? 'Tu cuenta no tiene permiso para editar este recinto'
+                : e?.message?.includes('credenciales') || e?.message?.includes('permisos') || e?.message?.includes('autenticado')
+                    ? e.message
+                    : `No se pudo guardar${e?.code ? ` (${e.code})` : ''}: ${String(e?.message || 'error desconocido').slice(0, 140)}`;
+            console.error('Guardar recinto', error);
+            setNotification({ msg: reason, type: 'error' });
+            setTerminalLines(prev => [...prev, { text: `[SISTEMA] ${reason}`, type: 'error' }]);
         } finally {
             setSaving(false);
         }
