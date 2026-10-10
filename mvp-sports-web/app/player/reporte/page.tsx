@@ -288,7 +288,7 @@ export default function ReportePage() {
                         <p className="text-[11px] font-semibold uppercase tracking-wide mb-2" style={{ color: '#94A3B8' }}>PANTALLA O SECCIÓN (OPCIONAL)</p>
                         <div className={inputClass('screen')} style={{ backgroundColor: '#0F172A' }}>
                             <input
-                                placeholder="Ej. estadisticas / menu principal"
+                                placeholder="Ej.: Estadísticas / menú principal"
                                 value={screen}
                                 maxLength={80} onChange={e => setScreen(e.target.value)}
                                 onFocus={() => setFocusedField('screen')}

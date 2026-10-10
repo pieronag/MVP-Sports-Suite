@@ -251,7 +251,7 @@ export default function PlayerDashboard() {
             <Link href={`/player/ticket?bookingId=${nb.id}`} className="block p-4 active:opacity-90">
               <div className="flex items-center justify-between mb-1.5">
                 <p className={`text-[11px] font-semibold ${soon ? "text-emerald-500" : muted}`}>{isTodayBooking ? "Juegas hoy" : "Tu próxima reserva"}</p>
-                {nb.paymentStatus !== "paid" && <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-500">{nb.paymentMethod === "cash" ? "Pagas en el recinto" : "Pago pendiente"}</span>}
+                {nb.paymentStatus !== "paid" && <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-500">Pago pendiente</span>}
               </div>
               <p className={`text-[22px] font-heading font-black tracking-tight ${soon ? "text-emerald-500" : isDark ? "text-slate-100" : "text-slate-900"}`} aria-live="polite">{countdown(nbStart.getTime() - now)}</p>
               <p className={`text-[14px] font-semibold mt-1 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{nb.courtName || "Cancha"}{nb.sport ? ` · ${nb.sport}` : ""}</p>

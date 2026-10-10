@@ -382,7 +382,7 @@ export default function ReservasPage() {
                       </p>
                       {!isCancelled && b.paymentStatus !== "paid" && (
                         <p className="text-[11px] font-semibold mt-1" style={{ color: b.paymentStatus === "refunded" ? "#10b981" : b.paymentStatus === "refund_failed" ? "#ef4444" : "#f59e0b" }}>
-                          {b.paymentStatus === "refunded" ? "Reembolsado" : b.paymentStatus === "refund_failed" ? "Error en el reembolso" : b.paymentMethod === "cash" ? "Pagas en el recinto" : "Pago pendiente"}
+                          {b.paymentStatus === "refunded" ? "Reembolsado" : b.paymentStatus === "refund_failed" ? "Error en el reembolso" : "Pago pendiente"}
                         </p>
                       )}
                     </div>

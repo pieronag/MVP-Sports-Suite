@@ -122,8 +122,6 @@ export default function CheckInPage() {
     const [filter, setFilter] = useState<'all' | 'pending' | 'completed' | 'cancelled' | 'noshow'>('pending');
     const [selectedBookingForConfirm, setSelectedBookingForConfirm] = useState<Booking | null>(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('cash');
-    const [confirmActionType, setConfirmActionType] = useState<'pay' | 'checkin'>('checkin');
     // ESTADOS DE CÁMARA
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [cameraError, setCameraError] = useState<string | null>(null);
@@ -404,8 +402,13 @@ export default function CheckInPage() {
 
     // El cobro se registra en cualquier momento (prepago en mesón, durante o al
     // final del partido); la ventana horaria aplica solo al ingreso a la cancha.
-    const handleCheckInAction = (booking: Booking, action: 'pay' | 'checkin' = 'checkin') => {
-        const validation = action === 'pay' ? { valid: true, message: '', isLate: false } : validateCheckInTime(booking);
+    const handleCheckInAction = (booking: Booking, _action: 'checkin' = 'checkin') => {
+        // 100% online: sin pago aprobado no hay ingreso (vale para botón, QR y código manual)
+        if (booking.paymentStatus !== 'paid') {
+            setStatusModal({ isOpen: true, title: "Reserva sin pago", message: "Esta reserva no tiene un pago online aprobado. El jugador debe pagar desde la app para poder ingresar.", type: 'error' });
+            return;
+        }
+        const validation = validateCheckInTime(booking);
         if (!validation.valid) {
             setStatusModal({ isOpen: true, title: "Acceso Denegado", message: validation.message, type: 'error' });
             return;
@@ -433,7 +436,6 @@ export default function CheckInPage() {
             startTime: Timestamp.fromDate(startTimeDate),
             endTime: Timestamp.fromDate(endTimeDate)
         });
-        setSelectedPaymentMethod('cash');
         setIsConfirmModalOpen(true);
     };
 
@@ -445,25 +447,6 @@ export default function CheckInPage() {
 
         try {
             const updateData: any = {};
-            if (confirmActionType === 'pay') {
-                updateData.paymentStatus = 'paid';
-                updateData.remainingBalance = 0;
-                updateData.paymentMethod = selectedPaymentMethod;
-                
-                await updateDoc(doc(db, "bookings", booking.id), updateData);
-                await syncBookingSlots(booking.id);
-                setBookings(prev => prev.map(b => b.id === booking.id ? { ...b, paymentStatus: 'paid', paymentMethod: selectedPaymentMethod, remainingBalance: 0 } : b));
-                
-                await auditService.logAuditEvent({
-                    action: 'RESERVA_PAGO',
-                    module: 'Acceso/CheckIn',
-                    details: `Registro de pago exitoso para la reserva ${booking.id} (${booking.clientName}) de la cancha ${booking.courtName}. Método: ${selectedPaymentMethod}.`,
-                    severity: 'LOW',
-                    status: 'SUCCESS'
-                });
-
-                setStatusModal({ isOpen: true, title: "Pago Registrado", message: `El pago de ${booking.clientName} ha sido procesado exitosamente.`, type: 'info' });
-            } else {
                 updateData.checkIn = true;
                 updateData.checkInTime = Timestamp.now();
                 updateData.status = 'active';
@@ -481,17 +464,15 @@ export default function CheckInPage() {
                 });
 
                 setStatusModal({ isOpen: true, title: "Ingreso Exitoso", message: `El ingreso de ${booking.clientName} ha sido registrado correctamente y la reserva está en juego.`, type: 'info' });
-            }
 
             setIsConfirmModalOpen(false);
             setSelectedBookingForConfirm(null);
         } catch (error: any) {
             console.error("Error confirming check-in:", error);
-            const isPay = confirmActionType === 'pay';
             await auditService.logAuditEvent({
-                action: isPay ? 'RESERVA_PAGO' : 'RESERVA_CHECKIN',
+                action: 'RESERVA_CHECKIN',
                 module: 'Acceso/CheckIn',
-                details: `Falla al procesar ${isPay ? 'pago' : 'ingreso'} para la reserva ${booking.id} (${booking.clientName}). Error: ${error.message || error}`,
+                details: `Falla al procesar ingreso para la reserva ${booking.id} (${booking.clientName}). Error: ${error.message || error}`,
                 severity: 'MEDIUM',
                 status: 'FAILED'
             });
@@ -1013,16 +994,18 @@ export default function CheckInPage() {
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center gap-2">
-                                                    <button
-                                                        onClick={() => { setConfirmActionType(isPaid ? 'checkin' : 'pay'); handleCheckInAction(booking, isPaid ? 'checkin' : 'pay'); }}
-                                                        className={`h-9 px-4 rounded-md text-[9px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95
-                                                            ${isPaid
-                                                                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-105 shadow-slate-900/10'
-                                                                : 'bg-amber-500 text-white hover:bg-amber-600 shadow-amber-500/20'
-                                                            }`}
-                                                    >
-                                                        {isPaid ? 'Ingresar' : 'Cobrar'}
-                                                    </button>
+                                                    {isPaid ? (
+                                                        <button
+                                                            onClick={() => handleCheckInAction(booking, 'checkin')}
+                                                            className="h-9 px-4 rounded-md text-[9px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95 bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-105 shadow-slate-900/10"
+                                                        >
+                                                            Ingresar
+                                                        </button>
+                                                    ) : (
+                                                        <span className="h-9 px-3 inline-flex items-center rounded-md text-[9px] font-black uppercase tracking-widest bg-slate-100 dark:bg-white/5 text-slate-400" title="Solo se puede ingresar con una reserva pagada online">
+                                                            Sin pago online
+                                                        </span>
+                                                    )}
                                                     <button
                                                         onClick={() => handleNoShow(booking)}
                                                         disabled={processingId === booking.id}
@@ -1048,18 +1031,14 @@ export default function CheckInPage() {
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-md overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10 animate-scaleIn">
                         {/* Header Modal FINANCE STYLE */}
                         <div className="p-8 pb-4 text-center">
-                            <div className={`w-16 h-16 rounded-md flex items-center justify-center mb-6 mx-auto border ${confirmActionType === 'pay' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-emerald-500/10 border-emerald-500/20'}`}>
-                                {confirmActionType === 'pay' ? <BanknotesIcon className="w-8 h-8 text-amber-500" /> : <ShieldCheckIcon className="w-8 h-8 text-emerald-500" />}
+                            <div className={`w-16 h-16 rounded-md flex items-center justify-center mb-6 mx-auto border bg-emerald-500/10 border-emerald-500/20`}>
+                                <ShieldCheckIcon className="w-8 h-8 text-emerald-500" />
                             </div>
                             <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
-                                {confirmActionType === 'pay' ? (
-                                    <>Registro de <span className="text-amber-500">Pago</span></>
-                                ) : (
-                                    <>Autorización de <span className="text-emerald-500">Acceso</span></>
-                                )}
+                                <>Autorización de <span className="text-emerald-500">Acceso</span></>
                             </h2>
                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-2">
-                                {confirmActionType === 'pay' ? 'Módulo de Caja' : 'Protocolo de Seguridad v2.0'}
+                                Reserva pagada online
                             </p>
                         </div>
 
@@ -1105,28 +1084,6 @@ export default function CheckInPage() {
                                 </div>
                             </div>
 
-                            {selectedBookingForConfirm?.paymentStatus !== 'paid' && (
-                                <div className="space-y-3 mt-3">
-                                    <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-md p-3 flex gap-2.5">
-                                        <ExclamationTriangleIcon className="w-4 h-4 text-amber-600 shrink-0" />
-                                        <p className="text-[9px] leading-relaxed font-bold text-amber-700 dark:text-amber-400 uppercase">
-                                            Alerta: El cliente tiene saldos pendientes. Al autorizar, se registrará el pago.
-                                        </p>
-                                    </div>
-                                    <div className="flex flex-col gap-2">
-                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Método de Pago</label>
-                                        <select 
-                                            value={selectedPaymentMethod} 
-                                            onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                                            className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-4 py-3 text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer appearance-none"
-                                        >
-                                            <option value="cash" className="dark:bg-[#0B0F19]">Efectivo</option>
-                                            <option value="transfer" className="dark:bg-[#0B0F19]">Transferencia</option>
-                                            <option value="pos" className="dark:bg-[#0B0F19]">Tarjeta / POS en Recinto</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            )}
                         </div>
 
                         {/* Footer Modal Acciones PREMIUM COMPACT */}
@@ -1140,12 +1097,12 @@ export default function CheckInPage() {
                             <button
                                 onClick={confirmCheckIn}
                                 disabled={!!processingId}
-                                className={`flex-2 py-3.5 rounded-md text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 ${confirmActionType === 'pay' ? 'bg-amber-500 text-white shadow-amber-500/20' : 'bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950'}`}
+                                className={`flex-2 py-3.5 rounded-md text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950`}
                             >
                                 {processingId ? (
                                     <ArrowPathIcon className="w-4 h-4 animate-spin" />
                                 ) : (
-                                    confirmActionType === 'pay' ? <>Confirmar Cobro <BanknotesIcon className="w-4 h-4" /></> : <>Confirmar Entrada <CheckCircleIcon className="w-4 h-4" /></>
+                                    <>Confirmar Entrada <CheckCircleIcon className="w-4 h-4" /></>
                                 )}
                             </button>
                         </div>

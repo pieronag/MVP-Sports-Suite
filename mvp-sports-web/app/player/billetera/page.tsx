@@ -33,17 +33,14 @@ export default function BilleteraPage() {
   }, [(profile as any)?.uid]);
 
   const data = useMemo(() => {
-    const now = Date.now();
     const year = new Date().getFullYear();
     const rows = (bookings as any[]).map((b) => ({ b, st: startOf(b), amount: Number(b.totalPrice || b.price || 0) }));
-    const due = rows
-      .filter((x) => x.b.status !== "cancelled" && x.b.paymentStatus === "pending" && !x.b.isInternalMatch && x.st && x.st.getTime() > now - 60 * 60_000)
-      .sort((a, b) => a.st!.getTime() - b.st!.getTime());
     const moves = rows
       .filter((x) => x.b.paymentStatus === "paid" || x.b.paymentStatus === "refunded" || x.b.paymentStatus === "refund_failed")
       .sort((a, b) => (b.st?.getTime() || 0) - (a.st?.getTime() || 0));
     const paidYear = moves.filter((x) => x.b.paymentStatus === "paid" && x.st && x.st.getFullYear() === year).reduce((s, x) => s + x.amount, 0);
-    return { due, dueTotal: due.reduce((s, x) => s + x.amount, 0), moves, paidYear };
+    const refunded = moves.filter((x) => x.b.paymentStatus === "refunded").reduce((s, x) => s + Number(x.b.refundAmount || 0), 0);
+    return { moves, paidYear, refunded };
   }, [bookings]);
 
   const card = isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200";
@@ -66,9 +63,9 @@ export default function BilleteraPage() {
         <div className="px-5 space-y-4 pb-8">
           <div className="grid grid-cols-2 gap-2.5">
             <div className={`rounded-md ${card} p-4`}>
-              <Clock size={18} color="#f59e0b" />
-              <p className={`text-[18px] font-bold mt-1.5 tabular-nums ${strong}`}>{formatMoney(data.dueTotal)}</p>
-              <p className={`text-[12px] ${muted}`}>por pagar en el recinto</p>
+              <Clock size={18} color="#3b82f6" />
+              <p className={`text-[18px] font-bold mt-1.5 tabular-nums ${strong}`}>{formatMoney(data.refunded)}</p>
+              <p className={`text-[12px] ${muted}`}>reembolsado</p>
             </div>
             <div className={`rounded-md ${card} p-4`}>
               <CheckCircle2 size={18} color="#10b981" />
@@ -77,24 +74,6 @@ export default function BilleteraPage() {
             </div>
           </div>
 
-          {data.due.length > 0 && (
-            <section aria-label="Por pagar">
-              <h2 className={`text-[12px] font-semibold mb-2 ${muted}`}>Por pagar al llegar</h2>
-              <ul className={`rounded-md ${card} divide-y ${isDark ? "divide-white/[0.06]" : "divide-slate-100"}`}>
-                {data.due.map(({ b, st, amount }: any) => (
-                  <li key={b.id}>
-                    <Link href={`/player/ticket?bookingId=${b.id}`} className="flex items-center gap-3 px-4 py-3">
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-[13px] font-semibold truncate ${strong}`}>{b.tenantName || "Recinto"} · {b.courtName}</p>
-                        <p className={`text-[12px] ${muted}`}>{st.toLocaleDateString("es-CL", { weekday: "short", day: "numeric", month: "short" })} · {b.startTime} hrs</p>
-                      </div>
-                      <span className="text-[13px] font-semibold text-amber-500 tabular-nums">{formatMoney(amount)}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
 
           <section aria-label="Movimientos">
             <h2 className={`text-[12px] font-semibold mb-2 ${muted}`}>Movimientos</h2>

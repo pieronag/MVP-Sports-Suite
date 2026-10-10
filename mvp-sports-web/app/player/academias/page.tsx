@@ -204,7 +204,7 @@ export default function AcademiasPage() {
               </div>
               {enrolled ? (
                 <div className="p-3 rounded-md bg-emerald-500/10 text-emerald-500 text-[13px] font-semibold flex items-center gap-2">
-                  <CheckCircle2 size={18} /> Ya estás inscrito{enrolled.paymentStatus === "pending" ? " · pago pendiente en el recinto" : ""}
+                  <CheckCircle2 size={18} /> Ya estás inscrito
                 </div>
               ) : full ? (
                 <div className="p-3 rounded-md bg-rose-500/10 text-rose-500 text-[13px] font-semibold">No quedan cupos en esta clase</div>
