@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle, MapPin, Share2, Clock, Trophy, AlertCircle, ChevronLeft, Receipt, X, FileText, Calendar } from "@/components/player/icons";
 import { QRCodeSVG } from "qrcode.react";
 import { usePlayer } from "@/context/PlayerContext";
+import FindPlayers from "@/components/player/FindPlayers";
 import { bookingService } from "@/services/player/bookingService";
 
 
@@ -69,7 +70,7 @@ async function shareWithTeam(b: any, dateLabel: string) {
 export default function TicketPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { theme } = usePlayer();
+  const { theme, profile } = usePlayer();
   const isDark = theme === "dark";
 
   const bookingId = searchParams.get("bookingId");
@@ -266,6 +267,9 @@ export default function TicketPage() {
               className="w-full h-14 rounded-md bg-red-500 text-white font-semibold text-[13px] uppercase tracking-wide flex items-center justify-center gap-2.5 transition-all active:scale-[0.98]">
               <Receipt size={18} /> Comprobante Devolución
             </button>
+          )}
+          {!isCancelled && !isRefundFailed && !booking?.checkOut && booking?.status !== "completed" && (
+            <FindPlayers booking={{ ...booking, id: bookingId }} profile={profile} isDark={isDark} />
           )}
           {!isCancelled && !isRefundFailed && (
             <div className="grid grid-cols-2 gap-2">

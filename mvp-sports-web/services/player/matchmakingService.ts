@@ -3,7 +3,7 @@ import { db } from '../firebase';
 
 export interface MatchEntry {
     id: string;
-    type: "team" | "player";
+    type: "team" | "player" | "need";
     teamId?: string;
     teamName?: string;
     teamImageUrl?: string;
@@ -21,6 +21,8 @@ export interface MatchEntry {
     commune?: string;
     communes?: string[];
     description?: string;
+    // type "need": partido reservado que busca jugadores
+    bookingId?: string; tenantName?: string; courtName?: string; day?: string; startTime?: string; needed?: number;
     status: "active" | "matched" | "closed";
     createdAt: Timestamp;
 }
@@ -127,6 +129,30 @@ export const matchmakingService = {
         if (data.description) clean.description = data.description;
         const docRef = await addDoc(collection(db, 'matchmaking'), clean);
         return docRef.id;
+    },
+
+    // ── Completar equipo: un partido reservado que busca jugadores ──
+    async publishNeed(data: { userId: string; displayName: string; photoURL?: string; sport: string; bookingId: string; tenantName: string; courtName: string; day: string; startTime: string; needed: number; communes?: string[] }): Promise<string> {
+        const mine = await getDocs(query(collection(db, 'matchmaking'), where('userId', '==', data.userId), where('bookingId', '==', data.bookingId), where('status', '==', 'active')));
+        if (!mine.empty) { await updateDoc(mine.docs[0].ref, { needed: data.needed }); return mine.docs[0].id; }
+        const clean: any = { type: 'need', status: 'active', createdAt: Timestamp.now(), ...data };
+        Object.keys(clean).forEach((k) => clean[k] === undefined && delete clean[k]);
+        return (await addDoc(collection(db, 'matchmaking'), clean)).id;
+    },
+
+    async getNeeds(): Promise<MatchEntry[]> {
+        const snap = await getDocs(query(collection(db, 'matchmaking'), where('type', '==', 'need'), where('status', '==', 'active')));
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const pad = (n: number) => String(n).padStart(2, '0');
+        const todayStr = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+        return snap.docs.map((d) => ({ id: d.id, ...d.data() } as MatchEntry))
+            .filter((e) => (e.day || '') >= todayStr)
+            .sort((a, b) => `${a.day} ${a.startTime}`.localeCompare(`${b.day} ${b.startTime}`));
+    },
+
+    async getMyNeed(userId: string, bookingId: string): Promise<MatchEntry | null> {
+        const snap = await getDocs(query(collection(db, 'matchmaking'), where('userId', '==', userId), where('bookingId', '==', bookingId), where('status', '==', 'active')));
+        return snap.empty ? null : ({ id: snap.docs[0].id, ...snap.docs[0].data() } as MatchEntry);
     },
 
     async closeEntry(entryId: string): Promise<void> {

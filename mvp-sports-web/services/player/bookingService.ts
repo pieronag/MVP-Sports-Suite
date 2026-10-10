@@ -1,7 +1,7 @@
 import { cached, invalidate } from './cache';
 import { syncBookingSlots } from '../apiClient';
 import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
 
 export interface Booking {
     id?: string;
@@ -110,6 +110,12 @@ export const bookingService = {
             cancelledAt: Timestamp.now() as any,
             cancelledBy: params.cancelledBy as any,
         } as any);
+        // Una reserva cancelada deja de buscar jugadores en Partidos
+        const uid = auth.currentUser?.uid;
+        if (uid) {
+            const pubs = await getDocs(query(collection(db, 'matchmaking'), where('userId', '==', uid), where('bookingId', '==', params.bookingId), where('status', '==', 'active'))).catch(() => null);
+            await Promise.all((pubs?.docs || []).map((d) => updateDoc(d.ref, { status: 'closed' }))).catch(() => undefined);
+        }
     },
 
     async getUserBookings(userId: string): Promise<Booking[]> {

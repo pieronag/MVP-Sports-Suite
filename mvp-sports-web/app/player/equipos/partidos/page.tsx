@@ -49,6 +49,8 @@ export default function PartidosPage() {
   const [selectedTeam, setSelectedTeam] = useState("");
   const [teams, setTeams] = useState<MatchEntry[]>([]);
   const [players, setPlayers] = useState<MatchEntry[]>([]);
+  const [needs, setNeeds] = useState<MatchEntry[]>([]);
+  useEffect(() => { if (activeTab === "jugadores") matchmakingService.getNeeds().then(setNeeds).catch(() => setNeeds([])); }, [activeTab]);
   const [myEntries, setMyEntries] = useState<MatchEntry[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [userTeams, setUserTeams] = useState<any[]>([]);
@@ -224,6 +226,22 @@ export default function PartidosPage() {
       setFeedback({ type: "success", msg: "Chat abierto con el jugador." });
       router.push(`/player/equipos/partidos/chat?id=${challengeId}`);
     } catch { setFeedback({ type: "error", msg: "Error al contactar." }); }
+    finally { setActionLoading(false); }
+  };
+
+  const handleJoinNeed = async (entry: MatchEntry) => {
+    if (!uid || !entry.userId) return;
+    setActionLoading(true);
+    try {
+      const challengeId = await matchmakingService.createChallenge({
+        type: "captain_to_player",
+        captainId: entry.userId, captainName: entry.displayName || "Organizador",
+        playerId: uid, playerName,
+        sport: entry.sport || "Fútbol",
+        senderId: uid, receiverId: entry.userId,
+      });
+      router.push(`/player/equipos/partidos/chat?id=${challengeId}`);
+    } catch { setFeedback({ type: "error", msg: "No pudimos abrir el chat. Intenta de nuevo." }); }
     finally { setActionLoading(false); }
   };
 
@@ -410,6 +428,30 @@ export default function PartidosPage() {
         {/* Tab: Jugadores */}
         {activeTab === "jugadores" && (
           <>
+            {(() => {
+              const n = (v: string) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+              const list = needs.filter((e) => e.userId !== uid
+                && (!sportFilter || n(e.sport) === n(sportFilter))
+                && (communeFilters.length === 0 || (e.communes || []).some((c) => communeFilters.includes(c))));
+              if (!list.length) return null;
+              return (
+                <section aria-label="Partidos que buscan jugadores" className="space-y-2">
+                  <p className={`text-[12px] font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>Partidos que buscan jugadores</p>
+                  {list.map((e) => (
+                    <div key={e.id} className={`rounded-md p-4 border flex items-center gap-3 ${isDark ? "bg-[#0A101D] border-emerald-500/20" : "bg-white border-emerald-500/30"}`}>
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-[14px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>Faltan {e.needed} · {e.sport}</p>
+                        <p className={`text-[12px] truncate ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                          {e.day ? new Date(`${e.day}T12:00:00`).toLocaleDateString("es-CL", { weekday: "short", day: "numeric", month: "short" }) : ""} · {e.startTime} hrs · {e.tenantName}
+                        </p>
+                        <p className={`text-[11px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>Organiza {e.displayName}</p>
+                      </div>
+                      <button disabled={actionLoading} onClick={() => handleJoinNeed(e)} className="px-4 h-10 rounded-md bg-emerald-500 text-white text-[12px] font-semibold shrink-0 disabled:opacity-60">Me sumo</button>
+                    </div>
+                  ))}
+                </section>
+              );
+            })()}
             <button onClick={() => setShowPublishPlayer(true)}
               className="w-full h-[52px] rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
               <User size={16} /> Estoy Disponible
@@ -492,11 +534,13 @@ export default function PartidosPage() {
                             {entry.type === "team" ? <Swords size={20} className="text-emerald-500" /> : <User size={20} className="text-emerald-500" />}
                           </div>
                           <div className="flex-1">
-                            <p className={`font-semibold text-[12px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.type === "team" ? entry.teamName : "Disponible como jugador"}</p>
+                            <p className={`font-semibold text-[12px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.type === "team" ? entry.teamName : entry.type === "need" ? `Buscas ${entry.needed} jugador${entry.needed === 1 ? "" : "es"} · ${entry.tenantName} ${entry.startTime}` : "Disponible como jugador"}</p>
                             <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.sport || entry.sports?.join(", ")}</p>
                           </div>
+                          {entry.type !== "need" && (
                           <button onClick={() => { setEditEntry(entry); setEditDesc(entry.description || ""); setEditSport(entry.sport || ""); setEditSports(entry.sports || []); }}
                             className={`px-2.5 h-7 rounded-md text-[11px] font-semibold uppercase ${isDark ? "bg-blue-500/10 text-blue-400" : "bg-blue-50 text-blue-500"}`}>Editar</button>
+                          )}
                           <button onClick={() => setShowCloseConfirm(entry)}
                             className={`px-2.5 h-7 rounded-md text-[11px] font-semibold uppercase ml-1.5 ${isDark ? "bg-red-500/10 text-red-400" : "bg-red-50 text-red-500"}`}>Cancelar</button>
                         </div>
