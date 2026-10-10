@@ -34,6 +34,7 @@ export default function CheckoutPage() {
   const [userTeams, setUserTeams] = useState<any[]>([]);
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [showCoupon, setShowCoupon] = useState(false);
+  const [repeatWeeks, setRepeatWeeks] = useState<1 | 2 | 4>(1);
   const [couponInput, setCouponInput] = useState("");
   const [validatingCoupon, setValidatingCoupon] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
@@ -129,7 +130,32 @@ export default function CheckoutPage() {
       discountApplied: appliedCoupon?.discount || 0, status: "confirmed", paymentStatus: "pending", paymentMethod: "cash",
       createdBy: userProfile.email || userProfile.uid, ...(selectedTeamId ? { teamId: selectedTeamId } : {}),
     } as any);
-    router.replace(`/player/ticket?bookingId=${id}`);
+
+    // Reserva recurrente: misma cancha, día y hora las semanas siguientes (sin cupón; se saltan las ocupadas)
+    let created = 1;
+    const skipped: string[] = [];
+    for (let k = 1; k < repeatWeeks; k++) {
+      const d = new Date(`${date}T12:00:00`);
+      d.setDate(d.getDate() + 7 * k);
+      const dayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const s2 = await getDoc(doc(db, "court_slots", `${courtId}_${dayStr}`)).catch(() => null);
+      if ((s2?.data() as any)?.taken?.[startTime as string]) { skipped.push(dayStr); continue; }
+      const w2 = new Date(`${dayStr}T00:00:00`);
+      w2.setHours(sh, sm || 0, 0, 0);
+      if (sh < 6) w2.setDate(w2.getDate() + 1);
+      const base = Math.max(0, Math.round(Number(price)));
+      await bookingService.createBooking({
+        userId: userProfile.uid, tenantId: tenantId as string, tenantName: tenantName || "Recinto",
+        courtId: courtId as string, courtName: courtName || "Cancha", sport: sport || "futbol",
+        clientName: userProfile.displayName || userProfile.fullName || "Jugador MVP", clientPhone: userProfile.phone || "",
+        date: Timestamp.fromDate(w2), startTime: startTime as string,
+        endTime: `${String((sh + 1) % 24).padStart(2, "0")}:${String(sm || 0).padStart(2, "0")}`,
+        price: base, totalPrice: base, originalPrice: base, status: "confirmed", paymentStatus: "pending", paymentMethod: "cash",
+        createdBy: userProfile.email || userProfile.uid, seriesOf: id, ...(selectedTeamId ? { teamId: selectedTeamId } : {}),
+      } as any).then(() => { created++; }).catch(() => { skipped.push(dayStr); });
+    }
+    const q = repeatWeeks > 1 ? `&serie=${created}&de=${repeatWeeks}${skipped.length ? `&saltadas=${encodeURIComponent(skipped.join(","))}` : ""}` : "";
+    router.replace(`/player/ticket?bookingId=${id}${q}`);
   };
 
   const handleConfirm = async () => {
@@ -333,6 +359,20 @@ export default function CheckoutPage() {
                 </span>
               </button>
             ))}
+            {method === "venue" && !isTournament && (
+              <div className="pt-1">
+                <p className={`text-[12px] font-semibold mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>Repetir este horario</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {([1, 2, 4] as const).map((n) => (
+                    <button key={n} type="button" aria-pressed={repeatWeeks === n} onClick={() => setRepeatWeeks(n)}
+                      className={`h-10 rounded-md text-[12px] font-semibold transition-all ${repeatWeeks === n ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-600"}`}>
+                      {n === 1 ? "Solo esta vez" : `${n} semanas`}
+                    </button>
+                  ))}
+                </div>
+                {repeatWeeks > 1 && <p className="text-[11px] text-slate-400 mt-2">Misma cancha, día y hora durante {repeatWeeks} semanas. Las que estén ocupadas se saltan y pagas cada partido en el recinto.</p>}
+              </div>
+            )}
             {hasCashNoShow && !isTournament && (
               <p className="text-[11px] text-amber-500">Por una inasistencia anterior, este recinto requiere pagar online para reservar.</p>
             )}

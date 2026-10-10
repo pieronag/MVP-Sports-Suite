@@ -73,6 +73,12 @@ export default function TicketPage() {
   const isDark = theme === "dark";
 
   const bookingId = searchParams.get("bookingId");
+  const serie = (() => {
+    if (typeof window === "undefined") return null;
+    const q = new URLSearchParams(window.location.search);
+    const created = Number(q.get("serie")), of = Number(q.get("de"));
+    return created && of ? { created, of, skipped: (q.get("saltadas") || "").split(",").filter(Boolean) } : null;
+  })();
   const [booking, setBooking] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [sharing, setSharing] = useState(false);
@@ -240,6 +246,13 @@ export default function TicketPage() {
             </div>
           </GlowCard>
         </div>
+        )}
+
+        {serie && (
+          <div className="p-4 rounded-md bg-emerald-500/10 border border-emerald-500/20">
+            <p className="text-emerald-500 text-[13px] font-semibold">Reservaste {serie.created} de {serie.of} semanas</p>
+            <p className={`text-[12px] mt-0.5 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{serie.skipped.length ? `Ocupadas: ${serie.skipped.map((d) => new Date(`${d}T12:00:00`).toLocaleDateString("es-CL", { day: "numeric", month: "short" })).join(", ")}. ` : ""}Todas aparecen en Mis reservas.</p>
+          </div>
         )}
 
         {booking?.__offline && (
