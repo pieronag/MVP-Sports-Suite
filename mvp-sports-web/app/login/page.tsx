@@ -22,6 +22,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 import BrandLogo from "@/components/shared/BrandLogo";
+import GoogleButton from "@/components/shared/GoogleButton";
+import { signInWithGoogle } from "@/services/client/accountService";
 
 const TRUST_POINTS = ["Reserva canchas en segundos", "Paga online con Mercado Pago", "Gestiona tu complejo"];
 
@@ -110,6 +112,16 @@ export default function LoginPage() {
         : code === "auth/user-disabled" ? "Tu cuenta está deshabilitada. Contacta a soporte."
         : "Credenciales incorrectas."
       );
+      setLoading(false);
+    }
+  };
+
+  // Google ya verificó el correo; AuthContext redirige según el rol al detectar la sesión
+  const handleGoogle = async () => {
+    setLoading(true); setError("");
+    try { await signInWithGoogle(); }
+    catch (e: any) {
+      if (e?.code !== "auth/popup-closed-by-user") setError("No pudimos iniciar sesión con Google. Intenta de nuevo.");
       setLoading(false);
     }
   };
@@ -216,7 +228,13 @@ export default function LoginPage() {
                 Bienvenido de nuevo. Ingresa a tu cuenta para continuar.
               </p>
 
-              <form onSubmit={handleLogin} className="mt-7 space-y-4">
+              <div className="mt-7 space-y-4">
+                <GoogleButton onClick={handleGoogle} disabled={loading} label="Ingresar con Google" />
+                <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                  <span className="h-px flex-1 bg-slate-200 dark:bg-white/10" /> o con tu correo <span className="h-px flex-1 bg-slate-200 dark:bg-white/10" />
+                </div>
+              </div>
+              <form onSubmit={handleLogin} className="mt-4 space-y-4">
                 <Field
                   label="Email"
                   id="email"

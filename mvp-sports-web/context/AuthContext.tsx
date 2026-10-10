@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { ensurePlayerDoc } from "@/services/client/accountService";
 import { auth, db } from "@/services/client/firebase";
 
 export type UserRole = "superadmin" | "admin" | "owner" | "manager" | "staff" | "player" | null;
@@ -56,11 +57,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             foundRole = userDoc.data().role as UserRole;
             foundUser = userDoc.data();
           } else {
-            const profileDoc = await getDoc(doc(db, "profiles", currentUser.uid));
-            if (profileDoc.exists()) {
-              foundRole = (profileDoc.data().role || "player") as UserRole;
-              foundUser = profileDoc.data();
-            }
+            // Sin documento: primer ingreso con Google (incluido el regreso de una redirección)
+            foundUser = await ensurePlayerDoc(currentUser);
+            foundRole = (foundUser?.role || "player") as UserRole;
           }
           // Normalizar rol a minúsculas para que coincida con las reglas de
           // Firestore y la UI, sin importar la forma en que esté guardado (ej: "SuperAdmin").

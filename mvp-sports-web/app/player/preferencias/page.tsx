@@ -253,7 +253,9 @@ export default function PreferenciasPage() {
       await reloadProfile();
       setInitialData({ ...formData });
       showFeedbackMsg("success", "Cambios sincronizados correctamente.");
-      setTimeout(() => { setShowFeedback(false); router.replace("/player"); }, 1500);
+      // Si venía desde un pago, vuelve a él
+      const back = new URLSearchParams(window.location.search).get("volver");
+      setTimeout(() => { setShowFeedback(false); router.replace(back && back.startsWith("/player") ? back : "/player"); }, 1500);
     } catch { showFeedbackMsg("error", "Error al guardar."); }
     finally { setSaving(false); }
   };

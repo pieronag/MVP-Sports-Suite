@@ -1,6 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { auth } from "@/services/client/firebase";
+import { usePlayer } from "@/context/PlayerContext";
+import { missingForPayment } from "@/services/client/accountService";
 import { CheckCircle2, AlertCircle, Lock } from "@/components/player/icons";
 
 // Pago con tarjeta dentro de la PWA (Mercado Pago Checkout API · Card Payment Brick).
@@ -32,7 +35,7 @@ async function authedGet(path: string) {
   return d;
 }
 
-export default function CardPayment({ tenantId, amount, isDark, onPay, onApproved }: {
+function CardPaymentForm({ tenantId, amount, isDark, onPay, onApproved }: {
   tenantId: string;
   amount: number;
   isDark: boolean;
@@ -142,4 +145,25 @@ export default function CardPayment({ tenantId, amount, isDark, onPay, onApprove
       <p className={`flex items-center gap-1.5 text-[11px] ${muted}`}><Lock size={12} /> Pago seguro con Mercado Pago. Tus datos de tarjeta no pasan por MVP Sports.</p>
     </div>
   );
+}
+
+// Antes del primer pago se completan los datos que pide Mercado Pago (RUT) y el recinto (teléfono)
+export default function CardPayment(props: Parameters<typeof CardPaymentForm>[0]) {
+  const { profile } = usePlayer();
+  const missing = missingForPayment(profile);
+  if (profile && missing.length) {
+    const back = typeof window !== "undefined" ? window.location.pathname + window.location.search : "/player";
+    return (
+      <div className={`p-4 rounded-md border space-y-3 ${props.isDark ? "border-amber-500/30 bg-amber-500/10" : "border-amber-300 bg-amber-50"}`}>
+        <p className={`text-[13px] font-semibold ${props.isDark ? "text-amber-300" : "text-amber-700"}`}>Completa tu perfil para pagar</p>
+        <p className={`text-[12px] ${props.isDark ? "text-slate-300" : "text-slate-600"}`}>
+          Antes de tu primer pago necesitamos tu {missing.join(", ")}. Lo pedimos una sola vez.
+        </p>
+        <Link href={`/player/preferencias?volver=${encodeURIComponent(back)}`} className="inline-flex h-11 px-5 items-center rounded-md bg-emerald-500 text-white text-[13px] font-semibold">
+          Completar mis datos
+        </Link>
+      </div>
+    );
+  }
+  return <CardPaymentForm {...props} />;
 }
