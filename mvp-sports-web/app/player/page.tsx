@@ -10,8 +10,11 @@ import { bookingService, Booking } from "@/services/player/bookingService";
 import {
   Trophy, CreditCard, Shield, TrendingUp, Swords,
   GraduationCap, ArrowRight, Calendar, Clock, MapPin, ChevronRight,
-  Navigation, Ticket, Share2, Flame, Zap, Target, CheckCircle2
+  Navigation, Ticket, Share2, Flame, Zap, Target, CheckCircle2,
+  Sun, Cloud, CloudRain, CloudStorm, Repeat, Star
 } from "@/components/player/icons";
+import { venueService } from "@/services/player/venueService";
+import { getMatchWeather, MatchWeather } from "@/services/player/weather";
 
 // Solo destinos que no están en la barra inferior (Inicio, Reservas, Mapa, Perfil, Más)
 const quickItems = [
@@ -62,6 +65,14 @@ const isPlayed = (b: any, now: number) => {
   return !!st && st.getTime() + 60 * 60_000 < now;
 };
 
+const DAY_NAMES = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+const WEATHER_ICON: Record<string, any> = { sun: Sun, cloud: Cloud, rain: CloudRain, storm: CloudStorm, fog: Cloud, snow: Cloud };
+
+const coordsOf = (v: any) => {
+  const t = v?.location || v?.coordinates || v?.coords || v || {};
+  return { lat: parseFloat(t.latitude ?? t.lat ?? t._lat), lng: parseFloat(t.longitude ?? t.lng ?? t._long) };
+};
+
 export default function PlayerDashboard() {
   const router = useRouter();
   const { profile, theme, toggleTheme } = usePlayer();
@@ -72,6 +83,9 @@ export default function PlayerDashboard() {
   const [nextBooking, setNextBooking] = useState<Booking | null>(null);
   const [allBookings, setAllBookings] = useState<Booking[]>([]);
   const [now, setNow] = useState(() => Date.now());
+  const [venues, setVenues] = useState<any[]>([]);
+  const [weather, setWeather] = useState<MatchWeather | null>(null);
+  useEffect(() => { venueService.getVenues().then(setVenues).catch(() => {}); }, []);
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 30_000); return () => clearInterval(t); }, []);
 
   useEffect(() => {
@@ -117,6 +131,41 @@ export default function PlayerDashboard() {
   const prog = gamification ? gamificationService.tierProgress(xp, gamification) : null;
   const xpPerGame = gamification ? (Number(gamification.xpPerMatch) || 0) + (Number(gamification.xpPerCheckin) || 0) : 0;
   const matchesToNext = prog?.next && xpPerGame > 0 ? Math.ceil(prog.xpToNext / xpPerGame) : 0;
+  // Clima a la hora del partido (solo canchas con coordenadas y hasta 15 días)
+  useEffect(() => {
+    setWeather(null);
+    if (!nb || !nbStart) return;
+    const v = venues.find((x) => x.id === nb.tenantId);
+    if (!v) return;
+    const { lat, lng } = coordsOf(v);
+    getMatchWeather(lat, lng, nbStart).then(setWeather).catch(() => {});
+  }, [nb?.id, venues.length]);
+
+  // "Tu cancha de siempre": recinto + día + hora que más se repite (al menos 2 veces)
+  const usual = useMemo(() => {
+    const counts = new Map<string, { n: number; b: any; day: number }>();
+    for (const b of allBookings as any[]) {
+      if (b.status === "cancelled" || b.isInternalMatch || !b.tenantId) continue;
+      const st = matchStart(b);
+      if (!st) continue;
+      const k = `${b.tenantId}|${st.getDay()}|${b.startTime}`;
+      const c = counts.get(k) || { n: 0, b, day: st.getDay() };
+      c.n++; counts.set(k, c);
+    }
+    const top = [...counts.values()].sort((a, b) => b.n - a.n)[0];
+    return top && top.n >= 2 ? top : null;
+  }, [allBookings]);
+
+  // Último partido jugado en los últimos 7 días sin evaluación
+  const toRate = useMemo(() => {
+    const week = now - 7 * 24 * 60 * 60_000;
+    return (allBookings as any[])
+      .filter((b) => isPlayed(b, now) && !(Number(b.rating) > 0))
+      .map((b) => ({ b, st: matchStart(b) }))
+      .filter((x) => x.st && x.st.getTime() > week)
+      .sort((a, b) => b.st!.getTime() - a.st!.getTime())[0]?.b || null;
+  }, [allBookings, now]);
+
   const activity = useMemo(() => {
     const played = allBookings.filter((b) => isPlayed(b, now)).map((b) => matchStart(b)).filter(Boolean) as Date[];
     const weeks = new Set(played.map((d) => weekStart(d)));
@@ -178,6 +227,11 @@ export default function PlayerDashboard() {
                 <span className="flex items-center gap-1.5"><Clock size={13} />{nb.startTime} hrs</span>
                 {nb.tenantName && <span className="flex items-center gap-1.5 truncate"><MapPin size={13} />{nb.tenantName}</span>}
               </div>
+              {weather && (() => { const W = WEATHER_ICON[weather.icon] || Cloud; return (
+                <p className={`mt-2 flex items-center gap-1.5 text-[12px] ${weather.rainChance >= 50 ? "text-sky-400" : muted}`}>
+                  <W size={14} /> {weather.temp}° · {weather.label}{weather.rainChance >= 20 ? ` · ${weather.rainChance}% lluvia` : ""}
+                </p>
+              ); })()}
             </Link>
             <div className={`grid grid-cols-3 border-t ${isDark ? "border-white/[0.06] divide-white/[0.06]" : "border-slate-200 divide-slate-200"} divide-x`}>
               <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nb.tenantName || "")}`} target="_blank" rel="noopener" className={`h-11 flex items-center justify-center gap-1.5 text-[12px] font-semibold ${muted}`}><Navigation size={14} /> Cómo llegar</a>
@@ -189,6 +243,30 @@ export default function PlayerDashboard() {
               }} className="h-11 flex items-center justify-center gap-1.5 text-[12px] font-semibold text-emerald-500"><Share2 size={14} /> Avisar</button>
             </div>
           </div>
+        )}
+
+        {/* Evaluar el último partido */}
+        {toRate && (
+          <Link href="/player/estadisticas" className={`flex items-center gap-3 rounded-md ${card} p-4 active:opacity-90`}>
+            <div className="w-10 h-10 rounded-md bg-amber-500/15 flex items-center justify-center shrink-0"><Star size={20} color="#f59e0b" /></div>
+            <div className="flex-1 min-w-0">
+              <p className={`text-[14px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Cómo te fue?</p>
+              <p className={`text-[12px] truncate ${muted}`}>Registra tu partido en {toRate.tenantName || "la cancha"} y suma a tus estadísticas</p>
+            </div>
+            <ChevronRight size={18} className={muted} />
+          </Link>
+        )}
+
+        {/* Tu cancha de siempre: reserva en un toque */}
+        {usual && (!nb || nb.tenantId !== usual.b.tenantId || nb.startTime !== usual.b.startTime) && (
+          <Link href={`/player/clubes/${usual.b.tenantId}?sport=${encodeURIComponent(usual.b.sport || "")}`} className={`flex items-center gap-3 rounded-md ${card} p-4 active:opacity-90`}>
+            <div className="w-10 h-10 rounded-md bg-emerald-500/15 flex items-center justify-center shrink-0"><Repeat size={20} color="#10b981" /></div>
+            <div className="flex-1 min-w-0">
+              <p className={`text-[12px] font-semibold ${muted}`}>Tu cancha de siempre</p>
+              <p className={`text-[14px] font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{usual.b.tenantName || "Tu recinto"} · {DAY_NAMES[usual.day]} {usual.b.startTime}</p>
+            </div>
+            <span className="text-[12px] font-semibold text-emerald-500 shrink-0">Reservar</span>
+          </Link>
         )}
 
         {/* Progreso de nivel */}

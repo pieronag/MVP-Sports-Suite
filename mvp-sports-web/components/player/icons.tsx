@@ -101,6 +101,16 @@ import {
     Sword01Icon as HiSword01Icon,
     Ticket01Icon as HiTicket01Icon,
     Timer01Icon as HiTimer01Icon,
+    CloudIcon as HiCloudIcon,
+    SunCloud01Icon as HiSunCloud01Icon,
+    CloudAngledRainIcon as HiCloudAngledRainIcon,
+    CloudAngledZapIcon as HiCloudAngledZapIcon,
+    RepeatIcon as HiRepeatIcon,
+    RankingIcon as HiRankingIcon,
+    GiftIcon as HiGiftIcon,
+    News01Icon as HiNews01Icon,
+    Notification01Icon as HiNotification01Icon,
+    WifiOffIcon as HiWifiOffIcon,
 } from "@hugeicons/core-free-icons";
 
 export interface PlayerIconProps {
@@ -228,4 +238,14 @@ export const Sunrise = make(HiSunriseIcon, "Sunrise");
 export const Sword = make(HiSword01Icon, "Sword");
 export const Ticket = make(HiTicket01Icon, "Ticket");
 export const Timer = make(HiTimer01Icon, "Timer");
-
+export const Cloud = make(HiCloudIcon, "Cloud");
+export const SunCloud = make(HiSunCloud01Icon, "SunCloud");
+export const CloudRain = make(HiCloudAngledRainIcon, "CloudRain");
+export const CloudStorm = make(HiCloudAngledZapIcon, "CloudStorm");
+export const Repeat = make(HiRepeatIcon, "Repeat");
+export const Ranking = make(HiRankingIcon, "Ranking");
+export const Gift = make(HiGiftIcon, "Gift");
+export const News = make(HiNews01Icon, "News");
+export const UserGroup = make(HiUserGroupIcon, "UserGroup");
+export const Bell = make(HiNotification01Icon, "Bell");
+export const WifiOff = make(HiWifiOffIcon, "WifiOff");
