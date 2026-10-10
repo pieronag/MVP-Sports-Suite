@@ -143,7 +143,7 @@ const sections: LegalSection[] = [
       <Bullets
         items={[
           "Mientras tu cuenta esté activa conservamos tus datos para prestarte el servicio.",
-          "Si eliminas tu cuenta, borramos tu perfil y tu acceso. Tus reservas pasadas quedan anonimizadas: dejan de mostrar tu nombre y teléfono, y solo se conservan para la contabilidad del recinto.",
+          "Si eliminas tu cuenta, borramos tu perfil, tu acceso, tus búsquedas de partido, tus desafíos y mensajes, tus reportes y tu vínculo con tus tarjetas guardadas. Te quitamos de tus equipos (si eras el único miembro, el equipo se borra). Tus reservas, pagos, inscripciones y reseñas se conservan anonimizadas, sin tu nombre ni datos de contacto, para la contabilidad del recinto.",
           "Los registros de pagos y facturación se conservan por el plazo que exige la normativa tributaria chilena (en general, 6 años).",
           "Los registros técnicos de errores se guardan por un tiempo limitado y luego se eliminan.",
         ]}

@@ -55,13 +55,12 @@ export const userService = {
         await updateDoc(ref, cleanData as any);
     },
 
-    // Requiere un inicio de sesión reciente (reautenticar antes de llamar).
-    // Orden: anonimizar reservas (mientras aún es el titular) → borrar perfil → borrar acceso.
-    async deleteAccount(uid: string): Promise<void> {
-        const snap = await getDocs(query(collection(db, 'bookings'), where('userId', '==', uid)));
-        await Promise.all(snap.docs.map(d => updateDoc(doc(db, 'bookings', d.id), { userId: null, clientName: 'Usuario eliminado', clientPhone: '' })));
-        await deleteDoc(doc(db, 'users', uid));
-        if (auth.currentUser) await deleteUser(auth.currentUser);
+    // Requiere reautenticar justo antes: el servidor exige un inicio de sesión reciente.
+    async deleteAccount(): Promise<void> {
+        const token = await auth.currentUser?.getIdToken(true);
+        const res = await fetch('/api/account/delete', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data?.error || 'No se pudo eliminar la cuenta.');
     },
 
     async getGamificationSettings(): Promise<any> {

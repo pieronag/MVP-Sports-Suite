@@ -66,9 +66,9 @@ const sections: LegalSection[] = [
         />
         <Card title="Eliminar tu cuenta" tone="warn">
           <p>
-            Puedes eliminar tu cuenta cuando quieras desde Ajustes en la app. Al hacerlo borramos tu perfil y tu acceso. Tus reservas
-            pasadas no se borran porque el recinto las necesita para su contabilidad, pero quedan anonimizadas: dejan de mostrar tu
-            nombre y teléfono. El detalle está en la{" "}
+            Puedes eliminar tu cuenta cuando quieras desde Ajustes en la app. Borramos tu perfil, tu acceso y tu actividad en la
+            comunidad. Tus reservas y pagos pasados quedan anonimizados, sin tu nombre ni datos de contacto, porque el recinto los
+            necesita para su contabilidad. El detalle está en la{" "}
             <Link href="/privacy" className="text-white underline hover:text-[#00df82]">Política de Privacidad</Link>.
           </p>
         </Card>

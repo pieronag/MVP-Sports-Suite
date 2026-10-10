@@ -297,13 +297,12 @@ export default function PreferenciasPage() {
         setLoadingDelete(false);
         return;
       }
-      await userService.deleteAccount(user.uid);
+      await userService.deleteAccount();
       setShowDeleteModal(false);
       showFeedbackMsg("success", "Cuenta eliminada.");
       setTimeout(() => { logout(); router.push("/login"); }, 1500);
     } catch (err: any) {
-      let msg = "No se pudo borrar la cuenta.";
-      if (err.code === "auth/requires-recent-login") msg = "Cierra sesión y vuelve a iniciarla antes de eliminar tu cuenta.";
+      const msg = err?.message || "No se pudo borrar la cuenta.";
       showFeedbackMsg("error", msg);
     } finally { setLoadingDelete(false); }
   };
