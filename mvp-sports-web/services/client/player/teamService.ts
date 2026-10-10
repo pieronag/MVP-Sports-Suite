@@ -1,3 +1,4 @@
+import { getApi } from "@/services/client/apiClient";
 import { collection, query, where, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, Timestamp } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
 
@@ -131,19 +132,13 @@ export const teamService = {
         await updateDoc(ref, { members: arrayRemove(userId) });
     },
 
-    // Fetch user profiles for a list of UIDs
+    // Perfiles públicos de los miembros (el servidor devuelve solo datos deportivos)
     async getMemberProfiles(uids: string[]): Promise<Record<string, any>> {
         const result: Record<string, any> = {};
-        const chunks: string[][] = [];
-        for (let i = 0; i < uids.length; i += 10) chunks.push(uids.slice(i, i + 10));
-        for (const chunk of chunks) {
-            const q = query(collection(db, 'users'), where('__name__', 'in', chunk));
-            const snap = await getDocs(q);
-            snap.docs.forEach(d => {
-                const data = d.data() as any;
-                // Nombre legible siempre (algunas cuentas solo tienen fullName)
-                result[d.id] = { uid: d.id, ...data, displayName: data.displayName || data.fullName || 'Jugador MVP' };
-            });
+        for (let i = 0; i < uids.length; i += 30) {
+            const chunk = uids.slice(i, i + 30);
+            const { profiles } = await getApi<{ profiles: any[] }>(`/api/public-profiles?ids=${encodeURIComponent(chunk.join(","))}`);
+            profiles.forEach((p) => { result[p.uid] = p; });
             // UIDs sin documento: nombre genérico (nunca mostrar el ID)
             chunk.forEach(uid => {
                 if (!result[uid]) result[uid] = { uid, displayName: 'Jugador MVP', photoURL: null, tier: 'Bronce', ovr: 40 };

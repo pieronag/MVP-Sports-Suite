@@ -26,3 +26,11 @@ function serializeDate(d: any) {
   if (typeof d?.seconds === "number") return new Date(d.seconds * 1000).toISOString();
   return d;
 }
+
+export async function getApi<T = any>(path: string): Promise<T> {
+  const token = await auth.currentUser?.getIdToken().catch(() => undefined);
+  const res = await fetch(path, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.error || `Error ${res.status}`);
+  return data as T;
+}

@@ -132,7 +132,9 @@ service cloud.firestore {
     
     // Perfiles unificados (App y Web)
     match /profiles/{userId} {
-      allow read: if isAuthenticated();
+      // Contiene correo, teléfono, RUT y fecha de nacimiento: solo el titular y el personal.
+      // Los demás jugadores ven el perfil público vía /api/public-profiles.
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isStaff());
       allow create: if isAuthenticated() && (
         isSuperAdmin() ||
         (request.auth.uid == userId && isSafeSelfCreate()) ||
@@ -144,8 +146,7 @@ service cloud.firestore {
         isSuperAdmin() ||
         (request.auth.uid == userId && !touchesPrivileged()) ||
         isOwnerManagingManager() ||
-        (isStaff() && !touchesPrivileged()) ||
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stats', 'xp', 'ovr', 'tier', 'badges', 'badgeXpBonus', 'lastELOUpdate', 'lastBulkSync'])
+        (isStaff() && !touchesPrivileged())
       );
 
       // Subcolecciones (tarjetas, estadísticas, transacciones, etc.)
@@ -156,7 +157,9 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow read: if isAuthenticated();
+      // Contiene correo, teléfono, RUT y fecha de nacimiento: solo el titular y el personal.
+      // Los demás jugadores ven el perfil público vía /api/public-profiles.
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isStaff());
       allow create: if isAuthenticated() && (
         isSuperAdmin() ||
         (request.auth.uid == userId && isSafeSelfCreate()) ||
@@ -168,8 +171,7 @@ service cloud.firestore {
         isSuperAdmin() ||
         (request.auth.uid == userId && !touchesPrivileged()) ||
         isOwnerManagingManager() ||
-        (isStaff() && !touchesPrivileged()) ||
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stats', 'xp', 'ovr', 'tier', 'badges', 'badgeXpBonus', 'lastELOUpdate', 'lastBulkSync'])
+        (isStaff() && !touchesPrivileged())
       );
       match /{subcollection=**} {
         allow read: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());

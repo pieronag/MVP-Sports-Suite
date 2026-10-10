@@ -1,4 +1,5 @@
 "use client";
+import { getApi } from "@/services/client/apiClient";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -21,15 +22,8 @@ const shortName = (n: string) => {
 };
 
 async function loadTop(city?: string): Promise<Row[]> {
-  const base = collection(db, "users");
-  const q = city
-    ? query(base, where("role", "==", "player"), where("city", "==", city), orderBy("xp", "desc"), limit(50))
-    : query(base, where("role", "==", "player"), orderBy("xp", "desc"), limit(50));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => {
-    const u: any = d.data();
-    return { uid: d.id, name: shortName(u.displayName || u.fullName), photo: u.photoURL, xp: Number(u.xp) || 0, city: u.city };
-  });
+  const { profiles } = await getApi<{ profiles: any[] }>(`/api/public-profiles?top=1${city ? `&city=${encodeURIComponent(city)}` : ""}`);
+  return profiles.map((u) => ({ uid: u.uid, name: shortName(u.displayName), photo: u.photoURL, xp: u.xp, city: u.city }));
 }
 
 export default function RankingPage() {
