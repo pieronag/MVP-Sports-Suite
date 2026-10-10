@@ -238,7 +238,7 @@ export async function chargeCard(params: Parameters<typeof createPaymentRecord>[
   const { payRef, buyOrder } = await createPaymentRecord(params);
   // Cuenta de prueba: comprador de prueba (con una cuenta real se usa el correo del jugador)
   if (await isTestSeller(accessToken)) {
-    params = { ...params, payerEmail: `test_user_${params.uid.slice(0, 8).toLowerCase()}@testuser.com`, saveCard: false };
+    params = { ...params, payerEmail: process.env.MP_TEST_PAYER_EMAIL || `test_user_${params.uid.slice(0, 8).toLowerCase()}@testuser.com`, saveCard: false };
   }
   const customerId = params.saveCard || params.card.token
     ? await mpCustomerId(accessToken, params.tenantId, params.uid, params.payerEmail, !!params.saveCard).catch(() => null)
