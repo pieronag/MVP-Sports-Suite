@@ -83,7 +83,18 @@ export default function TicketPage() {
     (async () => {
       if (!bookingId) { setLoading(false); return; }
       // Reserva ajena o inexistente: getBooking lanza por permisos → "no encontrada"
-      const b = await bookingService.getBooking(bookingId).catch(() => null);
+      // Sin señal en la cancha: el ticket se guarda en el teléfono la última vez que se abrió con conexión
+      const key = `mvp-ticket:${bookingId}`;
+      let b: any = await bookingService.getBooking(bookingId).catch(() => null);
+      try {
+        if (b) {
+          const plain = { ...b, date: b.date?.toDate ? b.date.toDate().toISOString() : b.date };
+          localStorage.setItem(key, JSON.stringify(plain));
+        } else if (typeof navigator !== "undefined" && !navigator.onLine) {
+          const saved = localStorage.getItem(key);
+          if (saved) { b = JSON.parse(saved); b.__offline = true; }
+        }
+      } catch { /* almacenamiento no disponible */ }
       setBooking(b);
       setLoading(false);
     })();
@@ -229,6 +240,10 @@ export default function TicketPage() {
             </div>
           </GlowCard>
         </div>
+        )}
+
+        {booking?.__offline && (
+          <p className={`text-center text-[12px] ${isDark ? "text-slate-400" : "text-slate-500"}`}>Sin conexión: mostrando el ticket guardado en tu teléfono.</p>
         )}
 
         {/* Actions */}
