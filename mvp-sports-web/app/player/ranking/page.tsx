@@ -38,7 +38,7 @@ export default function RankingPage() {
   const { user } = useAuth();
   const isDark = theme === "dark";
   const city = (profile as any)?.city as string | undefined;
-  const [scope, setScope] = useState<"city" | "all">(city ? "city" : "all");
+  const [scope, setScope] = useState<"city" | "all" | "season">(city ? "city" : "all");
   const [touched, setTouched] = useState(false);
   useEffect(() => { if (city && !touched) setScope("city"); }, [city, touched]);
   const [rows, setRows] = useState<Row[] | null>(null);
@@ -46,8 +46,15 @@ export default function RankingPage() {
   const [gamification, setGamification] = useState<any>(null);
 
   useEffect(() => { gamificationService.getSettings().then(setGamification); }, []);
+  const [season, setSeason] = useState<{ label: string; endsInDays: number } | null>(null);
   useEffect(() => {
     setRows(null); setError(false);
+    if (scope === "season") {
+      cached("ranking:season", 30 * 60_000, () => fetch("/api/season").then((r) => { if (!r.ok) throw new Error(); return r.json(); }))
+        .then((d: any) => { setSeason({ label: d.label, endsInDays: d.endsInDays }); setRows(d.rows.map((r: any) => ({ ...r, xp: r.matches }))); })
+        .catch(() => { setError(true); setRows([]); });
+      return;
+    }
     const c = scope === "city" ? city : undefined;
     cached(`ranking:${c || "all"}`, 10 * 60_000, () => loadTop(c)).then(setRows).catch(() => { setError(true); setRows([]); });
   }, [scope, city]);
@@ -71,12 +78,16 @@ export default function RankingPage() {
         <SegmentedTabs isDark={isDark} value={scope} onChange={(v) => { setTouched(true); setScope(v); }} options={[
           ...(city ? [{ id: "city" as const, label: city }] : []),
           { id: "all" as const, label: "Todo Chile" },
+          { id: "season" as const, label: "Temporada" },
         ]} />
+        {scope === "season" && season && (
+          <p className={`text-[12px] ${sub}`}>Temporada {season.label} · termina en {season.endsInDays} día{season.endsInDays === 1 ? "" : "s"}. Gana quien juegue más partidos.</p>
+        )}
 
         {myIndex >= 0 && (
           <div className="rounded-md p-4 bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between">
-            <p className="text-[13px] font-semibold text-emerald-500">Vas #{myIndex + 1}{scope === "city" && city ? ` en ${city}` : " en Chile"}</p>
-            {myIndex > 0 && rows && <p className={`text-[12px] ${sub}`}>{(rows[myIndex - 1].xp - rows[myIndex].xp).toLocaleString("es-CL")} XP para subir un puesto</p>}
+            <p className="text-[13px] font-semibold text-emerald-500">Vas #{myIndex + 1}{scope === "season" ? " en la temporada" : scope === "city" && city ? ` en ${city}` : " en Chile"}</p>
+            {myIndex > 0 && rows && <p className={`text-[12px] ${sub}`}>{(rows[myIndex - 1].xp - rows[myIndex].xp).toLocaleString("es-CL")} {scope === "season" ? "partidos" : "XP"} para subir un puesto</p>}
           </div>
         )}
 
@@ -91,7 +102,7 @@ export default function RankingPage() {
           <ol className={`rounded-md ${card} divide-y ${isDark ? "divide-white/[0.06]" : "divide-slate-100"}`}>
             {rows.map((r, i) => {
               const me = r.uid === user?.uid;
-              const tier = gamification ? gamificationService.calculateTier(r.xp, gamification).name : "";
+              const tier = scope === "season" ? (r.city || "") : gamification ? gamificationService.calculateTier(r.xp, gamification).name : "";
               return (
                 <li key={r.uid} className={`flex items-center gap-3 px-4 py-3 ${me ? "bg-emerald-500/[0.07]" : ""}`}>
                   <span className="w-7 text-center text-[13px] font-bold tabular-nums" style={{ color: i < 3 ? medal[i] : undefined }}>
@@ -104,7 +115,7 @@ export default function RankingPage() {
                     <p className={`text-[13px] font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{r.name}{me ? " (tú)" : ""}</p>
                     <p className={`text-[11px] ${sub}`}>{tier}{scope === "all" && r.city ? ` · ${r.city}` : ""}</p>
                   </div>
-                  <span className="text-[13px] font-semibold text-emerald-500 tabular-nums">{r.xp.toLocaleString("es-CL")}</span>
+                  <span className="text-[13px] font-semibold text-emerald-500 tabular-nums">{r.xp.toLocaleString("es-CL")}{scope === "season" ? " PJ" : ""}</span>
                 </li>
               );
             })}
