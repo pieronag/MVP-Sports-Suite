@@ -4,9 +4,29 @@
     {
       "name": "web",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "mvp-sports-web", "run", "dev"],
+      "runtimeArgs": [
+        "--prefix",
+        "mvp-sports-web",
+        "run",
+        "dev"
+      ],
       "port": 3001,
       "autoPort": true
+    },
+    {
+      "name": "app-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "mvp-sports-app",
+        "run",
+        "web",
+        "--",
+        "--port",
+        "8081",
+        "--clear"
+      ],
+      "port": 8081
     }
   ]
 }
