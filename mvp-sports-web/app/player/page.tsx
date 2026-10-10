@@ -280,7 +280,7 @@ export default function PlayerDashboard() {
 
         {/* Evaluar el último partido */}
         {toRate && (
-          <Link href="/player/estadisticas" className={`flex items-center gap-3 rounded-md ${card} p-4 active:opacity-90`}>
+          <Link href={`/player/estadisticas?registrar=${toRate.id}`} className={`flex items-center gap-3 rounded-md ${card} p-4 active:opacity-90`}>
             <div className="w-10 h-10 rounded-md bg-amber-500/15 flex items-center justify-center shrink-0"><Star size={20} color="#f59e0b" /></div>
             <div className="flex-1 min-w-0">
               <p className={`text-[14px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Cómo te fue?</p>

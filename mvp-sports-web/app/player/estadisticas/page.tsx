@@ -62,6 +62,7 @@ export default function EstadisticasPage() {
   const [showStatsModal, setShowStatsModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
+  const [showTeamDetail, setShowTeamDetail] = useState(false);
   const [userTeams, setUserTeams] = useState<any[]>([]);
   const [selectedTeamId, setSelectedTeamId] = useState('');
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
@@ -94,6 +95,15 @@ export default function EstadisticasPage() {
       .then((s) => { if (s.exists()) { const d: any = s.data(); setGamification({ ...d.gamification, badges: d.badges || d.gamification?.badges || {} }); } })
       .catch(() => {});
   }, []);
+
+  const [autoOpened, setAutoOpened] = useState(false);
+  useEffect(() => {
+    if (autoOpened || loading || typeof window === 'undefined') return;
+    const id = new URLSearchParams(window.location.search).get('registrar');
+    if (!id) return;
+    const b: any = bookings.find((x: any) => x.id === id);
+    if (b) { setAutoOpened(true); handleOpenStatsModal({ ...b, id: b.id }); }
+  }, [bookings, loading, autoOpened]);
 
   const handleLoadTeamMembers = async (teamId: string, teamsList?: any[], existingStats?: any, existingAssignments?: any, existingAssists?: any) => {
     setLoadingMembers(true);
@@ -132,13 +142,13 @@ export default function EstadisticasPage() {
     setMemberAssists(match ? (match.teamAssists || {}) : {});
     setWinnerTeamInput(match ? (match.winnerTeam || 'A') : 'A');
     setTeamAssignments(match ? (match.teamAssignments || {}) : {});
-    setTeamMembers([]); setShowConfirmModal(false); setShowStatsModal(true);
+    setTeamMembers([]); setShowConfirmModal(false); setShowTeamDetail(!!(match && match.selectedTeamId)); setShowStatsModal(true);
     const uid = (profile as any)?.uid;
     if (uid) {
       try {
         const teams = await teamService.getUserTeams(uid); setUserTeams(teams);
         if (match && match.selectedTeamId) { await handleLoadTeamMembers(match.selectedTeamId, teams, match.teamStats || {}, match.teamAssignments || {}, match.teamAssists || {}); }
-        else if (teams.length > 0) { setSelectedTeamId(teams[0].id); await handleLoadTeamMembers(teams[0].id, teams, {}, {}, {}); }
+        // Modo rápido por defecto: el detalle del equipo es opcional
       } catch (error) { console.error(error); }
     }
   };
@@ -160,7 +170,7 @@ export default function EstadisticasPage() {
       const matchSport = selectedMatch?.sport || 'futbol';
       const isScorelessSport = ['padel', 'pádel', 'tenis', 'tennis', 'basket', 'básquet', 'basquet'].some(s => matchSport.toLowerCase().includes(s));
       let activeUserOutcome = matchOutcomeInput;
-      if (isScorelessSport) {
+      if (isScorelessSport && selectedTeamId) {
         if (winnerTeamInput === 'draw') { activeUserOutcome = 'draw'; }
         else { const activeUserAssignment = teamAssignments[uid || ''] || 'A'; activeUserOutcome = (activeUserAssignment === 'N') ? 'draw' : (winnerTeamInput === activeUserAssignment ? 'win' : 'loss'); }
       }
@@ -250,15 +260,23 @@ export default function EstadisticasPage() {
       dateObj.setSeconds(dateObj.getSeconds() - idx * 60);
       return { isBadge: true, id: badge.id, badgeName: info.name, badgeTier: tn[badge.tier] || 'BRONCE', badgeColor: tc[badge.tier] || '#b45309', badgeDesc: BADGE_DESCRIPTIONS[badge.id] || 'Hito superado', xpBonus, dateObj };
     });
+    // Hora de término ya pasada (inicio + 1 h; los bloques antes de las 06:00 son del día siguiente)
+    const hasEnded = (b: any) => {
+      const raw = b.date; const d = raw?.toDate ? raw.toDate() : raw?.seconds ? new Date(raw.seconds * 1000) : /^\d{4}-\d{2}-\d{2}$/.test(String(raw)) ? new Date(`${raw}T12:00:00`) : raw ? new Date(raw) : null;
+      if (!d || isNaN(d.getTime())) return false;
+      const [h, m] = String(b.startTime || '00:00').split(':').map(Number);
+      const st = new Date(d); st.setHours(h || 0, m || 0, 0, 0); if ((h || 0) < 6) st.setDate(st.getDate() + 1);
+      return st.getTime() + 60 * 60_000 < Date.now();
+    };
     const matchesList = bookings.filter(b => {
-      const isCompleted = b.status === 'completed' || (b as any).checkOut === true;
+      const isCompleted = b.status === 'completed' || (b as any).checkOut === true || (b.status !== 'cancelled' && hasEnded(b));
       const isNoShow = b.status === 'no-show' || b.paymentStatus === 'no-show' || b.noShow === true;
       if (b.status === 'cancelled' && !isNoShow) return false;
       return isCompleted || isNoShow;
     }).map(b => {
       const bData = b as any;
       const dateObj = b.date?.seconds ? new Date(b.date.seconds * 1000) : (b.date?.toDate ? b.date.toDate() : new Date());
-      const isCompleted = b.status === 'completed' || bData.checkOut === true;
+      const isCompleted = b.status === 'completed' || bData.checkOut === true || (b.status !== 'cancelled' && hasEnded(b));
       const isNoShow = b.status === 'no-show' || b.paymentStatus === 'no-show' || bData.noShow === true;
       let ds = 'pending';
       if (isNoShow) ds = 'no-show'; else if (isCompleted) ds = 'completed'; else if (b.status === 'confirmed') ds = 'confirmed'; else if (b.status === 'cancelled') ds = 'cancelled'; else if (b.status === 'pending') ds = 'pending';
@@ -405,6 +423,13 @@ export default function EstadisticasPage() {
           { id: 'partidos', label: `Partidos (${analytics.bitacora.filter((h: any) => !h.isBadge).length})` },
           { id: 'logros', label: `Logros (${analytics.bitacora.filter((h: any) => h.isBadge).length})` },
         ]} />
+
+        {activeTab === 'partidos' && (
+          <button onClick={() => handleOpenStatsModal(null)}
+            className="w-full h-11 rounded-md bg-emerald-500 text-white text-[13px] font-semibold flex items-center justify-center gap-2 active:scale-[0.98]">
+            <Plus size={16} /> Registrar partido
+          </button>
+        )}
 
         {/* Feed */}
         <GlowCard isDark={isDark}>
@@ -553,6 +578,7 @@ export default function EstadisticasPage() {
 
               return (
                 <div className="space-y-5">
+                  {selectedTeamId && (
                   <GlowCard isDark={isDark}>
                     <div className="p-4 flex items-center justify-center gap-6">
                       <div className="flex-1 text-center">
@@ -576,14 +602,15 @@ export default function EstadisticasPage() {
                       </div>
                     </div>
                   </GlowCard>
+                  )}
 
                   <GlowCard isDark={isDark}>
                     <div className={`p-4 space-y-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
                       <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                        {isScorelessSport ? 'Equipo Ganador' : 'Resultado'}
+                        {isScorelessSport && selectedTeamId ? 'Equipo ganador' : 'Resultado'}
                       </p>
                       <div className={`flex rounded-md p-1 gap-1 ${isDark ? "bg-white/4" : "bg-slate-100"}`}>
-                        {(isScorelessSport ? [
+                        {(isScorelessSport && selectedTeamId ? [
                           { key: 'A', label: 'Equipo A' },
                           { key: 'B', label: 'Equipo B' },
                           { key: 'draw', label: 'Empate' }
@@ -592,8 +619,8 @@ export default function EstadisticasPage() {
                           { key: 'loss', label: 'Derrota' },
                           { key: 'draw', label: 'Empate' }
                         ]).map((opt) => {
-                          const sel = isScorelessSport ? winnerTeamInput : matchOutcomeInput;
-                          const setter = isScorelessSport ? setWinnerTeamInput : setMatchOutcomeInput;
+                          const sel = isScorelessSport && selectedTeamId ? winnerTeamInput : matchOutcomeInput;
+                          const setter = isScorelessSport && selectedTeamId ? setWinnerTeamInput : setMatchOutcomeInput;
                           const colors: Record<string, string> = {
                             A: '#ef4444', B: '#3b82f6', win: '#10b981', loss: '#ef4444', draw: '#94a3b8'
                           };
@@ -612,6 +639,34 @@ export default function EstadisticasPage() {
                     </div>
                   </GlowCard>
 
+                  {!selectedTeamId && (
+                    <GlowCard isDark={isDark}>
+                      <div className="p-4 space-y-4">
+                        {!isScorelessSport && (
+                          <div className="flex items-center justify-between">
+                            <p className={`text-[13px] font-semibold ${isDark ? "text-slate-200" : "text-slate-800"}`}>Tus goles</p>
+                            <div className="flex items-center gap-2">
+                              <button aria-label="Restar gol" onClick={() => setPersonalGoalsInput((g) => Math.max(0, g - 1))} className={`w-10 h-10 rounded-md flex items-center justify-center ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}><Minus size={16} /></button>
+                              <span className={`w-8 text-center text-[18px] font-bold tabular-nums ${isDark ? "text-slate-100" : "text-slate-900"}`}>{personalGoalsInput}</span>
+                              <button aria-label="Sumar gol" onClick={() => setPersonalGoalsInput((g) => g + 1)} className="w-10 h-10 rounded-md flex items-center justify-center bg-emerald-500 text-white"><Plus size={16} /></button>
+                            </div>
+                          </div>
+                        )}
+                        <button onClick={() => setMvpUserIdInput(mvpUserIdInput === (profile as any)?.uid ? null : (profile as any)?.uid)}
+                          aria-pressed={mvpUserIdInput === (profile as any)?.uid}
+                          className={`w-full h-11 rounded-md text-[13px] font-semibold flex items-center justify-center gap-2 border transition-all ${mvpUserIdInput === (profile as any)?.uid ? "bg-amber-500/15 border-amber-500/40 text-amber-500" : isDark ? "border-white/[0.08] text-slate-300" : "border-slate-200 text-slate-600"}`}>
+                          <Star size={16} /> {mvpUserIdInput === (profile as any)?.uid ? "Fuiste el MVP" : "Fui el MVP"}
+                        </button>
+                      </div>
+                    </GlowCard>
+                  )}
+
+                  {!showTeamDetail ? (
+                    userTeams.length > 0 && (
+                      <button onClick={() => setShowTeamDetail(true)} className="w-full text-[12px] font-semibold text-emerald-500 py-1">+ Agregar detalle del equipo (opcional)</button>
+                    )
+                  ) : (
+                  <>
                   <GlowCard isDark={isDark}>
                     <div className="p-4">
                       <p className={`text-[11px] font-semibold uppercase tracking-wide mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipo</p>
@@ -638,7 +693,7 @@ export default function EstadisticasPage() {
                           {['A', 'B', 'N'].map(t => (
                             <button key={t} onClick={() => setWinnerTeamInput(t as any)}
                               className={`flex-1 h-9 rounded-md text-[11px] font-semibold transition-all ${t === 'A' ? 'bg-red-500/15 text-red-400' : t === 'B' ? 'bg-blue-500/15 text-blue-400' : 'bg-slate-500/15 text-slate-400'}`}>
-                              {t === 'A' ? '🔴' : t === 'B' ? '🔵' : '⚪'} {t === 'A' ? 'A' : t === 'B' ? 'B' : 'Banca'}
+                              {t === 'A' ? 'Ganó A' : t === 'B' ? 'Ganó B' : 'Empate'}
                             </button>
                           ))}
                         </div>
@@ -670,16 +725,18 @@ export default function EstadisticasPage() {
                       </div>
                     </GlowCard>
                   )}
+                  </>
+                  )}
 
-                  {selectedMatch && selectedMatch.id && (
+                  {(
                     <div className="flex gap-3">
-                      <button onClick={() => setShowConfirmModal(true)} className="flex-1 h-12 rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wide transition-all active:scale-[0.98]">
+                      <button disabled={savingStats} onClick={executeSaveMatchStats} className="flex-1 h-12 rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wide transition-all active:scale-[0.98]">
                         {savingStats ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" /> : 'Guardar'}
                       </button>
                     </div>
                   )}
 
-                  {selectedMatch && selectedMatch.id && showConfirmModal && (
+                  {false && showConfirmModal && (
                     <GlowCard isDark={isDark}>
                       <div className="p-5 text-center">
                         <p className={`text-[15px] font-semibold mb-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Confirmar estadísticas?</p>
