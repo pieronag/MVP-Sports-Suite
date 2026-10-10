@@ -12,7 +12,7 @@ import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import {
   ChevronLeft, Sun, Moon, Camera, Trophy, Target, Handshake, Star,
-  Medal, Sparkles, Download, Activity, User as UserIcon, MapPin, Zap,
+  Medal, Sparkles, Download, Share2, Activity, User as UserIcon, MapPin, Zap,
   Shield, ShieldAlert, Award, Swords, Flame, Heart, Crosshair, CircleDot,
   Sunrise, GraduationCap, TrendingUp, Users, Sword, CalendarDays, X, Crown, Timer, CalendarCheck
 } from "@/components/player/icons";
@@ -542,7 +542,7 @@ export default function PerfilPage() {
               </button>
               <button onClick={handleDownloadCard}
                 className="flex-2 h-[54px] rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600">
-                <Download size={16} /> Descargar Carta
+                <Share2 size={16} /> Guardar o compartir
               </button>
             </div>
           </div>
