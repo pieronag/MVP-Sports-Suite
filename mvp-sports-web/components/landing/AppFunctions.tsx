@@ -57,12 +57,12 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4 lg:auto-rows-[150px]">
+        <div className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-3 md:gap-4 lg:auto-rows-[150px]">
           {/* Reservas */}
-          <div className="md:col-span-3 lg:col-span-4 lg:row-span-2 group p-7 rounded-md bg-[#00df82]/[0.07] border border-white/5 hover:border-[#00df82]/40 transition-all duration-500 hover:shadow-[0_0_50px_-15px_rgba(0,223,130,0.35)] overflow-hidden relative flex flex-col justify-between gap-5">
+          <div className="col-span-2 md:col-span-3 lg:col-span-4 lg:row-span-2 group p-5 md:p-7 rounded-md bg-[#00df82]/[0.07] border border-white/5 hover:border-[#00df82]/40 transition-all duration-500 hover:shadow-[0_0_50px_-15px_rgba(0,223,130,0.35)] overflow-hidden relative flex flex-col justify-between gap-5">
             <div className="relative z-10 space-y-3">
               <HugeiconsIcon icon={FlashIcon} className="w-12 h-12 text-[#00df82]" strokeWidth={1.6} />
-              <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">
+              <h3 className="text-xl sm:text-2xl font-black text-white leading-tight uppercase tracking-tight">
                 Canchas disponibles <br /> en tiempo real.
               </h3>
             </div>
@@ -78,10 +78,10 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           </div>
 
           {/* Progreso */}
-          <div className="md:col-span-3 lg:col-span-4 lg:row-span-2 group p-7 rounded-md bg-blue-500/[0.07] border border-white/5 hover:border-blue-500/40 transition-all duration-500 hover:shadow-[0_0_50px_-15px_rgba(59,130,246,0.35)] overflow-hidden relative flex flex-col justify-between gap-5">
+          <div className="col-span-2 md:col-span-3 lg:col-span-4 lg:row-span-2 group p-5 md:p-7 rounded-md bg-blue-500/[0.07] border border-white/5 hover:border-blue-500/40 transition-all duration-500 hover:shadow-[0_0_50px_-15px_rgba(59,130,246,0.35)] overflow-hidden relative flex flex-col justify-between gap-5">
             <div className="relative z-10 space-y-3">
               <HugeiconsIcon icon={TrophyIcon} className="w-12 h-12 text-blue-400" strokeWidth={1.6} />
-              <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">
+              <h3 className="text-xl sm:text-2xl font-black text-white leading-tight uppercase tracking-tight">
                 Gana XP y <br /> sube de nivel.
               </h3>
             </div>
@@ -97,10 +97,10 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           </div>
 
           {/* Pago online */}
-          <div className="md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-emerald-500/[0.07] border border-white/5 hover:border-emerald-500/30 transition-all duration-300 relative overflow-hidden">
+          <div className="col-span-2 md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-emerald-500/[0.07] border border-white/5 hover:border-emerald-500/30 transition-all duration-300 relative overflow-hidden">
             <div className="relative z-10 space-y-1.5">
               <HugeiconsIcon icon={CreditCardIcon} className="w-8 h-8 text-emerald-400" strokeWidth={1.6} />
-              <h3 className="text-base font-black text-white">Pago 100% online.</h3>
+              <h3 className="text-base font-black text-white uppercase tracking-wide">Pago 100% online.</h3>
               <p className="text-xs text-slate-400 leading-snug">
                 Mercado Pago con débito, crédito o saldo, sin efectivo.
               </p>
@@ -108,10 +108,10 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           </div>
 
           {/* Estadísticas */}
-          <div className="md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-orange-500/[0.07] border border-white/5 hover:border-orange-500/30 transition-all duration-300 relative overflow-hidden">
+          <div className="col-span-2 md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-orange-500/[0.07] border border-white/5 hover:border-orange-500/30 transition-all duration-300 relative overflow-hidden">
             <div className="relative z-10 space-y-1.5">
               <HugeiconsIcon icon={BarChartIcon} className="w-8 h-8 text-orange-400" strokeWidth={1.6} />
-              <h3 className="text-base font-black text-white">Mide tu rendimiento.</h3>
+              <h3 className="text-base font-black text-white uppercase tracking-wide">Mide tu rendimiento.</h3>
               <p className="text-xs text-slate-400 leading-snug">
                 Partidos, goles, asistencias y logros, mes a mes.
               </p>
@@ -122,9 +122,9 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           {compactFeatures.map((feature) => (
             <div
               key={feature.title}
-              className={`md:col-span-2 lg:col-span-3 group p-5 rounded-md bg-slate-900/50 border border-white/5 ${feature.border} transition-all duration-300 hover:-translate-y-1 flex flex-col gap-2.5`}
+              className={`md:col-span-2 lg:col-span-3 group p-4 md:p-5 rounded-md bg-slate-900/50 border border-white/5 ${feature.border} transition-all duration-300 hover:-translate-y-1 flex flex-col gap-2.5`}
             >
-              <HugeiconsIcon icon={feature.icon} className={`w-11 h-11 ${feature.accent}`} strokeWidth={1.6} />
+              <HugeiconsIcon icon={feature.icon} className={`w-9 h-9 md:w-11 md:h-11 ${feature.accent}`} strokeWidth={1.6} />
               <h3 className="text-sm font-black text-white uppercase tracking-wide">{feature.title}</h3>
               <p className="text-xs text-slate-400 leading-snug">{feature.description}</p>
             </div>
@@ -134,13 +134,13 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           <button
             type="button"
             onClick={onRegisterClick}
-            className="md:col-span-2 lg:col-span-3 group p-5 rounded-md bg-linear-to-br from-[#00df82] via-emerald-500 to-teal-500 border border-[#00df82]/30 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex flex-col justify-between gap-6 text-left cursor-pointer shadow-[0_0_50px_-15px_rgba(0,223,130,0.5)]"
+            className="md:col-span-2 lg:col-span-3 group p-4 md:p-5 rounded-md bg-linear-to-br from-[#00df82] via-emerald-500 to-teal-500 border border-[#00df82]/30 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex flex-col justify-between gap-6 text-left cursor-pointer shadow-[0_0_50px_-15px_rgba(0,223,130,0.5)]"
           >
             <span className="text-[10px] font-black text-slate-900/80 uppercase tracking-[0.2em]">
               Únete a la comunidad
             </span>
             <span className="flex items-end justify-between gap-4">
-              <span className="text-xl font-black text-slate-950 uppercase tracking-tighter leading-none">
+              <span className="text-lg md:text-xl font-black text-slate-950 uppercase tracking-tighter leading-none">
                 Regístrate
                 <br />
                 gratis

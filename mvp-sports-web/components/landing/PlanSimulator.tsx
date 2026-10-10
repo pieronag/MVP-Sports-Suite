@@ -79,7 +79,7 @@ export default function PlanSimulator() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {plans.map((plan) => {
             const isBest = plan.id === mejorPlan?.id;
             const com = comision(plan);
@@ -89,7 +89,7 @@ export default function PlanSimulator() {
             return (
               <div
                 key={plan.id}
-                className={`rounded-md p-6 border transition-all ${
+                className={`rounded-md p-4 md:p-6 border transition-all ${
                   isBest && !isFreePlan
                     ? "bg-emerald-500/10 border-emerald-500/40 shadow-[0_0_25px_rgba(16,185,129,0.12)]"
                     : "bg-slate-900/40 border-white/5"

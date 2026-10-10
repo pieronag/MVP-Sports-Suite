@@ -35,7 +35,7 @@ export default function Pricing() {
           description="Elige el plan que se ajuste a tu recinto. Precios claros, sin sorpresas. Todos incluyen panel de administración, app para jugadores y soporte técnico."
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 overflow-x-auto md:overflow-visible snap-x snap-mandatory -mx-4 px-4 pt-4 pb-4 md:mx-0 md:px-0 md:pt-0 md:pb-0 [scrollbar-width:none]">
           {(() => {
             const maxPrice = Math.max(0, ...plans.map(p => Number(p.price || 0)));
             return plans.map((plan, idx) => {
@@ -45,7 +45,7 @@ export default function Pricing() {
               <div
                 key={plan.id}
                 style={{ animationDelay: `${idx * 80}ms` }}
-                className={`relative rounded-md p-7 transition-all duration-300 group hover:-translate-y-1 flex flex-col animate-in fade-in slide-in-from-bottom-6 ${
+                className={`relative w-[84%] sm:w-[60%] md:w-auto shrink-0 snap-center rounded-md p-6 md:p-7 transition-all duration-300 group hover:-translate-y-1 flex flex-col animate-in fade-in slide-in-from-bottom-6 ${
                   isElite
                     ? "bg-linear-to-b from-emerald-500/15 to-slate-900 border-2 border-emerald-500/40 shadow-[0_0_40px_rgba(16,185,129,0.15)]"
                     : "bg-slate-900/50 backdrop-blur-sm border border-white/5 hover:border-white/20"

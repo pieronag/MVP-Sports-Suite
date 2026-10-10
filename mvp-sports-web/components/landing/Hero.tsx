@@ -11,7 +11,7 @@ const ORBIT_INNER = [22, 96, 170, 244, 318];
 
 export default function Hero({ onRegisterClick }: { onRegisterClick: () => void }) {
   return (
-    <section className="relative min-h-screen h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-24 lg:pt-16 pb-12 md:pb-16 lg:pb-12">
+    <section className="relative min-h-screen lg:h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-24 lg:pt-16 pb-12 md:pb-16 lg:pb-12">
       {/* Grid overlay */}
       <div
         aria-hidden="true"
@@ -30,7 +30,7 @@ export default function Hero({ onRegisterClick }: { onRegisterClick: () => void 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 lg:gap-12 items-center">
           {/* LEFT */}
           <div className="space-y-6 md:space-y-8 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 md:gap-3 px-3 md:px-3.5 py-1.5 md:py-2 rounded-md bg-white/3 border border-white/10 backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-700 justify-center md:justify-start w-full md:w-auto">
+            <div className="inline-flex items-center gap-2 md:gap-3 px-3 md:px-3.5 py-1.5 md:py-2 rounded-md bg-white/3 border border-white/10 backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-700">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00df82] opacity-75" />
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#00df82]" />
@@ -41,9 +41,9 @@ export default function Hero({ onRegisterClick }: { onRegisterClick: () => void 
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black text-white leading-[0.95] md:leading-[0.9] tracking-tighter font-heading animate-in fade-in slide-in-from-left-8 duration-700 uppercase">
-              Tu Cancha,
+              TU CANCHA,
               <br />
-              <span className="text-gradient">A un clic.</span>
+              <span className="text-gradient">A UN CLIC.</span>
             </h1>
 
             <p className="text-sm md:text-base lg:text-lg text-slate-300 max-w-2xl mx-auto md:mx-0 font-medium leading-relaxed animate-in fade-in slide-in-from-left-8 duration-700 stagger-2">
@@ -76,8 +76,8 @@ export default function Hero({ onRegisterClick }: { onRegisterClick: () => void 
           </div>
 
           {/* RIGHT — circular HUD */}
-          <div className="hidden md:flex relative justify-center items-center animate-in fade-in zoom-in duration-700 stagger-2">
-            <div className="relative w-full max-w-[280px] md:max-w-[380px] lg:max-w-[42vh] xl:max-w-[440px] aspect-square">
+          <div className="flex relative justify-center items-center animate-in fade-in zoom-in duration-700 stagger-2">
+            <div className="relative w-full max-w-[240px] sm:max-w-[300px] md:max-w-[380px] lg:max-w-[42vh] xl:max-w-[440px] aspect-square">
               {/* glows */}
               <div aria-hidden="true" className="absolute inset-[6%] rounded-full bg-[#00df82]/15 blur-[80px]" />
               <div aria-hidden="true" className="absolute inset-[24%] rounded-full bg-cyan-500/10 blur-[60px]" />

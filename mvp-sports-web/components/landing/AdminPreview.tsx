@@ -60,12 +60,12 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-4 lg:auto-rows-[150px]">
+        <div className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-3 md:gap-4 lg:auto-rows-[150px]">
           {/* Finanzas */}
-          <div className="md:col-span-3 lg:col-span-4 lg:row-span-2 group p-7 rounded-md bg-blue-500/[0.07] border border-white/5 hover:border-blue-500/40 transition-all duration-500 hover:shadow-[0_0_50px_-15px_rgba(59,130,246,0.35)] overflow-hidden relative flex flex-col justify-between gap-5">
+          <div className="col-span-2 md:col-span-3 lg:col-span-4 lg:row-span-2 group p-5 md:p-7 rounded-md bg-blue-500/[0.07] border border-white/5 hover:border-blue-500/40 transition-all duration-500 hover:shadow-[0_0_50px_-15px_rgba(59,130,246,0.35)] overflow-hidden relative flex flex-col justify-between gap-5">
             <div className="relative z-10 space-y-3">
               <HugeiconsIcon icon={MoneyBag01Icon} className="w-12 h-12 text-blue-400" strokeWidth={1.6} />
-              <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">
+              <h3 className="text-xl sm:text-2xl font-black text-white leading-tight uppercase tracking-tight">
                 Ingresos y ocupación <br /> en tiempo real.
               </h3>
             </div>
@@ -81,10 +81,10 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           </div>
 
           {/* Calendario */}
-          <div className="md:col-span-3 lg:col-span-4 lg:row-span-2 group p-7 rounded-md bg-[#00df82]/[0.07] border border-white/5 hover:border-[#00df82]/40 transition-all duration-500 hover:shadow-[0_0_50px_-15px_rgba(0,223,130,0.35)] overflow-hidden relative flex flex-col justify-between gap-5">
+          <div className="col-span-2 md:col-span-3 lg:col-span-4 lg:row-span-2 group p-5 md:p-7 rounded-md bg-[#00df82]/[0.07] border border-white/5 hover:border-[#00df82]/40 transition-all duration-500 hover:shadow-[0_0_50px_-15px_rgba(0,223,130,0.35)] overflow-hidden relative flex flex-col justify-between gap-5">
             <div className="relative z-10 space-y-3">
               <HugeiconsIcon icon={Calendar03Icon} className="w-12 h-12 text-[#00df82]" strokeWidth={1.6} />
-              <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">
+              <h3 className="text-xl sm:text-2xl font-black text-white leading-tight uppercase tracking-tight">
                 Agenda sin <br /> dobles reservas.
               </h3>
             </div>
@@ -100,10 +100,10 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           </div>
 
           {/* Torneos */}
-          <div className="md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-orange-500/[0.07] border border-white/5 hover:border-orange-500/30 transition-all duration-300 relative overflow-hidden">
+          <div className="col-span-2 md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-orange-500/[0.07] border border-white/5 hover:border-orange-500/30 transition-all duration-300 relative overflow-hidden">
             <div className="relative z-10 space-y-1.5">
               <HugeiconsIcon icon={TrophyIcon} className="w-8 h-8 text-orange-400" strokeWidth={1.6} />
-              <h3 className="text-base font-black text-white">Ligas y campeonatos.</h3>
+              <h3 className="text-base font-black text-white uppercase tracking-wide">Ligas y campeonatos.</h3>
               <p className="text-xs text-slate-400 leading-snug">
                 Torneos con grupos y eliminación, fixture y tabla de posiciones.
               </p>
@@ -111,10 +111,10 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           </div>
 
           {/* Academia */}
-          <div className="md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-sky-500/[0.07] border border-white/5 hover:border-sky-500/30 transition-all duration-300 relative overflow-hidden">
+          <div className="col-span-2 md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-sky-500/[0.07] border border-white/5 hover:border-sky-500/30 transition-all duration-300 relative overflow-hidden">
             <div className="relative z-10 space-y-1.5">
               <HugeiconsIcon icon={Mortarboard01Icon} className="w-8 h-8 text-sky-400" strokeWidth={1.6} />
-              <h3 className="text-base font-black text-white">Clases y alumnos.</h3>
+              <h3 className="text-base font-black text-white uppercase tracking-wide">Clases y alumnos.</h3>
               <p className="text-xs text-slate-400 leading-snug">
                 Horarios de clases, lista de alumnos y control de asistencias.
               </p>
@@ -125,9 +125,9 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           {compactFeatures.map((feature) => (
             <div
               key={feature.title}
-              className={`md:col-span-2 lg:col-span-3 group p-5 rounded-md bg-slate-900/50 border border-white/5 ${feature.border} transition-all duration-300 hover:-translate-y-1 flex flex-col gap-2.5`}
+              className={`md:col-span-2 lg:col-span-3 group p-4 md:p-5 rounded-md bg-slate-900/50 border border-white/5 ${feature.border} transition-all duration-300 hover:-translate-y-1 flex flex-col gap-2.5`}
             >
-              <HugeiconsIcon icon={feature.icon} className={`w-11 h-11 ${feature.accent}`} strokeWidth={1.6} />
+              <HugeiconsIcon icon={feature.icon} className={`w-9 h-9 md:w-11 md:h-11 ${feature.accent}`} strokeWidth={1.6} />
               <h3 className="text-sm font-black text-white uppercase tracking-wide">{feature.title}</h3>
               <p className="text-xs text-slate-400 leading-snug">{feature.description}</p>
             </div>
@@ -138,13 +138,13 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
             href="https://wa.me/56950194398?text=Hola,%20me%20interesa%20profesionalizar%20mi%20recinto%20deportivo%20con%20MVP%20Sports."
             target="_blank"
             rel="noopener noreferrer"
-            className="md:col-span-2 lg:col-span-3 group p-5 rounded-md bg-linear-to-br from-[#00df82] via-emerald-500 to-teal-500 border border-[#00df82]/30 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex flex-col justify-between shadow-[0_0_50px_-15px_rgba(0,223,130,0.5)]"
+            className="md:col-span-2 lg:col-span-3 group p-4 md:p-5 rounded-md bg-linear-to-br from-[#00df82] via-emerald-500 to-teal-500 border border-[#00df82]/30 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex flex-col justify-between shadow-[0_0_50px_-15px_rgba(0,223,130,0.5)]"
           >
             <span className="text-[10px] font-black text-slate-900/80 uppercase tracking-[0.2em]">
               Asesoría personalizada
             </span>
             <span className="flex items-end justify-between gap-4">
-              <span className="text-xl font-black text-slate-950 uppercase tracking-tighter leading-none">
+              <span className="text-lg md:text-xl font-black text-slate-950 uppercase tracking-tighter leading-none">
                 Habla con
                 <br />
                 un experto
