@@ -12,6 +12,7 @@ import { teamService } from "@/services/player/teamService";
 import { bookingService } from "@/services/player/bookingService";
 import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "@/services/firebase";
+import { priceFromTenantConfig } from "@/utils/pricing";
 
 
 
@@ -42,7 +43,9 @@ export default function CheckoutPage() {
   const tenantId = searchParams.get("tenantId");
   const tenantName = searchParams.get("tenantName");
   const courtName = searchParams.get("courtName");
-  const price = searchParams.get("price");
+  // El precio de la cancha sale de la tarifa del recinto (no de la URL, que se puede editar)
+  const [tenantPrice, setTenantPrice] = useState<number | null>(null);
+  const price = tenantPrice !== null ? String(tenantPrice) : searchParams.get("price");
   const date = searchParams.get("date");
   const startTime = searchParams.get("startTime");
   const sport = searchParams.get("sport");
@@ -90,6 +93,10 @@ export default function CheckoutPage() {
       const mpActive = t.isMercadopagoActive !== false && !!(t.isMercadopagoActive || t.mercadopagoPublicKey);
       const requireOnline = t.requireOnlinePayment === true || searchParams.get("requireOnlinePayment") === "true";
       setTenantInfo({ mpActive, requireOnline });
+      if (!isTournament && sport && date && startTime) {
+        const p = priceFromTenantConfig(t, sport, date, startTime);
+        if (p > 0) setTenantPrice(p);
+      }
       setMethod(mpActive ? "mercadopago" : "venue");
     }).catch(() => setTenantInfo({ mpActive: true, requireOnline: false }));
   }, [tenantId]); // eslint-disable-line react-hooks/exhaustive-deps
