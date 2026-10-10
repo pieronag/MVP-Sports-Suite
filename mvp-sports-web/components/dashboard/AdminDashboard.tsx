@@ -192,13 +192,16 @@ export default function AdminDashboard() {
             setCommissionRate(typeof cr === 'number' ? cr : 8);
             const rawPlans = Array.isArray(data.plans) ? data.plans : [];
             const sorted = [...rawPlans].sort((a: any, b: any) => Number(a.price || 0) - Number(b.price || 0));
-            setPlanList(sorted.map((p: any, i: number) => ({
+            // Solo si cambian: planList es dependencia del efecto que abre los listeners
+            // (un arreglo nuevo en cada snapshot reabría todo en bucle y agotaba la cuota)
+            const nextPlans = sorted.map((p: any, i: number) => ({
                 id: (p.id || '').toString(),
                 name: (p.name || p.id || 'Plan').toString(),
                 price: Number(p.price || 0),
                 commission: typeof p.commission === 'number' ? p.commission : (typeof cr === 'number' ? cr : 8),
                 color: PLAN_PALETTE[i % PLAN_PALETTE.length],
-            })));
+            }));
+            setPlanList(prev => JSON.stringify(prev) === JSON.stringify(nextPlans) ? prev : nextPlans);
         }, (error: any) => console.error("Error settings snapshot:", error));
 
         return () => {
