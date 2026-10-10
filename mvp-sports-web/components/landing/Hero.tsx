@@ -11,7 +11,7 @@ const ORBIT_INNER = [22, 96, 170, 244, 318];
 
 export default function Hero({ onRegisterClick }: { onRegisterClick: () => void }) {
   return (
-    <section className="relative min-h-screen lg:h-screen flex items-center justify-center overflow-hidden pt-20 md:pt-24 lg:pt-16 pb-12 md:pb-16 lg:pb-12">
+    <section className="relative min-h-screen lg:h-screen flex items-start lg:items-center justify-center overflow-hidden pt-32 md:pt-36 lg:pt-16 pb-12 md:pb-16 lg:pb-12">
       {/* Grid overlay */}
       <div
         aria-hidden="true"

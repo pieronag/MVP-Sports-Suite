@@ -61,7 +61,7 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           {/* Reservas */}
           <div className="col-span-2 md:col-span-3 lg:col-span-4 lg:row-span-2 group p-5 md:p-7 rounded-md bg-[#00df82]/[0.07] border border-white/5 hover:border-[#00df82]/40 transition-all duration-500 hover:shadow-[0_0_50px_-15px_rgba(0,223,130,0.35)] overflow-hidden relative flex flex-col justify-between gap-5">
             <div className="relative z-10 space-y-3">
-              <HugeiconsIcon icon={FlashIcon} className="w-12 h-12 text-[#00df82]" strokeWidth={1.6} />
+              <HugeiconsIcon icon={FlashIcon} className="w-10 h-10 md:w-12 md:h-12 text-[#00df82]" strokeWidth={1.6} />
               <h3 className="text-xl sm:text-2xl font-black text-white leading-tight uppercase tracking-tight">
                 Canchas disponibles <br /> en tiempo real.
               </h3>
@@ -80,7 +80,7 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           {/* Progreso */}
           <div className="col-span-2 md:col-span-3 lg:col-span-4 lg:row-span-2 group p-5 md:p-7 rounded-md bg-blue-500/[0.07] border border-white/5 hover:border-blue-500/40 transition-all duration-500 hover:shadow-[0_0_50px_-15px_rgba(59,130,246,0.35)] overflow-hidden relative flex flex-col justify-between gap-5">
             <div className="relative z-10 space-y-3">
-              <HugeiconsIcon icon={TrophyIcon} className="w-12 h-12 text-blue-400" strokeWidth={1.6} />
+              <HugeiconsIcon icon={TrophyIcon} className="w-10 h-10 md:w-12 md:h-12 text-blue-400" strokeWidth={1.6} />
               <h3 className="text-xl sm:text-2xl font-black text-white leading-tight uppercase tracking-tight">
                 Gana XP y <br /> sube de nivel.
               </h3>
@@ -97,10 +97,10 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           </div>
 
           {/* Pago online */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-emerald-500/[0.07] border border-white/5 hover:border-emerald-500/30 transition-all duration-300 relative overflow-hidden">
+          <div className="col-span-1 md:col-span-3 lg:col-span-4 row-span-1 group p-4 md:p-6 rounded-md bg-emerald-500/[0.07] border border-white/5 hover:border-emerald-500/30 transition-all duration-300 relative overflow-hidden">
             <div className="relative z-10 space-y-1.5">
-              <HugeiconsIcon icon={CreditCardIcon} className="w-8 h-8 text-emerald-400" strokeWidth={1.6} />
-              <h3 className="text-base font-black text-white uppercase tracking-wide">Pago 100% online.</h3>
+              <HugeiconsIcon icon={CreditCardIcon} className="w-9 h-9 md:w-8 md:h-8 text-emerald-400" strokeWidth={1.6} />
+              <h3 className="text-sm md:text-base font-black text-white uppercase tracking-wide">Pago 100% online.</h3>
               <p className="text-xs text-slate-400 leading-snug">
                 Mercado Pago con débito, crédito o saldo, sin efectivo.
               </p>
@@ -108,10 +108,10 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           </div>
 
           {/* Estadísticas */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-orange-500/[0.07] border border-white/5 hover:border-orange-500/30 transition-all duration-300 relative overflow-hidden">
+          <div className="col-span-1 md:col-span-3 lg:col-span-4 row-span-1 group p-4 md:p-6 rounded-md bg-orange-500/[0.07] border border-white/5 hover:border-orange-500/30 transition-all duration-300 relative overflow-hidden">
             <div className="relative z-10 space-y-1.5">
-              <HugeiconsIcon icon={BarChartIcon} className="w-8 h-8 text-orange-400" strokeWidth={1.6} />
-              <h3 className="text-base font-black text-white uppercase tracking-wide">Mide tu rendimiento.</h3>
+              <HugeiconsIcon icon={BarChartIcon} className="w-9 h-9 md:w-8 md:h-8 text-orange-400" strokeWidth={1.6} />
+              <h3 className="text-sm md:text-base font-black text-white uppercase tracking-wide">Mide tu rendimiento.</h3>
               <p className="text-xs text-slate-400 leading-snug">
                 Partidos, goles, asistencias y logros, mes a mes.
               </p>
@@ -140,7 +140,7 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
               Únete a la comunidad
             </span>
             <span className="flex items-end justify-between gap-4">
-              <span className="text-lg md:text-xl font-black text-slate-950 uppercase tracking-tighter leading-none">
+              <span className="text-sm md:text-xl font-black text-slate-950 uppercase tracking-tighter leading-none">
                 Regístrate
                 <br />
                 gratis

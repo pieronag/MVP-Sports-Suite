@@ -64,7 +64,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           {/* Finanzas */}
           <div className="col-span-2 md:col-span-3 lg:col-span-4 lg:row-span-2 group p-5 md:p-7 rounded-md bg-blue-500/[0.07] border border-white/5 hover:border-blue-500/40 transition-all duration-500 hover:shadow-[0_0_50px_-15px_rgba(59,130,246,0.35)] overflow-hidden relative flex flex-col justify-between gap-5">
             <div className="relative z-10 space-y-3">
-              <HugeiconsIcon icon={MoneyBag01Icon} className="w-12 h-12 text-blue-400" strokeWidth={1.6} />
+              <HugeiconsIcon icon={MoneyBag01Icon} className="w-10 h-10 md:w-12 md:h-12 text-blue-400" strokeWidth={1.6} />
               <h3 className="text-xl sm:text-2xl font-black text-white leading-tight uppercase tracking-tight">
                 Ingresos y ocupación <br /> en tiempo real.
               </h3>
@@ -83,7 +83,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           {/* Calendario */}
           <div className="col-span-2 md:col-span-3 lg:col-span-4 lg:row-span-2 group p-5 md:p-7 rounded-md bg-[#00df82]/[0.07] border border-white/5 hover:border-[#00df82]/40 transition-all duration-500 hover:shadow-[0_0_50px_-15px_rgba(0,223,130,0.35)] overflow-hidden relative flex flex-col justify-between gap-5">
             <div className="relative z-10 space-y-3">
-              <HugeiconsIcon icon={Calendar03Icon} className="w-12 h-12 text-[#00df82]" strokeWidth={1.6} />
+              <HugeiconsIcon icon={Calendar03Icon} className="w-10 h-10 md:w-12 md:h-12 text-[#00df82]" strokeWidth={1.6} />
               <h3 className="text-xl sm:text-2xl font-black text-white leading-tight uppercase tracking-tight">
                 Agenda sin <br /> dobles reservas.
               </h3>
@@ -100,10 +100,10 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           </div>
 
           {/* Torneos */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-orange-500/[0.07] border border-white/5 hover:border-orange-500/30 transition-all duration-300 relative overflow-hidden">
+          <div className="col-span-1 md:col-span-3 lg:col-span-4 row-span-1 group p-4 md:p-6 rounded-md bg-orange-500/[0.07] border border-white/5 hover:border-orange-500/30 transition-all duration-300 relative overflow-hidden">
             <div className="relative z-10 space-y-1.5">
-              <HugeiconsIcon icon={TrophyIcon} className="w-8 h-8 text-orange-400" strokeWidth={1.6} />
-              <h3 className="text-base font-black text-white uppercase tracking-wide">Ligas y campeonatos.</h3>
+              <HugeiconsIcon icon={TrophyIcon} className="w-9 h-9 md:w-8 md:h-8 text-orange-400" strokeWidth={1.6} />
+              <h3 className="text-sm md:text-base font-black text-white uppercase tracking-wide">Ligas y campeonatos.</h3>
               <p className="text-xs text-slate-400 leading-snug">
                 Torneos con grupos y eliminación, fixture y tabla de posiciones.
               </p>
@@ -111,10 +111,10 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
           </div>
 
           {/* Academia */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-4 row-span-1 group p-6 rounded-md bg-sky-500/[0.07] border border-white/5 hover:border-sky-500/30 transition-all duration-300 relative overflow-hidden">
+          <div className="col-span-1 md:col-span-3 lg:col-span-4 row-span-1 group p-4 md:p-6 rounded-md bg-sky-500/[0.07] border border-white/5 hover:border-sky-500/30 transition-all duration-300 relative overflow-hidden">
             <div className="relative z-10 space-y-1.5">
-              <HugeiconsIcon icon={Mortarboard01Icon} className="w-8 h-8 text-sky-400" strokeWidth={1.6} />
-              <h3 className="text-base font-black text-white uppercase tracking-wide">Clases y alumnos.</h3>
+              <HugeiconsIcon icon={Mortarboard01Icon} className="w-9 h-9 md:w-8 md:h-8 text-sky-400" strokeWidth={1.6} />
+              <h3 className="text-sm md:text-base font-black text-white uppercase tracking-wide">Clases y alumnos.</h3>
               <p className="text-xs text-slate-400 leading-snug">
                 Horarios de clases, lista de alumnos y control de asistencias.
               </p>
@@ -144,7 +144,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
               Asesoría personalizada
             </span>
             <span className="flex items-end justify-between gap-4">
-              <span className="text-lg md:text-xl font-black text-slate-950 uppercase tracking-tighter leading-none">
+              <span className="text-sm md:text-xl font-black text-slate-950 uppercase tracking-tighter leading-none">
                 Habla con
                 <br />
                 un experto
