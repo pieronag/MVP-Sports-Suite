@@ -59,5 +59,8 @@
     "defaults",
     "not ie 11",
     "not op_mini all"
-  ]
+  ],
+  "engines": {
+    "node": "24.x"
+  }
 }

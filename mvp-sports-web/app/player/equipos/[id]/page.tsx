@@ -167,7 +167,7 @@ export default function EquipoDetailPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[11px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -175,7 +175,7 @@ export default function EquipoDetailPage() {
   if (!team) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-        <p className={`text-sm font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipo no encontrado</p>
+        <p className={`text-[13px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipo no encontrado</p>
       </div>
     );
   }
@@ -208,7 +208,7 @@ export default function EquipoDetailPage() {
           <div className="flex items-center gap-2 mb-2">
             <span className="bg-emerald-500 px-3 py-1 rounded-md text-white font-semibold text-[11px] uppercase tracking-wide border border-white/10">{team.sport?.toUpperCase() || "GENERAL"}</span>
           </div>
-          <h1 className="text-white text-xl font-heading font-black uppercase line-clamp-2 wrap-break-word wrap-anywhere">{team.name}</h1>
+          <h1 className="text-white text-[18px] font-heading font-black uppercase line-clamp-2 wrap-break-word wrap-anywhere">{team.name}</h1>
         </div>
       </div>
 
@@ -218,14 +218,14 @@ export default function EquipoDetailPage() {
           <GlowCard isDark={isDark} className="flex-1">
             <div className="p-4 flex flex-col items-center text-center">
               <Users size={20} className="text-emerald-500" />
-              <p className={`text-lg font-semibold mt-1.5 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{team.members?.length || 1}</p>
+              <p className={`text-[16px] font-semibold mt-1.5 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{team.members?.length || 1}</p>
               <p className={`text-[11px] font-semibold uppercase tracking-wide mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>MIEMBROS</p>
             </div>
           </GlowCard>
           <GlowCard isDark={isDark} className="flex-1">
             <div className="p-4 flex flex-col items-center text-center">
               <Trophy size={20} className="text-amber-500" />
-              <p className={`text-sm font-semibold mt-2 uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{(((team as any).trophies || 0)).toString()}</p>
+              <p className={`text-[13px] font-semibold mt-2 uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{(((team as any).trophies || 0)).toString()}</p>
               <p className={`text-[11px] font-semibold uppercase tracking-wide mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>TROFEOS</p>
             </div>
           </GlowCard>
@@ -233,7 +233,7 @@ export default function EquipoDetailPage() {
             <GlowCard isDark={isDark}>
               <div className="p-4 flex flex-col items-center text-center">
                 <Copy size={18} className="text-emerald-500" />
-                <p className="text-emerald-500 text-sm font-semibold mt-1.5 tracking-wide">{team.inviteCode || "----"}</p>
+                <p className="text-emerald-500 text-[13px] font-semibold mt-1.5 tracking-wide">{team.inviteCode || "----"}</p>
                 <p className={`text-[11px] font-semibold uppercase tracking-wide mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>CÓDIGO</p>
               </div>
             </GlowCard>
@@ -243,17 +243,17 @@ export default function EquipoDetailPage() {
         {/* Action Button */}
         {isMember ? (
           <button onClick={() => router.push(`/player/equipos/chat?teamId=${team.id}&teamName=${encodeURIComponent(team.name || "")}`)}
-            className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wide flex items-center justify-center gap-2.5 transition-all active:scale-[0.98]">
+            className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] uppercase tracking-wide flex items-center justify-center gap-2.5 transition-all active:scale-[0.98]">
             <MessageCircle size={18} /> Chat del Equipo
           </button>
         ) : hasPendingRequest ? (
-          <div className="w-full h-12 rounded-md flex items-center justify-center gap-2.5 border font-semibold text-sm uppercase tracking-wide"
+          <div className="w-full h-12 rounded-md flex items-center justify-center gap-2.5 border font-semibold text-[13px] uppercase tracking-wide"
             style={{ borderColor: isDark ? "rgba(255,255,255,0.08)" : "#E2E8F0", color: isDark ? "#94A3B8" : "#64748B" }}>
             <AlertCircle size={16} /> Solicitud Pendiente
           </div>
         ) : (
           <button onClick={handleJoin} disabled={actionLoading}
-            className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wide flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] disabled:opacity-50">
+            className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] uppercase tracking-wide flex items-center justify-center gap-2.5 transition-all active:scale-[0.98] disabled:opacity-50">
             {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><Shield size={18} /> Solicitar Ingreso</>}
           </button>
         )}
@@ -271,7 +271,7 @@ export default function EquipoDetailPage() {
                       <div className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center shrink-0" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
                         {reqProfile.photoURL ? <img src={reqProfile.photoURL} alt="" className="w-full h-full object-cover" /> : <User size={18} className={isDark ? "text-slate-400" : "text-slate-500"} />}
                       </div>
-                      <span className={`text-sm font-medium flex-1 ${isDark ? "text-slate-200" : "text-slate-800"}`}>{reqProfile.displayName}</span>
+                      <span className={`text-[13px] font-medium flex-1 ${isDark ? "text-slate-200" : "text-slate-800"}`}>{reqProfile.displayName}</span>
                       <button aria-label="Aceptar solicitud" onClick={() => handleAcceptRequest(reqUid)} disabled={actionLoading} className="w-9 h-9 rounded-md bg-emerald-500/10 flex items-center justify-center">
                         <CheckCircle2 size={16} className="text-emerald-500" />
                       </button>
@@ -301,7 +301,7 @@ export default function EquipoDetailPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className={`text-sm font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{p.displayName || "Jugador MVP"}</p>
+                      <p className={`text-[13px] font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{p.displayName || "Jugador MVP"}</p>
                       {isMemberOwner && <span className="text-[11px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-500">Capitán</span>}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -333,22 +333,22 @@ export default function EquipoDetailPage() {
             {isOwner && (
               <button onClick={() => { setShowMenu(false); openEdit(); }} className="flex items-center gap-4 w-full px-6 py-4 transition-all hover:bg-white/2">
                 <div className="w-10 h-10 rounded-md flex items-center justify-center bg-blue-500/10"><Edit size={20} className="text-blue-400" /></div>
-                <span className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Editar Equipo</span>
+                <span className={`text-[13px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Editar Equipo</span>
               </button>
             )}
             {!isOwner && (
               <button onClick={() => { setShowMenu(false); setShowLeaveModal(true); }} className="flex items-center gap-4 w-full px-6 py-4 transition-all hover:bg-white/2">
                 <div className="w-10 h-10 rounded-md flex items-center justify-center bg-red-500/10"><LogOut size={20} className="text-red-400" /></div>
-                <span className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Salir del Equipo</span>
+                <span className={`text-[13px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Salir del Equipo</span>
               </button>
             )}
             {isOwner && (
               <button onClick={() => { setShowMenu(false); setShowDeleteModal(true); }} className="flex items-center gap-4 w-full px-6 py-4 transition-all hover:bg-white/2">
                 <div className="w-10 h-10 rounded-md flex items-center justify-center bg-red-500/10"><Trash2 size={20} className="text-red-400" /></div>
-                <span className="text-sm font-medium text-red-400">Eliminar Equipo</span>
+                <span className="text-[13px] font-medium text-red-400">Eliminar Equipo</span>
               </button>
             )}
-            <button onClick={() => setShowMenu(false)} className="w-full py-4 text-center text-sm font-semibold border-t" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", color: isDark ? "#94A3B8" : "#64748B" }}>Cancelar</button>
+            <button onClick={() => setShowMenu(false)} className="w-full py-4 text-center text-[13px] font-semibold border-t" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", color: isDark ? "#94A3B8" : "#64748B" }}>Cancelar</button>
           </div>
         </div>
       )}
@@ -358,26 +358,26 @@ export default function EquipoDetailPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowEditModal(false)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <p className={`font-semibold text-base ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar Equipo</p>
+              <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar Equipo</p>
               <button aria-label="Cerrar" onClick={() => setShowEditModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} /></button>
             </div>
             <div className="mb-4">
-              <label className={`text-[12px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nombre</label>
-              <input maxLength={40} value={editName} onChange={e => setEditName(e.target.value)} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-hidden ${isDark ? "bg-[#0A101D] text-slate-100 border-white/6" : "bg-white text-slate-900 border-slate-200"}`} />
+              <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nombre</label>
+              <input maxLength={40} value={editName} onChange={e => setEditName(e.target.value)} className={`w-full p-3.5 text-[13px] font-medium rounded-md border outline-hidden ${isDark ? "bg-[#0A101D] text-slate-100 border-white/6" : "bg-white text-slate-900 border-slate-200"}`} />
             </div>
             <div className="mb-4">
-              <label className={`text-[12px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción</label>
-              <textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} rows={2} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-hidden resize-none ${isDark ? "bg-[#0A101D] text-slate-100 border-white/6" : "bg-white text-slate-900 border-slate-200"}`} />
+              <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción</label>
+              <textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} rows={2} className={`w-full p-3.5 text-[13px] font-medium rounded-md border outline-hidden resize-none ${isDark ? "bg-[#0A101D] text-slate-100 border-white/6" : "bg-white text-slate-900 border-slate-200"}`} />
             </div>
             <div className="mb-6">
-              <label className={`text-[12px] font-semibold uppercase tracking-wide mb-2 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
+              <label className={`text-[11px] font-semibold uppercase tracking-wide mb-2 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
               <div className="flex flex-wrap gap-2">
                 {SPORTS.map(s => (
-                  <button key={s} onClick={() => setEditSport(s)} className={`px-4 py-2 rounded-md text-xs font-semibold transition-all ${editSport === s ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{s}</button>
+                  <button key={s} onClick={() => setEditSport(s)} className={`px-4 py-2 rounded-md text-[11px] font-semibold transition-all ${editSport === s ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{s}</button>
                 ))}
               </div>
             </div>
-            <button onClick={handleEditSave} disabled={actionLoading || !editName.trim()} className="w-full py-3.5 rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50">
+            <button onClick={handleEditSave} disabled={actionLoading || !editName.trim()} className="w-full py-3.5 rounded-md bg-emerald-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50">
               {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" /> : "Guardar Cambios"}
             </button>
           </div>
@@ -389,11 +389,11 @@ export default function EquipoDetailPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setShowDeleteModal(false)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-red-500/10 flex items-center justify-center mx-auto mb-4"><Trash2 size={32} className="text-red-500" /></div>
-            <p className={`text-base font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Eliminar Equipo?</p>
-            <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Esta acción es irreversible. Se perderán todos los datos del equipo.</p>
+            <p className={`text-[15px] font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Eliminar Equipo?</p>
+            <p className={`text-[13px] font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Esta acción es irreversible. Se perderán todos los datos del equipo.</p>
             <div className="flex gap-3">
-              <button onClick={() => setShowDeleteModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
-              <button onClick={handleDelete} disabled={actionLoading} className="flex-1 py-3.5 rounded-md bg-red-500 text-white font-semibold text-sm disabled:opacity-50">
+              <button onClick={() => setShowDeleteModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+              <button onClick={handleDelete} disabled={actionLoading} className="flex-1 py-3.5 rounded-md bg-red-500 text-white font-semibold text-[13px] disabled:opacity-50">
                 {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" /> : "SI, ELIMINAR"}
               </button>
             </div>
@@ -406,11 +406,11 @@ export default function EquipoDetailPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setShowLeaveModal(false)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-red-500/10 flex items-center justify-center mx-auto mb-4"><LogOut size={32} className="text-red-500" /></div>
-            <p className={`text-base font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Abandonar Equipo?</p>
-            <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Si abandonas, necesitarás que el capitán te acepte de nuevo.</p>
+            <p className={`text-[15px] font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Abandonar Equipo?</p>
+            <p className={`text-[13px] font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Si abandonas, necesitarás que el capitán te acepte de nuevo.</p>
             <div className="flex gap-3">
-              <button onClick={() => setShowLeaveModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
-              <button onClick={handleLeave} disabled={actionLoading} className="flex-1 py-3.5 rounded-md bg-red-500 text-white font-semibold text-sm disabled:opacity-50">
+              <button onClick={() => setShowLeaveModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+              <button onClick={handleLeave} disabled={actionLoading} className="flex-1 py-3.5 rounded-md bg-red-500 text-white font-semibold text-[13px] disabled:opacity-50">
                 {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" /> : "SI, ABANDONAR"}
               </button>
             </div>
@@ -423,11 +423,11 @@ export default function EquipoDetailPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setShowRemoveModal(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-red-500/10 flex items-center justify-center mx-auto mb-4"><X size={32} className="text-red-500" /></div>
-            <p className={`text-base font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Eliminar miembro?</p>
-            <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Esta acción no se puede deshacer.</p>
+            <p className={`text-[15px] font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Eliminar miembro?</p>
+            <p className={`text-[13px] font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Esta acción no se puede deshacer.</p>
             <div className="flex gap-3">
-              <button onClick={() => setShowRemoveModal(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
-              <button onClick={() => handleRemoveMember(showRemoveModal)} disabled={actionLoading} className="flex-1 py-3.5 rounded-md bg-red-500 text-white font-semibold text-sm disabled:opacity-50">
+              <button onClick={() => setShowRemoveModal(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+              <button onClick={() => handleRemoveMember(showRemoveModal)} disabled={actionLoading} className="flex-1 py-3.5 rounded-md bg-red-500 text-white font-semibold text-[13px] disabled:opacity-50">
                 {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" /> : "SI, ELIMINAR"}
               </button>
             </div>
@@ -442,9 +442,9 @@ export default function EquipoDetailPage() {
             <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 ${feedback.type === "success" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
               {feedback.type === "success" ? <CheckCircle2 size={32} className="text-emerald-500" /> : <AlertCircle size={32} className="text-red-500" />}
             </div>
-            <p className={`text-base font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{feedback.type === "success" ? "¡Hecho!" : "Error"}</p>
-            <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{feedback.msg}</p>
-            <button onClick={() => setFeedback(null)} className={`w-full py-3.5 rounded-md font-semibold text-sm ${feedback.type === "success" ? "bg-emerald-500 text-white" : "bg-red-500 text-white"}`}>Entendido</button>
+            <p className={`text-[15px] font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{feedback.type === "success" ? "¡Hecho!" : "Error"}</p>
+            <p className={`text-[13px] font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{feedback.msg}</p>
+            <button onClick={() => setFeedback(null)} className={`w-full py-3.5 rounded-md font-semibold text-[13px] ${feedback.type === "success" ? "bg-emerald-500 text-white" : "bg-red-500 text-white"}`}>Entendido</button>
           </div>
         </div>
       )}

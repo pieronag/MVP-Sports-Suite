@@ -206,7 +206,7 @@ export default function PerfilPage() {
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10" aria-hidden />
-        <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Perfil</h1>
+        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Perfil</h1>
         <button onClick={toggleTheme} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           {isDark ? <Moon size={18} className="text-amber-400" /> : <Sun size={18} className="text-slate-600" />}
         </button>
@@ -235,8 +235,8 @@ export default function PerfilPage() {
           </button>
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
         </div>
-        <h2 className={`text-xl font-heading font-black uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{displayName}</h2>
-        <p className={`text-[12px] font-medium tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{userEmail}</p>
+        <h2 className={`text-[18px] font-heading font-black uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{displayName}</h2>
+        <p className={`text-[11px] font-medium tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{userEmail}</p>
         {city && (
           <div className="flex items-center gap-1 mt-1">
             <MapPin size={10} className="text-emerald-500" />
@@ -253,11 +253,11 @@ export default function PerfilPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Rango Actual</p>
-                <p className="text-emerald-500 text-lg font-semibold">{tierInfo.name}</p>
+                <p className="text-emerald-500 text-[16px] font-semibold">{tierInfo.name}</p>
               </div>
               <div className="text-right">
                 <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{tierInfo.index < TIERS.length - 1 ? "Próximo rango" : "Rango máximo"}</p>
-                <p className={`text-base font-medium ${tierInfo.index < TIERS.length - 1 ? "opacity-50" : "text-emerald-500"} ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                <p className={`text-[15px] font-medium ${tierInfo.index < TIERS.length - 1 ? "opacity-50" : "text-emerald-500"} ${isDark ? "text-slate-100" : "text-slate-900"}`}>
                   {tierInfo.index < TIERS.length - 1 ? TIERS[tierInfo.index + 1] : "Alcanzado"}
                 </p>
               </div>
@@ -284,7 +284,7 @@ export default function PerfilPage() {
             <div className="flex items-center justify-between px-5 py-5">
               <div>
                 <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nivel General</p>
-                <p className={`text-2xl font-bold tracking-[-0.06em] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{ovr}</p>
+                <p className={`text-[22px] font-bold tracking-[-0.06em] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{ovr}</p>
               </div>
               <div className="w-10 h-10 rounded-md bg-emerald-500/15 flex items-center justify-center">
                 <Medal size={22} className="text-emerald-500" />
@@ -297,8 +297,8 @@ export default function PerfilPage() {
                     <row.icon size={18} style={{ color: row.color }} strokeWidth={1.8} />
                   </div>
                   <div className="min-w-0">
-                    <p className={`text-[18px] font-semibold leading-tight ${isDark ? "text-slate-100" : "text-slate-900"}`}>{row.value}</p>
-                    <p className={`text-[12px] font-medium truncate ${isDark ? "text-slate-500" : "text-slate-400"}`}>{row.label}</p>
+                    <p className={`text-[16px] font-semibold leading-tight ${isDark ? "text-slate-100" : "text-slate-900"}`}>{row.value}</p>
+                    <p className={`text-[11px] font-medium truncate ${isDark ? "text-slate-500" : "text-slate-400"}`}>{row.label}</p>
                   </div>
                 </div>
               ))}
@@ -335,7 +335,7 @@ export default function PerfilPage() {
                 return (
                   <div className="py-8 flex flex-col items-center">
                     <Medal size={36} className={isDark ? "text-slate-600" : "text-slate-300"} />
-                    <p className={`text-[12px] font-semibold uppercase tracking-wide mt-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Juega más para desbloquear insignias</p>
+                    <p className={`text-[11px] font-semibold uppercase tracking-wide mt-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Juega más para desbloquear insignias</p>
                   </div>
                 );
               }
@@ -361,7 +361,7 @@ export default function PerfilPage() {
           </div>
         </GlowCard>
         <button onClick={() => setShowGlossary(true)}
-          className="w-full mt-3 h-[44px] rounded-md font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] border"
+          className="w-full mt-3 h-[44px] rounded-md font-semibold text-[11px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] border"
           style={{ borderColor: isDark ? "rgba(255,255,255,0.08)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC", color: isDark ? "#94A3B8" : "#64748B" }}>
           <Medal size={14} /> Ver Logros Disponibles
         </button>
@@ -370,7 +370,7 @@ export default function PerfilPage() {
       {/* Tu Carta MVP */}
       <div className="flex items-center gap-3 px-6 mb-4 mt-2">
         <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-        <span className="text-emerald-400 font-semibold text-[12px] tracking-[0.06em] uppercase">Tu Carta MVP</span>
+        <span className="text-emerald-400 font-semibold text-[11px] tracking-[0.06em] uppercase">Tu Carta MVP</span>
         <div className="flex-1 h-px bg-linear-to-r from-emerald-500/20 to-transparent" />
       </div>
 
@@ -390,14 +390,14 @@ export default function PerfilPage() {
             <div className="flex items-center gap-4 mb-4">
               <div className="w-[58px] h-[76px] bg-linear-to-b from-amber-400 to-amber-600 rounded-md flex flex-col items-center justify-center rotate-[-4deg] shrink-0">
                 <span className="text-black/60 font-medium text-[11px] tracking-[0.06em]">OVR</span>
-                <span className="text-black font-bold text-[22px] leading-none mt-0.5">{ovr}</span>
+                <span className="text-black font-bold text-[20px] leading-none mt-0.5">{ovr}</span>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 mb-0.5">
                   <div className={`w-1.5 h-1.5 rounded-full ${isDark ? "bg-emerald-500" : "bg-emerald-600"}`} />
                   <span className={`font-semibold text-[11px] tracking-[2px] uppercase ${isDark ? "text-emerald-400/80" : "text-emerald-600/80"}`}>Valoración MVP 2026</span>
                 </div>
-                <p className={`font-semibold text-[16px] ${isDark ? "text-white" : "text-slate-900"}`}>{displayName}</p>
+                <p className={`font-semibold text-[15px] ${isDark ? "text-white" : "text-slate-900"}`}>{displayName}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-500">{tierInfo.name.toUpperCase()}</span>
                   <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{xp.toLocaleString("es-CL")} XP</span>
@@ -414,7 +414,7 @@ export default function PerfilPage() {
                 { label: "MVP", value: stats.mvps },
               ].map((s) => (
                 <div key={s.label} className="text-center">
-                  <p className={`font-semibold text-[13px] ${isDark ? "text-white" : "text-slate-900"}`}>{s.value}</p>
+                  <p className={`font-semibold text-[12px] ${isDark ? "text-white" : "text-slate-900"}`}>{s.value}</p>
                   <p className={`font-medium text-[11px] tracking-[0.06em] uppercase mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{s.label}</p>
                 </div>
               ))}
@@ -422,7 +422,7 @@ export default function PerfilPage() {
 
             {/* Generate CTA */}
             <button onClick={handleGenerateCard} disabled={generatingCard}
-              className="w-full mt-4 h-[46px] rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600 disabled:opacity-60">
+              className="w-full mt-4 h-[46px] rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600 disabled:opacity-60">
               {generatingCard ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
@@ -537,11 +537,11 @@ export default function PerfilPage() {
             </div>
             <div className="flex gap-3 mt-6">
               <button onClick={() => setShowPreview(false)}
-                className={`flex-1 h-[54px] rounded-md font-semibold text-[12px] uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/8 text-slate-300 hover:bg-white/12" : "bg-slate-200 text-slate-700 hover:bg-slate-300"}`}>
+                className={`flex-1 h-[54px] rounded-md font-semibold text-[11px] uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/8 text-slate-300 hover:bg-white/12" : "bg-slate-200 text-slate-700 hover:bg-slate-300"}`}>
                 Cerrar
               </button>
               <button onClick={handleDownloadCard}
-                className="flex-2 h-[54px] rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600">
+                className="flex-2 h-[54px] rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600">
                 <Download size={16} /> Descargar Carta
               </button>
             </div>
@@ -560,7 +560,7 @@ export default function PerfilPage() {
                   <Medal size={18} className="text-emerald-500" />
                 </div>
                 <div>
-                  <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Galería de Insignias</p>
+                  <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Galería de Insignias</p>
                   <p className={`text-[11px] font-medium uppercase tracking-wide mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cómo ganar cada insignia</p>
                 </div>
               </div>
@@ -610,7 +610,7 @@ export default function PerfilPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
                             <div className="min-w-0">
-                              <p className={`text-[13px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{b.name}</p>
+                              <p className={`text-[12px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{b.name}</p>
                               <p className={`text-[11px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{b.desc}</p>
                             </div>
                             <span className="text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-md text-white shrink-0 leading-none" style={{ backgroundColor: progressColor }}>

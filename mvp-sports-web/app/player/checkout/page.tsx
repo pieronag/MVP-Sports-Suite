@@ -167,9 +167,9 @@ export default function CheckoutPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center ${isDark ? "bg-[#020611] text-slate-200" : "bg-[#F8FAFC] text-slate-900"}`}>
         <XCircle size={36} className="text-amber-500" />
-        <p className="font-bold uppercase tracking-wide text-sm">Nada que pagar</p>
-        <p className="text-xs text-slate-400 max-w-xs">Elige un recinto, cancha y horario para iniciar una reserva.</p>
-        <button onClick={() => router.replace("/player/clubes")} className="mt-2 px-5 py-3 rounded-md bg-emerald-500 text-white text-xs font-semibold uppercase tracking-wide">Buscar recintos</button>
+        <p className="font-bold uppercase tracking-wide text-[13px]">Nada que pagar</p>
+        <p className="text-[11px] text-slate-400 max-w-xs">Elige un recinto, cancha y horario para iniciar una reserva.</p>
+        <button onClick={() => router.replace("/player/clubes")} className="mt-2 px-5 py-3 rounded-md bg-emerald-500 text-white text-[11px] font-semibold uppercase tracking-wide">Buscar recintos</button>
       </div>
     );
   }
@@ -179,7 +179,7 @@ export default function CheckoutPage() {
         <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">{isTournament ? "Inscripción" : "Checkout"}</h1>
+        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">{isTournament ? "Inscripción" : "Checkout"}</h1>
         <div className="w-10" />
       </div>
 
@@ -192,10 +192,10 @@ export default function CheckoutPage() {
                 {isTournament ? <Trophy size={22} style={{ color: activeColor }} /> : <Calendar size={22} style={{ color: activeColor }} />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-base font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                <p className={`text-[15px] font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>
                   {isTournament ? (tournamentName || "").toUpperCase() : (tenantName || "").toUpperCase()}
                 </p>
-                <p className={`text-[12px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                   {isTournament ? `${sport || ""}` : `${sport || ""} • ${(courtName || "").toUpperCase()}`}
                 </p>
               </div>
@@ -207,9 +207,9 @@ export default function CheckoutPage() {
                   <div key={r.label} className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       <r.icon size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                      <span className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{r.label}</span>
+                      <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{r.label}</span>
                     </div>
-                    <span className={`text-xs font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{r.val}</span>
+                    <span className={`text-[11px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{r.val}</span>
                   </div>
                 ))}
               </div>
@@ -218,23 +218,23 @@ export default function CheckoutPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <Calendar size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                    <span className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Fecha</span>
+                    <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Fecha</span>
                   </div>
-                  <span className={`text-xs font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{date ? new Date(date + "T12:00:00").toLocaleDateString("es-CL", { day: "numeric", month: "long" }) : ""}</span>
+                  <span className={`text-[11px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{date ? new Date(date + "T12:00:00").toLocaleDateString("es-CL", { day: "numeric", month: "long" }) : ""}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <Clock size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                    <span className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Horario</span>
+                    <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Horario</span>
                   </div>
-                  <span className={`text-xs font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{startTime} HRS</span>
+                  <span className={`text-[11px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{startTime} HRS</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <MapPin size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                    <span className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Recinto</span>
+                    <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Recinto</span>
                   </div>
-                  <span className={`text-xs font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{tenantName || ""}</span>
+                  <span className={`text-[11px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{tenantName || ""}</span>
                 </div>
               </div>
             )}
@@ -244,11 +244,11 @@ export default function CheckoutPage() {
                 <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{appliedCoupon ? "Subtotal" : "Total"}</p>
                 {appliedCoupon ? (
                   <>
-                    <p className={`text-sm font-semibold line-through ${isDark ? "text-slate-500" : "text-slate-400"}`}>${formatMoney(Number(price))}</p>
-                    <p className="text-lg font-bold" style={{ color: activeColor }}>${formatMoney(finalPrice)}</p>
+                    <p className={`text-[13px] font-semibold line-through ${isDark ? "text-slate-500" : "text-slate-400"}`}>${formatMoney(Number(price))}</p>
+                    <p className="text-[16px] font-bold" style={{ color: activeColor }}>${formatMoney(finalPrice)}</p>
                   </>
                 ) : (
-                  <p className={`text-lg font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>${formatMoney(Number(price))}</p>
+                  <p className={`text-[16px] font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>${formatMoney(Number(price))}</p>
                 )}
               </div>
               {appliedCoupon && <span className="text-[11px] font-semibold px-2.5 py-1 rounded-md" style={{ backgroundColor: `${activeColor}15`, color: activeColor }}>-{appliedCoupon.discount}%</span>}
@@ -257,7 +257,7 @@ export default function CheckoutPage() {
         </GlowCard>
 
         {!showCoupon && !appliedCoupon ? (
-          <button onClick={() => setShowCoupon(true)} className="mt-4 mx-1 text-[13px] font-semibold text-emerald-500">¿Tienes un cupón?</button>
+          <button onClick={() => setShowCoupon(true)} className="mt-4 mx-1 text-[12px] font-semibold text-emerald-500">¿Tienes un cupón?</button>
         ) : (
           <>
         <SectionPill label="Cupón" />
@@ -265,14 +265,14 @@ export default function CheckoutPage() {
           <div className="p-5">
             <div className="flex items-center gap-2.5">
               <div className={`flex-1 h-12 rounded-md border flex items-center px-4 ${isDark ? "bg-white/4 border-white/6" : "bg-slate-50 border-slate-200"}`}>
-                <input className="w-full bg-transparent text-xs font-medium tracking-wide uppercase outline-hidden" style={{ color: appliedCoupon ? "#10b981" : isDark ? "#F8FAFC" : "#0F172A" }}
+                <input className="w-full bg-transparent text-[11px] font-medium tracking-wide uppercase outline-hidden" style={{ color: appliedCoupon ? "#10b981" : isDark ? "#F8FAFC" : "#0F172A" }}
                   placeholder="Código" autoFocus={!appliedCoupon} value={couponInput} onChange={(e) => setCouponInput(e.target.value.toUpperCase())} disabled={!!appliedCoupon || validatingCoupon} />
               </div>
               {appliedCoupon ? (
                 <button aria-label="Cerrar" onClick={() => setAppliedCoupon(null)} className="w-12 h-12 rounded-md bg-red-500 flex items-center justify-center transition-all active:scale-90"><X size={18} className="text-white" /></button>
               ) : (
                 <button onClick={handleApplyCoupon} disabled={validatingCoupon || !couponInput.trim()}
-                  className="h-12 px-5 rounded-md flex items-center justify-center text-white font-semibold text-xs uppercase tracking-wide transition-all active:scale-[0.98] disabled:opacity-50"
+                  className="h-12 px-5 rounded-md flex items-center justify-center text-white font-semibold text-[11px] uppercase tracking-wide transition-all active:scale-[0.98] disabled:opacity-50"
                   style={{ backgroundColor: validatingCoupon || !couponInput.trim() ? (isDark ? "#1E293B" : "#CBD5E1") : activeColor }}>
                   {validatingCoupon ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Aplicar"}
                 </button>
@@ -294,7 +294,7 @@ export default function CheckoutPage() {
                     <div className={`w-10 h-10 rounded-md flex items-center justify-center ${selectedTeamId === opt.id ? "" : isDark ? "bg-white/4" : "bg-slate-100"}`}>
                       <opt.icon size={18} color={selectedTeamId === opt.id ? activeColor : isDark ? "#94A3B8" : "#64748B"} />
                     </div>
-                    <span className={`flex-1 text-left text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{opt.label}</span>
+                    <span className={`flex-1 text-left text-[13px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{opt.label}</span>
                     {selectedTeamId === opt.id && <CheckCircle2 size={18} style={{ color: activeColor }} />}
                   </button>
                 ))}
@@ -323,7 +323,7 @@ export default function CheckoutPage() {
                   <CreditCard size={20} />
                 </div>
                 <div className="flex-1">
-                  <p className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{m.name}</p>
+                  <p className={`text-[13px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{m.name}</p>
                   <p className="text-[11px] font-medium text-slate-400">{m.sub}</p>
                 </div>
                 <span
@@ -334,10 +334,10 @@ export default function CheckoutPage() {
               </button>
             ))}
             {hasCashNoShow && !isTournament && (
-              <p className="text-xs text-amber-500">Por una inasistencia anterior, este recinto requiere pagar online para reservar.</p>
+              <p className="text-[11px] text-amber-500">Por una inasistencia anterior, este recinto requiere pagar online para reservar.</p>
             )}
             {!mpAllowed && !venueAllowed && (
-              <p className="text-xs text-rose-500">Este recinto no tiene métodos de pago disponibles para tu cuenta.</p>
+              <p className="text-[11px] text-rose-500">Este recinto no tiene métodos de pago disponibles para tu cuenta.</p>
             )}
           </div>
         </GlowCard>
@@ -352,7 +352,7 @@ export default function CheckoutPage() {
         <button onClick={handleConfirm} disabled={processing || (!isTournament && !mpAllowed && !venueAllowed)}
           className="w-full h-14 rounded-md flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
           style={{ backgroundColor: activeColor, boxShadow: `0 4px 20px ${activeColor}40` }}>
-          {processing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><CreditCard size={20} className="text-white" /><span className="text-white font-semibold text-sm uppercase tracking-wide">{isTournament ? "Pagar Inscripción" : method === "venue" ? "Reservar y pagar en el recinto" : `Pagar $${formatMoney(finalPrice)}`}</span></>}
+          {processing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><CreditCard size={20} className="text-white" /><span className="text-white font-semibold text-[13px] uppercase tracking-wide">{isTournament ? "Pagar Inscripción" : method === "venue" ? "Reservar y pagar en el recinto" : `Pagar $${formatMoney(finalPrice)}`}</span></>}
         </button>
       </div>
 
@@ -362,10 +362,10 @@ export default function CheckoutPage() {
             <div className="w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: (customAlert.type === "success" ? "#10b981" : "#ef4444") + "15" }}>
               {customAlert.type === "success" ? <CheckCircle2 size={32} className="text-emerald-500" /> : <XCircle size={32} className="text-red-500" />}
             </div>
-            <p className={`text-base font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{customAlert.title}</p>
-            <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{customAlert.message}</p>
+            <p className={`text-[15px] font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{customAlert.title}</p>
+            <p className={`text-[13px] font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{customAlert.message}</p>
             <button onClick={() => { setCustomAlert({ ...customAlert, visible: false }); if (customAlert.onClose) customAlert.onClose(); }}
-              className="w-full py-3.5 rounded-md font-semibold text-sm text-white" style={{ backgroundColor: customAlert.type === "success" ? "#10b981" : "#ef4444" }}>
+              className="w-full py-3.5 rounded-md font-semibold text-[13px] text-white" style={{ backgroundColor: customAlert.type === "success" ? "#10b981" : "#ef4444" }}>
               {customAlert.type === "success" ? "Entendido" : "Reintentar"}
             </button>
           </div>

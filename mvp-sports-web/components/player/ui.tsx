@@ -39,7 +39,7 @@ export function SegmentedTabs<T extends string>({ isDark, value, onChange, optio
         const on = value === id;
         return (
           <button key={id} role="tab" aria-selected={on} onClick={() => onChange(id)}
-            className={`flex-1 min-w-0 h-9 px-2 rounded-md text-[12px] font-semibold transition-all flex items-center justify-center gap-1.5 ${on ? (isDark ? "bg-[#0A101D] text-emerald-400" : "bg-white text-emerald-600 shadow-xs") : isDark ? "text-slate-400" : "text-slate-500"}`}>
+            className={`flex-1 min-w-0 h-9 px-2 rounded-md text-[11px] font-semibold transition-all flex items-center justify-center gap-1.5 ${on ? (isDark ? "bg-[#0A101D] text-emerald-400" : "bg-white text-emerald-600 shadow-xs") : isDark ? "text-slate-400" : "text-slate-500"}`}>
             {Icon && <Icon size={14} className="shrink-0" />}<span className="truncate">{label}</span>
           </button>
         );

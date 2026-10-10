@@ -311,14 +311,14 @@ export default function VenueDetailPage() {
   const renderSportSelection = () => (
     <GlowCard isDark={isDark}>
       <div className="p-5">
-        <p className={`text-[12px] font-semibold uppercase tracking-wide mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige un deporte</p>
+        <p className={`text-[11px] font-semibold uppercase tracking-wide mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige un deporte</p>
         <div className="flex flex-wrap gap-3">
           {availableSports.map((sport: string) => {
             const info = getSportInfo(sport);
             const SportIcon = info.icon;
             return (
               <button key={sport} onClick={() => { setSelectedSport(sport); setSelectedCourtId(null); setSelectedTime(null); setBookingStep(2); }}
-                className={`flex items-center gap-2.5 px-5 py-3 rounded-md text-sm font-semibold transition-all active:scale-95 ${selectedSport === sport ? "text-white" : isDark ? "text-slate-300 bg-white/6 hover:bg-white/10" : "text-slate-700 bg-slate-100 hover:bg-slate-200"}`}
+                className={`flex items-center gap-2.5 px-5 py-3 rounded-md text-[13px] font-semibold transition-all active:scale-95 ${selectedSport === sport ? "text-white" : isDark ? "text-slate-300 bg-white/6 hover:bg-white/10" : "text-slate-700 bg-slate-100 hover:bg-slate-200"}`}
                 style={selectedSport === sport ? { backgroundColor: info.color } : {}}>
                 <SportIcon color={selectedSport === sport ? "white" : info.color} size={22} />
                 {sport}
@@ -331,7 +331,7 @@ export default function VenueDetailPage() {
   );
 
   const renderBackButton = () => (
-    <button onClick={() => setBookingStep(p => p - 1)} className={`flex items-center gap-1.5 text-xs font-semibold transition-all active:scale-95 ${isDark ? "text-slate-400 hover:text-slate-200" : "text-slate-500 hover:text-slate-700"}`}>
+    <button onClick={() => setBookingStep(p => p - 1)} className={`flex items-center gap-1.5 text-[11px] font-semibold transition-all active:scale-95 ${isDark ? "text-slate-400 hover:text-slate-200" : "text-slate-500 hover:text-slate-700"}`}>
       <ChevronLeft size={14} /> Volver
     </button>
   );
@@ -356,25 +356,25 @@ export default function VenueDetailPage() {
         <div className="p-5">
           <div className="flex items-center justify-between mb-4">
             {renderBackButton()}
-            <p className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige la hora</p>
+            <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige la hora</p>
             <div className="w-12" />
           </div>
           <div className={`flex items-center gap-2 mb-4 p-3 rounded-md border ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
             <Clock size={14} className="text-emerald-500" />
-            <span className={`text-xs font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+            <span className={`text-[11px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
               {dateLabel} · {dateDayName} {currentDateInfo.date.toLocaleDateString("es-CL", { day: "numeric", month: "long" })}
             </span>
-            <button onClick={() => setBookingStep(2)} className="ml-auto text-emerald-500 text-[12px] font-semibold">Cambiar día</button>
+            <button onClick={() => setBookingStep(2)} className="ml-auto text-emerald-500 text-[11px] font-semibold">Cambiar día</button>
           </div>
 
           {bookableCourts.length === 0 ? (
-            <p className={`text-sm font-medium py-6 text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay canchas disponibles para este deporte</p>
+            <p className={`text-[13px] font-medium py-6 text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay canchas disponibles para este deporte</p>
           ) : loadingAllSlots ? (
             <div className="flex justify-center py-8"><div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
           ) : allTimes.filter((t) => !isPastSlot(t)).length === 0 ? (
             <div className="py-6 text-center">
-              <p className={`text-sm font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>No quedan horarios este día</p>
-              <button onClick={() => setDateOffset((d) => d + 1)} className="mt-3 px-5 h-10 rounded-md text-[13px] font-semibold bg-emerald-500 text-white">Ver el día siguiente</button>
+              <p className={`text-[13px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>No quedan horarios este día</p>
+              <button onClick={() => setDateOffset((d) => d + 1)} className="mt-3 px-5 h-10 rounded-md text-[12px] font-semibold bg-emerald-500 text-white">Ver el día siguiente</button>
             </div>
           ) : (
             <div className="space-y-4">
@@ -383,13 +383,13 @@ export default function VenueDetailPage() {
                 if (!times.length) return null;
                 return (
                   <div key={pk}>
-                    <p className={`text-[12px] font-semibold mb-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{periods[pk]}</p>
+                    <p className={`text-[11px] font-semibold mb-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{periods[pk]}</p>
                     <div className="grid grid-cols-4 gap-2">
                       {times.map((t) => {
                         const on = selectedTime === t;
                         return (
                           <button key={t} aria-pressed={on} onClick={() => pickTime(t)}
-                            className={`h-11 rounded-md text-[14px] font-semibold transition-all active:scale-95 ${on ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-100" : "bg-slate-100 text-slate-800"}`}>
+                            className={`h-11 rounded-md text-[13px] font-semibold transition-all active:scale-95 ${on ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-100" : "bg-slate-100 text-slate-800"}`}>
                             {t}
                           </button>
                         );
@@ -401,7 +401,7 @@ export default function VenueDetailPage() {
 
               {selectedTime && freeCourts.length > 0 && (
                 <div className={`pt-4 border-t ${isDark ? "border-white/6" : "border-slate-200"}`}>
-                  <p className={`text-[12px] font-semibold mb-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+                  <p className={`text-[11px] font-semibold mb-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                     {freeCourts.length === 1 ? "Cancha disponible" : `Cancha · ${freeCourts.length} libres a las ${selectedTime}`}
                   </p>
                   <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5">
@@ -410,15 +410,15 @@ export default function VenueDetailPage() {
                       return (
                         <button key={c.id} aria-pressed={on} onClick={() => setSelectedCourtId(c.id)}
                           className={`shrink-0 text-left px-4 py-2.5 rounded-md border transition-all ${on ? "border-emerald-500 bg-emerald-500/10" : isDark ? "border-white/8" : "border-slate-200"}`}>
-                          <p className={`text-[13px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{c.name}</p>
-                          <p className="text-[12px] font-semibold text-emerald-500">${Number(getCourtPrice(c.id, selectedSport || c.sport, selectedDate, selectedTime)).toLocaleString("es-CL")}</p>
+                          <p className={`text-[12px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{c.name}</p>
+                          <p className="text-[11px] font-semibold text-emerald-500">${Number(getCourtPrice(c.id, selectedSport || c.sport, selectedDate, selectedTime)).toLocaleString("es-CL")}</p>
                           {c.surface && <p className={`text-[11px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>{c.surface}</p>}
                         </button>
                       );
                     })}
                   </div>
                   <button onClick={() => setBookingStep(4)} disabled={!selectedCourtId}
-                    className="mt-4 w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50">
+                    className="mt-4 w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50">
                     Continuar <ChevronRight size={16} />
                   </button>
                 </div>
@@ -463,7 +463,7 @@ export default function VenueDetailPage() {
       <div className="p-5">
         <div className="flex items-center justify-between mb-5">
           {renderBackButton()}
-          <p className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige el día</p>
+          <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige el día</p>
           <div className="w-12" />
         </div>
         {/* Date selector card */}
@@ -474,9 +474,9 @@ export default function VenueDetailPage() {
               <ChevronLeft size={18} className="text-emerald-500" />
             </button>
             <div className="flex flex-col items-center">
-              <span className={`text-2xl font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{currentDateInfo.date.getDate()}</span>
-              <span className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-400" : "text-slate-500"}`}>{currentDateInfo.date.toLocaleDateString("es-CL", { month: "long" })}</span>
-              <span className={`text-[12px] font-bold mt-0.5 ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>{dateLabel} • {dateDayName}</span>
+              <span className={`text-[22px] font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{currentDateInfo.date.getDate()}</span>
+              <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-400" : "text-slate-500"}`}>{currentDateInfo.date.toLocaleDateString("es-CL", { month: "long" })}</span>
+              <span className={`text-[11px] font-bold mt-0.5 ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>{dateLabel} • {dateDayName}</span>
             </div>
             <button aria-label="Siguiente" onClick={() => { setDateOffset(p => p + 1); }}
               className={`w-12 h-12 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-white hover:bg-slate-100 shadow-xs"}`}>
@@ -495,14 +495,14 @@ export default function VenueDetailPage() {
                 <button key={offset} onClick={() => { if (!isPastOffset) setDateOffset(offset); }} disabled={isPastOffset}
                   className={`flex-1 py-2.5 rounded-md flex flex-col items-center transition-all active:scale-95 ${isActive ? "bg-emerald-500 text-white shadow-md" : isPastOffset ? (isDark ? "text-slate-600" : "text-slate-300") : isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"}`}>
                   <span className="text-[11px] font-semibold uppercase">{labels[d.getDay()]}</span>
-                  <span className="text-xs font-bold mt-0.5">{d.getDate()}</span>
+                  <span className="text-[11px] font-bold mt-0.5">{d.getDate()}</span>
                 </button>
               );
             })}
           </div>
         </div>
         <div className={`text-center mb-4 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-          <p className="text-xs font-medium">
+          <p className="text-[11px] font-medium">
             {(() => {
               if (!selectedSport) return "Selecciona un deporte primero";
               const v = venue as any;
@@ -520,7 +520,7 @@ export default function VenueDetailPage() {
           </p>
         </div>
         <button onClick={() => setBookingStep(3)}
-          className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+          className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
           Ver canchas disponibles <ChevronRight size={16} />
         </button>
       </div>
@@ -538,7 +538,7 @@ export default function VenueDetailPage() {
         <div className="p-5">
           <div className="flex items-center justify-between mb-5">
             {renderBackButton()}
-            <p className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Reserva</p>
+            <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Reserva</p>
             <div className="w-12" />
           </div>
           <div className="space-y-0 divide-y divide-emerald-500/5">
@@ -548,7 +548,7 @@ export default function VenueDetailPage() {
                 <SportIcon color={info.color} size={24} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-base font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedSport}</p>
+                <p className={`text-[15px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedSport}</p>
                 <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</p>
               </div>
             </div>
@@ -558,7 +558,7 @@ export default function VenueDetailPage() {
                 {CourtIcon ? <CourtIcon color={info.color} size={26} /> : <ShieldCheck size={22} style={{ color: info.color }} />}
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-base font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedCourt?.name || "Cancha"}</p>
+                <p className={`text-[15px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedCourt?.name || "Cancha"}</p>
                 <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cancha {(selectedCourt as any)?.surface ? `• ${(selectedCourt as any).surface}` : ""}</p>
               </div>
             </div>
@@ -568,7 +568,7 @@ export default function VenueDetailPage() {
                 <Clock size={22} className="text-blue-500" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-base font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{dateDayName} {new Date(`${selectedDate}T12:00:00`).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}</p>
+                <p className={`text-[15px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{dateDayName} {new Date(`${selectedDate}T12:00:00`).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}</p>
                 <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{selectedTime} HRS</p>
               </div>
             </div>
@@ -576,14 +576,14 @@ export default function VenueDetailPage() {
             <div className={`p-4 rounded-md mt-4 mb-1 ${isDark ? "bg-emerald-500/10 border border-emerald-500/10" : "bg-emerald-50 border border-emerald-200"}`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Valor de la reserva</p>
+                  <p className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Valor de la reserva</p>
                   <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Pago único • Sin cargos adicionales</p>
                 </div>
-                <p className="text-2xl font-bold text-emerald-500">${Number(confirmationData.price).toLocaleString("es-CL")}</p>
+                <p className="text-[22px] font-bold text-emerald-500">${Number(confirmationData.price).toLocaleString("es-CL")}</p>
               </div>
             </div>
           </div>
-          <button onClick={handleConfirmBooking} className="w-full mt-5 h-14 rounded-md bg-emerald-500 text-white font-semibold text-base uppercase tracking-wide flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
+          <button onClick={handleConfirmBooking} className="w-full mt-5 h-14 rounded-md bg-emerald-500 text-white font-semibold text-[15px] uppercase tracking-wide flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
             <Zap size={20} /> Confirmar y Reservar
           </button>
         </div>
@@ -595,7 +595,7 @@ export default function VenueDetailPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[11px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -612,8 +612,8 @@ export default function VenueDetailPage() {
           <ChevronLeft size={20} className="text-white" />
         </button>
         <div className="absolute bottom-6 left-6 right-6">
-          <h1 className="text-white text-2xl font-heading font-black uppercase">{venue?.name}</h1>
-          {venueData?.description && <p className="text-white/60 text-xs font-medium mt-1 line-clamp-2">{venueData.description}</p>}
+          <h1 className="text-white text-[22px] font-heading font-black uppercase">{venue?.name}</h1>
+          {venueData?.description && <p className="text-white/60 text-[11px] font-medium mt-1 line-clamp-2">{venueData.description}</p>}
         </div>
       </div>
 
@@ -625,43 +625,43 @@ export default function VenueDetailPage() {
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1 bg-emerald-500/10 px-3 py-1.5 rounded-md">
                   <Star size={13} className="text-emerald-500" fill="currentColor" />
-                  <span className="text-emerald-500 font-semibold text-sm">{Number(venue?.rating) > 0 ? Number(venue?.rating).toFixed(1) : "Nuevo"}</span>
+                  <span className="text-emerald-500 font-semibold text-[13px]">{Number(venue?.rating) > 0 ? Number(venue?.rating).toFixed(1) : "Nuevo"}</span>
                 </div>
                 {distanceLabel && (
                   <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-emerald-500/5">
                     <Navigation size={11} className="text-emerald-500" />
-                    <span className="text-emerald-500 text-xs font-semibold">{distanceLabel}</span>
+                    <span className="text-emerald-500 text-[11px] font-semibold">{distanceLabel}</span>
                   </div>
                 )}
               </div>
               <div className="flex items-center gap-1.5">
                 <Clock size={12} className="text-emerald-500" />
-                <span className={`text-[12px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Hoy: {currentDayHours}</span>
+                <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Hoy: {currentDayHours}</span>
               </div>
             </div>
             <div className="flex items-center gap-4">
               {venueData?.phone && (
                 <a href={`tel:${venueData.phone}`} className="flex items-center gap-1.5">
                   <Phone size={12} className="text-emerald-500" />
-                  <span className={`text-[12px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{venueData.phone}</span>
+                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{venueData.phone}</span>
                 </a>
               )}
               {venueData?.whatsapp && (
                 <a href={`https://wa.me/${venueData.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
                   <MessageCircle size={12} className="text-emerald-500" />
-                  <span className={`text-[12px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>WhatsApp</span>
+                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>WhatsApp</span>
                 </a>
               )}
               {venueData?.instagram && (
                 <a href={`https://instagram.com/${venueData.instagram.replace(/^@/, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
                   <Globe size={12} className="text-emerald-500" />
-                  <span className={`text-[12px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Instagram</span>
+                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Instagram</span>
                 </a>
               )}
               {venueData?.website && (
                 <a href={venueData.website.startsWith("http") ? venueData.website : `https://${venueData.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
                   <Globe size={12} className="text-emerald-500" />
-                  <span className={`text-[12px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Web</span>
+                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Web</span>
                 </a>
               )}
             </div>
@@ -678,7 +678,7 @@ export default function VenueDetailPage() {
             <div className="flex gap-2">
               {venueData?.gallery && venueData.gallery.length > 0 && (
                 <button onClick={() => setShowGallery(true)}
-                  className="flex-1 h-10 rounded-md border text-[12px] font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="flex-1 h-10 rounded-md border text-[11px] font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                   style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
                   <Images size={13} className="text-emerald-500" />
                   <span className={isDark ? "text-slate-300" : "text-slate-600"}>Galería</span>
@@ -686,7 +686,7 @@ export default function VenueDetailPage() {
               )}
               {venueCoords && (
                 <button onClick={handleOpenMaps}
-                  className="flex-1 h-10 rounded-md border text-[12px] font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
+                  className="flex-1 h-10 rounded-md border text-[11px] font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
                   style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
                   <Navigation size={13} className="text-emerald-500" />
                   <span className={isDark ? "text-slate-300" : "text-slate-600"}>Cómo llegar</span>
@@ -701,7 +701,7 @@ export default function VenueDetailPage() {
                 return (
                   <div key={sport} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border" style={{ backgroundColor: `${info.color}10`, borderColor: `${info.color}20` }}>
                     <Icon color={info.color} size={14} />
-                    <span className="text-[12px] font-semibold" style={{ color: info.color }}>{sport}</span>
+                    <span className="text-[11px] font-semibold" style={{ color: info.color }}>{sport}</span>
                   </div>
                 );
               })}
@@ -736,9 +736,9 @@ export default function VenueDetailPage() {
                 <div key={r.id} className="p-4">
                   <div className="flex items-center gap-2 mb-1">
                     {[1,2,3,4,5].map(s => <Star key={s} size={10} className={s <= (r.rating || 0) ? "text-amber-500" : isDark ? "text-slate-600" : "text-slate-200"} fill={s <= (r.rating || 0) ? "currentColor" : "none"} />)}
-                    <span className={`text-[12px] font-medium ml-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{r.userName || "Jugador"}</span>
+                    <span className={`text-[11px] font-medium ml-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{r.userName || "Jugador"}</span>
                   </div>
-                  {r.comment && <p className={`text-xs font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>{r.comment}</p>}
+                  {r.comment && <p className={`text-[11px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>{r.comment}</p>}
                 </div>
               ))}
             </div>
@@ -747,7 +747,7 @@ export default function VenueDetailPage() {
           <GlowCard isDark={isDark}>
             <div className="py-8 flex flex-col items-center">
               <Star size={28} className={isDark ? "text-slate-600" : "text-slate-300"} />
-              <p className={`text-[12px] font-semibold uppercase tracking-wide mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin reseñas por el momento</p>
+              <p className={`text-[11px] font-semibold uppercase tracking-wide mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin reseñas por el momento</p>
             </div>
           </GlowCard>
         )}
@@ -755,7 +755,7 @@ export default function VenueDetailPage() {
         {/* Rules button */}
         {(venueData?.rules?.length > 0 || venueData?.cancellationPolicy) && (
           <button onClick={() => setShowRules(true)}
-            className="w-full h-[44px] rounded-md font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] border"
+            className="w-full h-[44px] rounded-md font-semibold text-[11px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] border"
             style={{ borderColor: isDark ? "rgba(255,255,255,0.08)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC", color: isDark ? "#94A3B8" : "#64748B" }}>
             <Ban size={14} /> Reglas del Recinto
           </button>
@@ -767,7 +767,7 @@ export default function VenueDetailPage() {
       {feedback && (
         <div className="fixed bottom-8 left-5 right-5 z-50 animate-in slide-in-from-bottom-4 duration-300">
           <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 ${feedback.type === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
-            <span className="flex-1 text-sm font-medium">{feedback.msg}</span>
+            <span className="flex-1 text-[13px] font-medium">{feedback.msg}</span>
             <button aria-label="Cerrar" onClick={() => setFeedback(null)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
           </div>
         </div>
@@ -782,7 +782,7 @@ export default function VenueDetailPage() {
                 <div className="w-9 h-9 rounded-md flex items-center justify-center bg-red-500/10">
                   <Ban size={16} className="text-red-400" />
                 </div>
-                <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Reglas del Recinto</p>
+                <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Reglas del Recinto</p>
               </div>
               <button aria-label="Cerrar" onClick={() => setShowRules(false)} className="w-8 h-8 rounded-md flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
                 <X size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />
@@ -792,13 +792,13 @@ export default function VenueDetailPage() {
               {venueData?.rules?.map((rule: string, i: number) => (
                 <div key={i} className={`flex items-start gap-3 p-3 rounded-md border ${isDark ? "border-white/6" : "border-slate-200"}`}>
                   <Ban size={14} className="text-red-400 shrink-0 mt-0.5" />
-                  <span className={`text-[12px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>{rule}</span>
+                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>{rule}</span>
                 </div>
               ))}
               {venueData?.cancellationPolicy && (
                 <div className={`p-4 rounded-md border ${isDark ? "bg-amber-500/5 border-amber-500/10" : "bg-amber-50 border-amber-200"}`}>
                   <p className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${isDark ? "text-amber-400" : "text-amber-600"}`}>Política de Cancelación</p>
-                  <p className={`text-[12px] font-medium leading-snug ${isDark ? "text-slate-300" : "text-slate-700"}`}>{venueData.cancellationPolicy}</p>
+                  <p className={`text-[11px] font-medium leading-snug ${isDark ? "text-slate-300" : "text-slate-700"}`}>{venueData.cancellationPolicy}</p>
                 </div>
               )}
             </div>
@@ -822,7 +822,7 @@ export default function VenueDetailPage() {
                   className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
                   <ChevronLeft size={16} className="text-white" />
                 </button>
-                <span className="text-white/60 text-[12px] font-medium">{galleryIndex + 1} / {venueData.gallery.length}</span>
+                <span className="text-white/60 text-[11px] font-medium">{galleryIndex + 1} / {venueData.gallery.length}</span>
                 <button aria-label="Siguiente" onClick={() => setGalleryIndex(i => (i + 1) % venueData.gallery.length)}
                   className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
                   <ChevronRight size={16} className="text-white" />

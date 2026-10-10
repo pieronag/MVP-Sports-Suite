@@ -112,7 +112,7 @@ export default function ExploreClubesPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[11px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -124,13 +124,13 @@ export default function ExploreClubesPage() {
           <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
             <ChevronLeft size={20} className="text-emerald-500" />
           </button>
-          <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Recintos</h1>
+          <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Recintos</h1>
           <div className="w-10" />
         </div>
         <div className={`flex items-center gap-3 px-4 h-12 rounded-md border ${isDark ? "bg-white/4 border-white/6" : "bg-slate-50 border-slate-200"}`}>
           <Search size={16} className="text-emerald-500 shrink-0" />
           <input placeholder="Buscar club o recinto..." value={search} onChange={(e) => setSearch(e.target.value)}
-            className={`flex-1 bg-transparent text-sm font-medium outline-hidden ${isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400"}`}
+            className={`flex-1 bg-transparent text-[13px] font-medium outline-hidden ${isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400"}`}
           />
         </div>
       </div>
@@ -142,7 +142,7 @@ export default function ExploreClubesPage() {
             const SportIcon = SPORT_ICON_MAP[sport.toLowerCase()];
             return (
               <button key={sport} onClick={() => setSelectedSport(sport)}
-                className={`flex items-center gap-1.5 h-10 px-4 rounded-md text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${selectedSport === sport ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-400 hover:bg-white/10" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+                className={`flex items-center gap-1.5 h-10 px-4 rounded-md text-[11px] font-semibold whitespace-nowrap transition-all active:scale-95 ${selectedSport === sport ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-400 hover:bg-white/10" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
                 {SportIcon && <SportIcon color={selectedSport === sport ? "white" : isDark ? "#94a3b8" : "#64748b"} size={14} />}
                 {sport}
               </button>
@@ -152,7 +152,7 @@ export default function ExploreClubesPage() {
         <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-none">
           {communesList.map((commune) => (
             <button key={commune} onClick={() => setSelectedCommune(commune)}
-              className={`h-10 px-4 rounded-md text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${selectedCommune === commune ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-400 hover:bg-white/10" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+              className={`h-10 px-4 rounded-md text-[11px] font-semibold whitespace-nowrap transition-all active:scale-95 ${selectedCommune === commune ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-400 hover:bg-white/10" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
               {commune}
             </button>
           ))}
@@ -183,24 +183,24 @@ export default function ExploreClubesPage() {
               <div className="p-5">
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1 min-w-0">
-                    <p className={`text-lg font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{venue.name}</p>
+                    <p className={`text-[16px] font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{venue.name}</p>
                     <div className="flex items-center gap-1.5 mt-1">
                       <MapPin size={11} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                      <span className={`text-xs font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{vComuna}</span>
+                      <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{vComuna}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 bg-emerald-500/10 px-2.5 py-1.5 rounded-md shrink-0">
                     <Star size={12} className="text-emerald-500" fill="currentColor" />
-                    <span className="text-emerald-500 font-semibold text-xs">{Number(venue.rating) > 0 ? Number(venue.rating).toFixed(1) : "Nuevo"}</span>
+                    <span className="text-emerald-500 font-semibold text-[11px]">{Number(venue.rating) > 0 ? Number(venue.rating).toFixed(1) : "Nuevo"}</span>
                   </div>
                 </div>
                 <div className={`flex items-center justify-between pt-4 border-t ${isDark ? "border-white/6" : "border-slate-200"}`}>
                   <div className="flex items-center gap-1.5">
                     <Navigation size={13} className="text-emerald-500" />
-                    <span className={`text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{distance || "Cerca de ti"}</span>
+                    <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{distance || "Cerca de ti"}</span>
                   </div>
                   <button onClick={() => router.push(`/player/clubes/${venue.id}`)}
-                    className="bg-emerald-500 hover:bg-emerald-600 transition-all px-5 h-10 rounded-md font-semibold text-xs text-white active:scale-[0.98]">
+                    className="bg-emerald-500 hover:bg-emerald-600 transition-all px-5 h-10 rounded-md font-semibold text-[11px] text-white active:scale-[0.98]">
                     RESERVAR
                   </button>
                 </div>
@@ -211,10 +211,10 @@ export default function ExploreClubesPage() {
         {filteredVenues.length === 0 && (
           <div className="py-16 flex flex-col items-center">
             <Compass size={32} className={isDark ? "text-slate-600" : "text-slate-300"} />
-            <p className={`text-sm font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay recintos con estos filtros</p>
+            <p className={`text-[13px] font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay recintos con estos filtros</p>
             {(selectedSport !== "Todos" || selectedCommune !== "Todas" || search) && (
               <button onClick={() => { setSelectedSport("Todos"); setSelectedCommune("Todas"); setSearch(""); }}
-                className="mt-4 px-5 h-10 rounded-md text-[13px] font-semibold bg-emerald-500 text-white">Ver todos los recintos</button>
+                className="mt-4 px-5 h-10 rounded-md text-[12px] font-semibold bg-emerald-500 text-white">Ver todos los recintos</button>
             )}
           </div>
         )}

@@ -89,15 +89,15 @@ export default function AcademiasPage() {
                 <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: ACCENT }}>{c.sport || "Academia"}</span>
                 {c.ageGroup && <span className={`text-[11px] ${sub}`}>· {AGE[c.ageGroup] || c.ageGroup}</span>}
               </div>
-              <p className={`text-[15px] font-semibold leading-snug ${txt}`}>{c.name}</p>
-              {c.instructor && <p className={`text-xs mt-0.5 ${sub}`}>{c.instructor}</p>}
+              <p className={`text-[14px] font-semibold leading-snug ${txt}`}>{c.name}</p>
+              {c.instructor && <p className={`text-[11px] mt-0.5 ${sub}`}>{c.instructor}</p>}
             </div>
             <div className="text-right shrink-0">
-              <p className={`text-sm font-semibold ${txt}`}>{c.price ? fmtCLP(c.price) : "Gratis"}</p>
+              <p className={`text-[13px] font-semibold ${txt}`}>{c.price ? fmtCLP(c.price) : "Gratis"}</p>
               {!!c.price && <p className={`text-[11px] ${sub}`}>mensual</p>}
             </div>
           </div>
-          <div className={`mt-3 pt-3 border-t flex items-center justify-between gap-2 text-xs ${isDark ? "border-white/5" : "border-slate-100"}`}>
+          <div className={`mt-3 pt-3 border-t flex items-center justify-between gap-2 text-[11px] ${isDark ? "border-white/5" : "border-slate-100"}`}>
             <span className={`flex items-center gap-1.5 ${sub}`}><CalendarDays size={14} /> {(c.daysOfWeek || []).map(d => d.slice(0, 3)).join(" · ") || "Por definir"}</span>
             <span className={`flex items-center gap-1.5 ${sub}`}><Clock size={14} /> {c.startTime || "--"}{c.endTime ? `–${c.endTime}` : ""}</span>
             {enrolled ? (
@@ -120,7 +120,7 @@ export default function AcademiasPage() {
         <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Academias</h1>
+        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Academias</h1>
         <div className="w-10" />
       </div>
 
@@ -130,7 +130,7 @@ export default function AcademiasPage() {
           <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5">
             {sports.map(s => (
               <button key={s} onClick={() => setSport(s)}
-                className={`h-9 px-4 rounded-md text-xs font-semibold whitespace-nowrap border transition-all ${sport === s ? "text-white border-transparent" : isDark ? "border-white/10 text-slate-300" : "border-slate-200 text-slate-600"}`}
+                className={`h-9 px-4 rounded-md text-[11px] font-semibold whitespace-nowrap border transition-all ${sport === s ? "text-white border-transparent" : isDark ? "border-white/10 text-slate-300" : "border-slate-200 text-slate-600"}`}
                 style={sport === s ? { backgroundColor: ACCENT } : undefined}>{s}</button>
             ))}
           </div>
@@ -149,9 +149,9 @@ export default function AcademiasPage() {
         ) : visible.length === 0 ? (
           <div className="py-14 flex flex-col items-center text-center">
             <GraduationCap size={32} className={isDark ? "text-slate-600" : "text-slate-300"} />
-            <p className={`text-sm font-medium mt-3 ${sub}`}>No hay clases publicadas por ahora</p>
-            <p className={`text-[13px] mt-1 ${sub}`}>Vuelve pronto o reserva una cancha para entrenar.</p>
-            <a href="/player/clubes" className="mt-4 px-5 h-10 inline-flex items-center rounded-md text-[13px] font-semibold bg-emerald-500 text-white">Reservar cancha</a>
+            <p className={`text-[13px] font-medium mt-3 ${sub}`}>No hay clases publicadas por ahora</p>
+            <p className={`text-[12px] mt-1 ${sub}`}>Vuelve pronto o reserva una cancha para entrenar.</p>
+            <a href="/player/clubes" className="mt-4 px-5 h-10 inline-flex items-center rounded-md text-[12px] font-semibold bg-emerald-500 text-white">Reservar cancha</a>
           </div>
         ) : (
           visible.map(c => <ClassCard key={c.id} c={c} />)
@@ -170,12 +170,12 @@ export default function AcademiasPage() {
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: ACCENT }}>{c.sport || "Academia"}</p>
-                  <h2 className={`text-lg font-heading font-black ${txt}`}>{c.name}</h2>
+                  <h2 className={`text-[16px] font-heading font-black ${txt}`}>{c.name}</h2>
                 </div>
                 <button aria-label="Cerrar" onClick={() => setSelected(null)} className={`w-9 h-9 rounded-md flex items-center justify-center ${isDark ? "bg-white/6" : "bg-slate-100"}`}><X size={18} /></button>
               </div>
-              {c.description && <p className={`text-sm mb-4 ${sub}`}>{c.description}</p>}
-              <div className={`grid grid-cols-2 gap-2.5 mb-4 text-sm`}>
+              {c.description && <p className={`text-[13px] mb-4 ${sub}`}>{c.description}</p>}
+              <div className={`grid grid-cols-2 gap-2.5 mb-4 text-[13px]`}>
                 {[
                   { icon: UserIcon, label: "Profesor", value: c.instructor || "Por confirmar" },
                   { icon: Users, label: "Edad", value: AGE[c.ageGroup || ""] || c.ageGroup || "Todas" },
@@ -186,24 +186,24 @@ export default function AcademiasPage() {
                 ].map(r => (
                   <div key={r.label} className={`p-3 rounded-md border ${isDark ? "border-white/5 bg-white/2" : "border-slate-200 bg-slate-50"}`}>
                     <p className={`flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide ${sub}`}><r.icon size={13} /> {r.label}</p>
-                    <p className={`mt-1 text-sm font-semibold ${txt}`}>{r.value}</p>
+                    <p className={`mt-1 text-[13px] font-semibold ${txt}`}>{r.value}</p>
                   </div>
                 ))}
               </div>
               {enrolled ? (
-                <div className="p-3 rounded-md bg-emerald-500/10 text-emerald-500 text-sm font-semibold flex items-center gap-2">
+                <div className="p-3 rounded-md bg-emerald-500/10 text-emerald-500 text-[13px] font-semibold flex items-center gap-2">
                   <CheckCircle2 size={18} /> Ya estás inscrito{enrolled.paymentStatus === "pending" ? " · pago pendiente en el recinto" : ""}
                 </div>
               ) : full ? (
-                <div className="p-3 rounded-md bg-rose-500/10 text-rose-500 text-sm font-semibold">No quedan cupos en esta clase</div>
+                <div className="p-3 rounded-md bg-rose-500/10 text-rose-500 text-[13px] font-semibold">No quedan cupos en esta clase</div>
               ) : (
                 <div className="space-y-2.5">
                   {!!c.price && (
-                    <button disabled={busy} onClick={() => enroll(c, true)} className="w-full h-12 rounded-md text-white text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-60" style={{ backgroundColor: ACCENT }}>
+                    <button disabled={busy} onClick={() => enroll(c, true)} className="w-full h-12 rounded-md text-white text-[13px] font-semibold flex items-center justify-center gap-2 disabled:opacity-60" style={{ backgroundColor: ACCENT }}>
                       <CreditCard size={18} /> Pagar {fmtCLP(c.price)} con Mercado Pago
                     </button>
                   )}
-                  <button disabled={busy} onClick={() => enroll(c, false)} className={`w-full h-12 rounded-md text-sm font-semibold border disabled:opacity-60 ${c.price ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!c.price ? { backgroundColor: ACCENT } : undefined}>
+                  <button disabled={busy} onClick={() => enroll(c, false)} className={`w-full h-12 rounded-md text-[13px] font-semibold border disabled:opacity-60 ${c.price ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!c.price ? { backgroundColor: ACCENT } : undefined}>
                     {busy ? "Procesando…" : c.price ? "Inscribirme y pagar en el recinto" : "Inscribirme"}
                   </button>
                 </div>
@@ -215,7 +215,7 @@ export default function AcademiasPage() {
 
       {toast && (
         <div className="fixed inset-x-4 top-4 z-60" role="status" onClick={() => setToast(null)}>
-          <div className={`p-3.5 rounded-md text-sm font-semibold text-white ${toast.type === "ok" ? "bg-emerald-600" : "bg-rose-600"}`}>{toast.msg}</div>
+          <div className={`p-3.5 rounded-md text-[13px] font-semibold text-white ${toast.type === "ok" ? "bg-emerald-600" : "bg-rose-600"}`}>{toast.msg}</div>
         </div>
       )}
     </div>

@@ -72,7 +72,7 @@ export default function MapView({ venues, center, isDark }: { venues: any[]; cen
     );
   }, [isLoaded]);
 
-  if (loadError) return <div className="flex items-center justify-center h-full text-slate-400 text-sm font-medium">Error al cargar Google Maps</div>;
+  if (loadError) return <div className="flex items-center justify-center h-full text-slate-400 text-[13px] font-medium">Error al cargar Google Maps</div>;
   if (!isLoaded) return <div className="flex items-center justify-center h-full">
     <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
   </div>;

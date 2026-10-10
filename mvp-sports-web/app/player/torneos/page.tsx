@@ -103,15 +103,15 @@ export default function TorneosPage() {
                 <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: ACCENT }}>{t.sport || "Torneo"}</span>
                 <span className={`text-[11px] ${sub}`}>· {TYPE[t.type] || t.type || "Liga"}</span>
               </div>
-              <p className={`text-[15px] font-semibold leading-snug ${txt}`}>{t.name}</p>
-              <p className={`text-xs mt-0.5 ${sub}`}>{STATUS[t.status] || "Inscripciones abiertas"}</p>
+              <p className={`text-[14px] font-semibold leading-snug ${txt}`}>{t.name}</p>
+              <p className={`text-[11px] mt-0.5 ${sub}`}>{STATUS[t.status] || "Inscripciones abiertas"}</p>
             </div>
             <div className="text-right shrink-0">
-              <p className={`text-sm font-semibold ${txt}`}>{t.price ? fmtCLP(t.price) : "Gratis"}</p>
+              <p className={`text-[13px] font-semibold ${txt}`}>{t.price ? fmtCLP(t.price) : "Gratis"}</p>
               <p className={`text-[11px] ${sub}`}>por equipo</p>
             </div>
           </div>
-          <div className={`mt-3 pt-3 border-t flex items-center justify-between gap-2 text-xs ${isDark ? "border-white/5" : "border-slate-100"}`}>
+          <div className={`mt-3 pt-3 border-t flex items-center justify-between gap-2 text-[11px] ${isDark ? "border-white/5" : "border-slate-100"}`}>
             <span className={`flex items-center gap-1.5 ${sub}`}><CalendarDays size={14} /> {fmtDate(t.tournamentStartDate || t.startDate)}</span>
             <span className={`flex items-center gap-1.5 ${sub}`}><Users size={14} /> {count}/{t.maxTeams || "∞"}</span>
             {reg ? <span className="flex items-center gap-1 font-semibold text-emerald-500"><CheckCircle2 size={14} /> Inscrito</span>
@@ -130,7 +130,7 @@ export default function TorneosPage() {
         <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Torneos</h1>
+        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Torneos</h1>
         <div className="w-10" />
       </div>
 
@@ -141,9 +141,9 @@ export default function TorneosPage() {
         ) : active.length === 0 ? (
           <div className="py-14 flex flex-col items-center text-center">
             <Trophy size={32} className={isDark ? "text-slate-600" : "text-slate-300"} />
-            <p className={`text-sm font-medium mt-3 ${sub}`}>No hay torneos con inscripciones abiertas</p>
-            <p className={`text-[13px] mt-1 ${sub}`}>Mientras tanto, arma un partido con otro equipo.</p>
-            <a href="/player/equipos/partidos" className="mt-4 px-5 h-10 inline-flex items-center rounded-md text-[13px] font-semibold bg-emerald-500 text-white">Buscar rival</a>
+            <p className={`text-[13px] font-medium mt-3 ${sub}`}>No hay torneos con inscripciones abiertas</p>
+            <p className={`text-[12px] mt-1 ${sub}`}>Mientras tanto, arma un partido con otro equipo.</p>
+            <a href="/player/equipos/partidos" className="mt-4 px-5 h-10 inline-flex items-center rounded-md text-[12px] font-semibold bg-emerald-500 text-white">Buscar rival</a>
           </div>
         ) : active.map(t => <Card key={t.id} t={t} />)}
 
@@ -167,11 +167,11 @@ export default function TorneosPage() {
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: ACCENT }}>{t.sport || "Torneo"} · {TYPE[t.type] || t.type || "Liga"}</p>
-                  <h2 className={`text-lg font-heading font-black ${txt}`}>{t.name}</h2>
+                  <h2 className={`text-[16px] font-heading font-black ${txt}`}>{t.name}</h2>
                 </div>
                 <button aria-label="Cerrar" onClick={() => setSelected(null)} className={`w-9 h-9 rounded-md flex items-center justify-center ${isDark ? "bg-white/6" : "bg-slate-100"}`}><X size={18} /></button>
               </div>
-              {t.description && <p className={`text-sm mb-4 ${sub}`}>{t.description}</p>}
+              {t.description && <p className={`text-[13px] mb-4 ${sub}`}>{t.description}</p>}
 
               <div className="grid grid-cols-2 gap-2.5 mb-4">
                 {[
@@ -184,7 +184,7 @@ export default function TorneosPage() {
                 ].map(r => (
                   <div key={r.label} className={`p-3 rounded-md border ${isDark ? "border-white/5 bg-white/2" : "border-slate-200 bg-slate-50"}`}>
                     <p className={`flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide ${sub}`}><r.icon size={13} /> {r.label}</p>
-                    <p className={`mt-1 text-sm font-semibold capitalize ${txt}`}>{r.value}</p>
+                    <p className={`mt-1 text-[13px] font-semibold capitalize ${txt}`}>{r.value}</p>
                   </div>
                 ))}
               </div>
@@ -192,34 +192,34 @@ export default function TorneosPage() {
               {prizes.length > 0 && (
                 <div className={`p-3 rounded-md border mb-4 ${isDark ? "border-white/5" : "border-slate-200"}`}>
                   <p className={`flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide mb-2 ${sub}`}><Award size={13} /> Premios</p>
-                  {prizes.map((p: string, i: number) => <p key={i} className={`text-sm ${txt}`}>{i + 1}° · {p}</p>)}
+                  {prizes.map((p: string, i: number) => <p key={i} className={`text-[13px] ${txt}`}>{i + 1}° · {p}</p>)}
                 </div>
               )}
               {t.rules && (
                 <div className={`p-3 rounded-md border mb-4 ${isDark ? "border-white/5" : "border-slate-200"}`}>
                   <p className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${sub}`}>Bases</p>
-                  <p className={`text-sm whitespace-pre-line ${sub}`}>{t.rules}</p>
+                  <p className={`text-[13px] whitespace-pre-line ${sub}`}>{t.rules}</p>
                 </div>
               )}
               {(t.teams?.length || 0) > 0 && (
                 <div className={`p-3 rounded-md border mb-4 ${isDark ? "border-white/5" : "border-slate-200"}`}>
                   <p className={`text-[11px] font-semibold uppercase tracking-wide mb-2 ${sub}`}>Equipos inscritos</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {t.teams.map((x: any) => <span key={x.id} className={`px-2.5 py-1 rounded-md text-xs ${myTeamIds.has(x.id) ? "bg-emerald-500/15 text-emerald-500 font-semibold" : isDark ? "bg-white/5 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{x.name}</span>)}
+                    {t.teams.map((x: any) => <span key={x.id} className={`px-2.5 py-1 rounded-md text-[11px] ${myTeamIds.has(x.id) ? "bg-emerald-500/15 text-emerald-500 font-semibold" : isDark ? "bg-white/5 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{x.name}</span>)}
                   </div>
                 </div>
               )}
 
               {reg ? (
-                <div className="p-3 rounded-md bg-emerald-500/10 text-emerald-500 text-sm font-semibold flex items-center gap-2"><CheckCircle2 size={18} /> {reg.name} ya está inscrito</div>
+                <div className="p-3 rounded-md bg-emerald-500/10 text-emerald-500 text-[13px] font-semibold flex items-center gap-2"><CheckCircle2 size={18} /> {reg.name} ya está inscrito</div>
               ) : closed ? (
-                <div className={`p-3 rounded-md text-sm font-semibold ${isDark ? "bg-white/4 text-slate-400" : "bg-slate-100 text-slate-500"}`}>Las inscripciones están cerradas</div>
+                <div className={`p-3 rounded-md text-[13px] font-semibold ${isDark ? "bg-white/4 text-slate-400" : "bg-slate-100 text-slate-500"}`}>Las inscripciones están cerradas</div>
               ) : full ? (
-                <div className="p-3 rounded-md bg-rose-500/10 text-rose-500 text-sm font-semibold">No quedan cupos</div>
+                <div className="p-3 rounded-md bg-rose-500/10 text-rose-500 text-[13px] font-semibold">No quedan cupos</div>
               ) : eligible.length === 0 ? (
                 <div className="space-y-2.5">
-                  <p className={`text-sm ${sub}`}>Para inscribirte necesitas ser capitán de un equipo de {t.sport || "este deporte"}.</p>
-                  <button onClick={() => router.push("/player/equipos")} className="w-full h-12 rounded-md text-white text-sm font-semibold" style={{ backgroundColor: ACCENT }}>Crear o gestionar equipos</button>
+                  <p className={`text-[13px] ${sub}`}>Para inscribirte necesitas ser capitán de un equipo de {t.sport || "este deporte"}.</p>
+                  <button onClick={() => router.push("/player/equipos")} className="w-full h-12 rounded-md text-white text-[13px] font-semibold" style={{ backgroundColor: ACCENT }}>Crear o gestionar equipos</button>
                 </div>
               ) : (
                 <div className="space-y-2.5">
@@ -228,11 +228,11 @@ export default function TorneosPage() {
                     {eligible.map(team => <option key={team.id} value={team.id}>{team.name}</option>)}
                   </select>
                   {!!t.price && (
-                    <button disabled={busy || !teamId} onClick={() => register(true)} className="w-full h-12 rounded-md text-white text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-60" style={{ backgroundColor: ACCENT }}>
+                    <button disabled={busy || !teamId} onClick={() => register(true)} className="w-full h-12 rounded-md text-white text-[13px] font-semibold flex items-center justify-center gap-2 disabled:opacity-60" style={{ backgroundColor: ACCENT }}>
                       <CreditCard size={18} /> Pagar {fmtCLP(t.price)} con Mercado Pago
                     </button>
                   )}
-                  <button disabled={busy || !teamId} onClick={() => register(false)} className={`w-full h-12 rounded-md text-sm font-semibold border disabled:opacity-60 ${t.price ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!t.price ? { backgroundColor: ACCENT } : undefined}>
+                  <button disabled={busy || !teamId} onClick={() => register(false)} className={`w-full h-12 rounded-md text-[13px] font-semibold border disabled:opacity-60 ${t.price ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!t.price ? { backgroundColor: ACCENT } : undefined}>
                     {busy ? "Procesando…" : t.price ? "Inscribir y pagar en el recinto" : "Inscribir equipo"}
                   </button>
                 </div>
@@ -244,7 +244,7 @@ export default function TorneosPage() {
 
       {toast && (
         <div className="fixed inset-x-4 top-4 z-60" role="status" onClick={() => setToast(null)}>
-          <div className={`p-3.5 rounded-md text-sm font-semibold text-white ${toast.type === "ok" ? "bg-emerald-600" : "bg-rose-600"}`}>{toast.msg}</div>
+          <div className={`p-3.5 rounded-md text-[13px] font-semibold text-white ${toast.type === "ok" ? "bg-emerald-600" : "bg-rose-600"}`}>{toast.msg}</div>
         </div>
       )}
     </div>

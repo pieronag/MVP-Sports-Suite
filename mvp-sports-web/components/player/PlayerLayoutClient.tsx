@@ -14,7 +14,7 @@ import { Home, Calendar, MapPin, User, LogOut, Sun, Moon, Menu, X, Building2, Sh
 function PlayerNavItem({ href, icon: Icon, active, isDark, children }: { href: string; icon: any; active: boolean; isDark: boolean; children: React.ReactNode }) {
     return (
         <Link href={href} aria-current={active ? 'page' : undefined}
-            className={`group relative flex items-center gap-3.5 w-full min-h-[48px] pl-4 pr-3 py-3 text-[15px] font-semibold rounded-md transition-all ${active
+            className={`group relative flex items-center gap-3.5 w-full min-h-[48px] pl-4 pr-3 py-3 text-[14px] font-semibold rounded-md transition-all ${active
                 ? (isDark ? 'text-[#00df82] bg-linear-to-r from-[#00df82]/15 to-transparent' : 'text-emerald-700 bg-linear-to-r from-emerald-500/10 to-transparent')
                 : (isDark ? 'text-slate-400 hover:text-white hover:bg-white/5' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100')}`}>
             {active && <span className={`absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full ${isDark ? 'bg-[#00df82]' : 'bg-emerald-500'}`} />}
@@ -71,7 +71,7 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
             {mobileOpen && (
                 <div className={` fixed inset-0 z-50 flex flex-col ${isDark ? 'bg-[#0A101D] text-slate-300' : 'bg-white text-slate-700'}`}>
                     <div className={`shrink-0 px-4 py-3.5 border-b flex items-center justify-between ${isDark ? 'border-white/5' : 'border-slate-100'}`}>
-                        <BrandLogo size={34} wordmarkClassName="text-base" appearance={isDark ? "onDark" : "onLight"} />
+                        <BrandLogo size={34} wordmarkClassName="text-[15px]" appearance={isDark ? "onDark" : "onLight"} />
                         <div className="flex items-center gap-1">
                             <button aria-label="Cambiar tema" onClick={toggleTheme} className="p-2.5 rounded-md text-slate-400">{isDark ? <Sun size={22} /> : <Moon size={22} />}</button>
                             <button aria-label="Cerrar" onClick={() => setMobileOpen(false)} className="p-2.5 rounded-md text-slate-400"><X size={24} /></button>
@@ -84,18 +84,18 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
                                     {profile.photoURL ? <Image src={profile.photoURL} alt="" width={48} height={48} className="object-cover w-full h-full" /> : <User size={18} className="text-emerald-500" />}
                                 </div>
                                 <div className="min-w-0">
-                                    <p className={`text-base font-bold truncate font-heading ${isDark ? 'text-white' : 'text-slate-700'}`}>{profile.displayName || (profile as any).fullName || 'Jugador'}</p>
-                                    <p className="text-xs uppercase tracking-[0.12em] font-black text-slate-400">{profile.tier || 'Bronce'} · {profile.xp || 0} XP</p>
+                                    <p className={`text-[15px] font-bold truncate font-heading ${isDark ? 'text-white' : 'text-slate-700'}`}>{profile.displayName || (profile as any).fullName || 'Jugador'}</p>
+                                    <p className="text-[11px] uppercase tracking-[0.12em] font-black text-slate-400">{profile.tier || 'Bronce'} · {profile.xp || 0} XP</p>
                                 </div>
                             </Link>
                         )}
-                        <p className="px-4 pt-2 pb-2 text-[12px] font-semibold text-slate-400">Jugar</p>
+                        <p className="px-4 pt-2 pb-2 text-[11px] font-semibold text-slate-400">Jugar</p>
                         {playLinks.map(l => <PlayerNavItem key={l.href} href={l.href} icon={l.icon} active={isMenuActive(l.href)} isDark={isDark}>{l.label}</PlayerNavItem>)}
-                        <p className="px-4 pt-5 pb-2 text-[12px] font-semibold text-slate-400">Mi cuenta</p>
+                        <p className="px-4 pt-5 pb-2 text-[11px] font-semibold text-slate-400">Mi cuenta</p>
                         {accountLinks.map(l => <PlayerNavItem key={l.href} href={l.href} icon={l.icon} active={isMenuActive(l.href)} isDark={isDark}>{l.label}</PlayerNavItem>)}
                     </nav>
                     <div className={`p-2.5 border-t pb-[calc(0.625rem+env(safe-area-inset-bottom))] ${isDark ? 'border-white/5' : 'border-slate-100'}`}>
-                        <button onClick={handleLogout} className="flex items-center gap-3.5 w-full min-h-[48px] pl-4 pr-3 py-3 rounded-md text-[15px] font-semibold text-red-500 hover:bg-red-500/5"><LogOut size={22} /> Cerrar sesión</button>
+                        <button onClick={handleLogout} className="flex items-center gap-3.5 w-full min-h-[48px] pl-4 pr-3 py-3 rounded-md text-[14px] font-semibold text-red-500 hover:bg-red-500/5"><LogOut size={22} /> Cerrar sesión</button>
                     </div>
                 </div>
             )}
@@ -169,7 +169,7 @@ export default function PlayerLayoutClient({ children }: { children: React.React
                             </div>
                         </div>
                     </div>
-                    <p className="text-emerald-400 font-semibold text-[12px] uppercase tracking-[0.4em] mt-8 animate-pulse">Cargando...</p>
+                    <p className="text-emerald-400 font-semibold text-[11px] uppercase tracking-[0.4em] mt-8 animate-pulse">Cargando...</p>
                 </div>
             </div>
         );

@@ -285,7 +285,7 @@ export default function PartidosPage() {
         <button aria-label="Volver" onClick={() => router.push("/player/equipos")} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Partidos</h1>
+        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Partidos</h1>
         <div className="w-10" />
       </div>
 
@@ -307,7 +307,7 @@ export default function PartidosPage() {
                 const on = sportFilter === s;
                 return (
                   <button key={s || "all"} aria-pressed={on} onClick={() => { setSportFilter(s); setPositionFilter(""); }}
-                    className={`px-4 h-10 rounded-md text-[13px] font-semibold whitespace-nowrap shrink-0 transition-all active:scale-[0.97] ${on ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-white text-slate-700 border border-slate-200"}`}>
+                    className={`px-4 h-10 rounded-md text-[12px] font-semibold whitespace-nowrap shrink-0 transition-all active:scale-[0.97] ${on ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-white text-slate-700 border border-slate-200"}`}>
                     {s || "Todos"}
                   </button>
                 );
@@ -315,13 +315,13 @@ export default function PartidosPage() {
             </div>
             <div className="flex gap-2">
               <button onClick={() => setShowZone(v => !v)} aria-expanded={showZone}
-                className={`flex-1 h-11 rounded-md px-4 text-[13px] font-semibold flex items-center justify-between gap-2 border ${regionFilter ? "border-emerald-500/40 text-emerald-500" : isDark ? "bg-[#0A101D] text-slate-300 border-white/6" : "bg-white text-slate-700 border-slate-200"}`}>
+                className={`flex-1 h-11 rounded-md px-4 text-[12px] font-semibold flex items-center justify-between gap-2 border ${regionFilter ? "border-emerald-500/40 text-emerald-500" : isDark ? "bg-[#0A101D] text-slate-300 border-white/6" : "bg-white text-slate-700 border-slate-200"}`}>
                 <span className="flex items-center gap-2 min-w-0"><MapPin size={15} /><span className="truncate">{regionFilter ? `${regionFilter}${communeFilters.length ? ` · ${communeFilters.length} comuna${communeFilters.length > 1 ? "s" : ""}` : ""}` : "Todo Chile"}</span></span>
                 <ChevronDown size={15} className={`shrink-0 transition-transform ${showZone ? "rotate-180" : ""}`} />
               </button>
               {activeTab === "jugadores" && sportFilter && (POSITIONS_BY_SPORT[sportFilter] || []).length > 0 && (
                 <select value={positionFilter} onChange={e => setPositionFilter(e.target.value)} aria-label="Posición"
-                  className={`flex-1 h-11 rounded-md px-3 text-[13px] font-semibold outline-hidden border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-700 border-slate-200"}`}>
+                  className={`flex-1 h-11 rounded-md px-3 text-[12px] font-semibold outline-hidden border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-700 border-slate-200"}`}>
                   <option value="">Cualquier posición</option>
                   {(POSITIONS_BY_SPORT[sportFilter] || []).map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
@@ -330,7 +330,7 @@ export default function PartidosPage() {
             {showZone && (
               <div className={`rounded-md p-3 space-y-3 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`}>
                 <select value={regionFilter} onChange={e => { setRegionFilter(e.target.value); setCommuneFilters([]); }} aria-label="Región"
-                  className={`w-full h-11 rounded-md px-3 text-[13px] font-semibold outline-hidden border ${isDark ? "bg-[#020611] text-slate-200 border-white/6" : "bg-slate-50 text-slate-700 border-slate-200"}`}>
+                  className={`w-full h-11 rounded-md px-3 text-[12px] font-semibold outline-hidden border ${isDark ? "bg-[#020611] text-slate-200 border-white/6" : "bg-slate-50 text-slate-700 border-slate-200"}`}>
                   <option value="">Todo Chile</option>
                   {Object.keys(REGIONS).map(r => <option key={r} value={r}>{r}</option>)}
                 </select>
@@ -340,16 +340,16 @@ export default function PartidosPage() {
                       const selected = communeFilters.includes(c);
                       return (
                         <button key={c} aria-pressed={selected} onClick={() => setCommuneFilters(prev => selected ? prev.filter(x => x !== c) : [...prev, c])}
-                          className={`px-3 h-9 rounded-md text-[12px] font-medium transition-all ${selected ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{c}</button>
+                          className={`px-3 h-9 rounded-md text-[11px] font-medium transition-all ${selected ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{c}</button>
                       );
                     })}
                   </div>
                 )}
                 <div className="flex gap-2">
                   {(regionFilter || communeFilters.length > 0) && (
-                    <button onClick={() => { setRegionFilter(""); setCommuneFilters([]); }} className={`flex-1 h-10 rounded-md text-[12px] font-semibold ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>Quitar zona</button>
+                    <button onClick={() => { setRegionFilter(""); setCommuneFilters([]); }} className={`flex-1 h-10 rounded-md text-[11px] font-semibold ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>Quitar zona</button>
                   )}
-                  <button onClick={() => setShowZone(false)} className="flex-1 h-10 rounded-md text-[12px] font-semibold bg-emerald-500 text-white">Listo</button>
+                  <button onClick={() => setShowZone(false)} className="flex-1 h-10 rounded-md text-[11px] font-semibold bg-emerald-500 text-white">Listo</button>
                 </div>
               </div>
             )}
@@ -360,7 +360,7 @@ export default function PartidosPage() {
         {activeTab === "rival" && (
           <>
             <button onClick={openPublishTeam}
-                className="w-full h-[52px] rounded-md font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                className="w-full h-[52px] rounded-md font-semibold text-[11px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                 style={{ backgroundColor: "#10b981", color: "white" }}>
                 <Swords size={16} /> Publicar mi Equipo
             </button>
@@ -370,10 +370,10 @@ export default function PartidosPage() {
             ) : teams.filter(e => e.userId !== uid).length === 0 ? (
               <div className="py-16 flex flex-col items-center">
                 <Swords size={40} className={isDark ? "text-slate-600" : "text-slate-300"} strokeWidth={1} />
-                <p className={`text-sm font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay equipos buscando rival</p>
+                <p className={`text-[13px] font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay equipos buscando rival</p>
                 {(sportFilter || regionFilter) && (
                   <button onClick={() => { setCommuneFilters([]); if (communeFilters.length === 0) { setRegionFilter(""); if (!regionFilter) setSportFilter(""); } }}
-                    className="mt-4 px-5 h-10 rounded-md text-[13px] font-semibold bg-emerald-500 text-white">
+                    className="mt-4 px-5 h-10 rounded-md text-[12px] font-semibold bg-emerald-500 text-white">
                     {communeFilters.length > 0 ? "Buscar en toda la región" : regionFilter ? "Buscar en todo Chile" : "Ver todos los deportes"}
                   </button>
                 )}
@@ -398,7 +398,7 @@ export default function PartidosPage() {
                         <div className="p-4">
                           <div className="flex items-center justify-between">
                             <div className="flex-1 min-w-0">
-                              <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.teamName}</p>
+                              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.teamName}</p>
                               <div className="flex items-center gap-2 mt-1 flex-wrap">
                                 {entry.communes && entry.communes.length > 0 ? (
                                   <span className={`text-[11px] font-medium flex items-center gap-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}><MapPin size={9} />{entry.communes.slice(0, 2).join(", ")}{entry.communes.length > 2 ? ` +${entry.communes.length - 2}` : ""} · {entry.region}</span>
@@ -412,7 +412,7 @@ export default function PartidosPage() {
                               {alreadyChallenged ? "Retado" : "Ver"}
                             </button>
                           </div>
-                          {entry.description && <p className={`text-[12px] font-medium mt-2 leading-snug ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.description}</p>}
+                          {entry.description && <p className={`text-[11px] font-medium mt-2 leading-snug ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.description}</p>}
                         </div>
                       </div>
                     </GlowCard>
@@ -427,7 +427,7 @@ export default function PartidosPage() {
         {activeTab === "jugadores" && (
           <>
             <button onClick={() => setShowPublishPlayer(true)}
-              className="w-full h-[52px] rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+              className="w-full h-[52px] rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
               <User size={16} /> Estoy Disponible
             </button>
 
@@ -436,10 +436,10 @@ export default function PartidosPage() {
             ) : players.filter(e => e.userId !== uid).length === 0 ? (
               <div className="py-16 flex flex-col items-center">
                 <Users size={40} className={isDark ? "text-slate-600" : "text-slate-300"} strokeWidth={1} />
-                <p className={`text-sm font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay jugadores disponibles</p>
+                <p className={`text-[13px] font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay jugadores disponibles</p>
                 {(sportFilter || regionFilter) && (
                   <button onClick={() => { setCommuneFilters([]); if (communeFilters.length === 0) { setRegionFilter(""); if (!regionFilter) setSportFilter(""); } }}
-                    className="mt-4 px-5 h-10 rounded-md text-[13px] font-semibold bg-emerald-500 text-white">
+                    className="mt-4 px-5 h-10 rounded-md text-[12px] font-semibold bg-emerald-500 text-white">
                     {communeFilters.length > 0 ? "Buscar en toda la región" : regionFilter ? "Buscar en todo Chile" : "Ver todos los deportes"}
                   </button>
                 )}
@@ -457,8 +457,8 @@ export default function PartidosPage() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
-                              <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.displayName}</p>
-                              <span className="text-emerald-500 text-[13px] font-bold shrink-0 ml-2">OVR {entry.ovr}</span>
+                              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.displayName}</p>
+                              <span className="text-emerald-500 text-[12px] font-bold shrink-0 ml-2">OVR {entry.ovr}</span>
                             </div>
                             <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                               <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>{entry.position || "Jugador"}</span>
@@ -508,7 +508,7 @@ export default function PartidosPage() {
                             {entry.type === "team" ? <Swords size={20} className="text-emerald-500" /> : <User size={20} className="text-emerald-500" />}
                           </div>
                           <div className="flex-1">
-                            <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.type === "team" ? entry.teamName : "Disponible como jugador"}</p>
+                            <p className={`font-semibold text-[12px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.type === "team" ? entry.teamName : "Disponible como jugador"}</p>
                             <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.sport || entry.sports?.join(", ")}</p>
                           </div>
                           <button onClick={() => { setEditEntry(entry); setEditDesc(entry.description || ""); setEditSport(entry.sport || ""); setEditSports(entry.sports || []); }}
@@ -541,7 +541,7 @@ export default function PartidosPage() {
                                 <MessageCircle size={20} className={c.status === "active" ? "text-emerald-500" : c.status === "pending" ? "text-amber-500" : "text-slate-400"} />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+                                <p className={`font-semibold text-[12px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>
                                   {c.type === "team_vs_team" ? `vs ${otherName}` : `Chat con ${otherName}`}
                                 </p>
                                 <div className="flex items-center gap-2 mt-0.5">
@@ -578,7 +578,7 @@ export default function PartidosPage() {
                 {myEntries.filter(e => e.status === "active").length === 0 && challenges.length === 0 && (
                   <div className="py-16 flex flex-col items-center">
                     <MessageCircle size={40} className={isDark ? "text-slate-600" : "text-slate-300"} strokeWidth={1} />
-                    <p className={`text-sm font-medium mt-3 text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>No tienes actividades aún.<br />Publica tu equipo o disponibilidad.</p>
+                    <p className={`text-[13px] font-medium mt-3 text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>No tienes actividades aún.<br />Publica tu equipo o disponibilidad.</p>
                   </div>
                 )}
               </div>
@@ -592,19 +592,19 @@ export default function PartidosPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowPublishTeam(false)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Publicar mi Equipo</p>
+              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Publicar mi Equipo</p>
               <button aria-label="Cerrar" onClick={() => setShowPublishTeam(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
             </div>
             <div className="mb-4">
               <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipo</label>
               {availableTeams.length === 0 ? (
-                <div className={`w-full h-11 rounded-md flex items-center px-4 text-sm font-medium border ${isDark ? "bg-white/4 text-slate-500 border-white/6" : "bg-slate-50 text-slate-400 border-slate-200"}`}>
+                <div className={`w-full h-11 rounded-md flex items-center px-4 text-[13px] font-medium border ${isDark ? "bg-white/4 text-slate-500 border-white/6" : "bg-slate-50 text-slate-400 border-slate-200"}`}>
                   {userTeams.length === 0 ? "No tienes equipos. Crea uno primero." : "Todos tus equipos ya están publicados"}
                 </div>
               ) : (
                 <div className="relative">
                   <select value={selectedTeam} onChange={e => { setSelectedTeam(e.target.value); const s = teamSport(userTeams.find(t => t.id === e.target.value)); if (s) setPublishSport(s); }}
-                    className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
+                    className={`w-full h-11 rounded-md px-4 text-[13px] font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
                     style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
                     <option value="">Seleccionar equipo</option>
                     {availableTeams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
@@ -617,7 +617,7 @@ export default function PartidosPage() {
               <div className="relative">
                 <select value={publishSport} onChange={e => setPublishSport(e.target.value)}
                   disabled={!!teamSport(userTeams.find(t => t.id === selectedTeam))}
-                  className={`w-full h-11 disabled:opacity-60 disabled:cursor-not-allowed rounded-md px-4 text-sm font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
+                  className={`w-full h-11 disabled:opacity-60 disabled:cursor-not-allowed rounded-md px-4 text-[13px] font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
                   style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
                   {SPORTS.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
@@ -626,13 +626,13 @@ export default function PartidosPage() {
             <div className="mb-4">
               <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción (opcional)</label>
               <input value={publishDesc} onChange={e => setPublishDesc(e.target.value)} placeholder="Ej: Buscamos rival para este sábado"
-                className={`w-full h-11 rounded-md px-3 text-sm font-medium outline-hidden border ${isDark ? "bg-white/6 text-slate-200 border-white/6 placeholder-slate-500" : "bg-slate-50 text-slate-900 border-slate-200 placeholder-slate-400"}`} />
+                className={`w-full h-11 rounded-md px-3 text-[13px] font-medium outline-hidden border ${isDark ? "bg-white/6 text-slate-200 border-white/6 placeholder-slate-500" : "bg-slate-50 text-slate-900 border-slate-200 placeholder-slate-400"}`} />
             </div>
             <div className="mb-4">
               <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Región</label>
               <div className="relative">
                 <select value={publishRegion} onChange={e => { setPublishRegion(e.target.value); setPublishCommunes([]); }}
-                  className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
+                  className={`w-full h-11 rounded-md px-4 text-[13px] font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
                   style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
                   <option value="">Seleccionar región</option>
                   {Object.keys(REGIONS).map(r => <option key={r} value={r}>{r}</option>)}
@@ -647,7 +647,7 @@ export default function PartidosPage() {
                     const selected = publishCommunes.includes(c);
                     return (
                       <button key={c} type="button" onClick={() => setPublishCommunes(prev => selected ? prev.filter(x => x !== c) : [...prev, c])}
-                        className={`px-2.5 py-1 hover:scale-[1.02] active:scale-95 rounded-md text-[12px] font-medium transition-all ${selected ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{c}</button>
+                        className={`px-2.5 py-1 hover:scale-[1.02] active:scale-95 rounded-md text-[11px] font-medium transition-all ${selected ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{c}</button>
                     );
                   })}
                 </div>
@@ -655,7 +655,7 @@ export default function PartidosPage() {
               </div>
             )}
             <button onClick={handlePublishTeam} disabled={actionLoading || !selectedTeam}
-              className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
+              className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
               {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Publicar Equipo"}
             </button>
           </div>
@@ -667,7 +667,7 @@ export default function PartidosPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowPublishPlayer(false)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Estoy Disponible</p>
+              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Estoy Disponible</p>
               <button aria-label="Cerrar" onClick={() => setShowPublishPlayer(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
             </div>
             <div className={`p-4 rounded-md mb-4 ${isDark ? "bg-white/4" : "bg-slate-50"}`}>
@@ -676,7 +676,7 @@ export default function PartidosPage() {
                   {playerPhoto ? <img src={playerPhoto} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User size={18} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
                 </div>
                 <div>
-                  <p className={`font-semibold text-sm ${isDark ? "text-slate-100" : "text-slate-900"}`}>{playerName}</p>
+                  <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{playerName}</p>
                   <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{playerPosition} · OVR {playerOvr} · {playerTier}</p>
                 </div>
               </div>
@@ -686,7 +686,7 @@ export default function PartidosPage() {
               <div className="flex flex-wrap gap-2">
                 {SPORTS.map(s => (
                   <button key={s} onClick={() => toggleSport(s)}
-                    className={`px-3 py-1.5 rounded-md text-[12px] font-semibold transition-all ${isSportToggled(s) ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{s}</button>
+                    className={`px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all ${isSportToggled(s) ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{s}</button>
                 ))}
               </div>
             </div>
@@ -694,7 +694,7 @@ export default function PartidosPage() {
               <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Región</label>
               <div className="relative">
                 <select value={publishRegion} onChange={e => { setPublishRegion(e.target.value); setPublishCommunes([]); }}
-                  className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
+                  className={`w-full h-11 rounded-md px-4 text-[13px] font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
                   style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
                   <option value="">Seleccionar región</option>
                   {Object.keys(REGIONS).map(r => <option key={r} value={r}>{r}</option>)}
@@ -709,7 +709,7 @@ export default function PartidosPage() {
                     const selected = publishCommunes.includes(c);
                     return (
                       <button key={c} type="button" onClick={() => setPublishCommunes(prev => selected ? prev.filter(x => x !== c) : [...prev, c])}
-                        className={`px-2.5 py-1 hover:scale-[1.02] active:scale-95 rounded-md text-[12px] font-medium transition-all ${selected ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{c}</button>
+                        className={`px-2.5 py-1 hover:scale-[1.02] active:scale-95 rounded-md text-[11px] font-medium transition-all ${selected ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{c}</button>
                     );
                   })}
                 </div>
@@ -719,10 +719,10 @@ export default function PartidosPage() {
             <div className="mb-4">
               <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Comentario (opcional)</label>
               <input value={publishDesc} onChange={e => setPublishDesc(e.target.value)} placeholder="Ej: Busco partidos los fines de semana"
-                className={`w-full h-11 rounded-md px-3 text-sm font-medium outline-hidden border ${isDark ? "bg-white/6 text-slate-200 border-white/6 placeholder-slate-500" : "bg-slate-50 text-slate-900 border-slate-200 placeholder-slate-400"}`} />
+                className={`w-full h-11 rounded-md px-3 text-[13px] font-medium outline-hidden border ${isDark ? "bg-white/6 text-slate-200 border-white/6 placeholder-slate-500" : "bg-slate-50 text-slate-900 border-slate-200 placeholder-slate-400"}`} />
             </div>
             <button onClick={handlePublishPlayer} disabled={actionLoading || publishSports.length === 0}
-              className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
+              className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
               {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Publicar Disponibilidad"}
             </button>
           </div>
@@ -734,20 +734,20 @@ export default function PartidosPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowTeamSelector(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Retar a {showTeamSelector.teamName}</p>
+              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Retar a {showTeamSelector.teamName}</p>
               <button aria-label="Cerrar" onClick={() => setShowTeamSelector(null)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
             </div>
-            <p className={`text-[12px] font-medium mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Selecciona con qué equipo quieres retar:</p>
+            <p className={`text-[11px] font-medium mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Selecciona con qué equipo quieres retar:</p>
             <div className="space-y-2 mb-5">
               {userCaptainTeams.map(t => (
                 <button key={t.id} onClick={async () => { setShowTeamSelector(null); setConfirmChallenge({ entry: showTeamSelector, team: t }); }}
                   className={`w-full p-4 rounded-md border text-left transition-all active:scale-[0.98] ${isDark ? "bg-[#0A101D] border-white/6 hover:bg-white/4" : "bg-white border-slate-200 hover:bg-slate-50"}`}>
-                  <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{t.name}</p>
+                  <p className={`font-semibold text-[12px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{t.name}</p>
                   <p className={`text-[11px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{(t.sport || "").charAt(0).toUpperCase() + (t.sport || "").slice(1)} · {t.members?.length || 1} jugadores</p>
                 </button>
               ))}
             </div>
-            <button onClick={() => setShowTeamSelector(null)} className={`w-full py-3 rounded-md font-semibold text-xs ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+            <button onClick={() => setShowTeamSelector(null)} className={`w-full py-3 rounded-md font-semibold text-[11px] ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
           </div>
         </div>
       )}
@@ -759,13 +759,13 @@ export default function PartidosPage() {
             <div className="w-16 h-16 rounded-md bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
               <Swords size={28} className="text-emerald-500" />
             </div>
-            <p className={`font-semibold text-[15px] mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Retar a {confirmChallenge.entry.teamName}?</p>
-            <p className={`text-[12px] font-medium mb-1 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Con tu equipo:</p>
-            <p className={`font-semibold text-[13px] mb-5 ${isDark ? "text-slate-200" : "text-slate-700"}`}>{confirmChallenge.team.name} · {confirmChallenge.entry.sport.toUpperCase()}</p>
+            <p className={`font-semibold text-[14px] mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Retar a {confirmChallenge.entry.teamName}?</p>
+            <p className={`text-[11px] font-medium mb-1 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Con tu equipo:</p>
+            <p className={`font-semibold text-[12px] mb-5 ${isDark ? "text-slate-200" : "text-slate-700"}`}>{confirmChallenge.team.name} · {confirmChallenge.entry.sport.toUpperCase()}</p>
             <div className="flex gap-3">
-              <button onClick={() => setConfirmChallenge(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+              <button onClick={() => setConfirmChallenge(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
               <button onClick={() => executeChallenge(confirmChallenge.entry, confirmChallenge.team)} disabled={actionLoading}
-                className="flex-1 py-3.5 rounded-md bg-emerald-500 text-white font-semibold text-sm disabled:opacity-50 flex items-center justify-center">
+                className="flex-1 py-3.5 rounded-md bg-emerald-500 text-white font-semibold text-[13px] disabled:opacity-50 flex items-center justify-center">
                 {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Confirmar Reto"}
               </button>
             </div>
@@ -781,16 +781,16 @@ export default function PartidosPage() {
               <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
               <button aria-label="Cerrar" onClick={() => { setShowChallengeDetail(null); setChallengeTeamData(null); }} className="absolute top-4 right-4 w-8 h-8 rounded-md bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
               <div className="absolute bottom-4 left-5 right-5">
-                <p className="text-white text-base font-semibold">{showChallengeDetail.type === "team_vs_team" ? (showChallengeDetail.senderId === uid ? showChallengeDetail.challengedTeamName : showChallengeDetail.challengerTeamName) : ""}</p>
-                <p className="text-white/70 text-[12px] font-medium mt-0.5">{showChallengeDetail.sport} · {showChallengeDetail.status === "pending" ? "Challenge pendiente" : showChallengeDetail.status === "active" ? "Challenge activo" : "Challenge cerrado"}</p>
+                <p className="text-white text-[15px] font-semibold">{showChallengeDetail.type === "team_vs_team" ? (showChallengeDetail.senderId === uid ? showChallengeDetail.challengedTeamName : showChallengeDetail.challengerTeamName) : ""}</p>
+                <p className="text-white/70 text-[11px] font-medium mt-0.5">{showChallengeDetail.sport} · {showChallengeDetail.status === "pending" ? "Challenge pendiente" : showChallengeDetail.status === "active" ? "Challenge activo" : "Challenge cerrado"}</p>
               </div>
             </div>
             <div className="p-5 space-y-4 max-h-[55vh] overflow-y-auto">
               {challengeTeamData ? (
                 <>
                   <div className="flex items-center justify-between p-3 rounded-md" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
-                    <p className={`text-[12px] font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>MIEMBROS</p>
-                    <span className={`text-[13px] font-semibold ${isDark ? "text-slate-200" : "text-slate-800"}`}>{challengeTeamData.team.members.length}</span>
+                    <p className={`text-[11px] font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>MIEMBROS</p>
+                    <span className={`text-[12px] font-semibold ${isDark ? "text-slate-200" : "text-slate-800"}`}>{challengeTeamData.team.members.length}</span>
                   </div>
                   <div className="space-y-1.5">
                     <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>JUGADORES</p>
@@ -803,9 +803,9 @@ export default function PartidosPage() {
                               {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : <User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-[12px] font-medium truncate ${isDark ? "text-slate-200" : "text-slate-700"}`}>{p.displayName || "Jugador MVP"}{mid === challengeTeamData.team.ownerId ? " (C)" : ""}</p>
+                              <p className={`text-[11px] font-medium truncate ${isDark ? "text-slate-200" : "text-slate-700"}`}>{p.displayName || "Jugador MVP"}{mid === challengeTeamData.team.ownerId ? " (C)" : ""}</p>
                             </div>
-                            <span className="text-emerald-500 text-[12px] font-semibold shrink-0">OVR {p.ovr || 40}</span>
+                            <span className="text-emerald-500 text-[11px] font-semibold shrink-0">OVR {p.ovr || 40}</span>
                           </div>
                         );
                       })}
@@ -818,9 +818,9 @@ export default function PartidosPage() {
               {showChallengeDetail.status === "pending" && showChallengeDetail.receiverId === uid && (
                 <div className="flex gap-3 pt-2">
                   <button onClick={() => setConfirmAction({ challengeId: showChallengeDetail.id, action: "accept" })}
-                    className="flex-1 h-11 rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wide transition-all active:scale-[0.98] shadow-xs shadow-emerald-500/25">Aceptar</button>
+                    className="flex-1 h-11 rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wide transition-all active:scale-[0.98] shadow-xs shadow-emerald-500/25">Aceptar</button>
                   <button onClick={() => setConfirmAction({ challengeId: showChallengeDetail.id, action: "decline" })}
-                    className="flex-1 h-11 rounded-md bg-red-500 text-white font-semibold text-[12px] uppercase tracking-wide transition-all active:scale-[0.98]">Rechazar</button>
+                    className="flex-1 h-11 rounded-md bg-red-500 text-white font-semibold text-[11px] uppercase tracking-wide transition-all active:scale-[0.98]">Rechazar</button>
                 </div>
               )}
             </div>
@@ -835,20 +835,20 @@ export default function PartidosPage() {
             <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 ${confirmAction.action === "accept" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
               {confirmAction.action === "accept" ? <CheckCircle2 size={28} className="text-emerald-500" /> : <X size={28} className="text-red-500" />}
             </div>
-            <p className={`font-semibold text-[15px] mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
+            <p className={`font-semibold text-[14px] mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
               {confirmAction.action === "accept" ? "¿Aceptar challenge?" : "¿Rechazar challenge?"}
             </p>
-            <p className={`text-[12px] font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+            <p className={`text-[11px] font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
               {confirmAction.action === "accept" ? "Se abrirá un chat con el capitán del equipo rival." : "El equipo rival será notificado de tu decisión."}
             </p>
             <div className="flex gap-3">
-              <button onClick={() => setConfirmAction(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+              <button onClick={() => setConfirmAction(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
               <button onClick={async () => {
                 const c = confirmAction; setConfirmAction(null); setShowChallengeDetail(null); setChallengeTeamData(null);
                 if (c.action === "accept") await handleAcceptChallenge(c.challengeId);
                 else await handleDeclineChallenge(c.challengeId);
               }} disabled={actionLoading}
-                className="flex-1 py-3.5 rounded-md font-semibold text-sm text-white disabled:opacity-50 flex items-center justify-center"
+                className="flex-1 py-3.5 rounded-md font-semibold text-[13px] text-white disabled:opacity-50 flex items-center justify-center"
                 style={{ backgroundColor: confirmAction.action === "accept" ? "#10b981" : "#ef4444" }}>
                 {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : (confirmAction.action === "accept" ? "Aceptar" : "Rechazar")}
               </button>
@@ -869,20 +869,20 @@ export default function PartidosPage() {
                   <span className="bg-emerald-500 px-2.5 py-1 rounded-md text-white font-semibold text-[11px] uppercase">{showTeamDetail.sport.toUpperCase()}</span>
                   <span className="bg-black/40 px-2.5 py-1 rounded-md text-white/80 text-[11px] font-medium">{showTeamDetail.memberCount} jugadores</span>
                 </div>
-                <p className="text-white text-lg font-semibold">{showTeamDetail.teamName}</p>
+                <p className="text-white text-[16px] font-semibold">{showTeamDetail.teamName}</p>
               </div>
             </div>
             <div className="p-5 space-y-4 max-h-[60vh] overflow-y-auto">
               {((showTeamDetail.communes && showTeamDetail.communes.length > 0) || showTeamDetail.region) && (
                 <div className="flex items-center gap-2">
                   <MapPin size={14} className="text-emerald-500 shrink-0" />
-                  <span className={`text-[12px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
+                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
                     {showTeamDetail.communes?.slice(0, 3).join(", ")}{showTeamDetail.communes && showTeamDetail.communes.length > 3 ? ` +${showTeamDetail.communes.length - 3}` : ""} · {showTeamDetail.region}
                   </span>
                 </div>
               )}
               {showTeamDetail.description && (
-                <p className={`text-[12px] font-medium leading-snug ${isDark ? "text-slate-400" : "text-slate-500"}`}>{showTeamDetail.description}</p>
+                <p className={`text-[11px] font-medium leading-snug ${isDark ? "text-slate-400" : "text-slate-500"}`}>{showTeamDetail.description}</p>
               )}
               {/* Team Stats */}
               {teamDetailData && (
@@ -898,7 +898,7 @@ export default function PartidosPage() {
                           <div className="w-8 h-8 rounded-md overflow-hidden shrink-0" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
                             {ownerProfile?.photoURL ? <img src={ownerProfile.photoURL} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
                           </div>
-                          <span className={`text-[13px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{ownerName}</span>
+                          <span className={`text-[12px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{ownerName}</span>
                         </div>
                       </div>
                     );
@@ -909,8 +909,8 @@ export default function PartidosPage() {
                     const avg = Math.round(ovrs.reduce((a: number, b: number) => a + b, 0) / ovrs.length);
                     return (
                       <div className="flex items-center justify-between p-3 rounded-md" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
-                        <p className={`text-[12px] font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>OVR PROMEDIO</p>
-                        <span className="text-emerald-500 text-[16px] font-bold">{avg}</span>
+                        <p className={`text-[11px] font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>OVR PROMEDIO</p>
+                        <span className="text-emerald-500 text-[15px] font-bold">{avg}</span>
                       </div>
                     );
                   })()}
@@ -927,9 +927,9 @@ export default function PartidosPage() {
                               {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : <User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className={`text-[12px] font-medium truncate ${isDark ? "text-slate-200" : "text-slate-700"}`}>{p.displayName || "Jugador MVP"}{isOwner ? " (C)" : ""}</p>
+                              <p className={`text-[11px] font-medium truncate ${isDark ? "text-slate-200" : "text-slate-700"}`}>{p.displayName || "Jugador MVP"}{isOwner ? " (C)" : ""}</p>
                             </div>
-                            <span className="text-emerald-500 text-[12px] font-semibold shrink-0">OVR {p.ovr || 40}</span>
+                            <span className="text-emerald-500 text-[11px] font-semibold shrink-0">OVR {p.ovr || 40}</span>
                           </div>
                         );
                       })}
@@ -941,7 +941,7 @@ export default function PartidosPage() {
                 <div className="flex justify-center py-4"><div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
               )}
               <button onClick={() => { if (!teamDetailData) return; const e = showTeamDetail; setShowTeamDetail(null); setTeamDetailData(null); handleChallenge(e); }} disabled={actionLoading || !teamDetailData}
-                className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50">
+                className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50">
                 {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><Swords size={16} /> Retar a este equipo</>}
               </button>
             </div>
@@ -958,14 +958,14 @@ export default function PartidosPage() {
               <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/20 to-transparent" />
               <button aria-label="Cerrar" onClick={() => setShowPlayerDetail(null)} className="absolute top-4 right-4 w-8 h-8 rounded-md bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
               <div className="absolute bottom-5 left-5 right-5">
-                <p className="text-white text-xl font-semibold">{showPlayerDetail.displayName}</p>
+                <p className="text-white text-[18px] font-semibold">{showPlayerDetail.displayName}</p>
               </div>
             </div>
             <div className="p-5 space-y-4">
               {/* Position & OVR row */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className={`text-[12px] font-semibold px-2.5 py-1 rounded-md ${isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>{showPlayerDetail.position || "Jugador"}</span>
+                  <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-md ${isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>{showPlayerDetail.position || "Jugador"}</span>
                   <span className={`text-[11px] font-medium px-2 py-0.5 rounded-md ${isDark ? "bg-white/6 text-slate-400" : "bg-slate-100 text-slate-500"}`}>{showPlayerDetail.tier}</span>
                 </div>
                 <span className="text-emerald-500 text-[17px] font-bold">OVR {showPlayerDetail.ovr}</span>
@@ -975,7 +975,7 @@ export default function PartidosPage() {
                 <div className="space-y-1.5">
                   <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>DEPORTES</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {showPlayerDetail.sports.map(s => <span key={s} className={`text-[12px] font-medium px-2.5 py-1 rounded-md ${isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>{s}</span>)}
+                    {showPlayerDetail.sports.map(s => <span key={s} className={`text-[11px] font-medium px-2.5 py-1 rounded-md ${isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>{s}</span>)}
                   </div>
                 </div>
               )}
@@ -984,18 +984,18 @@ export default function PartidosPage() {
                   <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>UBICACIÓN</p>
                   <div className="flex items-center gap-2">
                     <MapPin size={14} className="text-emerald-500 shrink-0" />
-                    <span className={`text-[12px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>{showPlayerDetail.communes?.slice(0, 2).join(", ")} · {showPlayerDetail.region}</span>
+                    <span className={`text-[11px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>{showPlayerDetail.communes?.slice(0, 2).join(", ")} · {showPlayerDetail.region}</span>
                   </div>
                 </div>
               )}
               {showPlayerDetail.description && (
                 <div className="space-y-1.5">
                   <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>COMENTARIO</p>
-                  <p className={`text-[12px] font-medium leading-snug ${isDark ? "text-slate-400" : "text-slate-500"}`}>{showPlayerDetail.description}</p>
+                  <p className={`text-[11px] font-medium leading-snug ${isDark ? "text-slate-400" : "text-slate-500"}`}>{showPlayerDetail.description}</p>
                 </div>
               )}
               <button onClick={() => { const e = showPlayerDetail; setShowPlayerDetail(null); handleContact(e); }} disabled={actionLoading}
-                className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50">
+                className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50">
                 {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><MessageCircle size={16} /> Contactar Jugador</>}
               </button>
             </div>
@@ -1008,12 +1008,12 @@ export default function PartidosPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowCloseConfirm(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 bg-red-500/10"><X size={28} className="text-red-500" /></div>
-            <p className={`font-semibold text-[15px] mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Retirar publicación?</p>
-            <p className={`text-[12px] font-medium mb-6 wrap-break-word ${isDark ? "text-slate-400" : "text-slate-500"}`}>
+            <p className={`font-semibold text-[14px] mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Retirar publicación?</p>
+            <p className={`text-[11px] font-medium mb-6 wrap-break-word ${isDark ? "text-slate-400" : "text-slate-500"}`}>
               {showCloseConfirm.type === "team" ? showCloseConfirm.teamName : "Tu disponibilidad como jugador"} dejará de aparecer en Partidos.
             </p>
             <div className="flex gap-3">
-              <button onClick={() => setShowCloseConfirm(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Volver</button>
+              <button onClick={() => setShowCloseConfirm(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Volver</button>
               <button disabled={actionLoading} onClick={async () => {
                 const e = showCloseConfirm; setActionLoading(true);
                 try {
@@ -1022,7 +1022,7 @@ export default function PartidosPage() {
                   setShowCloseConfirm(null);
                 } catch { setShowCloseConfirm(null); setFeedback({ type: "error", msg: "No se pudo retirar la publicación." }); }
                 finally { setActionLoading(false); }
-              }} className="flex-1 py-3.5 rounded-md font-semibold text-sm text-white bg-red-500 disabled:opacity-50">Retirar</button>
+              }} className="flex-1 py-3.5 rounded-md font-semibold text-[13px] text-white bg-red-500 disabled:opacity-50">Retirar</button>
             </div>
           </div>
         </div>
@@ -1033,11 +1033,11 @@ export default function PartidosPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setEditEntry(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar Publicación</p>
+              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar Publicación</p>
               <button aria-label="Cerrar" onClick={() => setEditEntry(null)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
             </div>
             <div className={`p-4 rounded-md mb-4 ${isDark ? "bg-white/4" : "bg-slate-50"}`}>
-              <p className={`font-semibold text-sm ${isDark ? "text-slate-100" : "text-slate-900"}`}>{editEntry.type === "team" ? editEntry.teamName : "Disponible como jugador"}</p>
+              <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{editEntry.type === "team" ? editEntry.teamName : "Disponible como jugador"}</p>
               <p className={`text-[11px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{editEntry.sport || editEntry.sports?.join(", ")}</p>
             </div>
             {/* Edit Sport for team */}
@@ -1046,7 +1046,7 @@ export default function PartidosPage() {
                 <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
                 <div className="relative">
                   <select value={editSport} onChange={e => setEditSport(e.target.value)}
-                    className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
+                    className={`w-full h-11 rounded-md px-4 text-[13px] font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
                     style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
                     {SPORTS.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
@@ -1060,7 +1060,7 @@ export default function PartidosPage() {
                 <div className="flex flex-wrap gap-2">
                   {SPORTS.map(s => (
                     <button key={s} onClick={() => setEditSports(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])}
-                      className={`px-3 py-1.5 rounded-md text-[12px] font-semibold transition-all ${editSports.includes(s) ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{s}</button>
+                      className={`px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all ${editSports.includes(s) ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{s}</button>
                   ))}
                 </div>
               </div>
@@ -1068,10 +1068,10 @@ export default function PartidosPage() {
             <div className="mb-5">
               <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción</label>
               <input value={editDesc} onChange={e => setEditDesc(e.target.value)} placeholder="Descripción de tu publicación"
-                className={`w-full h-11 rounded-md px-4 text-sm font-semibold outline-hidden border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6 placeholder-slate-500" : "bg-white text-slate-900 border-slate-200 placeholder-slate-400"}`} />
+                className={`w-full h-11 rounded-md px-4 text-[13px] font-semibold outline-hidden border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6 placeholder-slate-500" : "bg-white text-slate-900 border-slate-200 placeholder-slate-400"}`} />
             </div>
             <button onClick={handleEditSave} disabled={actionLoading}
-              className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
+              className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
               {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Guardar Cambios"}
             </button>
           </div>
@@ -1085,8 +1085,8 @@ export default function PartidosPage() {
             <div className={`w-14 h-14 rounded-md flex items-center justify-center mx-auto mb-4 ${feedback.type === "success" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
               {feedback.type === "success" ? <CheckCircle2 size={28} className="text-emerald-500" /> : <X size={28} className="text-red-500" />}
             </div>
-            <p className={`text-sm font-semibold mb-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{feedback.msg}</p>
-            <button onClick={() => setFeedback(null)} className={`w-full py-3 rounded-md font-semibold text-sm ${feedback.type === "success" ? "bg-emerald-500 text-white" : "bg-red-500 text-white"}`}>Entendido</button>
+            <p className={`text-[13px] font-semibold mb-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{feedback.msg}</p>
+            <button onClick={() => setFeedback(null)} className={`w-full py-3 rounded-md font-semibold text-[13px] ${feedback.type === "success" ? "bg-emerald-500 text-white" : "bg-red-500 text-white"}`}>Entendido</button>
           </div>
         </div>
       )}

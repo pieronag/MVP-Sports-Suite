@@ -99,11 +99,11 @@ function InputRow({ icon: Icon, color, label, value, onChange, error, maxLength,
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <label className={`text-[12px] font-semibold uppercase tracking-wide ${error ? "text-red-500" : (isDark ? "text-slate-500" : "text-slate-400")}`}>{label}</label>
+          <label className={`text-[11px] font-semibold uppercase tracking-wide ${error ? "text-red-500" : (isDark ? "text-slate-500" : "text-slate-400")}`}>{label}</label>
           {error && <span className="text-[11px] font-bold text-red-500 tracking-wide">INVÁLIDO</span>}
         </div>
         <input type={type} value={value} onChange={(e) => onChange(e.target.value)} maxLength={maxLength}
-          className={`w-full bg-transparent text-base font-medium outline-hidden mt-0.5 transition-colors ${error ? "text-red-500 placeholder-red-300" : (isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400")}`}
+          className={`w-full bg-transparent text-[15px] font-medium outline-hidden mt-0.5 transition-colors ${error ? "text-red-500 placeholder-red-300" : (isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400")}`}
         />
       </div>
     </div>
@@ -132,8 +132,8 @@ function SelectRow({ icon: Icon, color, label, value, options, onSelect, disable
           {renderIcon()}
         </div>
         <div className="flex-1 text-left min-w-0">
-          <p className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{label}</p>
-          <p className={`text-[15px] font-medium truncate ${disabled ? (isDark ? "text-slate-600" : "text-slate-400") : (isDark ? "text-slate-100" : "text-slate-900")}`}>
+          <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{label}</p>
+          <p className={`text-[14px] font-medium truncate ${disabled ? (isDark ? "text-slate-600" : "text-slate-400") : (isDark ? "text-slate-100" : "text-slate-900")}`}>
             {disabled ? "Elige deporte primero..." : (value || "Toca para elegir")}
           </p>
         </div>
@@ -150,7 +150,7 @@ function SelectRow({ icon: Icon, color, label, value, options, onSelect, disable
             const ic = OptIcon ? <OptIcon color={value === opt ? "white" : isDark ? "#94a3b8" : "#64748b"} size={16} /> : null;
             return (
               <button key={opt} type="button" onClick={() => { onSelect(opt); setOpen(false); }}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200 active:scale-95 ${value === opt ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-md text-[13px] font-medium transition-all duration-200 active:scale-95 ${value === opt ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
                 {ic}{opt}
               </button>
             );
@@ -334,7 +334,7 @@ export default function PreferenciasPage() {
       <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
+          <p className="text-emerald-400 text-[11px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
         </div>
       </div>
     );
@@ -347,7 +347,7 @@ export default function PreferenciasPage() {
         <button aria-label="Volver" onClick={handleBack} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Ajustes</h1>
+        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Ajustes</h1>
         <button aria-label="Guardar cambios" onClick={handleSave} disabled={saving}
           className="w-10 h-10 rounded-md flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 transition-all active:scale-90">
           {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save size={18} className="text-white" />}
@@ -359,7 +359,7 @@ export default function PreferenciasPage() {
         <div className="mx-5 mt-5 mb-3 p-4 rounded-md bg-red-500/10 border border-red-500/20">
           <div className="flex items-center gap-2.5 mb-2">
             <AlertCircle size={16} className="text-red-400" />
-            <span className="text-red-400 font-semibold text-xs uppercase tracking-wide">Perfil Incompleto</span>
+            <span className="text-red-400 font-semibold text-[11px] uppercase tracking-wide">Perfil Incompleto</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {!formData.displayName && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[11px] font-semibold uppercase tracking-wide">Nombre</span>}
@@ -379,11 +379,11 @@ export default function PreferenciasPage() {
               {profile?.photoURL ? <Image src={profile.photoURL} alt="" width={64} height={64} className="object-cover w-full h-full" /> : <User size={28} className="text-emerald-500" />}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-heading font-black text-lg truncate">{formData.displayName || "Jugador"}</h2>
-              <p className={`text-xs font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{user?.email}</p>
+              <h2 className="font-heading font-black text-[16px] truncate">{formData.displayName || "Jugador"}</h2>
+              <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{user?.email}</p>
             </div>
             <div className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-emerald-500/10">
-              <span className="text-emerald-400 text-xs font-semibold">{profile?.xp || 0} XP</span>
+              <span className="text-emerald-400 text-[11px] font-semibold">{profile?.xp || 0} XP</span>
             </div>
           </div>
         </GlowCard>
@@ -459,7 +459,7 @@ export default function PreferenciasPage() {
               <div className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${isDark ? "bg-amber-500/10" : "bg-slate-200"}`}>
                 {isDark ? <Moon size={20} className="text-amber-400" /> : <Sun size={20} className="text-slate-600" />}
               </div>
-              <span className="flex-1 text-left text-[15px] font-medium">Modo Oscuro</span>
+              <span className="flex-1 text-left text-[14px] font-medium">Modo Oscuro</span>
               <div className={`w-11 h-6 rounded-full relative transition-colors duration-300 ${isDark ? "bg-emerald-500" : "bg-slate-300"}`}>
                 <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 shadow-sm ${isDark ? "left-6" : "left-1"}`} />
               </div>
@@ -476,7 +476,7 @@ export default function PreferenciasPage() {
             <div className="w-10 h-10 rounded-md flex items-center justify-center shrink-0 bg-rose-500/15">
               <Lock size={20} className="text-rose-400" />
             </div>
-            <span className="flex-1 text-left text-[15px] font-medium">Cambiar Contraseña</span>
+            <span className="flex-1 text-left text-[14px] font-medium">Cambiar Contraseña</span>
             <ChevronRight size={16} className="text-emerald-500" />
           </button>
           <div className={`h-px ${isDark ? "bg-white/6" : "bg-slate-100"}`} />
@@ -484,7 +484,7 @@ export default function PreferenciasPage() {
             <div className="w-10 h-10 rounded-md flex items-center justify-center shrink-0 bg-blue-500/15">
               <Shield size={20} className="text-blue-400" />
             </div>
-            <span className="flex-1 text-left text-[15px] font-medium">Soporte</span>
+            <span className="flex-1 text-left text-[14px] font-medium">Soporte</span>
             <ChevronRight size={16} className="text-emerald-500" />
           </button>
         </GlowCard>
@@ -493,11 +493,11 @@ export default function PreferenciasPage() {
       {/* Actions */}
       <div className="px-5 mt-6 space-y-3">
         <button onClick={() => setShowSignOutModal(true)}
-          className={`w-full py-4 rounded-md flex items-center justify-center gap-2.5 font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
+          className={`w-full py-4 rounded-md flex items-center justify-center gap-2.5 font-semibold text-[13px] transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
           <LogOut size={18} /> Cerrar Sesión
         </button>
         <button onClick={() => setShowDeleteModal(true)}
-          className="w-full py-4 rounded-md flex items-center justify-center gap-2.5 font-semibold text-sm bg-red-500/10 text-red-400 border border-red-500/20 transition-all active:scale-[0.98] hover:bg-red-500/15">
+          className="w-full py-4 rounded-md flex items-center justify-center gap-2.5 font-semibold text-[13px] bg-red-500/10 text-red-400 border border-red-500/20 transition-all active:scale-[0.98] hover:bg-red-500/15">
           <Shield size={18} /> Eliminar Cuenta
         </button>
       </div>
@@ -508,8 +508,8 @@ export default function PreferenciasPage() {
       {hasChanges() && (
         <div className="sticky bottom-[calc(84px+env(safe-area-inset-bottom))] z-30 px-5 pb-3">
           <div className={`flex gap-2 p-2 rounded-md border shadow-lg ${isDark ? "bg-[#0A101D] border-white/8 shadow-black/40" : "bg-white border-slate-200 shadow-slate-300/50"}`}>
-            <button onClick={() => setFormData(initialData!)} disabled={saving} className={`flex-1 h-11 rounded-md text-[13px] font-semibold ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>Descartar</button>
-            <button onClick={handleSave} disabled={saving} className="flex-2 h-11 rounded-md text-[13px] font-semibold bg-emerald-500 text-white disabled:opacity-60 flex items-center justify-center">
+            <button onClick={() => setFormData(initialData!)} disabled={saving} className={`flex-1 h-11 rounded-md text-[12px] font-semibold ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>Descartar</button>
+            <button onClick={handleSave} disabled={saving} className="flex-2 h-11 rounded-md text-[12px] font-semibold bg-emerald-500 text-white disabled:opacity-60 flex items-center justify-center">
               {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Guardar cambios"}
             </button>
           </div>
@@ -521,7 +521,7 @@ export default function PreferenciasPage() {
         <div className="fixed bottom-8 left-5 right-5 z-50 animate-in slide-in-from-bottom-4 duration-300">
           <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 ${feedbackType === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
             {feedbackType === "error" ? <AlertCircle size={20} /> : <CheckCircle2 size={20} />}
-            <span className="flex-1 text-sm font-medium">{feedbackMsg}</span>
+            <span className="flex-1 text-[13px] font-medium">{feedbackMsg}</span>
             <button aria-label="Cerrar" onClick={() => setShowFeedback(false)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
           </div>
         </div>
@@ -530,7 +530,7 @@ export default function PreferenciasPage() {
       {/* Password Modal */}
       <Modal isOpen={showPasswordModal} onClose={() => { setShowPasswordModal(false); setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword(""); }} isDark={isDark}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-heading font-black text-lg">Cambiar Contraseña</h2>
+          <h2 className="font-heading font-black text-[16px]">Cambiar Contraseña</h2>
           <button aria-label="Cerrar" onClick={() => { setShowPasswordModal(false); setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword(""); }}
             className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/6 transition-colors">
             <X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
@@ -542,10 +542,10 @@ export default function PreferenciasPage() {
           { label: "Confirmar Nueva", value: confirmNewPassword, set: setConfirmNewPassword, show: showConfirm, toggle: () => setShowConfirm(!showConfirm) },
         ].map((f) => (
           <div key={f.label} className="mb-4">
-            <label className={`text-[12px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>{f.label}</label>
+            <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>{f.label}</label>
             <div className={`flex items-center rounded-md border transition-colors focus-within:border-emerald-500/50 ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`}>
               <input type={f.show ? "text" : "password"} value={f.value} onChange={(e) => f.set(e.target.value)} placeholder="••••••••"
-                className={`flex-1 p-3.5 text-sm font-medium bg-transparent outline-hidden ${isDark ? "text-slate-100" : "text-slate-900"}`}
+                className={`flex-1 p-3.5 text-[13px] font-medium bg-transparent outline-hidden ${isDark ? "text-slate-100" : "text-slate-900"}`}
               />
               <button onClick={f.toggle} className="px-3.5">{f.show ? <EyeOff size={16} className={isDark ? "text-slate-500" : "text-slate-400"} /> : <Eye size={16} className={isDark ? "text-slate-500" : "text-slate-400"} />}</button>
             </div>
@@ -553,9 +553,9 @@ export default function PreferenciasPage() {
         ))}
         <div className="flex gap-3 mt-2">
           <button onClick={() => { setShowPasswordModal(false); setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword(""); }}
-            className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
+            className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
           <button onClick={handleChangePassword} disabled={passwordLoading}
-            className="flex-2 py-3.5 rounded-md font-semibold text-sm bg-emerald-500 text-white hover:bg-emerald-600 transition-all active:scale-[0.98] flex items-center justify-center">
+            className="flex-2 py-3.5 rounded-md font-semibold text-[13px] bg-emerald-500 text-white hover:bg-emerald-600 transition-all active:scale-[0.98] flex items-center justify-center">
             {passwordLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Actualizar"}
           </button>
         </div>
@@ -567,12 +567,12 @@ export default function PreferenciasPage() {
           <div className="w-14 h-14 rounded-md bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
             <AlertCircle size={28} className="text-emerald-500" />
           </div>
-          <h2 className="font-heading font-black text-lg mb-2">¿Guardar cambios?</h2>
-          <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Tienes modificaciones sin guardar.</p>
+          <h2 className="font-heading font-black text-[16px] mb-2">¿Guardar cambios?</h2>
+          <p className={`text-[13px] font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Tienes modificaciones sin guardar.</p>
           <div className="space-y-2.5">
-            <button onClick={() => { setShowUnsavedModal(false); handleSave(); }} className="w-full py-3.5 rounded-md font-semibold text-sm bg-emerald-500 text-white hover:bg-emerald-600 transition-all active:scale-[0.98]">Guardar y Salir</button>
-            <button onClick={() => { setShowUnsavedModal(false); setFormData(initialData!); router.back(); }} className="w-full py-3.5 rounded-md font-semibold text-sm bg-red-500/10 text-red-400 border border-red-500/20 transition-all active:scale-[0.98]">Descartar Cambios</button>
-            <button onClick={() => setShowUnsavedModal(false)} className={`text-xs font-medium py-2 ${isDark ? "text-slate-500" : "text-slate-400"} hover:underline`}>Seguir Editando</button>
+            <button onClick={() => { setShowUnsavedModal(false); handleSave(); }} className="w-full py-3.5 rounded-md font-semibold text-[13px] bg-emerald-500 text-white hover:bg-emerald-600 transition-all active:scale-[0.98]">Guardar y Salir</button>
+            <button onClick={() => { setShowUnsavedModal(false); setFormData(initialData!); router.back(); }} className="w-full py-3.5 rounded-md font-semibold text-[13px] bg-red-500/10 text-red-400 border border-red-500/20 transition-all active:scale-[0.98]">Descartar Cambios</button>
+            <button onClick={() => setShowUnsavedModal(false)} className={`text-[11px] font-medium py-2 ${isDark ? "text-slate-500" : "text-slate-400"} hover:underline`}>Seguir Editando</button>
           </div>
         </div>
       </Modal>
@@ -583,11 +583,11 @@ export default function PreferenciasPage() {
           <div className="w-14 h-14 rounded-md bg-rose-500/10 flex items-center justify-center mx-auto mb-4">
             <LogOut size={28} className="text-rose-400" />
           </div>
-          <h2 className="font-heading font-black text-lg mb-2">¿Cerrar Sesión?</h2>
-          <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>¿Estás seguro de que deseas salir?</p>
+          <h2 className="font-heading font-black text-[16px] mb-2">¿Cerrar Sesión?</h2>
+          <p className={`text-[13px] font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>¿Estás seguro de que deseas salir?</p>
           <div className="flex gap-3">
-            <button onClick={() => setShowSignOutModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
-            <button onClick={() => { setShowSignOutModal(false); logout(); router.push("/login"); }} className="flex-1 py-3.5 rounded-md font-semibold text-sm bg-rose-500 text-white hover:bg-rose-600 transition-all active:scale-[0.98]">Sí, Salir</button>
+            <button onClick={() => setShowSignOutModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
+            <button onClick={() => { setShowSignOutModal(false); logout(); router.push("/login"); }} className="flex-1 py-3.5 rounded-md font-semibold text-[13px] bg-rose-500 text-white hover:bg-rose-600 transition-all active:scale-[0.98]">Sí, Salir</button>
           </div>
         </div>
       </Modal>
@@ -598,18 +598,18 @@ export default function PreferenciasPage() {
           <div className="w-14 h-14 rounded-md bg-rose-500/10 flex items-center justify-center mx-auto mb-4">
             <AlertCircle size={28} className="text-rose-400" />
           </div>
-          <h2 className="font-heading font-black text-lg text-rose-500 mb-2">¿Eliminar tu cuenta?</h2>
-          <p className={`text-sm font-medium mb-4 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Esta acción es irreversible.</p>
-          <div className={`text-left p-4 rounded-md mb-6 space-y-2 text-xs font-medium ${isDark ? "bg-white/3 text-slate-400" : "bg-slate-50 text-slate-500"}`}>
+          <h2 className="font-heading font-black text-[16px] text-rose-500 mb-2">¿Eliminar tu cuenta?</h2>
+          <p className={`text-[13px] font-medium mb-4 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Esta acción es irreversible.</p>
+          <div className={`text-left p-4 rounded-md mb-6 space-y-2 text-[11px] font-medium ${isDark ? "bg-white/3 text-slate-400" : "bg-slate-50 text-slate-500"}`}>
             <p>• Tu carta y perfil de jugador MVP.</p>
             <p>• Credenciales de acceso Firebase Auth.</p>
             <p>• Reservas e historial se conservan anónimos.</p>
           </div>
           <input type="password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} placeholder="Tu contraseña" aria-label="Contraseña para confirmar"
-            className={`w-full mb-4 px-4 py-3 rounded-md border text-sm outline-hidden ${isDark ? "bg-white/4 border-white/10 text-slate-100" : "bg-white border-slate-200 text-slate-900"}`} />
+            className={`w-full mb-4 px-4 py-3 rounded-md border text-[13px] outline-hidden ${isDark ? "bg-white/4 border-white/10 text-slate-100" : "bg-white border-slate-200 text-slate-900"}`} />
           <div className="flex gap-3">
-            <button onClick={() => { setShowDeleteModal(false); setDeletePassword(""); }} className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
-            <button onClick={handleDeleteAccount} disabled={loadingDelete || !deletePassword} className="flex-1 py-3.5 rounded-md font-semibold text-sm bg-rose-500 text-white hover:bg-rose-600 transition-all active:scale-[0.98] flex items-center justify-center">
+            <button onClick={() => { setShowDeleteModal(false); setDeletePassword(""); }} className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
+            <button onClick={handleDeleteAccount} disabled={loadingDelete || !deletePassword} className="flex-1 py-3.5 rounded-md font-semibold text-[13px] bg-rose-500 text-white hover:bg-rose-600 transition-all active:scale-[0.98] flex items-center justify-center">
               {loadingDelete ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Eliminar"}
             </button>
           </div>

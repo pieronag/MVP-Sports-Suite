@@ -54,21 +54,21 @@ export default function VerifyEmailGate({ user, onVerified }: { user: User; onVe
                     <Mail size={30} className="text-emerald-400" />
                 </div>
                 <div>
-                    <h1 className="text-xl font-black uppercase tracking-tight">Verifica tu <span className="text-[#00df82]">correo</span></h1>
-                    <p className="mt-2 text-sm text-slate-400">
+                    <h1 className="text-[18px] font-black uppercase tracking-tight">Verifica tu <span className="text-[#00df82]">correo</span></h1>
+                    <p className="mt-2 text-[13px] text-slate-400">
                         Enviamos un enlace de activación a <span className="text-slate-200 font-semibold">{user.email}</span>. Ábrelo para usar tu cuenta.
                     </p>
                 </div>
                 <button onClick={checkAgain} disabled={busy}
-                    className="w-full py-3.5 rounded-md bg-[#00df82] text-slate-950 text-xs font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2">
+                    className="w-full py-3.5 rounded-md bg-[#00df82] text-slate-950 text-[11px] font-black uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2">
                     <CheckCircle size={16} /> Ya verifiqué mi correo
                 </button>
                 <button onClick={resend} disabled={busy}
-                    className="w-full py-3 rounded-md border border-white/10 text-xs font-bold uppercase tracking-widest text-slate-300 disabled:opacity-50">
+                    className="w-full py-3 rounded-md border border-white/10 text-[11px] font-bold uppercase tracking-widest text-slate-300 disabled:opacity-50">
                     Reenviar enlace
                 </button>
-                {status && <p role="status" className="text-xs text-slate-400">{status}</p>}
-                <button onClick={() => logout()} className="inline-flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-slate-500 hover:text-red-400">
+                {status && <p role="status" className="text-[11px] text-slate-400">{status}</p>}
+                <button onClick={() => logout()} className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500 hover:text-red-400">
                     <LogOut size={14} /> Usar otra cuenta
                 </button>
             </div>

@@ -174,7 +174,7 @@ export default function MapaPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[12px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[11px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -185,13 +185,13 @@ export default function MapaPage() {
       <div className={`px-5 pt-12 pb-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="flex items-center justify-between mb-4">
           <div className="w-10" aria-hidden />
-          <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center text-emerald-500">Mapa</h1>
+          <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center text-emerald-500">Mapa</h1>
           <button aria-label="Usar mi ubicación" onClick={handleLocate} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
             <Locate size={18} className="text-emerald-500" />
           </button>
         </div>
         {geoError && (
-          <p className={`text-[12px] font-medium text-center mb-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Sin acceso a tu ubicación: te mostramos los recintos de tu zona.</p>
+          <p className={`text-[11px] font-medium text-center mb-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Sin acceso a tu ubicación: te mostramos los recintos de tu zona.</p>
         )}
         {/* Filters */}
         <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-none">
@@ -199,7 +199,7 @@ export default function MapaPage() {
             const CatIcon = cat.icon;
             return (
               <button key={cat.id} onClick={() => setActiveSport(cat.id)}
-                className={`flex items-center gap-1.5 h-10 px-4 rounded-md text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${activeSport === cat.id ? "text-white" : isDark ? "text-slate-400 bg-white/6 hover:bg-white/10" : "text-slate-500 bg-slate-100 hover:bg-slate-200"}`}
+                className={`flex items-center gap-1.5 h-10 px-4 rounded-md text-[11px] font-semibold whitespace-nowrap transition-all active:scale-95 ${activeSport === cat.id ? "text-white" : isDark ? "text-slate-400 bg-white/6 hover:bg-white/10" : "text-slate-500 bg-slate-100 hover:bg-slate-200"}`}
                 style={activeSport === cat.id ? { backgroundColor: getSportColor(cat.id) } : {}}>
                 {CatIcon && <CatIcon color={activeSport === cat.id ? "white" : isDark ? "#94a3b8" : "#64748b"} size={14} />}
                 {cat.name}
@@ -222,7 +222,7 @@ export default function MapaPage() {
         {venues.length === 0 ? (
           <div className="py-16 flex flex-col items-center">
             <Compass size={32} className={isDark ? "text-slate-600" : "text-slate-300"} />
-            <p className={`text-sm font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin recintos detectados</p>
+            <p className={`text-[13px] font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin recintos detectados</p>
           </div>
         ) : (
           venues.map((v) => {
@@ -242,7 +242,7 @@ export default function MapaPage() {
                     <div className="absolute bottom-4 left-5 right-5">
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
-                          <p className="text-white text-lg font-semibold uppercase truncate">{v.name}</p>
+                          <p className="text-white text-[16px] font-semibold uppercase truncate">{v.name}</p>
                           <div className="flex items-center gap-2 mt-1.5">
                             <div className="flex items-center gap-1 bg-emerald-500/20 px-2 py-0.5 rounded-md">
                               <Star size={10} className="text-emerald-500" fill="currentColor" />
@@ -252,7 +252,7 @@ export default function MapaPage() {
                         </div>
                         <div className="bg-white/15 px-3 py-2 rounded-md flex items-center gap-1.5 border border-white/10 shrink-0 ml-3">
                           <Navigation size={11} className="text-white" />
-                          <span className="text-white text-[12px] font-semibold">{v.distance}</span>
+                          <span className="text-white text-[11px] font-semibold">{v.distance}</span>
                         </div>
                       </div>
                     </div>

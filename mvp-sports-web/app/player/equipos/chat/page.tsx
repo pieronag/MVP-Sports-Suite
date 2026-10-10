@@ -77,7 +77,7 @@ export default function ChatEquiposPage() {
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <div className="flex-1 min-w-0">
-          <h1 className={`font-heading font-black text-base truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{team?.name || teamName || "Chat"}</h1>
+          <h1 className={`font-heading font-black text-[15px] truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{team?.name || teamName || "Chat"}</h1>
           <div className="flex items-center gap-1.5 mt-0.5">
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{team?.members?.length || 0} jugadores</span>
@@ -99,7 +99,7 @@ export default function ChatEquiposPage() {
             <div className="w-16 h-16 rounded-md bg-emerald-500/10 flex items-center justify-center mb-4">
               <MessageCircle size={30} className="text-emerald-500" />
             </div>
-            <p className={`text-xs font-medium text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sala de estrategia lista.<br />Inicia el chat con tu equipo.</p>
+            <p className={`text-[11px] font-medium text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sala de estrategia lista.<br />Inicia el chat con tu equipo.</p>
           </div>
         ) : (
           grouped.map((g, gi) => (
@@ -118,7 +118,7 @@ export default function ChatEquiposPage() {
                     )}
                     <div className={`max-w-[75%] ${isMe ? "items-end" : "items-start"} flex flex-col`}>
                       {!isMe && <span className={`text-[11px] font-medium mb-0.5 ml-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{msg.senderName}</span>}
-                      <div className={`px-3.5 py-2.5 rounded-md flex items-end flex-wrap gap-1 text-sm font-medium leading-5 ${isMe ? "bg-emerald-500 text-white rounded-md" : isDark ? "bg-[#1E293B] text-slate-100 rounded-md" : "bg-white text-slate-900 rounded-md border border-slate-200"}`}>
+                      <div className={`px-3.5 py-2.5 rounded-md flex items-end flex-wrap gap-1 text-[13px] font-medium leading-5 ${isMe ? "bg-emerald-500 text-white rounded-md" : isDark ? "bg-[#1E293B] text-slate-100 rounded-md" : "bg-white text-slate-900 rounded-md border border-slate-200"}`}>
                         <span className="min-w-0 wrap-break-word wrap-anywhere whitespace-pre-wrap">{msg.text}</span>
                         <span className={`text-[11px] font-semibold shrink-0 ${isMe ? "text-white/70" : isDark ? "text-slate-500" : "text-slate-400"}`}>{formatTime(msg.createdAt)}</span>
                       </div>
@@ -137,7 +137,7 @@ export default function ChatEquiposPage() {
           <div className={`flex-1 flex items-center h-12 rounded-md px-4 border ${isDark ? "bg-white/4 border-white/6" : "bg-slate-50 border-slate-200"}`}>
             <input maxLength={1000} value={newMessage} onChange={(e) => setNewMessage(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
               placeholder="Escribe un mensaje..."
-              className={`flex-1 bg-transparent text-sm font-medium outline-hidden ${isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400"}`}
+              className={`flex-1 bg-transparent text-[13px] font-medium outline-hidden ${isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400"}`}
             />
           </div>
           <button aria-label="Enviar mensaje" onClick={handleSend} disabled={!newMessage.trim() || sending}

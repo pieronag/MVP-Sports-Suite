@@ -74,7 +74,7 @@ export default function PartidosChatPage() {
             <Shield size={20} className="text-emerald-500" />
           </div>
           <div className="min-w-0">
-            <p className={`font-semibold text-[14px] truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{otherName || "Chat"}</p>
+            <p className={`font-semibold text-[13px] truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{otherName || "Chat"}</p>
             <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{otherRole} · {challenge?.sport}</p>
           </div>
         </div>
@@ -94,7 +94,7 @@ export default function PartidosChatPage() {
             <div className={`w-14 h-14 rounded-md flex items-center justify-center mb-4 ${isDark ? "bg-white/4" : "bg-slate-100"}`}>
               <Send size={24} className={isDark ? "text-slate-600" : "text-slate-300"} />
             </div>
-            <p className={`text-xs font-medium text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>Inicia la conversación con {otherName || "el otro capitán"}</p>
+            <p className={`text-[11px] font-medium text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>Inicia la conversación con {otherName || "el otro capitán"}</p>
           </div>
         )}
         {messages.map((msg) => {
@@ -109,7 +109,7 @@ export default function PartidosChatPage() {
                 )}
                 <div className={`rounded-md px-4 py-2.5 ${isMe ? "bg-emerald-500 text-white" : isDark ? "bg-[#0A101D] border border-white/6 text-slate-200" : "bg-white border border-slate-200 text-slate-800"}`}>
                   {!isMe && <p className="text-[11px] font-semibold opacity-70 mb-0.5">{msg.senderName}</p>}
-                  <p className="text-[13px] leading-snug wrap-break-word wrap-anywhere whitespace-pre-wrap">{msg.text}</p>
+                  <p className="text-[12px] leading-snug wrap-break-word wrap-anywhere whitespace-pre-wrap">{msg.text}</p>
                 </div>
               </div>
             </div>
@@ -122,7 +122,7 @@ export default function PartidosChatPage() {
       <div className={`px-4 py-3 border-t ${isDark ? "border-white/6" : "border-slate-200"}`}>
         <div className="flex gap-2">
           <input maxLength={1000} value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown} placeholder="Escribe un mensaje..."
-            className={`flex-1 h-[46px] rounded-md px-4 text-sm font-medium outline-hidden border ${isDark ? "bg-[#0A101D] text-slate-100 border-white/6 placeholder-slate-500" : "bg-white text-slate-900 border-slate-200 placeholder-slate-400"}`} />
+            className={`flex-1 h-[46px] rounded-md px-4 text-[13px] font-medium outline-hidden border ${isDark ? "bg-[#0A101D] text-slate-100 border-white/6 placeholder-slate-500" : "bg-white text-slate-900 border-slate-200 placeholder-slate-400"}`} />
           <button aria-label="Enviar mensaje" onClick={handleSend} disabled={!input.trim() || sending}
             className="w-[46px] h-[46px] rounded-md bg-emerald-500 flex items-center justify-center transition-all active:scale-90 disabled:opacity-50">
             {sending ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Send size={18} className="text-white" />}
@@ -137,12 +137,12 @@ export default function PartidosChatPage() {
             <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 bg-red-500/10`}>
               <X size={28} className="text-red-500" />
             </div>
-            <p className={`text-base font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Finalizar reto?</p>
-            <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>El chat se cerrará y no podrán enviarse más mensajes.</p>
+            <p className={`text-[15px] font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Finalizar reto?</p>
+            <p className={`text-[13px] font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>El chat se cerrará y no podrán enviarse más mensajes.</p>
             <div className="flex gap-3">
-              <button onClick={() => setShowCloseModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+              <button onClick={() => setShowCloseModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
               <button onClick={async () => { await matchmakingService.closeChallenge(challengeId); setShowCloseModal(false); router.back(); }}
-                className="flex-1 py-3.5 rounded-md bg-red-500 text-white font-semibold text-sm">Finalizar</button>
+                className="flex-1 py-3.5 rounded-md bg-red-500 text-white font-semibold text-[13px]">Finalizar</button>
             </div>
           </div>
         </div>
