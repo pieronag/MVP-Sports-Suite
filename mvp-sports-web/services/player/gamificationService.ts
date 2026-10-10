@@ -36,6 +36,21 @@ export const gamificationService = {
         return { name: 'Bronce', index: 0 };
     },
 
+    // Progreso hacia el siguiente rango (null en el rango máximo)
+    tierProgress(xp: number, settings: GamificationSettings) {
+        const t = settings.tiers;
+        const steps = [
+            { name: 'Bronce', min: t.bronze || 0 }, { name: 'Plata', min: t.silver }, { name: 'Oro', min: t.gold },
+            { name: 'Platino', min: t.platinum }, { name: 'Diamante', min: t.diamond }, { name: 'Elite', min: t.elite }, { name: 'Leyenda', min: t.legend },
+        ].filter((x) => typeof x.min === 'number');
+        let i = 0;
+        while (i + 1 < steps.length && xp >= steps[i + 1].min) i++;
+        const cur = steps[i], next = steps[i + 1];
+        if (!next) return { current: cur.name, next: null as string | null, xpToNext: 0, pct: 100 };
+        const span = Math.max(1, next.min - cur.min);
+        return { current: cur.name, next: next.name, xpToNext: Math.max(0, next.min - xp), pct: Math.min(100, Math.max(0, Math.round(((xp - cur.min) / span) * 100))) };
+    },
+
     calculateOVR(xp: number, settings: GamificationSettings) {
         const base = 40;
         const range = 99 - base;
