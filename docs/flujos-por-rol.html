@@ -224,19 +224,20 @@ flowchart TD
   I -->|No| L[Rechaza la cancelación]
   M[Cron diario 07:00 UTC] --> N[Borra pagos online abandonados]
   M --> O[Cancela lo pendiente de pago y libera cupos]
+  M --> P[Recalcula XP, nivel y logros de quienes jugaron]
+  Q[Check-in o partido interno] --> P
     </pre></div>
     <div class="cols">
       <div class="card"><h3>Reglas de Firestore</h3><ul>
         <li>Reservas de cancha <span>· solo las crea el servidor</span></li>
         <li>Partidos internos <span>· el jugador los registra sin recinto ni pago</span></li>
         <li>Perfiles completos <span>· solo el titular y el personal; los demás ven el perfil público vía servidor</span></li>
-        <li>Estadísticas ajenas <span>· ningún jugador puede modificar las de otro</span></li>
+        <li>Experiencia y logros <span>· solo los escribe el servidor; nadie puede editar los suyos ni los de otro</span></li>
         <li>Credenciales de Mercado Pago <span>· colección privada, nunca en lectura pública</span></li>
       </ul></div>
       <div class="card"><h3>Pendiente</h3><ul>
         <li>Publicar las reglas locales en Firebase</li>
-        <li>Calcular XP y logros en el servidor</li>
-        <li>Limitar al personal a los jugadores de su recinto</li>
+                <li>Limitar al personal a los jugadores de su recinto</li>
         <li>Notificaciones push <span>· falta la clave VAPID</span></li>
       </ul></div>
     </div>

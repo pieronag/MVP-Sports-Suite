@@ -86,11 +86,11 @@ td.pct{font:500 14px var(--mono);font-variant-numeric:tabular-nums;white-space:n
     <div class="eyebrow">Ruta al 100%</div>
     <h2>Orden recomendado</h2>
     <ol class="road">
-      <li><b>Publicar las reglas de Firestore <span class="tag">seguridad · ley 21.719</span></b><span>Ya cierran las dos fugas. Después: limitar al personal a los jugadores de su recinto y calcular XP y logros en el servidor.</span></li>
+      <li><b>Publicar las reglas de Firestore <span class="tag">seguridad · ley 21.719</span></b><span>Cierran las dos fugas y protegen la experiencia y los logros. Después: limitar al personal a los jugadores de su recinto.</span></li>
       <li><b>Auditoría de la base con datos reales <span class="tag">refactor bd</span></b><span>Correr el script de auditoría y decidir qué campos eliminar; luego una migración versionada.</span></li>
       <li><b>Prueba de punta a punta de pagos <span class="tag">jugador</span></b><span>Reserva, torneo y academia con tarjeta de prueba; cancelación con más y menos de 24 h; webhook.</span></li>
       <li><b>Revisión del panel por rol <span class="tag">panel</span></b><span>Admin, dueño y mánager con sus cuentas reales: cada pantalla, sus permisos y sus números.</span></li>
-      <li><b>Refactor del código <span class="tag">deuda técnica</span></b><span>Quitar los botones de datos demo, retirar los indicadores de "por cobrar" de los paneles, mover escrituras sensibles al servidor y dividir las páginas de más de 1.000 líneas.</span></li>
+      <li><b>Refactor del código <span class="tag">deuda técnica</span></b><span>Mover las escrituras sensibles que quedan (check-in, inasistencias) al servidor y dividir las páginas de más de 1.000 líneas.</span></li>
       <li><b>Notificaciones push <span class="tag">pendiente</span></b><span>Necesita la clave VAPID.</span></li>
     </ol>
   </section>
@@ -119,7 +119,7 @@ const AREAS = [
   ["Partidos y desafíos", "y","y","n","n","Restaurado tras el error de la sesión anterior."],
   ["Torneos", "y","y","n","n","Inscripción pagada solo online."],
   ["Academias", "y","y","n","n","Inscripción pagada solo online."],
-  ["Estadísticas y logros", "y","y","n","n","XP y logros se escriben desde el navegador (ver bloqueos)."],
+  ["Estadísticas y logros", "y","y","n","n","XP, nivel y logros los calcula el servidor desde las reservas, tras check-in, partidos internos y cada noche."],
   ["Ranking", "y","y","n","x","Lee perfiles públicos desde el servidor."],
   ["Perfil y preferencias", "y","y","n","x",""],
   ["Billetera y tarjetas guardadas", "y","y","n","n","Sin montos por pagar en el recinto."],
@@ -131,10 +131,10 @@ const AREAS = [
   ["Check-in", "y","y","n","n","Solo reservas pagadas online; sin cobro en mesón."],
   ["Canchas", "y","y","n","x",""],
   ["Personal", "y","y","n","x",""],
-  ["Finanzas", "y","y","n","x",""],
+  ["Finanzas", "y","y","n","x","Sin indicadores de por cobrar (pago 100% online)."],
   ["Cupones", "y","y","n","x",""],
-  ["Torneos (gestión)", "y","y","n","x","Tiene un botón que carga torneos demo en producción."],
-  ["Academia (gestión)", "y","y","n","x","Tiene un botón que carga clases demo en producción."],
+  ["Torneos (gestión)", "y","y","n","x","Sin botón de datos demo."],
+  ["Academia (gestión)", "y","y","n","x","Sin botón de datos demo."],
   ["Opiniones", "y","y","n","x",""],
   ["Configuración del complejo", "y","y","n","x",""],
  ]},
@@ -145,7 +145,7 @@ const AREAS = [
   ["Métricas", "y","y","n","x",""],
   ["Facturas y suscripciones", "y","y","n","n","Cobro mensual día 1."],
   ["Auditoría y reportes", "y","y","n","x",""],
-  ["Gamificación (reglas)", "y","y","n","x",""],
+  ["Gamificación (reglas)", "y","y","n","x","La sincronización masiva usa el cálculo del servidor."],
  ]},
  { name:"Plataforma", items:[
   ["Pagos con Mercado Pago", "y","y","p","n","Webhook con firma, 3D Secure, reembolsos. Endpoints responden; sin pago real probado."],
