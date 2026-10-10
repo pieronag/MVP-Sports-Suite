@@ -6,6 +6,7 @@ import { ChevronLeft, Trophy, Users, CalendarDays, CreditCard, CheckCircle2, X, 
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
 import { tournamentService } from "@/services/player/tournamentService";
+import { venueService } from "@/services/player/venueService";
 import { teamService } from "@/services/player/teamService";
 
 const ACCENT = "#f43f5e";
@@ -36,6 +37,13 @@ export default function TorneosPage() {
   const [selected, setSelected] = useState<any | null>(null);
   const [teamId, setTeamId] = useState<string>("");
   const [busy, setBusy] = useState(false);
+  const [venues, setVenues] = useState<any[]>([]);
+  useEffect(() => { venueService.getVenues().then(setVenues).catch(() => {}); }, []);
+  // Mercado Pago solo si el recinto del torneo lo tiene activo
+  const mpActiveFor = (t: any) => {
+    const v = venues.find((x: any) => x.id === t.tenantId || x.id === t.venueId);
+    return !!v && v.isMercadopagoActive !== false && !!(v.isMercadopagoActive || v.mercadopagoPublicKey);
+  };
   const [toast, setToast] = useState<{ type: "ok" | "error"; msg: string } | null>(null);
 
   const load = async () => {
@@ -227,12 +235,12 @@ export default function TorneosPage() {
                   <select value={teamId} onChange={e => setTeamId(e.target.value)} className={`w-full h-12 px-3 rounded-md border outline-hidden ${isDark ? "bg-white/4 border-white/10 text-slate-100" : "bg-white border-slate-200 text-slate-900"}`}>
                     {eligible.map(team => <option key={team.id} value={team.id}>{team.name}</option>)}
                   </select>
-                  {!!t.price && (
+                  {!!t.price && mpActiveFor(t) && (
                     <button disabled={busy || !teamId} onClick={() => register(true)} className="w-full h-12 rounded-md text-white text-[13px] font-semibold flex items-center justify-center gap-2 disabled:opacity-60" style={{ backgroundColor: ACCENT }}>
                       <CreditCard size={18} /> Pagar {fmtCLP(t.price)} con Mercado Pago
                     </button>
                   )}
-                  <button disabled={busy || !teamId} onClick={() => register(false)} className={`w-full h-12 rounded-md text-[13px] font-semibold border disabled:opacity-60 ${t.price ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!t.price ? { backgroundColor: ACCENT } : undefined}>
+                  <button disabled={busy || !teamId} onClick={() => register(false)} className={`w-full h-12 rounded-md text-[13px] font-semibold border disabled:opacity-60 ${t.price && mpActiveFor(t) ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!(t.price && mpActiveFor(t)) ? { backgroundColor: ACCENT } : undefined}>
                     {busy ? "Procesando…" : t.price ? "Inscribir y pagar en el recinto" : "Inscribir equipo"}
                   </button>
                 </div>

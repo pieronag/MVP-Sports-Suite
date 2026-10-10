@@ -6,8 +6,9 @@ import { ChevronLeft, GraduationCap, Users, Clock, CalendarDays, CreditCard, Che
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
 import { academyService, type AcademyClass } from "@/services/player/academyService";
+import { venueService } from "@/services/player/venueService";
 
-const ACCENT = "#8b5cf6";
+const ACCENT = "#10b981";
 const AGE: Record<string, string> = { libre: "Libre", infantil: "Infantil", juvenil: "Juvenil", adultos: "Adultos", senior: "Senior", todos: "Todas las edades" };
 const fmtCLP = (n?: number) => `$${Number(n || 0).toLocaleString("es-CL")}`;
 
@@ -24,6 +25,13 @@ export default function AcademiasPage() {
   const [sport, setSport] = useState("Todas");
   const [selected, setSelected] = useState<AcademyClass | null>(null);
   const [busy, setBusy] = useState(false);
+  const [venues, setVenues] = useState<any[]>([]);
+  useEffect(() => { venueService.getVenues().then(setVenues).catch(() => {}); }, []);
+  // Mercado Pago solo si el recinto de la clase lo tiene activo (misma regla que el checkout de canchas)
+  const mpActiveFor = (c: any) => {
+    const t = venues.find((v: any) => v.id === c.tenantId || v.ownerId === c.ownerId || (v.ownerIds || []).includes(c.ownerId));
+    return !!t && t.isMercadopagoActive !== false && !!(t.isMercadopagoActive || t.mercadopagoPublicKey);
+  };
   const [toast, setToast] = useState<{ type: "ok" | "error"; msg: string } | null>(null);
 
   const load = async () => {
@@ -198,12 +206,12 @@ export default function AcademiasPage() {
                 <div className="p-3 rounded-md bg-rose-500/10 text-rose-500 text-[13px] font-semibold">No quedan cupos en esta clase</div>
               ) : (
                 <div className="space-y-2.5">
-                  {!!c.price && (
+                  {!!c.price && mpActiveFor(c) && (
                     <button disabled={busy} onClick={() => enroll(c, true)} className="w-full h-12 rounded-md text-white text-[13px] font-semibold flex items-center justify-center gap-2 disabled:opacity-60" style={{ backgroundColor: ACCENT }}>
                       <CreditCard size={18} /> Pagar {fmtCLP(c.price)} con Mercado Pago
                     </button>
                   )}
-                  <button disabled={busy} onClick={() => enroll(c, false)} className={`w-full h-12 rounded-md text-[13px] font-semibold border disabled:opacity-60 ${c.price ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!c.price ? { backgroundColor: ACCENT } : undefined}>
+                  <button disabled={busy} onClick={() => enroll(c, false)} className={`w-full h-12 rounded-md text-[13px] font-semibold border disabled:opacity-60 ${c.price && mpActiveFor(c) ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!(c.price && mpActiveFor(c)) ? { backgroundColor: ACCENT } : undefined}>
                     {busy ? "Procesando…" : c.price ? "Inscribirme y pagar en el recinto" : "Inscribirme"}
                   </button>
                 </div>

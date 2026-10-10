@@ -364,6 +364,9 @@ export default function ReservasPage() {
           const dateInfo = getFormattedDate(b.date);
           const venueName = venues[b.tenantId]?.name || b.tenantName;
           const isConfirmed = b.status === "confirmed" && !b.checkOut;
+          // Ventana de ingreso: desde 30 min antes hasta el fin del bloque de 1 h
+          const st = (() => { const d = getFormattedDate(b.date).raw as Date | undefined; if (!d) return null; const [h, m] = String(b.startTime || "00:00").split(":").map(Number); const o = new Date(d); o.setHours(h || 0, m || 0, 0, 0); if ((h || 0) < 6) o.setDate(o.getDate() + 1); return o; })();
+          const inWindow = !!st && Date.now() >= st.getTime() - 30 * 60_000 && Date.now() <= st.getTime() + 60 * 60_000;
           const isActive = (b.status === "active" || b.checkIn) && !b.checkOut;
           const isCompleted = b.status === "completed" || b.status === "past" || b.checkOut === true;
           const isCancelled = b.status === "cancelled";
@@ -407,9 +410,12 @@ export default function ReservasPage() {
                         <CalendarDays size={15} /> Reservar de nuevo
                       </button>
                     )}
-                    {isConfirmed && !b.checkIn && (
+                    {isConfirmed && !b.checkIn && inWindow && b.paymentStatus !== "paid" && (
+                      <p className="flex-1 self-center text-[12px] font-semibold text-amber-500">Paga en recepción para ingresar</p>
+                    )}
+                    {isConfirmed && !b.checkIn && inWindow && b.paymentStatus === "paid" && (
                       <button onClick={() => handleCheckIn(b)} className="flex-1 h-[46px] rounded-md bg-emerald-500 flex items-center justify-center gap-2 text-white font-semibold text-[11px] uppercase transition-all active:scale-[0.98]">
-                        <ShieldCheck size={15} /> INGRESAR
+                        <ShieldCheck size={15} /> Ingresar
                       </button>
                     )}
                     {isActive && !b.checkOut && (
