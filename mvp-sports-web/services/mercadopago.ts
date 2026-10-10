@@ -224,6 +224,7 @@ async function isTestSeller(accessToken: string): Promise<boolean> {
   if (testAccountCache.has(accessToken)) return testAccountCache.get(accessToken)!;
   const me: any = await fetch(`${MP_API}/users/me`, { headers: { Authorization: `Bearer ${accessToken}` } }).then((r) => r.json()).catch(() => null);
   const isTest = Array.isArray(me?.tags) && me.tags.includes("test_user");
+  console.info("MP vendedor", JSON.stringify({ id: me?.id, test: isTest, site: me?.site_id }));
   testAccountCache.set(accessToken, isTest);
   return isTest;
 }
