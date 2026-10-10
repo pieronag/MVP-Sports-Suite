@@ -1,3 +1,4 @@
+import { cached } from './cache';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -12,6 +13,10 @@ export interface GamificationSettings {
 
 export const gamificationService = {
     async getSettings(): Promise<GamificationSettings | null> {
+        return cached('gamification', 10 * 60_000, () => gamificationService._loadSettings());
+    },
+
+    async _loadSettings(): Promise<GamificationSettings | null> {
         try {
             const docRef = doc(db, 'settings', 'global');
             const snap = await getDoc(docRef);

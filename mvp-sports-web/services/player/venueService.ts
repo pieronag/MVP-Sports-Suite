@@ -1,3 +1,4 @@
+import { cached } from './cache';
 import { collection, query, where, getDocs, documentId, doc, getDoc, addDoc, updateDoc, Timestamp, orderBy } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 
@@ -69,6 +70,10 @@ const processTenantData = (id: string, raw: any): Tenant => {
 
 export const venueService = {
     async getVenues(): Promise<Tenant[]> {
+        return cached('venues', 5 * 60_000, () => venueService._loadVenues());
+    },
+
+    async _loadVenues(): Promise<Tenant[]> {
         const tenantsRef = collection(db, 'tenants');
         const querySnapshot = await getDocs(tenantsRef);
         return querySnapshot.docs

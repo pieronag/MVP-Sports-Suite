@@ -12,6 +12,7 @@ import { usePlayer } from "@/context/PlayerContext";
 import { bookingService } from "@/services/player/bookingService";
 import { venueService } from "@/services/player/venueService";
 import { postApi } from "@/services/apiClient";
+import { invalidate } from "@/services/player/cache";
 import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
 
 const SPORT_CONFIG: Record<string, { color: string; icon: any }> = {
@@ -141,6 +142,7 @@ export default function ReservasPage() {
     if (!(profile as any)?.uid) return;
     if (!isRefreshing) setLoading(true);
     try {
+      invalidate('bookings:'); // Mis reservas siempre lee lo último (pagos/reembolsos del servidor)
       const all = await bookingService.getUserBookings((profile as any).uid);
       const tenantIds = Array.from(new Set(all.map((b) => b.tenantId)));
       const venueList = await venueService.getVenuesByIds(tenantIds);
@@ -347,7 +349,10 @@ export default function ReservasPage() {
             <GlowCard isDark={isDark}>
               <div className="py-12 flex flex-col items-center justify-center">
                 <CalendarDays size={48} strokeWidth={1} className={subClr} />
-                <p className={`text-[11px] font-semibold mt-5 text-center ${subClr}`}>No hay partidos para mostrar</p>
+                <p className={`text-[12px] font-semibold mt-5 text-center ${subClr}`}>{activeTab === "activas" ? "No tienes partidos próximos" : "Aún no hay partidos en tu historial"}</p>
+                {activeTab === "activas" && (
+                  <button onClick={() => router.push("/player/clubes")} className="mt-4 px-5 h-10 rounded-md text-[12px] font-semibold bg-emerald-500 text-white">Reservar cancha</button>
+                )}
               </div>
             </GlowCard>
           </div>
@@ -394,8 +399,14 @@ export default function ReservasPage() {
                   </div>
 
                   {/* Actions */}
-                  {(showMapsAndTicket || isConfirmed || isActive) && (
+                  {(showMapsAndTicket || isConfirmed || isActive || ((isCompleted || isCancelled) && b.tenantId)) && (
                   <div className="flex gap-2 pt-3.5 mt-4" style={{ borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0"}` }}>
+                    {(isCompleted || isCancelled) && b.tenantId && b.paymentStatus !== "refund_failed" && (
+                      <button onClick={() => router.push(`/player/clubes/${b.tenantId}?sport=${encodeURIComponent(b.sport || "")}`)}
+                        className={`flex-1 h-[44px] rounded-md flex items-center justify-center gap-2 font-semibold text-[12px] transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-200" : "bg-slate-100 text-slate-700"}`}>
+                        <CalendarDays size={15} /> Reservar de nuevo
+                      </button>
+                    )}
                     {isConfirmed && !b.checkIn && (
                       <button onClick={() => handleCheckIn(b)} className="flex-1 h-[46px] rounded-md bg-emerald-500 flex items-center justify-center gap-2 text-white font-semibold text-[11px] uppercase transition-all active:scale-[0.98]">
                         <ShieldCheck size={15} /> INGRESAR

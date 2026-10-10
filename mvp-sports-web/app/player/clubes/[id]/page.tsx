@@ -286,7 +286,8 @@ export default function VenueDetailPage() {
   useEffect(() => {
     if (autoSport || availableSports.length === 0) return;
     const n = (v: string) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
-    const pick = availableSports.length === 1 ? availableSports[0] : availableSports.find((sp: string) => n(sp) === n((profile as any)?.mainSport));
+    const wanted = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("sport") : null; // "Reservar de nuevo"
+    const pick = (wanted && availableSports.find((sp: string) => n(sp) === n(wanted))) || (availableSports.length === 1 ? availableSports[0] : availableSports.find((sp: string) => n(sp) === n((profile as any)?.mainSport)));
     if (pick) { setSelectedSport(pick); setBookingStep(2); }
     setAutoSport(true);
   }, [availableSports, profile, autoSport]);

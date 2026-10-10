@@ -11,6 +11,7 @@ import {
 import { BADGE_ICONS } from "@/components/player/badgeIcons";
 import { doc, getDoc, onSnapshot, updateDoc, addDoc, collection, Timestamp } from 'firebase/firestore';
 import { db } from "@/services/firebase";
+import { cached } from "@/services/player/cache";
 import { usePlayer } from "@/context/PlayerContext";
 import { gamificationService } from "@/services/player/gamificationService";
 import { bookingService, Booking } from "@/services/player/bookingService";
@@ -88,10 +89,10 @@ export default function EstadisticasPage() {
 
   useEffect(() => { if (profile) loadData(); }, [profile, loadData]);
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'settings', 'global'), (s) => {
-      if (s.exists()) { const d = s.data(); setGamification({ ...d.gamification, badges: d.badges || d.gamification?.badges || {} }); }
-    });
-    return () => unsub();
+    // Lectura única con caché (los ajustes de XP casi nunca cambian; no hace falta un listener en vivo)
+    cached('settings-global', 10 * 60_000, () => getDoc(doc(db, 'settings', 'global')))
+      .then((s) => { if (s.exists()) { const d: any = s.data(); setGamification({ ...d.gamification, badges: d.badges || d.gamification?.badges || {} }); } })
+      .catch(() => {});
   }, []);
 
   const handleLoadTeamMembers = async (teamId: string, teamsList?: any[], existingStats?: any, existingAssignments?: any, existingAssists?: any) => {

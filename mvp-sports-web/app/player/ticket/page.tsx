@@ -23,6 +23,49 @@ const getSportInfo = (sportName: string) => {
   return SPORT_CONFIG.default;
 };
 
+// Inicio del partido como Date local (fecha Timestamp o "YYYY-MM-DD" + "HH:MM")
+function matchStart(b: any): Date | null {
+  const raw = b?.date;
+  const d = raw?.toDate ? raw.toDate() : raw?.seconds ? new Date(raw.seconds * 1000) : /^\d{4}-\d{2}-\d{2}$/.test(String(raw)) ? new Date(`${raw}T12:00:00`) : raw ? new Date(raw) : null;
+  if (!d || isNaN(d.getTime())) return null;
+  const [h, m] = String(b?.startTime || "00:00").split(":").map(Number);
+  const out = new Date(d);
+  out.setHours(h || 0, m || 0, 0, 0);
+  if ((h || 0) < 6) out.setDate(out.getDate() + 1); // bloques de madrugada son del día siguiente
+  return out;
+}
+
+// Archivo .ics de 1 hora para agregar el partido al calendario del teléfono
+function downloadIcs(b: any, id: string) {
+  const start = matchStart(b);
+  if (!start) return;
+  const end = new Date(start.getTime() + 60 * 60 * 1000);
+  const f = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  const esc = (v: string) => String(v || "").replace(/[\\,;]/g, (c) => "\\" + c).replace(/\n/g, "\\n");
+  const ics = [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//MVP Sports//Reserva//ES", "BEGIN:VEVENT",
+    `UID:${id}@mvpsports.cl`, `DTSTAMP:${f(new Date())}`, `DTSTART:${f(start)}`, `DTEND:${f(end)}`,
+    `SUMMARY:${esc(`${b.sport || "Partido"} · ${b.courtName || "Cancha"}`)}`,
+    `LOCATION:${esc(b.tenantName || "")}`,
+    `DESCRIPTION:${esc(`Reserva #${id} en MVP Sports`)}`,
+    "BEGIN:VALARM", "TRIGGER:-PT1H", "ACTION:DISPLAY", "DESCRIPTION:Tu partido empieza en 1 hora", "END:VALARM",
+    "END:VEVENT", "END:VCALENDAR",
+  ].join("\r\n");
+  const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" }));
+  const a = document.createElement("a");
+  a.href = url; a.download = `partido-${id}.ics`; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// Invitación para el grupo del equipo (Web Share o WhatsApp)
+async function shareWithTeam(b: any, dateLabel: string) {
+  const text = `¡Tenemos cancha! ⚽\n${b.tenantName || ""} · ${b.courtName || ""}\n${dateLabel} a las ${b.startTime} hrs`;
+  if (typeof navigator !== "undefined" && (navigator as any).share) {
+    try { await (navigator as any).share({ title: "Partido MVP Sports", text }); return; } catch { /* cancelado */ }
+  }
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+}
+
 export default function TicketPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -195,6 +238,18 @@ export default function TicketPage() {
               className="w-full h-14 rounded-md bg-red-500 text-white font-semibold text-[13px] uppercase tracking-wide flex items-center justify-center gap-2.5 transition-all active:scale-[0.98]">
               <Receipt size={18} /> Comprobante Devolución
             </button>
+          )}
+          {!isCancelled && !isRefundFailed && (
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={() => bookingId && downloadIcs(booking, bookingId)}
+                className={`h-12 rounded-md flex items-center justify-center gap-2 font-semibold text-[12px] transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-200" : "bg-slate-100 text-slate-700"}`}>
+                <Calendar size={16} /> Agregar al calendario
+              </button>
+              <button onClick={() => shareWithTeam(booking, displayDate)}
+                className="h-12 rounded-md flex items-center justify-center gap-2 font-semibold text-[12px] bg-emerald-500 text-white transition-all active:scale-[0.98]">
+                <Share2 size={16} /> Avisar a mi equipo
+              </button>
+            </div>
           )}
           <button onClick={() => router.replace("/player")}
             className={`w-full h-14 rounded-md flex items-center justify-center gap-2.5 font-semibold text-[13px] uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>

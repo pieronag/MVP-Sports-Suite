@@ -1,3 +1,4 @@
+import { cached, invalidate } from './cache';
 import { syncBookingSlots } from '../apiClient';
 import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -82,6 +83,7 @@ export const bookingService = {
         Object.keys(cleanData).forEach(key => (cleanData as any)[key] === undefined && delete (cleanData as any)[key]);
         const docRef = doc(db, 'bookings', bookingId);
         await setDoc(docRef, cleanData);
+        invalidate('bookings:');
         await syncBookingSlots(bookingId);
         return bookingId;
     },
@@ -98,6 +100,7 @@ export const bookingService = {
         const cleanData = { ...data };
         Object.keys(cleanData).forEach(key => (cleanData as any)[key] === undefined && delete (cleanData as any)[key]);
         await updateDoc(ref, cleanData as any);
+        invalidate('bookings:');
         await syncBookingSlots(bookingId);
     },
 
@@ -110,6 +113,10 @@ export const bookingService = {
     },
 
     async getUserBookings(userId: string): Promise<Booking[]> {
+        return cached(`bookings:${userId}`, 60_000, () => bookingService._loadUserBookings(userId));
+    },
+
+    async _loadUserBookings(userId: string): Promise<Booking[]> {
         const bookingsRef = collection(db, 'bookings');
         const qByUser = query(bookingsRef, where('userId', '==', userId));
         const qByCreator = query(bookingsRef, where('createdBy', '==', userId));
@@ -125,6 +132,7 @@ export const bookingService = {
     async checkIn(bookingId: string) {
         const ref = doc(db, 'bookings', bookingId);
         await updateDoc(ref, { checkIn: true, checkInTime: Timestamp.now(), status: 'active' });
+        invalidate('bookings:');
         await syncBookingSlots(bookingId);
     },
 
@@ -134,6 +142,7 @@ export const bookingService = {
         if (surveyData?.rating !== undefined) updateData.rating = surveyData.rating;
         if (surveyData?.feedback !== undefined) updateData.feedback = surveyData.feedback;
         await updateDoc(ref, updateData);
+        invalidate('bookings:');
         await syncBookingSlots(bookingId);
     },
 
