@@ -1,0 +1,171 @@
+<title>MVP Sports · Estado real</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: resumen arriba, luego tabla por área con los 4 criterios como columnas de estado, y al final la ruta al 100%. */
+:root{
+  --bg:#f6f7f5; --surface:#ffffff; --line:#dfe3df; --fg:#17201b; --muted:#5d6a62;
+  --accent:#0a8f5a; --accent-soft:#e3f4ec; --warn:#a96a00; --warn-soft:#fbf0dc; --bad:#b4322a; --bad-soft:#f9e3e1;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1411; --surface:#151d19; --line:#25302a; --fg:#e4ebe6; --muted:#93a39a;
+  --accent:#2fd18b; --accent-soft:#163326; --warn:#e3a23b; --warn-soft:#33270f; --bad:#ef6b61; --bad-soft:#3a1a18; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1411; --surface:#151d19; --line:#25302a; --fg:#e4ebe6; --muted:#93a39a;
+  --accent:#2fd18b; --accent-soft:#163326; --warn:#e3a23b; --warn-soft:#33270f; --bad:#ef6b61; --bad-soft:#3a1a18; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:20px;padding-block:32px 64px;display:grid;gap:36px}
+h1,h2,h3{text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:28px;font-weight:700;letter-spacing:-.01em}
+h2{font-size:19px;font-weight:600}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:68ch;margin:8px 0 0}
+.summary{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,2fr);gap:20px;align-items:stretch}
+.big{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:22px;display:grid;gap:10px;align-content:start}
+.big .num{font:600 56px/1 var(--mono);font-variant-numeric:tabular-nums}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.areas{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.area{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:grid;gap:8px}
+.area b{font:600 22px var(--mono);font-variant-numeric:tabular-nums}
+.area span{color:var(--muted);font-size:13px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--muted)}
+.legend em{font-style:normal;color:var(--fg);font-weight:600}
+section{display:grid;gap:12px}
+.tablebox{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.mod{font-weight:600;min-width:180px}
+td.note{color:var(--muted);font-size:13px;min-width:240px}
+td.pct{font:500 14px var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.st{display:inline-block;font:500 11px var(--mono);padding:2px 8px;border-radius:999px;white-space:nowrap}
+.st.y{background:var(--accent-soft);color:var(--accent)}
+.st.p{background:var(--warn-soft);color:var(--warn)}
+.st.n{background:var(--bad-soft);color:var(--bad)}
+.st.x{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.road{display:grid;gap:10px;counter-reset:s;padding:0;margin:0;list-style:none}
+.road li{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px 14px 52px;position:relative;counter-increment:s}
+.road li::before{content:counter(s);position:absolute;left:16px;top:14px;font:600 14px var(--mono);color:var(--accent)}
+.road li b{display:block}
+.road li span{color:var(--muted);font-size:14px}
+.tag{font:500 11px var(--mono);color:var(--muted);margin-left:6px}
+.alert{background:var(--bad-soft);border:1px solid color-mix(in srgb,var(--bad) 30%,transparent);border-radius:6px;padding:14px 16px;display:grid;gap:4px}
+.alert b{color:var(--bad)}
+@media (max-width:720px){.summary{grid-template-columns:1fr}.big .num{font-size:44px}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Plataforma web completa · 10 oct 2026</div>
+    <h1>MVP Sports · Estado real del desarrollo</h1>
+    <p class="lede">Cada módulo se mide con cuatro criterios en lugar de una estimación. Reemplaza el informe anterior, que daba por avanzadas secciones que no estaban conectadas a datos y que ya fueron eliminadas.</p>
+  </header>
+
+  <div class="summary">
+    <div class="big">
+      <div class="eyebrow">Avance global</div>
+      <div class="num" id="total">–</div>
+      <div class="bar"><i id="totalbar"></i></div>
+      <div class="legend"><span><em>Construido</em> 40</span><span><em>Datos reales</em> 30</span><span><em>Probado en navegador</em> 15</span><span><em>Flujo completo probado</em> 15</span></div>
+    </div>
+    <div class="areas" id="areas"></div>
+  </div>
+
+  <div class="alert">
+    <b>Bloqueos antes de seguir sumando funciones</b>
+    <span>Dos reglas de Firestore exponen datos: cualquier usuario con sesión lee correo, teléfono y RUT de todos los perfiles, y puede cambiar la experiencia y los logros de otros jugadores. Las reglas locales tampoco están publicadas en Firebase.</span>
+  </div>
+
+  <div id="tables"></div>
+
+  <section>
+    <div class="eyebrow">Ruta al 100%</div>
+    <h2>Orden recomendado</h2>
+    <ol class="road">
+      <li><b>Publicar reglas y cerrar las dos fugas de datos <span class="tag">seguridad · ley 21.719</span></b><span>Perfil público separado (nombre, foto, nivel) del privado (RUT, correo, teléfono); XP y logros calculados en el servidor.</span></li>
+      <li><b>Auditoría de la base con datos reales <span class="tag">refactor bd</span></b><span>Correr el script de auditoría y decidir qué campos eliminar; luego una migración versionada.</span></li>
+      <li><b>Prueba de punta a punta de pagos <span class="tag">jugador</span></b><span>Reserva, torneo y academia con tarjeta de prueba; cancelación con más y menos de 24 h; webhook.</span></li>
+      <li><b>Revisión del panel por rol <span class="tag">panel</span></b><span>Admin, dueño y mánager con sus cuentas reales: cada pantalla, sus permisos y sus números.</span></li>
+      <li><b>Refactor del código <span class="tag">deuda técnica</span></b><span>Unificar las tres reservas manuales, quitar los botones de datos demo, mover escrituras sensibles al servidor y dividir las páginas de más de 1.000 líneas.</span></li>
+      <li><b>Notificaciones push <span class="tag">pendiente</span></b><span>Necesita la clave VAPID.</span></li>
+    </ol>
+  </section>
+</div>
+
+<script>
+// e: construido · d: datos reales · v: probado en navegador · f: flujo completo probado. y=sí p=parcial n=no x=no aplica
+const AREAS = [
+ { name:"Sitio público", items:[
+  ["Landing", "y","y","y","x","Mobile y desktop revisados midiendo cada sección; planes leídos desde la base."],
+  ["Términos y Privacidad", "y","y","y","x","Ley 21.719, pago solo online, cancelación 24 h, datos de Orion Technology SpA. Falta revisión de un abogado."],
+ ]},
+ { name:"Cuenta y acceso", items:[
+  ["Login y registro", "y","y","p","n","Carga y redirige; no se probó un registro completo."],
+  ["Verificación de correo y recuperación", "y","y","n","n","Resend con respaldo de Firebase."],
+  ["Eliminación de cuenta", "y","y","n","n","Nueva vía del servidor: borra y anonimiza en todas las colecciones."],
+ ]},
+ { name:"App del jugador", items:[
+  ["Inicio", "y","y","p","x","Cuenta regresiva, clima, cancha habitual, racha."],
+  ["Clubes y mapa", "y","y","n","x",""],
+  ["Checkout y pago con tarjeta", "y","y","p","n","Solo pago online. Falta un pago de prueba de punta a punta."],
+  ["Reservas y cancelación", "y","y","n","n","Regla de 24 h aplicada en el servidor y en las reglas."],
+  ["Ticket con QR", "y","y","n","n",""],
+  ["Equipos y chat", "y","y","n","n",""],
+  ["Partidos y desafíos", "y","y","n","n","Restaurado tras el error de la sesión anterior."],
+  ["Torneos", "y","y","n","n","Inscripción pagada solo online."],
+  ["Academias", "y","y","n","n","Inscripción pagada solo online."],
+  ["Estadísticas y logros", "y","y","n","n","XP y logros se escriben desde el navegador (ver bloqueos)."],
+  ["Ranking", "y","y","n","x",""],
+  ["Perfil y preferencias", "y","y","n","x",""],
+  ["Billetera y tarjetas guardadas", "y","y","n","n",""],
+  ["Reporte de problemas", "y","y","n","x",""],
+  ["Notificaciones push", "p","n","n","n","Falta la clave VAPID."],
+ ]},
+ { name:"Panel del recinto", items:[
+  ["Calendario y reserva manual", "y","y","n","n","Tres implementaciones distintas de la reserva manual."],
+  ["Check-in", "y","y","n","n",""],
+  ["Canchas", "y","y","n","x",""],
+  ["Personal", "y","y","n","x",""],
+  ["Finanzas", "y","y","n","x",""],
+  ["Cupones", "y","y","n","x",""],
+  ["Torneos (gestión)", "y","y","n","x","Tiene un botón que carga torneos demo en producción."],
+  ["Academia (gestión)", "y","y","n","x","Tiene un botón que carga clases demo en producción."],
+  ["Opiniones", "y","y","n","x",""],
+  ["Configuración del complejo", "y","y","n","x",""],
+ ]},
+ { name:"Panel de administración", items:[
+  ["Resumen", "y","y","n","x",""],
+  ["Recintos y dueños", "y","y","n","x",""],
+  ["Usuarios y analítica", "y","y","n","x",""],
+  ["Métricas", "y","y","n","x",""],
+  ["Facturas y suscripciones", "y","y","n","n","Cobro mensual día 1."],
+  ["Auditoría y reportes", "y","y","n","x",""],
+  ["Gamificación (reglas)", "y","y","n","x",""],
+ ]},
+ { name:"Plataforma", items:[
+  ["Pagos con Mercado Pago", "y","y","p","n","Webhook con firma, 3D Secure, reembolsos. Endpoints responden; sin pago real probado."],
+  ["Limpieza diaria (cron)", "y","y","n","n","Cancela lo pendiente de pago y libera cupos."],
+  ["Reglas de Firestore", "y","x","n","n","Cambios locales sin publicar y dos fugas abiertas."],
+  ["Estructura del código", "y","x","y","x","Servicios separados en servidor y cliente; código muerto eliminado; compila y 20 tests pasan."],
+  ["Base de datos", "p","x","n","n","Script de auditoría listo; falta correrlo con la clave de servicio."],
+  ["Entorno local", "p","x","n","x","La clave de Firebase Admin de .env.local está incompleta."],
+ ]},
+];
+const W={e:40,d:30,v:15,f:15}, V={y:1,p:.5,n:0};
+const LABEL={y:"sí",p:"parcial",n:"no",x:"no aplica"};
+function score(r){let got=0,max=0;["e","d","v","f"].forEach((k,i)=>{const s=r[i+1];if(s==="x")return;max+=W[k];got+=W[k]*V[s];});return max?Math.round(got/max*100):0;}
+let all=[];const areasEl=document.getElementById("areas"),tablesEl=document.getElementById("tables");
+AREAS.forEach(a=>{
+  const scores=a.items.map(score);all=all.concat(scores);
+  const avg=Math.round(scores.reduce((x,y)=>x+y,0)/scores.length);
+  areasEl.insertAdjacentHTML("beforeend",`<div class="area"><span>${a.name}</span><b>${avg}%</b><div class="bar"><i style="width:${avg}%"></i></div></div>`);
+  const rows=a.items.map((r,i)=>`<tr><td class="mod">${r[0]}</td>${[1,2,3,4].map(j=>`<td><span class="st ${r[j]}">${LABEL[r[j]]}</span></td>`).join("")}<td class="pct">${scores[i]}%</td><td class="note">${r[5]||""}</td></tr>`).join("");
+  tablesEl.insertAdjacentHTML("beforeend",`<section style="margin-bottom:28px"><div class="eyebrow">${a.items.length} módulos</div><h2>${a.name}</h2><div class="tablebox"><table><thead><tr><th>Módulo</th><th>Construido</th><th>Datos reales</th><th>Navegador</th><th>Flujo completo</th><th>Avance</th><th>Notas</th></tr></thead><tbody>${rows}</tbody></table></div></section>`);
+});
+const total=Math.round(all.reduce((x,y)=>x+y,0)/all.length);
+document.getElementById("total").textContent=total+"%";document.getElementById("totalbar").style.width=total+"%";
+</script>
