@@ -7,6 +7,7 @@ import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
 import { academyService, type AcademyClass } from "@/services/player/academyService";
 import { venueService } from "@/services/player/venueService";
+import CardPayment from "@/components/player/CardPayment";
 
 const ACCENT = "#10b981";
 const AGE: Record<string, string> = { libre: "Libre", infantil: "Infantil", juvenil: "Juvenil", adultos: "Adultos", senior: "Senior", todos: "Todas las edades" };
@@ -26,10 +27,13 @@ export default function AcademiasPage() {
   const [selected, setSelected] = useState<AcademyClass | null>(null);
   const [busy, setBusy] = useState(false);
   const [venues, setVenues] = useState<any[]>([]);
+  const [payingCard, setPayingCard] = useState(false);
+  useEffect(() => { setPayingCard(false); }, [selected]);
   useEffect(() => { venueService.getVenues().then(setVenues).catch(() => {}); }, []);
   // Mercado Pago solo si el recinto de la clase lo tiene activo (misma regla que el checkout de canchas)
+  const venueOf = (c: any) => venues.find((v: any) => v.id === c.tenantId || v.ownerId === c.ownerId || (v.ownerIds || []).includes(c.ownerId));
   const mpActiveFor = (c: any) => {
-    const t = venues.find((v: any) => v.id === c.tenantId || v.ownerId === c.ownerId || (v.ownerIds || []).includes(c.ownerId));
+    const t = venueOf(c);
     return !!t && t.isMercadopagoActive !== false && !!(t.isMercadopagoActive || t.mercadopagoPublicKey);
   };
   const [toast, setToast] = useState<{ type: "ok" | "error"; msg: string } | null>(null);
@@ -68,7 +72,7 @@ export default function AcademiasPage() {
     try {
       const res = await academyService.enroll(c.id, payOnline);
       if (res.url) { window.location.href = res.url; return; }
-      setSelected(null);
+      setSelected(null); setPayingCard(false);
       setToast({ type: "ok", msg: c.price ? "¡Inscrito! Paga la mensualidad en el recinto." : "¡Inscrito en la clase!" });
       await load();
     } catch (e: any) {
@@ -206,11 +210,15 @@ export default function AcademiasPage() {
                 <div className="p-3 rounded-md bg-rose-500/10 text-rose-500 text-[13px] font-semibold">No quedan cupos en esta clase</div>
               ) : (
                 <div className="space-y-2.5">
-                  {!!c.price && mpActiveFor(c) && (
-                    <button disabled={busy} onClick={() => enroll(c, true)} className="w-full h-12 rounded-md text-white text-[13px] font-semibold flex items-center justify-center gap-2 disabled:opacity-60" style={{ backgroundColor: ACCENT }}>
-                      <CreditCard size={18} /> Pagar {fmtCLP(c.price)} con Mercado Pago
+                  {!!c.price && mpActiveFor(c) && (payingCard ? (
+                    <CardPayment tenantId={venueOf(c)?.id || ""} amount={Number(c.price)} isDark={isDark}
+                      onPay={(card, save) => academyService.enroll(c.id, true, card, save)}
+                      onApproved={async () => { setPayingCard(false); setSelected(null); setPayingCard(false); setToast({ type: "ok", msg: "¡Pago aprobado! Ya estás inscrito en la clase." }); await load(); }} />
+                  ) : (
+                    <button disabled={busy} onClick={() => setPayingCard(true)} className="w-full h-12 rounded-md text-white text-[13px] font-semibold flex items-center justify-center gap-2 disabled:opacity-60" style={{ backgroundColor: ACCENT }}>
+                      <CreditCard size={18} /> Pagar {fmtCLP(c.price)} con tarjeta
                     </button>
-                  )}
+                  ))}
                   <button disabled={busy} onClick={() => enroll(c, false)} className={`w-full h-12 rounded-md text-[13px] font-semibold border disabled:opacity-60 ${c.price && mpActiveFor(c) ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!(c.price && mpActiveFor(c)) ? { backgroundColor: ACCENT } : undefined}>
                     {busy ? "Procesando…" : c.price ? "Inscribirme y pagar en el recinto" : "Inscribirme"}
                   </button>

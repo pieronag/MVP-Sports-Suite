@@ -138,7 +138,8 @@ export async function buildBookingCheckout(uid: string, input: BookingCheckoutIn
 
 // ---------- Preferencia ----------
 
-export async function createPreference(params: {
+// Registro del pago (payments/{id}) con lo que se confirmará al aprobarse
+export async function createPaymentRecord(params: {
   uid: string;
   tenantId: string;
   bookingId: string;
@@ -149,29 +150,8 @@ export async function createPreference(params: {
   title: string;
   returnUrl: string;
 }) {
-  const accessToken = await resolveMercadoPagoToken(params.tenantId);
-  if (!accessToken) throw new PaymentError("Mercado Pago no está configurado para este recinto.");
-
-  const db = adminDb();
-  const payRef = db.collection("payments").doc();
+  const payRef = adminDb().collection("payments").doc();
   const buyOrder = `ORD-${payRef.id}`;
-  const back = (status: string) => `${SITE_URL}/api/mercadopago/commit?status=${status}&pid=${payRef.id}`;
-
-  const resp = await fetch(`${MP_API}/checkout/preferences`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
-    body: JSON.stringify({
-      items: [{ id: params.bookingId, title: params.title, quantity: 1, unit_price: params.amount, currency_id: "CLP" }],
-      back_urls: { success: back("success"), pending: back("pending"), failure: back("failure") },
-      auto_return: "approved",
-      notification_url: `${SITE_URL}/api/mercadopago/webhook?pid=${payRef.id}`,
-      external_reference: buyOrder,
-      metadata: { payment_record_id: payRef.id, tenant_id: params.tenantId, booking_id: params.bookingId },
-    }),
-  });
-  const data = await resp.json();
-  if (!resp.ok) throw new PaymentError(data.message || "Error al crear la preferencia de pago", 502);
-
   await payRef.set({
     userId: params.uid,
     bookingId: params.bookingId,
@@ -179,7 +159,6 @@ export async function createPreference(params: {
     amount: params.amount,
     currency: "CLP",
     buyOrder,
-    preferenceId: data.id,
     status: "pending",
     method: "mercadopago",
     pendingBookingData: params.bookingData || null,
@@ -189,8 +168,118 @@ export async function createPreference(params: {
     returnUrl: params.returnUrl,
     createdAt: new Date(),
   });
+  return { payRef, buyOrder };
+}
 
-  return { url: data.init_point as string, preferenceId: data.id as string, paymentRecordId: payRef.id };
+// ---------- Checkout API (Card Payment Brick): pago dentro de la PWA ----------
+
+export interface CardData {
+  token: string;              // token de la tarjeta generado por el Brick (los datos nunca pasan por aquí)
+  payment_method_id: string;
+  issuer_id?: string | number;
+  installments?: number;
+}
+
+// Cliente de Mercado Pago del jugador para este recinto (para tarjetas guardadas)
+async function mpCustomerId(accessToken: string, tenantId: string, uid: string, email: string, create: boolean): Promise<string | null> {
+  const db = adminDb();
+  const ref = db.collection("mp_customers").doc(`${tenantId}_${uid}`);
+  const saved = (await ref.get()).data()?.customerId;
+  if (saved) return saved;
+  if (!email) return null;
+  const headers = { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` };
+  const found = await fetch(`${MP_API}/v1/customers/search?email=${encodeURIComponent(email)}`, { headers }).then((r) => r.json()).catch(() => null);
+  let id: string | null = found?.results?.[0]?.id || null;
+  if (!id && create) {
+    const made = await fetch(`${MP_API}/v1/customers`, { method: "POST", headers, body: JSON.stringify({ email }) }).then((r) => r.json()).catch(() => null);
+    id = made?.id || null;
+  }
+  if (id) await ref.set({ customerId: id, uid, tenantId, updatedAt: new Date() }, { merge: true });
+  return id;
+}
+
+// Public Key y tarjetas guardadas del jugador (para inicializar el Brick)
+export async function getCardSetup(uid: string, email: string, tenantId: string) {
+  const db = adminDb();
+  const tenant = (await db.collection("tenants").doc(tenantId).get()).data();
+  if (!tenant) throw new PaymentError("Recinto no encontrado", 404);
+  const accessToken = await resolveMercadoPagoToken(tenantId);
+  const publicKey = tenant.mercadopagoPublicKey || process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY || "";
+  if (!accessToken || !publicKey || tenant.isMercadopagoActive === false) throw new PaymentError("Este recinto no tiene pagos online habilitados");
+  const customerId = await mpCustomerId(accessToken, tenantId, uid, email, false);
+  let cardsIds: string[] = [];
+  if (customerId) {
+    const cards = await fetch(`${MP_API}/v1/customers/${customerId}/cards`, { headers: { Authorization: `Bearer ${accessToken}` } }).then((r) => r.json()).catch(() => []);
+    if (Array.isArray(cards)) cardsIds = cards.map((c: any) => String(c.id));
+  }
+  return { publicKey, customerId, cardsIds };
+}
+
+// Cobra con tarjeta y confirma con la misma conciliación que el webhook (settlePayment)
+export async function chargeCard(params: Parameters<typeof createPaymentRecord>[0] & { card: CardData; payerEmail: string; saveCard?: boolean }) {
+  const accessToken = await resolveMercadoPagoToken(params.tenantId);
+  if (!accessToken) throw new PaymentError("Mercado Pago no está configurado para este recinto.");
+  if (!params.card?.token || !params.card?.payment_method_id) throw new PaymentError("Datos de la tarjeta incompletos");
+
+  const { payRef, buyOrder } = await createPaymentRecord(params);
+  const customerId = params.saveCard || params.card.token
+    ? await mpCustomerId(accessToken, params.tenantId, params.uid, params.payerEmail, !!params.saveCard).catch(() => null)
+    : null;
+
+  const resp = await fetch(`${MP_API}/v1/payments`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}`, "X-Idempotency-Key": payRef.id },
+    body: JSON.stringify({
+      transaction_amount: params.amount,
+      token: params.card.token,
+      description: params.title,
+      installments: Number(params.card.installments) || 1,
+      payment_method_id: params.card.payment_method_id,
+      ...(params.card.issuer_id ? { issuer_id: Number(params.card.issuer_id) } : {}),
+      payer: customerId ? { type: "customer", id: customerId, email: params.payerEmail } : { email: params.payerEmail },
+      external_reference: buyOrder,
+      notification_url: `${SITE_URL}/api/mercadopago/webhook?pid=${payRef.id}`,
+      statement_descriptor: "MVPSPORTS",
+      three_d_secure_mode: "optional",
+      metadata: { payment_record_id: payRef.id, tenant_id: params.tenantId, booking_id: params.bookingId },
+    }),
+  });
+  const mp: any = await resp.json();
+  if (!resp.ok || !mp?.id) {
+    await payRef.update({ status: "error", error: String(mp?.message || resp.status), updatedAt: new Date() });
+    throw new PaymentError(mp?.message ? `Mercado Pago: ${mp.message}` : "No se pudo procesar el pago", 402);
+  }
+  await payRef.update({ mercadopagoPaymentId: String(mp.id), updatedAt: new Date() });
+
+  // Guardar la tarjeta para la próxima vez (si Mercado Pago lo permite con este token)
+  if (params.saveCard && customerId && mp.status === "approved") {
+    await fetch(`${MP_API}/v1/customers/${customerId}/cards`, {
+      method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({ token: params.card.token }),
+    }).catch(() => undefined);
+  }
+
+  const settled = await settlePayment(payRef.id, String(mp.id));
+  const challenge = mp.status_detail === "pending_challenge" && mp.three_ds_info
+    ? { url: mp.three_ds_info.external_resource_url, creq: mp.three_ds_info.creq }
+    : null;
+  return { paymentRecordId: payRef.id, status: mp.status as string, statusDetail: mp.status_detail as string, result: settled.result, returnUrl: settled.returnUrl, challenge };
+}
+
+// Mensaje claro para el jugador según el motivo de rechazo de Mercado Pago
+export function rejectionMessage(detail?: string) {
+  const m: Record<string, string> = {
+    cc_rejected_insufficient_amount: "La tarjeta no tiene saldo suficiente.",
+    cc_rejected_bad_filled_security_code: "El código de seguridad no es correcto.",
+    cc_rejected_bad_filled_date: "La fecha de vencimiento no es correcta.",
+    cc_rejected_bad_filled_other: "Revisa los datos de la tarjeta.",
+    cc_rejected_call_for_authorize: "Tu banco pide autorizar el pago. Llámalo y vuelve a intentar.",
+    cc_rejected_card_disabled: "La tarjeta está deshabilitada. Actívala con tu banco.",
+    cc_rejected_duplicated_payment: "Ya hiciste un pago igual hace un momento.",
+    cc_rejected_high_risk: "El pago fue rechazado por seguridad. Prueba con otra tarjeta.",
+    cc_rejected_max_attempts: "Superaste los intentos permitidos. Usa otra tarjeta.",
+  };
+  return (detail && m[detail]) || "El pago fue rechazado. Prueba con otra tarjeta.";
 }
 
 // ---------- Verificación y cierre ----------

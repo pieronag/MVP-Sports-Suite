@@ -7,6 +7,7 @@ import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
 import { tournamentService } from "@/services/player/tournamentService";
 import { venueService } from "@/services/player/venueService";
+import CardPayment from "@/components/player/CardPayment";
 import { teamService } from "@/services/player/teamService";
 
 const ACCENT = "#f43f5e";
@@ -38,10 +39,13 @@ export default function TorneosPage() {
   const [teamId, setTeamId] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [venues, setVenues] = useState<any[]>([]);
+  const [payingCard, setPayingCard] = useState(false);
+  useEffect(() => { setPayingCard(false); }, [selected]);
   useEffect(() => { venueService.getVenues().then(setVenues).catch(() => {}); }, []);
   // Mercado Pago solo si el recinto del torneo lo tiene activo
+  const venueOf = (t: any) => venues.find((x: any) => x.id === t.tenantId || x.id === t.venueId);
   const mpActiveFor = (t: any) => {
-    const v = venues.find((x: any) => x.id === t.tenantId || x.id === t.venueId);
+    const v = venueOf(t);
     return !!v && v.isMercadopagoActive !== false && !!(v.isMercadopagoActive || v.mercadopagoPublicKey);
   };
   const [toast, setToast] = useState<{ type: "ok" | "error"; msg: string } | null>(null);
@@ -81,7 +85,7 @@ export default function TorneosPage() {
     try {
       const res = await tournamentService.registerTeam(selected.id, teamId, payOnline);
       if (res.url) { window.location.href = res.url; return; }
-      setSelected(null);
+      setSelected(null); setPayingCard(false);
       setToast({ type: "ok", msg: selected.price ? "¡Equipo inscrito! Paga la inscripción en el recinto." : "¡Equipo inscrito!" });
       await load();
     } catch (e: any) {
@@ -235,11 +239,15 @@ export default function TorneosPage() {
                   <select value={teamId} onChange={e => setTeamId(e.target.value)} className={`w-full h-12 px-3 rounded-md border outline-hidden ${isDark ? "bg-white/4 border-white/10 text-slate-100" : "bg-white border-slate-200 text-slate-900"}`}>
                     {eligible.map(team => <option key={team.id} value={team.id}>{team.name}</option>)}
                   </select>
-                  {!!t.price && mpActiveFor(t) && (
-                    <button disabled={busy || !teamId} onClick={() => register(true)} className="w-full h-12 rounded-md text-white text-[13px] font-semibold flex items-center justify-center gap-2 disabled:opacity-60" style={{ backgroundColor: ACCENT }}>
-                      <CreditCard size={18} /> Pagar {fmtCLP(t.price)} con Mercado Pago
+                  {!!t.price && mpActiveFor(t) && (payingCard ? (
+                    <CardPayment tenantId={venueOf(t)?.id || ""} amount={Number(t.price)} isDark={isDark}
+                      onPay={(card, save) => tournamentService.registerTeam(t.id, teamId, true, card, save)}
+                      onApproved={async () => { setPayingCard(false); setSelected(null); setPayingCard(false); setToast({ type: "ok", msg: "¡Pago aprobado! Tu equipo quedó inscrito." }); await load(); }} />
+                  ) : (
+                    <button disabled={busy || !teamId} onClick={() => setPayingCard(true)} className="w-full h-12 rounded-md text-white text-[13px] font-semibold flex items-center justify-center gap-2 disabled:opacity-60" style={{ backgroundColor: ACCENT }}>
+                      <CreditCard size={18} /> Pagar {fmtCLP(t.price)} con tarjeta
                     </button>
-                  )}
+                  ))}
                   <button disabled={busy || !teamId} onClick={() => register(false)} className={`w-full h-12 rounded-md text-[13px] font-semibold border disabled:opacity-60 ${t.price && mpActiveFor(t) ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!(t.price && mpActiveFor(t)) ? { backgroundColor: ACCENT } : undefined}>
                     {busy ? "Procesando…" : t.price ? "Inscribir y pagar en el recinto" : "Inscribir equipo"}
                   </button>

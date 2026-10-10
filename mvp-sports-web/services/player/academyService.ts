@@ -37,16 +37,16 @@ export const academyService = {
         return out;
     },
 
-    async enroll(classId: string, payOnline: boolean): Promise<{ ok?: boolean; url?: string }> {
+    async enroll(classId: string, payOnline: boolean, card?: any, saveCard = false): Promise<any> {
         const token = await auth.currentUser?.getIdToken();
         if (!token) throw new Error('Inicia sesión para inscribirte');
         const res = await fetch('/api/academies/enroll', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ classId, payOnline }),
+            body: JSON.stringify({ classId, payOnline, card, saveCard }),
         });
         const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || 'No se pudo completar la inscripción');
+        if (!res.ok && res.status !== 402) throw new Error(data.error || 'No se pudo completar la inscripción');
         return data;
     },
 };

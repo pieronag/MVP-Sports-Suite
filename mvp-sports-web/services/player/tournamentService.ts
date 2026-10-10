@@ -17,16 +17,16 @@ export const tournamentService = {
     },
 
     // Inscripción vía servidor (valida capitán y cupos; el pago lo define el servidor)
-    async registerTeam(tournamentId: string, teamId: string, payOnline = false): Promise<{ ok?: boolean; url?: string; registrationId: string }> {
+    async registerTeam(tournamentId: string, teamId: string, payOnline = false, card?: any, saveCard = false): Promise<any> {
         const token = await auth.currentUser?.getIdToken();
         if (!token) throw new Error('Inicia sesión para inscribirte');
         const res = await fetch('/api/tournaments/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ tournamentId, teamId, payOnline }),
+            body: JSON.stringify({ tournamentId, teamId, payOnline, card, saveCard }),
         });
         const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || 'No se pudo completar la inscripción');
+        if (!res.ok && res.status !== 402) throw new Error(data.error || 'No se pudo completar la inscripción');
         return data;
     },
 
