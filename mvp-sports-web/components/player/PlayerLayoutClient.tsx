@@ -8,7 +8,7 @@ import { PlayerProvider, usePlayer } from "@/context/PlayerContext";
 import PwaSupport from "@/components/player/PwaSupport";
 import BrandLogo from "@/components/BrandLogo";
 import VerifyEmailGate, { needsEmailVerification } from "@/components/player/VerifyEmailGate";
-import { Home, Calendar, MapPin, User, LogOut, Sun, Moon, Menu, X, Building2, Shield, TrendingUp, GraduationCap, Trophy, CreditCard, ClipboardList, Settings, Swords } from "@/components/player/icons";
+import { Home, Calendar, MapPin, User, LogOut, Sun, Moon, Menu, X, Building2, Shield, TrendingUp, GraduationCap, Trophy, CreditCard, ClipboardList, Settings, Swords, Ranking } from "@/components/player/icons";
 
 // Ítem de menú con el estilo del dashboard (barra verde a la izquierda cuando está activo)
 function PlayerNavItem({ href, icon: Icon, active, isDark, children }: { href: string; icon: any; active: boolean; isDark: boolean; children: React.ReactNode }) {
@@ -48,6 +48,7 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
         { href: '/player/equipos', icon: Shield, label: 'Equipos' },
         { href: '/player/torneos', icon: Trophy, label: 'Torneos' },
         { href: '/player/academias', icon: GraduationCap, label: 'Academias' },
+        { href: '/player/ranking', icon: Ranking, label: 'Ranking' },
     ];
     const accountLinks = [
         { href: '/player/estadisticas', icon: TrendingUp, label: 'Estadísticas' },

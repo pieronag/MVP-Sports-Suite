@@ -11,7 +11,7 @@ import {
   Trophy, CreditCard, Shield, TrendingUp, Swords,
   GraduationCap, ArrowRight, Calendar, Clock, MapPin, ChevronRight,
   Navigation, Ticket, Share2, Flame, Zap, Target, CheckCircle2,
-  Sun, Cloud, CloudRain, CloudStorm, Repeat, Star
+  Sun, Cloud, CloudRain, CloudStorm, Repeat, Star, Lock, Trophy as TrophyIcon
 } from "@/components/player/icons";
 import { venueService } from "@/services/player/venueService";
 import { getMatchWeather, MatchWeather } from "@/services/player/weather";
@@ -166,6 +166,32 @@ export default function PlayerDashboard() {
       .sort((a, b) => b.st!.getTime() - a.st!.getTime())[0]?.b || null;
   }, [allBookings, now]);
 
+  // Desafíos del mes y logros secretos (todo calculado con los partidos jugados)
+  const goals = useMemo(() => {
+    const played = (allBookings as any[]).filter((b) => isPlayed(b, now)).map((b) => ({ b, st: matchStart(b)! })).filter((x) => x.st);
+    const nd = new Date(now);
+    const month = played.filter((x) => x.st.getMonth() === nd.getMonth() && x.st.getFullYear() === nd.getFullYear());
+    const venuesMonth = new Set(month.map((x) => x.b.tenantId)).size;
+    const morningMonth = month.some((x) => x.st.getHours() >= 6 && x.st.getHours() < 12);
+    const challenges = [
+      { label: "Juega 4 partidos", value: Math.min(4, month.length), total: 4 },
+      { label: "Juega en 2 recintos distintos", value: Math.min(2, venuesMonth), total: 2 },
+      { label: "Juega un partido de mañana", value: morningMonth ? 1 : 0, total: 1 },
+    ];
+    const perVenue = new Map<string, number>();
+    played.forEach((x) => perVenue.set(x.b.tenantId, (perVenue.get(x.b.tenantId) || 0) + 1));
+    const sports = new Set(played.map((x) => String(x.b.sport || "").toLowerCase()).filter(Boolean));
+    const secrets = [
+      { name: "Madrugador", hint: "Juega antes de las 9:00", ok: played.some((x) => x.st.getHours() >= 6 && x.st.getHours() < 9) },
+      { name: "Nocturno", hint: "Juega desde las 22:00", ok: played.some((x) => x.st.getHours() >= 22 || x.st.getHours() < 6) },
+      { name: "Trotamundos", hint: "Juega en 3 recintos", ok: perVenue.size >= 3 },
+      { name: "Multideporte", hint: "Juega 2 deportes distintos", ok: sports.size >= 2 },
+      { name: "Fiel", hint: "10 partidos en el mismo recinto", ok: [...perVenue.values()].some((n) => n >= 10) },
+      { name: "Imparable", hint: "Racha de 4 semanas", ok: false },
+    ];
+    return { challenges, secrets };
+  }, [allBookings, now]);
+
   const activity = useMemo(() => {
     const played = allBookings.filter((b) => isPlayed(b, now)).map((b) => matchStart(b)).filter(Boolean) as Date[];
     const weeks = new Set(played.map((d) => weekStart(d)));
@@ -290,6 +316,9 @@ export default function PlayerDashboard() {
             </p>
           </Link>
         )}
+        {prog && (
+          <Link href="/player/ranking" className="-mt-3 block text-right text-[12px] font-semibold text-emerald-500">Ver ranking de jugadores →</Link>
+        )}
 
         {/* Actividad: racha, mes y meta semanal */}
         <section aria-label="Tu actividad" className="grid grid-cols-3 gap-2.5">
@@ -308,6 +337,50 @@ export default function PlayerDashboard() {
             <p className={`text-[13px] font-bold mt-1.5 leading-tight ${activity.thisWeek ? "text-emerald-500" : isDark ? "text-slate-100" : "text-slate-900"}`}>{activity.thisWeek ? "Meta lista" : "1 partido"}</p>
             <p className={`text-[11px] mt-1 ${muted}`}>{activity.thisWeek ? "esta semana" : activity.streak > 0 ? "para no cortar la racha" : "para iniciar tu racha"}</p>
           </Link>
+        </section>
+
+        {/* Desafíos del mes */}
+        <section aria-label="Desafíos del mes" className={`rounded-md ${card} p-4`}>
+          <div className="flex items-center justify-between mb-3">
+            <p className={`text-[13px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>Desafíos de {new Date(now).toLocaleDateString("es-CL", { month: "long" })}</p>
+            <p className={`text-[12px] ${muted}`}>{goals.challenges.filter((c) => c.value >= c.total).length}/{goals.challenges.length} listos</p>
+          </div>
+          <ul className="space-y-3">
+            {goals.challenges.map((c) => {
+              const done = c.value >= c.total;
+              return (
+                <li key={c.label}>
+                  <div className="flex items-center justify-between text-[12px]">
+                    <span className={`flex items-center gap-1.5 ${done ? "text-emerald-500 font-semibold" : isDark ? "text-slate-300" : "text-slate-700"}`}>{done && <CheckCircle2 size={13} />}{c.label}</span>
+                    <span className={`tabular-nums ${muted}`}>{c.value}/{c.total}</span>
+                  </div>
+                  <div className={`h-1.5 rounded-full mt-1.5 overflow-hidden ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}>
+                    <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${(c.value / c.total) * 100}%` }} />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
+        {/* Logros secretos: se descubren jugando */}
+        <section aria-label="Logros secretos">
+          <div className="flex items-center justify-between mb-2.5">
+            <h2 className={`text-[12px] font-semibold ${muted}`}>Logros secretos</h2>
+            <p className={`text-[12px] ${muted}`}>{goals.secrets.filter((x) => x.ok || (x.name === "Imparable" && activity.streak >= 4)).length}/{goals.secrets.length}</p>
+          </div>
+          <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5">
+            {goals.secrets.map((x) => {
+              const ok = x.ok || (x.name === "Imparable" && activity.streak >= 4);
+              return (
+                <div key={x.name} title={ok ? x.name : x.hint} className={`shrink-0 w-[104px] rounded-md p-3 border ${ok ? "border-amber-500/30 bg-amber-500/10" : isDark ? "border-white/[0.06] bg-[#0A101D]" : "border-slate-200 bg-white"}`}>
+                  {ok ? <TrophyIcon size={18} color="#f59e0b" /> : <Lock size={18} color={isDark ? "#475569" : "#94a3b8"} />}
+                  <p className={`text-[12px] font-semibold mt-1.5 ${ok ? "text-amber-500" : isDark ? "text-slate-400" : "text-slate-500"}`}>{ok ? x.name : "???"}</p>
+                  <p className={`text-[11px] leading-tight mt-0.5 ${muted}`}>{x.hint}</p>
+                </div>
+              );
+            })}
+          </div>
         </section>
 
         {/* Explorar */}
