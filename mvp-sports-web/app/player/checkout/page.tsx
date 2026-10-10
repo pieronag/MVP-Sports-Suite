@@ -26,17 +26,12 @@ export default function CheckoutPage() {
   const isDark = theme === "dark";
   const activeColor = searchParams.get("sportColor") || "#10b981";
 
-  const [processing, setProcessing] = useState(false);
-  // Métodos de pago: Mercado Pago (si el recinto lo tiene activo) o en el recinto
-  // (salvo inasistencia previa con pago en efectivo, o si el recinto exige pago online)
-  const [method, setMethod] = useState<"mercadopago" | "venue">("mercadopago");
+  // Solo pago online con Mercado Pago
   const [tenantInfo, setTenantInfo] = useState<{ mpActive: boolean; requireOnline: boolean } | null>(null);
-  const [hasCashNoShow, setHasCashNoShow] = useState(false);
   const [customAlert, setCustomAlert] = useState<{ visible: boolean; title: string; message: string; type: "success" | "error"; onClose?: () => void }>({ visible: false, title: "", message: "", type: "success" });
   const [userTeams, setUserTeams] = useState<any[]>([]);
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [showCoupon, setShowCoupon] = useState(false);
-  const [repeatWeeks, setRepeatWeeks] = useState<1 | 2 | 4>(1);
   const [couponInput, setCouponInput] = useState("");
   const [validatingCoupon, setValidatingCoupon] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
@@ -98,73 +93,10 @@ export default function CheckoutPage() {
         const p = priceFromTenantConfig(t, sport, date, startTime);
         if (p > 0) setTenantPrice(p);
       }
-      setMethod(mpActive ? "mercadopago" : "venue");
     }).catch(() => setTenantInfo({ mpActive: true, requireOnline: false }));
   }, [tenantId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    const uid = (profile as any)?.uid;
-    if (!uid) return;
-    getDocs(query(collection(db, "bookings"), where("userId", "==", uid))).then(snap => {
-      setHasCashNoShow(snap.docs.some(d => {
-        const b: any = d.data();
-        const noShow = b.status === "no-show" || b.paymentStatus === "no-show" || b.noShow === true;
-        return noShow && (b.paymentMethod === "cash" || b.paymentMethod === "venue");
-      }));
-    }).catch(() => undefined);
-  }, [profile]);
-
-  const venueAllowed = !isTournament && !hasCashNoShow && !tenantInfo?.requireOnline;
   const mpAllowed = isTournament || tenantInfo?.mpActive !== false;
-
-  // Reserva con pago en el recinto: queda pendiente y se cobra al llegar
-  const confirmVenueBooking = async () => {
-    const userProfile = profile as any;
-    // El horario puede haberse tomado mientras el jugador elegía
-    const slot = await getDoc(doc(db, "court_slots", `${courtId}_${date}`)).catch(() => null);
-    if ((slot?.data() as any)?.taken?.[startTime as string]) throw new Error("Ese horario acaba de ser reservado. Elige otro.");
-    const [sh, sm] = String(startTime).split(":").map(Number);
-    const when = new Date(`${date}T00:00:00`);
-    when.setHours(sh, sm || 0, 0, 0);
-    if (sh < 6) when.setDate(when.getDate() + 1);
-    const total = Math.max(0, Math.round(finalPrice));
-    const id = await bookingService.createBooking({
-      userId: userProfile.uid, tenantId: tenantId as string, tenantName: tenantName || "Recinto",
-      courtId: courtId as string, courtName: courtName || "Cancha", sport: sport || "futbol",
-      clientName: userProfile.displayName || userProfile.fullName || "Jugador MVP", clientPhone: userProfile.phone || "",
-      date: Timestamp.fromDate(when), startTime: startTime as string,
-      endTime: `${String((sh + 1) % 24).padStart(2, "0")}:${String(sm || 0).padStart(2, "0")}`,
-      price: total, totalPrice: total, originalPrice: Number(price), couponCode: appliedCoupon?.code || null,
-      discountApplied: appliedCoupon?.discount || 0, status: "confirmed", paymentStatus: "pending", paymentMethod: "cash",
-      createdBy: userProfile.email || userProfile.uid, ...(selectedTeamId ? { teamId: selectedTeamId } : {}),
-    } as any);
-
-    // Reserva recurrente: misma cancha, día y hora las semanas siguientes (sin cupón; se saltan las ocupadas)
-    let created = 1;
-    const skipped: string[] = [];
-    for (let k = 1; k < repeatWeeks; k++) {
-      const d = new Date(`${date}T12:00:00`);
-      d.setDate(d.getDate() + 7 * k);
-      const dayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-      const s2 = await getDoc(doc(db, "court_slots", `${courtId}_${dayStr}`)).catch(() => null);
-      if ((s2?.data() as any)?.taken?.[startTime as string]) { skipped.push(dayStr); continue; }
-      const w2 = new Date(`${dayStr}T00:00:00`);
-      w2.setHours(sh, sm || 0, 0, 0);
-      if (sh < 6) w2.setDate(w2.getDate() + 1);
-      const base = Math.max(0, Math.round(Number(price)));
-      await bookingService.createBooking({
-        userId: userProfile.uid, tenantId: tenantId as string, tenantName: tenantName || "Recinto",
-        courtId: courtId as string, courtName: courtName || "Cancha", sport: sport || "futbol",
-        clientName: userProfile.displayName || userProfile.fullName || "Jugador MVP", clientPhone: userProfile.phone || "",
-        date: Timestamp.fromDate(w2), startTime: startTime as string,
-        endTime: `${String((sh + 1) % 24).padStart(2, "0")}:${String(sm || 0).padStart(2, "0")}`,
-        price: base, totalPrice: base, originalPrice: base, status: "confirmed", paymentStatus: "pending", paymentMethod: "cash",
-        createdBy: userProfile.email || userProfile.uid, seriesOf: id, ...(selectedTeamId ? { teamId: selectedTeamId } : {}),
-      } as any).then(() => { created++; }).catch(() => { skipped.push(dayStr); });
-    }
-    const q = repeatWeeks > 1 ? `&serie=${created}&de=${repeatWeeks}${skipped.length ? `&saltadas=${encodeURIComponent(skipped.join(","))}` : ""}` : "";
-    router.replace(`/player/ticket?bookingId=${id}${q}`);
-  };
 
   // Pago con tarjeta (Brick): el servidor calcula el monto y confirma la reserva o inscripción
   const payWithCard = async (card: any, saveCard: boolean) => {
@@ -183,18 +115,6 @@ export default function CheckoutPage() {
     if (isTournament) { router.push(`/player/torneos?registered=${encodeURIComponent(tournamentId || "")}`); return; }
     if (returnUrl) { try { const u = new URL(returnUrl); router.replace(u.pathname + u.search); return; } catch { /* sigue */ } }
     router.replace("/player/reservas");
-  };
-
-  const handleConfirm = async () => {
-    if (!profile) return;
-    setProcessing(true);
-    try {
-      if (!tenantId || !courtId || !date || !startTime || !sport) throw new Error("Datos de reserva incompletos");
-      await confirmVenueBooking();
-    } catch (error: any) {
-      setCustomAlert({ visible: true, title: "Error de Pago", message: error.message || "Error al procesar.", type: "error" });
-      setProcessing(false);
-    }
   };
 
   const discountAmount = appliedCoupon ? (Number(price) * appliedCoupon.discount / 100) : 0;
@@ -345,57 +265,21 @@ export default function CheckoutPage() {
         <SectionPill label="Pago" />
         <GlowCard isDark={isDark}>
           <div className="p-5 space-y-3">
-            {[
-              ...(mpAllowed ? [{ id: "mercadopago" as const, name: "Tarjeta", sub: "Crédito, débito o prepago · sin salir de la app", color: "#00B2E3" }] : []),
-              ...(venueAllowed ? [{ id: "venue" as const, name: "Pagar en el recinto", sub: "Reserva ahora y paga al llegar a la cancha", color: "#10b981" }] : []),
-            ].map((m) => (
-              <button
-                key={m.id}
-                onClick={() => setMethod(m.id)}
-                className={`w-full flex items-center gap-4 p-4 rounded-md border transition-all text-left ${
-                  method === m.id
-                    ? "border-emerald-500 bg-emerald-500/5"
-                    : "border-slate-200 dark:border-white/10 hover:border-emerald-500/40"
-                }`}
-              >
-                <div className="w-10 h-10 rounded-md flex items-center justify-center bg-white/10 shrink-0" style={{ backgroundColor: m.color + "1f", color: m.color }}>
-                  <CreditCard size={20} />
-                </div>
-                <div className="flex-1">
-                  <p className={`text-[13px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{m.name}</p>
-                  <p className="text-[11px] font-medium text-slate-400">{m.sub}</p>
-                </div>
-                <span
-                  className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${method === m.id ? "border-emerald-500" : "border-slate-300 dark:border-white/20"}`}
-                >
-                  {method === m.id && <span className="w-2 h-2 rounded-full bg-emerald-500" />}
-                </span>
-              </button>
-            ))}
-            {method === "venue" && !isTournament && (
-              <div className="pt-1">
-                <p className={`text-[12px] font-semibold mb-2 ${isDark ? "text-slate-300" : "text-slate-700"}`}>Repetir este horario</p>
-                <div className="grid grid-cols-3 gap-2">
-                  {([1, 2, 4] as const).map((n) => (
-                    <button key={n} type="button" aria-pressed={repeatWeeks === n} onClick={() => setRepeatWeeks(n)}
-                      className={`h-10 rounded-md text-[12px] font-semibold transition-all ${repeatWeeks === n ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-600"}`}>
-                      {n === 1 ? "Solo esta vez" : `${n} semanas`}
-                    </button>
-                  ))}
-                </div>
-                {repeatWeeks > 1 && <p className="text-[11px] text-slate-400 mt-2">Misma cancha, día y hora durante {repeatWeeks} semanas. Las que estén ocupadas se saltan y pagas cada partido en el recinto.</p>}
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: "#00B2E31f", color: "#00B2E3" }}>
+                <CreditCard size={20} />
               </div>
-            )}
-            {method === "mercadopago" && mpAllowed && (isTournament || tenantId) && (
+              <div className="flex-1">
+                <p className={`text-[13px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Tarjeta</p>
+                <p className="text-[11px] font-medium text-slate-400">Crédito, débito o prepago · sin salir de la app</p>
+              </div>
+            </div>
+            {mpAllowed && (isTournament || tenantId) ? (
               <div className="pt-1">
                 <CardPayment tenantId={(tenantId || searchParams.get("tenantId") || "") as string} amount={Math.max(1, Math.round(finalPrice))} isDark={isDark} onPay={payWithCard} onApproved={onCardApproved} />
               </div>
-            )}
-            {hasCashNoShow && !isTournament && (
-              <p className="text-[11px] text-amber-500">Por una inasistencia anterior, este recinto requiere pagar online para reservar.</p>
-            )}
-            {!mpAllowed && !venueAllowed && (
-              <p className="text-[11px] text-rose-500">Este recinto no tiene métodos de pago disponibles para tu cuenta.</p>
+            ) : (
+              <p className="text-[11px] text-rose-500">Este recinto aún no tiene pagos online habilitados.</p>
             )}
           </div>
         </GlowCard>
@@ -405,16 +289,6 @@ export default function CheckoutPage() {
           <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Transacción Protegida PCI-DSS</span>
         </div>
       </div>
-
-      {method !== "mercadopago" && (
-      <div className={`fixed bottom-0 left-0 right-0 p-5 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-        <button onClick={handleConfirm} disabled={processing || (!isTournament && !mpAllowed && !venueAllowed)}
-          className="w-full h-14 rounded-md flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
-          style={{ backgroundColor: activeColor, boxShadow: `0 4px 20px ${activeColor}40` }}>
-          {processing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><CreditCard size={20} className="text-white" /><span className="text-white font-semibold text-[13px] uppercase tracking-wide">{isTournament ? "Pagar Inscripción" : method === "venue" ? "Reservar y pagar en el recinto" : `Pagar $${formatMoney(finalPrice)}`}</span></>}
-        </button>
-      </div>
-      )}
 
       {customAlert.visible && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => { setCustomAlert({ ...customAlert, visible: false }); if (customAlert.onClose) customAlert.onClose(); }}>

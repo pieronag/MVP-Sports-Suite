@@ -81,7 +81,7 @@ const sections: LegalSection[] = [
         <Bullets
           items={[
             <><strong className="text-white">Prestarte el servicio</strong> (ejecución del contrato): crear tu cuenta, reservar, cobrar, reembolsar, emitir tu ticket QR, registrar tu asistencia, y gestionar torneos, academias, equipos y chat.</>,
-            <><strong className="text-white">Tu perfil deportivo y la comunidad</strong> (ejecución del contrato): calcular XP, niveles, logros, rankings y recompensas, y sugerirte jugadores o partidos de tu nivel y ciudad.</>,
+            <><strong className="text-white">Tu perfil deportivo y la comunidad</strong> (ejecución del contrato): calcular XP, niveles, logros y rankings, y sugerirte jugadores o partidos de tu nivel y ciudad.</>,
             <><strong className="text-white">Mostrarte canchas cercanas</strong> (consentimiento): usar tu ubicación solo cuando la autorizas en tu dispositivo.</>,
             <><strong className="text-white">Seguridad y mejora</strong> (interés legítimo): prevenir fraudes y abusos, mantener registros de auditoría y corregir errores.</>,
             <><strong className="text-white">Cumplir la ley</strong> (obligación legal): conservar registros de pagos y facturación exigidos por la normativa tributaria.</>,

@@ -254,19 +254,16 @@ service cloud.firestore {
         request.auth.uid in resource.data.get('participantIds', []) ||
         isStaff()
       );
-      // Un jugador solo crea reservas a su nombre y sin pago confirmado: las reservas
-      // pagadas online las crea el servidor tras verificar el pago en Mercado Pago.
-      allow create: if worksAtTenant(request.resource.data.get('tenantId', '')) || (
-        isAuthenticated() &&
-        request.resource.data.userId == request.auth.uid &&
-        request.resource.data.get('paymentStatus', 'pending') == 'pending' &&
-        !request.resource.data.keys().hasAny(['paymentRecordId', 'refundAmount', 'refundDetails'])
-      );
+      // Solo pago online: las reservas de jugadores las crea el servidor tras verificar el
+      // pago en Mercado Pago; el personal del recinto puede crear reservas manuales.
+      allow create: if worksAtTenant(request.resource.data.get('tenantId', ''));
       allow update: if isAuthenticated() && (
         (worksAtTenant(resource.data.get('tenantId', '')) &&
           request.resource.data.get('tenantId', '') == resource.data.get('tenantId', '')) ||
         ((resource.data.userId == request.auth.uid || resource.data.get('userEmail', '') == request.auth.token.email) &&
-          !request.resource.data.diff(resource.data).affectedKeys().hasAny(bookingPaymentKeys()))
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(bookingPaymentKeys()) &&
+          // Cancelar pasa por el servidor, que aplica la regla de 24 h y el reembolso
+          (request.resource.data.get('status', '') != 'cancelled' || resource.data.get('status', '') == 'cancelled'))
       );
       allow delete: if canManageTenant(resource.data.get('tenantId', ''));
     }

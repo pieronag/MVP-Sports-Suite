@@ -104,16 +104,11 @@ export const bookingService = {
         await syncBookingSlots(bookingId);
     },
 
-    async cancelBooking(params: { bookingId: string; cancelledBy: string }) {
-        await bookingService.updateBooking(params.bookingId, {
-            status: 'cancelled',
-            cancelledAt: Timestamp.now() as any,
-            cancelledBy: params.cancelledBy as any,
-        } as any);
-        // Una reserva cancelada deja de buscar jugadores en Partidos
+    // Una reserva cancelada deja de buscar jugadores en Partidos
+    async closeMatchmakingFor(bookingId: string) {
         const uid = auth.currentUser?.uid;
         if (uid) {
-            const pubs = await getDocs(query(collection(db, 'matchmaking'), where('userId', '==', uid), where('bookingId', '==', params.bookingId), where('status', '==', 'active'))).catch(() => null);
+            const pubs = await getDocs(query(collection(db, 'matchmaking'), where('userId', '==', uid), where('bookingId', '==', bookingId), where('status', '==', 'active'))).catch(() => null);
             await Promise.all((pubs?.docs || []).map((d) => updateDoc(d.ref, { status: 'closed' }))).catch(() => undefined);
         }
     },

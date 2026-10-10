@@ -6,7 +6,7 @@ import { buildRegistration, commitRegistration } from "@/services/tournaments";
 
 // Inscribe un equipo a un torneo.
 //  - payOnline: crea la preferencia de Mercado Pago; la inscripción se confirma al aprobarse el pago.
-//  - pago en recinto (o torneo gratis): inscribe de inmediato con el pago pendiente.
+//  - gratis: inscribe de inmediato. Si tiene precio, solo se acepta pago online.
 export async function POST(request: Request) {
   const caller = await verifyAuthedCaller(request);
   if (!caller) return NextResponse.json({ error: "Inicia sesión para inscribirte" }, { status: 401 });
@@ -14,6 +14,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const draft = await buildRegistration(caller.uid, String(body?.tournamentId || ""), String(body?.teamId || ""));
 
+    if (draft.price > 0 && !body?.payOnline) throw new PaymentError("La inscripción a este torneo se paga online.");
     if (body?.payOnline && draft.price > 0) {
       const { title, returnUrl, ...pendingRegistration } = draft;
       const pay = await chargeCard({

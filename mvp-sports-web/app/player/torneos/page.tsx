@@ -248,9 +248,9 @@ export default function TorneosPage() {
                       <CreditCard size={18} /> Pagar {fmtCLP(t.price)} con tarjeta
                     </button>
                   ))}
-                  <button disabled={busy || !teamId} onClick={() => register(false)} className={`w-full h-12 rounded-md text-[13px] font-semibold border disabled:opacity-60 ${t.price && mpActiveFor(t) ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!(t.price && mpActiveFor(t)) ? { backgroundColor: ACCENT } : undefined}>
-                    {busy ? "Procesando…" : t.price ? "Inscribir y pagar en el recinto" : "Inscribir equipo"}
-                  </button>
+                  {!t.price ? (<button disabled={busy || !teamId} onClick={() => register(false)} className={`w-full h-12 rounded-md text-[13px] font-semibold border disabled:opacity-60 ${t.price && mpActiveFor(t) ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!(t.price && mpActiveFor(t)) ? { backgroundColor: ACCENT } : undefined}>
+                    {busy ? "Procesando…" : "Inscribir equipo"}
+                  </button>) : !mpActiveFor(t) && (<p className="text-[12px] text-rose-500">Este recinto aún no tiene pagos online habilitados.</p>)}
                 </div>
               )}
             </div>

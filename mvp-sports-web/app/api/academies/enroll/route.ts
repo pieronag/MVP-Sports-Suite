@@ -6,7 +6,7 @@ import { buildEnrollment, commitEnrollment } from "@/services/academies";
 
 // Inscribe al jugador en una clase de academia.
 //  - payOnline: preferencia de Mercado Pago; la inscripción se confirma al aprobarse el pago.
-//  - pago en recinto (o clase gratis): inscribe de inmediato con pago pendiente.
+//  - gratis: inscribe de inmediato. Si tiene precio, solo se acepta pago online.
 export async function POST(request: Request) {
   const caller = await verifyAuthedCaller(request);
   if (!caller) return NextResponse.json({ error: "Inicia sesión para inscribirte" }, { status: 401 });
@@ -14,6 +14,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const draft = await buildEnrollment(caller.uid, String(body?.classId || ""));
 
+    if (draft.price > 0 && !body?.payOnline) throw new PaymentError("Esta clase se paga online al inscribirte.");
     if (body?.payOnline && draft.price > 0) {
       if (!draft.tenantId) throw new PaymentError("Esta clase no tiene un recinto con pagos online configurado");
       const { title, returnUrl, ...pendingEnrollment } = draft;

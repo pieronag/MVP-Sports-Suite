@@ -16,7 +16,7 @@ async function resolveMercadoPagoToken(tenantId?: string): Promise<string | unde
   return priv?.mercadopagoAccessToken || process.env.MERCADOPAGO_ACCESS_TOKEN || undefined;
 }
 
-const REFUND_MIN_HOURS = 4;
+const CANCEL_MIN_HOURS = 24;
 
 // Hora de pared en Chile como instante comparable (la diferencia entre dos de estos es la real)
 function chileWallClock(d: Date, time?: string): number {
@@ -35,7 +35,7 @@ function hoursUntilStart(booking: any): number | null {
   return (chileWallClock(date, booking.startTime) - chileWallClock(new Date())) / 3_600_000;
 }
 
-// Cancela una reserva propia y, si se pagó online con 4 h o más de anticipación, reembolsa descontando 3% de comisión.
+// Única vía para que un jugador cancele: solo hasta 24 h antes, reembolsando lo pagado menos 3% de comisión.
 export async function POST(request: Request) {
   const caller = await verifyAuthedCaller(request);
   if (!caller) return NextResponse.json({ error: "Debes estar autenticado." }, { status: 401 });
@@ -53,11 +53,11 @@ export async function POST(request: Request) {
     if (bookingData.userId !== caller.uid) return NextResponse.json({ error: "No tienes permisos sobre esta reserva." }, { status: 403 });
     if (bookingData.status === "cancelled") return NextResponse.json({ error: "La reserva ya está cancelada." }, { status: 409 });
     if (bookingData.checkIn || ["active", "completed", "past", "no-show"].includes(bookingData.status)) {
-      return NextResponse.json({ error: "La reserva ya comenzó, no admite reembolso." }, { status: 409 });
+      return NextResponse.json({ error: "La reserva ya comenzó, no se puede cancelar." }, { status: 409 });
     }
     const hoursLeft = hoursUntilStart(bookingData);
-    if (hoursLeft === null || hoursLeft < REFUND_MIN_HOURS) {
-      return NextResponse.json({ error: `Faltan menos de ${REFUND_MIN_HOURS} horas para el partido: según la política de cancelación no corresponde reembolso.` }, { status: 409 });
+    if (hoursLeft === null || hoursLeft < CANCEL_MIN_HOURS) {
+      return NextResponse.json({ error: `Las reservas solo se pueden cancelar hasta ${CANCEL_MIN_HOURS} horas antes del partido.` }, { status: 409 });
     }
 
     const paymentSnap = await db.collection("payments").where("bookingId", "==", String(bookingId)).limit(1).get();

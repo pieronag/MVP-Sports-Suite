@@ -219,9 +219,9 @@ export default function AcademiasPage() {
                       <CreditCard size={18} /> Pagar {fmtCLP(c.price)} con tarjeta
                     </button>
                   ))}
-                  <button disabled={busy} onClick={() => enroll(c, false)} className={`w-full h-12 rounded-md text-[13px] font-semibold border disabled:opacity-60 ${c.price && mpActiveFor(c) ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!(c.price && mpActiveFor(c)) ? { backgroundColor: ACCENT } : undefined}>
-                    {busy ? "Procesando…" : c.price ? "Inscribirme y pagar en el recinto" : "Inscribirme"}
-                  </button>
+                  {!c.price ? (<button disabled={busy} onClick={() => enroll(c, false)} className={`w-full h-12 rounded-md text-[13px] font-semibold border disabled:opacity-60 ${c.price && mpActiveFor(c) ? (isDark ? "border-white/10 text-slate-200" : "border-slate-200 text-slate-700") : "text-white border-transparent"}`} style={!(c.price && mpActiveFor(c)) ? { backgroundColor: ACCENT } : undefined}>
+                    {busy ? "Procesando…" : "Inscribirme"}
+                  </button>) : !mpActiveFor(c) && (<p className="text-[12px] text-rose-500">Este recinto aún no tiene pagos online habilitados.</p>)}
                 </div>
               )}
             </div>

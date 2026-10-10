@@ -222,66 +222,53 @@ export default function ReservasPage() {
   };
 
   const handleCancel = (bookingId: string) => {
+    const h = hoursUntil(bookings.find((b) => b.id === bookingId));
+    if (h !== null && h < 24) {
+      setFbType("error");
+      setFbMsg("Las reservas solo se pueden cancelar hasta 24 horas antes del partido.");
+      setFbVisible(true);
+      return;
+    }
     setBookingToCancel(bookingId);
     setShowCancelModal(true);
   };
 
+  const hoursUntil = (b?: (typeof bookings)[number]) => {
+    if (!b?.date || !b?.startTime) return null;
+    const bookingDate = (b.date as any).toDate ? (b.date as any).toDate() : new Date(b.date as any);
+    return (getBookingDateTimeChile(bookingDate, b.startTime).getTime() - getSantiagoDateTime(new Date()).getTime()) / 3_600_000;
+  };
+
   const confirmCancel = async () => {
     if (!bookingToCancel) return;
-    const targetBooking = bookings.find((b) => b.id === bookingToCancel);
-    const isPaid = targetBooking?.paymentStatus === "paid" || targetBooking?.paymentStatus === "partial";
-    let isLessThan4Hours = false;
-    if (targetBooking?.date && targetBooking?.startTime) {
-      const nowChile = getSantiagoDateTime(new Date());
-      const bookingDate = (targetBooking.date as any).toDate ? (targetBooking.date as any).toDate() : new Date(targetBooking.date as any);
-      const startDateTime = getBookingDateTimeChile(bookingDate, targetBooking.startTime);
-      const diffMs = startDateTime.getTime() - nowChile.getTime();
-      isLessThan4Hours = diffMs / (1000 * 60 * 60) < 4;
-    }
     try {
-      if (isPaid && !isLessThan4Hours) {
-        const resultData = await postApi<{ success: boolean; refundAmount: number; fee: number; error?: string }>("/api/bookings/refund", { bookingId: bookingToCancel });
-        loadData();
-        setShowCancelModal(false);
-        setFbType("success");
-        if (resultData.success) {
-          setFbMsg(`¡Cancelado y Reembolsado! Se procesó un reembolso parcial de $${new Intl.NumberFormat("es-CL").format(resultData.refundAmount)} (comisión del 3% retenida: $${new Intl.NumberFormat("es-CL").format(resultData.fee)}).`);
-        } else {
-          setFbMsg("Reserva cancelada con éxito. Sin embargo, hubo un error al procesar el reembolso automático. Contacta al dueño del recinto.");
-        }
-        setFbVisible(true);
-      } else {
-        await bookingService.cancelBooking({ bookingId: bookingToCancel, cancelledBy: (profile as any)?.displayName || (profile as any)?.email || "User" });
-        loadData();
-        setShowCancelModal(false);
-        setFbType("success");
-        setFbMsg(isPaid ? "Reserva cancelada de última hora. De acuerdo con las políticas, el monto pagado no admite devolución." : "Tu reserva ha sido cancelada correctamente.");
-        setFbVisible(true);
-      }
-    } catch {
+      const res = await postApi<{ success: boolean; refundAmount: number; fee: number; error?: string }>("/api/bookings/refund", { bookingId: bookingToCancel });
+      bookingService.closeMatchmakingFor(bookingToCancel).catch(() => undefined);
+      loadData();
+      setShowCancelModal(false);
+      setFbType("success");
+      setFbMsg(
+        res.refundAmount > 0
+          ? `Reserva cancelada. Te devolveremos $${new Intl.NumberFormat("es-CL").format(res.refundAmount)} (se descuenta un 3% por costos de procesamiento: $${new Intl.NumberFormat("es-CL").format(res.fee)}).`
+          : res.success
+            ? "Tu reserva fue cancelada."
+            : "Reserva cancelada, pero el reembolso automático falló. Usa el código de reclamo de tu ticket con el recinto."
+      );
+      setFbVisible(true);
+    } catch (e: any) {
+      setShowCancelModal(false);
       setFbType("error");
-      setFbMsg("Hubo un problema al cancelar. Contacta al soporte.");
+      setFbMsg(e?.message || "No se pudo cancelar la reserva. Intenta de nuevo.");
       setFbVisible(true);
     }
   };
 
   const cancelModalInfo = useMemo(() => {
-    if (!bookingToCancel) return { title: "¿Cancelar Reserva?", message: "Esta acción no se puede deshacer. ¿Estás seguro?", danger: true };
-    const targetBooking = bookings.find((b) => b.id === bookingToCancel);
-    if (!targetBooking) return { title: "¿Cancelar Reserva?", message: "Esta acción no se puede deshacer. ¿Estás seguro?", danger: true };
-    const nowChile = getSantiagoDateTime(new Date());
-    const bookingDate = (targetBooking.date as any).toDate ? (targetBooking.date as any).toDate() : new Date(targetBooking.date as any);
-    const startDateTime = getBookingDateTimeChile(bookingDate, targetBooking.startTime);
-    const diffMs = startDateTime.getTime() - nowChile.getTime();
-    const isLessThan4Hours = diffMs / (1000 * 60 * 60) < 4;
-    const isPaid = targetBooking.paymentStatus === "paid" || targetBooking.paymentStatus === "partial";
-    if (isLessThan4Hours) {
-      if (isPaid) return { title: "Penalización por Cancelación", message: "¡ATENCIÓN! Estás cancelando con menos de 4 horas de anticipación. El monto pagado online NO será devuelto. ¿Deseas continuar?", danger: true };
-      return { title: "Cancelación de Última Hora", message: "Estás cancelando con menos de 4 horas de anticipación. Tu cupo podría quedar vacío. ¿Estás seguro?", danger: true };
-    } else {
-      if (isPaid) return { title: "Confirmar Devolución", message: "Tu reserva está en período de cancelación permitido (+4h). Se gestionará la devolución de tu dinero. ¿Confirmas?", danger: false };
-      return { title: "¿Confirmar Cancelación?", message: "Esta acción no se puede deshacer. ¿Estás seguro?", danger: true };
-    }
+    const b = bookings.find((x) => x.id === bookingToCancel);
+    const isPaid = b?.paymentStatus === "paid" || b?.paymentStatus === "partial";
+    return isPaid
+      ? { title: "¿Cancelar reserva?", message: "Faltan más de 24 horas: te devolveremos lo pagado menos un 3% por costos de procesamiento. Esta acción no se puede deshacer.", danger: false }
+      : { title: "¿Cancelar reserva?", message: "Esta acción no se puede deshacer. ¿Estás seguro?", danger: true };
   }, [bookingToCancel, bookings]);
 
   const displayList = useMemo(() => {

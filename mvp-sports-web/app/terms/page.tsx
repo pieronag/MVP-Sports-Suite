@@ -88,25 +88,17 @@ const sections: LegalSection[] = [
             "Las reservas son por bloques de una hora en la fecha y horario elegidos, sujetos a disponibilidad.",
           ]}
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-          <Card title="Pago con tarjeta en la app">
-            <p>
-              Los pagos se procesan con <strong className="text-white">Mercado Pago</strong> dentro de la app. Los datos de tu
-              tarjeta van directo a Mercado Pago: MVP Sports nunca ve ni guarda el número, la fecha de vencimiento ni el código de
-              seguridad. Tu banco puede pedirte una validación adicional (3D Secure).
-            </p>
-            <p>
-              Si eliges guardar tu tarjeta, Mercado Pago la guarda en su sistema y nosotros solo conservamos un identificador para
-              ofrecértela la próxima vez.
-            </p>
-          </Card>
-          <Card title="Pago en el recinto">
-            <p>
-              Algunos recintos permiten reservar y pagar al llegar. En ese caso pagas directamente al recinto con los medios que él
-              acepte, y el recinto es responsable de ese cobro.
-            </p>
-          </Card>
-        </div>
+        <Card title="Pago 100% online">
+          <p>
+            Todas las reservas, inscripciones a torneos y clases se pagan en línea al momento de reservar, con{" "}
+            <strong className="text-white">Mercado Pago</strong> dentro de la app. No se aceptan reservas para pagar en el recinto.
+          </p>
+          <p>
+            Los datos de tu tarjeta van directo a Mercado Pago: MVP Sports nunca ve ni guarda el número, la fecha de vencimiento ni
+            el código de seguridad. Tu banco puede pedirte una validación adicional (3D Secure). Si eliges guardar tu tarjeta,
+            Mercado Pago la guarda en su sistema y nosotros solo conservamos un identificador para ofrecértela la próxima vez.
+          </p>
+        </Card>
         <p>
           El dinero de las reservas pagadas en línea llega directamente a la cuenta de Mercado Pago del recinto. MVP Sports no
           retiene esos fondos.
@@ -124,11 +116,11 @@ const sections: LegalSection[] = [
           <div className="flex flex-col md:flex-row gap-2 md:gap-4 justify-between border-b border-white/5 pb-4">
             <div className="space-y-1">
               <span className="text-[10px] font-black uppercase tracking-wider text-[#00df82] bg-[#00df82]/10 px-2 py-0.5 rounded-md">
-                4 horas o más antes del partido
+                24 horas o más antes del partido
               </span>
               <h4 className="font-bold text-white text-xs uppercase tracking-wider pt-1">Reembolso del 97%</h4>
               <p className="text-slate-400 text-xs">
-                Te devolvemos lo pagado menos un 3%, que cubre los costos de procesamiento del pago.
+                Puedes cancelar desde la app y te devolvemos lo pagado menos un 3%, que cubre los costos de procesamiento del pago.
               </p>
             </div>
             <span className="text-base md:text-lg font-black text-[#00df82] font-mono shrink-0">97%</span>
@@ -136,15 +128,15 @@ const sections: LegalSection[] = [
           <div className="flex flex-col md:flex-row gap-2 md:gap-4 justify-between">
             <div className="space-y-1">
               <span className="text-[10px] font-black uppercase tracking-wider text-red-400 bg-red-500/10 px-2 py-0.5 rounded-md">
-                Menos de 4 horas antes
+                Menos de 24 horas antes
               </span>
-              <h4 className="font-bold text-white text-xs uppercase tracking-wider pt-1">Sin reembolso</h4>
+              <h4 className="font-bold text-white text-xs uppercase tracking-wider pt-1">No se puede cancelar</h4>
               <p className="text-slate-400 text-xs">
-                Si cancelas con menos de 4 horas de anticipación, o después de hacer check-in, el pago queda para el recinto, que ya
-                reservó la cancha para ti.
+                Dentro de las 24 horas previas al partido la reserva ya no se puede cancelar ni reembolsar: el recinto guardó la
+                cancha para ti. Si no asistes, se considera inasistencia.
               </p>
             </div>
-            <span className="text-base md:text-lg font-black text-red-500 font-mono shrink-0">0%</span>
+            <span className="text-base md:text-lg font-black text-red-500 font-mono shrink-0">—</span>
           </div>
         </div>
         <Bullets
@@ -171,10 +163,9 @@ const sections: LegalSection[] = [
       <Bullets
         items={[
           "Tu asistencia se registra con el check-in: escaneando el QR de tu ticket o con la confirmación del personal del recinto.",
-          "Si no te presentas y no cancelaste a tiempo, la reserva se marca como inasistencia (no-show) y el pago no se devuelve.",
+          "Si no te presentas, la reserva se marca como inasistencia (no-show) y el pago no se devuelve.",
           "Las inasistencias pueden descontar puntos de experiencia (XP) de tu perfil según las reglas de gamificación vigentes.",
-          "Si la reserva era para pagar en el recinto y no asistes, la cancha se libera y el recinto puede limitar tus futuras reservas con esa modalidad.",
-          "Si crees que una inasistencia se registró por error, puedes pedir que la revise una persona escribiéndonos.",
+                    "Si crees que una inasistencia se registró por error, puedes pedir que la revise una persona escribiéndonos.",
         ]}
       />
     ),
@@ -199,20 +190,18 @@ const sections: LegalSection[] = [
   },
   {
     id: "gamificacion",
-    name: "Puntos, niveles y recompensas",
+    name: "Experiencia, niveles y logros",
     icon: TrophyIcon,
     content: (
       <>
         <p>
-          Al jugar acumulas experiencia (XP), subes de nivel, desbloqueas logros y sumas puntos de recompensa que puedes canjear por
-          beneficios, como descuentos en reservas.
+          Al jugar acumulas experiencia (XP), subes de nivel, desbloqueas logros y apareces en los rankings.
         </p>
         <Bullets
           items={[
-            "Los puntos, niveles y logros no son dinero: no se pueden cambiar por efectivo, vender ni transferir a otra cuenta.",
-            "Cada recompensa indica su costo en puntos, sus condiciones y su vigencia. El canje está sujeto a disponibilidad.",
-            "Podemos ajustar las reglas de puntos y recompensas avisando con anticipación. Los cupones ya canjeados se respetan hasta su vencimiento.",
-            "Si detectamos manipulación o fraude, podemos anular los puntos o recompensas obtenidos de esa forma.",
+            "La experiencia, los niveles y los logros no son dinero: no se pueden cambiar por efectivo, vender ni transferir a otra cuenta.",
+            "Podemos ajustar las reglas de experiencia y niveles avisando con anticipación.",
+            "Si detectamos manipulación o fraude, podemos anular la experiencia o los logros obtenidos de esa forma.",
           ]}
         />
       </>
