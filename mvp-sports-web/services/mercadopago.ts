@@ -218,6 +218,16 @@ export async function getCardSetup(uid: string, email: string, tenantId: string)
   return { publicKey, customerId, cardsIds, email, rut };
 }
 
+// ¿La cuenta del recinto es de prueba? Mercado Pago exige entonces un comprador de prueba (@testuser.com)
+const testAccountCache = new Map<string, boolean>();
+async function isTestSeller(accessToken: string): Promise<boolean> {
+  if (testAccountCache.has(accessToken)) return testAccountCache.get(accessToken)!;
+  const me: any = await fetch(`${MP_API}/users/me`, { headers: { Authorization: `Bearer ${accessToken}` } }).then((r) => r.json()).catch(() => null);
+  const isTest = Array.isArray(me?.tags) && me.tags.includes("test_user");
+  testAccountCache.set(accessToken, isTest);
+  return isTest;
+}
+
 // Cobra con tarjeta y confirma con la misma conciliación que el webhook (settlePayment)
 export async function chargeCard(params: Parameters<typeof createPaymentRecord>[0] & { card: CardData; payerEmail: string; saveCard?: boolean }) {
   const accessToken = await resolveMercadoPagoToken(params.tenantId);
@@ -225,6 +235,10 @@ export async function chargeCard(params: Parameters<typeof createPaymentRecord>[
   if (!params.card?.token || !params.card?.payment_method_id) throw new PaymentError("Datos de la tarjeta incompletos");
 
   const { payRef, buyOrder } = await createPaymentRecord(params);
+  // Cuenta de prueba: comprador de prueba (con una cuenta real se usa el correo del jugador)
+  if (await isTestSeller(accessToken)) {
+    params = { ...params, payerEmail: `test_user_${params.uid.slice(0, 8).toLowerCase()}@testuser.com`, saveCard: false };
+  }
   const customerId = params.saveCard || params.card.token
     ? await mpCustomerId(accessToken, params.tenantId, params.uid, params.payerEmail, !!params.saveCard).catch(() => null)
     : null;
@@ -249,6 +263,7 @@ export async function chargeCard(params: Parameters<typeof createPaymentRecord>[
   });
   const mp: any = await resp.json();
   if (!resp.ok || !mp?.id) {
+    console.error("MP /v1/payments", resp.status, JSON.stringify({ message: mp?.message, error: mp?.error, cause: mp?.cause }).slice(0, 500));
     await payRef.update({ status: "error", error: String(mp?.message || resp.status), updatedAt: new Date() });
     throw new PaymentError(mp?.message ? `Mercado Pago: ${mp.message}` : "No se pudo procesar el pago", 402);
   }
