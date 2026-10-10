@@ -5,10 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Trophy, Users, CalendarDays, CreditCard, CheckCircle2, X, Shield, Award, Info } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
-import { tournamentService } from "@/services/player/tournamentService";
-import { venueService } from "@/services/player/venueService";
+import { tournamentService } from "@/services/client/player/tournamentService";
+import { venueService } from "@/services/client/player/venueService";
 import CardPayment from "@/components/player/CardPayment";
-import { teamService } from "@/services/player/teamService";
+import { teamService } from "@/services/client/player/teamService";
 
 const ACCENT = "#f43f5e";
 const STATUS: Record<string, string> = { upcoming: "Inscripciones abiertas", open: "Inscripciones abiertas", active: "En curso", completed: "Finalizado", finished: "Finalizado" };

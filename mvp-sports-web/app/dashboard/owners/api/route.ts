@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { adminAuth as getAdminAuth } from '@/services/firebase-admin';
-import { isSuperAdminCaller } from '@/services/server-auth';
+import { adminAuth as getAdminAuth } from '@/services/server/firebase-admin';
+import { isSuperAdminCaller } from '@/services/server/server-auth';
 
 export async function POST(request: Request) {
   try {

@@ -5,16 +5,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
-import { gamificationService } from "@/services/player/gamificationService";
-import { bookingService, Booking } from "@/services/player/bookingService";
+import { gamificationService } from "@/services/client/player/gamificationService";
+import { bookingService, Booking } from "@/services/client/player/bookingService";
 import {
   Trophy, CreditCard, Shield, TrendingUp, Swords,
   GraduationCap, ArrowRight, Calendar, Clock, MapPin, ChevronRight,
   Navigation, Ticket, Share2, Flame, Zap, Target, CheckCircle2,
   Sun, Cloud, CloudRain, CloudStorm, Repeat, Star, Lock, Trophy as TrophyIcon
 } from "@/components/player/icons";
-import { venueService } from "@/services/player/venueService";
-import { getMatchWeather, MatchWeather } from "@/services/player/weather";
+import { venueService } from "@/services/client/player/venueService";
+import { getMatchWeather, MatchWeather } from "@/services/client/player/weather";
 import Onboarding from "@/components/player/Onboarding";
 
 // Solo destinos que no están en la barra inferior (Inicio, Reservas, Mapa, Perfil, Más)

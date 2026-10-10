@@ -4,7 +4,7 @@ import {
   QueryConstraint, type DocumentData, type FirestoreError,
 } from "firebase/firestore";
 import { useEffect } from "react";
-import { db } from "@/services/firebase";
+import { db } from "@/services/client/firebase";
 
 type QueryKey = readonly [string, ...unknown[]];
 

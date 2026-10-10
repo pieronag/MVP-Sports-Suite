@@ -1,14 +1,14 @@
 "use client";
-import { getOwnedTenantsSnap } from "@/services/ownedTenants";
+import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { db, auth } from '@/services/firebase';
+import { db, auth } from '@/services/client/firebase';
 import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc, or } from 'firebase/firestore';
 import { getApps, initializeApp, getApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { updateStaffPassword } from './actions';
-import { auditService } from '@/services/auditService';
+import { auditService } from '@/services/client/auditService';
 import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
 import {
     Add01Icon,

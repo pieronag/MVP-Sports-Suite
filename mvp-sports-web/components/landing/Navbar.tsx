@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Menu01Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
-import BrandLogo from "../BrandLogo";
+import BrandLogo from "@/components/shared/BrandLogo";
 
 const NAV_LINKS = [
   { href: "#como-funciona", label: "Cómo funciona" },

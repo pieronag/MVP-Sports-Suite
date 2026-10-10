@@ -1,15 +1,15 @@
 "use client";
 import { GlowCard, SectionPill } from "@/components/player/ui";
-import { uploadImage } from "@/services/imageUpload";
+import { uploadImage } from "@/services/client/imageUpload";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
-import { gamificationService } from "@/services/player/gamificationService";
+import { gamificationService } from "@/services/client/player/gamificationService";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
-import { db } from "@/services/firebase";
+import { db } from "@/services/client/firebase";
 import {
   ChevronLeft, Sun, Moon, Camera, Trophy, Target, Handshake, Star,
   Medal, Sparkles, Download, Share2, Activity, User as UserIcon, MapPin, Zap,

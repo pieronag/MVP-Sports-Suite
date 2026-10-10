@@ -11,7 +11,7 @@ import {
   Download01Icon, SquareIcon, CheckmarkSquare02Icon, ArrowUpDownIcon, Cancel01Icon,
 } from '@hugeicons/core-free-icons';
 import { collection, getDocs, doc, updateDoc, query, where, getDoc } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import PlayerModal from '@/components/ui/PlayerModal';
 import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';

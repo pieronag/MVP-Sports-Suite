@@ -3,11 +3,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore";
-import { db } from "@/services/firebase";
+import { db } from "@/services/client/firebase";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
-import { cached } from "@/services/player/cache";
-import { gamificationService } from "@/services/player/gamificationService";
+import { cached } from "@/services/client/player/cache";
+import { gamificationService } from "@/services/client/player/gamificationService";
 import { SegmentedTabs } from "@/components/player/ui";
 import { ChevronLeft, Ranking, Crown } from "@/components/player/icons";
 

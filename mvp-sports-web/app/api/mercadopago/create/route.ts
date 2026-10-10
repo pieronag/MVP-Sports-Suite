@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { verifyAuthedCaller } from "@/services/server-auth";
-import { buildBookingCheckout, chargeCard, rejectionMessage, PaymentError } from "@/services/mercadopago";
+import { verifyAuthedCaller } from "@/services/server/server-auth";
+import { buildBookingCheckout, chargeCard, rejectionMessage, PaymentError } from "@/services/server/mercadopago";
 
 // Cobra una reserva con tarjeta (Checkout API / Card Payment Brick). El cliente envía qué quiere
 // reservar y el token de la tarjeta; el monto y los datos de la reserva se calculan en el servidor.

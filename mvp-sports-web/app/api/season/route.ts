@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/services/firebase-admin";
-import { toDate } from "@/services/bookingProjections";
+import { adminDb } from "@/services/server/firebase-admin";
+import { toDate } from "@/services/server/bookingProjections";
 
 // Temporada = trimestre calendario. Ranking por partidos jugados en la temporada (reservas no canceladas ya jugadas).
 // Se calcula en el servidor y se cachea 1 h (en Spark cada lectura cuenta).

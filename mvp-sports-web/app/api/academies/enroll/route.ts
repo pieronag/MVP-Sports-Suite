@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/services/firebase-admin";
-import { verifyAuthedCaller } from "@/services/server-auth";
-import { chargeCard, rejectionMessage, PaymentError } from "@/services/mercadopago";
-import { buildEnrollment, commitEnrollment } from "@/services/academies";
+import { adminDb } from "@/services/server/firebase-admin";
+import { verifyAuthedCaller } from "@/services/server/server-auth";
+import { chargeCard, rejectionMessage, PaymentError } from "@/services/server/mercadopago";
+import { buildEnrollment, commitEnrollment } from "@/services/server/academies";
 
 // Inscribe al jugador en una clase de academia.
 //  - payOnline: preferencia de Mercado Pago; la inscripción se confirma al aprobarse el pago.

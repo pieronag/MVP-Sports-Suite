@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { adminDb } from "@/services/firebase-admin";
+import { adminDb } from "@/services/server/firebase-admin";
 
 // Perfil público para compartir: solo datos deportivos (nada de contacto ni documentos)
 export const revalidate = 600;

@@ -8,7 +8,7 @@ import {
     Shield, Activity, ArrowRight, Smartphone, User
 } from "@/components/player/icons";
 import { collection, addDoc, query, where, getDocs, Timestamp } from 'firebase/firestore';
-import { db } from "@/services/firebase";
+import { db } from "@/services/client/firebase";
 import { usePlayer } from "@/context/PlayerContext";
 
 const COLORS = {

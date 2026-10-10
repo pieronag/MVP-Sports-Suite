@@ -10,7 +10,7 @@ import {
     Grid02Icon, ListViewIcon, UserCircleIcon,
 } from '@hugeicons/core-free-icons';
 import { collection, getDocs, doc, updateDoc, deleteDoc, query, where, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db, auth } from '@/services/firebase';
+import { db, auth } from '@/services/client/firebase';
 import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import ModalPortal from '@/components/ui/ModalPortal';

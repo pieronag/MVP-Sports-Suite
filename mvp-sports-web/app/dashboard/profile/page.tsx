@@ -1,8 +1,8 @@
 "use client";
-import { uploadImage } from "@/services/imageUpload";
+import { uploadImage } from "@/services/client/imageUpload";
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { db, auth } from '@/services/firebase';
+import { db, auth } from '@/services/client/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredential, updateProfile } from 'firebase/auth';
 import { useRouter } from 'next/navigation';

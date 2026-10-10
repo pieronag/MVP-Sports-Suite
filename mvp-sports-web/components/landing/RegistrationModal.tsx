@@ -11,10 +11,10 @@ import {
   ViewOffIcon,
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
-import { auth, db } from "../../services/firebase";
+import { auth, db } from "@/services/client/firebase";
 import { createUserWithEmailAndPassword, updateProfile, signOut } from "firebase/auth";
 import { doc, setDoc, getDoc, getDocs, collection, query, where } from "firebase/firestore";
-import { emailService } from "../../services/emailService";
+import { emailService } from "@/services/client/emailService";
 
 const SPORT_POSITIONS: Record<string, string[]> = {
   'Fútbol': ['Arquero', 'Defensa', 'Lateral', 'Volante', 'Delantero'],

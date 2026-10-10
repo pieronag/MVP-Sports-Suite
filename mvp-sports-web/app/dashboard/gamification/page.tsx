@@ -21,7 +21,7 @@ import {
     ArrowRight01Icon,
 } from '@hugeicons/core-free-icons';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';
 
 const ic = "w-6 h-6";

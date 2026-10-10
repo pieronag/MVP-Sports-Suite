@@ -4,8 +4,8 @@ import { PanelGlass, TarjetaKpi, BotonAccion } from '@/components/ui/DashboardWi
 import { Key01Icon } from '@hugeicons/core-free-icons';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { auditService } from '@/services/auditService';
-import { db, auth, storage } from '@/services/firebase';
+import { auditService } from '@/services/client/auditService';
+import { db, auth, storage } from '@/services/client/firebase';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc, increment, or } from 'firebase/firestore';
 import {

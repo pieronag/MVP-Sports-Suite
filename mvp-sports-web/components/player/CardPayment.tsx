@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { auth } from "@/services/firebase";
+import { auth } from "@/services/client/firebase";
 import { CheckCircle2, AlertCircle, Lock } from "@/components/player/icons";
 
 // Pago con tarjeta dentro de la PWA (Mercado Pago Checkout API · Card Payment Brick).

@@ -1,5 +1,5 @@
 "use client";
-import BrandLogo from "../BrandLogo";
+import BrandLogo from "@/components/shared/BrandLogo";
 
 interface LoadingOverlayProps {
   label?: string;

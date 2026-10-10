@@ -1,10 +1,10 @@
 "use client";
-import { getOwnedTenantsSnap } from "@/services/ownedTenants";
+import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { DiscountTag01Icon, PercentIcon } from '@hugeicons/core-free-icons';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc, increment } from 'firebase/firestore';
 import {
     Add01Icon,
@@ -19,7 +19,7 @@ import {
     TrashIcon,
 } from '@hugeicons/core-free-icons';
 import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
-import { auditService } from '@/services/auditService';
+import { auditService } from '@/services/client/auditService';
 
 function PanelHeader({ titulo, desc, icon: Icon, action }: any) {
     let content: React.ReactNode;

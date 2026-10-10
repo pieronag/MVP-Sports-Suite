@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
-import { adminDb } from "@/services/firebase-admin";
-import { verifyAuthedCaller } from "@/services/server-auth";
-import { allowRequest } from "@/services/rateLimit";
-import { syncBooking } from "@/services/bookingProjections";
+import { adminDb } from "@/services/server/firebase-admin";
+import { verifyAuthedCaller } from "@/services/server/server-auth";
+import { allowRequest } from "@/services/server/rateLimit";
+import { syncBooking } from "@/services/server/bookingProjections";
 
 // Token Mercado Pago del recinto (tenant_secrets) o de la plataforma (settings_private)
 async function resolveMercadoPagoToken(tenantId?: string): Promise<string | undefined> {

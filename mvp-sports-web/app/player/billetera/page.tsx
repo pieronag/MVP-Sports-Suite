@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, Clock, CreditCard, CheckCircle2, Receipt } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
-import { bookingService, Booking } from "@/services/player/bookingService";
+import { bookingService, Booking } from "@/services/client/player/bookingService";
 
 const formatMoney = (n: number) => "$" + new Intl.NumberFormat("es-CL").format(Math.round(n || 0));
 const ONLINE = ["card", "mercadopago", "online", "webpay", "webpay_plus", "oneclick"];

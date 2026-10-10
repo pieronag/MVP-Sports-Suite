@@ -6,7 +6,7 @@ import { CheckCircle, MapPin, Share2, Clock, Trophy, AlertCircle, ChevronLeft, R
 import { QRCodeSVG } from "qrcode.react";
 import { usePlayer } from "@/context/PlayerContext";
 import FindPlayers from "@/components/player/FindPlayers";
-import { bookingService } from "@/services/player/bookingService";
+import { bookingService } from "@/services/client/player/bookingService";
 
 
 

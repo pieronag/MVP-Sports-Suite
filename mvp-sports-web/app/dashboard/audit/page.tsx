@@ -19,7 +19,7 @@ import {
     Cancel01Icon,
 } from '@hugeicons/core-free-icons';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { useAuth } from '@/context/AuthContext';
 
 import { TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';

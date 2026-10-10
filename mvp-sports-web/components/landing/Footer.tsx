@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import BrandLogo from "../BrandLogo";
+import BrandLogo from "@/components/shared/BrandLogo";
 
 interface FooterProps {
   onRegisterClick?: () => void;

@@ -1,12 +1,12 @@
 "use client";
-import { syncBookingSlots } from "@/services/apiClient";
+import { syncBookingSlots } from "@/services/client/apiClient";
 import React, { useState, useEffect } from 'react';
 import { HugeiconsIcon } from "@hugeicons/react";
 import { AlertCircleIcon, Cancel01Icon, CheckmarkCircle02Icon, RefreshIcon } from "@hugeicons/core-free-icons";
 import { 
     collection, query, where, getDocs, doc, getDoc, addDoc, Timestamp, setDoc 
 } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 
 // Adaptadores: conservan los nombres del JSX sobre Hugeicons
 const XMarkIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Cancel01Icon} className={className} strokeWidth={1.6} />;

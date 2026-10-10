@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { FieldValue, type DocumentReference, type Query } from "firebase-admin/firestore";
-import { adminAuth, adminDb } from "@/services/firebase-admin";
+import { adminAuth, adminDb } from "@/services/server/firebase-admin";
 
 // Derecho de supresión (Ley 21.719): borra la cuenta y los datos del jugador. Lo que el recinto o la
 // normativa tributaria necesitan conservar (reservas, pagos, inscripciones, reseñas) queda anonimizado.

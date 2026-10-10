@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Tick02Icon } from "@hugeicons/core-free-icons";
-import BrandLogo from "../BrandLogo";
+import BrandLogo from "@/components/shared/BrandLogo";
 
 const trustPoints = ["Pago online con Mercado Pago", "Confirmación instantánea", "Acceso con QR"];
 

@@ -5,8 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, GraduationCap, Users, Clock, CalendarDays, CreditCard, CheckCircle2, X, User as UserIcon } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
-import { academyService, type AcademyClass } from "@/services/player/academyService";
-import { venueService } from "@/services/player/venueService";
+import { academyService, type AcademyClass } from "@/services/client/player/academyService";
+import { venueService } from "@/services/client/player/venueService";
 import CardPayment from "@/components/player/CardPayment";
 
 const ACCENT = "#10b981";

@@ -1,5 +1,5 @@
 "use server";
-import { adminAuth as getAdminAuth, adminDb } from "@/services/firebase-admin";
+import { adminAuth as getAdminAuth, adminDb } from "@/services/server/firebase-admin";
 
 /**
  * Verifica la identidad y el rol del llamador de la server action.

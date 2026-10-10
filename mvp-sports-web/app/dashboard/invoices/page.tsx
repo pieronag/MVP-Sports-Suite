@@ -23,7 +23,7 @@ import {
     Cancel01Icon,
 } from '@hugeicons/core-free-icons';
 import { collection, getDocs, query, orderBy, where, addDoc, serverTimestamp, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 // jsPDF (~400 KB) se carga solo al exportar
 const loadPdf = async () => {
     const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([import('jspdf'), import('jspdf-autotable')]);

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
-import { adminDb } from "@/services/firebase-admin";
-import { slotOf, rebuildCourtDay } from "@/services/bookingProjections";
+import { adminDb } from "@/services/server/firebase-admin";
+import { slotOf, rebuildCourtDay } from "@/services/server/bookingProjections";
 
 // Cron de Vercel. Solo se acepta pago online: lo que un jugador dejó pendiente de pago no es una reserva válida.
 //  - Pago online iniciado y abandonado (más de 1 h): se borra.

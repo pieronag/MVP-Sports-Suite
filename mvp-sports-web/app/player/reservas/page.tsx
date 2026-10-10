@@ -9,10 +9,10 @@ import {
 } from "@/components/player/icons";
 import { QRCodeSVG } from "qrcode.react";
 import { usePlayer } from "@/context/PlayerContext";
-import { bookingService } from "@/services/player/bookingService";
-import { venueService } from "@/services/player/venueService";
-import { postApi } from "@/services/apiClient";
-import { invalidate } from "@/services/player/cache";
+import { bookingService } from "@/services/client/player/bookingService";
+import { venueService } from "@/services/client/player/venueService";
+import { postApi } from "@/services/client/apiClient";
+import { invalidate } from "@/services/client/player/cache";
 import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
 
 const SPORT_CONFIG: Record<string, { color: string; icon: any }> = {

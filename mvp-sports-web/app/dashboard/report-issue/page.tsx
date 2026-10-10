@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { collection, addDoc, serverTimestamp, getDocs, query, where, onSnapshot, or } from 'firebase/firestore';
-import { auditService } from '@/services/auditService';
+import { auditService } from '@/services/client/auditService';
 import { SectionCard } from '@/components/ui/DashboardWidgets';
 import { HugeiconsIcon } from "@hugeicons/react";
 import {

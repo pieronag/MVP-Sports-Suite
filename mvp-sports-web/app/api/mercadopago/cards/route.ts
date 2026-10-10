@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { verifyAuthedCaller } from "@/services/server-auth";
-import { getCardSetup, PaymentError } from "@/services/mercadopago";
+import { verifyAuthedCaller } from "@/services/server/server-auth";
+import { getCardSetup, PaymentError } from "@/services/server/mercadopago";
 
 // Datos para inicializar el Card Payment Brick: Public Key del recinto y tarjetas guardadas del jugador
 export async function GET(request: Request) {

@@ -18,7 +18,7 @@ import AdminKpiSection from './AdminKpiSection';
 import RevenueChart from './RevenueChart';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { collection, query, orderBy, limit, onSnapshot, doc, getCountFromServer } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { SectionCard } from '@/components/ui/DashboardWidgets';
 
 const formatCLP = (amount: number) =>

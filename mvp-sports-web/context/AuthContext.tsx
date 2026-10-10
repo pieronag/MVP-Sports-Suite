@@ -2,7 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../services/firebase";
+import { auth, db } from "@/services/client/firebase";
 
 export type UserRole = "superadmin" | "admin" | "owner" | "manager" | "staff" | "player" | null;
 

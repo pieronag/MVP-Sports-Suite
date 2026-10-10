@@ -15,7 +15,7 @@ import {
     CheckmarkCircle02Icon,
 } from '@hugeicons/core-free-icons';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { SectionCard } from '@/components/ui/DashboardWidgets';
 
 import {

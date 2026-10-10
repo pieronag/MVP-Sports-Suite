@@ -15,13 +15,13 @@ import {
   SquareLock01Icon,
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
-import { auth, functions, db } from "../../services/firebase";
+import { auth, functions, db } from "@/services/client/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { emailService } from "@/services/emailService";
+import { emailService } from "@/services/client/emailService";
 import { doc, getDoc } from "firebase/firestore";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
-import BrandLogo from "../../components/BrandLogo";
+import BrandLogo from "@/components/shared/BrandLogo";
 
 const TRUST_POINTS = ["Reserva canchas en segundos", "Paga online con Mercado Pago", "Gestiona tu complejo"];
 

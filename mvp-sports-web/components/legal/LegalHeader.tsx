@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
-import BrandLogo from "../BrandLogo";
+import BrandLogo from "@/components/shared/BrandLogo";
 
 export interface LegalSection {
   id: string;

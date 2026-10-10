@@ -4,8 +4,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Send, User, Shield, MessageCircle } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
-import { chatService, ChatMessage } from "@/services/player/chatService";
-import { teamService } from "@/services/player/teamService";
+import { chatService, ChatMessage } from "@/services/client/player/chatService";
+import { teamService } from "@/services/client/player/teamService";
 
 export default function ChatEquiposPage() {
   const router = useRouter();

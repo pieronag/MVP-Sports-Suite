@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { adminAuth, adminDb } from "@/services/firebase-admin";
-import { verifyAuthedCaller } from "@/services/server-auth";
-import { allowRequest } from "@/services/rateLimit";
+import { adminAuth, adminDb } from "@/services/server/firebase-admin";
+import { verifyAuthedCaller } from "@/services/server/server-auth";
+import { allowRequest } from "@/services/server/rateLimit";
 
 // Correos de verificación y de restablecimiento de contraseña (Resend).
 // Funciona sin sesión: el enlace solo viaja al buzón indicado, nunca en la respuesta.

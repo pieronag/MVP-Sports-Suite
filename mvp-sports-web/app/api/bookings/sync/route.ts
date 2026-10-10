@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { verifyAuthedCaller } from "@/services/server-auth";
-import { syncBooking } from "@/services/bookingProjections";
+import { verifyAuthedCaller } from "@/services/server/server-auth";
+import { syncBooking } from "@/services/server/bookingProjections";
 
 // Recalcula horarios ocupados y reseña de una reserva tras crearla, editarla o cancelarla.
 // Es idempotente y se deriva de la fuente, así que cualquier sesión puede pedirlo.

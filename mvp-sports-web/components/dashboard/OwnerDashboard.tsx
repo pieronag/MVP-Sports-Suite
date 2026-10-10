@@ -24,7 +24,7 @@ import {
     Wrench01Icon,
 } from '@hugeicons/core-free-icons';
 import { collection, query, where, orderBy, Timestamp, onSnapshot, or } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { PanelGlass, TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';
 import { ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';

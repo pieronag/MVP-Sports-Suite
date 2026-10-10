@@ -1,11 +1,11 @@
 "use client";
-import { syncBookingSlots } from "@/services/apiClient";
-import { getOwnedTenantsSnap } from "@/services/ownedTenants";
+import { syncBookingSlots } from "@/services/client/apiClient";
+import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useAuth } from '@/context/AuthContext';
-import { db } from '@/services/firebase';
-import { auditService } from '@/services/auditService';
+import { db } from '@/services/client/firebase';
+import { auditService } from '@/services/client/auditService';
 import { collection, query, where, getDocs, getDoc, orderBy, doc, updateDoc, Timestamp, or } from 'firebase/firestore';
 import { HugeiconsIcon } from "@hugeicons/react";
 import {

@@ -11,7 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, '.'),
-      '@/services/firebase': path.resolve(__dirname, './tests/__mocks__/firebase.ts'),
+      '@/services/client/firebase': path.resolve(__dirname, './tests/__mocks__/firebase.ts'),
       '@/context/AuthContext': path.resolve(__dirname, './tests/__mocks__/AuthContext.tsx'),
       '@/components/ui/DashboardWidgets': path.resolve(__dirname, './tests/__mocks__/DashboardWidgets.tsx'),
     },

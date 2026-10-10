@@ -13,7 +13,7 @@ import {
     ArrowLeft01Icon, ArrowRight01Icon,
 } from '@hugeicons/core-free-icons';
 import { collection, query, orderBy, limit, onSnapshot, doc } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';
 
 const formatCLP = (amount: number) =>

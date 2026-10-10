@@ -33,10 +33,10 @@ import {
     CreditCardIcon,
 } from '@hugeicons/core-free-icons';
 import { doc, getDoc, updateDoc, collection, query, where, getDocs, getCountFromServer, serverTimestamp, writeBatch, setDoc, orderBy, limit } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
 import { useAuth } from '@/context/AuthContext';
-import { auditService } from '@/services/auditService';
+import { auditService } from '@/services/client/auditService';
 
 // --- INTERFACES ---
 interface SettingsData {

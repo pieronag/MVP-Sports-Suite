@@ -10,13 +10,13 @@ import {
 } from "@/components/player/icons";
 import { BADGE_ICONS } from "@/components/player/badgeIcons";
 import { doc, getDoc, onSnapshot, updateDoc, addDoc, collection, Timestamp } from 'firebase/firestore';
-import { db } from "@/services/firebase";
-import { cached } from "@/services/player/cache";
+import { db } from "@/services/client/firebase";
+import { cached } from "@/services/client/player/cache";
 import { usePlayer } from "@/context/PlayerContext";
-import { gamificationService } from "@/services/player/gamificationService";
-import { bookingService, Booking } from "@/services/player/bookingService";
-import { userService } from "@/services/player/userService";
-import { teamService } from "@/services/player/teamService";
+import { gamificationService } from "@/services/client/player/gamificationService";
+import { bookingService, Booking } from "@/services/client/player/bookingService";
+import { userService } from "@/services/client/player/userService";
+import { teamService } from "@/services/client/player/teamService";
 
 const RANGOS_CONFIG = [
   { id: 'bronze', name: 'Bronce', min: 0, color: '#cd7f32' },

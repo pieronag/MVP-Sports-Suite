@@ -1,9 +1,9 @@
 "use client";
-import { syncBookingSlots } from "@/services/apiClient";
-import { getOwnedTenantsSnap } from "@/services/ownedTenants";
+import { syncBookingSlots } from "@/services/client/apiClient";
+import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { collection, query, where, getDocs, doc, setDoc, Timestamp } from 'firebase/firestore';
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Alert02Icon, Building03Icon, CheckmarkCircle02Icon, RefreshIcon, UserGroupIcon } from "@hugeicons/core-free-icons";

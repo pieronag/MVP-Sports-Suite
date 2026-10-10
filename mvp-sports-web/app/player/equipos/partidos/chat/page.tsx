@@ -4,9 +4,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Send, User, Shield, X } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
-import { matchmakingService, ChatMessage, Challenge } from "@/services/player/matchmakingService";
+import { matchmakingService, ChatMessage, Challenge } from "@/services/client/player/matchmakingService";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/services/firebase";
+import { db } from "@/services/client/firebase";
 
 export default function PartidosChatPage() {
   const router = useRouter();

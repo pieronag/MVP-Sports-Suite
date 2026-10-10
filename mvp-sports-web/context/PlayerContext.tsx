@@ -1,9 +1,9 @@
 "use client";
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useAuth } from "./AuthContext";
-import { userService, PlayerProfile } from "../services/player/userService";
+import { userService, PlayerProfile } from "@/services/client/player/userService";
 import { doc, onSnapshot, getDoc } from "firebase/firestore";
-import { db } from "../services/firebase";
+import { db } from "@/services/client/firebase";
 
 interface PlayerContextType {
     profile: PlayerProfile | null;

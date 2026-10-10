@@ -4,10 +4,10 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Clock, MapPin, Star, Info, ShieldCheck, CheckCircle2, X, Phone, MessageCircle, Navigation, Wifi, Tv, Car, Umbrella, Wind, CircleDot, Zap, Globe, Ban, CreditCard, Images } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
-import { venueService, Tenant, Court } from "@/services/player/venueService";
-import { bookingService } from "@/services/player/bookingService";
+import { venueService, Tenant, Court } from "@/services/client/player/venueService";
+import { bookingService } from "@/services/client/player/bookingService";
 import { collection, query, where, onSnapshot, doc } from "firebase/firestore";
-import { db } from "@/services/firebase";
+import { db } from "@/services/client/firebase";
 import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon, CanchaFutbolIcon, CanchaPadelIcon, CanchaTenisIcon, CanchaBasquetbolIcon, CanchaVoleibolIcon } from "@/components/icons/SportsIcons";
 
 

@@ -1,9 +1,9 @@
 "use client";
-import { getOwnedTenantsSnap } from "@/services/ownedTenants";
+import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { collection, getDocs, query, where, onSnapshot, or } from 'firebase/firestore';
 import Link from 'next/link';
 import {

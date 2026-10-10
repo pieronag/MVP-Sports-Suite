@@ -1,12 +1,12 @@
 "use client";
 import { GlowCard, SectionPill } from "@/components/player/ui";
-import { uploadImage } from "@/services/imageUpload";
+import { uploadImage } from "@/services/client/imageUpload";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ChevronLeft, Users, Trophy, Shield, MessageCircle, Crown, Copy, CheckCircle2, AlertCircle, X, User, Camera, MoreHorizontal, Edit, Trash2, LogOut, Star, Zap, Image as ImageIcon } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
-import { teamService, Team } from "@/services/player/teamService";
+import { teamService, Team } from "@/services/client/player/teamService";
 
 
 

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
-import { adminDb } from "@/services/firebase-admin";
-import { isSuperAdminCaller } from "@/services/server-auth";
-import { slotOf, blocksSlot, rebuildCourtDay, syncBooking } from "@/services/bookingProjections";
+import { adminDb } from "@/services/server/firebase-admin";
+import { isSuperAdminCaller } from "@/services/server/server-auth";
+import { slotOf, blocksSlot, rebuildCourtDay, syncBooking } from "@/services/server/bookingProjections";
 
 // Tareas de mantenimiento de una sola vez (solo superadmin), ejecutadas en el servidor
 // para no depender de la cuenta de servicio en un equipo local.

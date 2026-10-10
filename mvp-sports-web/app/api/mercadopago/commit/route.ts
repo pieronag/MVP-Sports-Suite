@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { settlePayment, SITE_URL } from "@/services/mercadopago";
+import { settlePayment, SITE_URL } from "@/services/server/mercadopago";
 
 // Retorno del checkout de Mercado Pago. Nunca confía en `status` de la URL:
 // el pago se verifica siempre contra la API de MP antes de confirmar la reserva.

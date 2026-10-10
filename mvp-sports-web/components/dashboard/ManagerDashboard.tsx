@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { collection, query, where, orderBy, limit, doc, getDoc, addDoc, Timestamp, onSnapshot, getDocs } from 'firebase/firestore';
 import { HugeiconsIcon } from "@hugeicons/react";
 import {

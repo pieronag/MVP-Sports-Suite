@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "@/services/firebase";
+import { db } from "@/services/client/firebase";
 import { DEFAULT_PLANS, PlanConfig, sortPlans } from "./plans";
 
 /**

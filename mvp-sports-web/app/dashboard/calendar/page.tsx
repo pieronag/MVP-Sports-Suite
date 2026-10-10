@@ -1,12 +1,12 @@
 "use client";
-import { syncBookingSlots } from "@/services/apiClient";
+import { syncBookingSlots } from "@/services/client/apiClient";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc } from 'firebase/firestore';
 import { collectedAmount, durationHours } from '@/utils/bookingMath';
-import { auditService } from '@/services/auditService';
+import { auditService } from '@/services/client/auditService';
 import {
     Add01Icon,
     Alert01Icon,

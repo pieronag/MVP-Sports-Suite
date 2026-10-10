@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/services/firebase-admin";
-import { verifyAuthedCaller } from "@/services/server-auth";
-import { settlePayment, rejectionMessage, fetchMercadoPagoPayment } from "@/services/mercadopago";
+import { adminDb } from "@/services/server/firebase-admin";
+import { verifyAuthedCaller } from "@/services/server/server-auth";
+import { settlePayment, rejectionMessage, fetchMercadoPagoPayment } from "@/services/server/mercadopago";
 
 // Estado de un pago con tarjeta (tras el desafío 3D Secure o un pago en revisión). Solo el dueño del pago.
 export async function GET(request: Request) {

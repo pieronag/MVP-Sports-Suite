@@ -25,7 +25,7 @@ import {
     GlobeIcon,
 } from '@hugeicons/core-free-icons';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import ModalPortal from '@/components/ui/ModalPortal';
 
 interface BadgeTier {

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { matchmakingService, MatchEntry } from "@/services/player/matchmakingService";
+import { matchmakingService, MatchEntry } from "@/services/client/player/matchmakingService";
 import { UserGroup, Minus, Plus } from "@/components/player/icons";
 
 // "Completar equipo": publica que a esta reserva le faltan jugadores (se ve en Partidos › Jugadores)

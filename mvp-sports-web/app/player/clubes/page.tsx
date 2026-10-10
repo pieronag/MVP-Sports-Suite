@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Search, Star, MapPin, Navigation, Compass } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
-import { venueService, Tenant } from "@/services/player/venueService";
+import { venueService, Tenant } from "@/services/client/player/venueService";
 import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
 
 const SPORT_ICON_MAP: Record<string, any> = {

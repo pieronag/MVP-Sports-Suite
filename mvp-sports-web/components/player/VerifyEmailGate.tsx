@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import type { User } from "firebase/auth";
-import { emailService } from "@/services/emailService";
+import { emailService } from "@/services/client/emailService";
 import { useAuth } from "@/context/AuthContext";
 import { Mail, LogOut, CheckCircle } from "@/components/player/icons";
 

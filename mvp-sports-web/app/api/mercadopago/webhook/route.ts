@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminDb } from "@/services/firebase-admin";
-import { isValidWebhookSignature, settlePayment } from "@/services/mercadopago";
+import { adminDb } from "@/services/server/firebase-admin";
+import { isValidWebhookSignature, settlePayment } from "@/services/server/mercadopago";
 
 // Webhook de Mercado Pago. El registro de pago viaja en ?pid (lo fija nuestra
 // preferencia), así que se usa solo el token de ese recinto. Si hay secreto

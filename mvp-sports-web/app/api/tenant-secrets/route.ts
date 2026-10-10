@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/services/firebase-admin";
-import { verifyAuthedCaller, getUserRole, SUPER_ADMIN_ROLES } from "@/services/server-auth";
-import { getTenantSecrets, setTenantSecrets, TENANT_SECRET_KEYS, type TenantSecrets } from "@/services/tenant-secrets";
+import { adminDb } from "@/services/server/firebase-admin";
+import { verifyAuthedCaller, getUserRole, SUPER_ADMIN_ROLES } from "@/services/server/server-auth";
+import { getTenantSecrets, setTenantSecrets, TENANT_SECRET_KEYS, type TenantSecrets } from "@/services/server/tenant-secrets";
 
 // Owner del recinto (ownerId/ownerIds) o superadmin. Los managers no gestionan credenciales.
 async function canManageTenantSecrets(uid: string, tenantId: string) {

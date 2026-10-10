@@ -1,5 +1,5 @@
 "use client";
-import { REGIONS } from "@/lib/chileRegions";
+import { REGIONS } from "@/utils/chileRegions";
 import { GlowCard, SectionPill, SegmentedTabs } from "@/components/player/ui";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -7,8 +7,8 @@ import { ChevronLeft, Swords, Users, MessageCircle, CheckCircle2, X, Send, User,
 import { ChevronDown } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
-import { matchmakingService, MatchEntry, Challenge } from "@/services/player/matchmakingService";
-import { teamService } from "@/services/player/teamService";
+import { matchmakingService, MatchEntry, Challenge } from "@/services/client/player/matchmakingService";
+import { teamService } from "@/services/client/player/teamService";
 
 const SPORTS = ["Fútbol", "Pádel", "Tenis", "Básquetbol", "Voleibol", "Futbolito"];
 const POSITIONS_BY_SPORT: Record<string, string[]> = {

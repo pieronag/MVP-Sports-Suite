@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { REGIONS } from "@/lib/chileRegions";
-import { userService } from "@/services/player/userService";
+import { REGIONS } from "@/utils/chileRegions";
+import { userService } from "@/services/client/player/userService";
 import { CheckCircle2, ChevronLeft } from "@/components/player/icons";
 
 // Onboarding de 3 pasos (deporte, comuna, nivel): alimenta las búsquedas por preferencias.

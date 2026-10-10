@@ -9,7 +9,7 @@ import {
     CrownIcon, Calendar03Icon, MapPinIcon,
     BlockedIcon, CheckmarkCircle02Icon, GlobeIcon, BarChartIcon,
 } from '@hugeicons/core-free-icons';
-import { db } from '@/services/firebase';
+import { db } from '@/services/client/firebase';
 import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import ModalPortal from './ModalPortal';
 

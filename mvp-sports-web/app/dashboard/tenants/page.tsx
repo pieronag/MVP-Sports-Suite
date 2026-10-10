@@ -13,7 +13,7 @@ import {
     collection, getDocs, doc, updateDoc, addDoc, deleteDoc,
     query, orderBy, where, serverTimestamp
 } from "firebase/firestore";
-import { db } from "@/services/firebase";
+import { db } from "@/services/client/firebase";
 import { TarjetaKpi, SectionCard } from "@/components/ui/DashboardWidgets";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import TenantWizard, { EMPTY_TENANT_FORM, TenantFormState, OwnerOption } from "@/components/dashboard/TenantWizard";

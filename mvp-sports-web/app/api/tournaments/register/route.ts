@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/services/firebase-admin";
-import { verifyAuthedCaller } from "@/services/server-auth";
-import { chargeCard, rejectionMessage, PaymentError } from "@/services/mercadopago";
-import { buildRegistration, commitRegistration } from "@/services/tournaments";
+import { adminDb } from "@/services/server/firebase-admin";
+import { verifyAuthedCaller } from "@/services/server/server-auth";
+import { chargeCard, rejectionMessage, PaymentError } from "@/services/server/mercadopago";
+import { buildRegistration, commitRegistration } from "@/services/server/tournaments";
 
 // Inscribe un equipo a un torneo.
 //  - payOnline: crea la preferencia de Mercado Pago; la inscripción se confirma al aprobarse el pago.
