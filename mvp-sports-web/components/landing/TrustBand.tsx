@@ -18,24 +18,24 @@ export default function TrustBand() {
   return (
     <section className="py-12 md:py-16 relative z-10 border-y border-slate-800/50 bg-slate-900/30">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-5">
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="group flex flex-col gap-3 p-6 rounded-md bg-slate-900/40 border border-white/5 hover:border-[#00df82]/30 transition-all duration-300 hover:-translate-y-1"
+              className="group flex items-center sm:flex-col sm:items-start gap-3 p-3.5 sm:p-6 rounded-md bg-slate-900/40 border border-white/5 hover:border-[#00df82]/30 transition-all duration-300 sm:hover:-translate-y-1"
             >
-              <HugeiconsIcon icon={stat.icon} className="w-7 h-7 text-[#00df82]" strokeWidth={1.6} />
-              <span className="text-3xl sm:text-4xl font-black text-white tracking-tighter font-mono leading-none">
+              <HugeiconsIcon icon={stat.icon} className="shrink-0 w-6 h-6 sm:w-7 sm:h-7 text-[#00df82]" strokeWidth={1.6} />
+              <span className="w-14 sm:w-auto shrink-0 text-xl sm:text-4xl font-black text-white tracking-tighter font-mono leading-none">
                 {stat.value}
               </span>
-              <span className="text-[11px] sm:text-xs font-bold uppercase tracking-[0.12em] text-slate-400 leading-tight">
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.12em] text-slate-400 leading-tight">
                 {stat.label}
               </span>
             </div>
           ))}
         </div>
 
-        <p className="mt-10 text-center text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-500">
+        <p className="mt-6 md:mt-10 text-center text-[10px] md:text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-500">
           Construido con tecnología de{" "}
           <span className="text-slate-300 font-black">Mercado Pago</span>,{" "}
           <span className="text-slate-300 font-black">Google Maps</span> y{" "}

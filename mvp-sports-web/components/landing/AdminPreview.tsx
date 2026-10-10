@@ -1,5 +1,6 @@
 "use client";
 import SectionHeading from "./SectionHeading";
+import WhatsappLogo from "../icons/WhatsappLogo";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   MoneyBag01Icon,
@@ -9,7 +10,6 @@ import {
   DashboardSquare01Icon,
   DiscountTag01Icon,
   UserMultipleIcon,
-  WhatsappIcon,
 } from "@hugeicons/core-free-icons";
 
 const WHATSAPP_URL = `https://wa.me/56950194398?text=${encodeURIComponent(
@@ -159,11 +159,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
                 <br />
                 un experto
               </span>
-              <HugeiconsIcon
-                icon={WhatsappIcon}
-                className="w-8 h-8 text-slate-950 transition-transform duration-300 group-hover:translate-x-1"
-                strokeWidth={2}
-              />
+              <WhatsappLogo className="w-8 h-8 text-slate-950 transition-transform duration-300 group-hover:translate-x-1" />
             </span>
           </a>
         </div>
