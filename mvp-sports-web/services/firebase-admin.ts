@@ -37,6 +37,10 @@ export function adminAuth() {
   return getAuth(ensureAdmin());
 }
 
+let dbSettingsApplied = false;
 export function adminDb() {
-  return getFirestore(ensureAdmin());
+  const db = getFirestore(ensureAdmin());
+  // REST en vez de gRPC: en funciones serverless gRPC puede quedar colgado
+  if (!dbSettingsApplied) { try { db.settings({ preferRest: true }); } catch { /* ya inicializado */ } dbSettingsApplied = true; }
+  return db;
 }
