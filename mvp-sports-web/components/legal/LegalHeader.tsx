@@ -18,7 +18,7 @@ interface LegalHeaderProps {
 export default function LegalHeader({ sections, onSectionClick, onRegisterClick }: LegalHeaderProps) {
   return (
     <header className="fixed top-0 inset-x-0 z-100 border-b border-white/5 bg-slate-950/85 backdrop-blur-xl">
-      <div className="container mx-auto px-6 max-w-6xl h-16 flex items-center justify-between gap-4">
+      <div className="container mx-auto px-4 md:px-6 max-w-6xl h-16 flex items-center justify-between gap-4">
         <Link href="/" aria-label="MVP Sports, ir al inicio" className="flex items-center">
           <BrandLogo size={34} wordmarkClassName="text-base sm:text-lg" priority />
         </Link>
@@ -33,7 +33,7 @@ export default function LegalHeader({ sections, onSectionClick, onRegisterClick 
           </Link>
           <button
             onClick={onRegisterClick}
-            className="px-4 sm:px-5 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] text-slate-950 bg-[#00df82] rounded-md hover:bg-[#3affa0] transition-all shadow-[0_0_25px_-8px_rgba(0,223,130,0.7)] active:scale-95 cursor-pointer"
+            className="hidden sm:inline-flex px-5 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] text-slate-950 bg-[#00df82] rounded-md hover:bg-[#3affa0] transition-all shadow-[0_0_25px_-8px_rgba(0,223,130,0.7)] active:scale-95 cursor-pointer"
           >
             Registrarme
           </button>
@@ -42,7 +42,7 @@ export default function LegalHeader({ sections, onSectionClick, onRegisterClick 
 
       {/* Mobile: secciones de la página */}
       <div className="lg:hidden border-t border-white/5 overflow-x-auto no-scrollbar">
-        <div className="flex gap-2 px-6 py-2.5 w-max">
+        <div className="flex gap-2 px-4 md:px-6 py-2.5 w-max">
           {sections.map((section) => (
             <button
               key={section.id}

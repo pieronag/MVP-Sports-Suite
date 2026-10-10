@@ -3,8 +3,6 @@ import Link from "next/link";
 import BrandLogo from "../BrandLogo";
 
 interface FooterProps {
-  onTermsClick?: () => void;
-  onPrivacyClick?: () => void;
   onRegisterClick?: () => void;
 }
 
@@ -22,7 +20,7 @@ const supportLinks = [
   { href: "/terms", label: "Términos" },
 ];
 
-export default function Footer({ onTermsClick, onPrivacyClick, onRegisterClick }: FooterProps) {
+export default function Footer({ onRegisterClick }: FooterProps) {
   return (
     <footer className="bg-slate-950 border-t border-white/5">
       <div className="container mx-auto px-4 md:px-6 py-8 md:py-16">
@@ -73,15 +71,6 @@ export default function Footer({ onTermsClick, onPrivacyClick, onRegisterClick }
                     href={link.href}
                     target={link.external ? "_blank" : undefined}
                     rel={link.external ? "noopener noreferrer" : undefined}
-                    onClick={(e) => {
-                      if (link.href === "/terms" && onTermsClick) {
-                        e.preventDefault();
-                        onTermsClick();
-                      } else if (link.href === "/privacy" && onPrivacyClick) {
-                        e.preventDefault();
-                        onPrivacyClick();
-                      }
-                    }}
                     className="text-xs md:text-sm font-semibold text-slate-400 hover:text-[#00df82] transition-colors"
                   >
                     {link.label}

@@ -1,328 +1,255 @@
 "use client";
 
-import { useState } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
+import Link from "next/link";
 import {
-  File01Icon,
-  CpuIcon,
-  Share01Icon,
-  Delete01Icon,
-  SquareLock01Icon,
+  SecurityCheckIcon,
   UserGroupIcon,
-  ArrowRight01Icon,
+  DashboardSquare01Icon,
+  ScaleIcon,
+  Store01Icon,
+  Calendar03Icon,
+  UserMinus01Icon,
+  SquareLock01Icon,
+  Alert02Icon,
+  MapPinIcon,
 } from "@hugeicons/core-free-icons";
-import LegalHeader from "../../components/legal/LegalHeader";
-import Footer from "../../components/landing/Footer";
-import RegistrationModal from "../../components/landing/RegistrationModal";
-import ScrollToTop from "../../components/landing/ScrollToTop";
+import LegalPage, { Bullets, Card, type LegalSection } from "../../components/legal/LegalPage";
+import { LEGAL_ENTITY, LEGAL_UPDATED } from "../../components/legal/entity";
+
+const identity = [LEGAL_ENTITY.legalName, LEGAL_ENTITY.rut && `RUT ${LEGAL_ENTITY.rut}`, LEGAL_ENTITY.address].filter(Boolean).join(", ");
+const mail = <a href={`mailto:${LEGAL_ENTITY.email}`} className="text-white underline hover:text-[#00df82]">{LEGAL_ENTITY.email}</a>;
+
+const dataGroups = [
+  { title: "Cuenta e identificación", items: "Nombre, correo, teléfono, RUT, foto de perfil, fecha de nacimiento, género y ciudad." },
+  { title: "Perfil deportivo", items: "Deportes, nivel, estatura y peso (si los ingresas), partidos, goles, asistencias, XP, logros, ranking, calificaciones, equipos y búsquedas de partido." },
+  { title: "Reservas y pagos", items: "Reservas, horarios, recinto, montos, cupones, estado del pago y de los reembolsos, check-in, y los identificadores que entrega Mercado Pago. Nunca el número de tu tarjeta ni su código de seguridad." },
+  { title: "Ubicación", items: "Tu ubicación aproximada, solo si das permiso en tu dispositivo, para mostrarte canchas cercanas y distancias. No la guardamos en tu perfil." },
+  { title: "Comunicaciones", items: "Mensajes en el chat de tu equipo, reseñas, reportes y lo que nos escribes a soporte." },
+  { title: "Datos técnicos", items: "Tipo de dispositivo y navegador, registros de errores y estadísticas de uso agregadas para mejorar la app." },
+];
+
+const providers = [
+  { name: "Google Firebase", use: "Inicio de sesión y base de datos", where: "Estados Unidos" },
+  { name: "Vercel", use: "Servidores de la app y estadísticas de uso sin cookies", where: "Estados Unidos" },
+  { name: "Mercado Pago", use: "Procesar pagos, tarjetas guardadas y reembolsos", where: "Chile y Latinoamérica" },
+  { name: "Google Maps", use: "Mapa y ubicación de recintos", where: "Estados Unidos" },
+  { name: "Sentry", use: "Detectar y corregir errores técnicos", where: "Estados Unidos" },
+  { name: "Resend", use: "Enviar correos de verificación y avisos", where: "Estados Unidos" },
+  { name: "Open-Meteo", use: "Pronóstico del clima del recinto (solo recibe la ubicación de la cancha, no tus datos)", where: "Unión Europea" },
+];
+
+const sections: LegalSection[] = [
+  {
+    id: "responsable",
+    name: "Quién es responsable",
+    icon: SecurityCheckIcon,
+    content: (
+      <>
+        <p>
+          {LEGAL_ENTITY.brand}
+          {identity ? <> ({identity})</> : null} es responsable del tratamiento de los datos personales que se recogen en la
+          plataforma. Para cualquier consulta sobre tus datos escríbenos a {mail}.
+        </p>
+        <Card title="Recintos y datos de sus clientes">
+          <p>
+            Cuando reservas en un recinto, ese recinto también recibe los datos necesarios para atenderte (tu nombre, teléfono,
+            reserva y asistencia). El recinto debe usarlos solo para gestionar tus reservas, torneos y clases.
+          </p>
+        </Card>
+      </>
+    ),
+  },
+  {
+    id: "datos",
+    name: "Qué datos recogemos",
+    icon: DashboardSquare01Icon,
+    content: (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+        {dataGroups.map((g) => (
+          <Card key={g.title} title={g.title}><p>{g.items}</p></Card>
+        ))}
+      </div>
+    ),
+  },
+  {
+    id: "finalidades",
+    name: "Para qué los usamos",
+    icon: Calendar03Icon,
+    content: (
+      <>
+        <p>Usamos tus datos solo para lo que se indica, y cada uso tiene una base legal:</p>
+        <Bullets
+          items={[
+            <><strong className="text-white">Prestarte el servicio</strong> (ejecución del contrato): crear tu cuenta, reservar, cobrar, reembolsar, emitir tu ticket QR, registrar tu asistencia, y gestionar torneos, academias, equipos y chat.</>,
+            <><strong className="text-white">Tu perfil deportivo y la comunidad</strong> (ejecución del contrato): calcular XP, niveles, logros, rankings y recompensas, y sugerirte jugadores o partidos de tu nivel y ciudad.</>,
+            <><strong className="text-white">Mostrarte canchas cercanas</strong> (consentimiento): usar tu ubicación solo cuando la autorizas en tu dispositivo.</>,
+            <><strong className="text-white">Seguridad y mejora</strong> (interés legítimo): prevenir fraudes y abusos, mantener registros de auditoría y corregir errores.</>,
+            <><strong className="text-white">Cumplir la ley</strong> (obligación legal): conservar registros de pagos y facturación exigidos por la normativa tributaria.</>,
+            <><strong className="text-white">Enviarte novedades y promociones</strong> (consentimiento): solo si lo aceptas, y puedes retirarlo cuando quieras.</>,
+          ]}
+        />
+        <p>No vendemos tus datos ni los usamos para publicidad de terceros.</p>
+      </>
+    ),
+  },
+  {
+    id: "publico",
+    name: "Qué ven otros usuarios",
+    icon: UserGroupIcon,
+    content: (
+      <Bullets
+        items={[
+          "Otros jugadores pueden ver tu nombre, foto, ciudad, nivel, estadísticas, logros y posición en los rankings.",
+          "Tus compañeros de equipo ven los mensajes del chat del equipo. Las búsquedas de partido que publicas son visibles para otros jugadores.",
+          "Tu RUT, correo, teléfono, fecha de nacimiento y datos de pago nunca se muestran a otros jugadores.",
+        ]}
+      />
+    ),
+  },
+  {
+    id: "terceros",
+    name: "Con quién los compartimos",
+    icon: Store01Icon,
+    content: (
+      <>
+        <p>
+          Compartimos datos solo con el recinto donde reservas y con proveedores que nos ayudan a operar la plataforma. Ellos actúan
+          por encargo nuestro y no pueden usar tus datos para fines propios.
+        </p>
+        <div className="border border-white/5 rounded-md overflow-hidden">
+          {providers.map((p) => (
+            <div key={p.name} className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4 p-3 md:p-4 border-b border-white/5 last:border-b-0 bg-slate-900/20">
+              <span className="font-bold text-white text-xs md:w-40 shrink-0">{p.name}</span>
+              <span className="text-xs text-slate-400 flex-1">{p.use}</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 md:w-40 md:text-right shrink-0">{p.where}</span>
+            </div>
+          ))}
+        </div>
+        <Card title="Transferencias internacionales" tone="warn">
+          <p>
+            Varios proveedores guardan datos fuera de Chile. Solo trabajamos con proveedores que ofrecen garantías adecuadas de
+            protección, como cláusulas contractuales y medidas de seguridad reconocidas internacionalmente.
+          </p>
+        </Card>
+        <p>También entregaremos datos a autoridades cuando una ley o una orden judicial lo exija.</p>
+      </>
+    ),
+  },
+  {
+    id: "conservacion",
+    name: "Cuánto tiempo los guardamos",
+    icon: UserMinus01Icon,
+    content: (
+      <Bullets
+        items={[
+          "Mientras tu cuenta esté activa conservamos tus datos para prestarte el servicio.",
+          "Si eliminas tu cuenta, borramos tu perfil y tu acceso. Tus reservas pasadas quedan anonimizadas: dejan de mostrar tu nombre y teléfono, y solo se conservan para la contabilidad del recinto.",
+          "Los registros de pagos y facturación se conservan por el plazo que exige la normativa tributaria chilena (en general, 6 años).",
+          "Los registros técnicos de errores se guardan por un tiempo limitado y luego se eliminan.",
+        ]}
+      />
+    ),
+  },
+  {
+    id: "derechos",
+    name: "Tus derechos",
+    icon: ScaleIcon,
+    content: (
+      <>
+        <p>De acuerdo con la Ley N° 19.628, modificada por la Ley N° 21.719, tienes derecho a:</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+          {[
+            ["Acceso", "Saber qué datos tuyos tratamos, para qué y con quién los compartimos."],
+            ["Rectificación", "Corregir datos inexactos o incompletos. Muchos los puedes editar tú mismo en Ajustes."],
+            ["Supresión", "Pedir que eliminemos tus datos cuando ya no sean necesarios o retires tu consentimiento."],
+            ["Oposición", "Oponerte a ciertos usos, como el envío de promociones."],
+            ["Portabilidad", "Recibir tus datos en un formato estructurado y de uso común."],
+            ["Bloqueo", "Pedir que suspendamos temporalmente el uso de tus datos mientras se revisa una solicitud."],
+          ].map(([t, d]) => (
+            <Card key={t} title={t}><p>{d}</p></Card>
+          ))}
+        </div>
+        <Card title="Decisiones automatizadas">
+          <p>
+            Algunas cosas se calculan de forma automática, como tus puntos, tu nivel, tu ranking o el registro de una inasistencia.
+            Puedes pedir que una persona revise cualquiera de esas decisiones y darnos tu punto de vista.
+          </p>
+        </Card>
+        <Card title="Cómo ejercerlos" tone="ok">
+          <p>
+            Escríbenos a {mail} desde el correo de tu cuenta, indicando qué derecho quieres ejercer. Es gratis. Te responderemos en un
+            plazo máximo de 30 días corridos, que podremos extender una vez por igual período si es necesario, avisándote el motivo.
+          </p>
+          <p>
+            Si no quedas conforme con la respuesta, puedes reclamar ante la Agencia de Protección de Datos Personales.
+          </p>
+        </Card>
+      </>
+    ),
+  },
+  {
+    id: "seguridad",
+    name: "Seguridad",
+    icon: SquareLock01Icon,
+    content: (
+      <Bullets
+        items={[
+          "Las comunicaciones viajan cifradas (HTTPS) y el acceso a los datos está restringido por reglas de seguridad según el rol de cada usuario.",
+          "Los datos de tarjetas los procesa directamente Mercado Pago. Las credenciales de pago de los recintos se guardan cifradas y separadas del resto.",
+          "Registramos los cambios administrativos importantes para poder auditarlos.",
+          "Si ocurre un incidente de seguridad que afecte tus datos, lo informaremos a la autoridad y, cuando corresponda, a ti, según lo exige la ley.",
+        ]}
+      />
+    ),
+  },
+  {
+    id: "menores",
+    name: "Menores de edad",
+    icon: Alert02Icon,
+    content: (
+      <p>
+        Si eres menor de 14 años, necesitas la autorización de tu padre, madre o tutor legal para usar MVP Sports, y ellos pueden
+        ejercer tus derechos en tu nombre. Si detectamos una cuenta de un menor de 14 años sin esa autorización, podremos
+        eliminarla.
+      </p>
+    ),
+  },
+  {
+    id: "cambios",
+    name: "Cookies y cambios a esta política",
+    icon: MapPinIcon,
+    content: (
+      <Bullets
+        items={[
+          "Usamos el almacenamiento de tu navegador solo para mantener tu sesión y tus preferencias, como el tema claro u oscuro. Las estadísticas de uso no usan cookies de seguimiento.",
+          "Si cambiamos esta política de forma importante, te avisaremos en la app o por correo antes de que entre en vigencia.",
+          <>Esta política se complementa con los <Link href="/terms" className="text-white underline hover:text-[#00df82]">Términos y Condiciones</Link>.</>,
+        ]}
+      />
+    ),
+  },
+];
 
 export default function PrivacyPage() {
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-
-  const sections = [
-    { id: "datos", name: "1. Datos Recopilados", icon: File01Icon },
-    { id: "finalidad", name: "2. Finalidad del Uso", icon: CpuIcon },
-    { id: "compartir", name: "3. Intercambio de Datos", icon: Share01Icon },
-    { id: "retencion", name: "4. Retención y Baja", icon: Delete01Icon },
-    { id: "seguridad", name: "5. Medidas de Seguridad", icon: SquareLock01Icon },
-    { id: "derechos", name: "6. Derechos ARCO", icon: UserGroupIcon },
-  ];
-
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 96;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementPosition = element.getBoundingClientRect().top - bodyRect;
-      window.scrollTo({ top: elementPosition - offset, behavior: "smooth" });
-    }
-  };
-
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 selection:bg-[#00df82] selection:text-slate-950 font-sans">
-      <LegalHeader
-        sections={sections}
-        onSectionClick={scrollToSection}
-        onRegisterClick={() => setIsRegisterOpen(true)}
-      />
-
-      {/* HERO */}
-      <section className="relative overflow-hidden pt-40 lg:pt-32 pb-20 border-b border-white/5">
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 opacity-[0.18]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)",
-            backgroundSize: "46px 46px",
-          }}
-        />
-        <div aria-hidden="true" className="absolute -top-20 left-1/4 w-[360px] h-[360px] bg-[#00df82]/12 blur-[130px] rounded-full" />
-        <div aria-hidden="true" className="absolute top-0 right-1/4 w-[300px] h-[300px] bg-emerald-500/10 blur-[120px] rounded-full" />
-
-        <div className="container mx-auto px-6 max-w-6xl relative z-10 text-center">
-          <span className="text-[11px] font-black uppercase tracking-[0.3em] text-[#00df82] bg-[#00df82]/10 px-4 py-2 rounded-md border border-[#00df82]/20">
-            Políticas de privacidad
-          </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase tracking-tighter text-white mt-6 mb-4 font-heading">
-            Protección de <span className="text-gradient">Datos</span>
-          </h1>
-          <p className="text-xs md:text-sm text-slate-400 max-w-2xl mx-auto uppercase tracking-[0.15em]">
-            Última actualización: 18 de Mayo, 2026 · MVP Sports Chile
+    <LegalPage
+      eyebrow="Documento legal"
+      title="Política de"
+      highlight="Privacidad"
+      updated={LEGAL_UPDATED}
+      sections={sections}
+      intro={
+        <>
+          <p className="text-slate-300 text-sm md:text-base font-medium">
+            En MVP Sports cuidamos tus datos personales. Aquí te explicamos qué datos recogemos, para qué los usamos, con quién los
+            compartimos y cómo puedes ejercer tus derechos.
           </p>
-        </div>
-      </section>
-
-      {/* CONTENT */}
-      <section className="py-16 container mx-auto px-6 max-w-6xl">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-
-          {/* SIDEBAR */}
-          <aside className="lg:col-span-1 lg:sticky lg:top-24 h-fit space-y-6 hidden lg:block">
-            <div className="bg-slate-900/50 border border-white/5 rounded-md p-6 backdrop-blur-xl">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 border-b border-white/5 pb-2">
-                Índice de contenidos
-              </h3>
-              <nav className="flex flex-col gap-1.5">
-                {sections.map((section) => (
-                  <button
-                    key={section.id}
-                    onClick={() => scrollToSection(section.id)}
-                    className="flex items-center gap-3 text-left py-2 px-3 rounded-md text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white hover:bg-[#00df82]/5 transition-all group cursor-pointer"
-                  >
-                    <HugeiconsIcon icon={section.icon} className="w-4 h-4 text-slate-500 group-hover:text-[#00df82] transition-colors shrink-0" strokeWidth={1.8} />
-                    <span className="truncate">{section.name}</span>
-                  </button>
-                ))}
-              </nav>
-            </div>
-
-            <div className="bg-linear-to-br from-[#00df82]/5 to-transparent border border-[#00df82]/10 rounded-md p-6 relative overflow-hidden group">
-              <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-[#00df82]/10 rounded-full blur-2xl group-hover:bg-[#00df82]/20 transition-all duration-500" />
-              <h4 className="text-xs font-black uppercase tracking-[0.2em] text-[#00df82] mb-2">Juego limpio</h4>
-              <p className="text-[10px] text-slate-400 uppercase tracking-wider leading-relaxed">
-                Tus datos están protegidos en Chile bajo la Ley N° 19.628 sobre Protección de la Vida Privada.
-              </p>
-            </div>
-          </aside>
-
-          {/* DOCUMENT */}
-          <div className="lg:col-span-3 space-y-16">
-
-            <div className="max-w-none text-xs md:text-sm text-slate-400 leading-relaxed space-y-6">
-              <p className="text-slate-300 text-sm md:text-base font-medium">
-                En <strong>MVP Sports Chile</strong>, nos tomamos muy en serio la privacidad y seguridad de la información de nuestros usuarios. Esta Política de Privacidad describe cómo recopilamos, utilizamos, almacenamos, procesamos y protegemos sus datos personales al utilizar el ecosistema <strong>MVP Sports Suite</strong>, el cual comprende nuestro sitio web (Dashboard de Gestión Administrativa) y nuestra aplicación móvil.
-              </p>
-              <p>
-                Esta política se redacta en estricto cumplimiento con la <strong>Ley N° 19.628 sobre Protección de la Vida Privada</strong> de la República de Chile y demás normativas aplicables en materia de protección de datos personales.
-              </p>
-            </div>
-
-            {/* 1 */}
-            <div id="datos" className="scroll-mt-28 space-y-6 border-t border-white/5 pt-10">
-              <div className="flex items-center gap-4">
-                <HugeiconsIcon icon={File01Icon} className="w-8 h-8 text-[#00df82] shrink-0" strokeWidth={1.8} />
-                <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-white font-heading">
-                  1. Datos Personales que Recopilamos
-                </h2>
-              </div>
-              <div className="space-y-4 text-xs md:text-sm text-slate-400 leading-relaxed">
-                <p>
-                  Recopilamos la información estrictamente necesaria para proveer los servicios de reservas e identidades deportivas:
-                </p>
-                <div className="space-y-4 mt-2">
-                  <div className="p-5 bg-slate-900/40 border border-white/5 rounded-md">
-                    <h4 className="font-bold text-white uppercase tracking-wider text-xs mb-2">Información de registro</h4>
-                    <p className="text-slate-400 text-xs">
-                      Nombre completo, RUN/RUT, correo electrónico y número de teléfono. Las fotos de perfil se serializan directamente en <strong>código Base64 con prefijo MIME</strong>, sincronizándose de forma segura entre las colecciones de Firestore <code className="text-white">users</code>, <code className="text-white">staff</code> y Firebase Auth, evitando el uso de enlaces externos volátiles.
-                    </p>
-                  </div>
-                  <div className="p-5 bg-slate-900/40 border border-white/5 rounded-md">
-                    <h4 className="font-bold text-white uppercase tracking-wider text-xs mb-2">Datos de geolocalización</h4>
-                    <p className="text-slate-400 text-xs">
-                      Recopilamos la ubicación física en tiempo real (GPS) del dispositivo del jugador con precisión balanceada. Esta ubicación <strong>se procesa exclusivamente para calcular las distancias en kilómetros (KM/M)</strong> a los recintos deportivos más cercanos en la sección del mapa interactivo, y nunca se almacena en base de datos.
-                    </p>
-                  </div>
-                  <div className="p-5 bg-slate-900/40 border border-white/5 rounded-md">
-                    <h4 className="font-bold text-white uppercase tracking-wider text-xs mb-2">Historial deportivo e integración de chats</h4>
-                    <p className="text-slate-400 text-xs">
-                      Almacenamos tu historial de partidos, puntuación competitiva (ELO), XP, medallas y membresías a legiones de equipos (Squads). Al utilizar el módulo de Squads en la aplicación móvil, procesamos los mensajes enviados a través de la herramienta de <strong>Chat Interno de Equipo</strong> para permitir la comunicación táctica y coordinación de encuentros.
-                    </p>
-                  </div>
-                  <div className="p-5 bg-slate-900/40 border border-white/5 rounded-md">
-                    <h4 className="font-bold text-[#00df82] uppercase tracking-wider text-xs mb-2">Seguridad transaccional (cero tarjetas físicas)</h4>
-                    <p className="text-slate-400 text-xs">
-                      Para garantizar la máxima seguridad financiera, <strong>MVP Sports Suite no recopila ni almacena números físicos de tarjetas bancarias, claves ni códigos CVV</strong>. Todas las transacciones se realizan directamente mediante la pasarela segura <strong>Mercado Pago</strong> dentro de un WebView in-app. Solo almacenamos metadatos de las transacciones (ID de reserva, fecha, monto total y estado de pago).
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 2 */}
-            <div id="finalidad" className="scroll-mt-28 space-y-6 border-t border-white/5 pt-10">
-              <div className="flex items-center gap-4">
-                <HugeiconsIcon icon={CpuIcon} className="w-8 h-8 text-purple-400 shrink-0" strokeWidth={1.8} />
-                <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-white font-heading">
-                  2. Finalidad del Tratamiento de Datos
-                </h2>
-              </div>
-              <div className="space-y-4 text-xs md:text-sm text-slate-400 leading-relaxed">
-                <p>
-                  Tratamos sus datos personales con los siguientes fines operativos y comerciales legítimos:
-                </p>
-                <ul className="list-none space-y-3 pl-0">
-                  <li className="flex items-start gap-3">
-                    <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4 text-[#00df82] shrink-0 mt-0.5" strokeWidth={2} />
-                    <span><strong>Reserva y coordinación:</strong> Proveer los flujos de reserva, confirmación instantánea sin sobre-reservas y el sistema de check-in rápido vía QR en sitio.</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4 text-[#00df82] shrink-0 mt-0.5" strokeWidth={2} />
-                    <span><strong>Gamificación competitiva:</strong> Calcular y desplegar el rendimiento deportivo en el perfil, evolución de rango ELO y niveles de XP.</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4 text-[#00df82] shrink-0 mt-0.5" strokeWidth={2} />
-                    <span><strong>Seguridad forense:</strong> Registrar logs de cambios inmutables (System Audit Log) en el panel de control web para auditoría técnica y prevención de fraudes.</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4 text-[#00df82] shrink-0 mt-0.5" strokeWidth={2} />
-                    <span><strong>Facturación SII:</strong> Sincronizar las ventas facturables con el Servicio de Impuestos Internos (SII) de Chile (válido en complejos con plan Elite).</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* 3 */}
-            <div id="compartir" className="scroll-mt-28 space-y-6 border-t border-white/5 pt-10">
-              <div className="flex items-center gap-4">
-                <HugeiconsIcon icon={Share01Icon} className="w-8 h-8 text-blue-400 shrink-0" strokeWidth={1.8} />
-                <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-white font-heading">
-                  3. Intercambio de Datos y Terceros
-                </h2>
-              </div>
-              <div className="space-y-4 text-xs md:text-sm text-slate-400 leading-relaxed">
-                <p>
-                  No comercializamos ni arrendamos sus datos personales. Sus datos solo se transfieren a los siguientes actores involucrados en el flujo deportivo:
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-5 bg-slate-900/30 border border-white/5 rounded-md">
-                    <h4 className="font-bold text-white uppercase tracking-wider text-xs mb-2">Recintos deportivos (Tenants)</h4>
-                    <p className="text-slate-400 text-xs leading-relaxed">
-                      El administrador del recinto deportivo en el que reservas recibe tu nombre, teléfono e historial básico de asistencia (Check-In) para coordinar el ingreso a la cancha.
-                    </p>
-                  </div>
-                  <div className="p-5 bg-slate-900/30 border border-white/5 rounded-md">
-                    <h4 className="font-bold text-white uppercase tracking-wider text-xs mb-2">Proveedores e integraciones</h4>
-                    <p className="text-slate-400 text-xs leading-relaxed">
-                      <strong>Mercado Pago</strong> (procesamiento y reversa de fondos), <strong>Google Cloud/Firebase</strong> (almacenamiento y Cloud Functions locales en Sudamérica) y <strong>Vercel</strong> (hosting de dashboard Next.js).
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 4 */}
-            <div id="retencion" className="scroll-mt-28 space-y-6 border-t border-white/5 pt-10">
-              <div className="flex items-center gap-4">
-                <HugeiconsIcon icon={Delete01Icon} className="w-8 h-8 text-red-400 shrink-0" strokeWidth={1.8} />
-                <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-white font-heading">
-                  4. Retención de Datos y Anonimización
-                </h2>
-              </div>
-              <div className="space-y-4 text-xs md:text-sm text-slate-400 leading-relaxed">
-                <p>
-                  Conservamos los datos personales únicamente durante el tiempo que sea requerido para brindar el servicio de reservas y análisis.
-                </p>
-                <div className="p-5 bg-slate-900/60 border border-white/10 rounded-md space-y-3">
-                  <h4 className="font-bold text-white uppercase tracking-wider text-xs">
-                    ¿Cómo funciona la baja de cuenta?
-                  </h4>
-                  <p className="text-slate-400 text-xs leading-relaxed">
-                    Al presionar "Eliminar Cuenta Definitivamente" en la app móvil, el sistema remueve tus credenciales y perfil personal. No obstante, las reservas pasadas y transacciones financieras se conservan bajo un estado de <strong>anonimización irreversible</strong>, lo que significa que el balance contable del recinto se mantiene sin asociar ningún dato que permita identificarte personalmente.
-                  </p>
-                  <p className="text-slate-400 text-xs leading-relaxed mt-3 border-t border-white/5 pt-3">
-                    <strong>Eliminación web:</strong> Si no tienes acceso a la aplicación y deseas solicitar la eliminación completa de tu cuenta y todos los datos asociados, envíanos un correo directamente a <a href="mailto:oriontechnologyspa@gmail.com" className="text-white font-bold hover:text-[#00df82] transition-colors">oriontechnologyspa@gmail.com</a> o <a href="mailto:soporte@mvpsports.cl" className="text-white font-bold hover:text-[#00df82] transition-colors">soporte@mvpsports.cl</a> con el asunto "Eliminar mi cuenta". Procesaremos tu solicitud en menos de 72 horas.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* 5 */}
-            <div id="seguridad" className="scroll-mt-28 space-y-6 border-t border-white/5 pt-10">
-              <div className="flex items-center gap-4">
-                <HugeiconsIcon icon={SquareLock01Icon} className="w-8 h-8 text-[#00df82] shrink-0" strokeWidth={1.8} />
-                <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-white font-heading">
-                  5. Resguardo y Medidas de Seguridad
-                </h2>
-              </div>
-              <div className="space-y-4 text-xs md:text-sm text-slate-400 leading-relaxed">
-                <p>
-                  Para proteger la información personal de accesos no autorizados o pérdidas accidentales, implementamos robustas medidas tecnológicas de primer nivel:
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-5 bg-slate-900/30 border border-white/5 rounded-md">
-                    <h4 className="font-bold text-white uppercase tracking-wider text-xs mb-2">Firestore Security Rules</h4>
-                    <p className="text-slate-400 text-xs">
-                      Políticas multi-inquilino a nivel de base de datos que validan que los operadores de un recinto solo puedan ver las reservas de su propio recinto, y los jugadores solo las suyas.
-                    </p>
-                  </div>
-                  <div className="p-5 bg-slate-900/30 border border-white/5 rounded-md">
-                    <h4 className="font-bold text-white uppercase tracking-wider text-xs mb-2">Cero bloques fantasmas</h4>
-                    <p className="text-slate-400 text-xs">
-                      Creación diferida de reservas en base de datos para evitar la retención innecesaria de bloques horarios y datos si la pasarela de pagos es abandonada por el jugador.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 6 */}
-            <div id="derechos" className="scroll-mt-28 space-y-6 border-t border-white/5 pt-10">
-              <div className="flex items-center gap-4">
-                <HugeiconsIcon icon={UserGroupIcon} className="w-8 h-8 text-amber-400 shrink-0" strokeWidth={1.8} />
-                <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight text-white font-heading">
-                  6. Derechos de los Usuarios (ARCO)
-                </h2>
-              </div>
-              <div className="space-y-4 text-xs md:text-sm text-slate-400 leading-relaxed">
-                <p>
-                  Los usuarios de MVP Sports Suite gozan de la totalidad de los derechos consagrados en la Ley N° 19.628 sobre protección de la vida privada:
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-2">
-                  <div className="p-4 bg-slate-900/40 border border-white/5 rounded-md text-center">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#00df82] block mb-1">A · Acceso</span>
-                    <p className="text-slate-400 text-[10px]">Conocer qué información personal recopilamos de usted.</p>
-                  </div>
-                  <div className="p-4 bg-slate-900/40 border border-white/5 rounded-md text-center">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 block mb-1">R · Rectificación</span>
-                    <p className="text-slate-400 text-[10px]">Solicitar la corrección de datos incorrectos o incompletos.</p>
-                  </div>
-                  <div className="p-4 bg-slate-900/40 border border-white/5 rounded-md text-center">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-purple-400 block mb-1">C · Cancelación</span>
-                    <p className="text-slate-400 text-[10px]">Solicitar la eliminación de sus datos de nuestros registros.</p>
-                  </div>
-                  <div className="p-4 bg-slate-900/40 border border-white/5 rounded-md text-center">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-400 block mb-1">O · Oposición</span>
-                    <p className="text-slate-400 text-[10px]">Oponerse al procesamiento de su información para ciertos fines.</p>
-                  </div>
-                </div>
-                <p className="pt-2">
-                  Para ejercer cualquiera de estos derechos o si desea contactar a nuestro oficial de protección de datos, escriba directamente al correo: <a href="mailto:soporte@mvpsports.cl" className="text-white hover:text-[#00df82] transition-colors font-bold uppercase tracking-wider">soporte@mvpsports.cl</a>.
-                </p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      <Footer
-        onTermsClick={() => (window.location.href = "/terms")}
-        onPrivacyClick={() => scrollToSection("datos")}
-        onRegisterClick={() => setIsRegisterOpen(true)}
-      />
-      <ScrollToTop />
-      <RegistrationModal isOpen={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} />
-    </main>
+          <p>
+            Esta política cumple con la Ley N° 19.628 sobre Protección de la Vida Privada, modificada por la Ley N° 21.719 sobre
+            Protección y Tratamiento de Datos Personales.
+          </p>
+        </>
+      }
+    />
   );
 }

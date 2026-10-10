@@ -16,13 +16,9 @@ import Footer from "../components/landing/Footer";
 import ScrollToTop from "../components/landing/ScrollToTop";
 
 const RegistrationModal = dynamic(() => import("../components/landing/RegistrationModal"));
-const TermsModal = dynamic(() => import("../components/landing/TermsModal"));
-const PrivacyModal = dynamic(() => import("../components/landing/PrivacyModal"));
 
 export default function Home() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [isTermsOpen, setIsTermsOpen] = useState(false);
-  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-slate-950 selection:bg-[#00df82] selection:text-slate-950">
@@ -59,14 +55,10 @@ export default function Home() {
       <FinalCta onRegisterClick={() => setIsRegisterOpen(true)} />
 
       <Footer
-        onTermsClick={() => setIsTermsOpen(true)}
-        onPrivacyClick={() => setIsPrivacyOpen(true)}
         onRegisterClick={() => setIsRegisterOpen(true)}
       />
       <ScrollToTop />
       <RegistrationModal isOpen={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} />
-      <TermsModal isOpen={isTermsOpen} onClose={() => setIsTermsOpen(false)} />
-      <PrivacyModal isOpen={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
     </main>
   );
 }
