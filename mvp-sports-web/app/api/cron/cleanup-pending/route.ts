@@ -3,11 +3,9 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/services/server/firebase-admin";
 import { slotOf, rebuildCourtDay } from "@/services/server/bookingProjections";
 
-// Cron de Vercel. Solo se acepta pago online: lo que un jugador dejó pendiente de pago no es una reserva válida.
+// Cron de Vercel. La plataforma es 100% online: nada pendiente de pago es una reserva válida.
 //  - Pago online iniciado y abandonado (más de 1 h): se borra.
-//  - Reservas e inscripciones antiguas de "pago en el recinto": se cancelan y se libera el cupo.
-// Las reservas manuales del personal del recinto (source manual_*) no se tocan.
-const PLAYER_SOURCES = new Set(["web_app", "mobile_app"]);
+//  - Reservas antiguas (pago en el recinto o manuales del personal) e inscripciones: se cancelan y se libera el cupo.
 
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
@@ -29,10 +27,10 @@ export async function GET(request: Request) {
       if (created <= 0 || created > staleBefore) continue;
       await d.ref.delete();
       deleted++;
-    } else if (PLAYER_SOURCES.has(b.source) || (b.userId && !String(b.source || "").startsWith("manual"))) {
+    } else {
       await d.ref.update({ status: "cancelled", ...cancelled });
       cancelledBookings++;
-    } else continue;
+    }
     const s = slotOf(b);
     if (s) days.set(`${s.courtId}_${s.day}`, s);
   }

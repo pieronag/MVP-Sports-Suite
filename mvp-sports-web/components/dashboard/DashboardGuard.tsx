@@ -30,7 +30,7 @@ function getAllowedRoles(pathname: string): string[] | null {
   if (pathname.startsWith("/dashboard/profile")) return ALL_ROLES;
 
   // Resto del dashboard (páginas de owner: feedback, courts, tournaments,
-  // academy, finance, staff, billing-subscription, marketing, manual-booking)
+  // academy, finance, staff, billing-subscription, marketing)
   if (pathname.startsWith("/dashboard")) return OWNER_ROLES;
 
   return null;

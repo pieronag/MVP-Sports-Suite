@@ -32,7 +32,6 @@ const TicketIcon = ({ className }: { className?: string }) => <HugeiconsIcon ico
 import { collectedAmount, pendingAmount, durationHours, dayOpenHours } from '@/utils/bookingMath';
 import Link from 'next/link';
 import MetricCard from './MetricCard';
-import ManualBookingModal from './ManualBookingModal';
 import { PanelGlass, TarjetaKpi } from '@/components/ui/DashboardWidgets';
 
 // --- INTERFACES ---
@@ -85,7 +84,6 @@ export default function ManagerDashboard() {
 
     const [nextBookings, setNextBookings] = useState<Booking[]>([]);
     const [courtStatuses, setCourtStatuses] = useState<CourtStatus[]>([]);
-    const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
@@ -259,13 +257,6 @@ export default function ManagerDashboard() {
 
     return (
         <div className="w-full space-y-5 pb-10 text-left relative animate-fadeIn">
-            <ManualBookingModal
-                isOpen={isBookingModalOpen}
-                onClose={() => setIsBookingModalOpen(false)}
-                tenantId={selectedTenantId}
-                onSuccess={() => setRefreshTrigger(prev => prev + 1)}
-            />
-
             {/* CABECERA ADN FINANCE STYLE */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6 relative z-10">
                 <div>

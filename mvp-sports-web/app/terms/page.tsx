@@ -44,7 +44,7 @@ const sections: LegalSection[] = [
           items={[
             <><strong className="text-white">Jugador:</strong> persona que usa la app para reservar, pagar y jugar.</>,
             <><strong className="text-white">Recinto u Owner:</strong> persona natural o jurídica que contrata un plan para administrar su complejo deportivo.</>,
-            <><strong className="text-white">Mánager o staff:</strong> personal autorizado por el recinto para operar el día a día (check-in, reservas manuales, caja).</>,
+            <><strong className="text-white">Mánager o staff:</strong> personal autorizado por el recinto para operar el día a día (check-in, canchas y atención a los jugadores).</>,
           ]}
         />
       </>

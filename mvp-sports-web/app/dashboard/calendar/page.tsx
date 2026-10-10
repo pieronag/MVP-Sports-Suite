@@ -79,17 +79,11 @@ export default function MasterCalendar() {
     const [dashboardCourts, setDashboardCourts] = useState<Court[]>([]);
     const [bookings, setBookings] = useState<any[]>([]);
     const [selectedDate, setSelectedDate] = useState(getChileDateISO());
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState<any>(null);
-    const [overlapError, setOverlapError] = useState<string | null>(null);
-    const [creatingBooking, setCreatingBooking] = useState(false);
-    const [priceAutoFilled, setPriceAutoFilled] = useState(false);
-    const [modalCourts, setModalCourts] = useState<Court[]>([]);
     const [confirmData, setConfirmData] = useState<{ isOpen: boolean, title: string, message: string, action: () => void, isDestructive: boolean, showCancel?: boolean }>({ 
         isOpen: false, title: '', message: '', action: () => { }, isDestructive: false, showCancel: true 
     });
 
-    const [newRes, setNewRes] = useState({ tenantId: '', date: '', courtId: '', clientName: '', clientPhone: '', startTime: '18:00', duration: '1.0', price: '', paymentStatus: 'paid', deposit: '0', paymentMethod: 'cash', notes: '' });
 
     const calendarConfig = React.useMemo(() => {
         let openHour = 8;
@@ -167,7 +161,6 @@ export default function MasterCalendar() {
                 if (list.length === 0) setLoading(false);
                 if (list.length > 0) {
                     setSelectedVenueId(list[0].id);
-                    setNewRes(prev => ({ ...prev, tenantId: list[0].id }));
                 }
             } catch (e) { console.error(e); }
         };
@@ -259,123 +252,6 @@ export default function MasterCalendar() {
         });
     };
 
-    useEffect(() => {
-        const fetchModalCourts = async () => {
-            if (!newRes.tenantId) return setModalCourts([]);
-            if (newRes.tenantId === selectedVenueId) setModalCourts(dashboardCourts);
-            else {
-                const snap = await getDocs(query(collection(db, "courts"), where("tenantId", "==", newRes.tenantId)));
-                setModalCourts(snap.docs.map(d => ({ id: d.id, ...d.data() } as Court)).sort((a, b) => a.name.localeCompare(b.name)));
-            }
-        };
-        if (newRes.tenantId) { setNewRes(prev => ({ ...prev, courtId: '' })); fetchModalCourts(); }
-    }, [newRes.tenantId, selectedVenueId, dashboardCourts]);
-
-    useEffect(() => {
-        if (newRes.courtId && newRes.startTime && newRes.tenantId && newRes.date) {
-            const venue = venues.find(v => v.id === newRes.tenantId);
-            const court = modalCourts.find(c => c.id === newRes.courtId);
-            if (venue?.pricing && court?.sport) {
-                const day = new Date(newRes.date + "T12:00:00").getDay();
-                const dayType = (day === 0 || day === 6) ? 'weekend' : 'weekday';
-                const sportPricing: any = venue.pricing[court.sport] || {};
-                const priceMap = sportPricing[dayType] || sportPricing;
-                const price = Number(priceMap?.[newRes.startTime] || 0);
-                if (price > 0) { setNewRes(prev => ({ ...prev, price: price.toString() })); setPriceAutoFilled(true); }
-                else setPriceAutoFilled(false);
-            } else setPriceAutoFilled(false);
-        } else setPriceAutoFilled(false);
-    }, [newRes.courtId, newRes.startTime, newRes.tenantId, newRes.date, venues, modalCourts]);
-
-    const [availabilityStatus, setAvailabilityStatus] = useState<'idle' | 'checking' | 'available' | 'occupied'>('idle');
-    const [occupiedBy, setOccupiedBy] = useState<string>('');
-
-    useEffect(() => {
-        if (!newRes.courtId || !newRes.startTime || !newRes.date) { setAvailabilityStatus('idle'); return; }
-        if (newRes.date === selectedDate && newRes.tenantId === selectedVenueId) {
-            const conflict = bookings.find(b => b.courtId === newRes.courtId && b.displayTime === newRes.startTime && b.status !== 'cancelled');
-            if (conflict) { setAvailabilityStatus('occupied'); setOccupiedBy(conflict.clientName || 'Reserva existente'); }
-            else { setAvailabilityStatus('available'); setOccupiedBy(''); }
-        } else {
-            const checkRemote = async () => {
-                setAvailabilityStatus('checking');
-                try {
-                    const [ch, cm] = newRes.startTime.split(':').map(Number);
-                    const checkDate = new Date(`${newRes.date}T00:00:00`);
-                    checkDate.setHours(ch, cm, 0, 0);
-                    if (ch < 6) checkDate.setDate(checkDate.getDate() + 1);
-                    const snap = await getDocs(query(collection(db, "bookings"), where("tenantId", "==", newRes.tenantId), where("courtId", "==", newRes.courtId), where("date", ">=", Timestamp.fromDate(checkDate)), where("date", "<=", Timestamp.fromDate(new Date(checkDate.getTime() + 3599000)))));
-                    const active = snap.docs.filter(d => d.data().status !== 'cancelled');
-                    if (active.length > 0) { setAvailabilityStatus('occupied'); setOccupiedBy(active[0].data().clientName || 'Reserva existente'); }
-                    else { setAvailabilityStatus('available'); setOccupiedBy(''); }
-                } catch { setAvailabilityStatus('available'); }
-            };
-            checkRemote();
-        }
-    }, [newRes.courtId, newRes.startTime, newRes.date, newRes.tenantId, bookings, selectedDate, selectedVenueId]);
-
-    const handleOpenAddModal = () => { setNewRes({ tenantId: selectedVenueId, date: selectedDate, courtId: '', clientName: '', clientPhone: '', startTime: '18:00', duration: '1.0', price: '', paymentStatus: 'paid', deposit: '0', paymentMethod: 'cash', notes: '' }); setOverlapError(null); setAvailabilityStatus('idle'); setPriceAutoFilled(false); setIsAddModalOpen(true); };
-
-    const handleAddBooking = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setOverlapError(null);
-        if (!user || !newRes.tenantId || !newRes.courtId) return;
-        if (!newRes.clientName.trim()) { setOverlapError("Falta nombre del cliente."); return; }
-        if (!newRes.clientPhone.trim()) { setOverlapError("Falta teléfono."); return; }
-        if (!newRes.price || Number(newRes.price) <= 0) { setOverlapError("Ingresa precio válido."); return; }
-        if (availabilityStatus === 'occupied') { setOverlapError("Horario ocupado."); return; }
-        const [bh, bm] = newRes.startTime.split(':').map(Number);
-        const bookingDate = new Date(`${newRes.date}T00:00:00`);
-        bookingDate.setHours(bh, bm, 0, 0);
-        if (bh < 6) {
-            bookingDate.setDate(bookingDate.getDate() + 1);
-        }
-        // Se permite el bloque en curso (cliente que llega a jugar ahora); solo se
-        // bloquean bloques que ya terminaron.
-        const blockEnd = new Date(bookingDate.getTime() + (parseFloat(newRes.duration) || 1) * 3600000);
-        if (blockEnd <= getChileNow()) { setOverlapError("Ese horario ya terminó."); return; }
-
-        setCreatingBooking(true);
-        try {
-            const selectedCourt = modalCourts.find(c => c.id === newRes.courtId);
-            const end = new Date(bookingDate.getTime() + parseFloat(newRes.duration) * 3600000);
-            // Generate 6-digit custom alphanumeric ID
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let bookingId = '';
-            for (let i = 0; i < 6; i++) {
-                bookingId += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            // Coherencia del cobro: pagado = total, pendiente = 0, abono = lo ingresado
-            const paidNow = newRes.paymentStatus === 'paid' ? Number(newRes.price) : newRes.paymentStatus === 'pending' ? 0 : Number(newRes.deposit) || 0;
-            await setDoc(doc(db, "bookings", bookingId), { tenantId: newRes.tenantId, tenantName: venues.find(v => v.id === newRes.tenantId)?.name, courtId: newRes.courtId, courtName: selectedCourt?.name || 'Cancha', sport: selectedCourt?.sport || 'General', clientName: newRes.clientName, clientPhone: newRes.clientPhone, date: Timestamp.fromDate(bookingDate), startTime: newRes.startTime, endTime: `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`, duration: parseFloat(newRes.duration), price: Number(newRes.price), totalPrice: Number(newRes.price), deposit: paidNow, remainingBalance: Math.max(0, Number(newRes.price) - paidNow), status: 'confirmed', paymentStatus: newRes.paymentStatus, paymentMethod: newRes.paymentMethod, notes: newRes.notes, source: 'manual_dashboard', ownerId: user.uid, createdAt: Timestamp.now(), createdBy: user.displayName || user.email });
-            await syncBookingSlots(bookingId);
-            setIsAddModalOpen(false);
-            if (newRes.date === selectedDate && newRes.tenantId === selectedVenueId) loadDashboardData();
-            await auditService.logAuditEvent({
-                action: 'RESERVA_CREAR_MANUAL',
-                module: 'Operación/Agenda',
-                details: `Reserva manual creada exitosamente. Código: ${bookingId} para ${newRes.clientName} (${newRes.date} ${newRes.startTime})`,
-                severity: 'LOW',
-                status: 'SUCCESS'
-            });
-        } catch (e: any) { 
-            await auditService.logAuditEvent({
-                action: 'RESERVA_CREAR_MANUAL',
-                module: 'Operación/Agenda',
-                details: `Falla al registrar reserva manual para ${newRes.clientName}: ${e.message || e}`,
-                severity: 'LOW',
-                status: 'FAILED'
-            });
-            setConfirmData({
-                isOpen: true,
-                title: "Error al Guardar",
-                message: "No pudimos sincronizar la reserva. Revisa tu conexión e intenta nuevamente.",
-                isDestructive: true,
-                showCancel: false,
-                action: () => setConfirmData(prev => ({ ...prev, isOpen: false }))
-            });
-        } finally { setCreatingBooking(false); }
-    };
 
     const getCardStyle = (paymentStatus: string, status: string) => {
         if (status === 'cancelled') return 'bg-slate-50 dark:bg-slate-800/60 border-slate-300 dark:border-white/10 text-slate-500 dark:text-slate-400 opacity-60';
@@ -428,7 +304,6 @@ export default function MasterCalendar() {
                     <select value={selectedVenueId} onChange={(e) => setSelectedVenueId(e.target.value)} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer appearance-none min-w-[180px]">
                         {venues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                     </select>
-                    <button onClick={handleOpenAddModal} className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all"><HugeiconsIcon icon={Add01Icon} className="w-4 h-4" strokeWidth={2} /> Nueva reserva</button>
                 </div>
             </div>
 
@@ -611,172 +486,6 @@ export default function MasterCalendar() {
                 </div>
             )}
 
-            {isAddModalOpen && (
-                <div className="fixed inset-0 z-110 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={() => setIsAddModalOpen(false)}>
-                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-4xl rounded-md shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden max-h-[95vh] flex flex-col" onClick={e => e.stopPropagation()}>
-                        <div className="flex items-center justify-between px-6 py-4 bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10">
-                            <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-[#00df82]">
-                                    <HugeiconsIcon icon={Add01Icon} className="w-5 h-5" strokeWidth={2} />
-                                </div>
-                                <div>
-                                    <h3 className="text-sm font-black uppercase text-slate-900 dark:text-white font-heading">Nueva reserva manual</h3>
-                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Registro directo en la agenda</p>
-                                </div>
-                            </div>
-                            <button aria-label="Cerrar" onClick={() => setIsAddModalOpen(false)} className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-md transition-all"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" strokeWidth={2} /></button>
-                        </div>
-
-                        <form onSubmit={handleAddBooking} className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto custom-scrollbar">
-                            {/* COLUMNA IZQUIERDA */}
-                            <div className="space-y-5">
-                                <div className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-5 space-y-4">
-                                    <div className="flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-3">
-                                        <HugeiconsIcon icon={Calendar03Icon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
-                                        <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest font-heading">Información de sesión</h4>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Recinto</label>
-                                            <select required value={newRes.tenantId} onChange={e => setNewRes({ ...newRes, tenantId: e.target.value })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase outline-hidden focus:border-emerald-500/40 transition-all">
-                                                {venues.map(v => <option key={v.id} value={v.id} className="dark:bg-black">{v.name}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Fecha</label>
-                                            <input type="date" required value={newRes.date} onChange={e => setNewRes({ ...newRes, date: e.target.value })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-hidden focus:border-emerald-500/40 transition-all" />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Cancha</label>
-                                            <select required value={newRes.courtId} onChange={e => setNewRes({ ...newRes, courtId: e.target.value })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase outline-hidden focus:border-emerald-500/40 transition-all">
-                                                <option value="">Selecciona...</option>
-                                                {modalCourts.map(c => <option key={c.id} value={c.id} className="dark:bg-black">{c.name} ({c.sport})</option>)}
-                                            </select>
-                                        </div>
-<div>
-                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Hora inicio</label>
-                                        <select required value={newRes.startTime} onChange={e => setNewRes({ ...newRes, startTime: e.target.value })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-hidden focus:border-emerald-500/40 transition-all">
-                                            {calendarConfig.timeSlots.map(t => <option key={t} value={t} className="dark:bg-black">{t}</option>)}
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                                <div className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-5 space-y-4">
-                                    <div className="flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-3">
-                                        <HugeiconsIcon icon={UserCircleIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
-                                        <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest font-heading">Cliente</h4>
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Nombre</label>
-                                            <input required type="text" value={newRes.clientName} onChange={e => setNewRes({ ...newRes, clientName: e.target.value })} placeholder="Nombre del jugador" className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-hidden focus:border-emerald-500/40 transition-all" />
-                                        </div>
-                                        <div>
-                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Teléfono</label>
-                                            <input required type="tel" value={newRes.clientPhone} onChange={e => setNewRes({ ...newRes, clientPhone: e.target.value })} placeholder="+56 9..." className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-hidden focus:border-emerald-500/40 transition-all" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Notas (opcional)</label>
-                                        <textarea rows={2} value={newRes.notes} onChange={e => setNewRes({ ...newRes, notes: e.target.value })} placeholder="Comentarios para el recinto..." className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-hidden focus:border-emerald-500/40 transition-all resize-none" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* COLUMNA DERECHA */}
-                            <div className="space-y-5">
-                                <div className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-5 space-y-4">
-                                    <div className="flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-3">
-                                        <HugeiconsIcon icon={MoneyBag01Icon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
-                                        <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest font-heading">Cobro y pago</h4>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Monto (CLP)</label>
-                                            <input required type="number" value={newRes.price} onChange={e => { setNewRes({ ...newRes, price: e.target.value }); setPriceAutoFilled(false); }} className={`w-full bg-white dark:bg-white/5 border rounded-md px-3 py-2.5 text-[11px] font-black outline-hidden transition-all ${priceAutoFilled ? 'border-emerald-500 text-emerald-600 dark:text-[#00df82]' : 'border-slate-200 dark:border-white/10 text-slate-900 dark:text-white'}`} />
-                                            {priceAutoFilled && <p className="text-[8px] font-black text-emerald-600 dark:text-[#00df82] uppercase mt-1">Auto-completado según tarifa</p>}
-                                        </div>
-                                        <div>
-                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Estado de pago</label>
-                                            <select value={newRes.paymentStatus} onChange={e => setNewRes({ ...newRes, paymentStatus: e.target.value, deposit: e.target.value === 'paid' ? newRes.price : '0' })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase outline-hidden focus:border-emerald-500/40 transition-all">
-                                                <option value="paid">Pagado total</option>
-                                                <option value="partial">Abono / parcial</option>
-                                                <option value="pending">Pendiente</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    {newRes.paymentStatus === 'partial' && (
-                                        <div className="animate-slideIn">
-                                            <label className="text-[9px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-wider block mb-1.5">Monto abono</label>
-                                            <input required type="number" value={newRes.deposit} onChange={e => setNewRes({ ...newRes, deposit: e.target.value })} className="w-full bg-white dark:bg-white/5 border-2 border-emerald-500 dark:border-[#00df82] rounded-md px-3 py-2.5 text-[11px] font-black text-emerald-600 dark:text-[#00df82] outline-hidden" />
-                                        </div>
-                                    )}
-                                    <div>
-                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-2">Método de pago</label>
-                                        <div className="flex gap-2">
-                                            {[['cash', 'Efectivo'], ['transfer', 'Transferencia'], ['card', 'Tarjeta']].map(([val, label]) => (
-                                                <button key={val} type="button" onClick={() => setNewRes({ ...newRes, paymentMethod: val })} className={`flex-1 py-2 rounded-md text-[9px] font-black uppercase border transition-all ${newRes.paymentMethod === val ? 'bg-emerald-500 dark:bg-[#00df82] border-emerald-500 dark:border-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 hover:border-emerald-400/40'}`}>{label}</button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* DISPONIBILIDAD */}
-                                <div className={`rounded-md border p-4 text-[10px] font-black uppercase flex items-center gap-2.5 ${overlapError || availabilityStatus === 'occupied' ? 'bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400' : availabilityStatus === 'checking' ? 'bg-sky-500/10 border-sky-500/30 text-sky-600 dark:text-sky-400' : availabilityStatus === 'available' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-[#00df82]' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-500'}`}>
-                                    {overlapError ? <><HugeiconsIcon icon={Alert01Icon} className="w-4 h-4" strokeWidth={2} /> {overlapError}</> : availabilityStatus === 'checking' ? <><HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> Verificando disponibilidad...</> : availabilityStatus === 'available' ? <><HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={2} /> Horario disponible</> : availabilityStatus === 'occupied' ? <><HugeiconsIcon icon={Alert01Icon} className="w-4 h-4" strokeWidth={2} /> Ocupado por {occupiedBy.toUpperCase()}</> : <><HugeiconsIcon icon={Clock01Icon} className="w-4 h-4" strokeWidth={2} /> Completa los datos para verificar</>}
-                                </div>
-
-                                {/* RESUMEN */}
-                                <div className="rounded-md bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-5 space-y-2.5">
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Resumen de la reserva</p>
-                                    <div className="flex justify-between text-[10px] font-black uppercase">
-                                        <span className="text-slate-400">Cancha</span>
-                                        <span className="text-slate-900 dark:text-white truncate max-w-[60%]">{modalCourts.find(c => c.id === newRes.courtId)?.name || '—'}</span>
-                                    </div>
-                                    <div className="flex justify-between text-[10px] font-black uppercase">
-                                        <span className="text-slate-400">Fecha</span>
-                                        <span className="text-slate-900 dark:text-white">{newRes.date ? new Date(newRes.date + "T12:00:00").toLocaleDateString('es-CL', { day: '2-digit', month: 'short' }) : '—'}</span>
-                                    </div>
-                                    <div className="flex justify-between text-[10px] font-black uppercase">
-                                        <span className="text-slate-400">Horario</span>
-                                        <span className="text-slate-900 dark:text-white">{newRes.startTime}</span>
-                                    </div>
-                                    <div className="flex justify-between text-[10px] font-black uppercase">
-                                        <span className="text-slate-400">Cliente</span>
-                                        <span className="text-slate-900 dark:text-white truncate max-w-[60%]">{newRes.clientName || '—'}</span>
-                                    </div>
-                                    <div className="pt-2 mt-1 border-t border-slate-200 dark:border-white/10 space-y-1.5">
-                                        <div className="flex justify-between text-[10px] font-black uppercase">
-                                            <span className="text-slate-400">Monto</span>
-                                            <span className="text-slate-900 dark:text-white font-mono">{formatCLP(newRes.price)}</span>
-                                        </div>
-                                        {newRes.paymentStatus === 'partial' && (
-                                            <div className="flex justify-between text-[10px] font-black uppercase">
-                                                <span className="text-slate-400">Abono</span>
-                                                <span className="text-emerald-600 dark:text-[#00df82] font-mono">{formatCLP(newRes.deposit)}</span>
-                                            </div>
-                                        )}
-                                        {newRes.paymentStatus !== 'paid' && (
-                                            <div className="flex justify-between text-[10px] font-black uppercase">
-                                                <span className="text-slate-400">Por cobrar</span>
-                                                <span className="text-amber-600 dark:text-amber-400 font-mono">{formatCLP(Number(newRes.price || 0) - Number(newRes.deposit || 0))}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-4">
-                                    <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 py-3.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 rounded-md text-[10px] font-black uppercase tracking-wider active:scale-95 transition-all">Cancelar</button>
-                                    <button type="submit" disabled={creatingBooking || availabilityStatus === 'occupied' || availabilityStatus === 'checking'} className="flex-2 py-3.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md text-[10px] font-black uppercase tracking-wider shadow-xl active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">{creatingBooking ? <><HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> Guardando...</> : <><HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={2} /> Confirmar reserva</>}</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

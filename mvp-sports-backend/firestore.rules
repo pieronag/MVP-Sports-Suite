@@ -256,9 +256,12 @@ service cloud.firestore {
         request.auth.uid in resource.data.get('participantIds', []) ||
         isStaff()
       );
-      // Solo pago online: las reservas de jugadores las crea el servidor tras verificar el
-      // pago en Mercado Pago; el personal del recinto puede crear reservas manuales.
-      allow create: if worksAtTenant(request.resource.data.get('tenantId', ''));
+      // 100% online: las reservas de cancha solo las crea el servidor tras verificar el pago en
+      // Mercado Pago. El jugador solo puede registrar un partido interno (sin recinto, cancha ni pago).
+      allow create: if isAuthenticated() &&
+        request.resource.data.get('userId', '') == request.auth.uid &&
+        request.resource.data.get('isInternalMatch', false) == true &&
+        !request.resource.data.keys().hasAny(['tenantId', 'courtId', 'price', 'totalPrice', 'paymentStatus', 'paymentMethod', 'paymentRecordId', 'refundAmount', 'refundDetails']);
       allow update: if isAuthenticated() && (
         (worksAtTenant(resource.data.get('tenantId', '')) &&
           request.resource.data.get('tenantId', '') == resource.data.get('tenantId', '')) ||
