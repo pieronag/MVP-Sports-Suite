@@ -32,13 +32,13 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="como-funciona" className="py-20 lg:py-28 relative overflow-hidden bg-slate-950/20">
+    <section id="como-funciona" className="py-16 md:py-24 lg:py-28 relative overflow-hidden bg-slate-950/20">
       <div
         aria-hidden="true"
         className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-[#00df82]/5 blur-[120px] rounded-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"
       />
 
-      <div className="container relative z-10 px-6">
+      <div className="container relative z-10 px-4 md:px-6">
         <SectionHeading
           eyebrow="Cómo funciona"
           title={

@@ -65,7 +65,7 @@ export default function Hero({ onRegisterClick }: { onRegisterClick: () => void 
               </Link>
             </div>
 
-            <ul className="flex flex-col md:flex-row md:flex-wrap items-start md:items-center justify-center md:justify-start gap-x-4 md:gap-x-6 gap-y-2 pt-2 md:pt-1">
+            <ul className="flex flex-col md:flex-row md:flex-wrap items-center justify-center md:justify-start gap-x-4 md:gap-x-6 gap-y-2 pt-2 md:pt-1">
               {trustPoints.map((point) => (
                 <li key={point} className="flex items-center gap-2 text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-slate-400">
                   <HugeiconsIcon icon={Tick02Icon} className="w-3 md:w-3.5 h-3 md:h-3.5 text-[#00df82] flex-shrink-0" strokeWidth={2.5} aria-hidden="true" />

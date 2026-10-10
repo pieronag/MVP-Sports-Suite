@@ -20,11 +20,11 @@ export default function Pricing() {
   };
 
   return (
-    <section id="planes" className="py-20 lg:py-32 relative overflow-hidden bg-slate-950/40">
+    <section id="planes" className="py-16 md:py-24 lg:py-28 relative overflow-hidden bg-slate-950/40">
       <div className="absolute top-1/3 right-0 w-[600px] h-[600px] bg-[#00df82]/5 blur-[120px] rounded-full pointer-events-none" aria-hidden="true" />
       <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none" aria-hidden="true" />
 
-      <div className="container relative z-10 px-6">
+      <div className="container relative z-10 px-4 md:px-6">
         <SectionHeading
           eyebrow="Planes"
           title={

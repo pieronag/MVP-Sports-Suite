@@ -25,10 +25,10 @@ export default function PlanSimulator() {
     : null;
 
   return (
-    <section className="py-20 lg:py-28 relative overflow-hidden bg-slate-950/40">
+    <section className="py-16 md:py-24 lg:py-28 relative overflow-hidden bg-slate-950/40">
       <div className="absolute top-1/2 left-0 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full -translate-y-1/2 pointer-events-none" aria-hidden="true" />
 
-      <div className="container relative z-10 px-6">
+      <div className="container relative z-10 px-4 md:px-6">
         <SectionHeading
           eyebrow="Simulador"
           title={

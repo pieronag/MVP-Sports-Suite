@@ -4,9 +4,9 @@ const WHATSAPP_NUMBER = "56950194398";
 
 export default function FinalCta({ onRegisterClick }: { onRegisterClick: () => void }) {
   return (
-    <section className="py-20 lg:py-28 relative overflow-hidden">
-      <div className="container mx-auto px-6">
-        <div className="relative rounded-md overflow-hidden border border-[#00df82]/15 bg-linear-to-br from-slate-900 via-slate-950 to-[#04231a] p-10 lg:p-16 text-center">
+    <section className="py-16 md:py-24 lg:py-28 relative overflow-hidden">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="relative rounded-md overflow-hidden border border-[#00df82]/15 bg-linear-to-br from-slate-900 via-slate-950 to-[#04231a] p-6 sm:p-10 lg:p-16 text-center">
           <div
             aria-hidden="true"
             className="absolute inset-0 opacity-[0.25]"

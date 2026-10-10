@@ -40,13 +40,13 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
   void onRegisterClick;
 
   return (
-    <section id="owners" className="py-20 lg:py-32 relative overflow-hidden bg-slate-950/40">
+    <section id="owners" className="py-16 md:py-24 lg:py-28 relative overflow-hidden bg-slate-950/40">
       <div
         aria-hidden="true"
         className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#00df82]/5 blur-[120px] rounded-full -translate-y-1/2 pointer-events-none"
       />
 
-      <div className="container relative z-10 px-6">
+      <div className="container relative z-10 px-4 md:px-6">
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
           <SectionHeading
             eyebrow="Para recintos"

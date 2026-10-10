@@ -16,8 +16,8 @@ const stats = [
 
 export default function TrustBand() {
   return (
-    <section className="py-14 lg:py-20 relative z-10 border-y border-slate-800/50 bg-slate-900/30">
-      <div className="container mx-auto px-6">
+    <section className="py-12 md:py-16 relative z-10 border-y border-slate-800/50 bg-slate-900/30">
+      <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
           {stats.map((stat) => (
             <div

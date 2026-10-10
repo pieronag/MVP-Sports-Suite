@@ -13,8 +13,8 @@ const sports = [
 
 export default function SupportedSports() {
   return (
-    <section className="py-20 lg:py-28 relative z-10 border-y border-slate-800/50 bg-slate-900/30">
-      <div className="container mx-auto px-6">
+    <section className="py-16 md:py-24 lg:py-28 relative z-10 border-y border-slate-800/50 bg-slate-900/30">
+      <div className="container mx-auto px-4 md:px-6">
         <SectionHeading
           align="center"
           eyebrow="Ecosistema deportivo"

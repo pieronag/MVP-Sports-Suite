@@ -22,8 +22,8 @@ const integrations = [
 
 export default function IntegracionesSection() {
   return (
-    <section className="py-16 lg:py-20 relative overflow-hidden border-t border-white/5 bg-slate-950/30">
-      <div className="container mx-auto px-6">
+    <section className="py-12 md:py-16 relative overflow-hidden border-t border-white/5 bg-slate-950/30">
+      <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-12 text-center lg:text-left">
           <div className="space-y-2 max-w-md">
             <p className="text-[11px] font-black text-[#00df82] uppercase tracking-[0.35em]">
