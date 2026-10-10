@@ -16,7 +16,26 @@ async function resolveMercadoPagoToken(tenantId?: string): Promise<string | unde
   return priv?.mercadopagoAccessToken || process.env.MERCADOPAGO_ACCESS_TOKEN || undefined;
 }
 
-// Cancela una reserva propia y, si se pagó online, reembolsa descontando 3% de comisión.
+const REFUND_MIN_HOURS = 4;
+
+// Hora de pared en Chile como instante comparable (la diferencia entre dos de estos es la real)
+function chileWallClock(d: Date, time?: string): number {
+  const p = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", { timeZone: "America/Santiago", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", hourCycle: "h23" })
+      .formatToParts(d).map((x) => [x.type, Number(x.value)])
+  );
+  const [h, m] = time ? time.split(":").map(Number) : [p.hour, p.minute];
+  return Date.UTC(p.year, p.month - 1, p.day, h || 0, m || 0);
+}
+
+function hoursUntilStart(booking: any): number | null {
+  const raw = booking.date;
+  const date: Date | null = raw?.toDate ? raw.toDate() : raw ? new Date(/^\d{4}-\d{2}-\d{2}$/.test(String(raw)) ? `${raw}T12:00:00Z` : raw) : null;
+  if (!date || isNaN(date.getTime()) || !booking.startTime) return null;
+  return (chileWallClock(date, booking.startTime) - chileWallClock(new Date())) / 3_600_000;
+}
+
+// Cancela una reserva propia y, si se pagó online con 4 h o más de anticipación, reembolsa descontando 3% de comisión.
 export async function POST(request: Request) {
   const caller = await verifyAuthedCaller(request);
   if (!caller) return NextResponse.json({ error: "Debes estar autenticado." }, { status: 401 });
@@ -32,6 +51,14 @@ export async function POST(request: Request) {
     const bookingData = (await bookingRef.get()).data();
     if (!bookingData) return NextResponse.json({ error: "No se encontró la reserva." }, { status: 404 });
     if (bookingData.userId !== caller.uid) return NextResponse.json({ error: "No tienes permisos sobre esta reserva." }, { status: 403 });
+    if (bookingData.status === "cancelled") return NextResponse.json({ error: "La reserva ya está cancelada." }, { status: 409 });
+    if (bookingData.checkIn || ["active", "completed", "past", "no-show"].includes(bookingData.status)) {
+      return NextResponse.json({ error: "La reserva ya comenzó, no admite reembolso." }, { status: 409 });
+    }
+    const hoursLeft = hoursUntilStart(bookingData);
+    if (hoursLeft === null || hoursLeft < REFUND_MIN_HOURS) {
+      return NextResponse.json({ error: `Faltan menos de ${REFUND_MIN_HOURS} horas para el partido: según la política de cancelación no corresponde reembolso.` }, { status: 409 });
+    }
 
     const paymentSnap = await db.collection("payments").where("bookingId", "==", String(bookingId)).limit(1).get();
     const paymentDoc = paymentSnap.empty ? null : paymentSnap.docs[0];
