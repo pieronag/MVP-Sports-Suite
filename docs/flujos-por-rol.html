@@ -69,7 +69,7 @@ code{font:13px var(--mono);background:var(--bg);padding:1px 6px;border-radius:4p
 flowchart TD
   A[Landing] --> B{Crear cuenta}
   B -->|Google| C[Entra de inmediato]
-  B -->|Correo y contraseña| D[Verifica su correo] --> E[Inicia sesión] --> C
+  B -->|Correo y contraseña de 8+ caracteres, dos veces| D[Verifica su correo] --> E[Inicia sesión] --> C
   C --> F[Onboarding: deporte, comuna y nivel]
   F --> G[Busca recinto en clubes o mapa]
   G --> H[Elige cancha, día y hora]
@@ -147,9 +147,10 @@ flowchart TD
   C --> D[Panel del día: ocupación, ingresos y próximas reservas]
   D --> E[Calendario: revisa reservas por cancha]
   D --> F[Check-in: escanea el QR del jugador]
-  F --> G{¿Reserva válida y pagada?}
+  F --> G{¿Pagada online y en su horario?}
   G -->|Sí| H[Registra asistencia] --> I[Partido en curso]
-  G -->|No| J[Rechaza el ingreso]
+  G -->|Sin pago| J[Aparece como Sin pago online: no puede ingresar]
+  G -->|Fuera de horario| J2[Acceso denegado]
   I --> K[Cierre del partido]
   D --> L[Reporta un problema a soporte]
     </pre></div>
@@ -159,7 +160,8 @@ flowchart TD
       </div>
       <div class="card"><h3>Qué ya no hace</h3><ul>
         <li>No crea reservas manuales <span>· toda reserva nace de un pago online</span></li>
-        <li>No cobra en mesón <span>· no hay pago en el recinto</span></li>
+        <li>No cobra en mesón <span>· el check-in no tiene caja ni efectivo</span></li>
+        <li>No deja ingresar sin pago <span>· aplica al botón, al QR y al código manual</span></li>
       </ul></div>
     </div>
   </section>
@@ -227,7 +229,8 @@ flowchart TD
       <div class="card"><h3>Reglas de Firestore</h3><ul>
         <li>Reservas de cancha <span>· solo las crea el servidor</span></li>
         <li>Partidos internos <span>· el jugador los registra sin recinto ni pago</span></li>
-        <li>Perfiles completos <span>· solo el titular y el personal</span></li>
+        <li>Perfiles completos <span>· solo el titular y el personal; los demás ven el perfil público vía servidor</span></li>
+        <li>Estadísticas ajenas <span>· ningún jugador puede modificar las de otro</span></li>
         <li>Credenciales de Mercado Pago <span>· colección privada, nunca en lectura pública</span></li>
       </ul></div>
       <div class="card"><h3>Pendiente</h3><ul>

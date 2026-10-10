@@ -76,8 +76,8 @@ td.pct{font:500 14px var(--mono);font-variant-numeric:tabular-nums;white-space:n
   </div>
 
   <div class="alert">
-    <b>Bloqueos antes de seguir sumando funciones</b>
-    <span>Dos reglas de Firestore exponen datos: cualquier usuario con sesión lee correo, teléfono y RUT de todos los perfiles, y puede cambiar la experiencia y los logros de otros jugadores. Las reglas locales tampoco están publicadas en Firebase.</span>
+    <b>Bloqueo antes de producción</b>
+    <span>Las dos fugas de datos ya están cerradas en las reglas, pero esas reglas no están publicadas en Firebase: hasta publicarlas, producción sigue con las anteriores.</span>
   </div>
 
   <div id="tables"></div>
@@ -86,11 +86,11 @@ td.pct{font:500 14px var(--mono);font-variant-numeric:tabular-nums;white-space:n
     <div class="eyebrow">Ruta al 100%</div>
     <h2>Orden recomendado</h2>
     <ol class="road">
-      <li><b>Publicar reglas y cerrar las dos fugas de datos <span class="tag">seguridad · ley 21.719</span></b><span>Perfil público separado (nombre, foto, nivel) del privado (RUT, correo, teléfono); XP y logros calculados en el servidor.</span></li>
+      <li><b>Publicar las reglas de Firestore <span class="tag">seguridad · ley 21.719</span></b><span>Ya cierran las dos fugas. Después: limitar al personal a los jugadores de su recinto y calcular XP y logros en el servidor.</span></li>
       <li><b>Auditoría de la base con datos reales <span class="tag">refactor bd</span></b><span>Correr el script de auditoría y decidir qué campos eliminar; luego una migración versionada.</span></li>
       <li><b>Prueba de punta a punta de pagos <span class="tag">jugador</span></b><span>Reserva, torneo y academia con tarjeta de prueba; cancelación con más y menos de 24 h; webhook.</span></li>
       <li><b>Revisión del panel por rol <span class="tag">panel</span></b><span>Admin, dueño y mánager con sus cuentas reales: cada pantalla, sus permisos y sus números.</span></li>
-      <li><b>Refactor del código <span class="tag">deuda técnica</span></b><span>Unificar las tres reservas manuales, quitar los botones de datos demo, mover escrituras sensibles al servidor y dividir las páginas de más de 1.000 líneas.</span></li>
+      <li><b>Refactor del código <span class="tag">deuda técnica</span></b><span>Quitar los botones de datos demo, retirar los indicadores de "por cobrar" de los paneles, mover escrituras sensibles al servidor y dividir las páginas de más de 1.000 líneas.</span></li>
       <li><b>Notificaciones push <span class="tag">pendiente</span></b><span>Necesita la clave VAPID.</span></li>
     </ol>
   </section>
@@ -104,9 +104,10 @@ const AREAS = [
   ["Términos y Privacidad", "y","y","y","x","Ley 21.719, pago solo online, cancelación 24 h, datos de Orion Technology SpA. Falta revisión de un abogado."],
  ]},
  { name:"Cuenta y acceso", items:[
-  ["Login y registro", "y","y","p","n","Carga y redirige; no se probó un registro completo."],
+  ["Registro y login", "y","y","y","n","Un paso con Google o correo; contraseña de 8+ caracteres con confirmación. Falta un registro real de punta a punta."],
   ["Verificación de correo y recuperación", "y","y","n","n","Resend con respaldo de Firebase."],
-  ["Eliminación de cuenta", "y","y","n","n","Nueva vía del servidor: borra y anonimiza en todas las colecciones."],
+  ["Eliminación de cuenta", "y","y","n","n","Vía del servidor: borra y anonimiza en todas las colecciones."],
+  ["Datos antes del primer pago", "y","y","n","n","Teléfono, RUT y fecha de nacimiento se piden en el pago y vuelve a él al guardarlos."],
  ]},
  { name:"App del jugador", items:[
   ["Inicio", "y","y","p","x","Cuenta regresiva, clima, cancha habitual, racha."],
@@ -114,20 +115,20 @@ const AREAS = [
   ["Checkout y pago con tarjeta", "y","y","p","n","Solo pago online. Falta un pago de prueba de punta a punta."],
   ["Reservas y cancelación", "y","y","n","n","Regla de 24 h aplicada en el servidor y en las reglas."],
   ["Ticket con QR", "y","y","n","n",""],
-  ["Equipos y chat", "y","y","n","n",""],
+  ["Equipos y chat", "y","y","n","n","Miembros desde perfiles públicos."],
   ["Partidos y desafíos", "y","y","n","n","Restaurado tras el error de la sesión anterior."],
   ["Torneos", "y","y","n","n","Inscripción pagada solo online."],
   ["Academias", "y","y","n","n","Inscripción pagada solo online."],
   ["Estadísticas y logros", "y","y","n","n","XP y logros se escriben desde el navegador (ver bloqueos)."],
-  ["Ranking", "y","y","n","x",""],
+  ["Ranking", "y","y","n","x","Lee perfiles públicos desde el servidor."],
   ["Perfil y preferencias", "y","y","n","x",""],
-  ["Billetera y tarjetas guardadas", "y","y","n","n",""],
+  ["Billetera y tarjetas guardadas", "y","y","n","n","Sin montos por pagar en el recinto."],
   ["Reporte de problemas", "y","y","n","x",""],
   ["Notificaciones push", "p","n","n","n","Falta la clave VAPID."],
  ]},
  { name:"Panel del recinto", items:[
-  ["Calendario y reserva manual", "y","y","n","n","Tres implementaciones distintas de la reserva manual."],
-  ["Check-in", "y","y","n","n",""],
+  ["Calendario", "y","y","n","x","Solo lectura de reservas: se eliminaron las reservas manuales."],
+  ["Check-in", "y","y","n","n","Solo reservas pagadas online; sin cobro en mesón."],
   ["Canchas", "y","y","n","x",""],
   ["Personal", "y","y","n","x",""],
   ["Finanzas", "y","y","n","x",""],
@@ -149,7 +150,7 @@ const AREAS = [
  { name:"Plataforma", items:[
   ["Pagos con Mercado Pago", "y","y","p","n","Webhook con firma, 3D Secure, reembolsos. Endpoints responden; sin pago real probado."],
   ["Limpieza diaria (cron)", "y","y","n","n","Cancela lo pendiente de pago y libera cupos."],
-  ["Reglas de Firestore", "y","x","n","n","Cambios locales sin publicar y dos fugas abiertas."],
+  ["Reglas de Firestore", "y","x","n","n","Fugas cerradas en el archivo; falta publicarlas en Firebase."],
   ["Estructura del código", "y","x","y","x","Servicios separados en servidor y cliente; código muerto eliminado; compila y 20 tests pasan."],
   ["Base de datos", "p","x","n","n","Script de auditoría listo; falta correrlo con la clave de servicio."],
   ["Entorno local", "p","x","n","x","La clave de Firebase Admin de .env.local está incompleta."],
