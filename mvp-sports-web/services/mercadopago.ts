@@ -212,7 +212,7 @@ export async function getCardSetup(uid: string, email: string, tenantId: string)
     const cards = await fetch(`${MP_API}/v1/customers/${customerId}/cards`, { headers: { Authorization: `Bearer ${accessToken}` } }).then((r) => r.json()).catch(() => []);
     if (Array.isArray(cards)) cardsIds = cards.map((c: any) => String(c.id));
   }
-  return { publicKey, customerId, cardsIds };
+  return { publicKey, customerId, cardsIds, email };
 }
 
 // Cobra con tarjeta y confirma con la misma conciliación que el webhook (settlePayment)

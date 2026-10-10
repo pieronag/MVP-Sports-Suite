@@ -71,7 +71,10 @@ export default function CardPayment({ tenantId, amount, isDark, onPay, onApprove
         controller.current = await mp.bricks().create("cardPayment", containerId, {
           initialization: {
             amount,
-            ...(setup.customerId && setup.cardsIds?.length ? { payer: { customerId: setup.customerId, cardsIds: setup.cardsIds } } : {}),
+            payer: {
+              ...(setup.email ? { email: setup.email } : {}),
+              ...(setup.customerId && setup.cardsIds?.length ? { customerId: setup.customerId, cardsIds: setup.cardsIds } : {}),
+            },
           },
           customization: {
             visual: { style: { theme: isDark ? "dark" : "default", customVariables: { baseColor: "#10b981", borderRadiusMedium: "6px", borderRadiusLarge: "6px" } }, texts: { formSubmit: `Pagar $${new Intl.NumberFormat("es-CL").format(amount)}` } },
