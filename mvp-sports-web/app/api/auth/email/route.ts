@@ -53,6 +53,9 @@ export async function POST(request: Request) {
     } catch (e: any) {
       // Respuesta idéntica exista o no la cuenta (evita enumerar correos)
       if (e?.code === "auth/user-not-found" || e?.code === "auth/email-not-found") return NextResponse.json({ success: true });
+      // Firebase a veces responde "internal-error" para correos inexistentes: se confirma antes de fallar
+      const exists = await adminAuth().getUserByEmail(cleanEmail).then(() => true).catch((x: any) => x?.code !== "auth/user-not-found");
+      if (!exists) return NextResponse.json({ success: true });
       throw e;
     }
 
