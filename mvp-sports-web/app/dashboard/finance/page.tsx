@@ -260,8 +260,6 @@ export default function FinancePage() {
     const trendUp = trendPct >= 0;
     const showTrend = prevStats.totalRevenue > 0 || stats.totalRevenue > 0;
 
-    const collectable = stats.totalRevenue + stats.pendingRevenue;
-    const collectionRate = collectable > 0 ? Math.round((stats.totalRevenue / collectable) * 100) : 0;
 
     // 4. Filtros de la tabla
     const filteredTransactions = useMemo(() => currentTransactions.filter(t => {
@@ -330,7 +328,6 @@ export default function FinancePage() {
         doc.text(`Ingresos Totales (Pagados): ${formatCLP(stats.totalRevenue)}`, 15, 68);
         doc.text(`Canchas / Reservas: ${formatCLP(stats.reservaRevenue)}`, 15, 74);
         doc.text(`Inscripciones / Torneos: ${formatCLP(stats.torneoRevenue)}`, 15, 80);
-        doc.text(`Saldo Pendiente: ${formatCLP(stats.pendingRevenue)}`, 15, 86);
 
         const tableData = filteredTransactions.map(t => {
             const sport = t.type === 'torneo' ? 'TORNEO' : (t.sport || 'FÚTBOL');
@@ -481,37 +478,12 @@ export default function FinancePage() {
                     sub="Torneos y ligas"
                     icon={<HugeiconsIcon icon={TrophyIcon} />}
                 />
-                <TarjetaKpi
-                    label="POR COBRAR"
-                    value={formatCLP(stats.pendingRevenue)}
-                    sub="Pagos pendientes"
-                    icon={<HugeiconsIcon icon={Coins01Icon} />}
-                />
             </div>
 
-            {/* COBRANZA + TENDENCIA + EXPORTACIÓN */}
+            {/* TENDENCIA + EXPORTACIÓN */}
             <PanelGlass className="p-6">
                 <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-3 mb-3">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Cobranza del periodo</p>
-                            <p className="text-[10px] font-black font-mono text-emerald-600 dark:text-[#00df82]">{collectionRate}% cobrado</p>
-                        </div>
-                        <div className="h-2 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden flex">
-                            <div className="h-full bg-emerald-500 dark:bg-[#00df82] transition-all duration-500" style={{ width: `${collectionRate}%` }} />
-                            <div className="h-full bg-amber-500 transition-all duration-500" style={{ width: `${100 - collectionRate}%` }} />
-                        </div>
-                        <div className="flex flex-wrap gap-x-6 gap-y-1.5 mt-3 text-[10px]">
-                            <span className="flex items-center gap-2 font-bold uppercase text-slate-500 dark:text-slate-300">
-                                <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-[#00df82]" /> Pagado <b className="font-mono">{formatCLP(stats.totalRevenue)}</b>
-                            </span>
-                            <span className="flex items-center gap-2 font-bold uppercase text-slate-500 dark:text-slate-300">
-                                <span className="w-2 h-2 rounded-full bg-amber-500" /> Por cobrar <b className="font-mono">{formatCLP(stats.pendingRevenue)}</b>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="lg:border-l lg:border-slate-100 dark:border-white/5 lg:pl-6 flex items-center gap-5">
+                    <div className="flex items-center gap-5">
                         <div className="flex items-center gap-3">
                             <div className={`w-11 h-11 rounded-md flex items-center justify-center shrink-0 ${trendUp ? 'bg-emerald-500/10 text-emerald-600 dark:text-[#00df82] border border-emerald-500/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
                                 <HugeiconsIcon icon={trendUp ? ChartBarIncreasingIcon : ChartBarDecreasingIcon} className="w-5 h-5" strokeWidth={1.8} />

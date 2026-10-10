@@ -303,11 +303,10 @@ export default function ManagerDashboard() {
             </div>
 
             {/* KPI GRID - COMPACT DNA */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 <TarjetaKpi label="Reservas Hoy" value={stats.todayCount} sub="Reservas" icon={<TicketIcon />} />
                 <TarjetaKpi label="En Uso" value={stats.activeNow} sub="Ocupación" icon={<UserGroupIcon />} />
                 <TarjetaKpi label="Caja Hoy" value={formatMoney(stats.revenueToday)} sub="Venta" icon={<CurrencyDollarIcon />} brillo />
-                <TarjetaKpi label="Pendiente Cobro" value={formatMoney(stats.pendingRevenue)} sub="Por Cobrar" icon={<ExclamationCircleIcon />} className="border-amber-500/20" />
                 <TarjetaKpi label="Ocupación" value={`${stats.occupancyRate}%`} sub="Rendimiento" icon={<Squares2X2Icon />} />
                 <TarjetaKpi label="Ticket Prom." value={formatMoney(stats.avgTicket)} sub="Promedio" icon={<SparklesIcon />} />
             </div>

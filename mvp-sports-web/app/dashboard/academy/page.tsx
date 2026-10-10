@@ -207,31 +207,6 @@ export default function AcademyPage() {
         setFormData(INITIAL_FORM_STATE);
     };
 
-    const seedDemoClasses = async () => {
-        if (!user?.uid) return;
-        setSaving(true);
-        const demo = [
-            { name: 'Escuela de Fútbol Infantil', sport: 'Fútbol', instructor: 'Carlos Rojas', ageGroup: 'infantil', price: 45000, maxStudents: 20, enrolledStudents: 14, startTime: '17:00', endTime: '18:30', daysOfWeek: ['Lunes', 'Miércoles', 'Viernes'], alertDays: 2, description: 'Formación técnica y táctica para menores', status: 'active' },
-            { name: 'Clínica de Pádel', sport: 'Pádel', instructor: 'Matías Herrera', ageGroup: 'adultos', price: 38000, maxStudents: 16, enrolledStudents: 9, startTime: '19:00', endTime: '20:30', daysOfWeek: ['Martes', 'Jueves'], alertDays: 1, description: 'Nivelación y perfeccionamiento de parejas', status: 'active' },
-            { name: 'Academia de Tenis', sport: 'Tenis', instructor: 'Felipe Gutiérrez', ageGroup: 'juvenil', price: 50000, maxStudents: 12, enrolledStudents: 5, startTime: '16:00', endTime: '17:30', daysOfWeek: ['Lunes', 'Jueves'], alertDays: 3, description: 'Técnica de golpes y saque', status: 'active' },
-            { name: 'Básquetbol Formativo', sport: 'Básquetbol', instructor: 'Andrés Vidal', ageGroup: 'infantil', price: 40000, maxStudents: 24, enrolledStudents: 18, startTime: '18:00', endTime: '19:30', daysOfWeek: ['Miércoles', 'Viernes'], alertDays: 2, description: 'Fundamentos y trabajo en equipo', status: 'active' },
-            { name: 'Escuela de Vóleibol', sport: 'Vóleibol', instructor: 'Camila Fuentes', ageGroup: 'juvenil', price: 35000, maxStudents: 18, enrolledStudents: 11, startTime: '17:30', endTime: '19:00', daysOfWeek: ['Martes', 'Jueves', 'Sábado'], alertDays: 2, description: 'Recepción, armado y remate', status: 'active' },
-            { name: 'Pádel Elite', sport: 'Pádel', instructor: 'Ramiro Salas', ageGroup: 'adultos', price: 55000, maxStudents: 8, enrolledStudents: 8, startTime: '20:00', endTime: '21:30', daysOfWeek: ['Lunes', 'Miércoles'], alertDays: 1, description: 'Nivel competitivo de parejas', status: 'suspended' },
-        ];
-        try {
-            let created = 0;
-            for (const c of demo) {
-                const existing = await getDocs(query(collection(db, "academy_classes"), where("name", "==", c.name), where("ownerId", "==", user.uid)));
-                if (existing.empty) {
-                    await addDoc(collection(db, "academy_classes"), { ...c, ownerId: user.uid, startDate: '2026-10-01', endDate: '2026-12-20', createdAt: serverTimestamp(), isVisibleInApp: true });
-                    created++;
-                }
-            }
-            addToast(created > 0 ? `${created} clases de ejemplo creadas para todos los deportes` : 'Los ejemplos ya estaban cargados', 'success');
-            fetchData();
-        } catch (e) { addToast("Error al crear datos de ejemplo", 'error'); } finally { setSaving(false); }
-    };
-
     const formatCLP = (n: number) => n.toLocaleString('es-CL');
     const ageGroupLabel = (g: string) => {
         const map: any = { libre: 'Todos los niveles', infantil: 'Infantil (Sub-12)', juvenil: 'Juvenil (Sub-17)', adultos: 'Adultos' };
@@ -289,9 +264,6 @@ export default function AcademyPage() {
                     <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">Gestión de <span className="text-emerald-500 dark:text-[#00df82]">Academias</span></h1>
                 </div>
                 <div className="flex items-center gap-2.5">
-                    <button onClick={seedDemoClasses} disabled={saving} title="Insertar clases de ejemplo para todos los deportes" className="px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[10px] font-black uppercase tracking-widest hover:border-indigo-400/40 hover:text-indigo-500 transition-all active:scale-95">
-                        Datos demo
-                    </button>
                     <button onClick={() => setIsModalOpen(true)} className="px-6 py-3 bg-indigo-500 text-white font-black text-[10px] uppercase rounded-md shadow-xl shadow-indigo-500/25 flex items-center gap-2.5 hover:brightness-110 active:scale-95 transition-all">
                         <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" /> Nueva Clase
                     </button>

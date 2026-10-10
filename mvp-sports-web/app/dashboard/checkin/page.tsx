@@ -717,7 +717,7 @@ export default function CheckInPage() {
             </div>
 
             {/* === KPI GRID PREMIUM COMPACT === */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-slate-100 dark:border-white/5 shadow-xs relative overflow-hidden group">
                     <div className="flex items-center gap-2.5 mb-2">
                         <div className="p-1.5 bg-slate-50 dark:bg-white/5 rounded-md text-slate-400 group-hover:text-emerald-500 transition-colors">
@@ -742,19 +742,6 @@ export default function CheckInPage() {
                     <div className="flex items-baseline justify-between">
                         <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tighter">{stats.in}</p>
                         <p className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase">{formatMoney(stats.totalCollected)}</p>
-                    </div>
-                </div>
-
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-amber-100 dark:border-amber-500/20 shadow-xs group">
-                    <div className="flex items-center gap-2.5 mb-2">
-                        <div className="p-1.5 bg-amber-50 dark:bg-amber-500/10 rounded-md text-amber-500">
-                            <BanknotesIcon className="w-3.5 h-3.5" />
-                        </div>
-                        <p className="text-[8px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">Saldo por Cobrar</p>
-                    </div>
-                    <div className="flex items-baseline justify-between">
-                        <p className="text-2xl font-black text-amber-600 dark:text-amber-400 tracking-tighter">{stats.unpaidCount}</p>
-                        <p className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase">{formatMoney(stats.totalDebt)}</p>
                     </div>
                 </div>
 

@@ -309,10 +309,9 @@ export default function OwnerDashboard() {
             </div>
 
             {/* KPI GRID */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <TarjetaKpi titulo={`Ingresos (${timeRange === 'today' ? 'hoy' : timeRange === '7d' ? '7d' : 'mes'})`} valor={formatCLP(kpis.revenueMonth)} sub={`${kpis.bookingsMonth} reservas`} icono={<HugeiconsIcon icon={BoltIcon} className="w-6 h-6" strokeWidth={1.6} />} brillo />
                 <TarjetaKpi titulo="Cierres hoy" valor={formatCLP(kpis.revenueToday)} sub="Venta directa" icono={<HugeiconsIcon icon={MoneyBag01Icon} className="w-6 h-6" strokeWidth={1.6} />} />
-                <TarjetaKpi titulo="Por cobrar" valor={formatCLP(kpis.pendingPayments)} sub="Saldos pendientes" icono={<HugeiconsIcon icon={Alert02Icon} className="w-6 h-6" strokeWidth={1.6} />} />
                 <TarjetaKpi titulo="Mantenimiento" valor={kpis.maintenanceCount} sub="Recintos en mantención" icono={<HugeiconsIcon icon={Wrench01Icon} className="w-6 h-6" strokeWidth={1.6} />} />
             </div>
 

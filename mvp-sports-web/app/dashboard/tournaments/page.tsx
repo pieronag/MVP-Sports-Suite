@@ -377,51 +377,6 @@ export default function ChampionshipsPage() {
         setFormData(prev => ({ ...prev, sport, teamSize: cfg.teamSize, matchDuration: cfg.matchDuration, type: cfg.type, category: cfg.category, skillLevel: cfg.skillLevel }));
     };
 
-    const seedDemoTournaments = async () => {
-        if (!user?.uid) return;
-        setSaving(true);
-        const tenantId = tenants[0]?.id || '';
-        const teamNames = ['Furia Roja', 'Los Halcones', 'Team Cobra', 'Santiago FC', 'Deportes Andes', 'Cóndores', 'Leones del Sur', 'Lobos Urbanos', 'Titanes', 'Dragones', 'Vikingos', 'Guerreros', 'Atlético Norte', 'Real Patagonia', 'Celestes', 'Aurora', 'Fénix', 'Pumas', 'Águilas', 'Toros', 'Huracanes'];
-        const futbolitoTeams = ['Los Cafeteros', 'Real Sociedad CHL', 'Atlético Valdivia', 'Deportes Arica', 'San Felipe Unido', 'Cóndor de Quillota', 'Los Diablos', 'Santiago Wanderers', 'Everton Viña', 'La Serena FC', 'Cobresal', 'O Higgins', 'Ñublense', 'Curicó Unido', 'Rangers de Talca', 'Melipilla', 'Unión San Felipe', 'San Luis', 'Coquimbo Unido', 'Puerto Montt', 'Deportes Temuco', 'Iberia', 'Malleco', 'Deportes Copiapó', 'Deportes Antofagasta', 'Cobreloa', 'Calama FC', 'Aguas Rojas', 'Cielo Austral', 'Ruta 68', 'Barrio Norte FC', 'Maipú Sports'].map((name, i) => ({ id: `demo-team-${i}-${Date.now()}`, name, registeredAt: new Date() }));
-        const makeTeams = (n: number) => teamNames.slice(0, n).map((name, i) => ({ id: `demo-team-${i}-${Date.now()}`, name, registeredAt: new Date() }));
-        const demos = [
-            { name: 'Futbolito 32 · Copa King', sport: 'Futbolito', type: 'eliminacion', category: 'libre', skillLevel: 'todo_competidor', maxTeams: 32, teamSize: 7, matchDuration: 60, price: 40000, prize1: 'Trofeo + $500.000', prize2: '$200.000', prize3: 'Kit completo', description: 'Eliminación directa con 32 equipos. Cuadro completo.', startTime: '10:00', endTime: '23:00', customTeams: futbolitoTeams },
-            { name: 'Copa Furia · Liga Fútbol', sport: 'Fútbol', type: 'liga', category: 'libre', skillLevel: 'todo_competidor', maxTeams: 8, teamSize: 7, matchDuration: 100, price: 50000, prize1: 'Trofeo + $200.000', prize2: 'Medallas', prize3: 'Kit deportivo', description: 'Torneo de prueba formato liga (round robin).', startTime: '10:00', endTime: '20:00' },
-            { name: 'Masters Pádel · Eliminación', sport: 'Pádel', type: 'eliminacion', category: 'tercera', skillLevel: 'avanzado', maxTeams: 8, teamSize: 2, matchDuration: 60, price: 45000, prize1: '$150.000', prize2: 'Paletas', prize3: 'Accesorios', description: 'Eliminación directa 8 parejas.', startTime: '18:00', endTime: '23:00' },
-            { name: 'Open Tenis · Eliminación', sport: 'Tenis', type: 'eliminacion', category: 'libre', skillLevel: 'profesional', maxTeams: 8, teamSize: 1, matchDuration: 90, price: 60000, prize1: '$300.000', prize2: '$100.000', prize3: 'Canastos', description: 'Cuadro de 8, singles.', startTime: '09:00', endTime: '19:00' },
-            { name: 'Liga Básquetbol · Grupos', sport: 'Básquetbol', type: 'fase_grupos', category: 'sub-18', skillLevel: 'amateur', maxTeams: 4, teamSize: 5, matchDuration: 40, price: 40000, prize1: 'Trofeo + $80.000', prize2: 'Medallas', prize3: 'Balones', description: 'Fase de grupos + playoffs.', startTime: '17:00', endTime: '21:00' },
-            { name: 'Torneo Vóleibol · Liga', sport: 'Vóleibol', type: 'liga', category: 'femenino', skillLevel: 'todo_competidor', maxTeams: 6, teamSize: 6, matchDuration: 75, price: 35000, prize1: '$120.000', prize2: 'Medallas', prize3: 'Red oficial', description: 'Liga femenina 6 equipos.', startTime: '16:00', endTime: '22:00' },
-        ];
-        try {
-            let created = 0;
-            for (const d of demos) {
-                const existing = await getDocs(query(collection(db, "tournaments"), where("name", "==", d.name), where("ownerId", "==", user.uid)));
-                if (!existing.empty) continue;
-                await addDoc(collection(db, "tournaments"), {
-                    ...d,
-                    tenantId,
-                    imageUrl: '',
-                    registrationStartDate: '2026-10-01',
-                    registrationEndDate: '2026-11-15',
-                    tournamentStartDate: '2026-11-20',
-                    tournamentEndDate: '2026-12-20',
-                    isHomeAway: false,
-                    isFinalSingleMatch: true,
-                    contactPhone: '+56 9 5555 1234',
-                    enrolledTeams: d.maxTeams,
-                    teams: d.customTeams || makeTeams(d.maxTeams),
-                    status: 'upcoming',
-                    ownerId: user.uid,
-                    isVisibleInApp: true,
-                    createdAt: serverTimestamp(),
-                });
-                created++;
-            }
-            addToast(created > 0 ? `${created} torneos demo creados (100% inscripciones)` : 'Los torneos demo ya estaban cargados', 'success');
-            fetchData();
-        } catch (e) { addToast("Error al crear torneos demo", 'error'); } finally { setSaving(false); }
-    };
-
     // FIXTURE ACTIONS
     const handleStartTournament = (t: any) => {
         const teams = t.teams || [];
@@ -517,9 +472,6 @@ export default function ChampionshipsPage() {
                     <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">Gestión de <span className="text-amber-500 dark:text-amber-400">Campeonatos</span></h1>
                 </div>
                 <div className="flex items-center gap-2.5">
-                    <button onClick={seedDemoTournaments} disabled={saving} title="Cargar torneos demo con 100% de inscripciones para probar el fixture" className="px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[10px] font-black uppercase tracking-widest hover:border-amber-400/40 hover:text-amber-500 transition-all active:scale-95">
-                        Datos demo
-                    </button>
                     <button onClick={() => setIsModalOpen(true)} className="px-6 py-3 bg-amber-500 text-white font-black text-[10px] uppercase rounded-md shadow-xl shadow-amber-500/25 flex items-center gap-2.5 hover:brightness-110 active:scale-95 transition-all"><HugeiconsIcon icon={Add01Icon} className="w-4 h-4" /> Nuevo Torneo</button>
                 </div>
             </div>
