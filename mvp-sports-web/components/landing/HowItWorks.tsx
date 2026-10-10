@@ -55,22 +55,22 @@ export default function HowItWorks() {
             <div
               key={item.step}
               style={{ animationDelay: `${index * 100}ms` }}
-              className="group relative flex items-start gap-3 md:block p-4 md:p-8 rounded-md bg-slate-900/50 backdrop-blur-sm border border-white/5 hover:border-[#00df82]/30 transition-all duration-300 md:hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-6"
+              className="group relative p-4 md:p-8 rounded-md bg-slate-900/50 backdrop-blur-sm border border-white/5 hover:border-[#00df82]/30 transition-all duration-300 md:hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-6"
             >
               <span className="absolute top-3 right-4 md:top-6 md:right-7 text-2xl md:text-5xl font-black text-white/6 font-mono">
                 {item.step}
               </span>
-              <HugeiconsIcon
+              <div className="flex items-center gap-3 mb-2 pr-8 md:block md:mb-0 md:pr-0">
+                <HugeiconsIcon
                 icon={item.icon}
                 className={`shrink-0 w-8 h-8 md:w-11 md:h-11 ${item.accent} md:mb-6 transition-transform duration-300 group-hover:scale-105`}
                 strokeWidth={1.6}
               />
-              <div className="pr-6 md:pr-0">
-                <h3 className="text-xs md:text-lg font-black text-white uppercase tracking-tight mb-1 md:mb-3">
+                <h3 className="text-base md:text-lg font-black text-white uppercase tracking-tight md:mb-3">
                   {item.title}
                 </h3>
-                <p className="text-[11px] md:text-sm text-slate-400 leading-relaxed">{item.description}</p>
               </div>
+              <p className="text-xs md:text-sm text-slate-400 leading-relaxed">{item.description}</p>
             </div>
           ))}
         </div>

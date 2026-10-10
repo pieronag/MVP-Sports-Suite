@@ -97,28 +97,28 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           </div>
 
           {/* Pago online */}
-          <div className="md:col-span-3 lg:col-span-4 row-span-1 group p-3.5 md:p-6 rounded-md bg-emerald-500/[0.07] border border-white/5 hover:border-emerald-500/30 transition-all duration-300 relative overflow-hidden">
-            <div className="relative z-10 flex items-start gap-3 md:block md:space-y-1.5">
-              <HugeiconsIcon icon={CreditCardIcon} className="shrink-0 w-7 h-7 md:w-8 md:h-8 text-emerald-400" strokeWidth={1.6} />
-              <div className="space-y-1 md:space-y-1.5">
-                <h3 className="text-xs md:text-base font-black text-white uppercase tracking-wide">Pago 100% online.</h3>
-                <p className="text-[11px] md:text-xs text-slate-400 leading-snug">
+          <div className="md:col-span-3 lg:col-span-4 row-span-1 group p-4 md:p-6 rounded-md bg-emerald-500/[0.07] border border-white/5 hover:border-emerald-500/30 transition-all duration-300 relative overflow-hidden">
+            <div className="relative z-10 space-y-2 md:space-y-1.5">
+              <div className="flex items-center gap-3 md:block md:space-y-1.5">
+                <HugeiconsIcon icon={CreditCardIcon} className="shrink-0 w-8 h-8 text-emerald-400" strokeWidth={1.6} />
+                <h3 className="text-base font-black text-white uppercase tracking-wide">Pago 100% online.</h3>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed md:leading-snug">
                 Mercado Pago con débito, crédito o saldo, sin efectivo.
               </p>
-              </div>
             </div>
           </div>
 
           {/* Estadísticas */}
-          <div className="md:col-span-3 lg:col-span-4 row-span-1 group p-3.5 md:p-6 rounded-md bg-orange-500/[0.07] border border-white/5 hover:border-orange-500/30 transition-all duration-300 relative overflow-hidden">
-            <div className="relative z-10 flex items-start gap-3 md:block md:space-y-1.5">
-              <HugeiconsIcon icon={BarChartIcon} className="shrink-0 w-7 h-7 md:w-8 md:h-8 text-orange-400" strokeWidth={1.6} />
-              <div className="space-y-1 md:space-y-1.5">
-                <h3 className="text-xs md:text-base font-black text-white uppercase tracking-wide">Mide tu rendimiento.</h3>
-                <p className="text-[11px] md:text-xs text-slate-400 leading-snug">
+          <div className="md:col-span-3 lg:col-span-4 row-span-1 group p-4 md:p-6 rounded-md bg-orange-500/[0.07] border border-white/5 hover:border-orange-500/30 transition-all duration-300 relative overflow-hidden">
+            <div className="relative z-10 space-y-2 md:space-y-1.5">
+              <div className="flex items-center gap-3 md:block md:space-y-1.5">
+                <HugeiconsIcon icon={BarChartIcon} className="shrink-0 w-8 h-8 text-orange-400" strokeWidth={1.6} />
+                <h3 className="text-base font-black text-white uppercase tracking-wide">Mide tu rendimiento.</h3>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed md:leading-snug">
                 Partidos, goles, asistencias y logros, mes a mes.
               </p>
-              </div>
             </div>
           </div>
 
@@ -126,13 +126,13 @@ export default function AppFunctions({ onRegisterClick }: { onRegisterClick: () 
           {compactFeatures.map((feature) => (
             <div
               key={feature.title}
-              className={`md:col-span-2 lg:col-span-3 group p-3.5 md:p-5 rounded-md bg-slate-900/50 border border-white/5 ${feature.border} transition-all duration-300 hover:-translate-y-1 flex items-start md:flex-col gap-3 md:gap-2.5`}
+              className={`md:col-span-2 lg:col-span-3 group p-4 md:p-5 rounded-md bg-slate-900/50 border border-white/5 ${feature.border} transition-all duration-300 hover:-translate-y-1 flex flex-col gap-2 md:gap-2.5`}
             >
-              <HugeiconsIcon icon={feature.icon} className={`shrink-0 w-7 h-7 md:w-11 md:h-11 ${feature.accent}`} strokeWidth={1.6} />
-              <div className="space-y-1 md:space-y-2.5">
-                <h3 className="text-xs md:text-sm font-black text-white uppercase tracking-wide">{feature.title}</h3>
-                <p className="text-[11px] md:text-xs text-slate-400 leading-snug">{feature.description}</p>
+              <div className="flex items-center gap-3 md:flex-col md:items-start md:gap-2.5">
+                <HugeiconsIcon icon={feature.icon} className={`shrink-0 w-8 h-8 md:w-11 md:h-11 ${feature.accent}`} strokeWidth={1.6} />
+                <h3 className="text-base md:text-sm font-black text-white uppercase tracking-wide">{feature.title}</h3>
               </div>
+              <p className="text-xs text-slate-400 leading-relaxed md:leading-snug">{feature.description}</p>
             </div>
           ))}
 
