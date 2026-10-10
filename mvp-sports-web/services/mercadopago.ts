@@ -212,7 +212,10 @@ export async function getCardSetup(uid: string, email: string, tenantId: string)
     const cards = await fetch(`${MP_API}/v1/customers/${customerId}/cards`, { headers: { Authorization: `Bearer ${accessToken}` } }).then((r) => r.json()).catch(() => []);
     if (Array.isArray(cards)) cardsIds = cards.map((c: any) => String(c.id));
   }
-  return { publicKey, customerId, cardsIds, email };
+  // RUT del perfil (Ajustes) para precargarlo en el Brick: sin puntos ni guion
+  const user = (await db.collection("users").doc(uid).get()).data() || {};
+  const rut = String(user.rut || "").replace(/[^0-9kK]/g, "").toUpperCase();
+  return { publicKey, customerId, cardsIds, email, rut };
 }
 
 // Cobra con tarjeta y confirma con la misma conciliación que el webhook (settlePayment)

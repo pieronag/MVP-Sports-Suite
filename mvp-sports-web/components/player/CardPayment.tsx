@@ -73,6 +73,7 @@ export default function CardPayment({ tenantId, amount, isDark, onPay, onApprove
             amount,
             payer: {
               ...(setup.email ? { email: setup.email } : {}),
+              ...(setup.rut ? { identification: { type: "RUT", number: setup.rut } } : {}),
               ...(setup.customerId && setup.cardsIds?.length ? { customerId: setup.customerId, cardsIds: setup.cardsIds } : {}),
             },
           },
