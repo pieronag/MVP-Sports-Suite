@@ -39,8 +39,8 @@ export default function PlanSimulator() {
           description="Calcula cuánto pagarías según tus reservas mensuales y elige el plan más rentable para tu recinto."
         />
 
-        <div className="max-w-2xl mx-auto mb-12 p-8 rounded-md bg-slate-900/50 backdrop-blur-sm border border-white/5">
-          <div className="mb-8">
+        <div className="max-w-2xl mx-auto mb-6 md:mb-12 p-4 md:p-8 rounded-md bg-slate-900/50 backdrop-blur-sm border border-white/5">
+          <div className="mb-5 md:mb-8">
             <div className="flex items-center justify-between mb-3">
               <label htmlFor="reservas" className="text-xs font-bold text-slate-300 uppercase tracking-wider">
                 Reservas al mes
@@ -79,7 +79,7 @@ export default function PlanSimulator() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {plans.map((plan) => {
             const isBest = plan.id === mejorPlan?.id;
             const com = comision(plan);
@@ -95,7 +95,7 @@ export default function PlanSimulator() {
                     : "bg-slate-900/40 border-white/5"
                 }`}
               >
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-2.5 md:mb-4">
                   <h3 className="text-sm font-black text-white uppercase tracking-wider">{plan.name}</h3>
                   {isBest && !isFreePlan && (
                     <span className="text-[9px] font-black text-emerald-400 uppercase tracking-[0.15em] bg-emerald-500/15 px-2.5 py-1 rounded-md">
@@ -103,7 +103,7 @@ export default function PlanSimulator() {
                     </span>
                   )}
                 </div>
-                <div className="space-y-2.5 text-sm">
+                <div className="space-y-1.5 md:space-y-2.5 text-xs md:text-sm">
                   <div className="flex justify-between">
                     <span className="text-slate-400 text-xs">Plan</span>
                     <span className="text-white font-bold font-mono">${formatPrice(plan.price)}</span>
@@ -134,7 +134,7 @@ export default function PlanSimulator() {
         </div>
 
         {mejorPlan && Number(mejorPlan.price || 0) !== 0 && (
-          <p className="text-center text-sm text-slate-400 font-medium mt-8">
+          <p className="text-center text-xs md:text-sm text-slate-400 font-medium mt-5 md:mt-8">
             Para <span className="text-white font-black font-mono">{reservas}</span> reservas de{" "}
             <span className="text-white font-black font-mono">${formatPrice(precioProm)}</span>, el más
             rentable es el{" "}

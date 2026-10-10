@@ -24,7 +24,7 @@ export default function IntegracionesSection() {
   return (
     <section className="py-12 md:py-16 relative overflow-hidden border-t border-white/5 bg-slate-950/30">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-12 text-center lg:text-left">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-6 md:gap-10 lg:gap-12 text-center lg:text-left">
           <div className="space-y-2 max-w-md">
             <p className="text-[11px] font-black text-[#00df82] uppercase tracking-[0.35em]">
               Tecnología en la que confías
@@ -34,18 +34,18 @@ export default function IntegracionesSection() {
             </h3>
           </div>
 
-          <div className="flex flex-wrap justify-center lg:justify-end gap-4">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap w-full sm:w-auto justify-center lg:justify-end gap-3 sm:gap-4">
             {integrations.map((item) => (
               <div
                 key={item.name}
-                className="group flex items-center gap-3 px-5 py-3.5 rounded-md bg-slate-900/50 border border-white/5 hover:border-[#00df82]/30 transition-all duration-300"
+                className="group w-full sm:w-auto flex items-center gap-3 p-4 sm:px-5 sm:py-3.5 rounded-md bg-slate-900/50 border border-white/5 hover:border-[#00df82]/30 transition-all duration-300"
               >
-                <HugeiconsIcon icon={item.icon} className="w-6 h-6 text-[#00df82]" strokeWidth={1.6} />
+                <HugeiconsIcon icon={item.icon} className="shrink-0 w-8 h-8 sm:w-6 sm:h-6 text-[#00df82]" strokeWidth={1.6} />
                 <span className="text-left">
-                  <span className="block text-sm font-black text-white uppercase tracking-wide leading-none">
+                  <span className="block text-base sm:text-sm font-black text-white uppercase tracking-wide leading-none">
                     {item.name}
                   </span>
-                  <span className="block text-[10px] font-semibold text-slate-500 mt-0.5">
+                  <span className="block text-xs sm:text-[10px] font-semibold text-slate-500 mt-1 sm:mt-0.5">
                     {item.detail}
                   </span>
                 </span>
