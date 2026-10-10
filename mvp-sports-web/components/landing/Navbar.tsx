@@ -94,22 +94,22 @@ export default function Navbar({ onRegisterClick }: { onRegisterClick: () => voi
             ))}
           </div>
 
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-2.5 md:gap-3">
             <Link
               href="/login"
-              className="hidden sm:block px-3 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 hover:text-[#00df82] transition-colors"
+              className="hidden md:block px-3 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400 hover:text-[#00df82] transition-colors"
             >
               Ingresar
             </Link>
             <button
               onClick={onRegisterClick}
-              className="hidden sm:inline-flex items-center px-5 py-2.5 text-[11px] font-black uppercase tracking-[0.18em] text-slate-950 bg-[#00df82] rounded-md hover:bg-[#3affa0] transition-all shadow-[0_0_25px_rgba(0,223,130,0.35)] hover:shadow-[0_0_35px_rgba(0,223,130,0.5)] active:scale-95 cursor-pointer"
+              className="hidden md:inline-flex items-center px-5 py-2.5 text-[11px] font-black uppercase tracking-[0.18em] text-slate-950 bg-[#00df82] rounded-md hover:bg-[#3affa0] transition-all shadow-[0_0_25px_rgba(0,223,130,0.35)] hover:shadow-[0_0_35px_rgba(0,223,130,0.5)] active:scale-95 cursor-pointer"
             >
               Registrarme
             </button>
 
             <button
-              className="lg:hidden p-2 text-white hover:bg-white/5 rounded-md transition-all"
+              className="md:hidden p-2 text-white hover:bg-white/5 rounded-md transition-all"
               onClick={() => setIsMobileMenuOpen((v) => !v)}
               aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
               aria-expanded={isMobileMenuOpen}
