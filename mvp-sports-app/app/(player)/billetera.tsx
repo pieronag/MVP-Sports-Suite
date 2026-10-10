@@ -120,7 +120,7 @@ export default function BilleteraScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={COLORS.accent} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Pagos Realizados</Text>
+                <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Pagos Realizados</Text>
                 <View style={{ width: 44 }} /> 
             </View>
 
@@ -132,10 +132,10 @@ export default function BilleteraScreen() {
                 {/* SALDO BANNER */}
                 <View style={{ padding: 30, paddingBottom: 10 }}>
                     <View style={{ backgroundColor: C.card, borderRadius: 30, padding: 30, borderWidth: 1, borderColor: C.border, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10 }}>
-                        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10 }}>Estado de Cuenta</Text>
+                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 10 }}>Estado de Cuenta</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <View>
-                                <Text style={{ color: C.text, fontSize: 32, fontWeight: '900', letterSpacing: -1 }}>Activa</Text>
+                                <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', letterSpacing: -1 }}>Activa</Text>
                                 <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '800', marginTop: 5 }}>Historial de Pagos Verificado</Text>
                             </View>
                             <View style={{ width: 60, height: 60, borderRadius: 20, backgroundColor: COLORS.accent + '22', alignItems: 'center', justifyContent: 'center' }}>
@@ -152,10 +152,10 @@ export default function BilleteraScreen() {
                             <View style={{ width: 24, height: 24, borderRadius: 8, backgroundColor: COLORS.accent + '15', alignItems: 'center', justifyContent: 'center' }}>
                                 <CreditCard color={COLORS.accent} size={14} />
                             </View>
-                            <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', marginLeft: 8, letterSpacing: 0.5 }}>PAGO ONLINE</Text>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', marginLeft: 8, letterSpacing: 0.5 }}>PAGO ONLINE</Text>
                         </View>
-                        <Text style={{ color: C.text, fontSize: 18, fontWeight: '900' }}>{formatMoney(totalOnline)}</Text>
-                        <Text style={{ color: C.sub, fontSize: 8, fontWeight: '700', marginTop: 4 }}>TRANSACCIONADO</Text>
+                        <Text style={{ color: C.text, fontSize: 15, fontWeight: '900' }}>{formatMoney(totalOnline)}</Text>
+                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', marginTop: 4 }}>TRANSACCIONADO</Text>
                     </View>
                     
                     <View style={{ flex: 1, backgroundColor: C.card, borderRadius: 24, padding: 20, borderWidth: 1, borderColor: C.border }}>
@@ -163,10 +163,10 @@ export default function BilleteraScreen() {
                             <View style={{ width: 24, height: 24, borderRadius: 8, backgroundColor: '#3b82f615', alignItems: 'center', justifyContent: 'center' }}>
                                 <MapPin color="#3b82f6" size={14} />
                             </View>
-                            <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', marginLeft: 8, letterSpacing: 0.5 }}>EN RECINTO</Text>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', marginLeft: 8, letterSpacing: 0.5 }}>EN RECINTO</Text>
                         </View>
-                        <Text style={{ color: C.text, fontSize: 18, fontWeight: '900' }}>{formatMoney(totalVenue)}</Text>
-                        <Text style={{ color: C.sub, fontSize: 8, fontWeight: '700', marginTop: 4 }}>POR RENDIR</Text>
+                        <Text style={{ color: C.text, fontSize: 15, fontWeight: '900' }}>{formatMoney(totalVenue)}</Text>
+                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', marginTop: 4 }}>POR RENDIR</Text>
                     </View>
                 </View>
 
@@ -211,23 +211,23 @@ export default function BilleteraScreen() {
                                             )}
                                         </View>
                                         <View style={{ marginLeft: 15, flex: 1 }}>
-                                            <Text style={{ color: C.text, fontSize: 15, fontWeight: '800' }} numberOfLines={1}>
+                                            <Text style={{ color: C.text, fontSize: 14, fontWeight: '800' }} numberOfLines={1}>
                                                 {match.tenantName || 'Reserva de Cancha'}
                                             </Text>
                                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-                                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700' }}>
+                                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>
                                                     {dateStr}
                                                 </Text>
                                                 <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: C.sub, opacity: 0.4, marginHorizontal: 8 }} />
                                                 <View style={{ backgroundColor: methodBadgeBg, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
-                                                    <Text style={{ color: methodBadgeColor, fontSize: 8, fontWeight: '900', letterSpacing: 0.3 }}>
+                                                    <Text style={{ color: methodBadgeColor, fontSize: 11, fontWeight: '900', letterSpacing: 0.3 }}>
                                                         {methodLabel}
                                                     </Text>
                                                 </View>
                                             </View>
                                         </View>
                                         <View style={{ alignItems: 'flex-end' }}>
-                                            <Text style={{ color: C.text, fontSize: 16, fontWeight: '900' }}>
+                                            <Text style={{ color: C.text, fontSize: 14, fontWeight: '900' }}>
                                                 -{formatMoney(match.totalPrice || 0)}
                                             </Text>
                                         </View>
@@ -239,12 +239,12 @@ export default function BilleteraScreen() {
                     ) : (
                         <View style={{ padding: 50, alignItems: 'center', justifyContent: 'center' }}>
                             <Clock color={C.sub} size={36} strokeWidth={1.5} />
-                            <Text style={{ color: C.sub, fontSize: 13, fontWeight: '800', marginTop: 15 }}>Sin movimientos registrados</Text>
+                            <Text style={{ color: C.sub, fontSize: 12, fontWeight: '800', marginTop: 15 }}>Sin movimientos registrados</Text>
                         </View>
                     )}
                 </View>
 
-                <Text style={{ textAlign: 'center', color: C.sub, fontSize: 8, fontWeight: '700', marginTop: 50, textTransform: 'uppercase', letterSpacing: 1 }}>
+                <Text style={{ textAlign: 'center', color: C.sub, fontSize: 11, fontWeight: '700', marginTop: 50, textTransform: 'uppercase', letterSpacing: 1 }}>
                     Pagos Protegidos y Registrados en Ecosistema MVP • 2026
                 </Text>
             </ScrollView>

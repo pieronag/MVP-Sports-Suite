@@ -439,7 +439,7 @@ export default function SettingsScreen() {
                 <TouchableOpacity onPress={handleBack} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={COLORS.accent} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Ajustes de Jugador</Text>
+                <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Ajustes de Jugador</Text>
                 <TouchableOpacity onPress={handleSave} disabled={saving} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: '#10b981', alignItems: 'center', justifyContent: 'center' }}>
                     {saving ? <ActivityIndicator color="white" size="small" /> : <Save color="white" size={20} />}
                 </TouchableOpacity>
@@ -456,9 +456,9 @@ export default function SettingsScreen() {
                     <View style={{ margin: 30, marginBottom: 10, padding: 25, backgroundColor: isDark ? '#ef444411' : '#fef2f2', borderRadius: 25, borderWidth: 1, borderColor: '#ef444444' }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
                             <AlertCircle color="#ef4444" size={20} />
-                            <Text style={{ color: '#ef4444', fontSize: 14, fontWeight: '900', marginLeft: 10, textTransform: 'uppercase' }}>Perfil Incompleto</Text>
+                            <Text style={{ color: '#ef4444', fontSize: 13, fontWeight: '900', marginLeft: 10, textTransform: 'uppercase' }}>Perfil Incompleto</Text>
                         </View>
-                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '600', lineHeight: 18 }}>
+                        <Text style={{ color: C.sub, fontSize: 12, fontWeight: '600', lineHeight: 18 }}>
                             Para poder realizar reservas y usar todas las funciones de MVP Sports, debes completar tus datos obligatorios:
                         </Text>
                         <View style={{ marginTop: 15, flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -481,8 +481,8 @@ export default function SettingsScreen() {
                             />
                         </View>
                         <View style={{ marginLeft: 20, flex: 1 }}>
-                            <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', textTransform: 'uppercase' }}>{formData.displayName || 'Jugador'}</Text>
-                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700' }}>{user?.email}</Text>
+                            <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase' }}>{formData.displayName || 'Jugador'}</Text>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>{user?.email}</Text>
                         </View>
                     </View>
                 </View>
@@ -570,7 +570,7 @@ export default function SettingsScreen() {
                         <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: '#f43f5e', alignItems: 'center', justifyContent: 'center' }}>
                             <Lock color="white" size={20} />
                         </View>
-                        <Text style={{ color: C.text, fontSize: 17, fontWeight: '800', textTransform: 'uppercase', marginLeft: 20, flex: 1 }}>Cambiar Contraseña</Text>
+                        <Text style={{ color: C.text, fontSize: 15, fontWeight: '800', textTransform: 'uppercase', marginLeft: 20, flex: 1 }}>Cambiar Contraseña</Text>
                         <ChevronRight color="#10b981" size={20} />
                     </TouchableOpacity>
                 </View>
@@ -582,7 +582,7 @@ export default function SettingsScreen() {
                         <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: '#10b981', alignItems: 'center', justifyContent: 'center' }}>
                             <Mail color="white" size={20} />
                         </View>
-                        <Text style={{ color: C.text, fontSize: 17, fontWeight: '800', textTransform: 'uppercase', marginLeft: 20, flex: 1 }}>Reportar un Problema</Text>
+                        <Text style={{ color: C.text, fontSize: 15, fontWeight: '800', textTransform: 'uppercase', marginLeft: 20, flex: 1 }}>Reportar un Problema</Text>
                         <ChevronRight color="#10b981" size={20} />
                     </TouchableOpacity>
                 </View>
@@ -603,7 +603,7 @@ export default function SettingsScreen() {
                         }}
                     >
                         <LogOut color={C.text} size={20} style={{ marginRight: 10 }} />
-                        <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Cerrar Sesión Activa</Text>
+                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Cerrar Sesión Activa</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity 
@@ -620,11 +620,11 @@ export default function SettingsScreen() {
                         }}
                     >
                         <Shield color="#f43f5e" size={20} style={{ marginRight: 10 }} />
-                        <Text style={{ color: '#f43f5e', fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Eliminar Cuenta Definitivamente</Text>
+                        <Text style={{ color: '#f43f5e', fontSize: 13, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Eliminar Cuenta Definitivamente</Text>
                     </TouchableOpacity>
                 </View>
 
-                <Text style={{ textAlign: 'center', color: C.sub, fontSize: 8, fontWeight: '700', marginTop: 40 }}>© MVP SPORTS CHILE • 2026</Text>
+                <Text style={{ textAlign: 'center', color: C.sub, fontSize: 11, fontWeight: '700', marginTop: 40 }}>© MVP SPORTS CHILE • 2026</Text>
             </ScrollView>
 
             {/* BARRA ACCESORIO TECLADO (K) */}
@@ -655,7 +655,7 @@ export default function SettingsScreen() {
                             elevation: 5
                         }}
                     >
-                        <Text style={{ color: 'white', fontWeight: '900', fontSize: 20 }}>INGRESAR K</Text>
+                        <Text style={{ color: 'white', fontWeight: '900', fontSize: 16 }}>INGRESAR K</Text>
                     </TouchableOpacity>
                     <TouchableOpacity 
                         onPress={() => Keyboard.dismiss()}
@@ -665,7 +665,7 @@ export default function SettingsScreen() {
                             top: 15
                         }}
                     >
-                        <Text style={{ color: C.sub, fontWeight: '700', fontSize: 14 }}>LISTO</Text>
+                        <Text style={{ color: C.sub, fontWeight: '700', fontSize: 13 }}>LISTO</Text>
                     </TouchableOpacity>
                 </View>
             )}
@@ -694,7 +694,7 @@ export default function SettingsScreen() {
                 >
                     <View style={{ backgroundColor: C.bg, borderRadius: 35, padding: 30, borderWidth: 1, borderColor: C.border }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 }}>
-                            <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase' }}>Cambiar Contraseña</Text>
+                            <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase' }}>Cambiar Contraseña</Text>
                             <TouchableOpacity 
                                 onPress={() => {
                                     setShowPasswordModal(false);
@@ -723,7 +723,7 @@ export default function SettingsScreen() {
                                     flex: 1,
                                     color: C.text, 
                                     padding: 15, 
-                                    fontSize: 16, 
+                                    fontSize: 14, 
                                     fontWeight: '700', 
                                 }}
                             />
@@ -744,7 +744,7 @@ export default function SettingsScreen() {
                                     flex: 1,
                                     color: C.text, 
                                     padding: 15, 
-                                    fontSize: 16, 
+                                    fontSize: 14, 
                                     fontWeight: '700', 
                                 }}
                             />
@@ -765,7 +765,7 @@ export default function SettingsScreen() {
                                     flex: 1,
                                     color: C.text, 
                                     padding: 15, 
-                                    fontSize: 16, 
+                                    fontSize: 14, 
                                     fontWeight: '700', 
                                 }}
                             />
@@ -813,10 +813,10 @@ export default function SettingsScreen() {
                         <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: COLORS.accent + '11', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
                             <AlertCircle color={COLORS.accent} size={40} />
                         </View>
-                        <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>
+                        <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>
                             ¿Guardar tus cambios?
                         </Text>
-                        <Text style={{ color: C.sub, fontSize: 14, fontWeight: '600', textAlign: 'center', marginBottom: 30, lineHeight: 20 }}>
+                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '600', textAlign: 'center', marginBottom: 30, lineHeight: 20 }}>
                             Has realizado modificaciones en tu perfil. ¿Deseas guardarlas antes de salir?
                         </Text>
                         
@@ -883,8 +883,8 @@ export default function SettingsScreen() {
                         <View style={{ width: 80, height: 80, borderRadius: 30, backgroundColor: '#f43f5e22', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
                             <LogOut color="#f43f5e" size={36} />
                         </View>
-                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', marginBottom: 10 }}>¿Cerrar Sesión?</Text>
-                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', textTransform: 'uppercase', marginBottom: 30 }}>¿Estás seguro de que deseas salir de tu cuenta?</Text>
+                        <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', marginBottom: 10 }}>¿Cerrar Sesión?</Text>
+                        <Text style={{ color: C.sub, fontSize: 12, fontWeight: '700', textAlign: 'center', textTransform: 'uppercase', marginBottom: 30 }}>¿Estás seguro de que deseas salir de tu cuenta?</Text>
                         
                         <View style={{ flexDirection: 'row', gap: 15, width: '100%' }}>
                             <TouchableOpacity 
@@ -914,8 +914,8 @@ export default function SettingsScreen() {
                         <View style={{ width: 80, height: 80, borderRadius: 30, backgroundColor: '#f43f5e22', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
                             <AlertCircle color="#f43f5e" size={40} />
                         </View>
-                        <Text style={{ color: '#f43f5e', fontSize: 22, fontWeight: '900', textAlign: 'center', marginBottom: 15, textTransform: 'uppercase', letterSpacing: -0.5 }}>¿ELIMINAR TU CUENTA?</Text>
-                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '800', textAlign: 'center', marginBottom: 25, lineHeight: 20 }}>
+                        <Text style={{ color: '#f43f5e', fontSize: 16, fontWeight: '900', textAlign: 'center', marginBottom: 15, textTransform: 'uppercase', letterSpacing: -0.5 }}>¿ELIMINAR TU CUENTA?</Text>
+                        <Text style={{ color: C.text, fontSize: 12, fontWeight: '800', textAlign: 'center', marginBottom: 25, lineHeight: 20 }}>
                             Esta acción es <Text style={{ color: '#f43f5e' }}>completamente irreversible</Text>. Se eliminarán de forma definitiva tus credenciales de acceso y perfil:
                         </Text>
 
@@ -956,10 +956,10 @@ const FeedbackModal = ({ visible, type, message, onClose, isDark }: any) => {
                     <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: isError ? '#ef444422' : '#10b98122', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
                         {isError ? <AlertCircle color="#ef4444" size={40} /> : <CheckCircle2 color="#10b981" size={40} />}
                     </View>
-                    <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>
+                    <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>
                         {isError ? 'Ups... algo falló' : '¡Todo listo!'}
                     </Text>
-                    <Text style={{ color: C.sub, fontSize: 14, fontWeight: '600', textAlign: 'center', marginBottom: 30, lineHeight: 20 }}>
+                    <Text style={{ color: C.sub, fontSize: 13, fontWeight: '600', textAlign: 'center', marginBottom: 30, lineHeight: 20 }}>
                         {message}
                     </Text>
                     <TouchableOpacity 
@@ -983,7 +983,7 @@ const FeedbackModal = ({ visible, type, message, onClose, isDark }: any) => {
 
 const Badge = ({ label }: { label: string }) => (
     <View style={{ backgroundColor: '#ef4444', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 }}>
-        <Text style={{ color: 'white', fontSize: 10, fontWeight: '900', textTransform: 'uppercase' }}>{label}</Text>
+        <Text style={{ color: 'white', fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>{label}</Text>
     </View>
 );
 
@@ -1005,7 +1005,7 @@ const RefinedRow = ({ icon: Icon, color, label, value, onChange, onBlur, onFocus
             <View style={{ marginLeft: 20, flex: 1 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={{ color: error ? '#ef4444' : C.sub, fontSize: 11, fontWeight: '700', textTransform: 'uppercase' }}>{label}</Text>
-                    {error && <Text style={{ color: '#ef4444', fontSize: 9, fontWeight: '900' }}>INVÁLIDO</Text>}
+                    {error && <Text style={{ color: '#ef4444', fontSize: 11, fontWeight: '900' }}>INVÁLIDO</Text>}
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <TextInput 
@@ -1018,7 +1018,7 @@ const RefinedRow = ({ icon: Icon, color, label, value, onChange, onBlur, onFocus
                         autoCapitalize={autoCapitalize}
                         autoCorrect={autoCorrect}
                         autoComplete={autoComplete}
-                        style={{ flex: 1, color: error ? '#ef4444' : C.text, fontSize: 18, fontWeight: '800', padding: 0, marginTop: 2 }} 
+                        style={{ flex: 1, color: error ? '#ef4444' : C.text, fontSize: 15, fontWeight: '800', padding: 0, marginTop: 2 }} 
                     />
                     {rightElement}
                 </View>
@@ -1038,7 +1038,7 @@ const RefinedSelectRow = ({ icon: Icon, color, label, value, options, onSelect, 
                 </View>
                 <View style={{ marginLeft: 15, flex: 1 }}>
                     <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', textTransform: 'uppercase' }}>{label}</Text>
-                    <Text style={{ color: disabled ? C.sub : C.text, fontSize: 22, fontWeight: '900' }}>{disabled ? 'Elige deporte primero...' : (value || '---')}</Text>
+                    <Text style={{ color: disabled ? C.sub : C.text, fontSize: 16, fontWeight: '900' }}>{disabled ? 'Elige deporte primero...' : (value || '---')}</Text>
                 </View>
                 {!disabled && <ChevronRight color="#10b981" size={20} />}
             </TouchableOpacity>
@@ -1046,7 +1046,7 @@ const RefinedSelectRow = ({ icon: Icon, color, label, value, options, onSelect, 
                 <View style={{ padding: 25, flexDirection: 'row', flexWrap: 'wrap', gap: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }}>
                     {options.map((opt: string) => (
                         <TouchableOpacity key={opt} onPress={() => { onSelect(opt); setOpen(false); }} style={{ paddingHorizontal: 18, paddingVertical: 10, borderRadius: 14, backgroundColor: value === opt ? '#10b981' : (isDark ? '#1e293b' : '#f1f5f9') }}>
-                            <Text style={{ color: value === opt ? 'white' : C.text, fontWeight: '800', fontSize: 14 }}>{opt}</Text>
+                            <Text style={{ color: value === opt ? 'white' : C.text, fontWeight: '800', fontSize: 13 }}>{opt}</Text>
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -1062,7 +1062,7 @@ const RefinedToggleRow = ({ icon: Icon, color, label, value, onValueChange, isDa
             <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: color, alignItems: 'center', justifyContent: 'center' }}>
                 <Icon color="white" size={20} />
             </View>
-            <Text style={{ color: C.text, fontSize: 17, fontWeight: '800', textTransform: 'uppercase', marginLeft: 20, flex: 1 }}>{label}</Text>
+            <Text style={{ color: C.text, fontSize: 15, fontWeight: '800', textTransform: 'uppercase', marginLeft: 20, flex: 1 }}>{label}</Text>
             <Switch value={value} onValueChange={onValueChange} trackColor={{ false: '#e2e8f0', true: '#10b981' }} thumbColor="#FFF" />
         </View>
     );

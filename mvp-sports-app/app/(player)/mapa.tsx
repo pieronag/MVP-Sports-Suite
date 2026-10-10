@@ -222,7 +222,7 @@ export default function MapaBusquedaScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={accent} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Mapa de Recintos</Text>
+                <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Mapa de Recintos</Text>
                 <TouchableOpacity onPress={() => refetchLocation()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <Locate color={accent} size={20} />
                 </TouchableOpacity>
@@ -250,7 +250,7 @@ export default function MapaBusquedaScreen() {
                                 }}
                             >
                                 {cat.icon && <cat.icon color={activeSport === cat.id ? 'white' : C.sub} size={14} />}
-                                <Text style={{ marginLeft: cat.icon ? 8 : 0, color: activeSport === cat.id ? 'white' : C.text, fontWeight: '900', fontSize: 10, textTransform: 'uppercase' }}>{cat.name}</Text>
+                                <Text style={{ marginLeft: cat.icon ? 8 : 0, color: activeSport === cat.id ? 'white' : C.text, fontWeight: '900', fontSize: 11, textTransform: 'uppercase' }}>{cat.name}</Text>
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
@@ -324,14 +324,14 @@ export default function MapaBusquedaScreen() {
 
                 {/* LISTADO DE CLUBES PRO */}
                 <View style={{ paddingHorizontal: 25 }}>
-                    <Text style={{ color: accent, fontWeight: '900', fontSize: 10, textTransform: 'uppercase', letterSpacing: 2, marginHorizontal: 15, marginBottom: 15 }}>Clubes Cercanos</Text>
+                    <Text style={{ color: accent, fontWeight: '900', fontSize: 11, textTransform: 'uppercase', letterSpacing: 2, marginHorizontal: 15, marginBottom: 15 }}>Clubes Cercanos</Text>
                     
                     {loadingVenues ? (
                         <ActivityIndicator color={accent} style={{ marginTop: 40 }} />
                     ) : venues.length === 0 ? (
                         <View style={{ padding: 60, alignItems: 'center', borderStyle: 'dashed', borderWidth: 1, borderColor: C.border, borderRadius: 25 }}>
                             <Compass color={C.sub} size={32} />
-                            <Text style={{ color: C.sub, fontWeight: '800', fontSize: 10, marginTop: 15 }}>SIN RECINTOS DETECTADOS</Text>
+                            <Text style={{ color: C.sub, fontWeight: '800', fontSize: 11, marginTop: 15 }}>SIN RECINTOS DETECTADOS</Text>
                         </View>
                     ) : (
                         venues.map(v => (
@@ -362,11 +362,11 @@ export default function MapaBusquedaScreen() {
                                     <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 25 }}>
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                                             <View style={{ flex: 1 }}>
-                                                <Text style={{ color: 'white', fontSize: 20, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{v.name}</Text>
+                                                <Text style={{ color: 'white', fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{v.name}</Text>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
                                                     <View style={{ backgroundColor: 'rgba(16,185,129,0.2)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, flexDirection: 'row', alignItems: 'center', marginRight: 10 }}>
                                                         <Star color={accent} size={10} fill={accent} />
-                                                        <Text style={{ color: accent, fontSize: 10, fontWeight: '900', marginLeft: 4 }}>{Number(v.rating || 0).toFixed(1)}</Text>
+                                                        <Text style={{ color: accent, fontSize: 11, fontWeight: '900', marginLeft: 4 }}>{Number(v.rating || 0).toFixed(1)}</Text>
                                                     </View>
                                                     <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: '800' }}>{v.displaySports}</Text>
                                                 </View>

@@ -138,8 +138,8 @@ export default function PlayerHome() {
                 {/* Carta MVP */}
                 <Pressable onPress={() => router.push('/(player)/perfil')} style={{ ...card, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
                     <View style={{ width: 52, height: 66, borderRadius: PLAYER.radius, backgroundColor: '#f59e0b', alignItems: 'center', justifyContent: 'center', transform: [{ rotate: '-4deg' }] }}>
-                        <Text style={{ color: 'rgba(0,0,0,0.6)', fontSize: 10, fontWeight: '500' }}>OVR</Text>
-                        <Text style={{ color: 'black', fontSize: 20, fontWeight: '800' }}>{ovr}</Text>
+                        <Text style={{ color: 'rgba(0,0,0,0.6)', fontSize: 11, fontWeight: '500' }}>OVR</Text>
+                        <Text style={{ color: 'black', fontSize: 16, fontWeight: '800' }}>{ovr}</Text>
                     </View>
                     <View style={{ flex: 1 }}>
                         <Text style={{ fontSize: PLAYER.font.base, fontWeight: '600', color: C.text }}>Tu carta MVP 2026</Text>

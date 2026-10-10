@@ -231,18 +231,18 @@ export default function TorneosScreen() {
                     <View style={{ width: 140, height: 140, borderRadius: 50, backgroundColor: accent + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 35, borderWidth: 2, borderColor: accent + '30' }}>
                         <Trophy color={accent} size={64} strokeWidth={1.5} />
                     </View>
-                    <Text style={{ color: C.text, fontSize: 32, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', letterSpacing: -1, marginBottom: 15 }}>Torneos MVP</Text>
+                    <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', letterSpacing: -1, marginBottom: 15 }}>Torneos MVP</Text>
                     <View style={{ backgroundColor: accent, paddingHorizontal: 15, paddingVertical: 6, borderRadius: 10, marginBottom: 25 }}>
-                        <Text style={{ color: 'white', fontSize: 10, fontWeight: '900', letterSpacing: 2, textTransform: 'uppercase' }}>Próximamente</Text>
+                        <Text style={{ color: 'white', fontSize: 11, fontWeight: '900', letterSpacing: 2, textTransform: 'uppercase' }}>Próximamente</Text>
                     </View>
-                    <Text style={{ color: C.sub, fontSize: 14, fontWeight: '700', textAlign: 'center', lineHeight: 22, maxWidth: 300, marginBottom: 45 }}>
+                    <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', lineHeight: 22, maxWidth: 300, marginBottom: 45 }}>
                         Estamos preparando las ligas y copas más competitivas con premios exclusivos y seguimiento de estadísticas en tiempo real. ¡Prepárate para la gloria!
                     </Text>
                     <TouchableOpacity
                         onPress={() => router.back()}
                         style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', height: 65, width: '100%', borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}
                     >
-                        <Text style={{ color: C.text, fontWeight: '900', fontSize: 13, textTransform: 'uppercase', letterSpacing: 1 }}>Volver</Text>
+                        <Text style={{ color: C.text, fontWeight: '900', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>Volver</Text>
                     </TouchableOpacity>
                 </View>
             </Modal>
@@ -254,7 +254,7 @@ export default function TorneosScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={accent} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Torneos</Text>
+                <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Torneos</Text>
                 <View style={{ width: 44 }} />
             </View>
 
@@ -284,7 +284,7 @@ export default function TorneosScreen() {
                                 }}
                             >
                                 <cat.icon color={activeSport === cat.id ? 'white' : C.sub} size={14} />
-                                <Text style={{ marginLeft: 8, color: activeSport === cat.id ? 'white' : C.text, fontWeight: '900', fontSize: 10, textTransform: 'uppercase' }}>{cat.name}</Text>
+                                <Text style={{ marginLeft: 8, color: activeSport === cat.id ? 'white' : C.text, fontWeight: '900', fontSize: 11, textTransform: 'uppercase' }}>{cat.name}</Text>
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
@@ -302,10 +302,10 @@ export default function TorneosScreen() {
                                 <Trophy color="white" size={24} />
                             </View>
                             <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
-                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 8, letterSpacing: 1 }}>TEMPORADA 2026</Text>
+                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 11, letterSpacing: 1 }}>TEMPORADA 2026</Text>
                             </View>
                         </View>
-                        <Text style={{ color: 'white', fontSize: 28, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Gloria Máxima</Text>
+                        <Text style={{ color: 'white', fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Gloria Máxima</Text>
                         <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 11, fontWeight: '700', marginTop: 5 }}>Compite en la liga más prestigiosa y gana premios exclusivos.</Text>
                     </LinearGradient>
                 </View>
@@ -318,7 +318,7 @@ export default function TorneosScreen() {
                     ) : filteredTournaments.length === 0 ? (
                         <View style={{ padding: 60, alignItems: 'center', borderStyle: 'dashed', borderWidth: 1, borderColor: C.border, borderRadius: 35 }}>
                             <Trophy color={C.sub} size={32} />
-                            <Text style={{ color: C.sub, fontWeight: '800', fontSize: 10, marginTop: 15, textTransform: 'uppercase' }}>No hay torneos disponibles</Text>
+                            <Text style={{ color: C.sub, fontWeight: '800', fontSize: 11, marginTop: 15, textTransform: 'uppercase' }}>No hay torneos disponibles</Text>
                         </View>
                     ) : (
                         filteredTournaments.map((torneo) => (
@@ -356,14 +356,14 @@ export default function TorneosScreen() {
                                     <XCircle color="#ef4444" size={40} />
                                 )}
                             </View>
-                            <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', marginBottom: 10 }}>{customAlert.title}</Text>
-                            <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', lineHeight: 20, marginBottom: 30 }}>{customAlert.message}</Text>
+                            <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', marginBottom: 10 }}>{customAlert.title}</Text>
+                            <Text style={{ color: C.sub, fontSize: 12, fontWeight: '700', textAlign: 'center', lineHeight: 20, marginBottom: 30 }}>{customAlert.message}</Text>
 
                             <TouchableOpacity
                                 onPress={() => setCustomAlert({ ...customAlert, visible: false })}
                                 style={{ backgroundColor: customAlert.type === 'success' ? '#10b981' : '#ef4444', height: 55, width: '100%', borderRadius: 18, alignItems: 'center', justifyContent: 'center' }}
                             >
-                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 14 }}>ENTENDIDO</Text>
+                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 13 }}>ENTENDIDO</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -375,8 +375,8 @@ export default function TorneosScreen() {
                     <View style={{ backgroundColor: C.card, borderRadius: 40, padding: 35, maxHeight: '85%', borderWidth: 1, borderColor: C.border }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 }}>
                             <View>
-                                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase' }}>Detalles del Torneo</Text>
-                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700' }}>INFORMACIÓN Y REGLAMENTOS</Text>
+                                <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase' }}>Detalles del Torneo</Text>
+                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>INFORMACIÓN Y REGLAMENTOS</Text>
                             </View>
                             <TouchableOpacity onPress={() => setShowInfoModal(false)} style={{ width: 40, height: 40, borderRadius: 15, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
                                 <X color={C.text} size={18} />
@@ -387,13 +387,13 @@ export default function TorneosScreen() {
                             <View style={{ marginBottom: 25 }}>
                                 <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
                                     <View style={{ backgroundColor: accent + '15', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, alignSelf: 'flex-start', borderWidth: 1, borderColor: accent + '30' }}>
-                                        <Text style={{ color: accent, fontWeight: '900', fontSize: 10, letterSpacing: 1 }}>{selectedTournament?.sport?.toUpperCase() || 'DEPORTE'}</Text>
+                                        <Text style={{ color: accent, fontWeight: '900', fontSize: 11, letterSpacing: 1 }}>{selectedTournament?.sport?.toUpperCase() || 'DEPORTE'}</Text>
                                     </View>
                                     <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#f1f5f9', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, alignSelf: 'flex-start', borderWidth: 1, borderColor: C.border }}>
-                                        <Text style={{ color: C.sub, fontWeight: '900', fontSize: 10, letterSpacing: 1 }}>{selectedTournament?.category?.toUpperCase()}</Text>
+                                        <Text style={{ color: C.sub, fontWeight: '900', fontSize: 11, letterSpacing: 1 }}>{selectedTournament?.category?.toUpperCase()}</Text>
                                     </View>
                                 </View>
-                                <Text style={{ color: C.text, fontSize: 28, fontWeight: '900', letterSpacing: -1 }}>{selectedTournament?.name}</Text>
+                                <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', letterSpacing: -1 }}>{selectedTournament?.name}</Text>
                             </View>
 
                             <View style={{ marginBottom: 20, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', padding: 20, borderRadius: 25, borderWidth: 1, borderColor: C.border }}>
@@ -402,15 +402,15 @@ export default function TorneosScreen() {
                                         <MapPin size={18} color={accent} />
                                     </View>
                                     <View style={{ marginLeft: 15, flex: 1 }}>
-                                        <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase' }}>Recinto Oficial</Text>
-                                        <Text style={{ color: C.text, fontSize: 14, fontWeight: '900' }}>{selectedTournament?.venueName || 'Sede por confirmar'}</Text>
+                                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>Recinto Oficial</Text>
+                                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '900' }}>{selectedTournament?.venueName || 'Sede por confirmar'}</Text>
                                     </View>
                                 </View>
                             </View>
 
                             <View style={{ marginBottom: 20 }}>
                                 <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', borderRadius: 25, padding: 20, borderWidth: 1, borderColor: C.border }}>
-                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', letterSpacing: 1, marginBottom: 15 }}>🏆 PREMIOS PRINCIPALES</Text>
+                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', letterSpacing: 1, marginBottom: 15 }}>🏆 PREMIOS PRINCIPALES</Text>
                                     <View style={{ gap: 12 }}>
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                             <Trophy size={14} color="#fbbf24" />
@@ -426,7 +426,7 @@ export default function TorneosScreen() {
 
                             <View style={{ marginBottom: 20 }}>
                                 <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', borderRadius: 25, padding: 20, borderWidth: 1, borderColor: C.border }}>
-                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', letterSpacing: 1, marginBottom: 8 }}>REGLAS Y DESCRIPCIÓN</Text>
+                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', letterSpacing: 1, marginBottom: 8 }}>REGLAS Y DESCRIPCIÓN</Text>
                                     <Text style={{ color: C.text, fontSize: 12, fontWeight: '700', lineHeight: 18 }}>{selectedTournament?.description}</Text>
                                 </View>
                             </View>
@@ -437,7 +437,7 @@ export default function TorneosScreen() {
                             style={{ backgroundColor: accent, height: 60, borderRadius: 20, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', marginTop: 10 }}
                         >
                             <Zap color="white" size={18} />
-                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 13, marginLeft: 10, textTransform: 'uppercase', letterSpacing: 1 }}>Inscribirme Ahora</Text>
+                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 12, marginLeft: 10, textTransform: 'uppercase', letterSpacing: 1 }}>Inscribirme Ahora</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -446,7 +446,7 @@ export default function TorneosScreen() {
             <Modal visible={showTeamModal} transparent animationType="fade">
                 <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', padding: 30 }}>
                     <View style={{ backgroundColor: C.card, borderRadius: 40, padding: 35, maxHeight: '70%', borderWidth: 1, borderColor: C.border }}>
-                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>Postular Equipo</Text>
+                        <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>Postular Equipo</Text>
                         <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', textAlign: 'center', marginBottom: 30 }}>SELECCIONA EL CLUB PARA EL TORNEO</Text>
 
                         {checkingReg ? (
@@ -489,8 +489,8 @@ export default function TorneosScreen() {
                                                     )}
                                                 </View>
                                                 <View style={{ marginLeft: 15, flex: 1 }}>
-                                                    <Text style={{ color: C.text, fontSize: 16, fontWeight: '900' }}>{team.name}</Text>
-                                                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', textTransform: 'uppercase' }}>{team.sport}</Text>
+                                                    <Text style={{ color: C.text, fontSize: 14, fontWeight: '900' }}>{team.name}</Text>
+                                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', textTransform: 'uppercase' }}>{team.sport}</Text>
                                                 </View>
                                                 <ChevronRight color={C.sub} size={18} />
                                             </TouchableOpacity>
@@ -576,27 +576,27 @@ const TournamentEliteCard = ({
                 <View style={{ position: 'absolute', bottom: 20, left: 25 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                         <View style={{ backgroundColor: accent, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
-                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 8 }}>{statusMap[torneo.status] || torneo.status.toUpperCase()}</Text>
+                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 11 }}>{statusMap[torneo.status] || torneo.status.toUpperCase()}</Text>
                         </View>
-                        <Text style={{ color: '#fbbf24', fontWeight: '900', fontSize: 9, marginLeft: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{torneo.sport || 'General'}</Text>
-                        <Text style={{ color: 'rgba(255,255,255,0.6)', fontWeight: '900', fontSize: 9, marginLeft: 8, textTransform: 'uppercase', letterSpacing: 1 }}>• {torneo.category}</Text>
+                        <Text style={{ color: '#fbbf24', fontWeight: '900', fontSize: 11, marginLeft: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{torneo.sport || 'General'}</Text>
+                        <Text style={{ color: 'rgba(255,255,255,0.6)', fontWeight: '900', fontSize: 11, marginLeft: 8, textTransform: 'uppercase', letterSpacing: 1 }}>• {torneo.category}</Text>
                     </View>
-                    <Text style={{ color: 'white', fontSize: 24, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{torneo.name}</Text>
+                    <Text style={{ color: 'white', fontSize: 17, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{torneo.name}</Text>
                 </View>
             </View>
 
             <View style={{ padding: 25 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }}>
                     <View style={{ flex: 1 }}>
-                        <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>INICIO</Text>
-                        <Text style={{ color: C.text, fontSize: 16, fontWeight: '900' }}>{formatDate(torneo.tournamentStartDate)}</Text>
+                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>INICIO</Text>
+                        <Text style={{ color: C.text, fontSize: 14, fontWeight: '900' }}>{formatDate(torneo.tournamentStartDate)}</Text>
                     </View>
                     <View style={{ flex: 1, alignItems: 'center', borderLeftWidth: 1, borderRightWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }}>
-                        <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>EQUIPOS</Text>
-                        <Text style={{ color: C.text, fontSize: 16, fontWeight: '900' }}>{torneo.enrolledTeams}/{torneo.maxTeams}</Text>
+                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>EQUIPOS</Text>
+                        <Text style={{ color: C.text, fontSize: 14, fontWeight: '900' }}>{torneo.enrolledTeams}/{torneo.maxTeams}</Text>
                     </View>
                     <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                        <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>MODALIDAD</Text>
+                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>MODALIDAD</Text>
                         <Text style={{ color: C.text, fontSize: 11, fontWeight: '800', textTransform: 'uppercase' }}>{torneo.type || 'LIGA'}</Text>
                     </View>
                 </View>
@@ -618,7 +618,7 @@ const TournamentEliteCard = ({
                     {isRegistered ? (
                         <View style={{ flex: 3, backgroundColor: '#10b98120', height: 50, borderRadius: 18, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', borderWidth: 1, borderColor: '#10b98140' }}>
                             <ShieldCheck color="#10b981" size={18} />
-                            <Text style={{ color: '#10b981', fontWeight: '900', fontSize: 13, marginLeft: 10, textTransform: 'uppercase' }}>Ya Inscrito</Text>
+                            <Text style={{ color: '#10b981', fontWeight: '900', fontSize: 12, marginLeft: 10, textTransform: 'uppercase' }}>Ya Inscrito</Text>
                         </View>
                     ) : (
                         <TouchableOpacity 
@@ -626,7 +626,7 @@ const TournamentEliteCard = ({
                             style={{ flex: 3, backgroundColor: accent, height: 50, borderRadius: 18, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', shadowColor: accent, shadowOpacity: 0.3, shadowRadius: 10, elevation: 5 }}
                         >
                             <Zap color="white" size={18} />
-                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 13, marginLeft: 10, textTransform: 'uppercase' }}>Inscribirse</Text>
+                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 12, marginLeft: 10, textTransform: 'uppercase' }}>Inscribirse</Text>
                         </TouchableOpacity>
                     )}
                 </View>
@@ -704,8 +704,8 @@ const TeamsListModal = ({ visible, onClose, tournament, isDark, C, accent }: any
                 <View style={{ backgroundColor: C.card, borderRadius: 45, padding: 35, maxHeight: '80%', borderWidth: 1, borderColor: C.border }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 30 }}>
                         <View>
-                            <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Inscritos</Text>
-                            <Text style={{ color: accent, fontSize: 10, fontWeight: '900', letterSpacing: 1 }}>{liveTeams.length} / {localTournament.maxTeams} ESCUADRAS</Text>
+                            <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Inscritos</Text>
+                            <Text style={{ color: accent, fontSize: 11, fontWeight: '900', letterSpacing: 1 }}>{liveTeams.length} / {localTournament.maxTeams} ESCUADRAS</Text>
                         </View>
                         <View style={{ flexDirection: 'row', gap: 10 }}>
                             <TouchableOpacity onPress={handleRefresh} style={{ width: 45, height: 45, borderRadius: 18, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
@@ -746,10 +746,10 @@ const TeamsListModal = ({ visible, onClose, tournament, isDark, C, accent }: any
                                             )}
                                         </View>
                                         <View style={{ marginLeft: 20, flex: 1 }}>
-                                            <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase' }}>{team.name}</Text>
+                                            <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase' }}>{team.name}</Text>
                                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
                                                 <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#10b981', marginRight: 8 }} />
-                                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase' }}>Escuadra Confirmada</Text>
+                                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>Escuadra Confirmada</Text>
                                             </View>
                                         </View>
                                         <Star color="#fbbf24" size={16} />
@@ -763,7 +763,7 @@ const TeamsListModal = ({ visible, onClose, tournament, isDark, C, accent }: any
                         onPress={onClose}
                         style={{ marginTop: 25, height: 70, borderRadius: 25, alignItems: 'center', justifyContent: 'center', backgroundColor: accent, shadowColor: accent, shadowOpacity: 0.4, shadowRadius: 15, elevation: 10 }}
                     >
-                        <Text style={{ color: 'white', fontWeight: '900', fontSize: 15, letterSpacing: 2, textTransform: 'uppercase' }}>Volver al Torneo</Text>
+                        <Text style={{ color: 'white', fontWeight: '900', fontSize: 14, letterSpacing: 2, textTransform: 'uppercase' }}>Volver al Torneo</Text>
                     </TouchableOpacity>
                 </View>
             </View>

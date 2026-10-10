@@ -145,7 +145,7 @@ export default function ExploreClubesScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={accent} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Recintos</Text>
+                <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Recintos</Text>
                 <View style={{ width: 44 }} />
             </View>
 
@@ -162,7 +162,7 @@ export default function ExploreClubesScreen() {
                             placeholderTextColor={isDark ? '#334155' : '#CBD5E1'}
                             value={search}
                             onChangeText={setSearch}
-                            style={{ flex: 1, marginLeft: 15, color: C.text, fontSize: 14, fontWeight: '700' }}
+                            style={{ flex: 1, marginLeft: 15, color: C.text, fontSize: 13, fontWeight: '700' }}
                         />
                     </View>
                 </View>
@@ -262,12 +262,12 @@ const RecintoVerticalEliteCard = ({ venue, isDark, userLoc, C, accent }: any) =>
                 <View style={{ position: 'absolute', top: 20, left: 20, flexDirection: 'row', flexWrap: 'wrap', gap: 5 }}>
                     {allSports.slice(0,3).map(s => (
                         <View key={s} style={{ backgroundColor: 'rgba(16,185,129,0.9)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 }}>
-                            <Text style={{ color: 'white', fontSize: 9, fontWeight: '900', letterSpacing: 1 }}>{s.toUpperCase()}</Text>
+                            <Text style={{ color: 'white', fontSize: 11, fontWeight: '900', letterSpacing: 1 }}>{s.toUpperCase()}</Text>
                         </View>
                     ))}
                     {allSports.length > 3 && (
                         <View style={{ backgroundColor: 'rgba(16,185,129,0.9)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 }}>
-                            <Text style={{ color: 'white', fontSize: 9, fontWeight: '900' }}>+{allSports.length - 3}</Text>
+                            <Text style={{ color: 'white', fontSize: 11, fontWeight: '900' }}>+{allSports.length - 3}</Text>
                         </View>
                     )}
                 </View>
@@ -276,25 +276,25 @@ const RecintoVerticalEliteCard = ({ venue, isDark, userLoc, C, accent }: any) =>
             <View style={{ padding: 25 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 15 }}>
                     <View style={{ flex: 1 }}>
-                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', letterSpacing: -0.5 }}>{venue.name}</Text>
+                        <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', letterSpacing: -0.5 }}>{venue.name}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
                             <MapPin color={C.sub} size={12} />
-                            <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', marginLeft: 6 }}>{vComuna}</Text>
+                            <Text style={{ color: C.sub, fontSize: 12, fontWeight: '700', marginLeft: 6 }}>{vComuna}</Text>
                         </View>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: accent + '15', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 }}>
                         <Star color={accent} size={14} fill={accent} />
-                        <Text style={{ color: accent, fontWeight: '900', fontSize: 14, marginLeft: 6 }}>{Number(venue.rating || 0).toFixed(1)}</Text>
+                        <Text style={{ color: accent, fontWeight: '900', fontSize: 13, marginLeft: 6 }}>{Number(venue.rating || 0).toFixed(1)}</Text>
                     </View>
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 20, borderTopWidth: 1, borderTopColor: C.border }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Navigation color={accent} size={16} />
-                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '800', marginLeft: 8 }}>{distance || 'Cerca de ti'}</Text>
+                        <Text style={{ color: C.sub, fontSize: 12, fontWeight: '800', marginLeft: 8 }}>{distance || 'Cerca de ti'}</Text>
                     </View>
                     <TouchableOpacity onPress={() => router.push({ pathname: '/(player)/clubes/[id]', params: { id: venue.id } } as any)} style={{ backgroundColor: accent, paddingHorizontal: 25, height: 50, borderRadius: 18, alignItems: 'center', justifyContent: 'center', shadowColor: accent, shadowOpacity: 0.3, shadowRadius: 10, elevation: 5 }}>
-                        <Text style={{ color: 'white', fontWeight: '900', fontSize: 13 }}>RESERVAR</Text>
+                        <Text style={{ color: 'white', fontWeight: '900', fontSize: 12 }}>RESERVAR</Text>
                     </TouchableOpacity>
                 </View>
             </View>

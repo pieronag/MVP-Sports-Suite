@@ -38,7 +38,7 @@ const DetailRow = ({ icon, label, value, C }: any) => (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             {icon}
-            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', marginLeft: 10, letterSpacing: 0.5 }}>{label}</Text>
+            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', marginLeft: 10, letterSpacing: 0.5 }}>{label}</Text>
         </View>
         <Text style={{ color: C.text, fontSize: 12, fontWeight: '900' }}>{value}</Text>
     </View>
@@ -325,7 +325,7 @@ export default function CheckoutScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={activeColor} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>{isTournament ? 'Inscripción Torneo' : 'Finalizar Reserva'}</Text>
+                <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>{isTournament ? 'Inscripción Torneo' : 'Finalizar Reserva'}</Text>
                 <View style={{ width: 44 }} /> 
             </View>
 
@@ -338,10 +338,10 @@ export default function CheckoutScreen() {
                             {isTournament ? <Trophy color={activeColor} size={24} /> : <Calendar color={activeColor} size={24} />}
                         </View>
                         <View style={{ marginLeft: 15, flex: 1 }}>
-                            <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase' }} numberOfLines={1}>
+                            <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase' }} numberOfLines={1}>
                                 {isTournament ? (tournamentName as string).toUpperCase() : (tenantName as string).toUpperCase()}
                             </Text>
-                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '800', letterSpacing: 1 }}>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>
                                 {isTournament ? `INSCRIPCIÓN DE EQUIPO` : `${(sport as string).toUpperCase()} • ${(courtName as string).toUpperCase()}`}
                             </Text>
                         </View>
@@ -367,21 +367,21 @@ export default function CheckoutScreen() {
 
                     <View style={{ marginTop: 25, paddingTop: 25, borderTopWidth: 1, borderTopColor: C.border, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <View>
-                            <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', letterSpacing: 1 }}>{appliedCoupon ? 'SUBTOTAL' : 'COSTO TOTAL'}</Text>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', letterSpacing: 1 }}>{appliedCoupon ? 'SUBTOTAL' : 'COSTO TOTAL'}</Text>
                             <Text style={{ color: appliedCoupon ? C.sub : C.text, fontSize: appliedCoupon ? 20 : 32, fontWeight: '900', letterSpacing: -1, textDecorationLine: appliedCoupon ? 'line-through' : 'none' }}>
                                 ${Number(price).toLocaleString('es-CL')}
                             </Text>
                             {appliedCoupon && (
                                 <>
-                                    <Text style={{ color: activeColor, fontSize: 10, fontWeight: '900', marginTop: 2 }}>DESCUENTO ({appliedCoupon.discount}%)</Text>
-                                    <Text style={{ color: C.text, fontSize: 32, fontWeight: '900', letterSpacing: -1 }}>
+                                    <Text style={{ color: activeColor, fontSize: 11, fontWeight: '900', marginTop: 2 }}>DESCUENTO ({appliedCoupon.discount}%)</Text>
+                                    <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', letterSpacing: -1 }}>
                                         ${(Number(price) - (Number(price) * appliedCoupon.discount / 100)).toLocaleString('es-CL')}
                                     </Text>
                                 </>
                             )}
                         </View>
                         <View style={{ backgroundColor: activeColor + '10', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 }}>
-                            <Text style={{ color: activeColor, fontWeight: '900', fontSize: 10 }}>MVP</Text>
+                            <Text style={{ color: activeColor, fontWeight: '900', fontSize: 11 }}>MVP</Text>
                         </View>
                     </View>
                 </View>
@@ -396,7 +396,7 @@ export default function CheckoutScreen() {
                             value={couponInput}
                             onChangeText={(t) => setCouponInput(t.toUpperCase())}
                             editable={!appliedCoupon && !validatingCoupon}
-                            style={{ color: appliedCoupon ? '#10b981' : C.text, fontSize: 13, fontWeight: '900', letterSpacing: 1 }}
+                            style={{ color: appliedCoupon ? '#10b981' : C.text, fontSize: 12, fontWeight: '900', letterSpacing: 1 }}
                         />
                     </View>
                     {appliedCoupon ? (
@@ -420,7 +420,7 @@ export default function CheckoutScreen() {
                 {/* SELECCIÓN DE EQUIPO (SOLO PARA RESERVAS) */}
                 {!isTournament && (
                     <View style={{ marginHorizontal: 30, marginTop: 30 }}>
-                        <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', marginBottom: 15 }}>¿JUEGAS CON UN EQUIPO?</Text>
+                        <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', marginBottom: 15 }}>¿JUEGAS CON UN EQUIPO?</Text>
                         <View style={{ gap: 10 }}>
                             <TouchableOpacity 
                                 onPress={() => setSelectedTeamId(null)}
@@ -438,7 +438,7 @@ export default function CheckoutScreen() {
                                 <View style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center' }}>
                                     <Users color={selectedTeamId === null ? activeColor : C.sub} size={20} />
                                 </View>
-                                <Text style={{ color: C.text, fontSize: 14, fontWeight: '800', marginLeft: 15, flex: 1 }}>Partido Amistoso (Sin Equipo)</Text>
+                                <Text style={{ color: C.text, fontSize: 13, fontWeight: '800', marginLeft: 15, flex: 1 }}>Partido Amistoso (Sin Equipo)</Text>
                                 {selectedTeamId === null && <CheckCircle2 color={activeColor} size={20} />}
                             </TouchableOpacity>
 
@@ -460,7 +460,7 @@ export default function CheckoutScreen() {
                                     <View style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center' }}>
                                         <Trophy color={selectedTeamId === team.id ? activeColor : C.sub} size={20} />
                                     </View>
-                                    <Text style={{ color: C.text, fontSize: 14, fontWeight: '800', marginLeft: 15, flex: 1 }}>{team.name}</Text>
+                                    <Text style={{ color: C.text, fontSize: 13, fontWeight: '800', marginLeft: 15, flex: 1 }}>{team.name}</Text>
                                     {selectedTeamId === team.id && <CheckCircle2 color={activeColor} size={20} />}
                                 </TouchableOpacity>
                             ))}
@@ -474,7 +474,7 @@ export default function CheckoutScreen() {
                 {hasCashNoShow && (
                     <View style={{ marginHorizontal: 30, marginBottom: 15, backgroundColor: '#ef444415', padding: 15, borderRadius: 15, borderWidth: 1, borderColor: '#ef444430', flexDirection: 'row', alignItems: 'center' }}>
                         <XCircle color="#ef4444" size={20} />
-                        <Text style={{ flex: 1, marginLeft: 10, color: '#ef4444', fontSize: 10, fontWeight: '900', textTransform: 'uppercase', lineHeight: 14 }}>
+                        <Text style={{ flex: 1, marginLeft: 10, color: '#ef4444', fontSize: 11, fontWeight: '900', textTransform: 'uppercase', lineHeight: 14 }}>
                             Opción de pago en recinto deshabilitada debido a inasistencias previas. Sólo pago online.
                         </Text>
                     </View>
@@ -495,8 +495,8 @@ export default function CheckoutScreen() {
                                 <MapPin color={paymentMethod === 'venue' ? activeColor : C.sub} size={22} />
                             </View>
                             <View style={{ marginLeft: 15, flex: 1 }}>
-                                <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase' }}>Pagar en el Recinto</Text>
-                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700' }}>PAGA AL LLEGAR (EFECTIVO/TRANSF)</Text>
+                                <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', textTransform: 'uppercase' }}>Pagar en el Recinto</Text>
+                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>PAGA AL LLEGAR (EFECTIVO/TRANSF)</Text>
                             </View>
                             {paymentMethod === 'venue' && <CheckCircle2 color={activeColor} size={20} />}
                         </TouchableOpacity>
@@ -516,8 +516,8 @@ export default function CheckoutScreen() {
                                 <CreditCard color={paymentMethod === 'card' ? activeColor : C.sub} size={22} />
                             </View>
                             <View style={{ marginLeft: 15, flex: 1 }}>
-                                <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase' }}>Pago Online con Tarjeta</Text>
-                                <Text style={{ color: activeColor, fontSize: 10, fontWeight: '700' }}>PAGO SEGURO CON MERCADO PAGO</Text>
+                                <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', textTransform: 'uppercase' }}>Pago Online con Tarjeta</Text>
+                                <Text style={{ color: activeColor, fontSize: 11, fontWeight: '700' }}>PAGO SEGURO CON MERCADO PAGO</Text>
                             </View>
                             {paymentMethod === 'card' && <CheckCircle2 color={activeColor} size={20} />}
                         </TouchableOpacity>
@@ -527,7 +527,7 @@ export default function CheckoutScreen() {
                 <View style={{ marginTop: 40, alignItems: 'center' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', opacity: 0.6 }}>
                         <ShieldCheck color={activeColor} size={14} />
-                        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', marginLeft: 8, textTransform: 'uppercase', letterSpacing: 1 }}>Transacción Protegida PCI-DSS</Text>
+                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', marginLeft: 8, textTransform: 'uppercase', letterSpacing: 1 }}>Transacción Protegida PCI-DSS</Text>
                     </View>
                 </View>
             </ScrollView>
@@ -539,8 +539,8 @@ export default function CheckoutScreen() {
                         <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: (customAlert.type === 'success' ? '#10b981' : '#ef4444') + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
                             {customAlert.type === 'success' ? <CheckCircle2 color="#10b981" size={40} /> : <XCircle color="#ef4444" size={40} />}
                         </View>
-                        <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>{customAlert.title}</Text>
-                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '600', textAlign: 'center', marginBottom: 30, lineHeight: 20 }}>{customAlert.message}</Text>
+                        <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>{customAlert.title}</Text>
+                        <Text style={{ color: C.sub, fontSize: 12, fontWeight: '600', textAlign: 'center', marginBottom: 30, lineHeight: 20 }}>{customAlert.message}</Text>
 
                         <TouchableOpacity 
                             onPress={() => {
@@ -549,7 +549,7 @@ export default function CheckoutScreen() {
                             }}
                             style={{ backgroundColor: customAlert.type === 'success' ? '#10b981' : '#ef4444', height: 60, width: '100%', borderRadius: 18, alignItems: 'center', justifyContent: 'center', shadowColor: (customAlert.type === 'success' ? '#10b981' : '#ef4444'), shadowOpacity: 0.3, shadowRadius: 10, elevation: 5 }}
                         >
-                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 13 }}>{customAlert.type === 'success' ? 'ENTENDIDO' : 'REINTENTAR'}</Text>
+                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 12 }}>{customAlert.type === 'success' ? 'ENTENDIDO' : 'REINTENTAR'}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -570,7 +570,7 @@ export default function CheckoutScreen() {
                     ) : (
                         <>
                             <Zap color="white" size={20} />
-                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 14, marginLeft: 15, textTransform: 'uppercase', letterSpacing: 1.5 }}>
+                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 13, marginLeft: 15, textTransform: 'uppercase', letterSpacing: 1.5 }}>
                                 {isTournament ? 'Confirmar Inscripción' : 'Confirmar Reserva'}
                             </Text>
                         </>
@@ -588,7 +588,7 @@ export default function CheckoutScreen() {
             >
                 <View style={{ flex: 1, backgroundColor: C.bg }}>
                     <View style={{ paddingTop: 60, paddingBottom: 20, paddingHorizontal: 25, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: C.border, backgroundColor: C.card }}>
-                        <Text style={{ fontSize: 18, fontWeight: '900', color: C.text, letterSpacing: -0.5 }}>PAGO ONLINE SEGURO</Text>
+                        <Text style={{ fontSize: 15, fontWeight: '900', color: C.text, letterSpacing: -0.5 }}>PAGO ONLINE SEGURO</Text>
                         <TouchableOpacity onPress={async () => {
                             setShowWebView(false);
                         }}>

@@ -259,7 +259,7 @@ export default function PerfilScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={COLORS.accent} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Perfil de Jugador</Text>
+                <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Perfil de Jugador</Text>
                 <TouchableOpacity onPress={toggleTheme} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     {isDark ? <Sun color="#facc15" size={20} /> : <Moon color="#1e293b" size={20} />}
                 </TouchableOpacity>
@@ -280,14 +280,14 @@ export default function PerfilScreen() {
                         >
                             <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                                 <View style={{ backgroundColor: '#f59e0b', width: 65, height: 85, borderRadius: 18, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 12, transform: [{ rotate: '-5deg' }] }}>
-                                    <Text style={{ color: 'black', fontWeight: '900', fontSize: 10 }}>VAL</Text>
-                                    <Text style={{ color: 'black', fontWeight: '900', fontSize: 26 }}>{ovr}</Text>
+                                    <Text style={{ color: 'black', fontWeight: '900', fontSize: 11 }}>VAL</Text>
+                                    <Text style={{ color: 'black', fontWeight: '900', fontSize: 18 }}>{ovr}</Text>
                                 </View>
                                 <View style={{ marginLeft: 25, flex: 1 }}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                                        <Text style={{ color: 'rgba(255,255,255,0.7)', fontWeight: '900', fontSize: 9, letterSpacing: 1.5 }}>CARTA MVP 2026</Text>
+                                        <Text style={{ color: 'rgba(255,255,255,0.7)', fontWeight: '900', fontSize: 11, letterSpacing: 1.5 }}>CARTA MVP 2026</Text>
                                     </View>
-                                    <Text style={{ color: 'white', fontSize: 22, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Generar Carta</Text>
+                                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Generar Carta</Text>
                                     <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, fontWeight: '700', marginTop: 4 }}>Descarga tu edición coleccionista.</Text>
                                 </View>
                             </View>
@@ -308,8 +308,8 @@ export default function PerfilScreen() {
                             <Camera color="white" size={20} />
                         </TouchableOpacity>
                     </View>
-                    <Text style={{ color: C.text, fontSize: 32, fontWeight: '900', textTransform: 'uppercase', marginTop: 25, letterSpacing: -1 }}>{displayName}</Text>
-                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', letterSpacing: 2 }}>{profile?.email}</Text>
+                    <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase', marginTop: 25, letterSpacing: -1 }}>{displayName}</Text>
+                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', letterSpacing: 2 }}>{profile?.email}</Text>
                 </View>
 
                 {/* NIVELES */}
@@ -317,12 +317,12 @@ export default function PerfilScreen() {
                 <View style={{ marginHorizontal: 30, backgroundColor: C.card, borderRadius: 30, padding: 30, borderWidth: 1, borderColor: C.border }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                         <View>
-                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2 }}>Rango Actual</Text>
-                            <Text style={{ color: COLORS.accent, fontSize: 24, fontWeight: '900' }}>{tierInfo.name}</Text>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2 }}>Rango Actual</Text>
+                            <Text style={{ color: COLORS.accent, fontSize: 17, fontWeight: '900' }}>{tierInfo.name}</Text>
                         </View>
                         <View style={{ alignItems: 'flex-end' }}>
-                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2 }}>Próximo Rango</Text>
-                            <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', opacity: 0.5 }}>{tierIndex < tierList.length - 1 ? tierList[tierIndex + 1].toUpperCase() : 'LÍMITE'}</Text>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2 }}>Próximo Rango</Text>
+                            <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', opacity: 0.5 }}>{tierIndex < tierList.length - 1 ? tierList[tierIndex + 1].toUpperCase() : 'LÍMITE'}</Text>
                         </View>
                     </View>
                     <View style={{ height: 4, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#f1f5f9', borderRadius: 2, position: 'relative', marginVertical: 10 }}>
@@ -340,7 +340,7 @@ export default function PerfilScreen() {
                 <View style={{ marginHorizontal: 30, backgroundColor: C.card, borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: C.border }}>
                     <View style={{ height: 100, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25, borderBottomWidth: 1, borderBottomColor: C.border }}>
                         <View style={{ flex: 1 }}>
-                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Nivel General</Text>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Nivel General</Text>
                             <Text style={{ color: C.text, fontSize: 42, fontWeight: '900', letterSpacing: -2 }}>{ovr}</Text>
                         </View>
                         <View style={{ width: 44, height: 44, borderRadius: 15, backgroundColor: COLORS.accent + '40', alignItems: 'center', justifyContent: 'center' }}>
@@ -362,7 +362,7 @@ export default function PerfilScreen() {
                     <Text style={{ color: '#10b981', fontWeight: '900', fontSize: 11, textTransform: 'uppercase', letterSpacing: 2 }}>Insignias Ganadas</Text>
                     <TouchableOpacity onPress={() => setShowBadgeGlossary(true)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: isDark ? 'rgba(16,185,129,0.1)' : '#ecfdf5', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 }}>
                         <BookOpen color={COLORS.accent} size={12} />
-                        <Text style={{ color: COLORS.accent, fontSize: 8, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Glosario</Text>
+                        <Text style={{ color: COLORS.accent, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Glosario</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={{ marginHorizontal: 30, backgroundColor: C.card, borderRadius: 25, padding: 20, borderWidth: 1, borderColor: C.border }}>
@@ -527,7 +527,7 @@ export default function PerfilScreen() {
                                                 <View style={{ marginBottom: 8, width: 40, height: 40, borderRadius: 12, backgroundColor: 'transparent', alignItems: 'center', justifyContent: 'center' }}>
                                                     <b.icon width={32} height={32} color={tierColors[b.tier!]} />
                                                 </View>
-                                                <Text style={{ color: C.text, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', textAlign: 'center', marginBottom: 3 }}>{b.name}</Text>
+                                                <Text style={{ color: C.text, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', textAlign: 'center', marginBottom: 3 }}>{b.name}</Text>
                                                 <View style={{ backgroundColor: tierColors[b.tier!] + '20', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
                                                     <Text style={{ color: tierColors[b.tier!], fontSize: 7, fontWeight: '900', letterSpacing: 1 }}>{tierNames[b.tier!]}</Text>
                                                 </View>
@@ -536,8 +536,8 @@ export default function PerfilScreen() {
                                     </View>
                                 ) : (
                                     <View style={{ alignItems: 'center', paddingVertical: 25 }}>
-                                        <Text style={{ fontSize: 36, marginBottom: 10 }}>🎖️</Text>
-                                        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Juega más para desbloquear insignias</Text>
+                                        <Text style={{ fontSize: 20, marginBottom: 10 }}>🎖️</Text>
+                                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>Juega más para desbloquear insignias</Text>
                                     </View>
                                 )}
                             </View>
@@ -579,8 +579,8 @@ export default function PerfilScreen() {
                         <Text style={{ color: 'white', fontSize: 140, fontWeight: '900', lineHeight: 140, textShadowColor: 'rgba(0,0,0,0.6)', textShadowRadius: 20 }}>{ovr}</Text>
                         <View style={{ height: 5, width: 140, backgroundColor: '#06b6d4', marginTop: -5, marginBottom: 10 }} />
                         <View style={{ alignItems: 'flex-end' }}>
-                            <Text style={{ color: '#06b6d4', fontSize: 14, fontWeight: '900', letterSpacing: 5 }}>VALORACIÓN</Text>
-                            <Text style={{ color: '#06b6d4', fontSize: 14, fontWeight: '900', letterSpacing: 5 }}>GENERAL</Text>
+                            <Text style={{ color: '#06b6d4', fontSize: 13, fontWeight: '900', letterSpacing: 5 }}>VALORACIÓN</Text>
+                            <Text style={{ color: '#06b6d4', fontSize: 13, fontWeight: '900', letterSpacing: 5 }}>GENERAL</Text>
                         </View>
                     </View>
 
@@ -628,7 +628,7 @@ export default function PerfilScreen() {
                             borderTopColor: '#06b6d4',
                             zIndex: 10
                         }}>
-                            <Text numberOfLines={1} adjustsFontSizeToFit style={{ color: 'white', fontSize: 22, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 4 }}>
+                            <Text numberOfLines={1} adjustsFontSizeToFit style={{ color: 'white', fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 4 }}>
                                 {profile?.mainSport ? `${profile.mainSport} • ` : ''}NIVEL {tierInfo.name} • 2026
                             </Text>
                         </View>
@@ -655,8 +655,8 @@ export default function PerfilScreen() {
                         <View style={{ width: 80, height: 80, borderRadius: 30, backgroundColor: '#10b981', alignItems: 'center', justifyContent: 'center', marginBottom: 25 }}>
                             <CheckCircle2 color="white" size={40} />
                         </View>
-                        <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', textAlign: 'center', marginBottom: 15 }}>{successMessage}</Text>
-                        <Text style={{ color: C.sub, fontSize: 14, fontWeight: '700', textAlign: 'center', marginBottom: 35 }}>Ya puedes compartir tu carta con tus amigos o en tus redes sociales.</Text>
+                        <Text style={{ color: C.text, fontSize: 17, fontWeight: '900', textAlign: 'center', marginBottom: 15 }}>{successMessage}</Text>
+                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', marginBottom: 35 }}>Ya puedes compartir tu carta con tus amigos o en tus redes sociales.</Text>
                         <TouchableOpacity onPress={() => setShowSuccessModal(false)} style={{ backgroundColor: '#10b981', width: '100%', height: 65, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }}>
                             <Text style={{ color: 'white', fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Entendido</Text>
                         </TouchableOpacity>
@@ -692,12 +692,12 @@ export default function PerfilScreen() {
                                     <Trophy color={COLORS.accent} size={22} />
                                 </View>
                                 <View>
-                                    <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Arsenal de Mérito</Text>
-                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 2 }}>Cómo ganar cada insignia</Text>
+                                    <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Arsenal de Mérito</Text>
+                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 2 }}>Cómo ganar cada insignia</Text>
                                 </View>
                             </View>
                             <TouchableOpacity onPress={() => setShowBadgeGlossary(false)} style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: C.card, borderWidth: 1, borderColor: C.border, alignItems: 'center', justifyContent: 'center' }}>
-                                <Text style={{ color: C.sub, fontWeight: '900', fontSize: 16 }}>✕</Text>
+                                <Text style={{ color: C.sub, fontWeight: '900', fontSize: 14 }}>✕</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -885,11 +885,11 @@ export default function PerfilScreen() {
                                                     <View style={{ flex: 1 }}>
                                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                                             <View style={{ flex: 1 }}>
-                                                                <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{b.name}</Text>
-                                                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '600', marginTop: 2, lineHeight: 14 }}>{b.desc}</Text>
+                                                                <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{b.name}</Text>
+                                                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '600', marginTop: 2, lineHeight: 14 }}>{b.desc}</Text>
                                                             </View>
                                                             <View style={{ backgroundColor: progressColor, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, marginLeft: 10 }}>
-                                                                <Text style={{ color: 'white', fontSize: 8, fontWeight: '900' }}>{currentTierLabel}</Text>
+                                                                <Text style={{ color: 'white', fontSize: 11, fontWeight: '900' }}>{currentTierLabel}</Text>
                                                             </View>
                                                         </View>
 
@@ -899,8 +899,8 @@ export default function PerfilScreen() {
                                                                 <View style={{ height: '100%', width: `${progress * 100}%`, backgroundColor: progressColor, borderRadius: 5 }} />
                                                             </View>
                                                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
-                                                                <Text style={{ color: C.text, fontSize: 9, fontWeight: '900' }}>{currentVal} {b.unit}</Text>
-                                                                <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900' }}>{Math.floor(progress * 100)}% COMPLETADO</Text>
+                                                                <Text style={{ color: C.text, fontSize: 11, fontWeight: '900' }}>{currentVal} {b.unit}</Text>
+                                                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900' }}>{Math.floor(progress * 100)}% COMPLETADO</Text>
                                                             </View>
                                                         </View>
                                                     </View>
@@ -916,8 +916,8 @@ export default function PerfilScreen() {
                                                             <View key={t} style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, opacity: isActive ? 1 : 0.2 }}>
                                                                 <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: milestoneColors[t] }} />
                                                                 <View>
-                                                                    <Text style={{ color: C.text, fontSize: 9, fontWeight: '900' }}>{milestoneNames[t]}</Text>
-                                                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '800' }}>{(config as any)[t]} {b.unit}</Text>
+                                                                    <Text style={{ color: C.text, fontSize: 11, fontWeight: '900' }}>{milestoneNames[t]}</Text>
+                                                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '800' }}>{(config as any)[t]} {b.unit}</Text>
                                                                 </View>
                                                             </View>
                                                         );
@@ -951,8 +951,8 @@ const ProfileRow = ({ icon: Icon, color, label, value, isDark }: any) => {
                 <Icon color={color} size={20} strokeWidth={1.5} width={24} height={24} />
             </View>
             <View style={{ marginLeft: 20, flex: 1 }}>
-                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>{label}</Text>
-                <Text style={{ color: C.text, fontSize: 18, fontWeight: '900' }}>{value}</Text>
+                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1 }}>{label}</Text>
+                <Text style={{ color: C.text, fontSize: 15, fontWeight: '900' }}>{value}</Text>
             </View>
         </View>
     );

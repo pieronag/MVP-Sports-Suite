@@ -14,14 +14,14 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const DetailRow = ({ label, value, C }: any) => (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</Text>
+        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</Text>
         <Text style={{ color: C.text, fontSize: 11, fontWeight: '900' }}>{value}</Text>
     </View>
 );
 
 const LargeDetailRow = ({ label, value, C, highlightColor }: any) => (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 2 }}>
-        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</Text>
+        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</Text>
         <Text style={{ color: highlightColor || C.text, fontSize: 11, fontWeight: '900' }}>{value}</Text>
     </View>
 );
@@ -149,7 +149,7 @@ export default function TicketScreen() {
                     <TouchableOpacity onPress={() => router.replace('/(player)/reservas')} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                         <ChevronLeft color="#ef4444" size={24} />
                     </TouchableOpacity>
-                    <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Detalle de Devolución</Text>
+                    <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Detalle de Devolución</Text>
                     <View style={{ width: 44 }} /> 
                 </View>
 
@@ -170,13 +170,13 @@ export default function TicketScreen() {
                     }}>
                         {/* SIMPLE TYPOGRAPHY HEADER */}
                         <View style={{ width: '100%', alignItems: 'center', marginBottom: 25 }}>
-                            <Text style={{ color: '#ef4444', fontSize: 10, fontWeight: '900', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8 }}>
+                            <Text style={{ color: '#ef4444', fontSize: 11, fontWeight: '900', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 8 }}>
                                 Reversa Automática Fallida
                             </Text>
-                            <Text style={{ color: C.text, fontSize: 32, fontWeight: '900', letterSpacing: -1 }}>
+                            <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', letterSpacing: -1 }}>
                                 ${Number(booking?.totalPrice || 0).toLocaleString('es-CL')}
                             </Text>
-                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '800', textAlign: 'center', marginTop: 4 }}>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '800', textAlign: 'center', marginTop: 4 }}>
                                 Monto Pendiente de Devolución
                             </Text>
                         </View>
@@ -198,10 +198,10 @@ export default function TicketScreen() {
 
                         {/* LEGAL/Warning TEXT WITHOUT ICONS */}
                         <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#F8FAFC', padding: 20, borderRadius: 20, borderWidth: 1, borderColor: C.border, width: '100%', gap: 8 }}>
-                            <Text style={{ color: '#ef4444', fontSize: 10, fontWeight: '900', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                            <Text style={{ color: '#ef4444', fontSize: 11, fontWeight: '900', letterSpacing: 0.5, textTransform: 'uppercase' }}>
                                 Instrucciones para Devolución
                             </Text>
-                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '600', lineHeight: 14 }}>
+                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '600', lineHeight: 14 }}>
                                 Debido a una desconexión temporal con la pasarela de pagos, el sistema automático no pudo reversar tu dinero. Presenta este comprobante de validación digital directamente al administrador o dueño del recinto deportivo para solicitar tu transferencia manual por el monto total indicado arriba.
                             </Text>
                         </View>
@@ -246,7 +246,7 @@ export default function TicketScreen() {
                             }}
                         >
                             <Share2 color="white" size={18} style={{ marginRight: 10 }} />
-                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 14, textTransform: 'uppercase', letterSpacing: 1 }}>COMPARTIR COMPROBANTE</Text>
+                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 13, textTransform: 'uppercase', letterSpacing: 1 }}>COMPARTIR COMPROBANTE</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
@@ -263,7 +263,7 @@ export default function TicketScreen() {
                             }}
                         >
                             <Calendar color={C.sub} size={18} style={{ marginRight: 10 }} />
-                            <Text style={{ color: C.text, fontWeight: '900', fontSize: 14, textTransform: 'uppercase', letterSpacing: 1 }}>Ir a mis Reservas</Text>
+                            <Text style={{ color: C.text, fontWeight: '900', fontSize: 13, textTransform: 'uppercase', letterSpacing: 1 }}>Ir a mis Reservas</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
@@ -308,7 +308,7 @@ export default function TicketScreen() {
                             <View style={{ gap: 18, marginBottom: 30 }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                                     <View style={{ width: 15, height: 2, backgroundColor: activeColor, marginRight: 10 }} />
-                                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2 }}>Información del Recinto</Text>
+                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2 }}>Información del Recinto</Text>
                                 </View>
 
                                 <View style={{ gap: 15 }}>
@@ -339,7 +339,7 @@ export default function TicketScreen() {
                             <View style={{ paddingVertical: 30, gap: 18, borderTopWidth: 1, borderTopColor: C.border }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
                                     <View style={{ width: 15, height: 2, backgroundColor: activeColor, marginRight: 10 }} />
-                                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2 }}>Detalles de Transacción</Text>
+                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2 }}>Detalles de Transacción</Text>
                                 </View>
 
                                 <View style={{ gap: 15 }}>
@@ -351,7 +351,7 @@ export default function TicketScreen() {
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                         <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700' }}>ESTADO</Text>
                                         <View style={{ backgroundColor: activeColor + '15', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 }}>
-                                            <Text style={{ color: activeColor, fontSize: 10, fontWeight: '900' }}>CONFIRMADO</Text>
+                                            <Text style={{ color: activeColor, fontSize: 11, fontWeight: '900' }}>CONFIRMADO</Text>
                                         </View>
                                     </View>
 
@@ -372,7 +372,7 @@ export default function TicketScreen() {
                                          }}>
                                              <Text style={{ 
                                                  color: (booking?.paymentStatus as any) === 'refunded' ? '#10b981' : ((booking?.paymentStatus as any) === 'refund_failed' ? '#ef4444' : (booking?.paymentStatus === 'paid' ? '#10b981' : '#f59e0b')), 
-                                                 fontSize: 10, 
+                                                 fontSize: 11, 
                                                  fontWeight: '900', 
                                                  textTransform: 'uppercase' 
                                              }}>
@@ -445,7 +445,7 @@ export default function TicketScreen() {
                                 }}
                             >
                                 <Receipt color="white" size={20} style={{ marginRight: 15 }} />
-                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 16, textTransform: 'uppercase', letterSpacing: 1 }}>Comprobante Devolución</Text>
+                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 14, textTransform: 'uppercase', letterSpacing: 1 }}>Comprobante Devolución</Text>
                             </TouchableOpacity>
                         )}
                         <TouchableOpacity 
@@ -464,7 +464,7 @@ export default function TicketScreen() {
                             }}
                         >
                             <Calendar color="white" size={20} style={{ marginRight: 15 }} />
-                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 16, textTransform: 'uppercase', letterSpacing: 1 }}>Ir a mis Reservas</Text>
+                            <Text style={{ color: 'white', fontWeight: '900', fontSize: 14, textTransform: 'uppercase', letterSpacing: 1 }}>Ir a mis Reservas</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -486,8 +486,8 @@ export default function TicketScreen() {
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                                 <Receipt color="white" size={24} />
                                 <View>
-                                    <Text style={{ color: 'white', fontSize: 13, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 }}>MVP SPORTS CHILE</Text>
-                                    <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: 9, fontWeight: '800', textTransform: 'uppercase' }}>Solicitud de Reembolso</Text>
+                                    <Text style={{ color: 'white', fontSize: 12, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 }}>MVP SPORTS CHILE</Text>
+                                    <Text style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: 11, fontWeight: '800', textTransform: 'uppercase' }}>Solicitud de Reembolso</Text>
                                 </View>
                             </View>
                             <TouchableOpacity onPress={() => setShowClaimModal(false)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' }}>
@@ -499,14 +499,14 @@ export default function TicketScreen() {
                         <ScrollView contentContainerStyle={{ padding: 25, gap: 20 }}>
                             <View style={{ alignItems: 'center', marginVertical: 5 }}>
                                 <View style={{ paddingHorizontal: 15, paddingVertical: 6, borderRadius: 10, backgroundColor: '#ef444415', borderWidth: 1, borderColor: '#ef444430' }}>
-                                    <Text style={{ color: '#ef4444', fontSize: 9, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' }}>
+                                    <Text style={{ color: '#ef4444', fontSize: 11, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' }}>
                                         REVERSA AUTOMÁTICA RECHAZADA
                                     </Text>
                                 </View>
-                                <Text style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontSize: 26, fontWeight: '900', marginTop: 10 }}>
+                                <Text style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontSize: 18, fontWeight: '900', marginTop: 10 }}>
                                     ${Number(booking?.totalPrice || 0).toLocaleString('es-CL')}
                                 </Text>
-                                <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 9, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>
+                                <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: 2 }}>
                                     Monto Pendiente de Reintegro Manual
                                 </Text>
                             </View>
@@ -514,33 +514,33 @@ export default function TicketScreen() {
                             {/* VOUCHER DETAILS BLOCK */}
                             <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#F8FAFC', padding: 20, borderRadius: 25, borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.04)' : '#E2E8F0', gap: 12 }}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 10, fontWeight: '700' }}>JUGADOR</Text>
+                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 11, fontWeight: '700' }}>JUGADOR</Text>
                                     <Text style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontSize: 11, fontWeight: '900' }}>{booking?.clientName || '—'}</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 10, fontWeight: '700' }}>RECINTO</Text>
+                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 11, fontWeight: '700' }}>RECINTO</Text>
                                     <Text style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontSize: 11, fontWeight: '900' }}>{booking?.tenantName || '—'}</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 10, fontWeight: '700' }}>CANCHA / DEPORTE</Text>
+                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 11, fontWeight: '700' }}>CANCHA / DEPORTE</Text>
                                     <Text style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>{booking?.courtName} • {booking?.sport}</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 10, fontWeight: '700' }}>FECHA RESERVA</Text>
+                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 11, fontWeight: '700' }}>FECHA RESERVA</Text>
                                     <Text style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontSize: 11, fontWeight: '900' }}>{displayDate} • {booking?.startTime} HRS</Text>
                                 </View>
                                 <View style={{ height: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : '#E2E8F0', marginVertical: 4 }} />
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 10, fontWeight: '700' }}>ID DE RESERVA</Text>
-                                    <Text style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontSize: 10, fontWeight: '900', letterSpacing: 0.2 }}>{bookingId}</Text>
+                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 11, fontWeight: '700' }}>ID DE RESERVA</Text>
+                                    <Text style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontSize: 11, fontWeight: '900', letterSpacing: 0.2 }}>{bookingId}</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 10, fontWeight: '700' }}>MEDIO PAGO ORIG.</Text>
-                                    <Text style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontSize: 10, fontWeight: '900', textTransform: 'uppercase' }}>TARJETA ONLINE (MERCADO PAGO)</Text>
+                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 11, fontWeight: '700' }}>MEDIO PAGO ORIG.</Text>
+                                    <Text style={{ color: isDark ? '#F8FAFC' : '#0F172A', fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>TARJETA ONLINE (MERCADO PAGO)</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={{ color: isDark ? '#ef4444' : '#b91c1c', fontSize: 10, fontWeight: '800' }}>CÓDIGO VALIDACIÓN</Text>
-                                    <Text style={{ color: isDark ? '#ef4444' : '#b91c1c', fontSize: 10, fontWeight: '900', letterSpacing: 0.5 }}>
+                                    <Text style={{ color: isDark ? '#ef4444' : '#b91c1c', fontSize: 11, fontWeight: '800' }}>CÓDIGO VALIDACIÓN</Text>
+                                    <Text style={{ color: isDark ? '#ef4444' : '#b91c1c', fontSize: 11, fontWeight: '900', letterSpacing: 0.5 }}>
                                         MVP-REFUND-{bookingId?.toUpperCase() || '—'}
                                     </Text>
                                 </View>
@@ -550,11 +550,11 @@ export default function TicketScreen() {
                             <View style={{ gap: 8 }}>
                                 <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start' }}>
                                     <FileText color="#ef4444" size={16} style={{ marginTop: 2 }} />
-                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 10, fontWeight: '800', lineHeight: 14, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                    <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 11, fontWeight: '800', lineHeight: 14, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                                         Instrucciones de Devolución
                                     </Text>
                                 </View>
-                                <Text style={{ color: isDark ? '#64748B' : '#94A3B8', fontSize: 9, fontWeight: '600', lineHeight: 13 }}>
+                                <Text style={{ color: isDark ? '#64748B' : '#94A3B8', fontSize: 11, fontWeight: '600', lineHeight: 13 }}>
                                     Este comprobante oficial certifica que la reserva fue cancelada bajo el reglamento de anticipación del recinto. Debido a una interrupción en la pasarela automatizada de pagos, la reversa electrónica directa no pudo ser procesada. El administrador del recinto deberá realizar una transferencia electrónica manual al jugador para liquidar este reintegro, utilizando el ID de Reserva para la validación interna en su panel.
                                 </Text>
                             </View>
@@ -588,14 +588,14 @@ export default function TicketScreen() {
                                 style={{ flex: 1, height: 60, borderRadius: 20, backgroundColor: '#25D366', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, shadowColor: '#25D366', shadowOpacity: 0.2, shadowRadius: 8, elevation: 4 }}
                             >
                                 <Share2 color="white" size={18} />
-                                <Text style={{ color: 'white', fontSize: 13, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>COMPARTIR</Text>
+                                <Text style={{ color: 'white', fontSize: 12, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>COMPARTIR</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
                                 onPress={() => setShowClaimModal(false)}
                                 style={{ height: 60, paddingHorizontal: 25, borderRadius: 20, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }}
                             >
-                                <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 13, fontWeight: '900', textTransform: 'uppercase' }}>Cerrar</Text>
+                                <Text style={{ color: isDark ? '#94A3B8' : '#64748B', fontSize: 12, fontWeight: '900', textTransform: 'uppercase' }}>Cerrar</Text>
                             </TouchableOpacity>
                         </View>
                     </View>

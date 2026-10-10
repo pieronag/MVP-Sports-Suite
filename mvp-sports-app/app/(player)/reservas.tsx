@@ -110,7 +110,7 @@ const getSportInfo = (sportName: string) => {
 
 const LargeDetailRow = ({ label, value, C, highlightColor }: any) => (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 2 }}>
-        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</Text>
+        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</Text>
         <Text style={{ color: highlightColor || C.text, fontSize: 11, fontWeight: '900' }}>{value}</Text>
     </View>
 );
@@ -501,7 +501,7 @@ export default function MisReservasScreen() {
                         <View style={{ backgroundColor: C.card, borderRadius: 30, borderWidth: 1, borderColor: C.border, overflow: 'hidden' }}>
                             {/* HEADER */}
                             <View style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: C.border, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Devolución Pendiente</Text>
+                                <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>Devolución Pendiente</Text>
                                 <TouchableOpacity onPress={() => setShowTicket(false)} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
                                     <X color={C.text} size={18} />
                                 </TouchableOpacity>
@@ -510,13 +510,13 @@ export default function MisReservasScreen() {
                             {/* BODY */}
                             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 25 }}>
                                 <View style={{ alignItems: 'center', marginVertical: 10 }}>
-                                    <Text style={{ color: '#ef4444', fontSize: 10, fontWeight: '900', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 6 }}>
+                                    <Text style={{ color: '#ef4444', fontSize: 11, fontWeight: '900', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 6 }}>
                                         Reversa Automática Fallida
                                     </Text>
-                                    <Text style={{ color: C.text, fontSize: 28, fontWeight: '900', letterSpacing: -1 }}>
+                                    <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', letterSpacing: -1 }}>
                                         ${Number(selectedBooking?.totalPrice || selectedBooking?.price || 0).toLocaleString('es-CL')}
                                     </Text>
-                                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '800', textAlign: 'center', marginTop: 4 }}>
+                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '800', textAlign: 'center', marginTop: 4 }}>
                                         Monto Pendiente de Devolución
                                     </Text>
                                 </View>
@@ -536,10 +536,10 @@ export default function MisReservasScreen() {
                                 </View>
 
                                 <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#F8FAFC', padding: 20, borderRadius: 20, borderWidth: 1, borderColor: C.border, gap: 8, marginBottom: 15 }}>
-                                    <Text style={{ color: '#ef4444', fontSize: 10, fontWeight: '900', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                                    <Text style={{ color: '#ef4444', fontSize: 11, fontWeight: '900', letterSpacing: 0.5, textTransform: 'uppercase' }}>
                                         Instrucciones para Devolución
                                     </Text>
-                                    <Text style={{ color: C.sub, fontSize: 10, fontWeight: '600', lineHeight: 14 }}>
+                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '600', lineHeight: 14 }}>
                                         Debido a una desconexión temporal con la pasarela de pagos, el sistema automático no pudo reversar tu dinero. Presenta este comprobante de validación digital directamente al administrador o dueño del recinto deportivo para solicitar tu transferencia manual por el monto total indicado arriba.
                                     </Text>
                                 </View>
@@ -600,16 +600,16 @@ export default function MisReservasScreen() {
                                         <X color={C.text} size={20} />
                                     </TouchableOpacity>
                                 </View>
-                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 5 }}>RECINTO</Text>
-                                <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', marginBottom: 20 }}>{selectedBooking?.tenantName}</Text>
+                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 5 }}>RECINTO</Text>
+                                <Text style={{ color: C.text, fontSize: 17, fontWeight: '900', marginBottom: 20 }}>{selectedBooking?.tenantName}</Text>
                                 <View style={{ flexDirection: 'row', gap: 30 }}>
                                     <View>
-                                        <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>CANCHA</Text>
-                                        <Text style={{ color: C.text, fontSize: 14, fontWeight: '800' }}>{selectedBooking?.courtName}</Text>
+                                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>CANCHA</Text>
+                                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '800' }}>{selectedBooking?.courtName}</Text>
                                     </View>
                                     <View>
-                                        <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>ESTADO</Text>
-                                        <Text style={{ color: modalStatus.color, fontSize: 14, fontWeight: '800' }}>{modalStatus.label}</Text>
+                                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>ESTADO</Text>
+                                        <Text style={{ color: modalStatus.color, fontSize: 13, fontWeight: '800' }}>{modalStatus.label}</Text>
                                     </View>
                                 </View>
                             </View>
@@ -617,18 +617,18 @@ export default function MisReservasScreen() {
                                 <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 25, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10 }}>
                                     {selectedBooking?.id && <QRCode value={selectedBooking.id} size={150} color="#0F172A" backgroundColor="white" />}
                                 </View>
-                                <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 4, marginTop: 25 }}>ID: {(selectedBooking?.id as string)?.slice(-8).toUpperCase()}</Text>
+                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 4, marginTop: 25 }}>ID: {(selectedBooking?.id as string)?.slice(-8).toUpperCase()}</Text>
                             </View>
                             <View style={{ padding: 30 }}>
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <View style={{ gap: 8 }}>
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                             <Calendar color={modalSportInfo.color} size={14} />
-                                            <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', marginLeft: 10 }}>{getFormattedDate(selectedBooking?.date).full}</Text>
+                                            <Text style={{ color: C.text, fontSize: 12, fontWeight: '900', marginLeft: 10 }}>{getFormattedDate(selectedBooking?.date).full}</Text>
                                         </View>
                                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                             <Clock color={modalSportInfo.color} size={14} />
-                                            <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', marginLeft: 10 }}>{selectedBooking?.startTime} HRS</Text>
+                                            <Text style={{ color: C.text, fontSize: 12, fontWeight: '900', marginLeft: 10 }}>{selectedBooking?.startTime} HRS</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -677,7 +677,7 @@ export default function MisReservasScreen() {
 
 const TabButton = ({ label, active, onPress, isDark }: any) => (
     <TouchableOpacity onPress={onPress} style={{ flex: 1, height: 50, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: active ? COLORS.accent : (isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9'), borderWidth: active ? 0 : 1, borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }}>
-        <Text style={{ color: active ? 'white' : (isDark ? '#94A3B8' : '#64748B'), fontWeight: '900', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</Text>
+        <Text style={{ color: active ? 'white' : (isDark ? '#94A3B8' : '#64748B'), fontWeight: '900', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</Text>
     </TouchableOpacity>
 );
 
@@ -702,7 +702,7 @@ const BookingEliteCard = ({ booking, venueName, isDark, onView, onMaps, onCheckI
             {/* Resumen compacto: fecha · recinto/cancha · hora y valor · estado */}
             <View style={{ flexDirection: 'row', gap: 14 }}>
                 <View style={{ width: 54, borderRadius: PLAYER.radius, backgroundColor: C.soft, alignItems: 'center', paddingVertical: 8 }}>
-                    <Text style={{ fontSize: 20, fontWeight: '700', color: C.text }}>{dateInfo.day}</Text>
+                    <Text style={{ fontSize: 16, fontWeight: '700', color: C.text }}>{dateInfo.day}</Text>
                     <Text style={{ fontSize: PLAYER.font.xs, fontWeight: '600', color: C.sub, marginTop: 2 }}>{dateInfo.month}</Text>
                 </View>
                 <View style={{ flex: 1, minWidth: 0 }}>
@@ -777,8 +777,8 @@ const FeedbackModal = ({ visible, type, message, onClose, isDark }: any) => {
                     <View style={{ width: 70, height: 70, borderRadius: 35, backgroundColor: (type === 'error' ? '#ef444422' : '#10b98122'), alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
                         {type === 'error' ? <XCircle color="#ef4444" size={35} /> : <CheckCircle2 color="#10b981" size={35} />}
                     </View>
-                    <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>{type === 'error' ? 'Oops' : '¡Éxito!'}</Text>
-                    <Text style={{ color: C.sub, fontSize: 13, fontWeight: '600', textAlign: 'center', marginBottom: 25 }}>{message}</Text>
+                    <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>{type === 'error' ? 'Oops' : '¡Éxito!'}</Text>
+                    <Text style={{ color: C.sub, fontSize: 12, fontWeight: '600', textAlign: 'center', marginBottom: 25 }}>{message}</Text>
                     <TouchableOpacity onPress={onClose} style={{ backgroundColor: (type === 'error' ? '#ef4444' : '#10b981'), paddingVertical: 15, borderRadius: 15, width: '100%', alignItems: 'center' }}>
                         <Text style={{ color: 'white', fontWeight: '900' }}>ENTENDIDO</Text>
                     </TouchableOpacity>
@@ -797,8 +797,8 @@ const EliteActionModal = ({ visible, onClose, onConfirm, title, message, confirm
                     <View style={{ width: 80, height: 80, borderRadius: 40, backgroundColor: (danger ? '#ef4444' : COLORS.accent) + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
                         {icon}
                     </View>
-                    <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>{title}</Text>
-                    <Text style={{ color: C.sub, fontSize: 13, fontWeight: '600', textAlign: 'center', marginBottom: 30, lineHeight: 20 }}>{message}</Text>
+                    <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textAlign: 'center', marginBottom: 10 }}>{title}</Text>
+                    <Text style={{ color: C.sub, fontSize: 12, fontWeight: '600', textAlign: 'center', marginBottom: 30, lineHeight: 20 }}>{message}</Text>
                     <View style={{ flexDirection: 'row', gap: 10, width: '100%' }}>
                         <TouchableOpacity onPress={onClose} style={{ flex: 1, height: 55, borderRadius: 15, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
                             <Text style={{ color: C.text, fontWeight: '900', fontSize: 12 }}>VOLVER</Text>
@@ -827,7 +827,7 @@ const SurveyModal = ({ visible, onClose, onSave, isDark }: any) => {
                         <View style={{ width: 60, height: 60, borderRadius: 20, backgroundColor: COLORS.accent + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 15 }}>
                             <Star color={COLORS.accent} size={30} fill={COLORS.accent} />
                         </View>
-                        <Text style={{ color: C.text, fontSize: 22, fontWeight: '900', textTransform: 'uppercase' }}>Tu Experiencia</Text>
+                        <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase' }}>Tu Experiencia</Text>
                         <Text style={{ color: C.sub, fontSize: 12, fontWeight: '600', textAlign: 'center', marginTop: 5 }}>¿Qué te pareció el recinto y el servicio hoy?</Text>
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 30 }}>
@@ -837,7 +837,7 @@ const SurveyModal = ({ visible, onClose, onSave, isDark }: any) => {
                             </TouchableOpacity>
                         ))}
                     </View>
-                    <TextInput value={feedback} onChangeText={setFeedback} placeholder="Comentarios adicionales (opcional)..." placeholderTextColor={C.sub} multiline style={{ backgroundColor: C.card, borderRadius: 20, padding: 20, color: C.text, fontSize: 14, height: 100, textAlignVertical: 'top', borderWidth: 1, borderColor: C.border, marginBottom: 25 }} />
+                    <TextInput value={feedback} onChangeText={setFeedback} placeholder="Comentarios adicionales (opcional)..." placeholderTextColor={C.sub} multiline style={{ backgroundColor: C.card, borderRadius: 20, padding: 20, color: C.text, fontSize: 13, height: 100, textAlignVertical: 'top', borderWidth: 1, borderColor: C.border, marginBottom: 25 }} />
                     <View style={{ flexDirection: 'row', gap: 10 }}>
                         <TouchableOpacity onPress={onClose} style={{ flex: 1, height: 60, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: C.card, borderWidth: 1, borderColor: C.border }}><Text style={{ color: C.sub, fontWeight: '900' }}>CANCELAR</Text></TouchableOpacity>
                         <TouchableOpacity onPress={() => onSave(rating, feedback)} style={{ flex: 2, height: 60, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.accent }}><Text style={{ color: 'white', fontWeight: '900' }}>FINALIZAR PARTIDO</Text></TouchableOpacity>

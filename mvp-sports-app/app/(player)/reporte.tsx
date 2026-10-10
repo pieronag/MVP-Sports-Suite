@@ -254,7 +254,7 @@ export default function ReporteScreen() {
                     ) : myReports.length === 0 ? (
                         <View style={{ padding: 40, alignItems: 'center' }}>
                             <AlertCircle color={C.sub} size={40} style={{ marginBottom: 15, opacity: 0.5 }} />
-                            <Text style={{ color: C.text, fontWeight: '800', fontSize: 16 }}>No hay reportes</Text>
+                            <Text style={{ color: C.text, fontWeight: '800', fontSize: 14 }}>No hay reportes</Text>
                             <Text style={{ color: C.sub, marginTop: 5, textAlign: 'center', fontSize: 12 }}>Aún no has enviado ningún reporte al equipo de soporte.</Text>
                         </View>
                     ) : (
@@ -273,9 +273,9 @@ export default function ReporteScreen() {
                                     <View style={[styles.reportResponse, { backgroundColor: isDark ? 'rgba(16,185,129,0.05)' : '#F8FAFC', borderColor: isDark ? 'rgba(16,185,129,0.2)' : C.border }]}>
                                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0' }}>
                                             <Shield color={accent} size={16} style={{ marginRight: 8 }} />
-                                            <Text style={{ fontSize: 10, fontWeight: '900', color: accent, letterSpacing: 1 }}>SOPORTE MVP ({report.repliedBy || 'Oficial'})</Text>
+                                            <Text style={{ fontSize: 11, fontWeight: '900', color: accent, letterSpacing: 1 }}>SOPORTE MVP ({report.repliedBy || 'Oficial'})</Text>
                                         </View>
-                                        <Text style={{ fontSize: 13, fontWeight: '700', color: C.text, lineHeight: 20 }}>{report.response}</Text>
+                                        <Text style={{ fontSize: 12, fontWeight: '700', color: C.text, lineHeight: 20 }}>{report.response}</Text>
                                     </View>
                                 ) : null}
                             </View>
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
     },
     headerTitle: {
-        fontSize: 18,
+        fontSize: 15,
         fontWeight: '900',
         textTransform: 'uppercase',
         letterSpacing: -0.5
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
     bannerBadge: {
         backgroundColor: 'rgba(255, 255, 255, 0.25)',
         color: 'white',
-        fontSize: 8,
+        fontSize: 11,
         fontWeight: '900',
         paddingHorizontal: 8,
         paddingVertical: 4,
@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
     },
     bannerTitle: {
         color: 'white',
-        fontSize: 22,
+        fontSize: 16,
         fontWeight: '900',
         letterSpacing: -0.5
     },
@@ -645,7 +645,7 @@ const styles = StyleSheet.create({
         fontWeight: '800'
     },
     inputLabel: {
-        fontSize: 9,
+        fontSize: 11,
         fontWeight: '900',
         letterSpacing: 1,
         marginBottom: 8,
@@ -665,12 +665,12 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start'
     },
     textInput: {
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: '700',
         padding: 0
     },
     textArea: {
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: '700',
         padding: 0,
         height: '100%',
@@ -688,7 +688,7 @@ const styles = StyleSheet.create({
         marginBottom: 8
     },
     diagnosticsTitle: {
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: '900',
         marginLeft: 8,
         textTransform: 'uppercase',
@@ -736,7 +736,7 @@ const styles = StyleSheet.create({
     },
     submitButtonText: {
         color: 'white',
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: '900',
         textTransform: 'uppercase',
         letterSpacing: 1
@@ -757,7 +757,7 @@ const styles = StyleSheet.create({
         borderWidth: 2
     },
     successTitle: {
-        fontSize: 26,
+        fontSize: 18,
         fontWeight: '900',
         letterSpacing: -0.5,
         marginBottom: 12
@@ -770,12 +770,12 @@ const styles = StyleSheet.create({
     },
     successPillText: {
         color: 'white',
-        fontSize: 9,
+        fontSize: 11,
         fontWeight: '900',
         letterSpacing: 1.5
     },
     successDescription: {
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: '600',
         textAlign: 'center',
         lineHeight: 20,
@@ -794,7 +794,7 @@ const styles = StyleSheet.create({
     successButtonText: {
         color: 'white',
         fontWeight: '900',
-        fontSize: 13,
+        fontSize: 12,
         textTransform: 'uppercase',
         letterSpacing: 0.5
     },
@@ -808,7 +808,7 @@ const styles = StyleSheet.create({
     },
     backHomeButtonText: {
         fontWeight: '900',
-        fontSize: 13,
+        fontSize: 12,
         textTransform: 'uppercase',
         letterSpacing: 0.5
     },
@@ -835,7 +835,7 @@ const styles = StyleSheet.create({
         borderWidth: 1
     },
     reportStatusText: {
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: '900',
         textTransform: 'uppercase',
         letterSpacing: 0.5
@@ -845,14 +845,14 @@ const styles = StyleSheet.create({
         fontWeight: '800'
     },
     reportSubject: {
-        fontSize: 18,
+        fontSize: 15,
         fontWeight: '900',
         marginBottom: 8,
         letterSpacing: -0.5,
         textTransform: 'uppercase'
     },
     reportDesc: {
-        fontSize: 13,
+        fontSize: 12,
         fontWeight: '600',
         lineHeight: 20,
         marginBottom: 15

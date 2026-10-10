@@ -391,10 +391,10 @@ export default function VenueDetailsScreen() {
                         elevation: isDark ? 10 : 0
                     }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Text style={{ color: C.text, fontSize: 28, fontWeight: '900', letterSpacing: -1, flex: 1 }}>{venue?.name}</Text>
+                            <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', letterSpacing: -1, flex: 1 }}>{venue?.name}</Text>
                             <View style={{ backgroundColor: accent + '15', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, flexDirection: 'row', alignItems: 'center' }}>
                                 <Star color={accent} size={14} fill={accent} />
-                                <Text style={{ color: accent, fontWeight: '900', fontSize: 13, marginLeft: 6 }}>
+                                <Text style={{ color: accent, fontWeight: '900', fontSize: 12, marginLeft: 6 }}>
                                     {reviews.length > 0 
                                         ? (Math.round((reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length) * 10) / 10).toFixed(1)
                                         : '0.0'
@@ -405,23 +405,23 @@ export default function VenueDetailsScreen() {
 
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12 }}>
                             <MapPin color={C.sub} size={14} />
-                            <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', marginLeft: 8 }}>{venue?.address}</Text>
+                            <Text style={{ color: C.sub, fontSize: 12, fontWeight: '700', marginLeft: 8 }}>{venue?.address}</Text>
                         </View>
 
                         <View style={{ flexDirection: 'row', marginTop: 30, gap: 15 }}>
                             <View style={{ flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', borderRadius: 20, padding: 15, borderWidth: 1, borderColor: C.border }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                                     <Clock color={accent} size={14} />
-                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', marginLeft: 6 }}>HORARIO DE HOY</Text>
+                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', marginLeft: 6 }}>HORARIO DE HOY</Text>
                                 </View>
-                                <Text style={{ color: C.text, fontSize: 13, fontWeight: '800' }}>{currentDayHours}</Text>
+                                <Text style={{ color: C.text, fontSize: 12, fontWeight: '800' }}>{currentDayHours}</Text>
                             </View>
                             <View style={{ flex: 1, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', borderRadius: 20, padding: 15, borderWidth: 1, borderColor: C.border }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}>
                                     <LayoutDashboard color={accent} size={14} />
-                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', marginLeft: 6 }}>CANCHAS</Text>
+                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', marginLeft: 6 }}>CANCHAS</Text>
                                 </View>
-                                <Text style={{ color: C.text, fontSize: 14, fontWeight: '800' }}>{courts.length} Disponibles</Text>
+                                <Text style={{ color: C.text, fontSize: 13, fontWeight: '800' }}>{courts.length} Disponibles</Text>
                             </View>
                         </View>
 
@@ -429,7 +429,7 @@ export default function VenueDetailsScreen() {
                             <View style={{ flexDirection: 'row', gap: 10 }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9', paddingHorizontal: 15, borderRadius: 15, borderWidth: 1, borderColor: C.border }}>
                                     <Navigation2 color={accent} size={16} fill={accent} />
-                                    <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', marginLeft: 10 }}>{distance || '---'}</Text>
+                                    <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', marginLeft: 10 }}>{distance || '---'}</Text>
                                 </View>
                                 <TouchableOpacity onPress={openMaps} style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: '#3b82f615', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(59,130,246,0.1)' }}>
                                     <Navigation2 color="#3b82f6" size={24} />
@@ -459,14 +459,14 @@ export default function VenueDetailsScreen() {
                     
                     {bookingStep === 1 && (
                         <View style={{ paddingHorizontal: 30 }}>
-                            <Text style={{ color: C.text, fontSize: 24, fontWeight: '900', marginBottom: 20 }}>Selecciona tu Disciplina</Text>
+                            <Text style={{ color: C.text, fontSize: 17, fontWeight: '900', marginBottom: 20 }}>Selecciona tu Disciplina</Text>
                             <View style={{ gap: 15 }}>
                                 {availableSports.map(sport => {
                                     const info = getSportInfo(sport);
                                     return (
                                         <TouchableOpacity key={sport} onPress={() => { setSelectedSport(sport); setBookingStep(2); }} style={{ height: 90, backgroundColor: C.card, borderRadius: 25, borderWidth: 1, borderColor: selectedSport === sport ? info.color : C.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25, shadowColor: info.color, shadowOpacity: selectedSport === sport ? 0.2 : 0, shadowRadius: 10, elevation: selectedSport === sport ? 5 : 0 }}>
                                             <View style={{ width: 50, height: 50, borderRadius: 15, backgroundColor: info.color + '15', alignItems: 'center', justifyContent: 'center' }}><info.icon color={info.color} size={24} /></View>
-                                            <Text style={{ flex: 1, marginLeft: 20, color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase' }}>{sport}</Text>
+                                            <Text style={{ flex: 1, marginLeft: 20, color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase' }}>{sport}</Text>
                                             <ArrowRight color={C.sub} size={20} />
                                         </TouchableOpacity>
                                     );
@@ -557,17 +557,17 @@ export default function VenueDetailsScreen() {
 
                     {bookingStep === 4 && (
                         <View style={{ paddingHorizontal: 30 }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 25 }}><Text style={{ color: C.text, fontSize: 24, fontWeight: '900' }}>Resumen Elite</Text><TouchableOpacity onPress={() => setBookingStep(2)} style={{ backgroundColor: activeSportInfo.color + '15', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 10 }}><Text style={{ color: activeSportInfo.color, fontWeight: '900', fontSize: 11 }}>EDITAR</Text></TouchableOpacity></View>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 25 }}><Text style={{ color: C.text, fontSize: 17, fontWeight: '900' }}>Resumen Elite</Text><TouchableOpacity onPress={() => setBookingStep(2)} style={{ backgroundColor: activeSportInfo.color + '15', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 10 }}><Text style={{ color: activeSportInfo.color, fontWeight: '900', fontSize: 11 }}>EDITAR</Text></TouchableOpacity></View>
                             
                             <View style={{ backgroundColor: C.card, borderRadius: 35, padding: 30, borderWidth: 1, borderColor: activeSportInfo.color + '30', shadowColor: activeSportInfo.color, shadowOpacity: 0.1, shadowRadius: 20 }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 25 }}>
                                     <View style={{ width: 55, height: 55, borderRadius: 18, backgroundColor: activeSportInfo.color + '15', alignItems: 'center', justifyContent: 'center' }}><activeSportInfo.icon color={activeSportInfo.color} size={24} /></View>
-                                    <View style={{ marginLeft: 20 }}><Text style={{ color: C.text, fontSize: 20, fontWeight: '900' }}>{selectedSport}</Text><Text style={{ color: C.sub, fontSize: 11, fontWeight: '800' }}>{courts.find(c => c.id === selectedCourtId)?.name}</Text></View>
+                                    <View style={{ marginLeft: 20 }}><Text style={{ color: C.text, fontSize: 16, fontWeight: '900' }}>{selectedSport}</Text><Text style={{ color: C.sub, fontSize: 11, fontWeight: '800' }}>{courts.find(c => c.id === selectedCourtId)?.name}</Text></View>
                                 </View>
                                 <ConfirmItem label="FECHA" value={new Date(selectedDate + 'T12:00:00').toLocaleDateString('es-CL', { day: 'numeric', month: 'long' })} C={C} />
                                 <ConfirmItem label="HORARIO" value={`${selectedTime} HRS`} C={C} />
                                 <View style={{ marginTop: 25, paddingTop: 25, borderTopWidth: 1, borderTopColor: C.border, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <View><Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', letterSpacing: 1 }}>TOTAL A PAGAR</Text><Text style={{ color: C.text, fontSize: 32, fontWeight: '900', letterSpacing: -1 }}>${(venue?.pricing?.[selectedSport!]?.[selectedTime!] || venue?.pricing?.[selectedSport!]?.default || 18000).toLocaleString('es-CL')}</Text></View>
+                                    <View><Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', letterSpacing: 1 }}>TOTAL A PAGAR</Text><Text style={{ color: C.text, fontSize: 18, fontWeight: '900', letterSpacing: -1 }}>${(venue?.pricing?.[selectedSport!]?.[selectedTime!] || venue?.pricing?.[selectedSport!]?.default || 18000).toLocaleString('es-CL')}</Text></View>
                                     <View style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: activeSportInfo.color, alignItems: 'center', justifyContent: 'center', shadowColor: activeSportInfo.color, shadowOpacity: 0.4, shadowRadius: 10, elevation: 5 }}><ShieldCheck color="white" size={24} /></View>
                                 </View>
                             </View>
@@ -594,7 +594,7 @@ export default function VenueDetailsScreen() {
                                 ) : (
                                     <>
                                         <Zap color="white" size={20} fill="white" />
-                                        <Text style={{ color: 'white', fontWeight: '900', fontSize: 16, marginLeft: 15, letterSpacing: 1 }}>RESERVAR AHORA</Text>
+                                        <Text style={{ color: 'white', fontWeight: '900', fontSize: 14, marginLeft: 15, letterSpacing: 1 }}>RESERVAR AHORA</Text>
                                     </>
                                 )}
                             </TouchableOpacity>
@@ -604,7 +604,7 @@ export default function VenueDetailsScreen() {
                     {/* SECCIÓN DE OPINIONES */}
                     <View style={{ marginTop: 40, paddingHorizontal: 30, marginBottom: 20 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={{ color: C.text, fontSize: 22, fontWeight: '900' }}>Opiniones de Jugadores</Text>
+                            <Text style={{ color: C.text, fontSize: 16, fontWeight: '900' }}>Opiniones de Jugadores</Text>
                             <View style={{ backgroundColor: accent + '10', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 }}>
                                 <Text style={{ color: accent, fontWeight: '900', fontSize: 12 }}>{reviews.length}</Text>
                             </View>
@@ -618,10 +618,10 @@ export default function VenueDetailsScreen() {
                         <View style={{ backgroundColor: C.card, borderRadius: 25, padding: 20, borderWidth: 1, borderColor: C.border }}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                                 <View style={{ flex: 1, marginRight: 10 }}>
-                                    <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', textTransform: 'uppercase' }} numberOfLines={1}>
+                                    <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', textTransform: 'uppercase' }} numberOfLines={1}>
                                         {typeof rev.userName === 'string' ? rev.userName : (rev.userName?.userName || 'Jugador MVP')}
                                     </Text>
-                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '800' }}>
+                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '800' }}>
                                         {rev.date?.toDate ? rev.date.toDate().toLocaleDateString('es-CL', { day: '2-digit', month: 'short' }) : 'Reciente'} • {typeof rev.sport === 'string' ? rev.sport : 'General'}
                                     </Text>
                                 </View>
@@ -642,7 +642,7 @@ export default function VenueDetailsScreen() {
                         <View style={{ paddingHorizontal: 30 }}>
                             <View style={{ backgroundColor: C.card, borderRadius: 25, padding: 30, alignItems: 'center', borderWidth: 1, borderColor: C.border, borderStyle: 'dashed' }}>
                                 <Info color={C.sub} size={30} strokeWidth={1.5} />
-                                <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', marginTop: 15, textAlign: 'center' }}>Aún no hay valoraciones para este recinto. ¡Sé el primero en jugar y calificar!</Text>
+                                <Text style={{ color: C.sub, fontSize: 12, fontWeight: '700', marginTop: 15, textAlign: 'center' }}>Aún no hay valoraciones para este recinto. ¡Sé el primero en jugar y calificar!</Text>
                             </View>
                         </View>
                     ) : null
@@ -686,7 +686,7 @@ const SlotGroup = ({ title, icon, slots, selectedTime, onSelect, C, activeColor,
     const now = new Date();
     return (
         <View style={{ marginBottom: 25 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>{icon}<Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2, marginLeft: 10 }}>{title}</Text></View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>{icon}<Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2, marginLeft: 10 }}>{title}</Text></View>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
                 {slots.map((time: string) => {
                     const [h, m] = time.split(':').map(Number);
@@ -717,7 +717,7 @@ const SlotGroup = ({ title, icon, slots, selectedTime, onSelect, C, activeColor,
                                 shadowRadius: 10
                             }}
                         >
-                            <Text style={{ color: selectedTime === time ? 'white' : (isPast ? C.sub : C.text), fontWeight: '900', fontSize: 14 }}>{time}</Text>
+                            <Text style={{ color: selectedTime === time ? 'white' : (isPast ? C.sub : C.text), fontWeight: '900', fontSize: 13 }}>{time}</Text>
                         </TouchableOpacity>
                     );
                 })}
@@ -727,7 +727,7 @@ const SlotGroup = ({ title, icon, slots, selectedTime, onSelect, C, activeColor,
 };
 
 const ConfirmItem = ({ label, value, C }: any) => (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}><Text style={{ color: C.sub, fontSize: 11, fontWeight: '800' }}>{label}</Text><Text style={{ color: C.text, fontSize: 14, fontWeight: '900' }}>{value}</Text></View>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}><Text style={{ color: C.sub, fontSize: 11, fontWeight: '800' }}>{label}</Text><Text style={{ color: C.text, fontSize: 13, fontWeight: '900' }}>{value}</Text></View>
 );
 
 const SectionLabel = ({ label, accent }: { label: string, accent: string }) => (

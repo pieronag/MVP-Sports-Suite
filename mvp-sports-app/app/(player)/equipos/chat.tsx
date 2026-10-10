@@ -138,10 +138,10 @@ export default function ChatEquiposScreen() {
                     <ChevronLeft color={COLORS.accent} size={24} />
                 </TouchableOpacity>
                 <View style={{ flex: 1, marginLeft: 20 }}>
-                    <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase' }} numberOfLines={1}>{teamName || team?.name || 'Sala de Chat'}</Text>
+                    <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase' }} numberOfLines={1}>{teamName || team?.name || 'Sala de Chat'}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 2 }}>
                         <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: COLORS.success, marginRight: 6 }} />
-                        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '800', textTransform: 'uppercase' }}>{team?.members?.length || 0} Jugadores en Línea</Text>
+                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '800', textTransform: 'uppercase' }}>{team?.members?.length || 0} Jugadores en Línea</Text>
                     </View>
                 </View>
                 <View style={{ width: 44, height: 44, borderRadius: 15, backgroundColor: COLORS.accent + '22', alignItems: 'center', justifyContent: 'center' }}>
@@ -169,7 +169,7 @@ export default function ChatEquiposScreen() {
                                     {/* SEPARADOR DE FECHA TIPO WHATSAPP */}
                                     <View style={{ alignItems: 'center', marginVertical: 15 }}>
                                         <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : '#E2E8F0', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 10 }}>
-                                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', textTransform: 'uppercase' }}>{group.dateLabel}</Text>
+                                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', textTransform: 'uppercase' }}>{group.dateLabel}</Text>
                                         </View>
                                     </View>
                                     
@@ -183,7 +183,7 @@ export default function ChatEquiposScreen() {
                                                     </View>
                                                 )}
                                                 <View style={{ maxWidth: width * 0.75 }}>
-                                                    {!isMe && <Text style={{ color: C.sub, fontSize: 10, fontWeight: '800', marginBottom: 2, marginLeft: 2 }}>{msg.senderName}</Text>}
+                                                    {!isMe && <Text style={{ color: C.sub, fontSize: 11, fontWeight: '800', marginBottom: 2, marginLeft: 2 }}>{msg.senderName}</Text>}
                                                     <View style={{ 
                                                         backgroundColor: isMe ? COLORS.accent : (isDark ? '#1E293B' : '#FFFFFF'),
                                                         paddingHorizontal: 12, paddingVertical: 8, borderRadius: 16, 
@@ -191,8 +191,8 @@ export default function ChatEquiposScreen() {
                                                         borderWidth: isDark || isMe ? 0 : 1, borderColor: '#E2E8F0',
                                                         flexDirection: 'row', alignItems: 'flex-end', flexWrap: 'wrap'
                                                     }}>
-                                                        <Text style={{ color: isMe ? 'white' : C.text, fontSize: 15, fontWeight: '500', lineHeight: 20, marginRight: 10, marginBottom: 2 }}>{msg.text}</Text>
-                                                        <Text style={{ color: isMe ? 'rgba(255,255,255,0.7)' : C.sub, fontSize: 9, fontWeight: '700', alignSelf: 'flex-end' }}>{formatTime(msg.createdAt)}</Text>
+                                                        <Text style={{ color: isMe ? 'white' : C.text, fontSize: 14, fontWeight: '500', lineHeight: 20, marginRight: 10, marginBottom: 2 }}>{msg.text}</Text>
+                                                        <Text style={{ color: isMe ? 'rgba(255,255,255,0.7)' : C.sub, fontSize: 11, fontWeight: '700', alignSelf: 'flex-end' }}>{formatTime(msg.createdAt)}</Text>
                                                     </View>
                                                 </View>
                                             </View>
@@ -213,7 +213,7 @@ export default function ChatEquiposScreen() {
                                 onChangeText={setNewMessage} 
                                 placeholder="Escribe un mensaje..." 
                                 placeholderTextColor={C.sub}
-                                style={{ color: C.text, fontSize: 16, fontWeight: '600' }}
+                                style={{ color: C.text, fontSize: 14, fontWeight: '600' }}
                                 multiline
                             />
                         </View>

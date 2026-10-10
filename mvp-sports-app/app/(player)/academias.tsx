@@ -103,18 +103,18 @@ export default function AcademiasScreen() {
                     <View style={{ width: 140, height: 140, borderRadius: 50, backgroundColor: accent + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 35, borderWidth: 2, borderColor: accent + '30' }}>
                         <GraduationCap color={accent} size={64} strokeWidth={1.5} />
                     </View>
-                    <Text style={{ color: C.text, fontSize: 32, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', letterSpacing: -1, marginBottom: 15 }}>Academias MVP</Text>
+                    <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', letterSpacing: -1, marginBottom: 15 }}>Academias MVP</Text>
                     <View style={{ backgroundColor: accent, paddingHorizontal: 15, paddingVertical: 6, borderRadius: 10, marginBottom: 25 }}>
-                        <Text style={{ color: 'white', fontSize: 10, fontWeight: '900', letterSpacing: 2, textTransform: 'uppercase' }}>Próximamente</Text>
+                        <Text style={{ color: 'white', fontSize: 11, fontWeight: '900', letterSpacing: 2, textTransform: 'uppercase' }}>Próximamente</Text>
                     </View>
-                    <Text style={{ color: C.sub, fontSize: 14, fontWeight: '700', textAlign: 'center', lineHeight: 22, maxWidth: 300, marginBottom: 45 }}>
+                    <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', lineHeight: 22, maxWidth: 300, marginBottom: 45 }}>
                         Potencia tu rendimiento con clases impartidas por instructores certificados, planes personalizados y seguimiento de tu progreso semanal.
                     </Text>
                     <TouchableOpacity
                         onPress={() => router.back()}
                         style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', height: 65, width: '100%', borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}
                     >
-                        <Text style={{ color: C.text, fontWeight: '900', fontSize: 13, textTransform: 'uppercase', letterSpacing: 1 }}>Volver</Text>
+                        <Text style={{ color: C.text, fontWeight: '900', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>Volver</Text>
                     </TouchableOpacity>
                 </View>
             </Modal>
@@ -126,7 +126,7 @@ export default function AcademiasScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={accent} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Academias</Text>
+                <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Academias</Text>
                 <View style={{ width: 44 }} />
             </View>
 
@@ -156,7 +156,7 @@ export default function AcademiasScreen() {
                                 }}
                             >
                                 <cat.icon color={activeSport === cat.id ? 'white' : C.sub} size={14} />
-                                <Text style={{ marginLeft: 8, color: activeSport === cat.id ? 'white' : C.text, fontWeight: '900', fontSize: 10, textTransform: 'uppercase' }}>{cat.name}</Text>
+                                <Text style={{ marginLeft: 8, color: activeSport === cat.id ? 'white' : C.text, fontWeight: '900', fontSize: 11, textTransform: 'uppercase' }}>{cat.name}</Text>
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
@@ -174,10 +174,10 @@ export default function AcademiasScreen() {
                                 <GraduationCap color="white" size={24} />
                             </View>
                             <View style={{ backgroundColor: 'rgba(255,255,255,0.2)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
-                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 8, letterSpacing: 1 }}>INSCRIPCIONES 2026</Text>
+                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 11, letterSpacing: 1 }}>INSCRIPCIONES 2026</Text>
                             </View>
                         </View>
-                        <Text style={{ color: 'white', fontSize: 28, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Aprende de los Mejores</Text>
+                        <Text style={{ color: 'white', fontSize: 18, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Aprende de los Mejores</Text>
                         <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 11, fontWeight: '700', marginTop: 5 }}>Inscríbete en una academia y sube tu nivel de juego con XP garantizados.</Text>
                     </LinearGradient>
                 </View>
@@ -191,7 +191,7 @@ export default function AcademiasScreen() {
                     ) : filteredAcademias.length === 0 ? (
                         <View style={{ padding: 60, alignItems: 'center', borderStyle: 'dashed', borderWidth: 1, borderColor: C.border, borderRadius: 35 }}>
                             <BookOpen color={C.sub} size={32} />
-                            <Text style={{ color: C.sub, fontWeight: '800', fontSize: 10, marginTop: 15, textTransform: 'uppercase' }}>No hay academias para este deporte</Text>
+                            <Text style={{ color: C.sub, fontWeight: '800', fontSize: 11, marginTop: 15, textTransform: 'uppercase' }}>No hay academias para este deporte</Text>
                         </View>
                     ) : (
                         filteredAcademias.map((academia) => (
@@ -223,11 +223,11 @@ export default function AcademiasScreen() {
                                     <View style={{ position: 'absolute', bottom: 20, left: 25 }}>
                                         <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
                                             <View style={{ backgroundColor: accent, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
-                                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 8 }}>{academia.status === 'active' ? 'ACTIVA' : 'DISPONIBLE'}</Text>
+                                                <Text style={{ color: 'white', fontWeight: '900', fontSize: 11 }}>{academia.status === 'active' ? 'ACTIVA' : 'DISPONIBLE'}</Text>
                                             </View>
-                                            <Text style={{ color: 'rgba(255,255,255,0.8)', fontWeight: '900', fontSize: 9, marginLeft: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{academia.level || academia.nivel || 'General'}</Text>
+                                            <Text style={{ color: 'rgba(255,255,255,0.8)', fontWeight: '900', fontSize: 11, marginLeft: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{academia.level || academia.nivel || 'General'}</Text>
                                         </View>
-                                        <Text style={{ color: 'white', fontSize: 24, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{academia.name || academia.nombre}</Text>
+                                        <Text style={{ color: 'white', fontSize: 17, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{academia.name || academia.nombre}</Text>
                                     </View>
                                 </View>
 
@@ -239,12 +239,12 @@ export default function AcademiasScreen() {
 
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 15, borderTopWidth: 1, borderTopColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }}>
                                         <View style={{ flex: 1 }}>
-                                            <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>HORARIO</Text>
-                                            <Text style={{ color: C.text, fontSize: 13, fontWeight: '900' }}>{academia.schedule || academia.horario || 'Por confirmar'}</Text>
+                                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>HORARIO</Text>
+                                            <Text style={{ color: C.text, fontSize: 12, fontWeight: '900' }}>{academia.schedule || academia.horario || 'Por confirmar'}</Text>
                                         </View>
                                         <View style={{ flex: 1, alignItems: 'center', borderLeftWidth: 1, borderColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9' }}>
-                                            <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>ALUMNOS</Text>
-                                            <Text style={{ color: C.text, fontSize: 16, fontWeight: '900' }}>{academia.enrolled || academia.cupos || '0/20'}</Text>
+                                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>ALUMNOS</Text>
+                                            <Text style={{ color: C.text, fontSize: 14, fontWeight: '900' }}>{academia.enrolled || academia.cupos || '0/20'}</Text>
                                         </View>
                                     </View>
 
@@ -252,7 +252,7 @@ export default function AcademiasScreen() {
                                         activeOpacity={0.8}
                                         style={{ backgroundColor: accent, height: 50, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginTop: 10, flexDirection: 'row', shadowColor: accent, shadowOpacity: 0.3, shadowRadius: 10, elevation: 5 }}
                                     >
-                                        <Text style={{ color: 'white', fontWeight: '900', fontSize: 13, letterSpacing: 1 }}>VER DETALLES</Text>
+                                        <Text style={{ color: 'white', fontWeight: '900', fontSize: 12, letterSpacing: 1 }}>VER DETALLES</Text>
                                         <ArrowRight size={16} color="white" style={{ marginLeft: 10 }} />
                                     </TouchableOpacity>
                                 </View>

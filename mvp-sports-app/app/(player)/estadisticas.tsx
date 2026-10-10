@@ -635,7 +635,7 @@ export default function EstadisticasScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : C.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                     <ChevronLeft color={accent} size={24} />
                 </TouchableOpacity>
-                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Estadísticas</Text>
+                <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -1 }}>Estadísticas</Text>
                 <View style={{ width: 44 }} />
             </View>
 
@@ -656,22 +656,22 @@ export default function EstadisticasScreen() {
                     }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                             <View>
-                                <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Rango Actual</Text>
+                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 }}>Rango Actual</Text>
                                 <Text style={{ color: analytics.rangoActual.color, fontSize: 38, fontWeight: '900', letterSpacing: -1 }}>{analytics.rangoActual.name}</Text>
                                 <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, marginTop: 10, alignSelf: 'flex-start', borderWidth: 1, borderColor: C.border }}>
-                                    <Text style={{ color: C.text, fontSize: 10, fontWeight: '900' }}>VALORACIÓN GENERAL: {analytics.nivel}</Text>
+                                    <Text style={{ color: C.text, fontSize: 11, fontWeight: '900' }}>VALORACIÓN GENERAL: {analytics.nivel}</Text>
                                 </View>
                             </View>
                             <View style={{ alignItems: 'flex-end' }}>
-                                <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase' }}>Puntos Totales</Text>
-                                <Text style={{ color: C.text, fontSize: 32, fontWeight: '900' }}>{analytics.puntosTotales.toLocaleString()}</Text>
-                                <Text style={{ color: accent, fontSize: 9, fontWeight: '900', letterSpacing: 1 }}>XP ACUMULADOS</Text>
+                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>Puntos Totales</Text>
+                                <Text style={{ color: C.text, fontSize: 18, fontWeight: '900' }}>{analytics.puntosTotales.toLocaleString()}</Text>
+                                <Text style={{ color: accent, fontSize: 11, fontWeight: '900', letterSpacing: 1 }}>XP ACUMULADOS</Text>
                             </View>
                         </View>
 
                         <View style={{ marginTop: 40 }}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
-                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900' }}>
+                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900' }}>
                                     {analytics.rangoActual.id === analytics.siguienteRango.id ? 'NIVEL MÁXIMO ALCANZADO' : `SIGUIENTE NIVEL: ${analytics.siguienteRango.name}`}
                                 </Text>
                                 <Text style={{ color: C.text, fontSize: 11, fontWeight: '900' }}>{analytics.progreso}%</Text>
@@ -807,14 +807,14 @@ export default function EstadisticasScreen() {
                                                         
                                                         <View style={{ flex: 1 }}>
                                                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                                                                <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>
+                                                                <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>
                                                                     {b.badgeName}
                                                                 </Text>
                                                                 <View style={{ backgroundColor: b.badgeColor + '20', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
                                                                     <Text style={{ color: b.badgeColor, fontSize: 7, fontWeight: '900', letterSpacing: 1 }}>{b.badgeTier}</Text>
                                                                 </View>
                                                             </View>
-                                                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '700', marginTop: 4 }}>
+                                                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', marginTop: 4 }}>
                                                                 {b.badgeDesc}
                                                             </Text>
                                                         </View>
@@ -830,10 +830,10 @@ export default function EstadisticasScreen() {
                                                             borderColor: b.badgeColor + '30', 
                                                             alignItems: 'center' 
                                                         }}>
-                                                            <Text style={{ color: b.badgeColor, fontSize: 18, fontWeight: '900' }}>
+                                                            <Text style={{ color: b.badgeColor, fontSize: 15, fontWeight: '900' }}>
                                                                 +{b.xpBonus}
                                                             </Text>
-                                                            <Text style={{ color: b.badgeColor, fontSize: 8, fontWeight: '900', letterSpacing: 0.5 }}>XP BONUS</Text>
+                                                            <Text style={{ color: b.badgeColor, fontSize: 11, fontWeight: '900', letterSpacing: 0.5 }}>XP BONUS</Text>
                                                         </View>
                                                     </View>
                                                 </View>
@@ -865,33 +865,33 @@ export default function EstadisticasScreen() {
                                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                                                         <View style={{ backgroundColor: 'rgba(99,102,241,0.1)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.2)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
-                                                            <Text style={{ color: '#6366f1', fontSize: 8, fontWeight: '900', letterSpacing: 1 }}>PARTIDO INTERNO</Text>
+                                                            <Text style={{ color: '#6366f1', fontSize: 11, fontWeight: '900', letterSpacing: 1 }}>PARTIDO INTERNO</Text>
                                                         </View>
-                                                        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '800' }}>{b.dateObj.toLocaleDateString('es-CL')}</Text>
+                                                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '800' }}>{b.dateObj.toLocaleDateString('es-CL')}</Text>
                                                     </View>
                                                     
                                                     {/* XP Display */}
                                                     {b.matchXP !== null && (
                                                         <View style={{ backgroundColor: b.matchXP >= 0 ? 'rgba(16,185,129,0.1)' : 'rgba(244,63,94,0.1)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: b.matchXP >= 0 ? 'rgba(16,185,129,0.2)' : 'rgba(244,63,94,0.2)' }}>
-                                                            <Text style={{ color: b.matchXP >= 0 ? '#10b981' : '#f43f5e', fontSize: 8, fontWeight: '900' }}>
+                                                            <Text style={{ color: b.matchXP >= 0 ? '#10b981' : '#f43f5e', fontSize: 11, fontWeight: '900' }}>
                                                                 {b.matchXP >= 0 ? `+${b.matchXP}` : b.matchXP} XP
                                                             </Text>
                                                         </View>
                                                     )}
                                                 </View>
 
-                                                <Text style={{ color: C.text, fontSize: 16, fontWeight: '900', textTransform: 'uppercase', marginBottom: 15, letterSpacing: -0.5 }}>{b.tenantName}</Text>
+                                                <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', textTransform: 'uppercase', marginBottom: 15, letterSpacing: -0.5 }}>{b.tenantName}</Text>
 
                                                 {/* SCOREBOARD */}
                                                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#F8FAFC', padding: 20, borderRadius: 25, borderWidth: 1, borderColor: C.border, marginBottom: 15 }}>
                                                     <View style={{ flex: 1, alignItems: 'center' }}>
                                                         <Text style={{ color: '#ef4444', fontSize: 11, fontWeight: '900', letterSpacing: 0.5 }}>🔴 EQUIPO A</Text>
-                                                        <Text style={{ color: C.text, fontSize: 32, fontWeight: '900', marginTop: 5 }}>{scoreA}</Text>
+                                                        <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', marginTop: 5 }}>{scoreA}</Text>
                                                     </View>
-                                                    <Text style={{ color: C.sub, fontSize: 14, fontWeight: '900', marginHorizontal: 20 }}>VS</Text>
+                                                    <Text style={{ color: C.sub, fontSize: 13, fontWeight: '900', marginHorizontal: 20 }}>VS</Text>
                                                     <View style={{ flex: 1, alignItems: 'center' }}>
                                                         <Text style={{ color: '#3b82f6', fontSize: 11, fontWeight: '900', letterSpacing: 0.5 }}>🔵 EQUIPO B</Text>
-                                                        <Text style={{ color: C.text, fontSize: 32, fontWeight: '900', marginTop: 5 }}>{scoreB}</Text>
+                                                        <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', marginTop: 5 }}>{scoreB}</Text>
                                                     </View>
                                                 </View>
 
@@ -899,11 +899,11 @@ export default function EstadisticasScreen() {
                                                 <View style={{ gap: 10 }}>
                                                     {teamAStats.length > 0 && (
                                                         <View>
-                                                            <Text style={{ color: '#ef4444', fontSize: 8, fontWeight: '900', textTransform: 'uppercase', marginBottom: 6, letterSpacing: 0.5 }}>Goleadores Equipo A:</Text>
+                                                            <Text style={{ color: '#ef4444', fontSize: 11, fontWeight: '900', textTransform: 'uppercase', marginBottom: 6, letterSpacing: 0.5 }}>Goleadores Equipo A:</Text>
                                                             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                                                                 {teamAStats.map(([uid, g]: any) => (
                                                                     <View key={uid} style={{ backgroundColor: 'rgba(239,68,68,0.08)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(239,68,68,0.15)' }}>
-                                                                        <Text style={{ color: C.text, fontSize: 9, fontWeight: '800' }}>
+                                                                        <Text style={{ color: C.text, fontSize: 11, fontWeight: '800' }}>
                                                                             {uid === user?.uid ? 'Tú' : (b.teamMemberNames?.[uid] || 'Compañero').split(' ')[0]}: <Text style={{ color: '#ef4444', fontWeight: '900' }}>{g} G</Text>
                                                                         </Text>
                                                                     </View>
@@ -914,11 +914,11 @@ export default function EstadisticasScreen() {
 
                                                     {teamBStats.length > 0 && (
                                                         <View>
-                                                            <Text style={{ color: '#3b82f6', fontSize: 8, fontWeight: '900', textTransform: 'uppercase', marginBottom: 6, letterSpacing: 0.5 }}>Goleadores Equipo B:</Text>
+                                                            <Text style={{ color: '#3b82f6', fontSize: 11, fontWeight: '900', textTransform: 'uppercase', marginBottom: 6, letterSpacing: 0.5 }}>Goleadores Equipo B:</Text>
                                                             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                                                                 {teamBStats.map(([uid, g]: any) => (
                                                                     <View key={uid} style={{ backgroundColor: 'rgba(59,130,246,0.08)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(59,130,246,0.15)' }}>
-                                                                        <Text style={{ color: C.text, fontSize: 9, fontWeight: '800' }}>
+                                                                        <Text style={{ color: C.text, fontSize: 11, fontWeight: '800' }}>
                                                                             {uid === user?.uid ? 'Tú' : (b.teamMemberNames?.[uid] || 'Compañero').split(' ')[0]}: <Text style={{ color: '#3b82f6', fontWeight: '900' }}>{g} G</Text>
                                                                         </Text>
                                                                     </View>
@@ -949,12 +949,12 @@ export default function EstadisticasScreen() {
                                                 <View style={{ flex: 1 }}>
                                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                                                         <View style={{ backgroundColor: cStyles.bg, borderWidth: 1, borderColor: cStyles.border, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 }}>
-                                                            <Text style={{ color: cStyles.text, fontSize: 8, fontWeight: '900', letterSpacing: 1 }}>{b.resultText}</Text>
+                                                            <Text style={{ color: cStyles.text, fontSize: 11, fontWeight: '900', letterSpacing: 1 }}>{b.resultText}</Text>
                                                         </View>
-                                                        <Text style={{ color: C.sub, fontSize: 10, fontWeight: '800' }}>{b.formattedTime}</Text>
+                                                        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '800' }}>{b.formattedTime}</Text>
                                                     </View>
                                                     
-                                                    <Text style={{ color: C.text, fontSize: 17, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{b.tenantName}</Text>
+                                                    <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase', letterSpacing: -0.5 }}>{b.tenantName}</Text>
                                                     <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', marginBottom: 15 }}>{b.dateObj.toLocaleDateString('es-CL')} • {b.sport || 'FÚTBOL'}</Text>
                                                     
                                                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -963,7 +963,7 @@ export default function EstadisticasScreen() {
                                                             return (
                                                                 <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F8FAFC', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 10, borderWidth: 1, borderColor: C.border }}>
                                                                     <PIcon size={12} color={perf.color} strokeWidth={3} />
-                                                                    <Text style={{ color: C.text, fontSize: 10, fontWeight: '900' }}>{perf.text}</Text>
+                                                                    <Text style={{ color: C.text, fontSize: 11, fontWeight: '900' }}>{perf.text}</Text>
                                                                 </View>
                                                             );
                                                         })}
@@ -983,7 +983,7 @@ export default function EstadisticasScreen() {
                                                                     borderColor: C.border 
                                                                 }}
                                                             >
-                                                                <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', letterSpacing: 0.8 }}>
+                                                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', letterSpacing: 0.8 }}>
                                                                     ESTADÍSTICAS REGISTRADAS
                                                                 </Text>
                                                             </View>
@@ -1002,7 +1002,7 @@ export default function EstadisticasScreen() {
                                                                     borderColor: accent + '35' 
                                                                 }}
                                                             >
-                                                                <Text style={{ color: accent, fontSize: 10, fontWeight: '900', letterSpacing: 0.8 }}>
+                                                                <Text style={{ color: accent, fontSize: 11, fontWeight: '900', letterSpacing: 0.8 }}>
                                                                     REGISTRAR RESULTADO / GOLES
                                                                 </Text>
                                                             </TouchableOpacity>
@@ -1012,19 +1012,19 @@ export default function EstadisticasScreen() {
                                                 <View style={{ alignItems: 'flex-end', marginLeft: 15 }}>
                                                     {b.resultType === 'cancelled' ? (
                                                         <View style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 15, borderWidth: 1, borderColor: C.border, alignItems: 'center' }}>
-                                                            <Text style={{ color: C.sub, fontSize: 16, fontWeight: '900' }}>0 XP</Text>
-                                                            <Text style={{ color: C.sub, fontSize: 8, fontWeight: '900', letterSpacing: 1 }}>SIN PUNTOS</Text>
+                                                            <Text style={{ color: C.sub, fontSize: 14, fontWeight: '900' }}>0 XP</Text>
+                                                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', letterSpacing: 1 }}>SIN PUNTOS</Text>
                                                         </View>
                                                     ) : b.matchXP !== null ? (
                                                         <View style={{ backgroundColor: b.matchXP >= 0 ? 'rgba(16,185,129,0.1)' : 'rgba(244,63,94,0.1)', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 15, borderWidth: 1, borderColor: b.matchXP >= 0 ? 'rgba(16,185,129,0.2)' : 'rgba(244,63,94,0.2)', alignItems: 'center' }}>
-                                                            <Text style={{ color: b.matchXP >= 0 ? '#10b981' : '#f43f5e', fontSize: 20, fontWeight: '900' }}>
+                                                            <Text style={{ color: b.matchXP >= 0 ? '#10b981' : '#f43f5e', fontSize: 16, fontWeight: '900' }}>
                                                                 {b.matchXP >= 0 ? `+${b.matchXP}` : b.matchXP}
                                                             </Text>
-                                                            <Text style={{ color: b.matchXP >= 0 ? '#10b981' : '#f43f5e', fontSize: 9, fontWeight: '900', letterSpacing: 1 }}>PUNTOS ELO</Text>
+                                                            <Text style={{ color: b.matchXP >= 0 ? '#10b981' : '#f43f5e', fontSize: 11, fontWeight: '900', letterSpacing: 1 }}>PUNTOS ELO</Text>
                                                         </View>
                                                     ) : (
                                                         <View style={{ backgroundColor: 'transparent', paddingHorizontal: 8, paddingVertical: 8, alignItems: 'center' }}>
-                                                            <Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', letterSpacing: 1 }}>PROCESANDO</Text>
+                                                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', letterSpacing: 1 }}>PROCESANDO</Text>
                                                         </View>
                                                     )}
                                                 </View>
@@ -1068,7 +1068,7 @@ export default function EstadisticasScreen() {
                 <View style={{ flex: 1, backgroundColor: C.bg, paddingTop: 60, paddingHorizontal: 25, paddingBottom: 30 }}>
                     <View style={{ flex: 1 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 25 }}>
-                            <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textTransform: 'uppercase' }}>
+                            <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textTransform: 'uppercase' }}>
                                 {selectedMatch ? 'EDITAR PARTIDO' : 'REGISTRAR PARTIDO'}
                             </Text>
                             <TouchableOpacity onPress={() => setShowStatsModal(false)} style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9', alignItems: 'center', justifyContent: 'center' }}>
@@ -1087,12 +1087,12 @@ export default function EstadisticasScreen() {
                                     <MapPin color={accent} size={24} />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', textTransform: 'uppercase' }} numberOfLines={1}>
+                                    <Text style={{ color: C.text, fontSize: 12, fontWeight: '900', textTransform: 'uppercase' }} numberOfLines={1}>
                                         {selectedMatch.venueName || selectedMatch.tenantName || 'Recinto Deportivo'}
                                     </Text>
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
                                         <View style={{ backgroundColor: accent + '15', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
-                                            <Text style={{ color: accent, fontSize: 9, fontWeight: '900', textTransform: 'uppercase' }}>
+                                            <Text style={{ color: accent, fontSize: 11, fontWeight: '900', textTransform: 'uppercase' }}>
                                                 {selectedMatch.sport || 'FÚTBOL'}
                                             </Text>
                                         </View>
@@ -1134,7 +1134,7 @@ export default function EstadisticasScreen() {
                                                     <Text style={{ color: C.sub, fontSize: 11, fontWeight: '600', marginTop: 12, fontStyle: 'italic' }}>-</Text>
                                                 )
                                             ) : (
-                                                <Text style={{ color: C.text, fontSize: 36, fontWeight: '900', marginTop: 5 }}>{liveScoreA}</Text>
+                                                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', marginTop: 5 }}>{liveScoreA}</Text>
                                             )}
                                         </View>
                                         <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0', alignItems: 'center', justifyContent: 'center' }}>
@@ -1151,13 +1151,13 @@ export default function EstadisticasScreen() {
                                                     <Text style={{ color: C.sub, fontSize: 11, fontWeight: '600', marginTop: 12, fontStyle: 'italic' }}>-</Text>
                                                 )
                                             ) : (
-                                                <Text style={{ color: C.text, fontSize: 36, fontWeight: '900', marginTop: 5 }}>{liveScoreB}</Text>
+                                                <Text style={{ color: C.text, fontSize: 20, fontWeight: '900', marginTop: 5 }}>{liveScoreB}</Text>
                                             )}
                                         </View>
                                     </View>
 
                                     {/* OUTCOME / WINNER SELECTOR */}
-                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', marginBottom: 12, letterSpacing: 1 }}>
+                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', marginBottom: 12, letterSpacing: 1 }}>
                                         {isScorelessSport ? 'Equipo Ganador del Partido' : 'Resultado de tu Equipo'}
                                     </Text>
                                     <View style={{ flexDirection: 'row', backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9', borderRadius: 18, padding: 4, borderWidth: 1, borderColor: C.border, marginBottom: 25 }}>
@@ -1207,7 +1207,7 @@ export default function EstadisticasScreen() {
                                     </View>
 
                                     {/* SELECT TEAM */}
-                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', marginBottom: 12, letterSpacing: 1 }}>Seleccionar Plantilla</Text>
+                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', marginBottom: 12, letterSpacing: 1 }}>Seleccionar Plantilla</Text>
                                     {userTeams.length === 0 ? (
                                         <Text style={{ color: C.sub, fontSize: 12, fontWeight: '600', fontStyle: 'italic', marginBottom: 25 }}>No tienes equipos registrados. Crea uno en la sección de Equipos.</Text>
                                     ) : (
@@ -1237,7 +1237,7 @@ export default function EstadisticasScreen() {
                                     {/* ROSTER & TEAM ASSIGNMENT */}
                                     {selectedTeamId !== '' && (
                                         <>
-                                            <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', marginBottom: 12, letterSpacing: 1 }}>Roster y Asignación de Equipos</Text>
+                                            <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', marginBottom: 12, letterSpacing: 1 }}>Roster y Asignación de Equipos</Text>
                                             {loadingMembers ? (
                                                 <ActivityIndicator color={accent} style={{ marginVertical: 30 }} />
                                             ) : teamMembers.length === 0 ? (
@@ -1255,9 +1255,9 @@ export default function EstadisticasScreen() {
                                                                 {/* TOP ROW: NAME & TEAM ASSIGNMENT SELECTOR */}
                                                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                                                                     <View style={{ flex: 1, marginRight: 10 }}>
-                                                                        <Text style={{ color: C.text, fontSize: 13, fontWeight: '900' }} numberOfLines={1}>{member.displayName.toUpperCase()}</Text>
+                                                                        <Text style={{ color: C.text, fontSize: 12, fontWeight: '900' }} numberOfLines={1}>{member.displayName.toUpperCase()}</Text>
                                                                         {member.uid === user?.uid && (
-                                                                            <Text style={{ color: accent, fontSize: 8, fontWeight: '900', marginTop: 2 }}>TÚ</Text>
+                                                                            <Text style={{ color: accent, fontSize: 11, fontWeight: '900', marginTop: 2 }}>TÚ</Text>
                                                                         )}
                                                                     </View>
                                                                     
@@ -1269,7 +1269,7 @@ export default function EstadisticasScreen() {
                                                                                 backgroundColor: currentAssignment === 'A' ? '#ef4444' : 'transparent' 
                                                                             }}
                                                                         >
-                                                                            <Text style={{ color: currentAssignment === 'A' ? 'white' : C.sub, fontSize: 9, fontWeight: '900' }}>EQ. A</Text>
+                                                                            <Text style={{ color: currentAssignment === 'A' ? 'white' : C.sub, fontSize: 11, fontWeight: '900' }}>EQ. A</Text>
                                                                         </TouchableOpacity>
                                                                         <TouchableOpacity 
                                                                             onPress={() => setTeamAssignments(prev => ({ ...prev, [member.uid]: 'B' }))}
@@ -1278,7 +1278,7 @@ export default function EstadisticasScreen() {
                                                                                 backgroundColor: currentAssignment === 'B' ? '#3b82f6' : 'transparent' 
                                                                             }}
                                                                         >
-                                                                            <Text style={{ color: currentAssignment === 'B' ? 'white' : C.sub, fontSize: 9, fontWeight: '900' }}>EQ. B</Text>
+                                                                            <Text style={{ color: currentAssignment === 'B' ? 'white' : C.sub, fontSize: 11, fontWeight: '900' }}>EQ. B</Text>
                                                                         </TouchableOpacity>
                                                                         <TouchableOpacity 
                                                                             onPress={() => {
@@ -1291,7 +1291,7 @@ export default function EstadisticasScreen() {
                                                                                 backgroundColor: currentAssignment === 'N' ? C.sub : 'transparent' 
                                                                             }}
                                                                         >
-                                                                            <Text style={{ color: currentAssignment === 'N' ? 'white' : C.sub, fontSize: 9, fontWeight: '900' }}>NO JUGÓ</Text>
+                                                                            <Text style={{ color: currentAssignment === 'N' ? 'white' : C.sub, fontSize: 11, fontWeight: '900' }}>NO JUGÓ</Text>
                                                                         </TouchableOpacity>
                                                                     </View>
                                                                 </View>
@@ -1309,7 +1309,7 @@ export default function EstadisticasScreen() {
                                                                                 >
                                                                                     <Minus color={C.text} size={12} />
                                                                                 </TouchableOpacity>
-                                                                                <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', width: 16, textAlign: 'center' }}>{currentGoals}</Text>
+                                                                                <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', width: 16, textAlign: 'center' }}>{currentGoals}</Text>
                                                                                 <TouchableOpacity 
                                                                                     onPress={() => setMemberGoals(prev => ({ ...prev, [member.uid]: Math.min(20, (prev[member.uid] || 0) + 1) }))}
                                                                                     style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0', alignItems: 'center', justifyContent: 'center' }}
@@ -1329,7 +1329,7 @@ export default function EstadisticasScreen() {
                                                                                 >
                                                                                     <Minus color={C.text} size={12} />
                                                                                 </TouchableOpacity>
-                                                                                <Text style={{ color: C.text, fontSize: 14, fontWeight: '900', width: 16, textAlign: 'center' }}>{currentAssists}</Text>
+                                                                                <Text style={{ color: C.text, fontSize: 13, fontWeight: '900', width: 16, textAlign: 'center' }}>{currentAssists}</Text>
                                                                                 <TouchableOpacity 
                                                                                     onPress={() => setMemberAssists(prev => ({ ...prev, [member.uid]: Math.min(20, (prev[member.uid] || 0) + 1) }))}
                                                                                     style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#E2E8F0', alignItems: 'center', justifyContent: 'center' }}
@@ -1349,7 +1349,7 @@ export default function EstadisticasScreen() {
                                     )}
 
                                     {/* CHOOSE MVP OF THE MATCH */}
-                                    <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', marginBottom: 12, letterSpacing: 1 }}>🏆 ELEGIR MVP DEL PARTIDO</Text>
+                                    <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', marginBottom: 12, letterSpacing: 1 }}>🏆 ELEGIR MVP DEL PARTIDO</Text>
                                     {(() => {
                                         const playingMembers = teamMembers.filter(m => teamAssignments[m.uid] === 'A' || teamAssignments[m.uid] === 'B');
                                         if (playingMembers.length === 0) {
@@ -1389,7 +1389,7 @@ export default function EstadisticasScreen() {
                                                         );
                                                     })}
                                                 </ScrollView>
-                                                <Text style={{ color: C.sub, fontSize: 9, fontWeight: '700', textAlign: 'center', marginTop: 5 }}>Toca un jugador para elegirlo como la figura del partido (MVP)</Text>
+                                                <Text style={{ color: C.sub, fontSize: 11, fontWeight: '700', textAlign: 'center', marginTop: 5 }}>Toca un jugador para elegirlo como la figura del partido (MVP)</Text>
                                             </View>
                                         );
                                     })()}
@@ -1433,11 +1433,11 @@ export default function EstadisticasScreen() {
                             <AlertCircle color="#ef4444" size={32} />
                         </View>
 
-                        <Text style={{ color: C.text, fontSize: 18, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', marginBottom: 12 }}>
+                        <Text style={{ color: C.text, fontSize: 15, fontWeight: '900', textAlign: 'center', textTransform: 'uppercase', marginBottom: 12 }}>
                             ¿Confirmar Registro?
                         </Text>
 
-                        <Text style={{ color: C.sub, fontSize: 13, fontWeight: '700', textAlign: 'center', lineHeight: 20, marginBottom: 25 }}>
+                        <Text style={{ color: C.sub, fontSize: 12, fontWeight: '700', textAlign: 'center', lineHeight: 20, marginBottom: 25 }}>
                             Una vez guardada la información de este partido, no se podrá modificar. Por favor, asegúrate de que todos los datos sean correctos.
                         </Text>
 
@@ -1468,8 +1468,8 @@ const Ficha = ({ etiqueta, valor, icono: Icono, C, accent, isDark }: any) => (
         <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: accent + '15', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
             <Icono color={accent} size={22} />
         </View>
-        <Text style={{ color: C.text, fontSize: 15, fontWeight: '900' }}>{valor}</Text>
-        <Text style={{ color: C.sub, fontSize: 9, fontWeight: '900', textTransform: 'uppercase', marginTop: 4 }}>{etiqueta}</Text>
+        <Text style={{ color: C.text, fontSize: 14, fontWeight: '900' }}>{valor}</Text>
+        <Text style={{ color: C.sub, fontSize: 11, fontWeight: '900', textTransform: 'uppercase', marginTop: 4 }}>{etiqueta}</Text>
     </View>
 );
 
@@ -1479,10 +1479,10 @@ const ReglaItem = ({ icono: Icono, titulo, valor, C, accent, isDark }: any) => (
             <View style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F1F5F9', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}>
                 <Icono color={C.sub} size={18} />
             </View>
-            <Text style={{ marginLeft: 15, color: C.text, fontSize: 14, fontWeight: '700' }}>{titulo}</Text>
+            <Text style={{ marginLeft: 15, color: C.text, fontSize: 13, fontWeight: '700' }}>{titulo}</Text>
         </View>
         <View style={{ backgroundColor: accent + '10', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 }}>
-            <Text style={{ color: accent, fontSize: 14, fontWeight: '900' }}>{valor}</Text>
+            <Text style={{ color: accent, fontSize: 13, fontWeight: '900' }}>{valor}</Text>
         </View>
     </View>
 );
