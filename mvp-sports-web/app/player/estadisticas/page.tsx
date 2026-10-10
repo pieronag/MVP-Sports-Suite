@@ -17,6 +17,7 @@ import { gamificationService } from "@/services/client/player/gamificationServic
 import { bookingService, Booking } from "@/services/client/player/bookingService";
 import { userService } from "@/services/client/player/userService";
 import { teamService } from "@/services/client/player/teamService";
+import { postApi } from "@/services/client/apiClient";
 
 const RANGOS_CONFIG = [
   { id: 'bronze', name: 'Bronce', min: 0, color: '#cd7f32' },
@@ -184,7 +185,7 @@ export default function EstadisticasPage() {
       if (selectedMatch?.id) { await updateDoc(doc(db, 'bookings', selectedMatch.id), matchData); }
       else if (uid) { await addDoc(collection(db, 'bookings'), { ...matchData, userId: uid, status: 'completed', date: new Date(), isInternalMatch: true, tenantName: `PARTIDO INTERNO: ${teamName}` }); }
       if (uid) {
-        if (typeof (userService as any).awardInternalMatchXpAndStats === 'function') { await (userService as any).awardInternalMatchXpAndStats(teamAssignments, memberGoals, memberAssists, scoreA, scoreB, mvpUserIdInput, uid, activeUserOutcome); }
+        await postApi('/api/players/recompute', { uids: [uid, ...participantIds] }).catch(() => undefined);
       }
       setShowStatsModal(false); await loadData(true);
     } catch (error) { console.error(error); }

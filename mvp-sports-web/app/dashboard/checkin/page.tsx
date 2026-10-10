@@ -1,5 +1,5 @@
 "use client";
-import { syncBookingSlots } from "@/services/client/apiClient";
+import { postApi, syncBookingSlots } from "@/services/client/apiClient";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -454,6 +454,7 @@ export default function CheckInPage() {
                 await updateDoc(doc(db, "bookings", booking.id), updateData);
                 await syncBookingSlots(booking.id);
                 setBookings(prev => prev.map(b => b.id === booking.id ? { ...b, checkIn: true, status: 'active' } : b));
+                if (booking.userId) postApi('/api/players/recompute', { uids: [booking.userId] }).catch(() => undefined);
                 
                 await auditService.logAuditEvent({
                     action: 'RESERVA_CHECKIN',
@@ -531,6 +532,7 @@ export default function CheckInPage() {
             setBookings(prev => prev.map(b =>
                 b.id === booking.id ? { ...b, status: 'cancelled', noShow: true } : b
             ));
+            if (booking.userId) postApi('/api/players/recompute', { uids: [booking.userId] }).catch(() => undefined);
 
             setStatusModal({
                 isOpen: true,

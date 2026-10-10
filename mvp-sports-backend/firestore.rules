@@ -96,7 +96,9 @@ service cloud.firestore {
     // nunca puede escribirlos. Solo superadmin (cualquier valor) u owner
     // (únicamente para dar de alta/editar managers).
     function privilegedKeys() {
-      return ['role', 'tenantId', 'tenantIds', 'permissions', 'status', 'isAdmin'];
+      // Permisos y gamificación: la experiencia, el nivel y los logros solo los calcula el servidor
+      return ['role', 'tenantId', 'tenantIds', 'permissions', 'status', 'isAdmin',
+              'xp', 'ovr', 'tier', 'badges', 'badgeXpBonus', 'stats', 'lastStatsUpdate', 'lastELOUpdate', 'lastBulkSync'];
     }
 
     function touchesPrivileged() {
@@ -111,7 +113,9 @@ service cloud.firestore {
         && !('tenantIds' in d && d.tenantIds.size() > 0)
         && !('permissions' in d)
         && !('isAdmin' in d)
-        && (!('status' in d) || d.status == 'active');
+        && (!('status' in d) || d.status == 'active')
+        && (!('xp' in d) || d.xp == 0)
+        && (!('ovr' in d) || d.ovr <= 40);
     }
 
     // Owner gestionando a su personal: el rol resultante solo puede ser manager

@@ -2,10 +2,12 @@ import { NextResponse } from "next/server";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "@/services/server/firebase-admin";
 import { slotOf, rebuildCourtDay } from "@/services/server/bookingProjections";
+import { recomputePlayer } from "@/services/server/gamification";
 
 // Cron de Vercel. La plataforma es 100% online: nada pendiente de pago es una reserva válida.
 //  - Pago online iniciado y abandonado (más de 1 h): se borra.
 //  - Reservas antiguas (pago en el recinto o manuales del personal) e inscripciones: se cancelan y se libera el cupo.
+//  - Recalcula experiencia y logros de quienes jugaron en las últimas 48 h.
 
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
@@ -65,5 +67,12 @@ export async function GET(request: Request) {
     cancelledEnrollments++;
   }
 
-  return NextResponse.json({ ok: true, deleted, cancelledBookings, cancelledRegs, cancelledEnrollments });
+  // Experiencia y logros de quienes jugaron en las últimas 48 h
+  const recent = await db.collection("bookings").where("date", ">=", Timestamp.fromMillis(Date.now() - 48 * 3_600_000)).get();
+  const players = new Set<string>();
+  recent.docs.forEach((d) => { const b = d.data(); if (b.userId) players.add(b.userId); (b.participantIds || []).forEach((p: string) => players.add(p)); });
+  let recomputed = 0;
+  for (const uid of players) if (await recomputePlayer(uid).catch(() => null)) recomputed++;
+
+  return NextResponse.json({ ok: true, deleted, cancelledBookings, cancelledRegs, cancelledEnrollments, recomputed });
 }
