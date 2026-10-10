@@ -771,7 +771,7 @@ f(true);
                             placeholder="Buscar recinto, dueño o email..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-[10px] font-black outline-none text-slate-700 dark:text-white placeholder:text-slate-400 transition-all shadow-sm"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400 transition-all shadow-xs"
                         />
                     </div>
                     <div className="flex items-center rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 overflow-hidden">
@@ -809,7 +809,7 @@ f(true);
                         <select
                             value={planFilter}
                             onChange={(e) => setPlanFilter(e.target.value)}
-                            className="bg-transparent text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white"
+                            className="bg-transparent text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white"
                         >
                             {plansList.map(p => <option key={p} value={p}>{p}</option>)}
                         </select>
@@ -843,7 +843,7 @@ f(true);
                 <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-left min-w-[1000px]">
                         <thead>
-                            <tr className="bg-slate-50/60 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
+                            <tr className="bg-slate-50/60 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Centro operativo</th>
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Administración</th>
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Periodo</th>
@@ -855,7 +855,7 @@ f(true);
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                             {filteredInvoices.map((inv) => (
-                                <tr key={inv.id} className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors">
+                                <tr key={inv.id} className="hover:bg-slate-50/60 dark:hover:bg-white/2 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
                                             <p className="text-[11px] font-black text-slate-900 dark:text-white uppercase leading-none mb-1">{inv.tenant}</p>
@@ -933,9 +933,9 @@ f(true);
 
             {/* MODAL GENERACION MASIVA */}
             {showConfirmModal && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setShowConfirmModal(false)}>
+                <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setShowConfirmModal(false)}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-md p-8 border border-slate-200 dark:border-white/10 shadow-2xl text-center relative overflow-hidden" onClick={e => e.stopPropagation()}>
-                        <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-slate-50 dark:from-white/[0.03] to-transparent pointer-events-none"></div>
+                        <div className="absolute top-0 left-0 right-0 h-24 bg-linear-to-b from-slate-50 dark:from-white/3 to-transparent pointer-events-none"></div>
                         <div className="relative z-10 w-16 h-16 bg-emerald-500/10 dark:bg-[#00df82]/10 rounded-md flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
                             <HugeiconsIcon icon={ReceiptIcon} className="w-8 h-8 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.6} />
                         </div>
@@ -954,7 +954,7 @@ f(true);
             )}
 
             {modalConfig.isOpen && (
-                <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setModalConfig({ ...modalConfig, isOpen: false })}>
+                <div className="fixed inset-0 z-300 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setModalConfig({ ...modalConfig, isOpen: false })}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-md p-8 border border-slate-200 dark:border-white/10 shadow-2xl text-center" onClick={e => e.stopPropagation()}>
                         <div className="w-14 h-14 bg-emerald-500/10 dark:bg-[#00df82]/10 rounded-md flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
                             <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-7 h-7 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.6} />
@@ -975,7 +975,7 @@ f(true);
 
             {/* MODAL VISTA PREVIA PDF */}
             {preview.url && (
-                <div className="fixed inset-0 z-[400] flex flex-col bg-black/70 backdrop-blur-md animate-fadeIn p-3 sm:p-5" onClick={closePreview}>
+                <div className="fixed inset-0 z-400 flex flex-col bg-black/70 backdrop-blur-md animate-fadeIn p-3 sm:p-5" onClick={closePreview}>
                     <div className="flex items-center justify-between gap-3 mb-3 w-full max-w-5xl mx-auto" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center gap-2 min-w-0">
                             <span className="flex items-center justify-center w-8 h-8 rounded-md bg-emerald-500/15 border border-emerald-500/25 shrink-0">

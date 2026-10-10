@@ -97,7 +97,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
     return (
         <ModalPortal>
             <div
-                    className="fixed inset-0 z-[500] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/80 dark:bg-black/85 backdrop-blur-xl animate-in fade-in duration-200"
+                    className="fixed inset-0 z-500 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/80 dark:bg-black/85 backdrop-blur-xl animate-in fade-in duration-200"
                 role="presentation"
                 onClick={() => !isSubmitting && onClose()}
             >
@@ -110,7 +110,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                 >
                     <div className="flex flex-1 min-h-0">
                         {/* SIDEBAR DE PASOS */}
-                        <aside className="hidden md:flex md:w-64 shrink-0 flex-col border-r border-slate-100 dark:border-white/5 bg-slate-50/70 dark:bg-white/[0.02] p-6 relative overflow-hidden">
+                        <aside className="hidden md:flex md:w-64 shrink-0 flex-col border-r border-slate-100 dark:border-white/5 bg-slate-50/70 dark:bg-white/2 p-6 relative overflow-hidden">
                             <div aria-hidden="true" className="pointer-events-none absolute -top-16 -left-10 w-40 h-40 bg-emerald-400/20 dark:bg-[#00df82]/15 blur-[70px] rounded-full" />
 
                             <div className="relative flex items-center gap-3 mb-8">
@@ -137,8 +137,8 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                                             type="button"
                                             onClick={() => { if (s.id < step || (s.id === 2 && step1Valid) || (s.id === 3 && step1Valid && step2Valid)) setStep(s.id); }}
                                             className={`flex items-start gap-3 p-3 rounded-md text-left transition-all ${
-                                                active ? "bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-sm"
-                                                    : "border border-transparent hover:bg-white/60 dark:hover:bg-white/[0.03]"
+                                                active ? "bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-xs"
+                                                    : "border border-transparent hover:bg-white/60 dark:hover:bg-white/3"
                                             }`}
                                         >
                                             <span className={`w-7 h-7 rounded-md flex items-center justify-center text-[11px] font-black border shrink-0 transition-all ${
@@ -163,7 +163,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                                     <span className="text-[10px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{Math.round((step / 3) * 100)}%</span>
                                 </div>
                                 <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
-                                    <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-[#00df82] transition-all duration-500" style={{ width: `${(step / 3) * 100}%` }} />
+                                    <div className="h-full rounded-full bg-linear-to-r from-emerald-500 to-[#00df82] transition-all duration-500" style={{ width: `${(step / 3) * 100}%` }} />
                                 </div>
                             </div>
                         </aside>
@@ -190,7 +190,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                                 </button>
                             </div>
                             <div className="md:hidden h-1 bg-slate-100 dark:bg-white/5 shrink-0">
-                                <div className="h-full bg-gradient-to-r from-emerald-500 to-[#00df82] transition-all duration-500" style={{ width: `${(step / 3) * 100}%` }} />
+                                <div className="h-full bg-linear-to-r from-emerald-500 to-[#00df82] transition-all duration-500" style={{ width: `${(step / 3) * 100}%` }} />
                             </div>
 
                             {/* HEADER desktop */}
@@ -254,7 +254,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                                                         onChange={(e) => set({ password: e.target.value })}
                                                         placeholder="Mínimo 6 caracteres"
                                                         autoComplete="new-password"
-                                                        className="w-full pl-10 pr-11 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-emerald-500 dark:focus:border-[#00df82] focus:ring-2 focus:ring-emerald-500/15 outline-none transition-all"
+                                                        className="w-full pl-10 pr-11 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-emerald-500 dark:focus:border-[#00df82] focus:ring-2 focus:ring-emerald-500/15 outline-hidden transition-all"
                                                     />
                                                     <button
                                                         type="button"
@@ -272,7 +272,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                                         )}
 
                                         <div className="rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
-                                            <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/[0.03] border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
+                                            <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
                                                 <HugeiconsIcon icon={SecurityCheckIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
                                                 <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Resumen del dueño</span>
                                             </div>
@@ -299,7 +299,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                             </div>
 
                             {/* FOOTER */}
-                            <div className="px-5 sm:px-6 py-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between gap-3 shrink-0 bg-slate-50/70 dark:bg-white/[0.02]">
+                            <div className="px-5 sm:px-6 py-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between gap-3 shrink-0 bg-slate-50/70 dark:bg-white/2">
                                 {step > 1 ? (
                                     <button type="button" onClick={() => setStep((s) => s - 1)} disabled={isSubmitting} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/5 transition-all disabled:opacity-50 cursor-pointer">
                                         <HugeiconsIcon icon={ArrowLeft01Icon} className="w-4 h-4" strokeWidth={2} />
@@ -340,7 +340,7 @@ function Field({ label, icon: Icon, hint, ...props }: any) {
                 )}
                 <input
                     id={id}
-                    className={`w-full ${Icon ? "pl-10" : "pl-3.5"} pr-3.5 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-emerald-500 dark:focus:border-[#00df82] focus:ring-2 focus:ring-emerald-500/15 outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed`}
+                    className={`w-full ${Icon ? "pl-10" : "pl-3.5"} pr-3.5 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-emerald-500 dark:focus:border-[#00df82] focus:ring-2 focus:ring-emerald-500/15 outline-hidden transition-all disabled:opacity-60 disabled:cursor-not-allowed`}
                     {...props}
                 />
             </div>

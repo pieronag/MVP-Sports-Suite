@@ -207,7 +207,7 @@ export default function PerfilPage() {
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10" aria-hidden />
         <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Perfil</h1>
-        <button onClick={toggleTheme} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button onClick={toggleTheme} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           {isDark ? <Moon size={18} className="text-amber-400" /> : <Sun size={18} className="text-slate-600" />}
         </button>
       </div>
@@ -217,7 +217,7 @@ export default function PerfilPage() {
       {/* Avatar Section */}
       <div className="flex flex-col items-center py-2 mb-4">
         <div className="relative mb-4">
-          <div className={`w-28 h-28 rounded-md overflow-hidden border-[3px] ${isDark ? "border-white/[0.08]" : "border-white"} ${isDark ? "shadow-black/30" : "shadow-slate-200"}`}>
+          <div className={`w-28 h-28 rounded-md overflow-hidden border-[3px] ${isDark ? "border-white/8" : "border-white"} ${isDark ? "shadow-black/30" : "shadow-slate-200"}`}>
             {photoURL ? (
               <Image src={photoURL} alt={displayName} width={112} height={112} className="object-cover w-full h-full" />
             ) : (
@@ -226,7 +226,7 @@ export default function PerfilPage() {
               </div>
             )}
           </div>
-          <button onClick={handlePickImage} className="absolute -bottom-0.5 -right-0.5 w-10 h-10 rounded-md bg-emerald-500 flex items-center justify-center border-[4px] border-[#020611] hover:bg-emerald-600 transition-colors">
+          <button onClick={handlePickImage} className="absolute -bottom-0.5 -right-0.5 w-10 h-10 rounded-md bg-emerald-500 flex items-center justify-center border-4 border-[#020611] hover:bg-emerald-600 transition-colors">
             {uploading ? (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
@@ -263,7 +263,7 @@ export default function PerfilPage() {
               </div>
             </div>
             <div className="relative h-4">
-              <div className={`absolute top-1/2 -translate-y-1/2 w-full h-[3px] rounded ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`} />
+              <div className={`absolute top-1/2 -translate-y-1/2 w-full h-[3px] rounded ${isDark ? "bg-white/6" : "bg-slate-100"}`} />
               <div className="absolute top-1/2 -translate-y-1/2 h-[3px] rounded bg-emerald-500 transition-all" style={{ width: `${(tierInfo.index / (TIERS.length - 1)) * 100}%` }} />
               <div className="flex justify-between absolute w-full top-0">
                 {TIERS.map((t, i) => (
@@ -284,7 +284,7 @@ export default function PerfilPage() {
             <div className="flex items-center justify-between px-5 py-5">
               <div>
                 <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nivel General</p>
-                <p className={`text-2xl font-bold -tracking-[0.06em] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{ovr}</p>
+                <p className={`text-2xl font-bold tracking-[-0.06em] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{ovr}</p>
               </div>
               <div className="w-10 h-10 rounded-md bg-emerald-500/15 flex items-center justify-center">
                 <Medal size={22} className="text-emerald-500" />
@@ -371,24 +371,24 @@ export default function PerfilPage() {
       <div className="flex items-center gap-3 px-6 mb-4 mt-2">
         <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
         <span className="text-emerald-400 font-semibold text-[12px] tracking-[0.06em] uppercase">Tu Carta MVP</span>
-        <div className="flex-1 h-px bg-gradient-to-r from-emerald-500/20 to-transparent" />
+        <div className="flex-1 h-px bg-linear-to-r from-emerald-500/20 to-transparent" />
       </div>
 
       <div className="px-5 mb-8">
         <div className={`relative rounded-md overflow-hidden transition-all active:scale-[0.99] ${
           isDark
-            ? "bg-[#0A101D] border border-white/[0.06]"
+            ? "bg-[#0A101D] border border-white/6"
             : "bg-white border border-slate-200"
         } ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
-          <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-gradient-to-br from-emerald-500/[0.02] to-transparent" : "bg-gradient-to-br from-emerald-50/50 to-transparent"}`} />
-          <div className={`p-5 bg-gradient-to-br ${
+          <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-linear-to-br from-emerald-500/2 to-transparent" : "bg-linear-to-br from-emerald-50/50 to-transparent"}`} />
+          <div className={`p-5 bg-linear-to-br ${
             isDark
               ? "from-[#0F172A] via-[#0F172A] to-[#064e3b]"
               : "from-white via-white to-[#f0fdf4]"
           }`}>
             {/* Top row: OVR + Info */}
             <div className="flex items-center gap-4 mb-4">
-              <div className="w-[58px] h-[76px] bg-gradient-to-b from-amber-400 to-amber-600 rounded-md flex flex-col items-center justify-center -rotate-[4deg] shrink-0">
+              <div className="w-[58px] h-[76px] bg-linear-to-b from-amber-400 to-amber-600 rounded-md flex flex-col items-center justify-center rotate-[-4deg] shrink-0">
                 <span className="text-black/60 font-medium text-[11px] tracking-[0.06em]">OVR</span>
                 <span className="text-black font-bold text-[22px] leading-none mt-0.5">{ovr}</span>
               </div>
@@ -406,7 +406,7 @@ export default function PerfilPage() {
             </div>
 
             {/* Stats Grid */}
-            <div className={`grid grid-cols-4 gap-2 pt-4 border-t ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+            <div className={`grid grid-cols-4 gap-2 pt-4 border-t ${isDark ? "border-white/6" : "border-slate-200"}`}>
               {[
                 { label: "PARTIDOS", value: stats.matchesPlayed },
                 { label: "VICTORIAS", value: stats.matchesWon },
@@ -442,7 +442,7 @@ export default function PerfilPage() {
           {photoURL ? (
             <img src={photoURL} alt="" crossOrigin="anonymous" className="absolute inset-0 w-full h-full object-cover" />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a2e] via-[#0f0f3d] to-[#064e3b]" />
+            <div className="absolute inset-0 bg-linear-to-br from-[#0a0a2e] via-[#0f0f3d] to-[#064e3b]" />
           )}
           {/* Cinematic Overlay */}
           <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(2,6,23,0.5) 0%, transparent 40%, rgba(2,6,23,0.9) 100%)" }} />
@@ -537,11 +537,11 @@ export default function PerfilPage() {
             </div>
             <div className="flex gap-3 mt-6">
               <button onClick={() => setShowPreview(false)}
-                className={`flex-1 h-[54px] rounded-md font-semibold text-[12px] uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.08] text-slate-300 hover:bg-white/[0.12]" : "bg-slate-200 text-slate-700 hover:bg-slate-300"}`}>
+                className={`flex-1 h-[54px] rounded-md font-semibold text-[12px] uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/8 text-slate-300 hover:bg-white/12" : "bg-slate-200 text-slate-700 hover:bg-slate-300"}`}>
                 Cerrar
               </button>
               <button onClick={handleDownloadCard}
-                className="flex-[2] h-[54px] rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600">
+                className="flex-2 h-[54px] rounded-md bg-emerald-500 text-white font-semibold text-[12px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600">
                 <Download size={16} /> Descargar Carta
               </button>
             </div>
@@ -552,9 +552,9 @@ export default function PerfilPage() {
       {/* Glossary Modal */}
       {showGlossary && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-5" onClick={() => setShowGlossary(false)}>
-          <div className={`w-full max-w-md max-h-[85vh] flex flex-col rounded-md border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-md max-h-[85vh] flex flex-col rounded-md border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             {/* Header */}
-            <div className={`flex items-center justify-between px-5 py-4 border-b shrink-0 ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+            <div className={`flex items-center justify-between px-5 py-4 border-b shrink-0 ${isDark ? "border-white/6" : "border-slate-200"}`}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-md flex items-center justify-center" style={{ backgroundColor: "#10b98115" }}>
                   <Medal size={18} className="text-emerald-500" />
@@ -601,10 +601,10 @@ export default function PerfilPage() {
                 const progress = nextThreshold > 0 ? Math.min(1, val / nextThreshold) : 0;
 
                 return (
-                  <div key={b.id} className={`rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"} shadow-sm`}>
+                  <div key={b.id} className={`rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"} shadow-xs`}>
                     <div className="p-4">
                       <div className="flex items-center gap-3.5">
-                        <div className={`w-[50px] h-[50px] rounded-md flex items-center justify-center shrink-0 border ${isDark ? "border-white/[0.06]" : "border-slate-200"}`} style={{ backgroundColor: `${progressColor}12` }}>
+                        <div className={`w-[50px] h-[50px] rounded-md flex items-center justify-center shrink-0 border ${isDark ? "border-white/6" : "border-slate-200"}`} style={{ backgroundColor: `${progressColor}12` }}>
                           <b.icon size={24} style={{ color: progressColor }} strokeWidth={1.5} />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -618,7 +618,7 @@ export default function PerfilPage() {
                             </span>
                           </div>
                           <div className="mt-3">
-                            <div className={`h-[5px] rounded-full overflow-hidden ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}>
+                            <div className={`h-[5px] rounded-full overflow-hidden ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
                               <div className="h-full rounded-full transition-all duration-500" style={{ width: `${progress * 100}%`, backgroundColor: progressColor }} />
                             </div>
                             <div className="flex items-center justify-between mt-1">

@@ -317,7 +317,7 @@ export default function EstadisticasPage() {
     <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-        <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Estadísticas</h1>
@@ -350,7 +350,7 @@ export default function EstadisticasPage() {
                 </span>
                 <span className={`text-[12px] font-semibold ${isDark ? "text-slate-300" : "text-slate-700"}`}>{analytics.progreso}%</span>
               </div>
-              <div className={`h-2 rounded-full overflow-hidden ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}>
+              <div className={`h-2 rounded-full overflow-hidden ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
                 <div className="h-full rounded-full transition-all duration-500" style={{ width: `${analytics.progreso}%`, background: `linear-gradient(90deg, ${analytics.rangoActual.color}, ${analytics.rangoActual.color}80)` }} />
               </div>
             </div>
@@ -389,7 +389,7 @@ export default function EstadisticasPage() {
             ].map((r) => (
               <div key={r.label} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={`w-9 h-9 rounded-md flex items-center justify-center ${isDark ? "bg-white/[0.04]" : "bg-slate-100"}`}>
+                  <div className={`w-9 h-9 rounded-md flex items-center justify-center ${isDark ? "bg-white/4" : "bg-slate-100"}`}>
                     <r.icon size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
                   </div>
                   <span className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{r.label}</span>
@@ -397,7 +397,7 @@ export default function EstadisticasPage() {
                 <span className={`px-3 py-1 rounded-md text-sm font-semibold ${r.accent ? "text-red-400 bg-red-500/10" : "text-emerald-500 bg-emerald-500/10"}`}>{r.val}</span>
               </div>
             ))}
-            <div className={`p-4 rounded-md flex items-center gap-3 ${isDark ? "bg-white/[0.02]" : "bg-slate-50"}`}>
+            <div className={`p-4 rounded-md flex items-center gap-3 ${isDark ? "bg-white/2" : "bg-slate-50"}`}>
               <Info size={14} className="text-emerald-500 shrink-0" />
               <p className={`text-[12px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Tus XP se actualizan automáticamente al finalizar el partido.</p>
             </div>
@@ -480,14 +480,14 @@ export default function EstadisticasPage() {
                               </button>
                             )}
                             {item.displayStatus === 'completed' && item.bData?.teamStats && (
-                              <div className={`mt-3 px-4 py-2 rounded-md text-center text-[11px] font-medium ${isDark ? "bg-white/[0.02] text-slate-500" : "bg-slate-50 text-slate-400"}`}>
+                              <div className={`mt-3 px-4 py-2 rounded-md text-center text-[11px] font-medium ${isDark ? "bg-white/2 text-slate-500" : "bg-slate-50 text-slate-400"}`}>
                                 Estadísticas registradas
                               </div>
                             )}
                           </div>
                           <div className="text-right shrink-0">
                             {item.resultType === 'cancelled' ? (
-                              <div className={`px-3 py-2 rounded-md text-center border ${isDark ? "bg-white/[0.03]" : "bg-slate-50"}`} style={{ borderColor: isDark ? 'rgba(255,255,255,0.06)' : '#E2E8F0' }}>
+                              <div className={`px-3 py-2 rounded-md text-center border ${isDark ? "bg-white/3" : "bg-slate-50"}`} style={{ borderColor: isDark ? 'rgba(255,255,255,0.06)' : '#E2E8F0' }}>
                                 <p className={`text-sm font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>0 XP</p>
                               </div>
                             ) : item.matchXP !== null ? (
@@ -505,7 +505,7 @@ export default function EstadisticasPage() {
                   })}
                   {filtered.length > visibleCount && (
                     <button onClick={() => setVisibleCount(prev => prev + 10)}
-                      className={`w-full h-12 rounded-md font-semibold text-xs uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.04] text-emerald-500 hover:bg-white/[0.08]" : "bg-slate-100 text-emerald-600 hover:bg-slate-200"}`}>
+                      className={`w-full h-12 rounded-md font-semibold text-xs uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/4 text-emerald-500 hover:bg-white/8" : "bg-slate-100 text-emerald-600 hover:bg-slate-200"}`}>
                       Cargar 10 más
                     </button>
                   )}
@@ -524,7 +524,7 @@ export default function EstadisticasPage() {
           <div className="min-h-screen p-5 pt-12">
             <div className="flex items-center justify-between mb-6">
               <h2 className={`text-base font-heading font-black uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedMatch ? 'EDITAR' : 'REGISTRAR'} PARTIDO</h2>
-              <button aria-label="Cerrar" onClick={() => setShowStatsModal(false)} className="w-9 h-9 rounded-md flex items-center justify-center bg-white/[0.06]">
+              <button aria-label="Cerrar" onClick={() => setShowStatsModal(false)} className="w-9 h-9 rounded-md flex items-center justify-center bg-white/6">
                 <ChevronLeft size={18} className="text-slate-400" style={{ transform: 'rotate(-90deg)' }} />
               </button>
             </div>
@@ -566,7 +566,7 @@ export default function EstadisticasPage() {
                           <p className={`text-xl font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{scoreA}</p>
                         )}
                       </div>
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/[0.06]">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-white/6">
                         <span className="text-xs font-semibold text-slate-500">VS</span>
                       </div>
                       <div className="flex-1 text-center">
@@ -585,7 +585,7 @@ export default function EstadisticasPage() {
                       <p className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                         {isScorelessSport ? 'Equipo Ganador' : 'Resultado'}
                       </p>
-                      <div className={`flex rounded-md p-1 gap-1 ${isDark ? "bg-white/[0.04]" : "bg-slate-100"}`}>
+                      <div className={`flex rounded-md p-1 gap-1 ${isDark ? "bg-white/4" : "bg-slate-100"}`}>
                         {(isScorelessSport ? [
                           { key: 'A', label: 'Equipo A' },
                           { key: 'B', label: 'Equipo B' },
@@ -618,7 +618,7 @@ export default function EstadisticasPage() {
                   <GlowCard isDark={isDark}>
                     <div className="p-4">
                       <p className={`text-[12px] font-semibold uppercase tracking-wide mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipo</p>
-                      <div className={`flex rounded-md p-1 gap-1 ${isDark ? "bg-white/[0.04]" : "bg-slate-100"}`}>
+                      <div className={`flex rounded-md p-1 gap-1 ${isDark ? "bg-white/4" : "bg-slate-100"}`}>
                         {[{ key: '', label: 'Sin equipo' }, ...userTeams.map((t: any) => ({ key: t.id, label: t.name }))].map((opt) => (
                           <button key={opt.key} onClick={() => {
                             setSelectedTeamId(opt.key);
@@ -646,7 +646,7 @@ export default function EstadisticasPage() {
                           ))}
                         </div>
                         {teamMembers.map((m: any) => (
-                          <div key={m.uid} className={`flex items-center gap-3 py-2.5 border-t ${isDark ? "border-white/[0.04]" : "border-slate-100"}`}>
+                          <div key={m.uid} className={`flex items-center gap-3 py-2.5 border-t ${isDark ? "border-white/4" : "border-slate-100"}`}>
                             <span className={`flex-1 text-sm font-medium truncate ${isDark ? "text-slate-200" : "text-slate-800"}`}>{m.displayName}</span>
                             <div className="flex gap-1">
                               {(['A', 'B', 'N'] as const).map(t => (
@@ -656,16 +656,16 @@ export default function EstadisticasPage() {
                                     if (t === 'N') setMatchOutcomeInput('draw');
                                   }
                                 }}
-                                  className={`w-8 h-8 rounded-md text-[11px] font-semibold transition-all active:scale-90 ${teamAssignments[m.uid] === t ? (t === 'A' ? 'bg-red-500/20 text-red-400' : t === 'B' ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-500/20 text-slate-400') : isDark ? "bg-white/[0.04] text-slate-500" : "bg-slate-50 text-slate-400"}`}>
+                                  className={`w-8 h-8 rounded-md text-[11px] font-semibold transition-all active:scale-90 ${teamAssignments[m.uid] === t ? (t === 'A' ? 'bg-red-500/20 text-red-400' : t === 'B' ? 'bg-blue-500/20 text-blue-400' : 'bg-slate-500/20 text-slate-400') : isDark ? "bg-white/4 text-slate-500" : "bg-slate-50 text-slate-400"}`}>
                                   {t === 'A' ? 'A' : t === 'B' ? 'B' : '—'}
                                 </button>
                               ))}
                             </div>
                             {!isScorelessSport && teamAssignments[m.uid] !== 'N' && (
                               <div className="flex items-center gap-1">
-                                <button aria-label="Restar gol" onClick={() => setMemberGoals(prev => ({ ...prev, [m.uid]: Math.max(0, (prev[m.uid] || 0) - 1) }))} className="w-7 h-7 rounded-md flex items-center justify-center bg-white/[0.06]"><Minus size={12} className="text-slate-400" /></button>
+                                <button aria-label="Restar gol" onClick={() => setMemberGoals(prev => ({ ...prev, [m.uid]: Math.max(0, (prev[m.uid] || 0) - 1) }))} className="w-7 h-7 rounded-md flex items-center justify-center bg-white/6"><Minus size={12} className="text-slate-400" /></button>
                                 <span className={`w-6 text-center text-sm font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{memberGoals[m.uid] || 0}</span>
-                                <button aria-label="Sumar gol" onClick={() => setMemberGoals(prev => ({ ...prev, [m.uid]: (prev[m.uid] || 0) + 1 }))} className="w-7 h-7 rounded-md flex items-center justify-center bg-white/[0.06]"><Plus size={12} className="text-slate-400" /></button>
+                                <button aria-label="Sumar gol" onClick={() => setMemberGoals(prev => ({ ...prev, [m.uid]: (prev[m.uid] || 0) + 1 }))} className="w-7 h-7 rounded-md flex items-center justify-center bg-white/6"><Plus size={12} className="text-slate-400" /></button>
                               </div>
                             )}
                           </div>
@@ -687,8 +687,8 @@ export default function EstadisticasPage() {
                       <div className="p-5 text-center">
                         <p className={`text-base font-semibold mb-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Confirmar estadísticas?</p>
                         <div className="flex gap-3">
-                          <button onClick={() => setShowConfirmModal(false)} className={`flex-1 h-11 rounded-md text-xs font-semibold ${isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
-                          <button onClick={executeSaveMatchStats} className="flex-[2] h-11 rounded-md bg-emerald-500 text-white text-xs font-semibold">Confirmar</button>
+                          <button onClick={() => setShowConfirmModal(false)} className={`flex-1 h-11 rounded-md text-xs font-semibold ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+                          <button onClick={executeSaveMatchStats} className="flex-2 h-11 rounded-md bg-emerald-500 text-white text-xs font-semibold">Confirmar</button>
                         </div>
                       </div>
                     </GlowCard>

@@ -25,7 +25,7 @@ export default function SectionHeading({
         centered ? "items-center text-center" : "items-start lg:items-end"
       }`}
     >
-      <div className={`flex-[2] space-y-4 ${centered ? "flex flex-col items-center" : ""}`}>
+      <div className={`flex-2 space-y-4 ${centered ? "flex flex-col items-center" : ""}`}>
         {eyebrow && (
           <div className={`inline-flex items-center gap-2.5 ${centered ? "justify-center" : ""}`}>
             <span className={`h-[3px] w-6 rounded-md ${accentBar}`} />

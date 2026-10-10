@@ -176,7 +176,7 @@ export default function CheckoutPage() {
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-        <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">{isTournament ? "Inscripción" : "Checkout"}</h1>
@@ -200,7 +200,7 @@ export default function CheckoutPage() {
                 </p>
               </div>
             </div>
-            <div className={`h-px ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`} />
+            <div className={`h-px ${isDark ? "bg-white/6" : "bg-slate-100"}`} />
             {isTournament ? (
               <div className="space-y-3">
                 {[{ icon: Users, label: "Equipo", val: (teamName || "").toUpperCase() }, { icon: Trophy, label: "Modalidad", val: (tournamentType || "LIGA").toUpperCase() }, { icon: MapPin, label: "Recinto", val: (venueName || "POR CONFIRMAR").toUpperCase() }].map((r) => (
@@ -238,7 +238,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
             )}
-            <div className={`h-px ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`} />
+            <div className={`h-px ${isDark ? "bg-white/6" : "bg-slate-100"}`} />
             <div className="flex items-center justify-between">
               <div>
                 <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{appliedCoupon ? "Subtotal" : "Total"}</p>
@@ -264,8 +264,8 @@ export default function CheckoutPage() {
         <GlowCard isDark={isDark}>
           <div className="p-5">
             <div className="flex items-center gap-2.5">
-              <div className={`flex-1 h-12 rounded-md border flex items-center px-4 ${isDark ? "bg-white/[0.04] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
-                <input className="w-full bg-transparent text-xs font-medium tracking-wide uppercase outline-none" style={{ color: appliedCoupon ? "#10b981" : isDark ? "#F8FAFC" : "#0F172A" }}
+              <div className={`flex-1 h-12 rounded-md border flex items-center px-4 ${isDark ? "bg-white/4 border-white/6" : "bg-slate-50 border-slate-200"}`}>
+                <input className="w-full bg-transparent text-xs font-medium tracking-wide uppercase outline-hidden" style={{ color: appliedCoupon ? "#10b981" : isDark ? "#F8FAFC" : "#0F172A" }}
                   placeholder="Código" autoFocus={!appliedCoupon} value={couponInput} onChange={(e) => setCouponInput(e.target.value.toUpperCase())} disabled={!!appliedCoupon || validatingCoupon} />
               </div>
               {appliedCoupon ? (
@@ -290,8 +290,8 @@ export default function CheckoutPage() {
               <div className="p-5 space-y-2.5">
                 {[{ id: null, label: "Sin equipo", icon: Users }, ...userTeams.map((t: any) => ({ id: t.id, label: t.name, icon: Trophy }))].map((opt) => (
                   <button key={opt.id || "none"} onClick={() => setSelectedTeamId(opt.id)}
-                    className={`w-full flex items-center gap-4 p-4 rounded-md border transition-all active:scale-[0.98] ${selectedTeamId === opt.id ? "border-emerald-500 bg-emerald-500/5" : isDark ? "border-white/[0.06] hover:bg-white/[0.02]" : "border-slate-200 hover:bg-slate-50"}`}>
-                    <div className={`w-10 h-10 rounded-md flex items-center justify-center ${selectedTeamId === opt.id ? "" : isDark ? "bg-white/[0.04]" : "bg-slate-100"}`}>
+                    className={`w-full flex items-center gap-4 p-4 rounded-md border transition-all active:scale-[0.98] ${selectedTeamId === opt.id ? "border-emerald-500 bg-emerald-500/5" : isDark ? "border-white/6 hover:bg-white/2" : "border-slate-200 hover:bg-slate-50"}`}>
+                    <div className={`w-10 h-10 rounded-md flex items-center justify-center ${selectedTeamId === opt.id ? "" : isDark ? "bg-white/4" : "bg-slate-100"}`}>
                       <opt.icon size={18} color={selectedTeamId === opt.id ? activeColor : isDark ? "#94A3B8" : "#64748B"} />
                     </div>
                     <span className={`flex-1 text-left text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{opt.label}</span>
@@ -358,7 +358,7 @@ export default function CheckoutPage() {
 
       {customAlert.visible && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => { setCustomAlert({ ...customAlert, visible: false }); if (customAlert.onClose) customAlert.onClose(); }}>
-          <div className={`w-full max-w-sm rounded-md p-6 ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"} text-center`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-6 ${isDark ? "bg-[#0A101D] border border-white/6" : "bg-white border border-slate-200"} text-center`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: (customAlert.type === "success" ? "#10b981" : "#ef4444") + "15" }}>
               {customAlert.type === "success" ? <CheckCircle2 size={32} className="text-emerald-500" /> : <XCircle size={32} className="text-red-500" />}
             </div>

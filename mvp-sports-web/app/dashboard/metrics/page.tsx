@@ -550,7 +550,7 @@ export default function MetricsPage() {
                     <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full text-left min-w-[640px]">
                             <thead>
-                                <tr className="bg-slate-50/60 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
+                                <tr className="bg-slate-50/60 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
                                     <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Recinto</th>
                                     <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Monto</th>
                                     <th className="px-6 py-4 text-[10px] font-black text-emerald-500 uppercase tracking-wider text-right">Comisión</th>
@@ -560,7 +560,7 @@ export default function MetricsPage() {
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                 {liveTransactions.length > 0 ? liveTransactions.map((tx: any) => (
-                                    <tr key={tx.id} className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors">
+                                    <tr key={tx.id} className="hover:bg-slate-50/60 dark:hover:bg-white/2 transition-colors">
                                         <td className="px-6 py-4 text-[11px] font-bold text-slate-900 dark:text-white uppercase truncate max-w-[160px]">{tx.venue}</td>
                                         <td className="px-6 py-4 text-right text-[11px] font-bold text-slate-500 dark:text-slate-400 font-mono">{formatCLP(tx.amount)}</td>
                                         <td className="px-6 py-4 text-right text-[11px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{formatCLP(tx.fee)}</td>
@@ -593,7 +593,7 @@ export default function MetricsPage() {
                     <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full text-left min-w-[560px]">
                             <thead>
-                                <tr className="bg-slate-50/60 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
+                                <tr className="bg-slate-50/60 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
                                     <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Centro operativo</th>
                                     <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Comisión</th>
                                     <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Total</th>
@@ -602,7 +602,7 @@ export default function MetricsPage() {
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                                 {tenantsDebt.length > 0 ? tenantsDebt.map((t: any) => (
-                                    <tr key={t.id} className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors">
+                                    <tr key={t.id} className="hover:bg-slate-50/60 dark:hover:bg-white/2 transition-colors">
                                         <td className="px-6 py-4 text-[11px] font-bold text-slate-900 dark:text-white uppercase truncate max-w-[160px]">{t.name}</td>
                                         <td className="px-6 py-4 text-right text-[11px] font-bold text-emerald-500 font-mono">{formatCLP(t.commission)}</td>
                                         <td className="px-6 py-4 text-right text-[11px] font-black text-slate-900 dark:text-white font-mono">{formatCLP(t.totalDebt)}</td>

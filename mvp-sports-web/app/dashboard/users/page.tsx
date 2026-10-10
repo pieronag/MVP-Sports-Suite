@@ -652,7 +652,7 @@ export default function Page() {
   return (
     <div className="w-full space-y-6 pb-12 animate-fadeIn relative">
       {notification && (
-        <div className={`fixed top-6 right-6 z-[420] flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${
+        <div className={`fixed top-6 right-6 z-420 flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${
             notification.type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-emerald-400 dark:border-emerald-500/50' : 
             'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
         }`}>
@@ -673,7 +673,7 @@ export default function Page() {
               </h1>
           </div>
           <div className="flex items-center gap-2">
-              <button onClick={() => setIsBadgesModalOpen(true)} className="inline-flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md hover:bg-slate-50 dark:hover:bg-white/10 transition-all active:scale-95 text-amber-600 dark:text-amber-400 text-[11px] font-black uppercase tracking-wider shadow-sm cursor-pointer">
+              <button onClick={() => setIsBadgesModalOpen(true)} className="inline-flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md hover:bg-slate-50 dark:hover:bg-white/10 transition-all active:scale-95 text-amber-600 dark:text-amber-400 text-[11px] font-black uppercase tracking-wider shadow-xs cursor-pointer">
                   <HugeiconsIcon icon={Medal01Icon} className="w-4 h-4" strokeWidth={2} />
                   Configurar insignias
               </button>
@@ -696,17 +696,17 @@ export default function Page() {
       <div className="sticky top-16 z-20 flex flex-col xl:flex-row gap-3 xl:items-center justify-between p-3 rounded-md border border-slate-200 dark:border-white/5 bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-xl shadow-[0_8px_30px_-12px_rgba(0,0,0,0.15)]">
           <div className="relative w-full xl:w-72 shrink-0">
               <HugeiconsIcon icon={Search01Icon} className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" strokeWidth={1.8} />
-              <input type="text" placeholder="Buscar jugador…" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none transition-all" />
+              <input type="text" placeholder="Buscar jugador…" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-hidden transition-all" />
           </div>
           <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-white/5 p-1 rounded-md border border-slate-100 dark:border-white/10">
                   {["Todos", "Capitanes", "Sin equipo", "Suspendidos"].map((f) => (
-                    <button key={f} onClick={() => setFilter(f)} className={`px-3 py-1.5 text-[10px] font-black uppercase rounded-md transition-all whitespace-nowrap cursor-pointer ${filter === f ? "bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-sm" : "text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}>{f}</button>
+                    <button key={f} onClick={() => setFilter(f)} className={`px-3 py-1.5 text-[10px] font-black uppercase rounded-md transition-all whitespace-nowrap cursor-pointer ${filter === f ? "bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-xs" : "text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}>{f}</button>
                   ))}
               </div>
               <div className="relative">
                   <HugeiconsIcon icon={Activity01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" strokeWidth={1.8} />
-                  <select value={sportFilter} onChange={(e) => setSportFilter(e.target.value)} aria-label="Filtrar por deporte" className="pl-9 pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-[12px] font-semibold text-slate-700 dark:text-white outline-none transition-all cursor-pointer appearance-none">
+                  <select value={sportFilter} onChange={(e) => setSportFilter(e.target.value)} aria-label="Filtrar por deporte" className="pl-9 pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-[12px] font-semibold text-slate-700 dark:text-white outline-hidden transition-all cursor-pointer appearance-none">
                       {uniqueSports.map((s) => <option key={s} value={s} className="bg-white text-slate-900 dark:bg-[#0B0F19] dark:text-white">{s}</option>)}
                   </select>
                   <HugeiconsIcon icon={ArrowDown01Icon} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" strokeWidth={2} />
@@ -715,14 +715,14 @@ export default function Page() {
                   <button
                     onClick={() => setViewMode('grid')}
                     aria-label="Vista cuadrícula"
-                    className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
+                    className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-xs' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                   >
                     <HugeiconsIcon icon={Grid02Icon} className="w-4 h-4" strokeWidth={1.8} />
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
                     aria-label="Vista listado"
-                    className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === 'list' ? 'bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
+                    className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === 'list' ? 'bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-xs' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                   >
                     <HugeiconsIcon icon={ListViewIcon} className="w-4 h-4" strokeWidth={1.8} />
                   </button>
@@ -799,7 +799,7 @@ export default function Page() {
               <div className="overflow-x-auto custom-scrollbar">
                 <table className="w-full text-left border-collapse min-w-[900px]">
                   <thead>
-                    <tr className="border-b border-slate-100 dark:border-white/5 bg-slate-50/60 dark:bg-white/[0.02]">
+                    <tr className="border-b border-slate-100 dark:border-white/5 bg-slate-50/60 dark:bg-white/2">
                       <th className="py-4 pl-6 pr-2 w-10">
                         <button onClick={() => toggleSelectAll(pagedUsers.map(u => u.id))} aria-label="Seleccionar página" className="text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] transition-colors cursor-pointer">
                           <HugeiconsIcon icon={pagedUsers.length > 0 && pagedUsers.every(u => selectedIds.has(u.id)) ? CheckmarkSquare02Icon : SquareIcon} className="w-4 h-4" strokeWidth={1.8} />
@@ -819,7 +819,7 @@ export default function Page() {
                       const winRate = user.winRate;
                       const isSelected = selectedIds.has(user.id);
                       return (
-                        <tr key={user.id} className={`transition-all ${isSelected ? 'bg-emerald-500/[0.04]' : 'hover:bg-slate-50/60 dark:hover:bg-white/[0.02]'}`}>
+                        <tr key={user.id} className={`transition-all ${isSelected ? 'bg-emerald-500/4' : 'hover:bg-slate-50/60 dark:hover:bg-white/2'}`}>
                           <td className="py-4 pl-6 pr-2">
                             <button onClick={() => toggleSelect(user.id)} aria-label={`Seleccionar ${user.name}`} className={`transition-colors cursor-pointer ${isSelected ? 'text-emerald-600 dark:text-[#00df82]' : 'text-slate-300 dark:text-slate-600 hover:text-slate-500 dark:hover:text-slate-400'}`}>
                               <HugeiconsIcon icon={isSelected ? CheckmarkSquare02Icon : SquareIcon} className="w-4 h-4" strokeWidth={1.8} />
@@ -844,7 +844,7 @@ export default function Page() {
 
                           <td className="py-4 px-6 text-center">
                             <div className="inline-flex flex-col items-center gap-1">
-                              <div className={`px-2.5 py-1 rounded-md text-[11px] font-black shadow-sm border ${getOvrColor(user.tier)}`}>
+                              <div className={`px-2.5 py-1 rounded-md text-[11px] font-black shadow-xs border ${getOvrColor(user.tier)}`}>
                                 {user.ovr} OVR
                               </div>
                               <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">{user.tier}</span>
@@ -930,14 +930,14 @@ export default function Page() {
                   <div className="relative p-4 pb-3">
                     <div
                       aria-hidden="true"
-                      className={`absolute left-0 top-0 bottom-0 w-[3px] ${user.status === 'Activo' ? "bg-gradient-to-b from-emerald-400 to-[#00df82]" : "bg-gradient-to-b from-red-400 to-red-600"}`}
+                      className={`absolute left-0 top-0 bottom-0 w-[3px] ${user.status === 'Activo' ? "bg-linear-to-b from-emerald-400 to-[#00df82]" : "bg-linear-to-b from-red-400 to-red-600"}`}
                     />
                     <div className="flex items-start justify-between gap-3 pl-1.5">
                       <div className="relative shrink-0">
                         <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center font-black text-slate-500 dark:text-slate-400 text-lg overflow-hidden">
                           {user.photoURL ? <img src={user.photoURL} className="w-full h-full object-cover" alt={user.name} /> : user.name.charAt(0).toUpperCase()}
                         </div>
-                        <div className={`absolute -bottom-1 -right-1 min-w-[26px] h-[26px] px-1 rounded-md border-2 border-white dark:border-slate-900 flex items-center justify-center font-black text-[10px] shadow-sm ${getOvrColor(user.tier)}`}>
+                        <div className={`absolute -bottom-1 -right-1 min-w-[26px] h-[26px] px-1 rounded-md border-2 border-white dark:border-slate-900 flex items-center justify-center font-black text-[10px] shadow-xs ${getOvrColor(user.tier)}`}>
                           {user.ovr}
                         </div>
                       </div>
@@ -977,15 +977,15 @@ export default function Page() {
 
                   {/* Métricas */}
                   <div className="px-4 pb-3 grid grid-cols-3 gap-1.5">
-                    <div className="px-2 py-2.5 rounded-md bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5 text-center">
+                    <div className="px-2 py-2.5 rounded-md bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5 text-center">
                       <span className="block text-[15px] font-black text-slate-900 dark:text-white leading-none font-mono">{user.stats.played || 0}</span>
                       <span className="block text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-1">Partidos</span>
                     </div>
-                    <div className="px-2 py-2.5 rounded-md bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5 text-center">
+                    <div className="px-2 py-2.5 rounded-md bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5 text-center">
                       <span className={`block text-[15px] font-black leading-none font-mono ${user.winRate >= 50 ? 'text-emerald-600 dark:text-[#00df82]' : 'text-slate-900 dark:text-white'}`}>{user.winRate}%</span>
                       <span className="block text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-1">Victorias</span>
                     </div>
-                    <div className="px-2 py-2.5 rounded-md bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5 text-center">
+                    <div className="px-2 py-2.5 rounded-md bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5 text-center">
                       <span className="block text-[15px] font-black text-slate-900 dark:text-white leading-none font-mono">{user.stats.goals || 0}</span>
                       <span className="block text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-1">Goles</span>
                     </div>

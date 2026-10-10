@@ -243,7 +243,7 @@ const buildStandings = (matches: any[]) => {
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
     return (
-        <div className={`fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-[#00df82] dark:border-emerald-500/50' :
+        <div className={`fixed top-6 right-6 z-200 flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-[#00df82] dark:border-emerald-500/50' :
                 'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
             }`}>
             {type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5" /> : <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5" />}
@@ -539,7 +539,7 @@ export default function ChampionshipsPage() {
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sincronizando competiciones...</p>
                 </div>
             ) : tournaments.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-200 dark:border-white/5 shadow-sm">
+                <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-200 dark:border-white/5 shadow-xs">
                     <div className="w-16 h-16 bg-amber-50 dark:bg-amber-500/10 rounded-md flex items-center justify-center text-amber-500 border border-amber-100 dark:border-amber-500/20">
                         <HugeiconsIcon icon={TrophyIcon} className="w-8 h-8" strokeWidth={1.4} />
                     </div>
@@ -557,14 +557,14 @@ export default function ChampionshipsPage() {
                         const occupancy = t.maxTeams > 0 ? Math.min(Math.round(((t.teams?.length || 0) / t.maxTeams) * 100), 100) : 0;
                         const st = sportStyle(t.sport);
                         return (
-                        <div key={t.id} className="group flex flex-col h-full bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-black/40 hover:-translate-y-0.5">
+                        <div key={t.id} className="group flex flex-col h-full bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 shadow-xs overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-black/40 hover:-translate-y-0.5">
                             {/* HERO */}
-                            <div className={`relative h-36 bg-gradient-to-br ${st.gradient} overflow-hidden shrink-0`}>
+                            <div className={`relative h-36 bg-linear-to-br ${st.gradient} overflow-hidden shrink-0`}>
                                 {t.imageUrl ? <img src={t.imageUrl} className="absolute inset-0 w-full h-full object-cover" alt="" /> : null}
                                 <div className="absolute -right-5 -bottom-9 opacity-10 group-hover:opacity-20 transition-opacity">
                                     {sportIcon(t.sport, 'w-28 h-28 text-white')}
                                 </div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10" />
+                                <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-black/10" />
                                 <div className="absolute top-3 left-3">
                                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md backdrop-blur-md text-white text-[8px] font-black uppercase tracking-widest border border-white/20 ${t.status === 'upcoming' ? 'bg-emerald-500/40' : 'bg-amber-500/40'}`}>
                                         <span className={`w-1.5 h-1.5 rounded-full ${t.status === 'upcoming' ? 'bg-white' : 'bg-amber-200 animate-pulse'}`} /> {t.status === 'upcoming' ? 'Inscripciones' : 'En Vivo'}
@@ -597,19 +597,19 @@ export default function ChampionshipsPage() {
 
                                 {/* SPECS GRID */}
                                 <div className="grid grid-cols-2 gap-2 mb-4">
-                                    <div className="p-2.5 rounded-md bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
+                                    <div className="p-2.5 rounded-md bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5">
                                         <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Inscripción</p>
                                         <p className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] font-mono">${formatCLP(Number(t.price) || 0)}</p>
                                     </div>
-                                    <div className="p-2.5 rounded-md bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
+                                    <div className="p-2.5 rounded-md bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5">
                                         <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Equipo</p>
                                         <p className="text-[11px] font-black text-slate-900 dark:text-white font-mono">{t.teamSize || 2} jug.</p>
                                     </div>
-                                    <div className="p-2.5 rounded-md bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
+                                    <div className="p-2.5 rounded-md bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5">
                                         <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Duración</p>
                                         <p className="text-[11px] font-black text-slate-900 dark:text-white font-mono">{t.matchDuration || 60} min</p>
                                     </div>
-                                    <div className="p-2.5 rounded-md bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
+                                    <div className="p-2.5 rounded-md bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5">
                                         <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Jornada</p>
                                         <p className="text-[11px] font-black text-slate-900 dark:text-white font-mono">{t.startTime || '--:--'}{t.endTime ? ` - ${t.endTime}` : ''}</p>
                                     </div>
@@ -629,19 +629,19 @@ export default function ChampionshipsPage() {
                                         <span className={`ml-auto text-[9px] font-black font-mono ${occupancy === 100 ? 'text-emerald-600 dark:text-[#00df82]' : 'text-amber-500'}`}>{occupancy}%</span>
                                     </div>
                                     <div className="w-full h-1.5 bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-1000" style={{ width: `${occupancy}%` }} />
+                                        <div className="h-full bg-linear-to-r from-amber-500 to-orange-500 transition-all duration-1000" style={{ width: `${occupancy}%` }} />
                                     </div>
                                 </div>
 
                                 {/* PREMIOS */}
-                                <div className="space-y-1.5 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-md border border-slate-100 dark:border-white/5 mb-4">
+                                <div className="space-y-1.5 bg-slate-50 dark:bg-white/3 p-3 rounded-md border border-slate-100 dark:border-white/5 mb-4">
                                     <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-amber-500" /><span className="text-[8px] font-black text-amber-600 uppercase w-12">1°:</span><span className="text-[9px] font-bold text-slate-700 dark:text-slate-300 truncate uppercase">{t.prize1 || '---'}</span></div>
                                     <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-slate-400" /><span className="text-[8px] font-black text-slate-500 uppercase w-12">2°:</span><span className="text-[9px] font-bold text-slate-700 dark:text-slate-300 truncate uppercase">{t.prize2 || '---'}</span></div>
                                     <div className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-amber-800" /><span className="text-[8px] font-black text-amber-800 uppercase w-12">3°:</span><span className="text-[9px] font-bold text-slate-700 dark:text-slate-300 truncate uppercase">{t.prize3 || '---'}</span></div>
                                 </div>
 
                                 {/* FOOTER ACCIONES */}
-                                <div className="mt-auto p-2 bg-slate-50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5 grid grid-cols-2 gap-2 -mx-4 -mb-4">
+                                <div className="mt-auto p-2 bg-slate-50 dark:bg-white/2 border-t border-slate-100 dark:border-white/5 grid grid-cols-2 gap-2 -mx-4 -mb-4">
                                     <button onClick={() => handleOpenFixture(t)} className="py-2 flex items-center justify-center gap-1 bg-white dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 text-[8px] font-black uppercase tracking-widest hover:text-emerald-500 hover:border-emerald-400/40 transition-all active:scale-95" title="Fixture">
                                         <HugeiconsIcon icon={PlayCircleIcon} className="w-3 h-3" /> Fixture
                                     </button>
@@ -664,7 +664,7 @@ export default function ChampionshipsPage() {
 
             {/* MODAL CREAR / EDITAR */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[180] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn" onClick={handleCloseModal}>
+                <div className="fixed inset-0 z-180 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn" onClick={handleCloseModal}>
                     <div onClick={e => e.stopPropagation()} className="bg-white dark:bg-[#0B0F19] w-full max-w-5xl rounded-md shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
                         <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-5 border-b border-slate-100 dark:border-white/5">
                             <div className="flex items-center gap-3.5">
@@ -739,7 +739,7 @@ export default function ChampionshipsPage() {
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <label className="text-[8px] font-black uppercase tracking-widest text-slate-400">Descripción</label>
-                                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-none h-20 resize-none focus:border-amber-500 text-slate-700 dark:text-white" placeholder="Reglas y condiciones..." />
+                                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-hidden h-20 resize-none focus:border-amber-500 text-slate-700 dark:text-white" placeholder="Reglas y condiciones..." />
                                     </div>
                                 </div>
 
@@ -807,7 +807,7 @@ export default function ChampionshipsPage() {
 
                             {/* VISTA PREVIA */}
                             <div className="rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
-                                <div className="px-4 py-3 bg-slate-50/50 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
+                                <div className="px-4 py-3 bg-slate-50/50 dark:bg-white/2 border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
                                     <span className="w-1.5 h-4 bg-amber-500 rounded-md"></span>
                                     <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Vista previa del torneo</p>
                                 </div>
@@ -828,7 +828,7 @@ export default function ChampionshipsPage() {
 
                             <div className="flex gap-3 pt-1">
                                 <button type="button" onClick={handleCloseModal} className="flex-1 py-3.5 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 rounded-md text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-white/10 transition-all">Cancelar</button>
-                                <button type="submit" disabled={saving} className="flex-[2] py-3.5 bg-amber-500 text-white rounded-md text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-amber-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                                <button type="submit" disabled={saving} className="flex-2 py-3.5 bg-amber-500 text-white rounded-md text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-amber-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                                     {saving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" /> : <HugeiconsIcon icon={ShieldCheckIcon} className="w-4 h-4" />}
                                     {isEditing ? 'Actualizar Competición' : 'Lanzar Competición'}
                                 </button>
@@ -841,7 +841,7 @@ export default function ChampionshipsPage() {
             {/* MODAL FIXTURE */}
             {fixtureModal.isOpen && (
                 <ModalPortal>
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fadeIn" onClick={() => setFixtureModal({ ...fixtureModal, isOpen: false })}>
+                <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fadeIn" onClick={() => setFixtureModal({ ...fixtureModal, isOpen: false })}>
                     <div onClick={e => e.stopPropagation()} className="bg-white dark:bg-[#0B0F19] w-full max-w-6xl rounded-md shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[92vh]">
                         {/* HEADER */}
                         <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-5 border-b border-slate-100 dark:border-white/5">
@@ -860,7 +860,7 @@ export default function ChampionshipsPage() {
                         </div>
 
                         {/* STEPPER */}
-                        <div className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/40 dark:bg-white/[0.01]">
+                        <div className="flex items-center gap-4 px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/40 dark:bg-white/1">
                             {[
                                 { key: 'validation', label: 'Validación', icon: ShieldCheckIcon },
                                 { key: 'draw', label: 'Sorteo', icon: RefreshIcon },
@@ -890,7 +890,7 @@ export default function ChampionshipsPage() {
                         <div className="flex-1 overflow-y-auto p-6 custom-scrollbar min-h-[540px] flex flex-col">
                             {/* HERO DEL TORNEO (solo en validación; sorteo y fixture usan todo el espacio) */}
                             {fixtureModal.step === 'validation' && (
-                            <div className={`relative overflow-hidden rounded-md bg-gradient-to-br ${sportStyle(fixtureModal.tournament?.sport).gradient} p-6 mb-6 shrink-0`}>
+                            <div className={`relative overflow-hidden rounded-md bg-linear-to-br ${sportStyle(fixtureModal.tournament?.sport).gradient} p-6 mb-6 shrink-0`}>
                                 <div className="absolute -right-6 -bottom-10 opacity-10">{sportIcon(fixtureModal.tournament?.sport, 'w-32 h-32 text-white')}</div>
                                 <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
                                     <div>
@@ -930,7 +930,7 @@ export default function ChampionshipsPage() {
                                             { icon: BarChartIcon, value: fixtureModal.tournament?.type === 'liga' ? 'Liga' : fixtureModal.tournament?.type === 'eliminacion' ? 'Eliminación' : 'Grupos', label: 'Formato', ok: true },
                                             { icon: ShieldCheckIcon, value: fixtureModal.tournament?.prize1 ? 'Listo' : 'Pendiente', label: 'Premios', ok: !!(fixtureModal.validations[2]?.ok) },
                                         ].map((s, i) => (
-                                            <div key={i} className={`relative p-4 rounded-md border text-center transition-all ${s.ok ? 'border-emerald-500/30 bg-emerald-500/[0.03]' : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.02]'}`}>
+                                            <div key={i} className={`relative p-4 rounded-md border text-center transition-all ${s.ok ? 'border-emerald-500/30 bg-emerald-500/3' : 'border-slate-200 dark:border-white/10 bg-white dark:bg-white/2'}`}>
                                                 {s.ok && (
                                                     <span className="absolute top-2 right-2 w-4 h-4 rounded-full bg-emerald-500 dark:bg-[#00df82] flex items-center justify-center">
                                                         <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-3 h-3 text-white dark:text-black" strokeWidth={2.5} />
@@ -972,11 +972,11 @@ export default function ChampionshipsPage() {
                                         </div>
                                     </div>
                                     <div className="w-full h-2 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
-                                        <div className="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-500" style={{ width: `${(drawAnimation.drawnTeams.length / Math.max(drawAnimation.drawnTeams.length + drawAnimation.remainingTeams.length, 1)) * 100}%` }} />
+                                        <div className="h-full bg-linear-to-r from-amber-500 to-orange-500 transition-all duration-500" style={{ width: `${(drawAnimation.drawnTeams.length / Math.max(drawAnimation.drawnTeams.length + drawAnimation.remainingTeams.length, 1)) * 100}%` }} />
                                     </div>
 
                                     {/* MESA DE SORTEO (COLOR DEL DEPORTE) */}
-                                    <div className={`relative overflow-hidden rounded-md border border-white/20 bg-gradient-to-br ${st.gradient} p-6 shadow-2xl`}>
+                                    <div className={`relative overflow-hidden rounded-md border border-white/20 bg-linear-to-br ${st.gradient} p-6 shadow-2xl`}>
                                         <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full bg-white/10 blur-[80px] pointer-events-none" />
                                         <div className="absolute -bottom-24 right-0 w-72 h-72 rounded-full bg-white/10 blur-[80px] pointer-events-none" />
 
@@ -1003,7 +1003,7 @@ export default function ChampionshipsPage() {
                                                 <div className={`rounded-lg border-2 p-5 text-center transition-all duration-300 ${drawAnimation.currentPair[0] ? 'border-white/70 bg-white text-slate-900 shadow-xl shadow-black/10' : 'border-dashed border-white/40 bg-white/10'}`}>
                                                     {drawAnimation.currentPair[0] ? (
                                                         <div className="space-y-2 animate-fadeIn">
-                                                            <div className={`w-14 h-14 mx-auto rounded-full bg-gradient-to-br ${st.gradient} flex items-center justify-center text-white text-sm font-black font-heading shadow-lg`}>
+                                                            <div className={`w-14 h-14 mx-auto rounded-full bg-linear-to-br ${st.gradient} flex items-center justify-center text-white text-sm font-black font-heading shadow-lg`}>
                                                                 {teamInitials(drawAnimation.currentPair[0])}
                                                             </div>
                                                             <p className="text-slate-900 font-black uppercase text-sm truncate font-heading">{drawAnimation.currentPair[0]}</p>
@@ -1026,7 +1026,7 @@ export default function ChampionshipsPage() {
                                                 <div className={`rounded-lg border-2 p-5 text-center transition-all duration-300 ${drawAnimation.currentPair[1] ? 'border-white/70 bg-white text-slate-900 shadow-xl shadow-black/10' : 'border-dashed border-white/40 bg-white/10'}`}>
                                                     {drawAnimation.currentPair[1] ? (
                                                         <div className="space-y-2 animate-fadeIn">
-                                                            <div className={`w-14 h-14 mx-auto rounded-full bg-gradient-to-br ${st.gradient} flex items-center justify-center text-white text-sm font-black font-heading shadow-lg`}>
+                                                            <div className={`w-14 h-14 mx-auto rounded-full bg-linear-to-br ${st.gradient} flex items-center justify-center text-white text-sm font-black font-heading shadow-lg`}>
                                                                 {teamInitials(drawAnimation.currentPair[1])}
                                                             </div>
                                                             <p className="text-slate-900 font-black uppercase text-sm truncate font-heading">{drawAnimation.currentPair[1]}</p>
@@ -1061,9 +1061,9 @@ export default function ChampionshipsPage() {
                                                 <div className="flex flex-col items-center gap-4 w-full">
                                                     {/* TRAGAMONEDAS */}
                                                     <div className="relative w-full max-w-md">
-                                                        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-white/70 to-transparent rounded-full" />
-                                                        <div className="relative rounded-lg border-2 border-white/30 bg-black/50 backdrop-blur px-6 py-4 text-center overflow-hidden shadow-inner">
-                                                            <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-white/10 pointer-events-none" />
+                                                        <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-transparent via-white/70 to-transparent rounded-full" />
+                                                        <div className="relative rounded-lg border-2 border-white/30 bg-black/50 backdrop-blur-sm px-6 py-4 text-center overflow-hidden shadow-inner">
+                                                            <div className="absolute inset-0 bg-linear-to-b from-white/5 via-transparent to-white/10 pointer-events-none" />
                                                             <p className="relative text-[8px] font-black uppercase tracking-[0.3em] text-white/60 mb-1">Bolillero tragamonedas</p>
                                                             <div className="relative h-16 flex items-center justify-center">
                                                                 {reel.phase === 'spinning' ? (
@@ -1078,7 +1078,7 @@ export default function ChampionshipsPage() {
                                                                 )}
                                                             </div>
                                                         </div>
-                                                        <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-white/70 to-transparent rounded-full" />
+                                                        <div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-transparent via-white/70 to-transparent rounded-full" />
                                                     </div>
 
                                                     <button onClick={pickBall} disabled={reel.phase !== 'idle' || drawAnimation.remainingTeams.length === 0} className="px-14 py-4 rounded-full bg-white text-slate-900 font-black text-[11px] uppercase tracking-[0.25em] shadow-[0_0_45px_rgba(255,255,255,0.4)] hover:bg-slate-50 active:scale-95 transition-all disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed flex items-center gap-3">
@@ -1097,7 +1097,7 @@ export default function ChampionshipsPage() {
                                     </div>
 
                                     {/* EMPAREJAMIENTOS (abre modal) */}
-                                    <button onClick={() => setIsPairsModalOpen(true)} className="w-full flex items-center justify-between px-5 py-4 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-sm hover:border-amber-400/50 hover:shadow-md transition-all active:scale-[0.99]">
+                                    <button onClick={() => setIsPairsModalOpen(true)} className="w-full flex items-center justify-between px-5 py-4 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 shadow-xs hover:border-amber-400/50 hover:shadow-md transition-all active:scale-[0.99]">
                                         <div className="flex items-center gap-3">
                                             <div className="w-9 h-9 rounded-md bg-amber-500/10 text-amber-500 flex items-center justify-center">
                                                 <HugeiconsIcon icon={UserGroupIcon} className="w-4 h-4" strokeWidth={1.8} />
@@ -1131,9 +1131,9 @@ export default function ChampionshipsPage() {
                                 return (
                                     <div className="flex-1 flex flex-col space-y-6 animate-fadeIn">
                                         {/* RESUMEN DEL TORNEO */}
-                                        <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.02] shrink-0">
+                                        <div className="flex flex-wrap items-center justify-between gap-4 p-5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/2 shrink-0">
                                             <div className="flex items-center gap-3.5 min-w-0">
-                                                <div className={`w-11 h-11 rounded-md bg-gradient-to-br ${st.gradient} flex items-center justify-center text-white shrink-0`}>
+                                                <div className={`w-11 h-11 rounded-md bg-linear-to-br ${st.gradient} flex items-center justify-center text-white shrink-0`}>
                                                     {sportIcon(fixtureModal.tournament?.sport, 'w-6 h-6')}
                                                 </div>
                                                 <div className="min-w-0">
@@ -1184,7 +1184,7 @@ export default function ChampionshipsPage() {
                                                             </div>
                                                             <div className="flex-1 flex flex-col justify-center gap-3">
                                                                 {matches.map((m: any, i: number) => (
-                                                                    <div key={i} className="bg-white dark:bg-[#0B0F19] rounded-md border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden transition-all hover:border-amber-500/40">
+                                                                    <div key={i} className="bg-white dark:bg-[#0B0F19] rounded-md border border-slate-200 dark:border-white/10 shadow-xs overflow-hidden transition-all hover:border-amber-500/40">
                                                                         <div className={`h-1 w-full ${m.status === 'finished' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                                                                         <div className="p-3 space-y-2">
                                                                             <div className={`flex items-center justify-between gap-2 text-[10px] font-bold uppercase ${m.score1 != null && m.score1 > (m.score2 ?? -1) ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}>
@@ -1211,7 +1211,7 @@ export default function ChampionshipsPage() {
                                             <>
                                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                                                     {roundMatches(fixtureModal.selectedRound).map((match: any, idx: number) => (
-                                                        <div key={idx} className="bg-white dark:bg-[#0B0F19] p-5 rounded-md border border-slate-200 dark:border-white/10 shadow-sm space-y-4 transition-transform hover:scale-[1.02]">
+                                                        <div key={idx} className="bg-white dark:bg-[#0B0F19] p-5 rounded-md border border-slate-200 dark:border-white/10 shadow-xs space-y-4 transition-transform hover:scale-[1.02]">
                                                             <div className="flex justify-between items-center">
                                                                 <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest font-mono">#{idx + 1}{match.stage ? ` · ${match.stage}` : ''}</span>
                                                                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[8px] font-black uppercase ${match.status === 'finished' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-[#00df82]' : 'bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'}`}>
@@ -1253,9 +1253,9 @@ export default function ChampionshipsPage() {
 
                                         {/* POSICIONES */}
                                         {fixtureModal.view === 'standings' && (
-                                            <div className="max-w-2xl mx-auto w-full overflow-hidden rounded-md border border-slate-200 dark:border-white/10 shadow-sm">
+                                            <div className="max-w-2xl mx-auto w-full overflow-hidden rounded-md border border-slate-200 dark:border-white/10 shadow-xs">
                                                 <table className="w-full text-left">
-                                                    <thead className="bg-slate-50/50 dark:bg-white/[0.02] text-[9px] font-black uppercase text-slate-400 tracking-widest">
+                                                    <thead className="bg-slate-50/50 dark:bg-white/2 text-[9px] font-black uppercase text-slate-400 tracking-widest">
                                                         <tr><th className="px-4 py-3.5">#</th><th className="px-4 py-3.5">Equipo</th><th className="px-3 py-3.5 text-center">PJ</th><th className="px-3 py-3.5 text-center">G</th><th className="px-3 py-3.5 text-center">E</th><th className="px-3 py-3.5 text-center">P</th><th className="px-3 py-3.5 text-center">DG</th><th className="px-4 py-3.5 text-center">Pts</th></tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-[11px] font-bold uppercase">
@@ -1264,7 +1264,7 @@ export default function ChampionshipsPage() {
                                                             if (standings.length === 0) return <tr><td colSpan={8} className="px-4 py-14 text-center text-[10px] text-slate-400 tracking-widest">Sin resultados registrados aún</td></tr>;
                                                             const medals = ['🥇', '🥈', '🥉'];
                                                             return standings.map((s: any, i: number) => (
-                                                                <tr key={s.name} className={i < 3 ? 'bg-amber-500/5' : 'hover:bg-slate-50/50 dark:hover:bg-white/[0.02]'}>
+                                                                <tr key={s.name} className={i < 3 ? 'bg-amber-500/5' : 'hover:bg-slate-50/50 dark:hover:bg-white/2'}>
                                                                     <td className="px-4 py-3.5 text-slate-400 font-mono font-black">{i < 3 ? medals[i] : i + 1}</td>
                                                                     <td className="px-4 py-3.5 text-slate-900 dark:text-white truncate max-w-[180px]">{s.name}</td>
                                                                     <td className="px-3 py-3.5 text-center text-slate-500 font-mono">{s.pj}</td>
@@ -1292,7 +1292,7 @@ export default function ChampionshipsPage() {
             {/* MODAL EMPAREJAMIENTOS */}
             {isPairsModalOpen && (
                 <ModalPortal>
-                <div className="fixed inset-0 z-[260] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setIsPairsModalOpen(false)}>
+                <div className="fixed inset-0 z-260 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setIsPairsModalOpen(false)}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-lg rounded-md shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[80vh]" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-5 border-b border-slate-100 dark:border-white/5">
                             <div className="flex items-center gap-3.5">
@@ -1319,7 +1319,7 @@ export default function ChampionshipsPage() {
                                 </div>
                             )}
                             {drawAnimation.completedMatches.map((m: any, idx: number) => (
-                                <div key={idx} className="bg-white dark:bg-white/5 p-3.5 rounded-md border border-slate-100 dark:border-white/10 flex items-center gap-3 text-[11px] font-black uppercase shadow-sm">
+                                <div key={idx} className="bg-white dark:bg-white/5 p-3.5 rounded-md border border-slate-100 dark:border-white/10 flex items-center gap-3 text-[11px] font-black uppercase shadow-xs">
                                     <span className="w-6 h-6 rounded-md bg-amber-500/10 text-amber-500 flex items-center justify-center text-[9px] font-black font-mono shrink-0">{idx + 1}</span>
                                     <span className="truncate flex-1 text-left text-slate-900 dark:text-white">{m.t1}</span>
                                     <span className="text-amber-500 italic text-[9px] font-black shrink-0">VS</span>
@@ -1337,7 +1337,7 @@ export default function ChampionshipsPage() {
                             )}
                         </div>
 
-                        <div className="px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center justify-between">
+                        <div className="px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/2 flex items-center justify-between">
                             <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Partidos formados</span>
                             <span className="text-base font-black font-mono text-amber-500">{drawAnimation.completedMatches.length}</span>
                         </div>
@@ -1348,7 +1348,7 @@ export default function ChampionshipsPage() {
 
             {/* MODAL ELIMINAR ESTANDARIZADO */}
             {tournamentToDelete && (
-                <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setTournamentToDelete(null)}>
+                <div className="fixed inset-0 z-250 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setTournamentToDelete(null)}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-md p-6 border border-slate-200 dark:border-white/10 shadow-2xl text-center" onClick={e => e.stopPropagation()}>
                         <div className="w-16 h-16 bg-red-50 dark:bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100 dark:border-red-500/20">
                             <HugeiconsIcon icon={Alert02Icon} className="w-8 h-8 text-red-600" />
@@ -1365,9 +1365,9 @@ export default function ChampionshipsPage() {
 
             {/* MODAL PARTICIPANTES (EQUIPOS INSCRITOS) */}
             {participantsModal.isOpen && (
-                <div className="fixed inset-0 z-[180] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setParticipantsModal({ isOpen: false, tournament: null })}>
+                <div className="fixed inset-0 z-180 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setParticipantsModal({ isOpen: false, tournament: null })}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-2xl rounded-md shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
-                        <div className="p-5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-white/[0.02]">
+                        <div className="p-5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-white/2">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-blue-500 rounded-md shadow-lg shadow-blue-500/20"><HugeiconsIcon icon={UserGroupIcon} className="w-5 h-5 text-white" /></div>
                                 <div>
@@ -1386,7 +1386,7 @@ export default function ChampionshipsPage() {
                             ) : (
                                 <div className="grid grid-cols-1 gap-3">
                                     {participantsModal.tournament?.teams.map((team: any, idx: number) => (
-                                        <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/[0.03] rounded-md border border-slate-100 dark:border-white/5">
+                                        <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/3 rounded-md border border-slate-100 dark:border-white/5">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center overflow-hidden">
                                                     {team.logo ? <img src={team.logo} className="w-full h-full object-cover" alt="" /> : <HugeiconsIcon icon={Flag01Icon} className="w-5 h-5 text-slate-300" />}
@@ -1404,7 +1404,7 @@ export default function ChampionshipsPage() {
                                 </div>
                             )}
                         </div>
-                        <div className="p-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex justify-between items-center px-8">
+                        <div className="p-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/2 flex justify-between items-center px-8">
                             <span className="text-[10px] font-black text-black dark:text-white uppercase">Total Inscritos</span>
                             <span className="text-base font-black text-blue-600 dark:text-blue-400">{participantsModal.tournament?.teams?.length || 0} / {participantsModal.tournament?.maxTeams}</span>
                         </div>
@@ -1423,9 +1423,9 @@ function InputGroupPremium({ label, value, onChange, placeholder, icon, readOnly
             <div className="relative">
                 {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 dark:text-white/20 group-focus-within:text-amber-500 transition-colors">{icon}</div>}
                 {type === 'select' ? (
-                    <select value={value || ''} onChange={onChange} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold text-slate-700 dark:text-white focus:border-amber-500 outline-none transition-all appearance-none uppercase cursor-pointer`}>{children}</select>
+                    <select value={value || ''} onChange={onChange} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold text-slate-700 dark:text-white focus:border-amber-500 outline-hidden transition-all appearance-none uppercase cursor-pointer`}>{children}</select>
                 ) : (
-                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2.5 rounded-md border text-[10px] font-bold transition-all outline-none ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white focus:border-amber-500'}`} />
+                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2.5 rounded-md border text-[10px] font-bold transition-all outline-hidden ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white focus:border-amber-500'}`} />
                 )}
                 {type === 'select' && <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"><HugeiconsIcon icon={ChevronDownIcon} className="w-3 h-3" /></div>}
             </div>

@@ -202,7 +202,7 @@ export default function BillingPage() {
 
     return (
         <div className="w-full space-y-5 pb-10 text-left relative">
-            {toast && <div className={`fixed top-4 right-4 px-5 py-3 rounded-md shadow-2xl text-[10px] font-black uppercase tracking-widest z-[300] text-white flex items-center gap-2.5 animate-slideIn ${toast.type === 'success' ? 'bg-emerald-500 dark:bg-[#00df82] dark:text-black' : 'bg-red-600'}`}>{toast.type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" /> : <HugeiconsIcon icon={Cancel01Icon} className="w-4 h-4" />} {toast.msg}</div>}
+            {toast && <div className={`fixed top-4 right-4 px-5 py-3 rounded-md shadow-2xl text-[10px] font-black uppercase tracking-widest z-300 text-white flex items-center gap-2.5 animate-slideIn ${toast.type === 'success' ? 'bg-emerald-500 dark:bg-[#00df82] dark:text-black' : 'bg-red-600'}`}>{toast.type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" /> : <HugeiconsIcon icon={Cancel01Icon} className="w-4 h-4" />} {toast.msg}</div>}
 
             {/* CABECERA */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
@@ -357,7 +357,7 @@ export default function BillingPage() {
                             const isRecommended = p.id === recommendedId && !isCurrent;
                             const price = billingCycle === 'annual' ? Math.round(p.price * 0.8) : p.price;
                             return (
-                                <div key={p.id} className={`relative flex flex-col bg-white dark:bg-[#0B0F19] rounded-md border p-6 transition-all overflow-hidden ${isCurrent ? 'border-emerald-500 ring-1 ring-emerald-500/20 shadow-lg' : 'border-slate-100 dark:border-white/5 shadow-sm hover:border-emerald-500/30 hover:shadow-md'}`}>
+                                <div key={p.id} className={`relative flex flex-col bg-white dark:bg-[#0B0F19] rounded-md border p-6 transition-all overflow-hidden ${isCurrent ? 'border-emerald-500 ring-1 ring-emerald-500/20 shadow-lg' : 'border-slate-100 dark:border-white/5 shadow-xs hover:border-emerald-500/30 hover:shadow-md'}`}>
                                     {isRecommended && (
                                         <span className="absolute top-0 right-0 px-3 py-1 bg-[#00df82] dark:bg-[#00df82] text-black text-[8px] font-black uppercase tracking-widest rounded-bl-md">
                                             Recomendado
@@ -421,7 +421,7 @@ export default function BillingPage() {
 
             {/* HISTORIAL */}
             {isHistoryModalOpen && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setIsHistoryModalOpen(false)}>
+                <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setIsHistoryModalOpen(false)}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-3xl rounded-md shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-5 border-b border-slate-100 dark:border-white/5">
                             <div className="flex items-center gap-3.5">
@@ -485,7 +485,7 @@ export default function BillingPage() {
 
             {/* CONFIRMACIÓN */}
             {confirmModal?.isOpen && (
-                <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setConfirmModal(null)}>
+                <div className="fixed inset-0 z-250 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setConfirmModal(null)}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-md shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden" onClick={e => e.stopPropagation()}>
                         <div className="p-6 pb-5 border-b border-slate-100 dark:border-white/5">
                             <div className="w-11 h-11 rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-[#00df82] mb-3">

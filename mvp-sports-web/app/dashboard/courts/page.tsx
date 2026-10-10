@@ -168,7 +168,7 @@ function HeaderSeccion({ titulo, desc, icon: Icon }: any) {
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructive = false }: any) => {
     if (!isOpen) return null;
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={onCancel}>
+        <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn" onClick={onCancel}>
             <div className="bg-white dark:bg-[#0B0F19] rounded-md shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
                 <div className={`absolute top-0 left-0 w-full h-1 ${isDestructive ? 'bg-red-500' : 'bg-emerald-500'}`}></div>
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter leading-none">{title}</h3>
@@ -866,7 +866,7 @@ export default function CourtsPage() {
 
 return (
         <div className="w-full space-y-6 pb-28 text-left relative animate-fadeIn">
-            {toast && <div className={`fixed top-6 right-6 px-6 py-3.5 rounded-md shadow-2xl text-[10px] font-black uppercase tracking-[0.1em] z-[1000] text-white flex items-center gap-3 animate-slideIn ${toast.type === 'success' ? 'bg-emerald-500 dark:bg-[#00df82] dark:text-black' : 'bg-red-600'}`}>{toast.type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" /> : <HugeiconsIcon icon={Alert02Icon} className="w-4 h-4" />} {toast.msg}</div>}
+            {toast && <div className={`fixed top-6 right-6 px-6 py-3.5 rounded-md shadow-2xl text-[10px] font-black uppercase tracking-widest z-1000 text-white flex items-center gap-3 animate-slideIn ${toast.type === 'success' ? 'bg-emerald-500 dark:bg-[#00df82] dark:text-black' : 'bg-red-600'}`}>{toast.type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" /> : <HugeiconsIcon icon={Alert02Icon} className="w-4 h-4" />} {toast.msg}</div>}
             <ConfirmModal 
                 isOpen={confirmData.isOpen} 
                 title={confirmData.title} 
@@ -887,7 +887,7 @@ return (
 
             {/* CABECERA MAESTRA */}
             <div className="relative overflow-hidden rounded-md border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/50">
-                <div className="absolute inset-0 h-32 bg-gradient-to-r from-emerald-500/20 to-indigo-500/20 opacity-30 blur-3xl -top-10"></div>
+                <div className="absolute inset-0 h-32 bg-linear-to-r from-emerald-500/20 to-indigo-500/20 opacity-30 blur-3xl -top-10"></div>
                 <div className="relative p-6 lg:p-8">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                         <div className="flex items-center gap-5">
@@ -971,7 +971,7 @@ return (
                                     </div>
                                     <div className="space-y-2.5">
                                         {configSteps.map((step, i) => (
-                                            <div key={step.label} className={`flex items-center gap-3 p-2.5 rounded-md border transition-all ${step.done ? 'bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-100 dark:border-emerald-500/15' : 'bg-slate-50/50 dark:bg-white/[0.02] border-slate-100 dark:border-white/5'}`}>
+                                            <div key={step.label} className={`flex items-center gap-3 p-2.5 rounded-md border transition-all ${step.done ? 'bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-100 dark:border-emerald-500/15' : 'bg-slate-50/50 dark:bg-white/2 border-slate-100 dark:border-white/5'}`}>
                                                 <span className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${step.done ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black' : 'bg-slate-100 dark:bg-white/10 text-slate-400'}`}>
                                                     {step.done ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={2} /> : <span className="font-mono text-[10px] font-black">{String(i + 1).padStart(2, '0')}</span>}
                                                 </span>
@@ -1000,7 +1000,7 @@ return (
                             <PanelGlass className="overflow-hidden">
                                 <PanelHeader titulo="Identidad visual" desc="Portada y galería del recinto" icon={<HugeiconsIcon icon={Image01Icon} className="w-4 h-4" strokeWidth={1.8} />} />
                                 <div className="p-6 lg:p-7">
-                                    <div className="relative aspect-[16/7] rounded-md overflow-hidden border border-slate-200 dark:border-white/5 shadow-lg transition-all group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                                    <div className="relative aspect-16/7 rounded-md overflow-hidden border border-slate-200 dark:border-white/5 shadow-lg transition-all group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                                         {selectedVenue.imageURL ? (
                                             <img src={selectedVenue.imageURL} className="w-full h-full object-cover" />
                                         ) : (
@@ -1009,12 +1009,12 @@ return (
                                                 <span className="text-[9px] font-black uppercase tracking-[0.2em]">Sin imagen de portada</span>
                                             </div>
                                         )}
-                                        <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                                        <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-xs">
                                             <div className="bg-white/10 p-4 rounded-md border border-white/20">
                                                 <HugeiconsIcon icon={PencilEdit02Icon} className="w-8 h-8 text-white" strokeWidth={1.6} />
                                             </div>
                                         </div>
-                                        {venueImageLoading && <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center"><HugeiconsIcon icon={RefreshIcon} className="w-8 h-8 text-white animate-spin" strokeWidth={1.6} /></div>}
+                                        {venueImageLoading && <div className="absolute inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center"><HugeiconsIcon icon={RefreshIcon} className="w-8 h-8 text-white animate-spin" strokeWidth={1.6} /></div>}
                                     </div>
                                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleVenueImageUpload} />
 
@@ -1108,7 +1108,7 @@ return (
                                                 {Object.keys(DAYS_MAP).map(dayKey => {
                                                     const day = weeklySchedule[dayKey] || DEFAULT_DAY_SCHEDULE;
                                                     return (
-                                                        <div key={dayKey} className={`p-4 rounded-md border transition-all ${day.isOpen ? 'border-emerald-500/30 bg-emerald-500/[0.02] shadow-sm' : 'border-slate-200 dark:border-white/5 opacity-30 grayscale'}`}>
+                                                        <div key={dayKey} className={`p-4 rounded-md border transition-all ${day.isOpen ? 'border-emerald-500/30 bg-emerald-500/2 shadow-xs' : 'border-slate-200 dark:border-white/5 opacity-30 grayscale'}`}>
                                                             <div className="flex justify-between items-center mb-4">
                                                                 <span className="text-[11px] font-black uppercase tracking-tighter text-slate-900 dark:text-white">{DAYS_MAP[dayKey]}</span>
                                                                 <button
@@ -1120,8 +1120,8 @@ return (
                                                             </div>
                                                             {day.isOpen && (
                                                                 <div className="grid grid-cols-2 gap-2.5">
-                                                                    <input type="time" value={day.open} onChange={e => updateDaySchedule(dayKey, 'open', e.target.value)} className="bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[11px] font-black outline-none focus:border-emerald-500 text-center" />
-                                                                    <input type="time" value={day.close} onChange={e => updateDaySchedule(dayKey, 'close', e.target.value)} className="bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[11px] font-black outline-none focus:border-emerald-500 text-center" />
+                                                                    <input type="time" value={day.open} onChange={e => updateDaySchedule(dayKey, 'open', e.target.value)} className="bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[11px] font-black outline-hidden focus:border-emerald-500 text-center" />
+                                                                    <input type="time" value={day.close} onChange={e => updateDaySchedule(dayKey, 'close', e.target.value)} className="bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[11px] font-black outline-hidden focus:border-emerald-500 text-center" />
                                                                 </div>
                                                             )}
                                                         </div>
@@ -1162,7 +1162,7 @@ return (
                                                                 const currentVal = pricingMatrix[activePricingTab]?.[activeDayTypeTab]?.[time] || '';
                                                                 const missing = currentVal === '' || currentVal === 0;
                                                                 return (
-                                                                <div key={time} className={`p-4 bg-slate-50/50 dark:bg-white/[0.02] rounded-md border relative group hover:border-emerald-500/30 transition-all ${missing ? 'border-amber-300 dark:border-amber-500/40' : 'border-slate-200 dark:border-white/5'}`}>
+                                                                <div key={time} className={`p-4 bg-slate-50/50 dark:bg-white/2 rounded-md border relative group hover:border-emerald-500/30 transition-all ${missing ? 'border-amber-300 dark:border-amber-500/40' : 'border-slate-200 dark:border-white/5'}`}>
                                                                     <div className="flex items-center justify-between gap-2 mb-3">
                                                                         <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter">{time}</label>
                                                                         {missing && (
@@ -1177,7 +1177,7 @@ return (
                                                                             type="number"
                                                                             value={pricingMatrix[activePricingTab]?.[activeDayTypeTab]?.[time] || ''}
                                                                             onChange={e => updatePrice(activePricingTab, activeDayTypeTab, time, parseInt(e.target.value) || 0)}
-                                                                            className={`w-full pl-6 pr-2 py-3 bg-white dark:bg-black/40 border rounded-md text-[11px] font-black outline-none focus:ring-1 ring-emerald-500 text-emerald-600 dark:text-[#00df82] ${missing ? 'border-amber-300 dark:border-amber-500/40' : 'border-slate-200 dark:border-white/10'}`}
+                                                                            className={`w-full pl-6 pr-2 py-3 bg-white dark:bg-black/40 border rounded-md text-[11px] font-black outline-hidden focus:ring-1 ring-emerald-500 text-emerald-600 dark:text-[#00df82] ${missing ? 'border-amber-300 dark:border-amber-500/40' : 'border-slate-200 dark:border-white/10'}`}
                                                                             placeholder="0"
                                                                         />
                                                                     </div>
@@ -1264,7 +1264,7 @@ return (
                                                 value={searchCourt}
                                                 onChange={e => setSearchCourt(e.target.value)}
                                                 placeholder="Buscar cancha..."
-                                                className="w-56 pl-9 pr-3 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black outline-none focus:border-emerald-500 placeholder:text-slate-300 dark:placeholder:text-white/20"
+                                                className="w-56 pl-9 pr-3 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black outline-hidden focus:border-emerald-500 placeholder:text-slate-300 dark:placeholder:text-white/20"
                                             />
                                         </div>
                                     </div>
@@ -1295,7 +1295,7 @@ return (
                                     return <HugeiconsIcon icon={FootballIcon} className="w-5 h-5" strokeWidth={1.8} />;
                                 })();
                                 return (
-                                <div key={c.id} className="bg-white dark:bg-slate-900/50 rounded-md border border-slate-200 dark:border-white/5 shadow-sm relative group hover:border-emerald-500/30 hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-none transition-all overflow-hidden flex flex-col">
+                                <div key={c.id} className="bg-white dark:bg-slate-900/50 rounded-md border border-slate-200 dark:border-white/5 shadow-xs relative group hover:border-emerald-500/30 hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-none transition-all overflow-hidden flex flex-col">
                                     <div className={`h-1 w-full ${accent}`} />
                                     <div className="p-4 flex flex-col flex-1">
                                         {/* ESTADO + ACCIONES */}

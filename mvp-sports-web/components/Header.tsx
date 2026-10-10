@@ -51,7 +51,7 @@ export default function Header() {
                        backdrop-blur-xl border-b
                        bg-white/80 border-slate-200
                        dark:bg-[#0B0F19]/80 dark:border-white/5">
-      <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-emerald-500/40 dark:via-[#00df82]/40 to-transparent" />
+      <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-emerald-500/40 dark:via-[#00df82]/40 to-transparent" />
 
       {/* LEFT — página actual */}
       <div className="flex items-center gap-3 pl-12 xl:pl-0 min-w-0">

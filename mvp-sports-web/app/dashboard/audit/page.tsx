@@ -244,7 +244,7 @@ export default function Page() {
                             placeholder="Buscar por ID de trazabilidad, IP, actor o acción..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-[10px] font-black outline-none text-slate-700 dark:text-white placeholder:text-slate-400 transition-all"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400 transition-all"
                         />
                     </div>
                     <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10">
@@ -252,7 +252,7 @@ export default function Page() {
                         <select
                             value={moduleFilter}
                             onChange={(e) => setModuleFilter(e.target.value)}
-                            className="bg-transparent text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white"
+                            className="bg-transparent text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white"
                         >
                             {modules.map(m => <option key={m} value={m}>{m}</option>)}
                         </select>
@@ -284,7 +284,7 @@ export default function Page() {
                 <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-left min-w-[1080px]">
                         <thead>
-                            <tr className="bg-slate-50/60 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
+                            <tr className="bg-slate-50/60 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Fecha / ID</th>
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Severidad</th>
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Actor / Rol</th>
@@ -295,7 +295,7 @@ export default function Page() {
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                             {filteredLogs.length > 0 ? filteredLogs.map((log) => (
-                                <tr key={log.id} className={`group hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors ${['critical', 'high'].includes(log.severity.toLowerCase()) ? 'bg-red-500/[0.03]' : ''}`}>
+                                <tr key={log.id} className={`group hover:bg-slate-50/60 dark:hover:bg-white/2 transition-colors ${['critical', 'high'].includes(log.severity.toLowerCase()) ? 'bg-red-500/3' : ''}`}>
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
                                             <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase">{log.date}</span>
@@ -319,7 +319,7 @@ export default function Page() {
                                         <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{log.module}</span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <p className="text-[9px] font-bold text-slate-500 dark:text-slate-300 leading-relaxed max-w-xs break-words uppercase">{log.details}</p>
+                                        <p className="text-[9px] font-bold text-slate-500 dark:text-slate-300 leading-relaxed max-w-xs wrap-break-word uppercase">{log.details}</p>
                                         <div className="flex items-center gap-1.5 mt-2 text-[8px] font-black text-slate-400 uppercase">
                                             <HugeiconsIcon icon={GlobeIcon} className="w-3 h-3" strokeWidth={1.8} />
                                             {log.ip} <span className="opacity-30">·</span> {log.location} <span className="opacity-30">·</span> {log.device}

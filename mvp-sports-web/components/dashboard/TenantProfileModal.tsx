@@ -63,7 +63,7 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
     return (
         <ModalPortal>
             <div
-                className="fixed inset-0 z-[400] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/80 dark:bg-black/85 backdrop-blur-xl animate-in fade-in duration-200"
+                className="fixed inset-0 z-400 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/80 dark:bg-black/85 backdrop-blur-xl animate-in fade-in duration-200"
                 role="presentation"
                 onClick={onClose}
             >
@@ -79,19 +79,19 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
                         {tenant.imageUrl ? (
                             <img src={tenant.imageUrl} alt={tenant.name} className="w-full h-full object-cover" />
                         ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-slate-900 to-slate-800 dark:from-[#0B0F19] dark:to-[#04231a]" />
+                            <div className="w-full h-full bg-linear-to-br from-slate-900 to-slate-800 dark:from-[#0B0F19] dark:to-[#04231a]" />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/20" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-black/20" />
 
-                        <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border border-white/15 backdrop-blur shadow-lg ${planStyle}`}>
+                        <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border border-white/15 backdrop-blur-sm shadow-lg ${planStyle}`}>
                             {planLabel}
                         </span>
-                        <span className={`absolute top-3 left-3 mt-9 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border backdrop-blur shadow-lg ${isActive ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/30" : "bg-red-500/20 text-red-300 border-red-400/30"}`}>
+                        <span className={`absolute top-3 left-3 mt-9 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border backdrop-blur-sm shadow-lg ${isActive ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/30" : "bg-red-500/20 text-red-300 border-red-400/30"}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-400" : "bg-red-400"}`} />
                             {tenant.status}
                         </span>
 
-                        <button onClick={onClose} aria-label="Cerrar" className="absolute top-3 right-3 p-2 rounded-md bg-black/40 backdrop-blur text-white/80 hover:text-white hover:bg-black/60 transition-colors cursor-pointer">
+                        <button onClick={onClose} aria-label="Cerrar" className="absolute top-3 right-3 p-2 rounded-md bg-black/40 backdrop-blur-sm text-white/80 hover:text-white hover:bg-black/60 transition-colors cursor-pointer">
                             <HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" strokeWidth={1.8} />
                         </button>
 
@@ -106,7 +106,7 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
                                 </p>
                             </div>
                             {rating > 0 && (
-                                <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-black/55 backdrop-blur border border-white/15">
+                                <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-black/55 backdrop-blur-sm border border-white/15">
                                     <HugeiconsIcon icon={StarIcon} className="w-3.5 h-3.5 text-amber-400" strokeWidth={2} />
                                     <span className="text-sm font-black text-white font-mono">{rating.toFixed(1)}</span>
                                     <span className="text-[9px] font-bold text-slate-300 uppercase">({tenant.totalFeedbacks ?? 0})</span>
@@ -119,15 +119,15 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
                     <div className="flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-6 space-y-5">
                         {/* KPIs */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                            <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/[0.02] text-center">
+                            <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2 text-center">
                                 <span className="block text-xl font-black text-slate-900 dark:text-white font-mono leading-none">{tenant.infra?.courts ?? 0}</span>
                                 <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Canchas</span>
                             </div>
-                            <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/[0.02] text-center">
+                            <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2 text-center">
                                 <span className="block text-xl font-black text-slate-900 dark:text-white font-mono leading-none">{tenant.infra?.staff ?? 0}</span>
                                 <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Staff</span>
                             </div>
-                            <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/[0.02] text-center">
+                            <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2 text-center">
                                 <span className="block text-xl font-black text-slate-900 dark:text-white font-mono leading-none">{tenant.totalFeedbacks ?? 0}</span>
                                 <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Reseñas</span>
                             </div>
@@ -139,7 +139,7 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
 
                         {/* Información */}
                         <div className="rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
-                            <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/[0.03] border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
+                            <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
                                 <HugeiconsIcon icon={Building01Icon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
                                 <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Información del recinto</span>
                             </div>
@@ -156,7 +156,7 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
 
                         {/* Dueños detalle */}
                         <div className="rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
-                            <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/[0.03] border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
+                            <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
                                 <span className="flex items-center gap-2">
                                     <HugeiconsIcon icon={UserGroupIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
                                     <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Dueños</span>
@@ -182,7 +182,7 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
                     </div>
 
                     {/* FOOTER */}
-                    <div className="px-5 sm:px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/70 dark:bg-white/[0.02] flex items-center justify-between gap-2.5 shrink-0">
+                    <div className="px-5 sm:px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/70 dark:bg-white/2 flex items-center justify-between gap-2.5 shrink-0">
                         {onDelete && (
                             <button onClick={() => onDelete(tenant)} aria-label="Eliminar recinto" className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md text-[11px] font-black uppercase tracking-wider border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-500/30 dark:text-red-400 dark:hover:bg-red-500/10 transition-all cursor-pointer">
                                 <HugeiconsIcon icon={Delete01Icon} className="w-4 h-4" strokeWidth={2} />

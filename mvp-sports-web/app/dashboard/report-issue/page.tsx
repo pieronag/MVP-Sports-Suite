@@ -38,7 +38,7 @@ interface UserReport {
     repliedBy?: string;
 }
 
-const inputCls = "w-full px-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-none text-slate-800 dark:text-white placeholder:text-slate-400 focus:border-emerald-500/40 transition-all";
+const inputCls = "w-full px-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-hidden text-slate-800 dark:text-white placeholder:text-slate-400 focus:border-emerald-500/40 transition-all";
 
 export default function ReportIssuePage() {
     const { user, role, firestoreUser } = useAuth();
@@ -417,7 +417,7 @@ export default function ReportIssuePage() {
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sincronizando tus tickets...</p>
                         </div>
                     ) : reportsList.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-24 text-slate-400 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-md bg-slate-50/50 dark:bg-white/[0.02]">
+                        <div className="flex flex-col items-center justify-center py-24 text-slate-400 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-md bg-slate-50/50 dark:bg-white/2">
                             <HugeiconsIcon icon={Message02Icon} className="w-12 h-12 mb-4 text-slate-300 dark:text-slate-700" strokeWidth={1.4} />
                             <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">No has enviado ningún reporte de incidencia aún.</p>
                             <button onClick={() => setActiveTab('create')} className="mt-4 px-5 py-2 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[9px] uppercase rounded-md tracking-wider transition-all hover:brightness-110">
@@ -449,7 +449,7 @@ export default function ReportIssuePage() {
                                             </p>
                                         </div>
 
-                                        <div className="bg-slate-50 dark:bg-white/[0.02] p-4 rounded-md space-y-2 border border-slate-200 dark:border-white/5">
+                                        <div className="bg-slate-50 dark:bg-white/2 p-4 rounded-md space-y-2 border border-slate-200 dark:border-white/5">
                                             <div>
                                                 <h4 className="text-[8px] font-black uppercase tracking-widest text-slate-400">Descripción del problema:</h4>
                                                 <p className="text-xs text-slate-600 dark:text-slate-300 font-medium whitespace-pre-line mt-1">{ticket.description}</p>

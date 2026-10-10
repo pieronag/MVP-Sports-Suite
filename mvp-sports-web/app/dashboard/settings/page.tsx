@@ -430,7 +430,7 @@ export default function SettingsPage() {
         { id: 'system', label: 'Núcleo', icon: <HugeiconsIcon icon={CpuIcon} className="w-4 h-4" strokeWidth={1.8} /> },
     ];
 
-    const inputCls = "w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-4 py-2.5 text-xs font-bold outline-none text-slate-800 dark:text-white focus:border-emerald-500/40 transition-all";
+    const inputCls = "w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-4 py-2.5 text-xs font-bold outline-hidden text-slate-800 dark:text-white focus:border-emerald-500/40 transition-all";
     const panelCls = "rounded-md bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-6";
 
     if (loading) {
@@ -539,7 +539,7 @@ export default function SettingsPage() {
                                                         type="number" min={0}
                                                         value={p.price}
                                                         onChange={e => updatePlan(idx, 'price', Math.max(0, parseInt(e.target.value) || 0))}
-                                                        className="w-16 bg-transparent text-sm font-black outline-none text-slate-900 dark:text-white text-right font-mono"
+                                                        className="w-16 bg-transparent text-sm font-black outline-hidden text-slate-900 dark:text-white text-right font-mono"
                                                     />
                                                 </div>
                                                 <p className="text-[7px] font-black text-slate-400 uppercase mt-0.5">
@@ -553,14 +553,14 @@ export default function SettingsPage() {
                                                 <p className="text-[7px] font-black text-slate-400 uppercase mb-1.5 tracking-widest leading-none">Comisión %</p>
                                                 <div className="flex items-center gap-1">
                                                     <span className="text-emerald-600 dark:text-[#00df82] font-black text-[10px]">%</span>
-                                                    <input type="number" step="0.1" min={0} max={100} value={p.commission} onChange={e => updatePlan(idx, 'commission', Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)))} className="w-full bg-transparent text-xs font-black outline-none text-slate-900 dark:text-white font-mono" />
+                                                    <input type="number" step="0.1" min={0} max={100} value={p.commission} onChange={e => updatePlan(idx, 'commission', Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)))} className="w-full bg-transparent text-xs font-black outline-hidden text-slate-900 dark:text-white font-mono" />
                                                 </div>
                                             </div>
                                             <div className="p-3.5 bg-slate-50 dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10">
                                                 <p className="text-[7px] font-black text-slate-400 uppercase mb-1.5 tracking-widest leading-none">Peso prioridad</p>
                                                 <div className="flex items-center gap-1">
                                                     <HugeiconsIcon icon={BoltIcon} className="w-3 h-3 text-indigo-500" strokeWidth={1.8} />
-                                                    <input type="number" min={0} value={p.priorityScore} onChange={e => updatePlan(idx, 'priorityScore', Math.max(0, parseInt(e.target.value) || 0))} className="w-full bg-transparent text-xs font-black outline-none text-slate-900 dark:text-white font-mono" />
+                                                    <input type="number" min={0} value={p.priorityScore} onChange={e => updatePlan(idx, 'priorityScore', Math.max(0, parseInt(e.target.value) || 0))} className="w-full bg-transparent text-xs font-black outline-hidden text-slate-900 dark:text-white font-mono" />
                                                 </div>
                                             </div>
                                         </div>
@@ -727,7 +727,7 @@ export default function SettingsPage() {
                                     value={staffSearch}
                                     onChange={e => setStaffSearch(e.target.value)}
                                     placeholder="Buscar por nombre o correo..."
-                                    className="w-full pl-9 pr-3 py-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 rounded-md text-[10px] font-black outline-none text-slate-700 dark:text-white placeholder:text-slate-400"
+                                    className="w-full pl-9 pr-3 py-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 rounded-md text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400"
                                 />
                             </div>
                         </div>
@@ -738,7 +738,7 @@ export default function SettingsPage() {
                                     <h4 className="text-[11px] font-black text-indigo-100 uppercase tracking-widest leading-none font-heading">Elevar privilegios</h4>
                                 </div>
                                 <div className="space-y-3">
-                                    <input type="email" value={promoEmail} onChange={e => setPromoEmail(e.target.value)} className="w-full bg-white/10 border-none rounded-md px-4 py-3 text-[11px] font-black placeholder-indigo-300 text-white outline-none focus:ring-2 ring-white/20" placeholder="email@mvp.cl" />
+                                    <input type="email" value={promoEmail} onChange={e => setPromoEmail(e.target.value)} className="w-full bg-white/10 border-none rounded-md px-4 py-3 text-[11px] font-black placeholder-indigo-300 text-white outline-hidden focus:ring-2 ring-white/20" placeholder="email@mvp.cl" />
                                     <button onClick={promoteUser} disabled={saving} className="w-full py-3 bg-white text-indigo-600 rounded-md text-[10px] font-black uppercase active:scale-95 shadow-lg hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2">
                                         Asignar rango <HugeiconsIcon icon={ArrowUpRight01Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                                     </button>
@@ -880,7 +880,7 @@ export default function SettingsPage() {
 
             {/* MODAL */}
             {modal.show && (
-                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-black/70 backdrop-blur-md animate-fadeIn" onClick={() => setModal(prev => ({ ...prev, show: false }))}>
+                <div className="fixed inset-0 z-1000 flex items-center justify-center p-6 bg-black/70 backdrop-blur-md animate-fadeIn" onClick={() => setModal(prev => ({ ...prev, show: false }))}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-md rounded-md shadow-2xl border border-slate-200 dark:border-white/10 p-8 text-center relative overflow-hidden" onClick={e => e.stopPropagation()}>
                         <div className={`w-16 h-16 rounded-md mx-auto mb-6 flex items-center justify-center shadow-xl ${modal.type === 'danger' ? 'bg-red-500 text-white' : 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black'}`}>
                             {modal.type === 'danger' ? <HugeiconsIcon icon={Alert02Icon} className="w-8 h-8" strokeWidth={1.8} /> : <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-8 h-8" strokeWidth={1.8} />}

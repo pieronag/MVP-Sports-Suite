@@ -103,7 +103,7 @@ function InputRow({ icon: Icon, color, label, value, onChange, error, maxLength,
           {error && <span className="text-[11px] font-bold text-red-500 tracking-wide">INVÁLIDO</span>}
         </div>
         <input type={type} value={value} onChange={(e) => onChange(e.target.value)} maxLength={maxLength}
-          className={`w-full bg-transparent text-base font-medium outline-none mt-0.5 transition-colors ${error ? "text-red-500 placeholder-red-300" : (isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400")}`}
+          className={`w-full bg-transparent text-base font-medium outline-hidden mt-0.5 transition-colors ${error ? "text-red-500 placeholder-red-300" : (isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400")}`}
         />
       </div>
     </div>
@@ -127,7 +127,7 @@ function SelectRow({ icon: Icon, color, label, value, options, onSelect, disable
   return (
     <div className={`${disabled ? "opacity-40" : ""}`}>
       <button type="button" disabled={disabled} onClick={() => setOpen(!open)}
-        className="flex items-center gap-4 px-6 py-4 w-full transition-all hover:bg-white/[0.02] active:scale-[0.99]">
+        className="flex items-center gap-4 px-6 py-4 w-full transition-all hover:bg-white/2 active:scale-[0.99]">
         <div className="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: color }}>
           {renderIcon()}
         </div>
@@ -144,13 +144,13 @@ function SelectRow({ icon: Icon, color, label, value, options, onSelect, disable
         )}
       </button>
       {open && !disabled && (
-        <div className={`px-6 py-4 flex flex-wrap gap-2.5 border-t ${isDark ? "border-white/[0.04] bg-white/[0.02]" : "border-slate-100 bg-slate-50/50"}`}>
+        <div className={`px-6 py-4 flex flex-wrap gap-2.5 border-t ${isDark ? "border-white/4 bg-white/2" : "border-slate-100 bg-slate-50/50"}`}>
           {options.map((opt) => {
             const OptIcon = SPORT_ICONS[opt];
             const ic = OptIcon ? <OptIcon color={value === opt ? "white" : isDark ? "#94a3b8" : "#64748b"} size={16} /> : null;
             return (
               <button key={opt} type="button" onClick={() => { onSelect(opt); setOpen(false); }}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200 active:scale-95 ${value === opt ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200 active:scale-95 ${value === opt ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
                 {ic}{opt}
               </button>
             );
@@ -165,7 +165,7 @@ function Modal({ isOpen, onClose, children, isDark }: { isOpen: boolean; onClose
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6 animate-in fade-in duration-200" onClick={onClose}>
-      <div className={`w-full max-w-md rounded-md p-6 ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+      <div className={`w-full max-w-md rounded-md p-6 ${isDark ? "bg-[#0A101D] border border-white/6" : "bg-white border border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
     </div>
@@ -344,7 +344,7 @@ export default function PreferenciasPage() {
     <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-        <button aria-label="Volver" onClick={handleBack} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button aria-label="Volver" onClick={handleBack} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Ajustes</h1>
@@ -455,13 +455,13 @@ export default function PreferenciasPage() {
               options={["De vez en cuando", "1-2 veces por semana", "Casi todos los días"]}
               onSelect={(v) => setFormData((f) => ({ ...f, frequency: v }))}
             />
-            <button onClick={toggleTheme} className="flex items-center gap-4 px-6 py-4 w-full transition-all hover:bg-white/[0.02]">
+            <button onClick={toggleTheme} className="flex items-center gap-4 px-6 py-4 w-full transition-all hover:bg-white/2">
               <div className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${isDark ? "bg-amber-500/10" : "bg-slate-200"}`}>
                 {isDark ? <Moon size={20} className="text-amber-400" /> : <Sun size={20} className="text-slate-600" />}
               </div>
               <span className="flex-1 text-left text-[15px] font-medium">Modo Oscuro</span>
               <div className={`w-11 h-6 rounded-full relative transition-colors duration-300 ${isDark ? "bg-emerald-500" : "bg-slate-300"}`}>
-                <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 shadow ${isDark ? "left-6" : "left-1"}`} />
+                <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 shadow-sm ${isDark ? "left-6" : "left-1"}`} />
               </div>
             </button>
           </div>
@@ -472,15 +472,15 @@ export default function PreferenciasPage() {
       <SectionPill label="Seguridad" />
       <div className="px-5">
         <GlowCard isDark={isDark}>
-          <button onClick={() => setShowPasswordModal(true)} className="flex items-center gap-4 px-6 py-4 w-full transition-all hover:bg-white/[0.02]">
+          <button onClick={() => setShowPasswordModal(true)} className="flex items-center gap-4 px-6 py-4 w-full transition-all hover:bg-white/2">
             <div className="w-10 h-10 rounded-md flex items-center justify-center shrink-0 bg-rose-500/15">
               <Lock size={20} className="text-rose-400" />
             </div>
             <span className="flex-1 text-left text-[15px] font-medium">Cambiar Contraseña</span>
             <ChevronRight size={16} className="text-emerald-500" />
           </button>
-          <div className={`h-px ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`} />
-          <button onClick={() => router.push("/player/reporte")} className="flex items-center gap-4 px-6 py-4 w-full transition-all hover:bg-white/[0.02]">
+          <div className={`h-px ${isDark ? "bg-white/6" : "bg-slate-100"}`} />
+          <button onClick={() => router.push("/player/reporte")} className="flex items-center gap-4 px-6 py-4 w-full transition-all hover:bg-white/2">
             <div className="w-10 h-10 rounded-md flex items-center justify-center shrink-0 bg-blue-500/15">
               <Shield size={20} className="text-blue-400" />
             </div>
@@ -493,7 +493,7 @@ export default function PreferenciasPage() {
       {/* Actions */}
       <div className="px-5 mt-6 space-y-3">
         <button onClick={() => setShowSignOutModal(true)}
-          className={`w-full py-4 rounded-md flex items-center justify-center gap-2.5 font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
+          className={`w-full py-4 rounded-md flex items-center justify-center gap-2.5 font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
           <LogOut size={18} /> Cerrar Sesión
         </button>
         <button onClick={() => setShowDeleteModal(true)}
@@ -507,9 +507,9 @@ export default function PreferenciasPage() {
       {/* Guardar visible solo con cambios pendientes, sobre la barra inferior */}
       {hasChanges() && (
         <div className="sticky bottom-[calc(84px+env(safe-area-inset-bottom))] z-30 px-5 pb-3">
-          <div className={`flex gap-2 p-2 rounded-md border shadow-lg ${isDark ? "bg-[#0A101D] border-white/[0.08] shadow-black/40" : "bg-white border-slate-200 shadow-slate-300/50"}`}>
-            <button onClick={() => setFormData(initialData!)} disabled={saving} className={`flex-1 h-11 rounded-md text-[13px] font-semibold ${isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-600"}`}>Descartar</button>
-            <button onClick={handleSave} disabled={saving} className="flex-[2] h-11 rounded-md text-[13px] font-semibold bg-emerald-500 text-white disabled:opacity-60 flex items-center justify-center">
+          <div className={`flex gap-2 p-2 rounded-md border shadow-lg ${isDark ? "bg-[#0A101D] border-white/8 shadow-black/40" : "bg-white border-slate-200 shadow-slate-300/50"}`}>
+            <button onClick={() => setFormData(initialData!)} disabled={saving} className={`flex-1 h-11 rounded-md text-[13px] font-semibold ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>Descartar</button>
+            <button onClick={handleSave} disabled={saving} className="flex-2 h-11 rounded-md text-[13px] font-semibold bg-emerald-500 text-white disabled:opacity-60 flex items-center justify-center">
               {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Guardar cambios"}
             </button>
           </div>
@@ -532,7 +532,7 @@ export default function PreferenciasPage() {
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-heading font-black text-lg">Cambiar Contraseña</h2>
           <button aria-label="Cerrar" onClick={() => { setShowPasswordModal(false); setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword(""); }}
-            className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/[0.06] transition-colors">
+            className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/6 transition-colors">
             <X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
           </button>
         </div>
@@ -543,9 +543,9 @@ export default function PreferenciasPage() {
         ].map((f) => (
           <div key={f.label} className="mb-4">
             <label className={`text-[12px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>{f.label}</label>
-            <div className={`flex items-center rounded-md border transition-colors focus-within:border-emerald-500/50 ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`}>
+            <div className={`flex items-center rounded-md border transition-colors focus-within:border-emerald-500/50 ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`}>
               <input type={f.show ? "text" : "password"} value={f.value} onChange={(e) => f.set(e.target.value)} placeholder="••••••••"
-                className={`flex-1 p-3.5 text-sm font-medium bg-transparent outline-none ${isDark ? "text-slate-100" : "text-slate-900"}`}
+                className={`flex-1 p-3.5 text-sm font-medium bg-transparent outline-hidden ${isDark ? "text-slate-100" : "text-slate-900"}`}
               />
               <button onClick={f.toggle} className="px-3.5">{f.show ? <EyeOff size={16} className={isDark ? "text-slate-500" : "text-slate-400"} /> : <Eye size={16} className={isDark ? "text-slate-500" : "text-slate-400"} />}</button>
             </div>
@@ -553,9 +553,9 @@ export default function PreferenciasPage() {
         ))}
         <div className="flex gap-3 mt-2">
           <button onClick={() => { setShowPasswordModal(false); setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword(""); }}
-            className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
+            className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
           <button onClick={handleChangePassword} disabled={passwordLoading}
-            className="flex-[2] py-3.5 rounded-md font-semibold text-sm bg-emerald-500 text-white hover:bg-emerald-600 transition-all active:scale-[0.98] flex items-center justify-center">
+            className="flex-2 py-3.5 rounded-md font-semibold text-sm bg-emerald-500 text-white hover:bg-emerald-600 transition-all active:scale-[0.98] flex items-center justify-center">
             {passwordLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Actualizar"}
           </button>
         </div>
@@ -586,7 +586,7 @@ export default function PreferenciasPage() {
           <h2 className="font-heading font-black text-lg mb-2">¿Cerrar Sesión?</h2>
           <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>¿Estás seguro de que deseas salir?</p>
           <div className="flex gap-3">
-            <button onClick={() => setShowSignOutModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
+            <button onClick={() => setShowSignOutModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
             <button onClick={() => { setShowSignOutModal(false); logout(); router.push("/login"); }} className="flex-1 py-3.5 rounded-md font-semibold text-sm bg-rose-500 text-white hover:bg-rose-600 transition-all active:scale-[0.98]">Sí, Salir</button>
           </div>
         </div>
@@ -600,15 +600,15 @@ export default function PreferenciasPage() {
           </div>
           <h2 className="font-heading font-black text-lg text-rose-500 mb-2">¿Eliminar tu cuenta?</h2>
           <p className={`text-sm font-medium mb-4 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Esta acción es irreversible.</p>
-          <div className={`text-left p-4 rounded-md mb-6 space-y-2 text-xs font-medium ${isDark ? "bg-white/[0.03] text-slate-400" : "bg-slate-50 text-slate-500"}`}>
+          <div className={`text-left p-4 rounded-md mb-6 space-y-2 text-xs font-medium ${isDark ? "bg-white/3 text-slate-400" : "bg-slate-50 text-slate-500"}`}>
             <p>• Tu carta y perfil de jugador MVP.</p>
             <p>• Credenciales de acceso Firebase Auth.</p>
             <p>• Reservas e historial se conservan anónimos.</p>
           </div>
           <input type="password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} placeholder="Tu contraseña" aria-label="Contraseña para confirmar"
-            className={`w-full mb-4 px-4 py-3 rounded-md border text-sm outline-none ${isDark ? "bg-white/[0.04] border-white/10 text-slate-100" : "bg-white border-slate-200 text-slate-900"}`} />
+            className={`w-full mb-4 px-4 py-3 rounded-md border text-sm outline-hidden ${isDark ? "bg-white/4 border-white/10 text-slate-100" : "bg-white border-slate-200 text-slate-900"}`} />
           <div className="flex gap-3">
-            <button onClick={() => { setShowDeleteModal(false); setDeletePassword(""); }} className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
+            <button onClick={() => { setShowDeleteModal(false); setDeletePassword(""); }} className={`flex-1 py-3.5 rounded-md font-semibold text-sm transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cancelar</button>
             <button onClick={handleDeleteAccount} disabled={loadingDelete || !deletePassword} className="flex-1 py-3.5 rounded-md font-semibold text-sm bg-rose-500 text-white hover:bg-rose-600 transition-all active:scale-[0.98] flex items-center justify-center">
               {loadingDelete ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Eliminar"}
             </button>

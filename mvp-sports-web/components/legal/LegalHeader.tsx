@@ -17,7 +17,7 @@ interface LegalHeaderProps {
 
 export default function LegalHeader({ sections, onSectionClick, onRegisterClick }: LegalHeaderProps) {
   return (
-    <header className="fixed top-0 inset-x-0 z-[100] border-b border-white/5 bg-slate-950/85 backdrop-blur-xl">
+    <header className="fixed top-0 inset-x-0 z-100 border-b border-white/5 bg-slate-950/85 backdrop-blur-xl">
       <div className="container mx-auto px-6 max-w-6xl h-16 flex items-center justify-between gap-4">
         <Link href="/" aria-label="MVP Sports, ir al inicio" className="flex items-center">
           <BrandLogo size={34} wordmarkClassName="text-base sm:text-lg" priority />
@@ -47,7 +47,7 @@ export default function LegalHeader({ sections, onSectionClick, onRegisterClick 
             <button
               key={section.id}
               onClick={() => onSectionClick(section.id)}
-              className="whitespace-nowrap px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[10px] font-bold uppercase tracking-[0.1em] text-slate-300 hover:text-white hover:border-[#00df82]/40 transition-all cursor-pointer"
+              className="whitespace-nowrap px-3 py-1.5 rounded-md border border-white/10 bg-white/5 text-[10px] font-bold uppercase tracking-widest text-slate-300 hover:text-white hover:border-[#00df82]/40 transition-all cursor-pointer"
             >
               {section.name}
             </button>

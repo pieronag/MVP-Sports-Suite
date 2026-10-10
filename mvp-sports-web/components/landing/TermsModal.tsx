@@ -35,7 +35,7 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-200"
+      className="fixed inset-0 z-200 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-200"
       role="presentation"
     >
       {/* BACKDROP */}
@@ -192,14 +192,14 @@ export default function TermsModal({ isOpen, onClose }: TermsModalProps) {
                   <span className="font-bold text-white block">Cancelaciones con más de 4 horas de anticipación:</span>
                   Reembolso del dinero descontando un 3% por gastos de comisión y procesamiento de Mercado Pago + IVA.
                 </div>
-                <span className="text-[#00df82] font-black flex-shrink-0 ml-4">97% Reembolsado</span>
+                <span className="text-[#00df82] font-black shrink-0 ml-4">97% Reembolsado</span>
               </div>
               <div className="flex justify-between pt-1">
                 <div>
                   <span className="font-bold text-white block">Cancelaciones con menos de 4 horas o Check-In activo:</span>
                   El dinero se retiene de forma íntegra en favor del recinto deportivo por concepto de reserva bloqueada tardía.
                 </div>
-                <span className="text-red-500 font-black flex-shrink-0 ml-4">0% Reembolsado</span>
+                <span className="text-red-500 font-black shrink-0 ml-4">0% Reembolsado</span>
               </div>
             </div>
             <div className="p-4 bg-amber-950/10 border border-amber-900/20 rounded-md">

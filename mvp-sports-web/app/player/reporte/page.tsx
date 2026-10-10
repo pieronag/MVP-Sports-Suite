@@ -128,19 +128,19 @@ export default function ReportePage() {
 
     const inputClass = (field: string) =>
         `w-full rounded-md border px-4 h-[52px] flex items-center mb-5 transition-colors ${
-            focusedField === field ? 'border-emerald-500' : 'border-white/[0.08]'
+            focusedField === field ? 'border-emerald-500' : 'border-white/8'
         }`;
 
     const textareaClass = (field: string) =>
         `w-full rounded-md border px-4 py-3 mb-5 transition-colors min-h-[100px] ${
-            focusedField === field ? 'border-emerald-500' : 'border-white/[0.08]'
+            focusedField === field ? 'border-emerald-500' : 'border-white/8'
         }`;
 
     return (
         <div className={`min-h-screen pb-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
             {/* HEADER */}
             <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-                <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+                <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
                     <ChevronLeft size={20} className="text-emerald-500" />
                 </button>
                 <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Soporte</h1>
@@ -168,7 +168,7 @@ export default function ReportePage() {
                             Reportar otro Problema <ArrowRight size={15} />
                         </button>
                         <button onClick={() => setActiveTab('historial')}
-                            className={`w-full h-[52px] rounded-md font-semibold uppercase tracking-wide text-[12px] flex items-center justify-center border transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-[#94A3B8] border-white/[0.06]" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
+                            className={`w-full h-[52px] rounded-md font-semibold uppercase tracking-wide text-[12px] flex items-center justify-center border transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-[#94A3B8] border-white/6" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
                             Ver mis Reportes
                         </button>
                     </div>
@@ -188,7 +188,7 @@ export default function ReportePage() {
                         ) : (
                             <div className="space-y-4">
                                 {myReports.map(report => (
-                                    <div key={report.id} className={`relative rounded-md ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+                                    <div key={report.id} className={`relative rounded-md ${isDark ? "bg-[#0A101D] border border-white/6" : "bg-white border border-slate-200"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
                                         <div className="p-5">
                                             <div className="flex justify-between items-center mb-3">
                                                 <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wide border"
@@ -279,7 +279,7 @@ export default function ReportePage() {
                                 maxLength={120} onChange={e => setSubject(e.target.value)}
                                 onFocus={() => setFocusedField('subject')}
                                 onBlur={() => setFocusedField(null)}
-                                className="w-full bg-transparent text-[15px] font-semibold outline-none"
+                                className="w-full bg-transparent text-[15px] font-semibold outline-hidden"
                                 style={{ color: '#F8FAFC' }}
                             />
                         </div>
@@ -293,7 +293,7 @@ export default function ReportePage() {
                                 maxLength={80} onChange={e => setScreen(e.target.value)}
                                 onFocus={() => setFocusedField('screen')}
                                 onBlur={() => setFocusedField(null)}
-                                className="w-full bg-transparent text-[15px] font-semibold outline-none"
+                                className="w-full bg-transparent text-[15px] font-semibold outline-hidden"
                                 style={{ color: '#F8FAFC' }}
                                 autoCapitalize="characters"
                             />
@@ -308,7 +308,7 @@ export default function ReportePage() {
                                 maxLength={3000} onChange={e => setDescription(e.target.value)}
                                 onFocus={() => setFocusedField('description')}
                                 onBlur={() => setFocusedField(null)}
-                                className="w-full bg-transparent text-[15px] font-semibold outline-none resize-none h-full"
+                                className="w-full bg-transparent text-[15px] font-semibold outline-hidden resize-none h-full"
                                 style={{ color: '#F8FAFC' }}
                                 rows={4}
                             />
@@ -323,7 +323,7 @@ export default function ReportePage() {
                                 maxLength={2000} onChange={e => setSteps(e.target.value)}
                                 onFocus={() => setFocusedField('steps')}
                                 onBlur={() => setFocusedField(null)}
-                                className="w-full bg-transparent text-[15px] font-semibold outline-none resize-none h-full"
+                                className="w-full bg-transparent text-[15px] font-semibold outline-hidden resize-none h-full"
                                 style={{ color: '#F8FAFC' }}
                                 rows={3}
                                 autoCapitalize="characters"

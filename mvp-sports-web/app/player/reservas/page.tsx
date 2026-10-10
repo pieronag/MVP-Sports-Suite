@@ -389,19 +389,19 @@ export default function ReservasPage() {
 
                   {/* Detail Grid */}
                   <div className="grid grid-cols-2 gap-2.5 mb-4">
-                    <div className={`p-3 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
+                    <div className={`p-3 rounded-md border ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
                       <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${subClr}`}>FECHA</span>
                       <p className={`text-[12px] font-semibold mt-0.5 ${textClr}`}>{dateInfo.full}</p>
                     </div>
-                    <div className={`p-3 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
+                    <div className={`p-3 rounded-md border ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
                       <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${subClr}`}>HORARIO</span>
                       <p className={`text-[12px] font-semibold mt-0.5 ${textClr}`}>{b.startTime} HRS</p>
                     </div>
-                    <div className={`p-3 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
+                    <div className={`p-3 rounded-md border ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
                       <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${subClr}`}>VALOR</span>
                       <p className={`text-[13px] font-semibold mt-0.5 ${textClr}`}>${new Intl.NumberFormat("es-CL").format(b.totalPrice || b.price || 0)}</p>
                     </div>
-                    <div className={`p-3 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
+                    <div className={`p-3 rounded-md border ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
                       <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${subClr}`}>PAGO</span>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: b.paymentStatus === "paid" ? "#10b981" : b.paymentStatus === "refunded" ? "#10b981" : b.paymentStatus === "refund_failed" ? "#ef4444" : "#f59e0b" }} />
@@ -457,7 +457,7 @@ export default function ReservasPage() {
         {activeTab === "historial" && displayList.length > historyLimit && (
           <button
             onClick={() => setHistoryLimit((prev) => prev + 10)}
-            className={`mx-6 mt-4 mb-6 h-[55px] rounded-md flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] border border-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 border border-slate-200 hover:bg-slate-200"}`}
+            className={`mx-6 mt-4 mb-6 h-[55px] rounded-md flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${isDark ? "bg-white/6 border border-white/6 hover:bg-white/10" : "bg-slate-100 border border-slate-200 hover:bg-slate-200"}`}
           >
             <span className="text-emerald-500 font-semibold text-[12px] uppercase tracking-[0.5px]">Cargar más reservas</span>
           </button>
@@ -468,8 +468,8 @@ export default function ReservasPage() {
       {showTicket && selectedBooking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-5" onClick={() => setShowTicket(false)}>
           {selectedBooking.paymentStatus === "refund_failed" ? (
-            <div className={`w-full max-w-sm rounded-md border overflow-hidden ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-              <div className={`p-5 border-b flex justify-between items-center ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+            <div className={`w-full max-w-sm rounded-md border overflow-hidden ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+              <div className={`p-5 border-b flex justify-between items-center ${isDark ? "border-white/6" : "border-slate-200"}`}>
                 <span className={`text-base font-semibold uppercase tracking-tight ${textClr}`}>Devolución Pendiente</span>
                 <button aria-label="Cerrar" onClick={() => setShowTicket(false)} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9" }}>
                   <X size={18} className={textClr} />
@@ -500,7 +500,7 @@ export default function ReservasPage() {
                     <span className="text-red-500 text-[12px] font-semibold">MVP-REFUND-{(selectedBooking.id || "").substring(0, 8).toUpperCase()}</span>
                   </div>
                 </div>
-                <div className={`p-5 rounded-md border space-y-2 ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
+                <div className={`p-5 rounded-md border space-y-2 ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
                   <p className="text-red-500 text-[12px] font-semibold tracking-[0.5px] uppercase">Instrucciones para Devolución</p>
                   <p className={`text-[12px] font-semibold leading-[14px] ${subClr}`}>
                     Debido a una desconexión temporal con la pasarela de pagos, el sistema automático no pudo reversar tu dinero. Presenta este comprobante de validación digital directamente al administrador o dueño del recinto deportivo para solicitar tu transferencia manual por el monto total indicado arriba.
@@ -536,7 +536,7 @@ export default function ReservasPage() {
               </div>
             </div>
           ) : (
-            <div className={`w-full max-w-sm rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+            <div className={`w-full max-w-sm rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
               <div className={`p-7 border-b-2 border-dashed ${isDark ? "border-white/10" : "border-slate-200"}`}>
                 <div className="flex justify-between items-center mb-5">
                   <div className="w-12 h-12 rounded-md flex items-center justify-center" style={{ backgroundColor: modalSportInfo.color + "15" }}>
@@ -559,8 +559,8 @@ export default function ReservasPage() {
                   </div>
                 </div>
               </div>
-              <div className={`p-10 flex flex-col items-center ${isDark ? "bg-white/[0.03]" : "bg-slate-50"}`}>
-                <div className="bg-white p-5 rounded-md shadow-sm">
+              <div className={`p-10 flex flex-col items-center ${isDark ? "bg-white/3" : "bg-slate-50"}`}>
+                <div className="bg-white p-5 rounded-md shadow-xs">
                   {selectedBooking.id && <QRCodeSVG value={selectedBooking.id} size={150} fgColor="#0F172A" bgColor="white" />}
                 </div>
                 <p className={`text-[11px] font-semibold uppercase tracking-[4px] mt-6 ${subClr}`}>ID: {(selectedBooking.id as string)?.slice(-8).toUpperCase()}</p>
@@ -585,7 +585,7 @@ export default function ReservasPage() {
       {/* Feedback Modal */}
       {fbVisible && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-10" onClick={() => setFbVisible(false)}>
-          <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-[70px] h-[70px] rounded-full flex items-center justify-center mb-5" style={{ backgroundColor: fbType === "error" ? "#ef444422" : "#10b98122" }}>
               {fbType === "error" ? <XCircle color="#ef4444" size={35} /> : <CheckCircle2 color="#10b981" size={35} />}
             </div>
@@ -601,7 +601,7 @@ export default function ReservasPage() {
       {/* Survey Modal */}
       {showSurveyModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowSurveyModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-7 border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-7 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col items-center mb-6">
               <div className="w-[60px] h-[60px] rounded-md flex items-center justify-center mb-4" style={{ backgroundColor: "#10b98115" }}>
                 <Star color="#10b981" size={30} fill="#10b981" />
@@ -617,18 +617,18 @@ export default function ReservasPage() {
               ))}
             </div>
             <textarea
-              className={`w-full min-h-[100px] rounded-md p-5 text-sm border mb-6 resize-none outline-none ${isDark ? "bg-[#0A101D] text-[#F8FAFC] border-white/[0.06]" : "bg-white text-[#0F172A] border-slate-200"}`}
+              className={`w-full min-h-[100px] rounded-md p-5 text-sm border mb-6 resize-none outline-hidden ${isDark ? "bg-[#0A101D] text-[#F8FAFC] border-white/6" : "bg-white text-[#0F172A] border-slate-200"}`}
               placeholder="Comentarios adicionales (opcional)..."
               value={surveyFeedback}
               onChange={(e) => setSurveyFeedback(e.target.value)}
             />
             <div className="flex gap-2.5">
-              <button onClick={() => setShowSurveyModal(false)} className={`flex-1 h-[60px] rounded-md font-semibold text-sm border transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-[#94A3B8] border-white/[0.06]" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
+              <button onClick={() => setShowSurveyModal(false)} className={`flex-1 h-[60px] rounded-md font-semibold text-sm border transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-[#94A3B8] border-white/6" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
                 CANCELAR
               </button>
               <button
                 onClick={() => handleSaveSurvey(surveyRating, surveyFeedback)}
-                className="flex-[2] h-[60px] rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98]"
+                className="flex-2 h-[60px] rounded-md bg-emerald-500 text-white font-semibold text-sm transition-all active:scale-[0.98]"
               >
                 FINALIZAR PARTIDO
               </button>
@@ -640,14 +640,14 @@ export default function ReservasPage() {
       {/* Cancel Modal */}
       {showCancelModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-10" onClick={() => setShowCancelModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-20 h-20 rounded-full flex items-center justify-center mb-5" style={{ backgroundColor: (cancelModalInfo.danger ? "#ef4444" : "#10b981") + "15" }}>
               <Trash2 size={40} color={cancelModalInfo.danger ? "#ef4444" : "#f59e0b"} />
             </div>
             <p className={`text-lg font-semibold text-center mb-2.5 ${textClr}`}>{cancelModalInfo.title}</p>
             <p className={`text-sm font-semibold text-center mb-7 leading-5 ${subClr}`}>{cancelModalInfo.message}</p>
             <div className="flex gap-2.5 w-full">
-              <button onClick={() => setShowCancelModal(false)} className={`flex-1 h-[55px] rounded-md font-semibold text-xs border transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-[#94A3B8] border-white/[0.06]" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
+              <button onClick={() => setShowCancelModal(false)} className={`flex-1 h-[55px] rounded-md font-semibold text-xs border transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-[#94A3B8] border-white/6" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
                 VOLVER
               </button>
               <button onClick={confirmCancel} className="flex-1 h-[55px] rounded-md font-semibold text-xs text-white transition-all active:scale-[0.98]" style={{ backgroundColor: cancelModalInfo.danger ? "#ef4444" : "#10b981" }}>
@@ -661,14 +661,14 @@ export default function ReservasPage() {
       {/* CheckIn Modal */}
       {showCheckInModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-10" onClick={() => setShowCheckInModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-20 h-20 rounded-full flex items-center justify-center mb-5" style={{ backgroundColor: "#10b98115" }}>
               <ShieldCheck color="#10b981" size={40} />
             </div>
             <p className={`text-lg font-semibold text-center mb-2.5 ${textClr}`}>Confirmar Llegada</p>
             <p className={`text-sm font-semibold text-center mb-7 leading-5 ${subClr}`}>¿Confirmas que ya te encuentras en el recinto para iniciar tu partido?</p>
             <div className="flex gap-2.5 w-full">
-              <button onClick={() => setShowCheckInModal(false)} className={`flex-1 h-[55px] rounded-md font-semibold text-xs border transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-[#94A3B8] border-white/[0.06]" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
+              <button onClick={() => setShowCheckInModal(false)} className={`flex-1 h-[55px] rounded-md font-semibold text-xs border transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-[#94A3B8] border-white/6" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
                 VOLVER
               </button>
               <button onClick={confirmCheckIn} className="flex-1 h-[55px] rounded-md font-semibold text-xs text-white bg-emerald-500 transition-all active:scale-[0.98]">

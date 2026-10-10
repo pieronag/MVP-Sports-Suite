@@ -34,7 +34,7 @@ const COLUMN_WIDTH = 180;
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructive = false, showCancel = true }: any) => {
     if (!isOpen) return null;
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={onCancel}>
+        <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn" onClick={onCancel}>
             <div className="bg-white dark:bg-[#0B0F19] rounded-md shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
                 <div className={`absolute top-0 left-0 w-full h-1 ${isDestructive ? 'bg-red-500' : 'bg-emerald-500'}`}></div>
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter leading-none">{title}</h3>
@@ -420,12 +420,12 @@ export default function MasterCalendar() {
                         <button onClick={() => shiftDay(-1)} aria-label="Día anterior" className="p-2.5 text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                             <HugeiconsIcon icon={ArrowLeft01Icon} className="w-4 h-4" strokeWidth={2.2} />
                         </button>
-                        <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="bg-transparent px-2 text-[10px] font-black uppercase text-slate-700 dark:text-white outline-none cursor-pointer" />
+                        <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="bg-transparent px-2 text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer" />
                         <button onClick={() => shiftDay(1)} aria-label="Día siguiente" className="p-2.5 text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                             <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4" strokeWidth={2.2} />
                         </button>
                     </div>
-                    <select value={selectedVenueId} onChange={(e) => setSelectedVenueId(e.target.value)} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase text-slate-700 dark:text-white outline-none cursor-pointer appearance-none min-w-[180px]">
+                    <select value={selectedVenueId} onChange={(e) => setSelectedVenueId(e.target.value)} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer appearance-none min-w-[180px]">
                         {venues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                     </select>
                     <button onClick={handleOpenAddModal} className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all"><HugeiconsIcon icon={Add01Icon} className="w-4 h-4" strokeWidth={2} /> Nueva reserva</button>
@@ -440,8 +440,8 @@ export default function MasterCalendar() {
                 <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Canchas</p><h3 className="text-lg font-black text-emerald-600 dark:text-[#00df82] leading-none font-mono">{dashboardCourts.length}</h3></div>
             </div>
 
-            <div className="flex-1 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 shadow-sm overflow-hidden flex flex-col min-h-0 relative">
-                <div className="px-5 py-2 border-b border-slate-50 dark:border-white/5 flex flex-wrap gap-4 bg-slate-50/50 dark:bg-white/[0.02]">
+            <div className="flex-1 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 shadow-xs overflow-hidden flex flex-col min-h-0 relative">
+                <div className="px-5 py-2 border-b border-slate-50 dark:border-white/5 flex flex-wrap gap-4 bg-slate-50/50 dark:bg-white/2">
                     {[['bg-emerald-500', 'Pagado'], ['bg-sky-500', 'Pendiente'], ['bg-amber-500', 'Abono'], ['bg-slate-400', 'Anulado']].map(([color, label]) => (
                         <div key={label} className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full ${color}`}></div><span className="text-[9px] font-bold text-slate-400 uppercase">{label}</span></div>
                     ))}
@@ -451,7 +451,7 @@ export default function MasterCalendar() {
                     <div className="min-w-max h-full">
                         <div className="sticky top-0 z-30 bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-md border-b border-slate-100 dark:border-white/10 flex ml-14">
                             {dashboardCourts.map(c => (
-                                <div key={c.id} style={{ width: COLUMN_WIDTH }} className="flex-shrink-0 py-3 text-center border-r border-slate-50 dark:border-white/5">
+                                <div key={c.id} style={{ width: COLUMN_WIDTH }} className="shrink-0 py-3 text-center border-r border-slate-50 dark:border-white/5">
                                     <p className="text-[8px] font-black text-emerald-500 uppercase tracking-widest mb-0.5">{c.sport}</p>
                                     <h4 className="text-[10px] font-black text-slate-800 dark:text-white uppercase">{c.name}</h4>
                                 </div>
@@ -459,15 +459,15 @@ export default function MasterCalendar() {
                         </div>
                         <div className="flex relative">
                             <div className="sticky left-0 z-20 w-14 bg-white dark:bg-[#0B0F19] border-r border-slate-100 dark:border-white/10">
-                                {calendarConfig.timeSlots.map(h => <div key={h} style={{ height: HOUR_HEIGHT }} className="border-b border-slate-50 dark:border-white/[0.03] flex items-start justify-center pt-2.5"><span className="text-[10px] font-mono font-bold text-slate-400">{h}</span></div>)}
+                                {calendarConfig.timeSlots.map(h => <div key={h} style={{ height: HOUR_HEIGHT }} className="border-b border-slate-50 dark:border-white/3 flex items-start justify-center pt-2.5"><span className="text-[10px] font-mono font-bold text-slate-400">{h}</span></div>)}
                             </div>
                             <div className="relative flex">
-                                {dashboardCourts.map(c => <div key={c.id} style={{ width: COLUMN_WIDTH }} className="border-r border-slate-50 dark:border-white/[0.04] h-full pointer-events-none"></div>)}
+                                {dashboardCourts.map(c => <div key={c.id} style={{ width: COLUMN_WIDTH }} className="border-r border-slate-50 dark:border-white/4 h-full pointer-events-none"></div>)}
                                 {bookings.map(b => {
                                     const cIndex = dashboardCourts.findIndex(c => c.name === b.courtName);
                                     if (cIndex === -1) return null;
                                     return (
-                                        <div key={b.id} onClick={() => setSelectedBooking(b)} className={`absolute z-10 p-2 mx-1 rounded-md border shadow-sm cursor-pointer flex flex-col justify-between overflow-hidden transition-all hover:brightness-95 ${getCardStyle(b.paymentStatus, b.status)}`} style={{ top: (b.extractedHour - calendarConfig.startHour) * HOUR_HEIGHT + 2, height: HOUR_HEIGHT - 4, left: cIndex * COLUMN_WIDTH, width: COLUMN_WIDTH - 8 }}>
+                                        <div key={b.id} onClick={() => setSelectedBooking(b)} className={`absolute z-10 p-2 mx-1 rounded-md border shadow-xs cursor-pointer flex flex-col justify-between overflow-hidden transition-all hover:brightness-95 ${getCardStyle(b.paymentStatus, b.status)}`} style={{ top: (b.extractedHour - calendarConfig.startHour) * HOUR_HEIGHT + 2, height: HOUR_HEIGHT - 4, left: cIndex * COLUMN_WIDTH, width: COLUMN_WIDTH - 8 }}>
                                             <div className="flex justify-between items-start gap-1">
                                                 <div className="min-w-0">
                                                     <p className="text-[7px] font-black uppercase opacity-40 mb-0.5">#{b.id.slice(-4).toUpperCase()}</p>
@@ -491,7 +491,7 @@ export default function MasterCalendar() {
             </div>
 
             {selectedBooking && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={() => setSelectedBooking(null)}>
+                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={() => setSelectedBooking(null)}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-md rounded-md shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden max-h-[95vh] flex flex-col" onClick={e => e.stopPropagation()}>
                         <div className={`flex items-center justify-between px-6 py-4 text-white ${selectedBooking.status === 'cancelled' ? 'bg-red-500' : 'bg-emerald-500 dark:bg-[#00df82] dark:text-black'}`}>
                             <div className="flex items-center gap-3">
@@ -612,7 +612,7 @@ export default function MasterCalendar() {
             )}
 
             {isAddModalOpen && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={() => setIsAddModalOpen(false)}>
+                <div className="fixed inset-0 z-110 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={() => setIsAddModalOpen(false)}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-4xl rounded-md shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden max-h-[95vh] flex flex-col" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between px-6 py-4 bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10">
                             <div className="flex items-center gap-3">
@@ -638,26 +638,26 @@ export default function MasterCalendar() {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Recinto</label>
-                                            <select required value={newRes.tenantId} onChange={e => setNewRes({ ...newRes, tenantId: e.target.value })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase outline-none focus:border-emerald-500/40 transition-all">
+                                            <select required value={newRes.tenantId} onChange={e => setNewRes({ ...newRes, tenantId: e.target.value })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase outline-hidden focus:border-emerald-500/40 transition-all">
                                                 {venues.map(v => <option key={v.id} value={v.id} className="dark:bg-black">{v.name}</option>)}
                                             </select>
                                         </div>
                                         <div>
                                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Fecha</label>
-                                            <input type="date" required value={newRes.date} onChange={e => setNewRes({ ...newRes, date: e.target.value })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-none focus:border-emerald-500/40 transition-all" />
+                                            <input type="date" required value={newRes.date} onChange={e => setNewRes({ ...newRes, date: e.target.value })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-hidden focus:border-emerald-500/40 transition-all" />
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Cancha</label>
-                                            <select required value={newRes.courtId} onChange={e => setNewRes({ ...newRes, courtId: e.target.value })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase outline-none focus:border-emerald-500/40 transition-all">
+                                            <select required value={newRes.courtId} onChange={e => setNewRes({ ...newRes, courtId: e.target.value })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase outline-hidden focus:border-emerald-500/40 transition-all">
                                                 <option value="">Selecciona...</option>
                                                 {modalCourts.map(c => <option key={c.id} value={c.id} className="dark:bg-black">{c.name} ({c.sport})</option>)}
                                             </select>
                                         </div>
 <div>
                                         <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Hora inicio</label>
-                                        <select required value={newRes.startTime} onChange={e => setNewRes({ ...newRes, startTime: e.target.value })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-none focus:border-emerald-500/40 transition-all">
+                                        <select required value={newRes.startTime} onChange={e => setNewRes({ ...newRes, startTime: e.target.value })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-hidden focus:border-emerald-500/40 transition-all">
                                             {calendarConfig.timeSlots.map(t => <option key={t} value={t} className="dark:bg-black">{t}</option>)}
                                         </select>
                                     </div>
@@ -672,16 +672,16 @@ export default function MasterCalendar() {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Nombre</label>
-                                            <input required type="text" value={newRes.clientName} onChange={e => setNewRes({ ...newRes, clientName: e.target.value })} placeholder="Nombre del jugador" className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-none focus:border-emerald-500/40 transition-all" />
+                                            <input required type="text" value={newRes.clientName} onChange={e => setNewRes({ ...newRes, clientName: e.target.value })} placeholder="Nombre del jugador" className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-hidden focus:border-emerald-500/40 transition-all" />
                                         </div>
                                         <div>
                                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Teléfono</label>
-                                            <input required type="tel" value={newRes.clientPhone} onChange={e => setNewRes({ ...newRes, clientPhone: e.target.value })} placeholder="+56 9..." className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-none focus:border-emerald-500/40 transition-all" />
+                                            <input required type="tel" value={newRes.clientPhone} onChange={e => setNewRes({ ...newRes, clientPhone: e.target.value })} placeholder="+56 9..." className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-hidden focus:border-emerald-500/40 transition-all" />
                                         </div>
                                     </div>
                                     <div>
                                         <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Notas (opcional)</label>
-                                        <textarea rows={2} value={newRes.notes} onChange={e => setNewRes({ ...newRes, notes: e.target.value })} placeholder="Comentarios para el recinto..." className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-none focus:border-emerald-500/40 transition-all resize-none" />
+                                        <textarea rows={2} value={newRes.notes} onChange={e => setNewRes({ ...newRes, notes: e.target.value })} placeholder="Comentarios para el recinto..." className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black outline-hidden focus:border-emerald-500/40 transition-all resize-none" />
                                     </div>
                                 </div>
                             </div>
@@ -696,12 +696,12 @@ export default function MasterCalendar() {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Monto (CLP)</label>
-                                            <input required type="number" value={newRes.price} onChange={e => { setNewRes({ ...newRes, price: e.target.value }); setPriceAutoFilled(false); }} className={`w-full bg-white dark:bg-white/5 border rounded-md px-3 py-2.5 text-[11px] font-black outline-none transition-all ${priceAutoFilled ? 'border-emerald-500 text-emerald-600 dark:text-[#00df82]' : 'border-slate-200 dark:border-white/10 text-slate-900 dark:text-white'}`} />
+                                            <input required type="number" value={newRes.price} onChange={e => { setNewRes({ ...newRes, price: e.target.value }); setPriceAutoFilled(false); }} className={`w-full bg-white dark:bg-white/5 border rounded-md px-3 py-2.5 text-[11px] font-black outline-hidden transition-all ${priceAutoFilled ? 'border-emerald-500 text-emerald-600 dark:text-[#00df82]' : 'border-slate-200 dark:border-white/10 text-slate-900 dark:text-white'}`} />
                                             {priceAutoFilled && <p className="text-[8px] font-black text-emerald-600 dark:text-[#00df82] uppercase mt-1">Auto-completado según tarifa</p>}
                                         </div>
                                         <div>
                                             <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1.5">Estado de pago</label>
-                                            <select value={newRes.paymentStatus} onChange={e => setNewRes({ ...newRes, paymentStatus: e.target.value, deposit: e.target.value === 'paid' ? newRes.price : '0' })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase outline-none focus:border-emerald-500/40 transition-all">
+                                            <select value={newRes.paymentStatus} onChange={e => setNewRes({ ...newRes, paymentStatus: e.target.value, deposit: e.target.value === 'paid' ? newRes.price : '0' })} className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase outline-hidden focus:border-emerald-500/40 transition-all">
                                                 <option value="paid">Pagado total</option>
                                                 <option value="partial">Abono / parcial</option>
                                                 <option value="pending">Pendiente</option>
@@ -711,7 +711,7 @@ export default function MasterCalendar() {
                                     {newRes.paymentStatus === 'partial' && (
                                         <div className="animate-slideIn">
                                             <label className="text-[9px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-wider block mb-1.5">Monto abono</label>
-                                            <input required type="number" value={newRes.deposit} onChange={e => setNewRes({ ...newRes, deposit: e.target.value })} className="w-full bg-white dark:bg-white/5 border-2 border-emerald-500 dark:border-[#00df82] rounded-md px-3 py-2.5 text-[11px] font-black text-emerald-600 dark:text-[#00df82] outline-none" />
+                                            <input required type="number" value={newRes.deposit} onChange={e => setNewRes({ ...newRes, deposit: e.target.value })} className="w-full bg-white dark:bg-white/5 border-2 border-emerald-500 dark:border-[#00df82] rounded-md px-3 py-2.5 text-[11px] font-black text-emerald-600 dark:text-[#00df82] outline-hidden" />
                                         </div>
                                     )}
                                     <div>
@@ -770,7 +770,7 @@ export default function MasterCalendar() {
 
                                 <div className="flex gap-4">
                                     <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 py-3.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 rounded-md text-[10px] font-black uppercase tracking-wider active:scale-95 transition-all">Cancelar</button>
-                                    <button type="submit" disabled={creatingBooking || availabilityStatus === 'occupied' || availabilityStatus === 'checking'} className="flex-[2] py-3.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md text-[10px] font-black uppercase tracking-wider shadow-xl active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">{creatingBooking ? <><HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> Guardando...</> : <><HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={2} /> Confirmar reserva</>}</button>
+                                    <button type="submit" disabled={creatingBooking || availabilityStatus === 'occupied' || availabilityStatus === 'checking'} className="flex-2 py-3.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md text-[10px] font-black uppercase tracking-wider shadow-xl active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2">{creatingBooking ? <><HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> Guardando...</> : <><HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={2} /> Confirmar reserva</>}</button>
                                 </div>
                             </div>
                         </form>

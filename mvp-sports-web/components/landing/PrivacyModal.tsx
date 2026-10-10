@@ -35,7 +35,7 @@ export default function PrivacyModal({ isOpen, onClose }: PrivacyModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-200"
+      className="fixed inset-0 z-200 flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-200"
       role="presentation"
     >
       {/* BACKDROP */}

@@ -43,7 +43,7 @@ function PanelHeader({ titulo, desc, icon: Icon, action }: any) {
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
     return (
-        <div className={`fixed top-4 right-4 z-[150] flex items-center gap-3 px-4 py-2.5 rounded-md shadow-2xl text-[9px] font-black uppercase tracking-widest text-white ${type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`}>
+        <div className={`fixed top-4 right-4 z-150 flex items-center gap-3 px-4 py-2.5 rounded-md shadow-2xl text-[9px] font-black uppercase tracking-widest text-white ${type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`}>
             {type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" /> : <HugeiconsIcon icon={Alert02Icon} className="w-4 h-4" />}
             <span>{message}</span>
         </div>
@@ -53,7 +53,7 @@ const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructive = false }: any) => {
     if (!isOpen) return null;
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={onCancel}>
+        <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn" onClick={onCancel}>
             <div className="bg-white dark:bg-[#0B0F19] rounded-md shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
                 <div className={`absolute top-0 left-0 w-full h-1 ${isDestructive ? 'bg-red-500' : 'bg-emerald-500'}`}></div>
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter">{title}</h3>
@@ -312,7 +312,7 @@ export default function CouponsPage() {
                         <select 
                             value={selectedTenantId || ''} 
                             onChange={(e) => setSelectedTenantId(e.target.value)}
-                            className="px-5 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[9px] font-black uppercase tracking-wider rounded-md focus:ring-1 focus:ring-pink-500 outline-none text-slate-700 dark:text-slate-200"
+                            className="px-5 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[9px] font-black uppercase tracking-wider rounded-md focus:ring-1 focus:ring-pink-500 outline-hidden text-slate-700 dark:text-slate-200"
                         >
                             {tenants.map(t => {
                                 const isLocked = !(t as any).features?.marketing;
@@ -360,9 +360,9 @@ export default function CouponsPage() {
 
                         <a 
                             href="/dashboard/billing-subscription" 
-                            className="relative group px-8 py-3.5 overflow-hidden rounded-md bg-gradient-to-r from-pink-500 via-rose-500 to-amber-500 font-black text-[9px] uppercase tracking-[0.2em] text-slate-950 transition-all hover:scale-[1.03] active:scale-95 shadow-xl shadow-pink-500/10 flex items-center justify-center gap-2 border border-white/20 z-10"
+                            className="relative group px-8 py-3.5 overflow-hidden rounded-md bg-linear-to-r from-pink-500 via-rose-500 to-amber-500 font-black text-[9px] uppercase tracking-[0.2em] text-slate-950 transition-all hover:scale-[1.03] active:scale-95 shadow-xl shadow-pink-500/10 flex items-center justify-center gap-2 border border-white/20 z-10"
                         >
-                            <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-amber-400 via-rose-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div className="absolute inset-0 w-full h-full bg-linear-to-r from-amber-400 via-rose-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                             <HugeiconsIcon icon={SparklesIcon} className="w-4 h-4 text-slate-950" />
                             <span className="relative z-10 font-black">MEJORAR PLAN</span>
                         </a>
@@ -417,7 +417,7 @@ export default function CouponsPage() {
                         {loading ? (
                             <div className="text-center py-20 text-[9px] font-bold text-slate-400 uppercase tracking-widest animate-pulse">Cargando beneficios...</div>
                         ) : filteredCoupons.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-200 dark:border-white/5 shadow-sm">
+                            <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-200 dark:border-white/5 shadow-xs">
                                 <div className="w-16 h-16 bg-pink-50 dark:bg-pink-500/10 rounded-md flex items-center justify-center text-pink-500 border border-pink-100 dark:border-pink-500/20">
                                     <HugeiconsIcon icon={DiscountTag01Icon} className="w-8 h-8" strokeWidth={1.4} />
                                 </div>
@@ -435,7 +435,7 @@ export default function CouponsPage() {
                                     const state = couponState(c);
                                     const usagePct = c.limit > 0 ? Math.min(Math.round(((c.uses || 0) / c.limit) * 100), 100) : 0;
                                     return (
-                                        <div key={c.id} className="bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 shadow-sm hover:border-pink-500/30 hover:shadow-lg hover:shadow-pink-500/5 transition-all flex flex-col overflow-hidden">
+                                        <div key={c.id} className="bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 shadow-xs hover:border-pink-500/30 hover:shadow-lg hover:shadow-pink-500/5 transition-all flex flex-col overflow-hidden">
                                             <div className="p-6 pb-5">
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div className="w-11 h-11 rounded-md bg-pink-50 dark:bg-pink-500/10 text-pink-500 border border-pink-100 dark:border-pink-500/20 flex items-center justify-center">
@@ -476,7 +476,7 @@ export default function CouponsPage() {
                                                 <p className="text-right text-[8px] text-slate-400 font-mono">{usagePct}% utilizado</p>
                                             </div>
 
-                                            <div className="p-3 bg-slate-50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5 flex gap-2">
+                                            <div className="p-3 bg-slate-50 dark:bg-white/2 border-t border-slate-100 dark:border-white/5 flex gap-2">
                                                 <button onClick={() => handleOpenModal(c)} className="flex-1 py-2.5 flex items-center justify-center bg-white dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-pink-400/40 transition-all" title="Editar">
                                                     <HugeiconsIcon icon={PencilEdit02Icon} className="w-4 h-4" />
                                                 </button>
@@ -494,7 +494,7 @@ export default function CouponsPage() {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setIsModalOpen(false)}>
+                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setIsModalOpen(false)}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-md rounded-md shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-5 border-b border-slate-100 dark:border-white/5">
                             <div className="flex items-center gap-3.5">
@@ -513,7 +513,7 @@ export default function CouponsPage() {
                         <form onSubmit={handleSave} className="p-6 space-y-4">
                             <div>
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Código Promocional</label>
-                                <input required type="text" value={formData.code} onChange={e => setFormData({ ...formData, code: e.target.value.toUpperCase() })} className="w-full px-3.5 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-lg font-black tracking-[0.2em] outline-none uppercase focus:border-pink-500 transition-all" placeholder="EJ: PADEL2026" />
+                                <input required type="text" value={formData.code} onChange={e => setFormData({ ...formData, code: e.target.value.toUpperCase() })} className="w-full px-3.5 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-lg font-black tracking-[0.2em] outline-hidden uppercase focus:border-pink-500 transition-all" placeholder="EJ: PADEL2026" />
                             </div>
                             <div>
                                 <div className="flex items-center justify-between mb-1.5">
@@ -525,30 +525,30 @@ export default function CouponsPage() {
                                         <button key={p} type="button" onClick={() => setFormData({ ...formData, discount: p })} className={`py-2 rounded-md text-[10px] font-black uppercase transition-all ${formData.discount === p ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/25' : 'bg-slate-100 dark:bg-white/5 text-slate-400 hover:bg-pink-50 dark:hover:bg-pink-500/10 hover:text-pink-500'}`}>{p}%</button>
                                     ))}
                                 </div>
-                                <input required type="number" min="1" max="100" value={formData.discount} onChange={e => setFormData({ ...formData, discount: Number(e.target.value) })} className="w-full px-3.5 py-2.5 bg-pink-50 dark:bg-pink-500/5 border border-pink-200 dark:border-pink-500/20 rounded-md text-xs font-black outline-none" />
+                                <input required type="number" min="1" max="100" value={formData.discount} onChange={e => setFormData({ ...formData, discount: Number(e.target.value) })} className="w-full px-3.5 py-2.5 bg-pink-50 dark:bg-pink-500/5 border border-pink-200 dark:border-pink-500/20 rounded-md text-xs font-black outline-hidden" />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Límite Usos</label>
-                                    <input required type="number" min="1" value={formData.limit} onChange={e => setFormData({ ...formData, limit: Number(e.target.value) })} className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-black outline-none" />
+                                    <input required type="number" min="1" value={formData.limit} onChange={e => setFormData({ ...formData, limit: Number(e.target.value) })} className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-black outline-hidden" />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Mínimo Compra ($)</label>
-                                    <input required type="number" min="0" value={formData.minimumPurchase} onChange={e => setFormData({ ...formData, minimumPurchase: Number(e.target.value) })} className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-black outline-none" />
+                                    <input required type="number" min="0" value={formData.minimumPurchase} onChange={e => setFormData({ ...formData, minimumPurchase: Number(e.target.value) })} className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-black outline-hidden" />
                                 </div>
                             </div>
                             <div>
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Descripción</label>
-                                <textarea required rows={2} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-none resize-none" placeholder="Restricciones..." />
+                                <textarea required rows={2} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-hidden resize-none" placeholder="Restricciones..." />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Fecha Inicio</label>
-                                    <input required type="date" value={formData.validFrom} onChange={e => setFormData({ ...formData, validFrom: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-black outline-none uppercase" />
+                                    <input required type="date" value={formData.validFrom} onChange={e => setFormData({ ...formData, validFrom: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-black outline-hidden uppercase" />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Fecha Fin</label>
-                                    <input required type="date" value={formData.validUntil} onChange={e => setFormData({ ...formData, validUntil: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-black outline-none uppercase" />
+                                    <input required type="date" value={formData.validUntil} onChange={e => setFormData({ ...formData, validUntil: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-black outline-hidden uppercase" />
                                 </div>
                             </div>
                             <button

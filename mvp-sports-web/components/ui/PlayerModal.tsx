@@ -320,7 +320,7 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
 
     return (
         <ModalPortal>
-            <div className="fixed inset-0 z-[400] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/80 dark:bg-black/85 backdrop-blur-xl animate-in fade-in duration-200" role="presentation" onClick={onClose}>
+            <div className="fixed inset-0 z-400 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/80 dark:bg-black/85 backdrop-blur-xl animate-in fade-in duration-200" role="presentation" onClick={onClose}>
                 <div
                     role="dialog"
                     aria-modal="true"
@@ -402,13 +402,13 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
                                     {mainSport && <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-400"><HugeiconsIcon icon={Target01Icon} className="w-3.5 h-3.5 text-emerald-500" strokeWidth={1.8} />{mainSport}{position ? ` · ${position}` : ''}</span>}
                                 </div>
 
-                                <div className="p-4 rounded-md border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
+                                <div className="p-4 rounded-md border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/2">
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Progreso a {siguienteRango.name}</span>
                                         <span className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{progreso}%</span>
                                     </div>
                                     <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
-                                        <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-[#00df82]" style={{ width: `${progreso}%` }} />
+                                        <div className="h-full rounded-full bg-linear-to-r from-emerald-500 to-[#00df82]" style={{ width: `${progreso}%` }} />
                                     </div>
                                 </div>
 
@@ -420,7 +420,7 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
                                         { label: 'Goles', val: stats.goals || 0, color: 'text-amber-500', icon: FireIcon },
                                         { label: 'Asistencias', val: stats.assists || 0, color: 'text-teal-500', icon: SparklesIcon },
                                     ].map((s, i) => (
-                                        <div key={i} className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/[0.02] text-center">
+                                        <div key={i} className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2 text-center">
                                             <HugeiconsIcon icon={s.icon} className={`w-4 h-4 mx-auto mb-1.5 ${s.color}`} strokeWidth={1.8} />
                                             <span className={`block text-lg font-black leading-none font-mono ${s.color}`}>{s.val}</span>
                                             <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">{s.label}</span>
@@ -452,7 +452,7 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
                             return (
                                 <div className="space-y-5 animate-in fade-in duration-200">
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                                        <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/[0.02] text-center">
+                                        <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2 text-center">
                                             <span className="block text-xl font-black text-slate-900 dark:text-white font-mono leading-none">{matches.length}</span>
                                             <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Partidos</span>
                                         </div>
@@ -460,7 +460,7 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
                                             <span className="block text-xl font-black text-emerald-600 dark:text-[#00df82] font-mono leading-none">{winRate}%</span>
                                             <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Victorias</span>
                                         </div>
-                                        <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/[0.02] text-center">
+                                        <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2 text-center">
                                             <span className="block text-xl font-black text-slate-900 dark:text-white font-mono leading-none">{wins}<span className="text-slate-400">/</span>{losses}</span>
                                             <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">V / D</span>
                                         </div>
@@ -496,7 +496,7 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
                                                 const rt = isWin ? 'Victoria' : isLoss ? 'Derrota' : isNoShow ? 'No-Show' : isCancelled ? 'Cancelado' : 'Jugado';
                                                 const mXP = calculateMatchXP(m);
                                                 return (
-                                                    <div key={m.id} className="flex items-center gap-3 p-3.5 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/[0.02] hover:border-emerald-300 dark:hover:border-[#00df82]/30 transition-all">
+                                                    <div key={m.id} className="flex items-center gap-3 p-3.5 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2 hover:border-emerald-300 dark:hover:border-[#00df82]/30 transition-all">
                                                         <div className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${isWin ? 'bg-emerald-500/10 text-emerald-600 dark:text-[#00df82]' : isLoss ? 'bg-rose-500/10 text-rose-500' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
                                                             <HugeiconsIcon icon={isWin ? TrophyIcon : isLoss ? Shield01Icon : Calendar03Icon} className="w-5 h-5" strokeWidth={1.8} />
                                                         </div>
@@ -534,7 +534,7 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
                                         <span className="block text-xl font-black text-amber-500 font-mono leading-none">{badgeData.earned.length}</span>
                                         <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Ganadas</span>
                                     </div>
-                                    <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/[0.02] text-center">
+                                    <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2 text-center">
                                         <span className="block text-xl font-black text-slate-900 dark:text-white font-mono leading-none">{badgeData.locked.length}</span>
                                         <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Pendientes</span>
                                     </div>
@@ -549,7 +549,7 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
                                         <h3 className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Ganadas</h3>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                             {badgeData.earned.map((b) => (
-                                                <div key={b.id} className="flex items-center gap-3 p-3.5 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/[0.02]">
+                                                <div key={b.id} className="flex items-center gap-3 p-3.5 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2">
                                                     <span className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${tierBadgeStyle(b.tier)}`}><HugeiconsIcon icon={b.icon} className="w-5 h-5" strokeWidth={1.8} /></span>
                                                     <div className="min-w-0 flex-1">
                                                         <div className="flex items-center gap-2">
@@ -572,7 +572,7 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
                                     ) : (
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                             {badgeData.locked.slice(0, 12).map((b) => (
-                                                <div key={b.id} className="flex items-center gap-3 p-3.5 rounded-md border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
+                                                <div key={b.id} className="flex items-center gap-3 p-3.5 rounded-md border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/2">
                                                     <span className="w-10 h-10 rounded-md bg-slate-200 dark:bg-white/10 text-slate-400 flex items-center justify-center shrink-0"><HugeiconsIcon icon={b.icon} className="w-5 h-5" strokeWidth={1.8} /></span>
                                                     <div className="min-w-0 flex-1">
                                                         <div className="flex items-center justify-between gap-2">
@@ -580,7 +580,7 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
                                                             <span className="text-[10px] font-mono text-slate-400 shrink-0">{b.value}/{b.nextTarget}</span>
                                                         </div>
                                                         <div className="mt-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
-                                                            <div className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-[#00df82]" style={{ width: `${b.progress}%` }} />
+                                                            <div className="h-full rounded-full bg-linear-to-r from-emerald-500 to-[#00df82]" style={{ width: `${b.progress}%` }} />
                                                         </div>
                                                         <p className="text-[9px] text-slate-400 mt-1">Próximo: {b.nextTierName}</p>
                                                     </div>

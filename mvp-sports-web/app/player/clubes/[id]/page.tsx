@@ -298,7 +298,7 @@ export default function VenueDetailPage() {
         const s = i + 1, done = bookingStep > s, current = bookingStep === s;
         return (
           <li key={s} aria-current={current ? "step" : undefined} className="flex flex-col items-center gap-1.5">
-            <div className={`h-1 w-full rounded-full ${done || current ? "bg-emerald-500" : isDark ? "bg-white/[0.08]" : "bg-slate-200"}`} />
+            <div className={`h-1 w-full rounded-full ${done || current ? "bg-emerald-500" : isDark ? "bg-white/8" : "bg-slate-200"}`} />
             <span className={`text-[11px] font-semibold flex items-center gap-1 ${current ? (isDark ? "text-slate-100" : "text-slate-900") : done ? "text-emerald-500" : isDark ? "text-slate-500" : "text-slate-400"}`}>
               {done && <CheckCircle2 size={12} />}{label}
             </span>
@@ -318,7 +318,7 @@ export default function VenueDetailPage() {
             const SportIcon = info.icon;
             return (
               <button key={sport} onClick={() => { setSelectedSport(sport); setSelectedCourtId(null); setSelectedTime(null); setBookingStep(2); }}
-                className={`flex items-center gap-2.5 px-5 py-3 rounded-md text-sm font-semibold transition-all active:scale-95 ${selectedSport === sport ? "text-white" : isDark ? "text-slate-300 bg-white/[0.06] hover:bg-white/[0.1]" : "text-slate-700 bg-slate-100 hover:bg-slate-200"}`}
+                className={`flex items-center gap-2.5 px-5 py-3 rounded-md text-sm font-semibold transition-all active:scale-95 ${selectedSport === sport ? "text-white" : isDark ? "text-slate-300 bg-white/6 hover:bg-white/10" : "text-slate-700 bg-slate-100 hover:bg-slate-200"}`}
                 style={selectedSport === sport ? { backgroundColor: info.color } : {}}>
                 <SportIcon color={selectedSport === sport ? "white" : info.color} size={22} />
                 {sport}
@@ -359,7 +359,7 @@ export default function VenueDetailPage() {
             <p className={`text-[12px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige la hora</p>
             <div className="w-12" />
           </div>
-          <div className={`flex items-center gap-2 mb-4 p-3 rounded-md border ${isDark ? "bg-white/[0.03] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
+          <div className={`flex items-center gap-2 mb-4 p-3 rounded-md border ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
             <Clock size={14} className="text-emerald-500" />
             <span className={`text-xs font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
               {dateLabel} · {dateDayName} {currentDateInfo.date.toLocaleDateString("es-CL", { day: "numeric", month: "long" })}
@@ -389,7 +389,7 @@ export default function VenueDetailPage() {
                         const on = selectedTime === t;
                         return (
                           <button key={t} aria-pressed={on} onClick={() => pickTime(t)}
-                            className={`h-11 rounded-md text-[14px] font-semibold transition-all active:scale-95 ${on ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-100" : "bg-slate-100 text-slate-800"}`}>
+                            className={`h-11 rounded-md text-[14px] font-semibold transition-all active:scale-95 ${on ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-100" : "bg-slate-100 text-slate-800"}`}>
                             {t}
                           </button>
                         );
@@ -400,7 +400,7 @@ export default function VenueDetailPage() {
               })}
 
               {selectedTime && freeCourts.length > 0 && (
-                <div className={`pt-4 border-t ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+                <div className={`pt-4 border-t ${isDark ? "border-white/6" : "border-slate-200"}`}>
                   <p className={`text-[12px] font-semibold mb-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
                     {freeCourts.length === 1 ? "Cancha disponible" : `Cancha · ${freeCourts.length} libres a las ${selectedTime}`}
                   </p>
@@ -409,7 +409,7 @@ export default function VenueDetailPage() {
                       const on = selectedCourtId === c.id;
                       return (
                         <button key={c.id} aria-pressed={on} onClick={() => setSelectedCourtId(c.id)}
-                          className={`shrink-0 text-left px-4 py-2.5 rounded-md border transition-all ${on ? "border-emerald-500 bg-emerald-500/10" : isDark ? "border-white/[0.08]" : "border-slate-200"}`}>
+                          className={`shrink-0 text-left px-4 py-2.5 rounded-md border transition-all ${on ? "border-emerald-500 bg-emerald-500/10" : isDark ? "border-white/8" : "border-slate-200"}`}>
                           <p className={`text-[13px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{c.name}</p>
                           <p className="text-[12px] font-semibold text-emerald-500">${Number(getCourtPrice(c.id, selectedSport || c.sport, selectedDate, selectedTime)).toLocaleString("es-CL")}</p>
                           {c.surface && <p className={`text-[11px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>{c.surface}</p>}
@@ -470,7 +470,7 @@ export default function VenueDetailPage() {
         <div className={`p-5 rounded-md border mb-5 ${isDark ? "bg-emerald-500/5 border-emerald-500/10" : "bg-emerald-50 border-emerald-200"}`}>
           <div className="flex items-center justify-between mb-4">
             <button aria-label="Volver" onClick={() => { if (dateOffset > 0) setDateOffset(p => p - 1); }} disabled={dateOffset === 0}
-              className={`w-12 h-12 rounded-md flex items-center justify-center transition-all active:scale-90 ${dateOffset === 0 ? "opacity-30" : isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-white hover:bg-slate-100 shadow-sm"}`}>
+              className={`w-12 h-12 rounded-md flex items-center justify-center transition-all active:scale-90 ${dateOffset === 0 ? "opacity-30" : isDark ? "bg-white/6 hover:bg-white/10" : "bg-white hover:bg-slate-100 shadow-xs"}`}>
               <ChevronLeft size={18} className="text-emerald-500" />
             </button>
             <div className="flex flex-col items-center">
@@ -479,7 +479,7 @@ export default function VenueDetailPage() {
               <span className={`text-[12px] font-bold mt-0.5 ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>{dateLabel} • {dateDayName}</span>
             </div>
             <button aria-label="Siguiente" onClick={() => { setDateOffset(p => p + 1); }}
-              className={`w-12 h-12 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-white hover:bg-slate-100 shadow-sm"}`}>
+              className={`w-12 h-12 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-white hover:bg-slate-100 shadow-xs"}`}>
               <ChevronRight size={18} className="text-emerald-500" />
             </button>
           </div>
@@ -493,7 +493,7 @@ export default function VenueDetailPage() {
               const isPastOffset = offset < dateOffset;
               return (
                 <button key={offset} onClick={() => { if (!isPastOffset) setDateOffset(offset); }} disabled={isPastOffset}
-                  className={`flex-1 py-2.5 rounded-md flex flex-col items-center transition-all active:scale-95 ${isActive ? "bg-emerald-500 text-white shadow-md" : isPastOffset ? (isDark ? "text-slate-600" : "text-slate-300") : isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"}`}>
+                  className={`flex-1 py-2.5 rounded-md flex flex-col items-center transition-all active:scale-95 ${isActive ? "bg-emerald-500 text-white shadow-md" : isPastOffset ? (isDark ? "text-slate-600" : "text-slate-300") : isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"}`}>
                   <span className="text-[11px] font-semibold uppercase">{labels[d.getDay()]}</span>
                   <span className="text-xs font-bold mt-0.5">{d.getDate()}</span>
                 </button>
@@ -607,7 +607,7 @@ export default function VenueDetailPage() {
       {/* Hero */}
       <div className="h-[220px] relative overflow-hidden">
         <img src={venueData?.imageURL || venueData?.imageUrl || "https://images.unsplash.com/photo-1574629810360-7efbbe195018"} alt={venue?.name} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-black/10" />
         <button aria-label="Volver" onClick={() => router.back()} className="absolute top-12 left-5 w-10 h-10 rounded-md bg-black/40 border border-white/10 flex items-center justify-center z-10">
           <ChevronLeft size={20} className="text-white" />
         </button>
@@ -710,7 +710,7 @@ export default function VenueDetailPage() {
             {venueData?.amenities && venueData.amenities.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {venueData.amenities.map((a: string) => (
-                  <div key={a} className={`px-3 py-1.5 rounded-md border ${isDark ? "border-white/[0.06] bg-white/[0.03]" : "border-slate-200 bg-slate-50"}`}>
+                  <div key={a} className={`px-3 py-1.5 rounded-md border ${isDark ? "border-white/6 bg-white/3" : "border-slate-200 bg-slate-50"}`}>
                     <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{a}</span>
                   </div>
                 ))}
@@ -776,8 +776,8 @@ export default function VenueDetailPage() {
       {/* Rules Modal */}
       {showRules && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowRules(false)}>
-          <div className={`w-full max-w-sm rounded-md border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-            <div className={`flex items-center justify-between px-5 py-4 border-b ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+          <div className={`w-full max-w-sm rounded-md border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+            <div className={`flex items-center justify-between px-5 py-4 border-b ${isDark ? "border-white/6" : "border-slate-200"}`}>
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-md flex items-center justify-center bg-red-500/10">
                   <Ban size={16} className="text-red-400" />
@@ -790,7 +790,7 @@ export default function VenueDetailPage() {
             </div>
             <div className="p-5 max-h-[60vh] overflow-y-auto space-y-3">
               {venueData?.rules?.map((rule: string, i: number) => (
-                <div key={i} className={`flex items-start gap-3 p-3 rounded-md border ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+                <div key={i} className={`flex items-start gap-3 p-3 rounded-md border ${isDark ? "border-white/6" : "border-slate-200"}`}>
                   <Ban size={14} className="text-red-400 shrink-0 mt-0.5" />
                   <span className={`text-[12px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>{rule}</span>
                 </div>

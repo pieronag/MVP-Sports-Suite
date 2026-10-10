@@ -134,7 +134,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen w-full flex bg-slate-50 dark:bg-[#020611] text-slate-900 dark:text-slate-200">
       {/* ============ COLUMNA IZQUIERDA (BRANDING) ============ */}
-      <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden border-r border-slate-200 dark:border-white/5 bg-gradient-to-br from-white via-emerald-50/50 to-white dark:from-[#020611] dark:via-[#04140f] dark:to-[#020611]">
+      <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center overflow-hidden border-r border-slate-200 dark:border-white/5 bg-linear-to-br from-white via-emerald-50/50 to-white dark:from-[#020611] dark:via-[#04140f] dark:to-[#020611]">
         {/* grilla light */}
         <div
           aria-hidden="true"
@@ -156,8 +156,8 @@ export default function LoginPage() {
           }}
         />
         {/* glows */}
-        <div aria-hidden="true" className="absolute -top-[12%] -left-[10%] w-[520px] h-[520px] bg-emerald-400/25 dark:bg-[#00df82]/15 blur-[140px] rounded-full" />
-        <div aria-hidden="true" className="absolute -bottom-[18%] -right-[12%] w-[460px] h-[460px] bg-lime-300/20 dark:bg-emerald-500/10 blur-[140px] rounded-full" />
+        <div aria-hidden="true" className="absolute top-[-12%] left-[-10%] w-[520px] h-[520px] bg-emerald-400/25 dark:bg-[#00df82]/15 blur-[140px] rounded-full" />
+        <div aria-hidden="true" className="absolute bottom-[-18%] right-[-12%] w-[460px] h-[460px] bg-lime-300/20 dark:bg-emerald-500/10 blur-[140px] rounded-full" />
 
         <div className="relative z-10 flex flex-col items-start text-left px-14 max-w-lg">
           <BrandLogo size={60} wordmarkClassName="text-2xl" appearance="auto" />
@@ -190,7 +190,7 @@ export default function LoginPage() {
         <button
           onClick={toggleTheme}
           aria-label="Cambiar tema"
-          className="absolute top-6 right-6 z-20 p-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-500 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-[#00df82] hover:border-emerald-300 dark:hover:border-[#00df82]/40 shadow-sm transition-all active:scale-95 cursor-pointer"
+          className="absolute top-6 right-6 z-20 p-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-500 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-[#00df82] hover:border-emerald-300 dark:hover:border-[#00df82]/40 shadow-xs transition-all active:scale-95 cursor-pointer"
         >
           <HugeiconsIcon icon={theme === "dark" ? Sun01Icon : Moon01Icon} className="w-5 h-5" strokeWidth={1.8} />
         </button>
@@ -203,7 +203,7 @@ export default function LoginPage() {
 
           <div className="relative rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/50 shadow-xl shadow-slate-200/60 dark:shadow-[0_0_90px_-35px_rgba(0,223,130,0.45)] backdrop-blur-xl overflow-hidden">
             {/* top hairline */}
-            <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/60 dark:via-[#00df82]/60 to-transparent" />
+            <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-emerald-500/60 dark:via-[#00df82]/60 to-transparent" />
             {/* glow */}
             <div aria-hidden="true" className="pointer-events-none absolute -top-24 right-0 w-[320px] h-[180px] bg-emerald-400/20 dark:bg-[#00df82]/12 blur-[110px] rounded-full" />
 
@@ -345,7 +345,7 @@ function Field({ label, id, icon: Icon, rightSlot, ...props }: any) {
         )}
         <input
           id={id}
-          className={`w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md py-3 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500 dark:focus:border-[#00df82] focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-[#00df82]/20 outline-none transition-all ${Icon ? "pl-10" : "pl-4"} ${rightSlot ? "pr-11" : "pr-4"}`}
+          className={`w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md py-3 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500 dark:focus:border-[#00df82] focus:ring-2 focus:ring-emerald-500/20 dark:focus:ring-[#00df82]/20 outline-hidden transition-all ${Icon ? "pl-10" : "pl-4"} ${rightSlot ? "pr-11" : "pr-4"}`}
           {...props}
         />
         {rightSlot && <span className="absolute inset-y-0 right-3 flex items-center">{rightSlot}</span>}

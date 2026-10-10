@@ -399,7 +399,7 @@ export default function AdminDashboard() {
                                     </div>
                                     <div className="h-1.5 w-full bg-slate-100 dark:bg-white/5 rounded-md overflow-hidden">
                                         <div
-                                            className="h-full bg-gradient-to-r from-emerald-500 to-[#00df82] rounded-md transition-all duration-1000"
+                                            className="h-full bg-linear-to-r from-emerald-500 to-[#00df82] rounded-md transition-all duration-1000"
                                             style={{ width: `${(t.value / (topTenants[0]?.value || 1)) * 100}%` }}
                                         />
                                     </div>
@@ -535,7 +535,7 @@ export default function AdminDashboard() {
                 <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-left border-collapse min-w-[900px]">
                         <thead>
-                            <tr className="bg-slate-50/60 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
+                            <tr className="bg-slate-50/60 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
                                 <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-400">Fecha / hora</th>
                                 <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-400">Cliente</th>
                                 <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-400">Recinto</th>
@@ -549,7 +549,7 @@ export default function AdminDashboard() {
                                 const method = getMethodBadge(b);
                                 const status = getStatusBadge(b);
                                 return (
-                                    <tr key={b.id} className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors">
+                                    <tr key={b.id} className="hover:bg-slate-50/60 dark:hover:bg-white/2 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">
                                                 <span className="text-[11px] font-black text-slate-700 dark:text-white font-mono uppercase">{getRelativeTime(b.createdAt || b.date)}</span>

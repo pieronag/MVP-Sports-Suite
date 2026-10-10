@@ -243,7 +243,7 @@ export default function OwnerDashboard() {
     return (
         <div className="w-full space-y-6 pb-12 text-left relative animate-fadeIn">
             {toast && (
-                <div className={`fixed top-6 right-6 z-[100] p-4 rounded-md shadow-2xl backdrop-blur-xl border animate-slideIn ${toast.type === 'success' ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black' : toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-slate-900 text-white'}`}>
+                <div className={`fixed top-6 right-6 z-100 p-4 rounded-md shadow-2xl backdrop-blur-xl border animate-slideIn ${toast.type === 'success' ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black' : toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-slate-900 text-white'}`}>
                     <div className="flex items-center gap-3">
                         <HugeiconsIcon icon={toast.type === 'success' ? CheckmarkCircle02Icon : InformationCircleIcon} className="w-5 h-5" strokeWidth={2} />
                         <p className="text-[10px] font-black uppercase tracking-widest">{toast.msg}</p>
@@ -271,7 +271,7 @@ export default function OwnerDashboard() {
                         <select
                             value={selectedVenueId}
                             onChange={(e) => setSelectedVenueId(e.target.value)}
-                            className="bg-transparent text-[10px] font-black uppercase text-slate-700 dark:text-white outline-none cursor-pointer appearance-none pr-3 py-2"
+                            className="bg-transparent text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer appearance-none pr-3 py-2"
                         >
                             <option value="all">Todos los recintos</option>
                             {myVenues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
@@ -439,7 +439,7 @@ export default function OwnerDashboard() {
                                 {visibleBookings.length > 0 ? visibleBookings.map((b) => {
                                     const badge = paymentBadge(b);
                                     return (
-                                        <div key={b.id} className="p-4 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 transition-all hover:border-emerald-400/40 shadow-sm">
+                                        <div key={b.id} className="p-4 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 transition-all hover:border-emerald-400/40 shadow-xs">
                                             <div className="flex justify-between items-start gap-3">
                                                 <div className="min-w-0">
                                                     <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase truncate mb-1 leading-none">{b.clientName}</p>

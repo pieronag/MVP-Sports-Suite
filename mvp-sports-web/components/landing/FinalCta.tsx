@@ -6,7 +6,7 @@ export default function FinalCta({ onRegisterClick }: { onRegisterClick: () => v
   return (
     <section className="py-20 lg:py-28 relative overflow-hidden">
       <div className="container mx-auto px-6">
-        <div className="relative rounded-md overflow-hidden border border-[#00df82]/15 bg-gradient-to-br from-slate-900 via-slate-950 to-[#04231a] p-10 lg:p-16 text-center">
+        <div className="relative rounded-md overflow-hidden border border-[#00df82]/15 bg-linear-to-br from-slate-900 via-slate-950 to-[#04231a] p-10 lg:p-16 text-center">
           <div
             aria-hidden="true"
             className="absolute inset-0 opacity-[0.25]"
@@ -41,7 +41,7 @@ export default function FinalCta({ onRegisterClick }: { onRegisterClick: () => v
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto px-10 py-4 bg-white/[0.03] text-white font-black rounded-md border border-white/12 hover:bg-white/[0.08] transition-all uppercase tracking-[0.18em] text-[11px] backdrop-blur-xl"
+                className="w-full sm:w-auto px-10 py-4 bg-white/3 text-white font-black rounded-md border border-white/12 hover:bg-white/8 transition-all uppercase tracking-[0.18em] text-[11px] backdrop-blur-xl"
               >
                 Soy recinto deportivo
               </a>

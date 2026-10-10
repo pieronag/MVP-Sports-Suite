@@ -595,7 +595,7 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
               <Select label="Frecuencia" name="frequency" value={formData.frequency} onChange={handleInputChange} options={['De vez en cuando', '1-2 veces por semana', 'Casi todos los días']} />
               <Input label="Fecha de nacimiento" name="birthDate" value={formData.birthDate} onChange={handleInputChange} type="date" />
 
-              <div className="col-span-1 sm:col-span-2 mt-2 flex items-start gap-3 rounded-md border border-white/5 bg-white/[0.02] p-4">
+              <div className="col-span-1 sm:col-span-2 mt-2 flex items-start gap-3 rounded-md border border-white/5 bg-white/2 p-4">
                 <input
                   type="checkbox"
                   id="acceptTerms"
@@ -623,7 +623,7 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-200"
+      className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xl animate-in fade-in duration-200"
       onClick={handleClose}
       role="presentation"
     >
@@ -786,7 +786,7 @@ function Input({ label, className = "", rightSlot, ...props }: any) {
       <div className="relative">
         <input
           id={id}
-          className={`w-full bg-white/5 border border-white/10 rounded-md px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-[#00df82] focus:ring-2 focus:ring-[#00df82]/20 outline-none transition-all ${rightSlot ? "pr-11" : ""} ${className}`}
+          className={`w-full bg-white/5 border border-white/10 rounded-md px-4 py-2.5 text-sm text-white placeholder:text-slate-600 focus:border-[#00df82] focus:ring-2 focus:ring-[#00df82]/20 outline-hidden transition-all ${rightSlot ? "pr-11" : ""} ${className}`}
           {...props}
         />
         {rightSlot && (
@@ -806,7 +806,7 @@ function Select({ label, options, ...props }: any) {
       </label>
       <select
         id={id}
-        className="w-full bg-white/5 border border-white/10 rounded-md px-4 py-2.5 text-sm text-white focus:border-[#00df82] focus:ring-2 focus:ring-[#00df82]/20 outline-none appearance-none transition-all disabled:opacity-40"
+        className="w-full bg-white/5 border border-white/10 rounded-md px-4 py-2.5 text-sm text-white focus:border-[#00df82] focus:ring-2 focus:ring-[#00df82]/20 outline-hidden appearance-none transition-all disabled:opacity-40"
         {...props}
       >
         <option value="" disabled className="bg-slate-900">—</option>

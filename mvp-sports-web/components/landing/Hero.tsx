@@ -15,7 +15,7 @@ export default function Hero({ onRegisterClick }: { onRegisterClick: () => void 
       {/* Grid overlay */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 opacity-[0.35] [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_75%)]"
+        className="absolute inset-0 opacity-[0.35] mask-[radial-gradient(ellipse_at_center,black_35%,transparent_75%)]"
         style={{
           backgroundImage:
             "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)",
@@ -30,7 +30,7 @@ export default function Hero({ onRegisterClick }: { onRegisterClick: () => void 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-12 items-center">
           {/* LEFT */}
           <div className="space-y-8 text-center lg:text-left">
-            <div className="inline-flex items-center gap-3 px-3.5 py-2 rounded-md bg-white/[0.03] border border-white/10 backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-700">
+            <div className="inline-flex items-center gap-3 px-3.5 py-2 rounded-md bg-white/3 border border-white/10 backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-700">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00df82] opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00df82]" />
@@ -60,7 +60,7 @@ export default function Hero({ onRegisterClick }: { onRegisterClick: () => void 
               </button>
               <Link
                 href="#owners"
-                className="w-full sm:w-auto px-9 py-4 bg-white/[0.03] text-white font-black rounded-md border border-white/12 hover:bg-white/[0.08] hover:border-white/20 transition-all uppercase tracking-[0.18em] text-[11px] backdrop-blur-xl"
+                className="w-full sm:w-auto px-9 py-4 bg-white/3 text-white font-black rounded-md border border-white/12 hover:bg-white/8 hover:border-white/20 transition-all uppercase tracking-[0.18em] text-[11px] backdrop-blur-xl"
               >
                 Soy recinto deportivo
               </Link>
@@ -114,7 +114,7 @@ export default function Hero({ onRegisterClick }: { onRegisterClick: () => void 
               <div aria-hidden="true" className="absolute inset-[23%] animate-[spin_16s_linear_infinite_reverse]">
                 {ORBIT_INNER.map((deg) => (
                   <div key={deg} className="absolute inset-0" style={{ transform: `rotate(${deg}deg)` }}>
-                    <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-[#00e0ff] shadow-[0_0_8px_#00e0ff]" />
+                    <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-mvp-cyan shadow-[0_0_8px_#00e0ff]" />
                   </div>
                 ))}
               </div>

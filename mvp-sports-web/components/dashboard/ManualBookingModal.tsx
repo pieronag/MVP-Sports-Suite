@@ -216,9 +216,9 @@ export default function ManualBookingModal({ isOpen, onClose, tenantId, onSucces
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={onClose}>
+        <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn" onClick={onClose}>
             <div className="bg-white dark:bg-[#0B0F19] w-full max-w-3xl rounded-md shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden" onClick={e => e.stopPropagation()}>
-                <div className="flex justify-between items-center p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02]">
+                <div className="flex justify-between items-center p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/2">
                     <div>
                         <h3 className="text-xs font-black uppercase text-slate-900 dark:text-white">RESERVA MANUAL</h3>
                         <p className="text-[9px] text-slate-400 mt-0.5 uppercase font-bold">COMPLETA LOS DATOS — EL PRECIO SE ASIGNA AUTOMÁTICAMENTE</p>
@@ -234,7 +234,7 @@ export default function ManualBookingModal({ isOpen, onClose, tenantId, onSucces
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Cancha</label>
-                                    <select required className="w-full mt-1.5 px-4 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-semibold uppercase outline-none focus:border-emerald-500 transition-all shadow-sm"
+                                    <select required className="w-full mt-1.5 px-4 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-semibold uppercase outline-hidden focus:border-emerald-500 transition-all shadow-xs"
                                         value={formData.courtId} onChange={e => setFormData({ ...formData, courtId: e.target.value })}>
                                         <option value="">Cancha...</option>
                                         {courts.map(c => <option key={c.id} value={c.id} className="uppercase">{c.name} ({c.sport})</option>)}
@@ -242,7 +242,7 @@ export default function ManualBookingModal({ isOpen, onClose, tenantId, onSucces
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Hora</label>
-                                    <select required className="w-full mt-1.5 px-4 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-semibold outline-none focus:border-emerald-500 transition-all shadow-sm"
+                                    <select required className="w-full mt-1.5 px-4 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-semibold outline-hidden focus:border-emerald-500 transition-all shadow-xs"
                                         value={formData.time} onChange={e => setFormData({ ...formData, time: e.target.value })}>
                                         {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
                                     </select>
@@ -251,19 +251,19 @@ export default function ManualBookingModal({ isOpen, onClose, tenantId, onSucces
 
                             <div>
                                 <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Fecha de Reserva</label>
-                                <input type="date" required className="w-full mt-1.5 px-4 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-semibold outline-none focus:border-emerald-500 transition-all shadow-sm uppercase"
+                                <input type="date" required className="w-full mt-1.5 px-4 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-semibold outline-hidden focus:border-emerald-500 transition-all shadow-xs uppercase"
                                     value={formData.date} onChange={e => setFormData({ ...formData, date: e.target.value })} />
                             </div>
 
                             <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-white/5">
                                 <div>
                                     <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Nombre del Cliente</label>
-                                    <input type="text" required className="w-full mt-1.5 px-4 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-semibold outline-none placeholder:normal-case focus:border-emerald-500 transition-all shadow-sm"
+                                    <input type="text" required className="w-full mt-1.5 px-4 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-semibold outline-hidden placeholder:normal-case focus:border-emerald-500 transition-all shadow-xs"
                                         value={formData.clientName} onChange={e => setFormData({ ...formData, clientName: e.target.value })} placeholder="Ej: juan pérez" />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Teléfono Móvil</label>
-                                    <input type="tel" required className="w-full mt-1.5 px-4 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-semibold outline-none focus:border-emerald-500 transition-all shadow-sm font-mono"
+                                    <input type="tel" required className="w-full mt-1.5 px-4 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-semibold outline-hidden focus:border-emerald-500 transition-all shadow-xs font-mono"
                                         value={formData.clientPhone} onChange={e => setFormData({ ...formData, clientPhone: e.target.value })} placeholder="+569 1234 5678" />
                                 </div>
                             </div>
@@ -273,16 +273,16 @@ export default function ManualBookingModal({ isOpen, onClose, tenantId, onSucces
                         <div className="space-y-4">
                             <h4 className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em] mb-2">Administración Financiera</h4>
                             
-                            <div className="bg-slate-50 dark:bg-white/[0.02] p-4 rounded-md border border-slate-200 dark:border-white/10 space-y-4">
+                            <div className="bg-slate-50 dark:bg-white/2 p-4 rounded-md border border-slate-200 dark:border-white/10 space-y-4">
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
                                         <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Valor Total</label>
-                                        <input type="number" required className={`w-full mt-1.5 px-4 py-2 bg-white dark:bg-black/20 border rounded-xl text-[11px] font-bold outline-none font-mono transition-all ${priceAutoFilled ? 'border-emerald-300 dark:border-emerald-500/40 text-emerald-600' : 'border-slate-200 dark:border-white/10'}`}
+                                        <input type="number" required className={`w-full mt-1.5 px-4 py-2 bg-white dark:bg-black/20 border rounded-xl text-[11px] font-bold outline-hidden font-mono transition-all ${priceAutoFilled ? 'border-emerald-300 dark:border-emerald-500/40 text-emerald-600' : 'border-slate-200 dark:border-white/10'}`}
                                             value={formData.price} onChange={e => { setFormData({ ...formData, price: e.target.value }); setPriceAutoFilled(false); }} placeholder="0" />
                                     </div>
                                     <div>
                                         <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Estado de Pago</label>
-                                        <select required className="w-full mt-1.5 px-4 py-2 bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-semibold outline-none focus:border-emerald-500 transition-all"
+                                        <select required className="w-full mt-1.5 px-4 py-2 bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl text-[11px] font-semibold outline-hidden focus:border-emerald-500 transition-all"
                                             value={formData.paymentStatus} onChange={e => setFormData({ ...formData, paymentStatus: e.target.value, deposit: e.target.value === 'paid' ? formData.price : e.target.value === 'pending' ? '0' : formData.deposit })}>
                                             <option value="paid">PAGADO TOTAL</option>
                                             <option value="partial">ABONO / PARCIAL</option>
@@ -295,7 +295,7 @@ export default function ManualBookingModal({ isOpen, onClose, tenantId, onSucces
                                     <div className="animate-slideIn">
                                         <label className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Monto del Abono</label>
                                         <div className="relative mt-1.5">
-                                            <input type="number" required className="w-full pl-10 pr-4 py-2 bg-white dark:bg-black/20 border-2 border-emerald-500 rounded-xl text-[11px] font-bold outline-none font-mono text-emerald-600 shadow-[0_0_15px_-3px_rgba(16,185,129,0.2)]"
+                                            <input type="number" required className="w-full pl-10 pr-4 py-2 bg-white dark:bg-black/20 border-2 border-emerald-500 rounded-xl text-[11px] font-bold outline-hidden font-mono text-emerald-600 shadow-[0_0_15px_-3px_rgba(16,185,129,0.2)]"
                                                 value={formData.deposit} onChange={e => setFormData({ ...formData, deposit: e.target.value })} />
                                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-emerald-500">$</span>
                                         </div>
@@ -330,7 +330,7 @@ export default function ManualBookingModal({ isOpen, onClose, tenantId, onSucces
 
                     <div className="pt-8 flex gap-4">
                         <button type="button" onClick={onClose} className="flex-1 py-3 bg-white dark:bg-white/5 text-slate-500 border-2 border-slate-100 dark:border-white/5 text-[10px] font-black uppercase rounded-2xl hover:bg-slate-50 transition-all active:scale-95">CANCELAR OPERACIÓN</button>
-                        <button type="submit" disabled={loading || availStatus === 'occupied'} className="flex-[2] py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-2xl shadow-2xl shadow-emerald-500/30 flex items-center justify-center gap-3 hover:bg-emerald-700 transition-all active:scale-95 disabled:opacity-50 disabled:grayscale">
+                        <button type="submit" disabled={loading || availStatus === 'occupied'} className="flex-2 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase rounded-2xl shadow-2xl shadow-emerald-500/30 flex items-center justify-center gap-3 hover:bg-emerald-700 transition-all active:scale-95 disabled:opacity-50 disabled:grayscale">
                             {loading ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <CheckCircleIcon className="w-4 h-4" />}
                             {loading ? 'Sincronizando...' : 'Confirmar y Guardar Reserva'}
                         </button>

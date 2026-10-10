@@ -55,9 +55,9 @@ export default function HowItWorks() {
             <div
               key={item.step}
               style={{ animationDelay: `${index * 100}ms` }}
-              className="group relative p-8 rounded-md bg-slate-900/50 backdrop-blur border border-white/5 hover:border-[#00df82]/30 transition-all duration-300 hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-6"
+              className="group relative p-8 rounded-md bg-slate-900/50 backdrop-blur-sm border border-white/5 hover:border-[#00df82]/30 transition-all duration-300 hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-6"
             >
-              <span className="absolute top-6 right-7 text-5xl font-black text-white/[0.06] font-mono">
+              <span className="absolute top-6 right-7 text-5xl font-black text-white/6 font-mono">
                 {item.step}
               </span>
               <HugeiconsIcon

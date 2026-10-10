@@ -47,7 +47,7 @@ const sportIcon = (sport: string, cls: string) => {
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
     return (
-        <div className={`fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${
+        <div className={`fixed top-6 right-6 z-200 flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${
             type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-[#00df82] dark:border-emerald-500/50' : 
             'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
         }`}>
@@ -250,7 +250,7 @@ export default function AcademyPage() {
     return (
         <div className="w-full space-y-6 pb-12 animate-fadeIn relative">
             {studentsModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setStudentsModal(null)}>
+                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs" onClick={() => setStudentsModal(null)}>
                     <div className="w-full max-w-lg rounded-md border bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
                         <div className="px-5 py-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
                             <div>
@@ -313,7 +313,7 @@ export default function AcademyPage() {
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sincronizando academia...</p>
                 </div>
             ) : classes.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-200 dark:border-white/5 shadow-sm">
+                <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-200 dark:border-white/5 shadow-xs">
                     <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-500/10 rounded-md flex items-center justify-center text-indigo-500 border border-indigo-100 dark:border-indigo-500/20">
                         <HugeiconsIcon icon={Mortarboard01Icon} className="w-8 h-8" strokeWidth={1.4} />
                     </div>
@@ -331,13 +331,13 @@ export default function AcademyPage() {
                         const occupancy = c.maxStudents > 0 ? Math.min(Math.round(((c.enrolledStudents || 0) / c.maxStudents) * 100), 100) : 0;
                         const st = sportStyle(c.sport);
                         return (
-                            <div key={c.id} className="group flex flex-col h-full bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-black/40 hover:-translate-y-0.5">
+                            <div key={c.id} className="group flex flex-col h-full bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 shadow-xs overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-black/40 hover:-translate-y-0.5">
                                 {/* HERO */}
-                                <div className={`relative h-32 bg-gradient-to-br ${st.gradient} overflow-hidden shrink-0`}>
+                                <div className={`relative h-32 bg-linear-to-br ${st.gradient} overflow-hidden shrink-0`}>
                                     <div className="absolute -right-5 -bottom-9 opacity-10 group-hover:opacity-20 transition-opacity">
                                         {sportIcon(c.sport, 'w-28 h-28 text-white')}
                                     </div>
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10" />
+                                    <div className="absolute inset-0 bg-linear-to-t from-black/45 via-transparent to-black/10" />
                                     <div className="absolute top-3 left-3">
                                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md backdrop-blur-md text-white text-[8px] font-black uppercase tracking-widest border border-white/20 ${c.status === 'active' ? 'bg-white/15' : 'bg-amber-500/40'}`}>
                                             <span className={`w-1.5 h-1.5 rounded-full ${c.status === 'active' ? 'bg-white animate-pulse' : 'bg-amber-200'}`} />
@@ -377,7 +377,7 @@ export default function AcademyPage() {
                                     </div>
 
                                     {/* STATS */}
-                                    <div className="space-y-2 bg-slate-50 dark:bg-white/[0.03] p-3.5 rounded-md border border-slate-100 dark:border-white/5 mb-4">
+                                    <div className="space-y-2 bg-slate-50 dark:bg-white/3 p-3.5 rounded-md border border-slate-100 dark:border-white/5 mb-4">
                                         <div className="flex items-center justify-between">
                                             <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Mensualidad</span>
                                             <span className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] font-mono">${formatCLP(Number(c.price) || 0)}</span>
@@ -396,7 +396,7 @@ export default function AcademyPage() {
                                     </div>
 
                                     {/* FOOTER ACCIONES */}
-                                    <div className="mt-auto p-2 bg-slate-50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5 grid grid-cols-3 gap-2 -mx-4 -mb-4">
+                                    <div className="mt-auto p-2 bg-slate-50 dark:bg-white/2 border-t border-slate-100 dark:border-white/5 grid grid-cols-3 gap-2 -mx-4 -mb-4">
                                         <button onClick={() => handleOpenEdit(c)} className="py-2 flex items-center justify-center gap-1.5 bg-white dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 text-[8px] font-black uppercase tracking-widest hover:text-slate-900 dark:hover:text-white hover:border-indigo-400/40 transition-all active:scale-95" title="Editar">
                                             <HugeiconsIcon icon={PencilEdit02Icon} className="w-3 h-3" /> Editar
                                         </button>
@@ -422,7 +422,7 @@ export default function AcademyPage() {
 
             {/* MODAL CREAR / EDITAR */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[180] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={handleCloseModal}>
+                <div className="fixed inset-0 z-180 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={handleCloseModal}>
                     <div onClick={e => e.stopPropagation()} className="bg-white dark:bg-[#0B0F19] w-full max-w-3xl rounded-md shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden flex flex-col max-h-[90vh]">
                         <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-5 border-b border-slate-100 dark:border-white/5">
                             <div className="flex items-center gap-3.5">
@@ -479,7 +479,7 @@ export default function AcademyPage() {
                                     </InputGroupPremium>
                                     <div className="flex flex-col gap-1">
                                         <label className="text-[8px] font-black uppercase tracking-widest text-slate-400">Descripción Ejecutiva</label>
-                                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-none h-24 resize-none focus:border-indigo-500 text-slate-700 dark:text-white" placeholder="Objetivos y metodología..." />
+                                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-hidden h-24 resize-none focus:border-indigo-500 text-slate-700 dark:text-white" placeholder="Objetivos y metodología..." />
                                     </div>
                                 </div>
 
@@ -530,7 +530,7 @@ export default function AcademyPage() {
 
                             {/* VISTA PREVIA EN VIVO */}
                             <div className="rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
-                                <div className="px-4 py-3 bg-slate-50/50 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
+                                <div className="px-4 py-3 bg-slate-50/50 dark:bg-white/2 border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
                                     <span className="w-1.5 h-4 bg-indigo-500 rounded-md"></span>
                                     <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Vista previa del plan</p>
                                 </div>
@@ -551,7 +551,7 @@ export default function AcademyPage() {
 
                             <div className="flex gap-3 pt-1">
                                 <button type="button" onClick={handleCloseModal} className="flex-1 py-3.5 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 rounded-md text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-white/10 transition-all">Cancelar</button>
-                                <button type="submit" disabled={saving} className="flex-[2] py-3.5 bg-indigo-500 text-white rounded-md text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                                <button type="submit" disabled={saving} className="flex-2 py-3.5 bg-indigo-500 text-white rounded-md text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                                     {saving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" /> : <HugeiconsIcon icon={ShieldCheckIcon} className="w-4 h-4" />}
                                     {isEditing ? 'Actualizar Plan Académico' : 'Lanzar Clase en App'}
                                 </button>
@@ -563,7 +563,7 @@ export default function AcademyPage() {
 
             {/* MODAL CONFIRMAR ESTADO */}
             {statusConfirm.isOpen && (
-                <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setStatusConfirm({ ...statusConfirm, isOpen: false })}>
+                <div className="fixed inset-0 z-250 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setStatusConfirm({ ...statusConfirm, isOpen: false })}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-md p-6 border border-slate-200 dark:border-white/10 shadow-2xl text-center" onClick={e => e.stopPropagation()}>
                         <div className={`w-16 h-16 ${statusConfirm.nextStatus === 'suspended' ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-100 dark:border-amber-500/20' : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20'} rounded-md flex items-center justify-center mx-auto mb-4 border`}>
                             <HugeiconsIcon icon={statusConfirm.nextStatus === 'suspended' ? BlockedIcon : PlayCircleIcon} className={`w-8 h-8 ${statusConfirm.nextStatus === 'suspended' ? 'text-amber-500' : 'text-emerald-600 dark:text-[#00df82]'}`} />
@@ -586,7 +586,7 @@ export default function AcademyPage() {
 
             {/* MODAL ELIMINAR */}
             {classToDelete && (
-                <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setClassToDelete(null)}>
+                <div className="fixed inset-0 z-250 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setClassToDelete(null)}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-md p-6 border border-slate-200 dark:border-white/10 shadow-2xl text-center" onClick={e => e.stopPropagation()}>
                         <div className="w-16 h-16 bg-red-50 dark:bg-red-500/10 rounded-md flex items-center justify-center mx-auto mb-4 border border-red-100 dark:border-red-500/20">
                             <HugeiconsIcon icon={Alert02Icon} className="w-8 h-8 text-red-600" />
@@ -612,9 +612,9 @@ function InputGroupPremium({ label, value, onChange, placeholder, icon, readOnly
             <div className="relative">
                 {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 dark:text-white/20 group-focus-within:text-indigo-500 transition-colors">{icon}</div>}
                 {type === 'select' ? (
-                    <select value={value || ''} onChange={onChange} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold text-slate-700 dark:text-white focus:border-indigo-500 outline-none transition-all appearance-none uppercase cursor-pointer`}>{children}</select>
+                    <select value={value || ''} onChange={onChange} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold text-slate-700 dark:text-white focus:border-indigo-500 outline-hidden transition-all appearance-none uppercase cursor-pointer`}>{children}</select>
                 ) : (
-                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2.5 rounded-md border text-[10px] font-bold transition-all outline-none ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white focus:border-indigo-500'}`} />
+                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2.5 rounded-md border text-[10px] font-bold transition-all outline-hidden ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white focus:border-indigo-500'}`} />
                 )}
                 {type === 'select' && <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"><HugeiconsIcon icon={ChevronDownIcon} className="w-3 h-3" /></div>}
             </div>

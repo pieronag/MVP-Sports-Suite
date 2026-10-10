@@ -39,7 +39,7 @@ export default function PlanSimulator() {
           description="Calcula cuánto pagarías según tus reservas mensuales y elige el plan más rentable para tu recinto."
         />
 
-        <div className="max-w-2xl mx-auto mb-12 p-8 rounded-md bg-slate-900/50 backdrop-blur border border-white/5">
+        <div className="max-w-2xl mx-auto mb-12 p-8 rounded-md bg-slate-900/50 backdrop-blur-sm border border-white/5">
           <div className="mb-8">
             <div className="flex items-center justify-between mb-3">
               <label htmlFor="reservas" className="text-xs font-bold text-slate-300 uppercase tracking-wider">
@@ -73,7 +73,7 @@ export default function PlanSimulator() {
                 type="number"
                 value={precioProm}
                 onChange={(e) => setPrecioProm(Math.max(0, Number(e.target.value)))}
-                className="w-full bg-slate-800/50 border border-white/10 rounded-md px-8 py-3.5 text-sm font-black text-white font-mono outline-none focus:border-emerald-500/40 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                className="w-full bg-slate-800/50 border border-white/10 rounded-md px-8 py-3.5 text-sm font-black text-white font-mono outline-hidden focus:border-emerald-500/40 focus:ring-2 focus:ring-emerald-500/20 transition-all"
               />
             </div>
           </div>

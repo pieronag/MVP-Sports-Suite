@@ -88,7 +88,7 @@ export default function TermsPage() {
                   <button
                     key={section.id}
                     onClick={() => scrollToSection(section.id)}
-                    className="flex items-center gap-3 text-left py-2 px-3 rounded-md text-xs font-bold uppercase tracking-[0.1em] text-slate-400 hover:text-white hover:bg-[#00df82]/5 transition-all group cursor-pointer"
+                    className="flex items-center gap-3 text-left py-2 px-3 rounded-md text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white hover:bg-[#00df82]/5 transition-all group cursor-pointer"
                   >
                     <HugeiconsIcon icon={section.icon} className="w-4 h-4 text-slate-500 group-hover:text-[#00df82] transition-colors shrink-0" strokeWidth={1.8} />
                     <span className="truncate">{section.name}</span>
@@ -97,7 +97,7 @@ export default function TermsPage() {
               </nav>
             </div>
 
-            <div className="bg-gradient-to-br from-[#00df82]/5 to-transparent border border-[#00df82]/10 rounded-md p-6 relative overflow-hidden group">
+            <div className="bg-linear-to-br from-[#00df82]/5 to-transparent border border-[#00df82]/10 rounded-md p-6 relative overflow-hidden group">
               <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-[#00df82]/10 rounded-full blur-2xl group-hover:bg-[#00df82]/20 transition-all duration-500" />
               <h4 className="text-xs font-black uppercase tracking-[0.2em] text-[#00df82] mb-2">¿Necesitas soporte?</h4>
               <p className="text-[10px] text-slate-400 uppercase tracking-wider leading-relaxed">
@@ -302,7 +302,7 @@ export default function TermsPage() {
                         Se devolverá el dinero descontando un 3% del total cobrado para mitigar las tarifas de adquirencia e impuestos de la pasarela Mercado Pago.
                       </p>
                     </div>
-                    <div className="text-left md:text-right flex-shrink-0">
+                    <div className="text-left md:text-right shrink-0">
                       <span className="text-lg font-black text-[#00df82] font-mono">97% devuelto</span>
                     </div>
                   </div>
@@ -317,7 +317,7 @@ export default function TermsPage() {
                         Si cancela dentro del margen de 4 horas o si ya se realizó el Check-In de asistencia, el dinero se retiene de forma íntegra en favor del recinto.
                       </p>
                     </div>
-                    <div className="text-left md:text-right flex-shrink-0">
+                    <div className="text-left md:text-right shrink-0">
                       <span className="text-lg font-black text-red-500 font-mono">0% devuelto</span>
                     </div>
                   </div>

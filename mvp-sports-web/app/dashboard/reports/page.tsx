@@ -299,7 +299,7 @@ export default function Page() {
                             placeholder="Buscar ticket, recinto, email..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-[10px] font-black outline-none text-slate-700 dark:text-white placeholder:text-slate-400 transition-all"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400 transition-all"
                         />
                     </div>
                     <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10">
@@ -307,7 +307,7 @@ export default function Page() {
                         <select
                             value={categoryFilter}
                             onChange={(e) => setCategoryFilter(e.target.value)}
-                            className="bg-transparent text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white"
+                            className="bg-transparent text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white"
                         >
                             {categories.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
@@ -315,7 +315,7 @@ export default function Page() {
                     <select
                         value={priorityFilter}
                         onChange={(e) => setPriorityFilter(e.target.value)}
-                        className="px-2.5 py-2 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white"
+                        className="px-2.5 py-2 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white"
                     >
                         {priorities.map(p => <option key={p} value={p}>{p}</option>)}
                     </select>
@@ -346,7 +346,7 @@ export default function Page() {
                 <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-left min-w-[1080px]">
                         <thead>
-                            <tr className="bg-slate-50/60 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
+                            <tr className="bg-slate-50/60 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Ticket</th>
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Asunto</th>
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Cliente</th>
@@ -359,7 +359,7 @@ export default function Page() {
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                             {filteredTickets.length > 0 ? filteredTickets.map((t) => (
-                                <tr key={t.id} className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors">
+                                <tr key={t.id} className="hover:bg-slate-50/60 dark:hover:bg-white/2 transition-colors">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2.5">
                                             <div className="flex items-center gap-1.5">
@@ -438,7 +438,7 @@ export default function Page() {
 
             {/* MODAL DE GESTIÓN */}
             {modalOpen && selectedTicket && (
-                <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setModalOpen(false)}>
+                <div className="fixed inset-0 z-400 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setModalOpen(false)}>
                     <div className="bg-white dark:bg-[#0B0F19] rounded-md shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-2xl overflow-hidden animate-fadeIn text-left" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between px-6 py-4 bg-slate-50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5">
                             <div className="flex items-center gap-3">
@@ -539,7 +539,7 @@ export default function Page() {
                                         <select
                                             value={ticketStatus}
                                             onChange={(e) => setTicketStatus(e.target.value)}
-                                            className="w-full px-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-none text-slate-800 dark:text-white focus:border-emerald-500/40 transition-all"
+                                            className="w-full px-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-hidden text-slate-800 dark:text-white focus:border-emerald-500/40 transition-all"
                                         >
                                             <option value="Abierto">Abierto</option>
                                             <option value="En Proceso">En Proceso</option>
@@ -565,7 +565,7 @@ export default function Page() {
                                         value={adminResponse}
                                         onChange={(e) => setAdminResponse(e.target.value)}
                                         placeholder="Escribe la respuesta de soporte que se mostrará al cliente..."
-                                        className="w-full px-4 py-3 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-none text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/40 transition-all"
+                                        className="w-full px-4 py-3 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-hidden text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-emerald-500/40 transition-all"
                                         required
                                     />
                                 </div>

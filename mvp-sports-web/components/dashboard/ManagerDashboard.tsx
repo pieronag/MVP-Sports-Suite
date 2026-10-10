@@ -288,7 +288,7 @@ export default function ManagerDashboard() {
                             const name = myVenues.find(v => v.id === e.target.value)?.name || '';
                             setSelectedTenantName(name);
                         }}
-                        className="pl-4 pr-2 py-1.5 bg-transparent text-[10px] font-black uppercase text-slate-700 dark:text-white outline-none cursor-pointer appearance-none"
+                        className="pl-4 pr-2 py-1.5 bg-transparent text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer appearance-none"
                     >
                         {myVenues.map(v => <option key={v.id} value={v.id} >{v.name}</option>)}
                     </select>
@@ -300,7 +300,7 @@ export default function ManagerDashboard() {
                                 type="date"
                                 value={selectedDate}
                                 onChange={(e) => setSelectedDate(e.target.value)}
-                                className="pl-5 bg-transparent text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white cursor-pointer appearance-none"
+                                className="pl-5 bg-transparent text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white cursor-pointer appearance-none"
                             />
                         </div>
                     </div>
@@ -374,7 +374,7 @@ export default function ManagerDashboard() {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead>
-                                    <tr className="bg-slate-50/30 dark:bg-white/[0.01] text-[8px] font-black text-slate-400 uppercase tracking-wider">
+                                    <tr className="bg-slate-50/30 dark:bg-white/1 text-[8px] font-black text-slate-400 uppercase tracking-wider">
                                         <th className="px-6 py-4">Fecha / Hora</th>
                                         <th className="px-6 py-4">Recinto / Deporte</th>
                                         <th className="px-6 py-4">Cliente / Campo</th>
@@ -384,7 +384,7 @@ export default function ManagerDashboard() {
                                 </thead>
                                 <tbody className="divide-y divide-slate-50 dark:divide-white/5">
                                     {nextBookings.length > 0 ? nextBookings.map((b) => (
-                                        <tr key={b.id} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors group">
+                                        <tr key={b.id} className="hover:bg-slate-50/50 dark:hover:bg-white/2 transition-colors group">
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
                                                     <span className="font-black text-slate-900 dark:text-white font-mono text-xs">{formatTime(b.startTime)}</span>

@@ -41,7 +41,7 @@ import {
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
     return (
-        <div className={`fixed top-5 right-5 z-[160] flex items-center gap-3 px-4 py-3 rounded-md shadow-xl border animate-slideIn ${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-[#00df82] dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
+        <div className={`fixed top-5 right-5 z-160 flex items-center gap-3 px-4 py-3 rounded-md shadow-xl border animate-slideIn ${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-[#00df82] dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
             {type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5" /> : <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5" />}
             <span className="text-[10px] font-bold uppercase tracking-widest">{message}</span>
         </div>
@@ -393,14 +393,14 @@ export default function TenantSettingsPage() {
                                 <p className="text-[11px] font-black uppercase text-slate-900 dark:text-white font-heading">{tenants.find(t => t.id === selectedTenantId)?.name || 'Seleccionar'}</p>
                             </div>
                         </div>
-                        <select value={selectedTenantId} onChange={(e) => handleSelectTenant(e.target.value)} className="w-full sm:w-auto px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold uppercase outline-none text-slate-700 dark:text-white cursor-pointer">
+                        <select value={selectedTenantId} onChange={(e) => handleSelectTenant(e.target.value)} className="w-full sm:w-auto px-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold uppercase outline-hidden text-slate-700 dark:text-white cursor-pointer">
                             {tenants.map(t => <option key={t.id} value={t.id} className="dark:bg-[#0B0F19]">{t.name}</option>)}
                         </select>
                     </div>
 
                     {/* NAV STICKY POR SECCIÓN */}
-                    <div className="sticky top-0 z-30 bg-slate-50/90 dark:bg-[#050b14]/90 backdrop-blur-md py-2 -my-2">
-                        <div className="flex flex-wrap items-center gap-1 p-1 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-200 dark:border-white/5 shadow-sm">
+                    <div className="sticky top-0 z-30 bg-slate-50/90 dark:bg-mvp-dark/90 backdrop-blur-md py-2 -my-2">
+                        <div className="flex flex-wrap items-center gap-1 p-1 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-200 dark:border-white/5 shadow-xs">
                             {[
                                 { id: 'identidad', label: 'Identidad', icon: Building01Icon },
                                 { id: 'legal', label: 'Legal', icon: IdentityCardIcon },
@@ -441,7 +441,7 @@ export default function TenantSettingsPage() {
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Reseña del Club</label>
-                                    <textarea rows={4} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-5 py-4 bg-slate-50 dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 resize-none transition-all" placeholder="Misión del complejo..." />
+                                    <textarea rows={4} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-5 py-4 bg-slate-50 dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-hidden focus:ring-1 focus:ring-emerald-500/30 resize-none transition-all" placeholder="Misión del complejo..." />
                                 </div>
                             </div>
                         </PanelGlass>
@@ -508,18 +508,18 @@ export default function TenantSettingsPage() {
                                         <div className="grid grid-cols-2 gap-2">
                                             <div>
                                                 <label className="text-[8px] font-black uppercase text-slate-400 tracking-widest mb-1 block">Apertura</label>
-                                                <input type="time" value={formData.openTime} onChange={e => setFormData({ ...formData, openTime: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black outline-none focus:border-emerald-500" />
+                                                <input type="time" value={formData.openTime} onChange={e => setFormData({ ...formData, openTime: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black outline-hidden focus:border-emerald-500" />
                                             </div>
                                             <div>
                                                 <label className="text-[8px] font-black uppercase text-slate-400 tracking-widest mb-1 block">Cierre</label>
-                                                <input type="time" value={formData.closeTime} onChange={e => setFormData({ ...formData, closeTime: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black outline-none focus:border-emerald-500" />
+                                                <input type="time" value={formData.closeTime} onChange={e => setFormData({ ...formData, closeTime: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black outline-hidden focus:border-emerald-500" />
                                             </div>
                                         </div>
                                         <p className="text-[11px] font-mono text-emerald-600 dark:text-[#00df82] font-black mt-3">{formData.openTime} — {formData.closeTime}</p>
                                     </div>
                                     <div>
                                         <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-1.5">Política de Cancelación</label>
-                                        <textarea rows={3} value={formData.cancellationPolicy} onChange={e => setFormData({ ...formData, cancellationPolicy: e.target.value })} className="w-full px-4 py-3 bg-slate-50 dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-none resize-none" placeholder="Condiciones de cancelación..." />
+                                        <textarea rows={3} value={formData.cancellationPolicy} onChange={e => setFormData({ ...formData, cancellationPolicy: e.target.value })} className="w-full px-4 py-3 bg-slate-50 dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-hidden resize-none" placeholder="Condiciones de cancelación..." />
                                     </div>
                                 </div>
                                 <div>
@@ -598,7 +598,7 @@ export default function TenantSettingsPage() {
 
                                 {/* TERMINAL DE DIAGNÓSTICO */}
                                 <div className="rounded-md bg-slate-950 dark:bg-black overflow-hidden border border-slate-800 dark:border-white/10 flex flex-col h-[240px]">
-                                    <div className="bg-slate-900/60 dark:bg-white/[0.03] px-4 py-3 flex items-center justify-between border-b border-slate-800 dark:border-white/10">
+                                    <div className="bg-slate-900/60 dark:bg-white/3 px-4 py-3 flex items-center justify-between border-b border-slate-800 dark:border-white/10">
                                         <div className="flex gap-1.5">
                                             <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
                                             <div className="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
@@ -675,7 +675,7 @@ function InputMini({ label, value, icon, onChange, type = "text", placeholder = 
                     placeholder={placeholder}
                     value={value}
                     onChange={onChange}
-                    className="w-full pl-12 pr-4 py-3.5 rounded-md border bg-white dark:bg-[#020611] border-slate-200 dark:border-white/10 text-xs font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all tracking-tight text-slate-700 dark:text-white"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-md border bg-white dark:bg-[#020611] border-slate-200 dark:border-white/10 text-xs font-bold outline-hidden focus:ring-1 focus:ring-emerald-500/30 transition-all tracking-tight text-slate-700 dark:text-white"
                 />
             </div>
         </div>

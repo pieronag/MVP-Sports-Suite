@@ -175,7 +175,7 @@ export default function MapaPage() {
         <div className="flex items-center justify-between mb-4">
           <div className="w-10" aria-hidden />
           <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center text-emerald-500">Mapa</h1>
-          <button aria-label="Usar mi ubicación" onClick={handleLocate} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+          <button aria-label="Usar mi ubicación" onClick={handleLocate} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
             <Locate size={18} className="text-emerald-500" />
           </button>
         </div>
@@ -188,7 +188,7 @@ export default function MapaPage() {
             const CatIcon = cat.icon;
             return (
               <button key={cat.id} onClick={() => setActiveSport(cat.id)}
-                className={`flex items-center gap-1.5 h-10 px-4 rounded-md text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${activeSport === cat.id ? "text-white" : isDark ? "text-slate-400 bg-white/[0.06] hover:bg-white/[0.1]" : "text-slate-500 bg-slate-100 hover:bg-slate-200"}`}
+                className={`flex items-center gap-1.5 h-10 px-4 rounded-md text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${activeSport === cat.id ? "text-white" : isDark ? "text-slate-400 bg-white/6 hover:bg-white/10" : "text-slate-500 bg-slate-100 hover:bg-slate-200"}`}
                 style={activeSport === cat.id ? { backgroundColor: getSportColor(cat.id) } : {}}>
                 {CatIcon && <CatIcon color={activeSport === cat.id ? "white" : isDark ? "#94a3b8" : "#64748b"} size={14} />}
                 {cat.name}
@@ -200,7 +200,7 @@ export default function MapaPage() {
 
       {/* Map */}
       <div className="px-4">
-        <div className={`relative h-[380px] rounded-md overflow-hidden border ${isDark ? "border-white/[0.06]" : "border-slate-200 shadow-sm"}`}>
+        <div className={`relative h-[380px] rounded-md overflow-hidden border ${isDark ? "border-white/6" : "border-slate-200 shadow-xs"}`}>
           <MapView venues={venues} center={center} isDark={isDark} />
         </div>
       </div>
@@ -218,10 +218,10 @@ export default function MapaPage() {
             const ds = v.displaySports.split(" • ");
             return (
               <button key={v.id} onClick={() => router.push(`/player/clubes/${v.id}`)} className="w-full text-left">
-                <div className={`relative rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
+                <div className={`relative rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
                   <div className="h-[160px] relative">
                     <img src={getVenueImage(v)} alt={v.name} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 to-transparent" />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/85 to-transparent" />
                     <div className="absolute top-4 left-4 flex flex-wrap gap-1.5">
                       {ds.slice(0, 3).map((s: string) => (
                         <span key={s} className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold tracking-wide uppercase">{s}</span>

@@ -19,7 +19,7 @@ export default function MetricCard({ label, value, icon: Icon, color, subtext }:
     };
 
     return (
-        <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-xl border border-slate-200 dark:border-white/5 shadow-sm hover:border-slate-300 transition-colors">
+        <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-xl border border-slate-200 dark:border-white/5 shadow-xs hover:border-slate-300 transition-colors">
             <div className="flex justify-between items-center mb-2">
                 <p className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wider truncate">{label}</p>
                 <div className={`p-1.5 rounded-lg ${colors[color]}`}>

@@ -235,7 +235,7 @@ export default function PlayerAnalyticsPage() {
                         <button
                             onClick={() => setExportOpen(o => !o)}
                             disabled={players.length === 0}
-                            className="flex items-center gap-2 px-4 py-2.5 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[11px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+                            className="flex items-center gap-2 px-4 py-2.5 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[11px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500/50"
                         >
                             {exported
                                 ? <><HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={2} /> Exportado</>
@@ -275,7 +275,7 @@ export default function PlayerAnalyticsPage() {
                         onClick={fetchPlayers}
                         aria-label="Refrescar datos"
                         title="Refrescar datos"
-                        className="p-2.5 rounded-md border bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-emerald-600 hover:border-emerald-300 active:scale-95 transition-all dark:bg-white/5 dark:border-white/10 dark:text-slate-300 dark:hover:border-[#00df82]/40 dark:hover:text-[#00df82] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40"
+                        className="p-2.5 rounded-md border bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-emerald-600 hover:border-emerald-300 active:scale-95 transition-all dark:bg-white/5 dark:border-white/10 dark:text-slate-300 dark:hover:border-[#00df82]/40 dark:hover:text-[#00df82] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500/40"
                     >
                         <HugeiconsIcon icon={RefreshIcon} className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} strokeWidth={2} />
                     </button>
@@ -409,13 +409,13 @@ export default function PlayerAnalyticsPage() {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Buscar..."
-                                className="w-28 bg-transparent text-[10px] font-black outline-none text-slate-700 dark:text-white placeholder:text-slate-400"
+                                className="w-28 bg-transparent text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400"
                             />
                         </div>
                         <select
                             value={tierFilter}
                             onChange={(e) => setTierFilter(e.target.value)}
-                            className="px-3 py-1.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white focus:border-emerald-400 dark:focus:border-[#00df82]/40 transition-colors"
+                            className="px-3 py-1.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white focus:border-emerald-400 dark:focus:border-[#00df82]/40 transition-colors"
                         >
                             {tiers.map(t => <option key={t} value={t}>{t}</option>)}
                         </select>
@@ -425,7 +425,7 @@ export default function PlayerAnalyticsPage() {
                 <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-left min-w-[680px]">
                         <thead>
-                            <tr className="bg-slate-50/60 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
+                            <tr className="bg-slate-50/60 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">#</th>
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Atleta</th>
                                 <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Categoría</th>
@@ -436,7 +436,7 @@ export default function PlayerAnalyticsPage() {
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                             {filteredRanking.slice(0, 10).map((p, i) => (
-                                <tr key={p.id} className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors">
+                                <tr key={p.id} className="hover:bg-slate-50/60 dark:hover:bg-white/2 transition-colors">
                                     <td className="px-6 py-4">
                                         <span className={`inline-flex items-center justify-center w-7 h-7 rounded-md font-black font-mono text-[11px] ${i < 3 ? 'bg-emerald-500 text-white dark:bg-[#00df82] dark:text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400'}`}>
                                             {i + 1}

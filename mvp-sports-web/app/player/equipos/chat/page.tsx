@@ -72,8 +72,8 @@ export default function ChatEquiposPage() {
   return (
     <div className={`min-h-screen flex flex-col ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
-      <div className={`px-5 pt-12 pb-4 flex items-center gap-3 border-b ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
-        <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+      <div className={`px-5 pt-12 pb-4 flex items-center gap-3 border-b ${isDark ? "border-white/6" : "border-slate-200"}`}>
+        <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <div className="flex-1 min-w-0">
@@ -105,21 +105,21 @@ export default function ChatEquiposPage() {
           grouped.map((g, gi) => (
             <div key={`g-${gi}`}>
               <div className="flex justify-center my-4">
-                <span className={`px-3 py-1 rounded-md text-[11px] font-semibold uppercase ${isDark ? "bg-white/[0.06] text-slate-500" : "bg-slate-100 text-slate-500"}`}>{g.dateLabel}</span>
+                <span className={`px-3 py-1 rounded-md text-[11px] font-semibold uppercase ${isDark ? "bg-white/6 text-slate-500" : "bg-slate-100 text-slate-500"}`}>{g.dateLabel}</span>
               </div>
               {g.messages.map((msg) => {
                 const isMe = msg.senderId === user?.uid;
                 return (
                   <div key={msg.id} className={`flex mb-3 ${isMe ? "justify-end" : "justify-start"}`}>
                     {!isMe && (
-                      <div className={`w-8 h-8 rounded-md overflow-hidden shrink-0 mr-2 self-end flex items-center justify-center ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}>
+                      <div className={`w-8 h-8 rounded-md overflow-hidden shrink-0 mr-2 self-end flex items-center justify-center ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
                         <User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />
                       </div>
                     )}
                     <div className={`max-w-[75%] ${isMe ? "items-end" : "items-start"} flex flex-col`}>
                       {!isMe && <span className={`text-[11px] font-medium mb-0.5 ml-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{msg.senderName}</span>}
                       <div className={`px-3.5 py-2.5 rounded-md flex items-end flex-wrap gap-1 text-sm font-medium leading-5 ${isMe ? "bg-emerald-500 text-white rounded-md" : isDark ? "bg-[#1E293B] text-slate-100 rounded-md" : "bg-white text-slate-900 rounded-md border border-slate-200"}`}>
-                        <span className="min-w-0 break-words [overflow-wrap:anywhere] whitespace-pre-wrap">{msg.text}</span>
+                        <span className="min-w-0 wrap-break-word wrap-anywhere whitespace-pre-wrap">{msg.text}</span>
                         <span className={`text-[11px] font-semibold shrink-0 ${isMe ? "text-white/70" : isDark ? "text-slate-500" : "text-slate-400"}`}>{formatTime(msg.createdAt)}</span>
                       </div>
                     </div>
@@ -132,16 +132,16 @@ export default function ChatEquiposPage() {
       </div>
 
       {/* Input */}
-      <div className={`px-4 py-4 pb-8 border-t ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+      <div className={`px-4 py-4 pb-8 border-t ${isDark ? "border-white/6" : "border-slate-200"}`}>
         <div className="flex items-center gap-2.5">
-          <div className={`flex-1 flex items-center h-12 rounded-md px-4 border ${isDark ? "bg-white/[0.04] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
+          <div className={`flex-1 flex items-center h-12 rounded-md px-4 border ${isDark ? "bg-white/4 border-white/6" : "bg-slate-50 border-slate-200"}`}>
             <input maxLength={1000} value={newMessage} onChange={(e) => setNewMessage(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
               placeholder="Escribe un mensaje..."
-              className={`flex-1 bg-transparent text-sm font-medium outline-none ${isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400"}`}
+              className={`flex-1 bg-transparent text-sm font-medium outline-hidden ${isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400"}`}
             />
           </div>
           <button aria-label="Enviar mensaje" onClick={handleSend} disabled={!newMessage.trim() || sending}
-            className={`w-12 h-12 rounded-md flex items-center justify-center shrink-0 transition-all active:scale-90 ${newMessage.trim() ? "bg-emerald-500" : isDark ? "bg-white/[0.04]" : "bg-slate-100"}`}>
+            className={`w-12 h-12 rounded-md flex items-center justify-center shrink-0 transition-all active:scale-90 ${newMessage.trim() ? "bg-emerald-500" : isDark ? "bg-white/4" : "bg-slate-100"}`}>
             {sending ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Send size={18} color={newMessage.trim() ? "white" : isDark ? "#94A3B8" : "#64748B"} />}
           </button>
         </div>

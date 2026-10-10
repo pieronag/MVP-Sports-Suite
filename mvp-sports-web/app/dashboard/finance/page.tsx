@@ -436,7 +436,7 @@ export default function FinancePage() {
 
                 {/* CONTROLES */}
                 <div className="flex flex-wrap items-center gap-2">
-                    <div className="flex items-center gap-0.5 bg-white dark:bg-[#0B0F19] px-1.5 py-1 rounded-md border border-slate-200 dark:border-white/5 shadow-sm">
+                    <div className="flex items-center gap-0.5 bg-white dark:bg-[#0B0F19] px-1.5 py-1 rounded-md border border-slate-200 dark:border-white/5 shadow-xs">
                         <button onClick={() => changeMonth(-1)} className="p-1.5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-all" title="Mes anterior">
                             <HugeiconsIcon icon={ArrowLeft01Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                         </button>
@@ -451,7 +451,7 @@ export default function FinancePage() {
                     <select
                         value={selectedVenueId}
                         onChange={(e) => setSelectedVenueId(e.target.value)}
-                        className="bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/5 rounded-md px-3 py-1.5 text-[11px] font-bold uppercase outline-none text-slate-700 dark:text-white cursor-pointer shadow-sm"
+                        className="bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/5 rounded-md px-3 py-1.5 text-[11px] font-bold uppercase outline-hidden text-slate-700 dark:text-white cursor-pointer shadow-xs"
                     >
                         <option value="all">TODOS LOS RECINTOS</option>
                         {myVenues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
@@ -537,7 +537,7 @@ export default function FinancePage() {
 
             {/* TABLA */}
             <PanelGlass className="p-0 overflow-hidden">
-                <div className="flex flex-col lg:flex-row justify-between items-center gap-4 p-6 bg-slate-50/50 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
+                <div className="flex flex-col lg:flex-row justify-between items-center gap-4 p-6 bg-slate-50/50 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
                     <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                         <div className="flex bg-white dark:bg-[#020611] p-1 rounded-md border border-slate-200 dark:border-white/10">
                             {(['all', 'reserva', 'torneo', 'pending'] as const).map((type) => (
@@ -568,7 +568,7 @@ export default function FinancePage() {
                             placeholder="Buscar cliente, recinto o detalle..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-white dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md pl-10 pr-4 py-2.5 text-[11px] font-bold outline-none focus:ring-1 focus:ring-emerald-500/30 tracking-tight"
+                            className="w-full bg-white dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md pl-10 pr-4 py-2.5 text-[11px] font-bold outline-hidden focus:ring-1 focus:ring-emerald-500/30 tracking-tight"
                         />
                     </div>
                 </div>
@@ -576,7 +576,7 @@ export default function FinancePage() {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50/30 dark:bg-white/[0.01]">
+                            <tr className="bg-slate-50/30 dark:bg-white/1">
                                 <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fecha</th>
                                 <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cliente</th>
                                 <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Recinto</th>
@@ -595,7 +595,7 @@ export default function FinancePage() {
                                 </tr>
                             ) : visibleTransactions.length > 0 ? (
                                 visibleTransactions.map((t) => (
-                                    <tr key={t.id} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors group text-[11px]">
+                                    <tr key={t.id} className="hover:bg-slate-50/50 dark:hover:bg-white/2 transition-colors group text-[11px]">
                                         <td className="px-5 py-4">
                                             <div className="flex flex-col">
                                                 <span className="font-bold text-slate-800 dark:text-white">
@@ -687,7 +687,7 @@ export default function FinancePage() {
                 </div>
 
                 {filteredTransactions.length > 0 && (
-                    <div className="px-6 py-4 border-t border-slate-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-white/[0.02]">
+                    <div className="px-6 py-4 border-t border-slate-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-white/2">
                         <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total del listado ({visibleTransactions.length})</p>
                         <p className="text-[10px] font-black font-mono text-emerald-600 dark:text-[#00df82]">{formatCLP(sumVisible)}</p>
                     </div>
@@ -696,7 +696,7 @@ export default function FinancePage() {
                 {filteredTransactions.length > rowLimit && (
                     <button
                         onClick={() => setRowLimit(r => r + 20)}
-                        className="w-full py-4 text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-[#00df82] hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors border-t border-slate-100 dark:border-white/5"
+                        className="w-full py-4 text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-[#00df82] hover:bg-slate-50/50 dark:hover:bg-white/2 transition-colors border-t border-slate-100 dark:border-white/5"
                     >
                         Mostrar más ({filteredTransactions.length - rowLimit} restantes)
                     </button>

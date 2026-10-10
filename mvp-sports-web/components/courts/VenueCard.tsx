@@ -53,11 +53,11 @@ export default function VenueCard({ venue, onClick }: VenueCardProps) {
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 dark:from-white/5 dark:to-white/10">
+                    <div className="w-full h-full flex items-center justify-center bg-linear-to-br from-slate-100 to-slate-200 dark:from-white/5 dark:to-white/10">
                         <HugeiconsIcon icon={Image01Icon} className="w-12 h-12 text-slate-300 dark:text-white/10" strokeWidth={1.4} />
                     </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
 
                 {/* BADGE ESTADO */}
                 <div className="absolute top-3 right-3">

@@ -150,7 +150,7 @@ export default function TicketPage() {
                 )}
               </div>
             ))}
-            <div className={`h-px ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`} />
+            <div className={`h-px ${isDark ? "bg-white/6" : "bg-slate-100"}`} />
             <div className="flex items-center justify-between pt-1">
               <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Total</p>
               <p className="text-lg font-semibold" style={{ color: activeColor }}>${new Intl.NumberFormat("es-CL").format(Number(booking?.totalPrice || 0))}</p>
@@ -178,7 +178,7 @@ export default function TicketPage() {
         <div className="flex flex-col items-center py-3">
           <GlowCard isDark={isDark}>
             <div className="p-6 flex flex-col items-center">
-              <div className="bg-white p-4 rounded-md shadow-sm">
+              <div className="bg-white p-4 rounded-md shadow-xs">
                 {bookingId && <QRCodeSVG value={bookingId} size={140} fgColor="#0F172A" bgColor="#ffffff" />}
               </div>
               <p className={`text-[11px] font-semibold uppercase tracking-[0.06em] mt-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>ID: {(bookingId || "").slice(-8).toUpperCase()}</p>
@@ -195,7 +195,7 @@ export default function TicketPage() {
             </button>
           )}
           <button onClick={() => router.replace("/player")}
-            className={`w-full h-14 rounded-md flex items-center justify-center gap-2.5 font-semibold text-sm uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
+            className={`w-full h-14 rounded-md flex items-center justify-center gap-2.5 font-semibold text-sm uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>
             <ChevronLeft size={18} /> Volver a Inicio
           </button>
         </div>
@@ -206,7 +206,7 @@ export default function TicketPage() {
       {/* Claim Modal */}
       {showClaimModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-5" onClick={() => setShowClaimModal(false)}>
-          <div className={`w-full max-w-sm rounded-md overflow-hidden ${isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md overflow-hidden ${isDark ? "bg-[#0A101D] border border-white/6" : "bg-white border border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="p-5 flex items-center justify-between" style={{ backgroundColor: "#ef4444" }}>
               <div className="flex items-center gap-3">
                 <Receipt size={20} className="text-white" />
@@ -225,7 +225,7 @@ export default function TicketPage() {
                 <p className={`text-xl font-bold mt-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>${new Intl.NumberFormat("es-CL").format(Number(booking?.totalPrice || 0))}</p>
                 <p className={`text-[11px] font-semibold uppercase tracking-wide mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Monto Pendiente de Reintegro Manual</p>
               </div>
-              <div className={`p-4 rounded-md border space-y-2.5 ${isDark ? "bg-white/[0.02] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
+              <div className={`p-4 rounded-md border space-y-2.5 ${isDark ? "bg-white/2 border-white/6" : "bg-slate-50 border-slate-200"}`}>
                 {[
                   { label: "Jugador", val: booking?.clientName },
                   { label: "Recinto", val: booking?.tenantName },
@@ -237,7 +237,7 @@ export default function TicketPage() {
                     <span className={`text-[12px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{r.val || "—"}</span>
                   </div>
                 ))}
-                <div className={`h-px ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`} />
+                <div className={`h-px ${isDark ? "bg-white/6" : "bg-slate-100"}`} />
                 <div className="flex items-center justify-between">
                   <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>ID Reserva</span>
                   <span className={`text-[12px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{bookingId}</span>
@@ -257,11 +257,11 @@ export default function TicketPage() {
                 </p>
               </div>
             </div>
-            <div className={`p-5 flex gap-3 border-t ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+            <div className={`p-5 flex gap-3 border-t ${isDark ? "border-white/6" : "border-slate-200"}`}>
               <button onClick={handleShare} className="flex-1 h-12 rounded-md bg-emerald-500 text-white font-semibold text-xs uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
                 <Share2 size={16} /> Compartir
               </button>
-              <button onClick={() => setShowClaimModal(false)} className={`h-12 px-5 rounded-md font-semibold text-xs uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/[0.06] text-slate-300 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cerrar</button>
+              <button onClick={() => setShowClaimModal(false)} className={`h-12 px-5 rounded-md font-semibold text-xs uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}>Cerrar</button>
             </div>
           </div>
         </div>

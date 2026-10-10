@@ -81,7 +81,7 @@ export default function PlayerDashboard() {
   const nb = nextBooking as any;
   const nbDay = nb ? bookingDay(nb) : null;
   const isTodayBooking = nbDay ? nbDay.toDateString() === new Date().toDateString() : false;
-  const card = isDark ? "bg-[#0A101D] border border-white/[0.06]" : "bg-white border border-slate-200";
+  const card = isDark ? "bg-[#0A101D] border border-white/6" : "bg-white border border-slate-200";
   const muted = isDark ? "text-slate-400" : "text-slate-500";
 
   return (
@@ -149,7 +149,7 @@ export default function PlayerDashboard() {
 
         {/* Carta MVP */}
         <Link href="/player/perfil" className={`flex items-center gap-4 rounded-md ${card} p-4 active:scale-[0.99] transition-transform`}>
-          <div className="w-[52px] h-[66px] bg-gradient-to-b from-amber-400 to-amber-600 rounded-md flex flex-col items-center justify-center -rotate-[4deg] shrink-0">
+          <div className="w-[52px] h-[66px] bg-linear-to-b from-amber-400 to-amber-600 rounded-md flex flex-col items-center justify-center rotate-[-4deg] shrink-0">
             <span className="text-black/60 font-medium text-[10px]">OVR</span>
             <span className="text-black font-bold text-[20px] leading-none">{ovr}</span>
           </div>

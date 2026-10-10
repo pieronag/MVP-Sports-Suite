@@ -76,7 +76,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
             <HugeiconsIcon
               icon={MoneyBag01Icon}
               aria-hidden="true"
-              className="absolute -right-6 -bottom-6 w-40 h-40 text-white/[0.04] group-hover:text-blue-500/10 transition-colors"
+              className="absolute -right-6 -bottom-6 w-40 h-40 text-white/4 group-hover:text-blue-500/10 transition-colors"
             />
           </div>
 
@@ -95,7 +95,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
             <HugeiconsIcon
               icon={Calendar03Icon}
               aria-hidden="true"
-              className="absolute -right-6 -bottom-6 w-40 h-40 text-white/[0.04] group-hover:text-[#00df82]/10 transition-colors"
+              className="absolute -right-6 -bottom-6 w-40 h-40 text-white/4 group-hover:text-[#00df82]/10 transition-colors"
             />
           </div>
 
@@ -148,7 +148,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
             href="https://wa.me/56950194398?text=Hola,%20me%20interesa%20profesionalizar%20mi%20recinto%20deportivo%20con%20MVP%20Sports."
             target="_blank"
             rel="noopener noreferrer"
-            className="md:col-span-2 lg:col-span-3 group p-5 rounded-md bg-gradient-to-br from-[#00df82] via-emerald-500 to-teal-500 border border-[#00df82]/30 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex flex-col justify-between shadow-[0_0_50px_-15px_rgba(0,223,130,0.5)]"
+            className="md:col-span-2 lg:col-span-3 group p-5 rounded-md bg-linear-to-br from-[#00df82] via-emerald-500 to-teal-500 border border-[#00df82]/30 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex flex-col justify-between shadow-[0_0_50px_-15px_rgba(0,223,130,0.5)]"
           >
             <span className="text-[10px] font-black text-slate-900/80 uppercase tracking-[0.2em]">
               Asesoría personalizada

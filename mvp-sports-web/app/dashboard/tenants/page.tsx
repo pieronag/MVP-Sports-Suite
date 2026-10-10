@@ -359,7 +359,7 @@ export default function Page() {
     return (
         <div className="w-full space-y-6 pb-12 animate-fadeIn relative">
             {notification && (
-                <div className={`fixed top-6 right-6 z-[420] flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${
+                <div className={`fixed top-6 right-6 z-420 flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${
                     notification.type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-emerald-400 dark:border-emerald-500/50'
                     : 'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
                 }`}>
@@ -439,7 +439,7 @@ export default function Page() {
                         placeholder="Buscar recinto o dueño…"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-hidden transition-all"
                     />
                 </div>
 
@@ -451,7 +451,7 @@ export default function Page() {
                             value={regionFilter}
                             onChange={(e) => setRegionFilter(e.target.value)}
                             aria-label="Filtrar por región"
-                            className="pl-9 pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-[12px] font-semibold text-slate-700 dark:text-white outline-none transition-all cursor-pointer appearance-none"
+                            className="pl-9 pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-[12px] font-semibold text-slate-700 dark:text-white outline-hidden transition-all cursor-pointer appearance-none"
                         >
                             <option value="Todas" className="bg-white text-slate-900 dark:bg-[#0B0F19] dark:text-white">Todas las regiones</option>
                             {regions.map((r) => <option key={r} value={r} className="bg-white text-slate-900 dark:bg-[#0B0F19] dark:text-white">{r}</option>)}
@@ -467,7 +467,7 @@ export default function Page() {
                             onChange={(e) => setCommuneFilter(e.target.value)}
                             aria-label="Filtrar por comuna"
                             disabled={communes.length === 0}
-                            className="pl-9 pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-[12px] font-semibold text-slate-700 dark:text-white outline-none transition-all cursor-pointer appearance-none disabled:opacity-50 max-w-[180px]"
+                            className="pl-9 pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-[12px] font-semibold text-slate-700 dark:text-white outline-hidden transition-all cursor-pointer appearance-none disabled:opacity-50 max-w-[180px]"
                         >
                             <option value="Todas" className="bg-white text-slate-900 dark:bg-[#0B0F19] dark:text-white">Todas las comunas</option>
                             {communes.map((c) => <option key={c} value={c} className="bg-white text-slate-900 dark:bg-[#0B0F19] dark:text-white">{c}</option>)}
@@ -478,16 +478,16 @@ export default function Page() {
                     {/* Estado */}
                     <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-white/5 p-1 rounded-md border border-slate-100 dark:border-white/10">
                         {["Todos", "Suspendidos"].map((f) => (
-                            <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-[10px] font-black uppercase rounded-md transition-all whitespace-nowrap cursor-pointer ${filter === f ? "bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-sm" : "text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}>{f}</button>
+                            <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-[10px] font-black uppercase rounded-md transition-all whitespace-nowrap cursor-pointer ${filter === f ? "bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-xs" : "text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}>{f}</button>
                         ))}
                     </div>
 
                     {/* Vista */}
                     <div className="flex items-center gap-1 bg-slate-50 dark:bg-white/5 p-1 rounded-md border border-slate-100 dark:border-white/10">
-                        <button onClick={() => setViewMode("grid")} aria-label="Vista cuadrícula" className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === "grid" ? "bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-sm" : "text-slate-400 hover:text-slate-600 dark:hover:text-white"}`}>
+                        <button onClick={() => setViewMode("grid")} aria-label="Vista cuadrícula" className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === "grid" ? "bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-xs" : "text-slate-400 hover:text-slate-600 dark:hover:text-white"}`}>
                             <HugeiconsIcon icon={Grid02Icon} className="w-4 h-4" strokeWidth={1.8} />
                         </button>
-                        <button onClick={() => setViewMode("list")} aria-label="Vista listado" className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === "list" ? "bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-sm" : "text-slate-400 hover:text-slate-600 dark:hover:text-white"}`}>
+                        <button onClick={() => setViewMode("list")} aria-label="Vista listado" className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === "list" ? "bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-xs" : "text-slate-400 hover:text-slate-600 dark:hover:text-white"}`}>
                             <HugeiconsIcon icon={ListViewIcon} className="w-4 h-4" strokeWidth={1.8} />
                         </button>
                     </div>
@@ -499,7 +499,7 @@ export default function Page() {
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value as 'name' | 'mrr' | 'rating')}
                             aria-label="Ordenar recintos"
-                            className="pl-3 pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-[12px] font-semibold text-slate-700 dark:text-white outline-none transition-all cursor-pointer appearance-none"
+                            className="pl-3 pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-[12px] font-semibold text-slate-700 dark:text-white outline-hidden transition-all cursor-pointer appearance-none"
                         >
                             <option value="name">Nombre (A-Z)</option>
                             <option value="mrr">Mayor MRR</option>
@@ -585,15 +585,15 @@ export default function Page() {
                                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             alt={t.name}
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/10 to-black/50" />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                                        <div className="absolute inset-0 bg-linear-to-r from-black/40 via-black/10 to-black/50" />
+                                        <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent" />
 
-                                        <span className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border backdrop-blur shadow-sm ${planStyle}`}>
+                                        <span className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border backdrop-blur-sm shadow-xs ${planStyle}`}>
                                             {t.plan}
                                         </span>
 
                                         {rating > 0 && (
-                                            <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/55 backdrop-blur border border-white/15">
+                                            <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/55 backdrop-blur-sm border border-white/15">
                                                 <HugeiconsIcon icon={StarIcon} className="w-3 h-3 text-amber-400" strokeWidth={2} />
                                                 <span className="text-[10px] font-black text-white font-mono">{rating.toFixed(1)}</span>
                                             </span>
@@ -675,7 +675,7 @@ export default function Page() {
                                         </div>
 
                                         {/* Acciones */}
-                                        <div className="mt-auto p-2.5 bg-slate-50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5 flex gap-1.5">
+                                        <div className="mt-auto p-2.5 bg-slate-50 dark:bg-white/2 border-t border-slate-100 dark:border-white/5 flex gap-1.5">
                                             <button onClick={() => openEdit(t)} aria-label="Editar recinto" className="flex-1 py-2 px-2 flex items-center justify-center gap-1.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-500 hover:text-emerald-600 hover:border-emerald-300 dark:hover:text-[#00df82] dark:hover:border-[#00df82]/30 transition-all active:scale-95 cursor-pointer">
                                                 <HugeiconsIcon icon={PencilEdit02Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                                                 <span className="text-[9px] font-black uppercase tracking-wider hidden sm:inline">Editar</span>
@@ -698,7 +698,7 @@ export default function Page() {
                         <div className="overflow-x-auto custom-scrollbar">
                             <table className="w-full text-left border-collapse min-w-[820px]">
                                 <thead>
-                                    <tr className="border-b border-slate-100 dark:border-white/5 bg-slate-50/60 dark:bg-white/[0.02]">
+                                    <tr className="border-b border-slate-100 dark:border-white/5 bg-slate-50/60 dark:bg-white/2">
                                         <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Recinto</th>
                                         <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Plan</th>
                                         <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center">Canchas</th>
@@ -716,7 +716,7 @@ export default function Page() {
                                         const planStyle = planStyleOf(t.plan).replace(/border-\S+/g, '').trim();
                                         const rating = Number(t.rating) || 0;
                                         return (
-                                            <tr key={t.id} className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors">
+                                            <tr key={t.id} className="hover:bg-slate-50/60 dark:hover:bg-white/2 transition-colors">
                                                 <td className="py-4 px-6">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-10 rounded-md overflow-hidden bg-slate-100 dark:bg-white/5 border border-slate-100 dark:border-white/10 shrink-0">

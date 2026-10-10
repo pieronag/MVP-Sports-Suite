@@ -155,7 +155,7 @@ export default function BadgesConfigModal({ isOpen, onClose }: { isOpen: boolean
     return (
         <ModalPortal>
             <div
-                className="fixed inset-0 z-[400] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/80 dark:bg-black/85 backdrop-blur-xl animate-in fade-in duration-200"
+                className="fixed inset-0 z-400 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/80 dark:bg-black/85 backdrop-blur-xl animate-in fade-in duration-200"
                 role="presentation"
                 onClick={() => !saving && onClose()}
             >
@@ -202,7 +202,7 @@ export default function BadgesConfigModal({ isOpen, onClose }: { isOpen: boolean
                                 placeholder="Buscar insignia…"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pl-10 pr-3 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-emerald-500 dark:focus:border-[#00df82] outline-none transition-all"
+                                className="w-full pl-10 pr-3 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-emerald-500 dark:focus:border-[#00df82] outline-hidden transition-all"
                             />
                         </div>
                     </div>
@@ -226,7 +226,7 @@ export default function BadgesConfigModal({ isOpen, onClose }: { isOpen: boolean
                                     return (
                                         <div
                                             key={badge.id}
-                                            className={`relative p-4 rounded-md border bg-white dark:bg-white/[0.02] transition-all ${invalid ? "border-red-300 dark:border-red-500/30" : "border-slate-200 dark:border-white/5 hover:border-emerald-300 dark:hover:border-[#00df82]/30"}`}
+                                            className={`relative p-4 rounded-md border bg-white dark:bg-white/2 transition-all ${invalid ? "border-red-300 dark:border-red-500/30" : "border-slate-200 dark:border-white/5 hover:border-emerald-300 dark:hover:border-[#00df82]/30"}`}
                                         >
                                             <div className="flex items-center gap-3 mb-4">
                                                 <span className="w-10 h-10 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-[#00df82] flex items-center justify-center shrink-0">
@@ -248,7 +248,7 @@ export default function BadgesConfigModal({ isOpen, onClose }: { isOpen: boolean
                                                             value={badge.thresholds[t.tier]}
                                                             onChange={(e) => updateThreshold(badge.id, t.tier, Number(e.target.value))}
                                                             aria-label={`${badge.name} ${t.label}`}
-                                                            className={`w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-2 py-2.5 text-sm font-mono font-black text-center text-slate-900 dark:text-white outline-none transition-all focus:ring-2 ${t.ring}`}
+                                                            className={`w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-2 py-2.5 text-sm font-mono font-black text-center text-slate-900 dark:text-white outline-hidden transition-all focus:ring-2 ${t.ring}`}
                                                         />
                                                     </div>
                                                 ))}
@@ -271,7 +271,7 @@ export default function BadgesConfigModal({ isOpen, onClose }: { isOpen: boolean
                     </div>
 
                     {/* FOOTER */}
-                    <div className="px-5 sm:px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/70 dark:bg-white/[0.02] shrink-0">
+                    <div className="px-5 sm:px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/70 dark:bg-white/2 shrink-0">
                         {notification && (
                             <div role="alert" className={`mb-3 flex items-center gap-2 rounded-md border px-3 py-2 text-[11px] font-bold ${notification.type === 'success' ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-[#00df82]" : "border-red-500/20 bg-red-500/10 text-red-500"}`}>
                                 <HugeiconsIcon icon={notification.type === 'success' ? CheckmarkCircle02Icon : AlertCircleIcon} className="w-4 h-4 shrink-0" strokeWidth={2} />

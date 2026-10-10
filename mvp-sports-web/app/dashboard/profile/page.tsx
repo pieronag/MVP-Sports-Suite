@@ -21,7 +21,7 @@ import { SectionCard } from '@/components/ui/DashboardWidgets';
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructive = false }: any) => {
     if (!isOpen) return null;
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={onCancel}>
+        <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={onCancel}>
             <div className="bg-white dark:bg-[#0B0F19] rounded-md shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
                 <div className={`absolute top-0 left-0 w-full h-1 ${isDestructive ? 'bg-red-500' : 'bg-emerald-500'}`}></div>
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter leading-none font-heading">{title}</h3>
@@ -57,7 +57,7 @@ interface UserProfile {
 
 interface Toast { id: number; type: 'success' | 'error' | 'info'; message: string; }
 
-const inputCls = "w-full px-4 py-3 rounded-md border text-[11px] font-black transition-all outline-none bg-white border-slate-200 text-slate-900 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 dark:bg-slate-900/50 dark:border-white/10 dark:text-white";
+const inputCls = "w-full px-4 py-3 rounded-md border text-[11px] font-black transition-all outline-hidden bg-white border-slate-200 text-slate-900 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 dark:bg-slate-900/50 dark:border-white/10 dark:text-white";
 
 const TIMEZONES = [
     { value: 'America/Santiago', label: 'Chile (Santiago)' },
@@ -251,7 +251,7 @@ export default function ProfilePage() {
             <ConfirmModal isOpen={confirmData.isOpen} title={confirmData.title} message={confirmData.message} onConfirm={confirmData.action} onCancel={() => setConfirmData(prev => ({ ...prev, isOpen: false }))} isDestructive={confirmData.isDestructive} />
 
             {/* TOASTS */}
-            <div className="fixed top-6 right-6 z-[200] flex flex-col gap-3 pointer-events-none">
+            <div className="fixed top-6 right-6 z-200 flex flex-col gap-3 pointer-events-none">
                 {toasts.map(toast => (
                     <div key={toast.id} className={`pointer-events-auto flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${toast.type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:border-emerald-500/50 dark:text-emerald-400' : toast.type === 'error' ? 'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:border-red-500/50 dark:text-red-400' : 'bg-white/90 border-blue-500 text-blue-700 dark:bg-[#0B0F19]/90 dark:border-blue-500/50 dark:text-blue-400'}`}>
                         {toast.type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5" strokeWidth={2} /> : toast.type === 'error' ? <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5" strokeWidth={2} /> : <HugeiconsIcon icon={InfoIcon} className="w-5 h-5" strokeWidth={2} />}
@@ -299,7 +299,7 @@ export default function ProfilePage() {
                                     <span className="text-4xl font-black text-slate-300 dark:text-white/20 uppercase tracking-tighter">{profile.displayName?.charAt(0) || 'U'}</span>
                                 )}
                                 {uploadingImg && (
-                                    <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center">
+                                    <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center">
                                         <HugeiconsIcon icon={RefreshIcon} className="w-8 h-8 text-white animate-spin" strokeWidth={1.6} />
                                     </div>
                                 )}
@@ -380,7 +380,7 @@ export default function ProfilePage() {
 
             {/* MODAL CROPPER */}
             {showCropper && imageToCrop && (
-                <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl animate-fadeIn">
+                <div className="fixed inset-0 z-250 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-xl animate-fadeIn">
                     <div className="w-full max-w-xl rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0B0F19] shadow-2xl flex flex-col h-[650px] max-h-[90vh] overflow-hidden">
                         <div className="p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center">
                             <h3 className="text-sm font-black uppercase tracking-tighter font-heading">Ajustar imagen</h3>
@@ -406,7 +406,7 @@ export default function ProfilePage() {
 
             {/* MODAL PASSWORD */}
             {isPassModalOpen && (
-                <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
+                <div className="fixed inset-0 z-250 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
                     <div className="w-full max-w-sm rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0B0F19] shadow-2xl">
                         <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-white/5">
                             <h3 className="text-[10px] font-black uppercase tracking-widest font-heading">Actualizar seguridad</h3>

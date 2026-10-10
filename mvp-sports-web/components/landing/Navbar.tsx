@@ -51,15 +51,15 @@ export default function Navbar({ onRegisterClick }: { onRegisterClick: () => voi
   return (
     <>
       {/* Scroll progress hairline */}
-      <div className="fixed top-0 left-0 w-full h-px z-[110] pointer-events-none" aria-hidden="true">
+      <div className="fixed top-0 left-0 w-full h-px z-110 pointer-events-none" aria-hidden="true">
         <div
-          className="h-full bg-gradient-to-r from-[#00df82] via-[#00e0ff] to-[#00df82] transition-[width] duration-150 ease-out"
+          className="h-full bg-linear-to-r from-[#00df82] via-mvp-cyan to-[#00df82] transition-[width] duration-150 ease-out"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
 
       <header
-        className={`fixed left-1/2 -translate-x-1/2 z-[100] w-[95%] max-w-[1180px] transition-all duration-500 ${
+        className={`fixed left-1/2 -translate-x-1/2 z-100 w-[95%] max-w-[1180px] transition-all duration-500 ${
           scrolled ? "top-3" : "top-6"
         }`}
       >
@@ -74,7 +74,7 @@ export default function Navbar({ onRegisterClick }: { onRegisterClick: () => voi
           {/* top gradient hairline */}
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-[#00df82] to-transparent"
+            className="pointer-events-none absolute inset-x-4 top-0 h-px bg-linear-to-r from-transparent via-[#00df82] to-transparent"
           />
 
           <Link href="/" aria-label="MVP Sports, ir al inicio" className="group flex items-center">
@@ -129,7 +129,7 @@ export default function Navbar({ onRegisterClick }: { onRegisterClick: () => voi
       <div
         id="mobile-menu"
         aria-hidden={!isMobileMenuOpen}
-        className={`fixed inset-0 z-[90] bg-slate-950/95 backdrop-blur-xl transition-all duration-300 lg:hidden ${
+        className={`fixed inset-0 z-90 bg-slate-950/95 backdrop-blur-xl transition-all duration-300 lg:hidden ${
           isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
         }`}
       >

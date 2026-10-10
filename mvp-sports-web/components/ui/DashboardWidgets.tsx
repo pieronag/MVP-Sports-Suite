@@ -27,7 +27,7 @@ export function PanelGlass({ children, className = "", id }: { children: React.R
     return (
         <div id={id} className={`
             rounded-md border transition-all duration-300
-            bg-white border-slate-200 shadow-sm shadow-slate-200/50
+            bg-white border-slate-200 shadow-xs shadow-slate-200/50
             dark:bg-slate-900/50 dark:border-white/5 dark:shadow-none
             ${className}
         `}>
@@ -54,7 +54,7 @@ export function SectionCard({
     bodyClassName?: string;
 }) {
     return (
-        <div className={`rounded-md border bg-white border-slate-200 shadow-sm shadow-slate-200/50 dark:bg-slate-900/50 dark:border-white/5 dark:shadow-none flex flex-col ${className}`}>
+        <div className={`rounded-md border bg-white border-slate-200 shadow-xs shadow-slate-200/50 dark:bg-slate-900/50 dark:border-white/5 dark:shadow-none flex flex-col ${className}`}>
             <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-100 dark:border-white/5 shrink-0">
                 <div className="flex items-center gap-2.5 min-w-0">
                     {icon && (

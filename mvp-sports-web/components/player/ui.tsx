@@ -10,7 +10,7 @@ export const PLAYER_CARD = { dark: "#0A101D", light: "#FFFFFF" } as const;
 
 export function GlowCard({ isDark, children, className = "" }: { isDark: boolean; children: ReactNode; className?: string }) {
   return (
-    <div className={`relative rounded-md border ${isDark ? "bg-[#0A101D] border-white/5" : "bg-white border-slate-200 shadow-sm shadow-slate-200/50"} ${className}`}>
+    <div className={`relative rounded-md border ${isDark ? "bg-[#0A101D] border-white/5" : "bg-white border-slate-200 shadow-xs shadow-slate-200/50"} ${className}`}>
       {children}
     </div>
   );
@@ -34,12 +34,12 @@ export function SegmentedTabs<T extends string>({ isDark, value, onChange, optio
   className?: string;
 }) {
   return (
-    <div role="tablist" className={`flex p-1 rounded-md ${isDark ? "bg-white/[0.04]" : "bg-slate-100"} ${className}`}>
+    <div role="tablist" className={`flex p-1 rounded-md ${isDark ? "bg-white/4" : "bg-slate-100"} ${className}`}>
       {options.map(({ id, label, icon: Icon }) => {
         const on = value === id;
         return (
           <button key={id} role="tab" aria-selected={on} onClick={() => onChange(id)}
-            className={`flex-1 min-w-0 h-9 px-2 rounded-md text-[12px] font-semibold transition-all flex items-center justify-center gap-1.5 ${on ? (isDark ? "bg-[#0A101D] text-emerald-400" : "bg-white text-emerald-600 shadow-sm") : isDark ? "text-slate-400" : "text-slate-500"}`}>
+            className={`flex-1 min-w-0 h-9 px-2 rounded-md text-[12px] font-semibold transition-all flex items-center justify-center gap-1.5 ${on ? (isDark ? "bg-[#0A101D] text-emerald-400" : "bg-white text-emerald-600 shadow-xs") : isDark ? "text-slate-400" : "text-slate-500"}`}>
             {Icon && <Icon size={14} className="shrink-0" />}<span className="truncate">{label}</span>
           </button>
         );

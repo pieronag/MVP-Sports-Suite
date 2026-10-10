@@ -38,7 +38,7 @@ import {
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
     return (
-        <div className={`fixed top-5 right-5 z-[160] flex items-center gap-3 px-4 py-3 rounded-md shadow-xl border animate-slideIn ${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-[#00df82] dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
+        <div className={`fixed top-5 right-5 z-160 flex items-center gap-3 px-4 py-3 rounded-md shadow-xl border animate-slideIn ${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-[#00df82] dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
             {type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5" /> : <HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" />}
             <span className="text-[10px] font-bold uppercase tracking-wider">{message}</span>
         </div>
@@ -48,7 +48,7 @@ const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructive = false }: any) => {
     if (!isOpen) return null;
     return (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={onCancel}>
+        <div className="fixed inset-0 z-150 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn" onClick={onCancel}>
             <div className="bg-white dark:bg-[#0B0F19] rounded-md shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase">{title}</h3>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-6 uppercase">{message}</p>
@@ -78,7 +78,7 @@ const PasswordModal = ({ isOpen, onClose, onConfirm, memberName }: any) => {
         setPassword('');
     };
     return (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={onClose}>
+        <div className="fixed inset-0 z-150 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={onClose}>
             <div className="bg-white dark:bg-[#0B0F19] rounded-md shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
                 <div className="flex justify-between items-start mb-4">
                     <div>
@@ -92,7 +92,7 @@ const PasswordModal = ({ isOpen, onClose, onConfirm, memberName }: any) => {
                         <label className="text-[10px] font-bold text-emerald-700 dark:text-[#00df82] uppercase tracking-wide block mb-1.5">Nueva Contraseña</label>
                         <div className="relative">
                             <HugeiconsIcon icon={LockIcon} className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2" />
-                            <input type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-9 pr-10 py-3 bg-white dark:bg-[#0B0F19] border border-emerald-200 dark:border-emerald-500/30 rounded-md text-xs font-bold outline-none" placeholder="Mínimo 6 caracteres" />
+                            <input type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-9 pr-10 py-3 bg-white dark:bg-[#0B0F19] border border-emerald-200 dark:border-emerald-500/30 rounded-md text-xs font-bold outline-hidden" placeholder="Mínimo 6 caracteres" />
                             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600">{showPassword ? <HugeiconsIcon icon={EyeOffIcon} className="w-5 h-5" /> : <HugeiconsIcon icon={EyeIcon} className="w-5 h-5" />}</button>
                         </div>
                     </div>
@@ -455,12 +455,12 @@ export default function StaffPage() {
             </div>
 
             {/* TOOLBAR */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-slate-100 dark:border-white/5 shadow-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-slate-100 dark:border-white/5 shadow-xs">
                 <div className="relative">
                     <select 
                         value={filterVenueId} 
                         onChange={(e) => setFilterVenueId(e.target.value)} 
-                        className="w-full bg-slate-50 dark:bg-white/5 border-0 rounded-md pl-3 pr-8 py-3 text-[10px] font-bold uppercase outline-none text-slate-600 dark:text-white cursor-pointer appearance-none"
+                        className="w-full bg-slate-50 dark:bg-white/5 border-0 rounded-md pl-3 pr-8 py-3 text-[10px] font-bold uppercase outline-hidden text-slate-600 dark:text-white cursor-pointer appearance-none"
                     >
                         <option value="ALL">TODOS LOS RECINTOS</option>
                         {venues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
@@ -474,7 +474,7 @@ export default function StaffPage() {
                         placeholder="Buscar por nombre..." 
                         value={searchTerm} 
                         onChange={(e) => setSearchTerm(e.target.value)} 
-                        className="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-md text-[10px] font-bold outline-none placeholder:text-slate-400" 
+                        className="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-md text-[10px] font-bold outline-hidden placeholder:text-slate-400" 
                     />
                 </div>
             </div>
@@ -528,7 +528,7 @@ export default function StaffPage() {
                                     </div>
                                 )}
                             </div>
-                            <div className="p-3 bg-slate-50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5 flex gap-2">
+                            <div className="p-3 bg-slate-50 dark:bg-white/2 border-t border-slate-100 dark:border-white/5 flex gap-2">
                                 <button onClick={() => handleOpenModal(member)} className="flex-1 py-2 flex items-center justify-center bg-white dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-900 hover:border-emerald-400/40 transition-all" title="Editar">
                                     <HugeiconsIcon icon={PencilEdit02Icon} className="w-4 h-4" />
                                 </button>
@@ -557,7 +557,7 @@ export default function StaffPage() {
             )}
 
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setIsModalOpen(false)}>
+                <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setIsModalOpen(false)}>
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-lg rounded-md shadow-2xl border border-slate-200 dark:border-white/10 overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-5 border-b border-slate-100 dark:border-white/5">
                             <div className="flex items-center gap-3.5">
@@ -576,26 +576,26 @@ export default function StaffPage() {
                         <form onSubmit={handleSave} className="p-6 space-y-4">
                             <div>
                                 <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Nombre Completo</label>
-                                <input type="text" required value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} placeholder="Ej: Carlos Soto" className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-none focus:border-emerald-500 transition-all" />
+                                <input type="text" required value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} placeholder="Ej: Carlos Soto" className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Cargo</label>
-                                    <input type="text" value={formData.jobTitle} onChange={e => setFormData({ ...formData, jobTitle: e.target.value })} placeholder="Ej: Recepcionista" className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-none focus:border-emerald-500 transition-all" />
+                                    <input type="text" value={formData.jobTitle} onChange={e => setFormData({ ...formData, jobTitle: e.target.value })} placeholder="Ej: Recepcionista" className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">RUT</label>
-                                    <input type="text" value={formData.rut} onChange={e => setFormData({ ...formData, rut: e.target.value })} placeholder="12.345.678-9" className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-none font-mono focus:border-emerald-500 transition-all" />
+                                    <input type="text" value={formData.rut} onChange={e => setFormData({ ...formData, rut: e.target.value })} placeholder="12.345.678-9" className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-hidden font-mono focus:border-emerald-500 transition-all" />
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Correo Electrónico</label>
-                                    <input type="email" required value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-none focus:border-emerald-500 transition-all" />
+                                    <input type="email" required value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
                                 </div>
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Teléfono</label>
-                                    <input type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-none focus:border-emerald-500 transition-all" />
+                                    <input type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
                                 </div>
                             </div>
                             {!editingId && (
@@ -603,7 +603,7 @@ export default function StaffPage() {
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Contraseña Inicial</label>
                                     <div className="relative">
                                         <HugeiconsIcon icon={LockIcon} className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.8} />
-                                        <input type={showPassword ? "text" : "password"} required minLength={6} value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder="Mínimo 6 caracteres" className="w-full pl-9 pr-10 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-md text-[11px] font-bold outline-none focus:border-emerald-500 transition-all" />
+                                        <input type={showPassword ? "text" : "password"} required minLength={6} value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder="Mínimo 6 caracteres" className="w-full pl-9 pr-10 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
                                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-[#00df82]">
                                             {showPassword ? <HugeiconsIcon icon={EyeOffIcon} className="w-4 h-4" /> : <HugeiconsIcon icon={EyeIcon} className="w-4 h-4" />}
                                         </button>

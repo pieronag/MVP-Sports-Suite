@@ -68,7 +68,7 @@ const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 
     }, [onClose]);
 
     return (
-        <div className={`fixed top-5 right-5 z-[150] flex items-center gap-3 px-4 py-3 rounded-md shadow-2xl border animate-slideIn ${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-emerald-400 dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
+        <div className={`fixed top-5 right-5 z-150 flex items-center gap-3 px-4 py-3 rounded-md shadow-2xl border animate-slideIn ${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-emerald-400 dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
             {type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5 text-emerald-500" strokeWidth={2} /> : <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5 text-red-500" strokeWidth={2} />}
             <span className="text-[10px] font-black uppercase tracking-widest">{message}</span>
         </div>
@@ -339,7 +339,7 @@ export default function GamificationSettingsPage() {
                                         type="number"
                                         value={params.tiers[tm.key]}
                                         onChange={(e) => setTier(tm.key, Number(e.target.value))}
-                                        className="w-16 text-right bg-transparent text-[10px] font-black text-slate-700 dark:text-white outline-none font-mono"
+                                        className="w-16 text-right bg-transparent text-[10px] font-black text-slate-700 dark:text-white outline-hidden font-mono"
                                     />
                                 </div>
                                 <p className="text-[8px] font-bold text-slate-500 dark:text-slate-400 font-mono">{fmt(Number(params.tiers[tm.key]) || 0)}</p>
@@ -373,7 +373,7 @@ function Simulator({ tiers }: { tiers: any }) {
         >
             <div className="flex flex-col md:flex-row items-center gap-10">
                 <div className="relative shrink-0">
-                    <div className="w-36 h-36 rounded-full border-[10px] border-slate-100 dark:border-white/5 flex items-center justify-center relative shadow-2xl bg-white dark:bg-slate-900">
+                    <div className="w-36 h-36 rounded-full border-10 border-slate-100 dark:border-white/5 flex items-center justify-center relative shadow-2xl bg-white dark:bg-slate-900">
                         <div className="text-center">
                             <p className="text-[8px] font-black uppercase text-slate-400 tracking-tighter">Nivel general</p>
                             <p className="text-5xl font-black text-slate-900 dark:text-white leading-none tracking-tighter font-mono">{overall}</p>
@@ -454,7 +454,7 @@ function StepperCard({ label, desc, value, onChange, icon, negative = false, ste
                         type="number"
                         value={value}
                         onChange={(e) => onChange(Number(e.target.value))}
-                        className={`w-16 text-center bg-transparent text-[11px] font-black outline-none font-mono ${negative ? 'text-rose-500' : 'text-emerald-600 dark:text-[#00df82]'}`}
+                        className={`w-16 text-center bg-transparent text-[11px] font-black outline-hidden font-mono ${negative ? 'text-rose-500' : 'text-emerald-600 dark:text-[#00df82]'}`}
                     />
                     <button onClick={() => onChange(value + step)} aria-label="Aumentar" className="w-8 h-8 rounded-md bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-500 hover:border-emerald-400 dark:hover:border-[#00df82]/40 hover:text-emerald-600 dark:hover:text-[#00df82] font-black text-base transition-all active:scale-90">+</button>
                 </div>
@@ -474,7 +474,7 @@ function InlineStepper({ label, value, onChange, color, disabled = false, step =
                     value={value}
                     disabled={disabled}
                     onChange={(e) => onChange(Number(e.target.value))}
-                    className={`w-14 text-right bg-transparent outline-none text-[11px] font-black ${color} font-mono disabled:cursor-not-allowed`}
+                    className={`w-14 text-right bg-transparent outline-hidden text-[11px] font-black ${color} font-mono disabled:cursor-not-allowed`}
                 />
                 <button onClick={() => !disabled && onChange(value + step)} aria-label={`Aumentar ${label}`} disabled={disabled} className="w-7 h-7 rounded-md bg-slate-100 dark:bg-white/10 text-slate-500 hover:text-emerald-600 dark:hover:text-[#00df82] font-black text-base transition-all active:scale-90 disabled:opacity-40">+</button>
             </div>

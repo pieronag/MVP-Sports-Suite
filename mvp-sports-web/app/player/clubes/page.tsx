@@ -121,16 +121,16 @@ export default function ExploreClubesPage() {
     <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="flex items-center justify-between mb-4">
-          <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06] hover:bg-white/[0.1]" : "bg-slate-100 hover:bg-slate-200"}`}>
+          <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
             <ChevronLeft size={20} className="text-emerald-500" />
           </button>
           <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Recintos</h1>
           <div className="w-10" />
         </div>
-        <div className={`flex items-center gap-3 px-4 h-12 rounded-md border ${isDark ? "bg-white/[0.04] border-white/[0.06]" : "bg-slate-50 border-slate-200"}`}>
+        <div className={`flex items-center gap-3 px-4 h-12 rounded-md border ${isDark ? "bg-white/4 border-white/6" : "bg-slate-50 border-slate-200"}`}>
           <Search size={16} className="text-emerald-500 shrink-0" />
           <input placeholder="Buscar club o recinto..." value={search} onChange={(e) => setSearch(e.target.value)}
-            className={`flex-1 bg-transparent text-sm font-medium outline-none ${isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400"}`}
+            className={`flex-1 bg-transparent text-sm font-medium outline-hidden ${isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400"}`}
           />
         </div>
       </div>
@@ -142,7 +142,7 @@ export default function ExploreClubesPage() {
             const SportIcon = SPORT_ICON_MAP[sport.toLowerCase()];
             return (
               <button key={sport} onClick={() => setSelectedSport(sport)}
-                className={`flex items-center gap-1.5 h-10 px-4 rounded-md text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${selectedSport === sport ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+                className={`flex items-center gap-1.5 h-10 px-4 rounded-md text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${selectedSport === sport ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-400 hover:bg-white/10" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
                 {SportIcon && <SportIcon color={selectedSport === sport ? "white" : isDark ? "#94a3b8" : "#64748b"} size={14} />}
                 {sport}
               </button>
@@ -152,7 +152,7 @@ export default function ExploreClubesPage() {
         <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-none">
           {communesList.map((commune) => (
             <button key={commune} onClick={() => setSelectedCommune(commune)}
-              className={`h-10 px-4 rounded-md text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${selectedCommune === commune ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-400 hover:bg-white/[0.1]" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+              className={`h-10 px-4 rounded-md text-[12px] font-semibold whitespace-nowrap transition-all active:scale-95 ${selectedCommune === commune ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-400 hover:bg-white/10" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
               {commune}
             </button>
           ))}
@@ -171,7 +171,7 @@ export default function ExploreClubesPage() {
               <button onClick={() => router.push(`/player/clubes/${venue.id}`)} className="w-full block text-left">
                 <div className="h-[160px] rounded-md overflow-hidden relative">
                   <img src={getVenueImage(venue)} alt={venue.name} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute top-4 left-4 flex flex-wrap gap-1.5">
                     {allSports.slice(0, 3).map((s: string) => (
                       <span key={s} className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold tracking-wide uppercase">{s}</span>
@@ -194,7 +194,7 @@ export default function ExploreClubesPage() {
                     <span className="text-emerald-500 font-semibold text-xs">{Number(venue.rating) > 0 ? Number(venue.rating).toFixed(1) : "Nuevo"}</span>
                   </div>
                 </div>
-                <div className={`flex items-center justify-between pt-4 border-t ${isDark ? "border-white/[0.06]" : "border-slate-200"}`}>
+                <div className={`flex items-center justify-between pt-4 border-t ${isDark ? "border-white/6" : "border-slate-200"}`}>
                   <div className="flex items-center gap-1.5">
                     <Navigation size={13} className="text-emerald-500" />
                     <span className={`text-xs font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{distance || "Cerca de ti"}</span>

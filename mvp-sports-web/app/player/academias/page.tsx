@@ -117,7 +117,7 @@ export default function AcademiasPage() {
     <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-        <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}>
+        <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
         <h1 className="font-heading font-black text-base tracking-tight uppercase flex-1 text-center">Academias</h1>
@@ -138,12 +138,12 @@ export default function AcademiasPage() {
 
         {myClasses.length > 0 && (
           <>
-            <SectionPill label="Mis clases" className="!px-0 !mt-2" />
+            <SectionPill label="Mis clases" className="px-0! mt-2!" />
             {myClasses.map(c => <ClassCard key={c.id} c={c} />)}
           </>
         )}
 
-        <SectionPill label="Clases disponibles" className="!px-0 !mt-2" />
+        <SectionPill label="Clases disponibles" className="px-0! mt-2!" />
         {loading ? (
           <div className="flex justify-center py-10"><div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
         ) : visible.length === 0 ? (
@@ -172,7 +172,7 @@ export default function AcademiasPage() {
                   <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: ACCENT }}>{c.sport || "Academia"}</p>
                   <h2 className={`text-lg font-heading font-black ${txt}`}>{c.name}</h2>
                 </div>
-                <button aria-label="Cerrar" onClick={() => setSelected(null)} className={`w-9 h-9 rounded-md flex items-center justify-center ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}><X size={18} /></button>
+                <button aria-label="Cerrar" onClick={() => setSelected(null)} className={`w-9 h-9 rounded-md flex items-center justify-center ${isDark ? "bg-white/6" : "bg-slate-100"}`}><X size={18} /></button>
               </div>
               {c.description && <p className={`text-sm mb-4 ${sub}`}>{c.description}</p>}
               <div className={`grid grid-cols-2 gap-2.5 mb-4 text-sm`}>
@@ -184,7 +184,7 @@ export default function AcademiasPage() {
                   { icon: CreditCard, label: "Mensualidad", value: c.price ? fmtCLP(c.price) : "Gratis" },
                   { icon: GraduationCap, label: "Cupos", value: c.maxStudents ? `${free} de ${c.maxStudents}` : "Libres" },
                 ].map(r => (
-                  <div key={r.label} className={`p-3 rounded-md border ${isDark ? "border-white/5 bg-white/[0.02]" : "border-slate-200 bg-slate-50"}`}>
+                  <div key={r.label} className={`p-3 rounded-md border ${isDark ? "border-white/5 bg-white/2" : "border-slate-200 bg-slate-50"}`}>
                     <p className={`flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide ${sub}`}><r.icon size={13} /> {r.label}</p>
                     <p className={`mt-1 text-sm font-semibold ${txt}`}>{r.value}</p>
                   </div>
@@ -214,7 +214,7 @@ export default function AcademiasPage() {
       })()}
 
       {toast && (
-        <div className="fixed inset-x-4 top-4 z-[60]" role="status" onClick={() => setToast(null)}>
+        <div className="fixed inset-x-4 top-4 z-60" role="status" onClick={() => setToast(null)}>
           <div className={`p-3.5 rounded-md text-sm font-semibold text-white ${toast.type === "ok" ? "bg-emerald-600" : "bg-rose-600"}`}>{toast.msg}</div>
         </div>
       )}

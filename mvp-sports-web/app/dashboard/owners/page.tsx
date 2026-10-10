@@ -247,7 +247,7 @@ export default function Page() {
     return (
         <div className="w-full space-y-6 pb-12 animate-fadeIn relative">
             {notification && (
-                <div className={`fixed top-6 right-6 z-[420] flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${notification.type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-emerald-400 dark:border-emerald-500/50' : 'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'}`}>
+                <div className={`fixed top-6 right-6 z-420 flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${notification.type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-emerald-400 dark:border-emerald-500/50' : 'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'}`}>
                     <HugeiconsIcon icon={notification.type === 'success' ? CheckmarkCircle02Icon : Alert02Icon} className="w-5 h-5" strokeWidth={1.8} />
                     <span className="text-[10px] font-black uppercase tracking-wider">{notification.msg}</span>
                 </div>
@@ -282,19 +282,19 @@ export default function Page() {
             <div className="flex flex-col xl:flex-row gap-3 xl:items-center justify-between p-3 rounded-md border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/50">
                 <div className="relative w-full xl:w-80 shrink-0">
                     <HugeiconsIcon icon={Search01Icon} className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" strokeWidth={1.8} />
-                    <input type="text" placeholder="Buscar por nombre, email o empresa…" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none transition-all" />
+                    <input type="text" placeholder="Buscar por nombre, email o empresa…" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-hidden transition-all" />
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                     <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-white/5 p-1 rounded-md border border-slate-100 dark:border-white/10">
                         {['Todos', 'Morosos', 'Suspendidos'].map(f => (
-                            <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-[10px] font-black uppercase rounded-md transition-all whitespace-nowrap cursor-pointer ${filter === f ? 'bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-sm' : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}>{f}</button>
+                            <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-[10px] font-black uppercase rounded-md transition-all whitespace-nowrap cursor-pointer ${filter === f ? 'bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-xs' : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}>{f}</button>
                         ))}
                     </div>
                     <div className="flex items-center gap-1 bg-slate-50 dark:bg-white/5 p-1 rounded-md border border-slate-100 dark:border-white/10">
-                        <button onClick={() => setViewMode('grid')} aria-label="Vista cuadrícula" className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}>
+                        <button onClick={() => setViewMode('grid')} aria-label="Vista cuadrícula" className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-xs' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}>
                             <HugeiconsIcon icon={Grid02Icon} className="w-4 h-4" strokeWidth={1.8} />
                         </button>
-                        <button onClick={() => setViewMode('list')} aria-label="Vista listado" className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === 'list' ? 'bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}>
+                        <button onClick={() => setViewMode('list')} aria-label="Vista listado" className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === 'list' ? 'bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-xs' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}>
                             <HugeiconsIcon icon={ListViewIcon} className="w-4 h-4" strokeWidth={1.8} />
                         </button>
                     </div>
@@ -362,17 +362,17 @@ export default function Page() {
                                                 alt={owner.name}
                                             />
                                         ) : (
-                                            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 to-emerald-800 flex items-center justify-center">
+                                            <div className="absolute inset-0 bg-linear-to-br from-emerald-500 to-emerald-800 flex items-center justify-center">
                                                 <span className="font-black text-white text-4xl uppercase">{owner.name.charAt(0)}</span>
                                             </div>
                                         )}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-black/35" />
+                                        <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/10 to-black/35" />
 
-                                        <span className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border backdrop-blur shadow-sm ${tierStyle}`}>
+                                        <span className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border backdrop-blur-sm shadow-xs ${tierStyle}`}>
                                             {owner.tier}
                                         </span>
 
-                                        <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-black/55 backdrop-blur border border-white/15">
+                                        <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-black/55 backdrop-blur-sm border border-white/15">
                                             <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-400' : 'bg-red-400'}`} />
                                             <span className="text-[9px] font-black text-white uppercase tracking-wider">{owner.status}</span>
                                         </span>
@@ -433,7 +433,7 @@ export default function Page() {
                                 </div>
 
                                 {/* Acción */}
-                                <div className="grid grid-cols-2 bg-slate-50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/5 divide-x divide-slate-100 dark:divide-white/5">
+                                <div className="grid grid-cols-2 bg-slate-50 dark:bg-white/2 border-t border-slate-100 dark:border-white/5 divide-x divide-slate-100 dark:divide-white/5">
                                     <button onClick={() => setProfileOwner(owner)} className="py-2.5 flex items-center justify-center gap-1.5 bg-[#00df82] text-slate-950 hover:bg-[#3affa0] transition-all cursor-pointer">
                                         <HugeiconsIcon icon={UserCircleIcon} className="w-3.5 h-3.5" strokeWidth={2} />
                                         <span className="text-[9px] font-black uppercase tracking-wider">Perfil</span>
@@ -452,7 +452,7 @@ export default function Page() {
                     <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full text-left border-collapse min-w-[860px]">
                             <thead>
-                                <tr className="border-b border-slate-100 dark:border-white/5 bg-slate-50/60 dark:bg-white/[0.02]">
+                                <tr className="border-b border-slate-100 dark:border-white/5 bg-slate-50/60 dark:bg-white/2">
                                     <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Dueño</th>
                                     <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tier</th>
                                     <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center">Recintos</th>
@@ -471,13 +471,13 @@ export default function Page() {
                                             ? 'bg-amber-400 text-amber-950'
                                             : 'bg-slate-200 text-slate-600 dark:bg-white/10 dark:text-slate-300';
                                     return (
-                                        <tr key={owner.id} className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors">
+                                        <tr key={owner.id} className="hover:bg-slate-50/60 dark:hover:bg-white/2 transition-colors">
                                             <td className="py-4 px-6">
                                                 <div className="flex items-center gap-3">
                                                     {owner.photoURL ? (
                                                         <img src={owner.photoURL} alt={owner.name} className="w-10 h-10 rounded-md object-cover border border-slate-200 dark:border-white/10 shrink-0" />
                                                     ) : (
-                                                        <span className="w-10 h-10 rounded-md bg-gradient-to-br from-emerald-500 to-emerald-800 text-white flex items-center justify-center font-black text-sm shrink-0">{owner.name.charAt(0).toUpperCase()}</span>
+                                                        <span className="w-10 h-10 rounded-md bg-linear-to-br from-emerald-500 to-emerald-800 text-white flex items-center justify-center font-black text-sm shrink-0">{owner.name.charAt(0).toUpperCase()}</span>
                                                     )}
                                                     <div className="min-w-0">
                                                         <span className="font-black text-[13px] text-slate-900 dark:text-white uppercase truncate block font-heading">{owner.name}</span>
@@ -564,7 +564,7 @@ export default function Page() {
             {/* MODAL PASSWORD */}
             {passwordOwner && (
                 <ModalPortal>
-                    <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-slate-900/80 dark:bg-black/85 backdrop-blur-xl animate-in fade-in duration-200" role="presentation" onClick={() => !isSubmitting && setPasswordOwner(null)}>
+                    <div className="fixed inset-0 z-500 flex items-center justify-center p-4 bg-slate-900/80 dark:bg-black/85 backdrop-blur-xl animate-in fade-in duration-200" role="presentation" onClick={() => !isSubmitting && setPasswordOwner(null)}>
                         <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()} className="relative w-full max-w-sm rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0B0F19] shadow-2xl p-6 text-center animate-in zoom-in-95 duration-200">
                             <div className="w-14 h-14 rounded-md bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4 text-amber-600 dark:text-amber-400">
                                 <HugeiconsIcon icon={Key01Icon} className="w-7 h-7" strokeWidth={1.8} />
@@ -582,7 +582,7 @@ export default function Page() {
                                         value={manualPassword}
                                         onChange={e => setManualPassword(e.target.value)}
                                         placeholder="Mínimo 6 caracteres"
-                                        className="w-full px-3.5 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 outline-none transition-all"
+                                        className="w-full px-3.5 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 outline-hidden transition-all"
                                     />
                                 </div>
                                 <div className="flex gap-3 pt-1">
@@ -598,7 +598,7 @@ export default function Page() {
             {/* MODAL CREDENCIALES */}
             {createdCredentials && (
                 <ModalPortal>
-                    <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-slate-900/80 dark:bg-black/90 backdrop-blur-xl animate-in fade-in duration-200" role="presentation">
+                    <div className="fixed inset-0 z-500 flex items-center justify-center p-4 bg-slate-900/80 dark:bg-black/90 backdrop-blur-xl animate-in fade-in duration-200" role="presentation">
                         <div role="dialog" aria-modal="true" className="relative w-full max-w-sm rounded-md border-2 border-emerald-500 bg-white dark:bg-[#0B0F19] shadow-[0_0_80px_-20px_rgba(0,223,130,0.5)] p-6 text-center animate-in zoom-in-95 duration-200">
                             <div className="w-16 h-16 rounded-md bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center mx-auto mb-4 text-emerald-600 dark:text-[#00df82]">
                                 <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-8 h-8" strokeWidth={1.8} />
@@ -606,7 +606,7 @@ export default function Page() {
                             <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 dark:text-white font-heading">¡Dueño registrado!</h3>
                             <p className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1 mb-5">Comparte estas credenciales de acceso.</p>
 
-                            <div className="rounded-md border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] p-4 text-left space-y-4 mb-5">
+                            <div className="rounded-md border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/2 p-4 text-left space-y-4 mb-5">
                                 <div>
                                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">Email de acceso</p>
                                     <p className="font-mono text-sm font-bold text-slate-900 dark:text-white truncate">{createdCredentials.email}</p>

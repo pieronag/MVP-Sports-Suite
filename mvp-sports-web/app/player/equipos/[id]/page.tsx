@@ -184,8 +184,8 @@ export default function EquipoDetailPage() {
     <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Hero with optional photo */}
       <div className="h-[200px] relative overflow-hidden" style={{ background: (team as any).imageUrl ? `url(${(team as any).imageUrl}) center/cover` : undefined }}>
-        {!((team as any).imageUrl) && <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/60 to-slate-900" />}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#020611] via-black/30 to-transparent" />
+        {!((team as any).imageUrl) && <div className="absolute inset-0 bg-linear-to-br from-emerald-900/60 to-slate-900" />}
+        <div className="absolute inset-0 bg-linear-to-t from-[#020611] via-black/30 to-transparent" />
         <div className="absolute top-0 left-0 right-0 px-5 pt-12 flex justify-between">
           <button aria-label="Volver" onClick={() => router.back()} className="w-10 h-10 rounded-md bg-black/30 border border-white/10 flex items-center justify-center">
             <ChevronLeft color="white" size={20} />
@@ -208,7 +208,7 @@ export default function EquipoDetailPage() {
           <div className="flex items-center gap-2 mb-2">
             <span className="bg-emerald-500 px-3 py-1 rounded-md text-white font-semibold text-[11px] uppercase tracking-wide border border-white/10">{team.sport?.toUpperCase() || "GENERAL"}</span>
           </div>
-          <h1 className="text-white text-xl font-heading font-black uppercase line-clamp-2 break-words [overflow-wrap:anywhere]">{team.name}</h1>
+          <h1 className="text-white text-xl font-heading font-black uppercase line-clamp-2 wrap-break-word wrap-anywhere">{team.name}</h1>
         </div>
       </div>
 
@@ -305,7 +305,7 @@ export default function EquipoDetailPage() {
                       {isMemberOwner && <span className="text-[11px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-500">Capitán</span>}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-md ${isDark ? "bg-white/[0.06] text-slate-400" : "bg-slate-100 text-slate-500"}`}>{p.tier || "Bronce"}</span>
+                      <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-md ${isDark ? "bg-white/6 text-slate-400" : "bg-slate-100 text-slate-500"}`}>{p.tier || "Bronce"}</span>
                       <span className="text-emerald-500 text-[11px] font-semibold">OVR {p.ovr || 40}</span>
                     </div>
                   </div>
@@ -331,19 +331,19 @@ export default function EquipoDetailPage() {
               <p className={`font-semibold text-center ${isDark ? "text-slate-100" : "text-slate-900"}`}>Opciones del Equipo</p>
             </div>
             {isOwner && (
-              <button onClick={() => { setShowMenu(false); openEdit(); }} className="flex items-center gap-4 w-full px-6 py-4 transition-all hover:bg-white/[0.02]">
+              <button onClick={() => { setShowMenu(false); openEdit(); }} className="flex items-center gap-4 w-full px-6 py-4 transition-all hover:bg-white/2">
                 <div className="w-10 h-10 rounded-md flex items-center justify-center bg-blue-500/10"><Edit size={20} className="text-blue-400" /></div>
                 <span className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Editar Equipo</span>
               </button>
             )}
             {!isOwner && (
-              <button onClick={() => { setShowMenu(false); setShowLeaveModal(true); }} className="flex items-center gap-4 w-full px-6 py-4 transition-all hover:bg-white/[0.02]">
+              <button onClick={() => { setShowMenu(false); setShowLeaveModal(true); }} className="flex items-center gap-4 w-full px-6 py-4 transition-all hover:bg-white/2">
                 <div className="w-10 h-10 rounded-md flex items-center justify-center bg-red-500/10"><LogOut size={20} className="text-red-400" /></div>
                 <span className={`text-sm font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Salir del Equipo</span>
               </button>
             )}
             {isOwner && (
-              <button onClick={() => { setShowMenu(false); setShowDeleteModal(true); }} className="flex items-center gap-4 w-full px-6 py-4 transition-all hover:bg-white/[0.02]">
+              <button onClick={() => { setShowMenu(false); setShowDeleteModal(true); }} className="flex items-center gap-4 w-full px-6 py-4 transition-all hover:bg-white/2">
                 <div className="w-10 h-10 rounded-md flex items-center justify-center bg-red-500/10"><Trash2 size={20} className="text-red-400" /></div>
                 <span className="text-sm font-medium text-red-400">Eliminar Equipo</span>
               </button>
@@ -356,24 +356,24 @@ export default function EquipoDetailPage() {
       {/* Edit Modal */}
       {showEditModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowEditModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <p className={`font-semibold text-base ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar Equipo</p>
               <button aria-label="Cerrar" onClick={() => setShowEditModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} /></button>
             </div>
             <div className="mb-4">
               <label className={`text-[12px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nombre</label>
-              <input maxLength={40} value={editName} onChange={e => setEditName(e.target.value)} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-none ${isDark ? "bg-[#0A101D] text-slate-100 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`} />
+              <input maxLength={40} value={editName} onChange={e => setEditName(e.target.value)} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-hidden ${isDark ? "bg-[#0A101D] text-slate-100 border-white/6" : "bg-white text-slate-900 border-slate-200"}`} />
             </div>
             <div className="mb-4">
               <label className={`text-[12px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción</label>
-              <textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} rows={2} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-none resize-none ${isDark ? "bg-[#0A101D] text-slate-100 border-white/[0.06]" : "bg-white text-slate-900 border-slate-200"}`} />
+              <textarea value={editDescription} onChange={e => setEditDescription(e.target.value)} rows={2} className={`w-full p-3.5 text-sm font-medium rounded-md border outline-hidden resize-none ${isDark ? "bg-[#0A101D] text-slate-100 border-white/6" : "bg-white text-slate-900 border-slate-200"}`} />
             </div>
             <div className="mb-6">
               <label className={`text-[12px] font-semibold uppercase tracking-wide mb-2 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
               <div className="flex flex-wrap gap-2">
                 {SPORTS.map(s => (
-                  <button key={s} onClick={() => setEditSport(s)} className={`px-4 py-2 rounded-md text-xs font-semibold transition-all ${editSport === s ? "bg-emerald-500 text-white" : isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-600"}`}>{s}</button>
+                  <button key={s} onClick={() => setEditSport(s)} className={`px-4 py-2 rounded-md text-xs font-semibold transition-all ${editSport === s ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{s}</button>
                 ))}
               </div>
             </div>
@@ -387,12 +387,12 @@ export default function EquipoDetailPage() {
       {/* Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setShowDeleteModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-red-500/10 flex items-center justify-center mx-auto mb-4"><Trash2 size={32} className="text-red-500" /></div>
             <p className={`text-base font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Eliminar Equipo?</p>
             <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Esta acción es irreversible. Se perderán todos los datos del equipo.</p>
             <div className="flex gap-3">
-              <button onClick={() => setShowDeleteModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+              <button onClick={() => setShowDeleteModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
               <button onClick={handleDelete} disabled={actionLoading} className="flex-1 py-3.5 rounded-md bg-red-500 text-white font-semibold text-sm disabled:opacity-50">
                 {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" /> : "SI, ELIMINAR"}
               </button>
@@ -404,12 +404,12 @@ export default function EquipoDetailPage() {
       {/* Leave Modal */}
       {showLeaveModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setShowLeaveModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-red-500/10 flex items-center justify-center mx-auto mb-4"><LogOut size={32} className="text-red-500" /></div>
             <p className={`text-base font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Abandonar Equipo?</p>
             <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Si abandonas, necesitarás que el capitán te acepte de nuevo.</p>
             <div className="flex gap-3">
-              <button onClick={() => setShowLeaveModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+              <button onClick={() => setShowLeaveModal(false)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
               <button onClick={handleLeave} disabled={actionLoading} className="flex-1 py-3.5 rounded-md bg-red-500 text-white font-semibold text-sm disabled:opacity-50">
                 {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" /> : "SI, ABANDONAR"}
               </button>
@@ -421,12 +421,12 @@ export default function EquipoDetailPage() {
       {/* Remove Member Modal */}
       {showRemoveModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setShowRemoveModal(null)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-red-500/10 flex items-center justify-center mx-auto mb-4"><X size={32} className="text-red-500" /></div>
             <p className={`text-base font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Eliminar miembro?</p>
             <p className={`text-sm font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Esta acción no se puede deshacer.</p>
             <div className="flex gap-3">
-              <button onClick={() => setShowRemoveModal(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/[0.06] text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
+              <button onClick={() => setShowRemoveModal(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-sm ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
               <button onClick={() => handleRemoveMember(showRemoveModal)} disabled={actionLoading} className="flex-1 py-3.5 rounded-md bg-red-500 text-white font-semibold text-sm disabled:opacity-50">
                 {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" /> : "SI, ELIMINAR"}
               </button>
@@ -438,7 +438,7 @@ export default function EquipoDetailPage() {
       {/* Feedback */}
       {feedback && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setFeedback(null)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/[0.06]" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 ${feedback.type === "success" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
               {feedback.type === "success" ? <CheckCircle2 size={32} className="text-emerald-500" /> : <AlertCircle size={32} className="text-red-500" />}
             </div>

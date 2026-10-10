@@ -21,12 +21,12 @@ import { db } from '@/services/firebase';
 import { collection, getDocs, query, where, orderBy, doc, updateDoc, Timestamp, or } from 'firebase/firestore';
 import { TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';
 
-const inputCls = "w-full px-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-none text-slate-800 dark:text-white focus:border-emerald-500/40 transition-all";
+const inputCls = "w-full px-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-hidden text-slate-800 dark:text-white focus:border-emerald-500/40 transition-all";
 
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
     return (
-        <div className={`fixed top-6 right-6 z-[200] flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${
+        <div className={`fixed top-6 right-6 z-200 flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${
             type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-[#00df82] dark:border-emerald-500/50' :
             'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
         }`}>
@@ -201,16 +201,16 @@ export default function FeedbackPage() {
                 <div className="flex flex-wrap items-center gap-2">
                     <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10">
                         <HugeiconsIcon icon={Building01Icon} className="w-3.5 h-3.5 text-emerald-600 dark:text-[#00df82] shrink-0" strokeWidth={2} />
-                        <select value={selectedVenueId} onChange={(e) => setSelectedVenueId(e.target.value)} className="bg-transparent text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white">
+                        <select value={selectedVenueId} onChange={(e) => setSelectedVenueId(e.target.value)} className="bg-transparent text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white">
                             <option value="all">Todos los recintos</option>
                             {venues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                         </select>
                     </div>
-                    <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value === 'all' ? 'all' : parseInt(e.target.value))} className="px-2.5 py-2 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white">
+                    <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value === 'all' ? 'all' : parseInt(e.target.value))} className="px-2.5 py-2 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white">
                         <option value="all">Todos los meses</option>
                         {MESES.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                     </select>
-                    <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="px-2.5 py-2 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase outline-none text-slate-700 dark:text-white">
+                    <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="px-2.5 py-2 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white">
                         {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
                     </select>
                 </div>

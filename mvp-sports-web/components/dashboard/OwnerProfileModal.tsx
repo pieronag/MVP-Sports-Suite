@@ -55,7 +55,7 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
     return (
         <ModalPortal>
             <div
-                className="fixed inset-0 z-[400] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/80 dark:bg-black/85 backdrop-blur-xl animate-in fade-in duration-200"
+                className="fixed inset-0 z-400 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/80 dark:bg-black/85 backdrop-blur-xl animate-in fade-in duration-200"
                 role="presentation"
                 onClick={onClose}
             >
@@ -74,7 +74,7 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
                                 {owner.photoURL ? (
                                     <img src={owner.photoURL} alt={owner.name} className="w-16 h-16 rounded-md object-cover border border-slate-200 dark:border-white/10 shrink-0" />
                                 ) : (
-                                    <span className="w-16 h-16 rounded-md bg-gradient-to-br from-emerald-500 to-emerald-800 text-white flex items-center justify-center font-black text-2xl shrink-0">
+                                    <span className="w-16 h-16 rounded-md bg-linear-to-br from-emerald-500 to-emerald-800 text-white flex items-center justify-center font-black text-2xl shrink-0">
                                         {owner.name.charAt(0).toUpperCase()}
                                     </span>
                                 )}
@@ -102,7 +102,7 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
                     <div className="flex-1 overflow-y-auto custom-scrollbar p-5 sm:p-6 space-y-5">
                         {/* KPIs */}
                         <div className="grid grid-cols-3 gap-2.5">
-                            <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/[0.02] text-center">
+                            <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2 text-center">
                                 <span className="block text-xl font-black text-slate-900 dark:text-white font-mono leading-none">{owner.venues?.length ?? 0}</span>
                                 <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Recintos</span>
                             </div>
@@ -110,7 +110,7 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
                                 <span className="block text-base font-black text-emerald-600 dark:text-[#00df82] font-mono leading-none truncate">{formatCLP(owner.totalMrr)}</span>
                                 <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">MRR</span>
                             </div>
-                            <div className={`p-3 rounded-md border text-center ${hasDebt ? "border-red-500/25 bg-red-500/5" : "border-slate-100 dark:border-white/5 bg-white dark:bg-white/[0.02]"}`}>
+                            <div className={`p-3 rounded-md border text-center ${hasDebt ? "border-red-500/25 bg-red-500/5" : "border-slate-100 dark:border-white/5 bg-white dark:bg-white/2"}`}>
                                 <span className={`block text-base font-black font-mono leading-none truncate ${hasDebt ? "text-red-600 dark:text-red-400" : "text-slate-900 dark:text-white"}`}>{hasDebt ? formatCLP(owner.debt) : "—"}</span>
                                 <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Deuda</span>
                             </div>
@@ -118,7 +118,7 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
 
                         {/* Información */}
                         <div className="rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
-                            <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/[0.03] border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
+                            <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
                                 <HugeiconsIcon icon={UserMultipleIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
                                 <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Información del dueño</span>
                             </div>
@@ -135,7 +135,7 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
 
                         {/* Recintos */}
                         <div className="rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
-                            <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/[0.03] border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
+                            <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
                                 <span className="flex items-center gap-2">
                                     <HugeiconsIcon icon={Store01Icon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
                                     <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Recintos asignados</span>
@@ -153,7 +153,7 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
                     </div>
 
                     {/* FOOTER */}
-                    <div className="px-5 sm:px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/70 dark:bg-white/[0.02] shrink-0 space-y-2.5">
+                    <div className="px-5 sm:px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/70 dark:bg-white/2 shrink-0 space-y-2.5">
                         <div className="flex items-center gap-2.5">
                             <button onClick={() => onChangePassword(owner)} className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md text-[11px] font-black uppercase tracking-wider border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-all cursor-pointer">
                                 <HugeiconsIcon icon={Key01Icon} className="w-4 h-4" strokeWidth={2} />

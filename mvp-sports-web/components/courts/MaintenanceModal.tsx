@@ -21,7 +21,7 @@ interface MaintenanceModalProps {
     onConfirm: () => void;
 }
 
-const inputCls = "w-full mt-1.5 px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black text-slate-900 dark:text-white outline-none focus:border-amber-500 focus:ring-1 ring-amber-500 transition-all";
+const inputCls = "w-full mt-1.5 px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black text-slate-900 dark:text-white outline-hidden focus:border-amber-500 focus:ring-1 ring-amber-500 transition-all";
 const labelCls = "block text-[10px] font-black uppercase tracking-widest text-slate-400";
 
 export default function MaintenanceModal({
@@ -37,7 +37,7 @@ export default function MaintenanceModal({
     if (!isOpen || !court) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs" onClick={onClose}>
             <div className="bg-white dark:bg-[#0B0F19] rounded-md shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-md max-h-[90vh] overflow-y-auto custom-scrollbar animate-fadeIn" onClick={e => e.stopPropagation()}>
                 {/* HEADER */}
                 <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-5 border-b border-slate-100 dark:border-white/5">
@@ -60,13 +60,13 @@ export default function MaintenanceModal({
                     <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-md border border-slate-200 dark:border-white/10">
                         <button
                             onClick={() => onFormChange('type', 'hours')}
-                            className={`flex-1 py-2.5 text-[10px] font-black uppercase rounded-md transition-all ${form.type === 'hours' ? 'bg-white dark:bg-slate-800 shadow text-slate-900 dark:text-white' : 'text-slate-400'}`}
+                            className={`flex-1 py-2.5 text-[10px] font-black uppercase rounded-md transition-all ${form.type === 'hours' ? 'bg-white dark:bg-slate-800 shadow-sm text-slate-900 dark:text-white' : 'text-slate-400'}`}
                         >
                             Por Horas
                         </button>
                         <button
                             onClick={() => onFormChange('type', 'days')}
-                            className={`flex-1 py-2.5 text-[10px] font-black uppercase rounded-md transition-all ${form.type === 'days' ? 'bg-white dark:bg-slate-800 shadow text-slate-900 dark:text-white' : 'text-slate-400'}`}
+                            className={`flex-1 py-2.5 text-[10px] font-black uppercase rounded-md transition-all ${form.type === 'days' ? 'bg-white dark:bg-slate-800 shadow-sm text-slate-900 dark:text-white' : 'text-slate-400'}`}
                         >
                             Por Días
                         </button>

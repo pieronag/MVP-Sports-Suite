@@ -47,8 +47,8 @@ export default function Pricing() {
                 style={{ animationDelay: `${idx * 80}ms` }}
                 className={`relative rounded-md p-7 transition-all duration-300 group hover:-translate-y-1 flex flex-col animate-in fade-in slide-in-from-bottom-6 ${
                   isElite
-                    ? "bg-gradient-to-b from-emerald-500/15 to-slate-900 border-2 border-emerald-500/40 shadow-[0_0_40px_rgba(16,185,129,0.15)]"
-                    : "bg-slate-900/50 backdrop-blur border border-white/5 hover:border-white/20"
+                    ? "bg-linear-to-b from-emerald-500/15 to-slate-900 border-2 border-emerald-500/40 shadow-[0_0_40px_rgba(16,185,129,0.15)]"
+                    : "bg-slate-900/50 backdrop-blur-sm border border-white/5 hover:border-white/20"
                 }`}
               >
                 {isElite && (

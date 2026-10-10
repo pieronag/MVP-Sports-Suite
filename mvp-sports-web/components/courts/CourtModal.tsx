@@ -39,7 +39,7 @@ const sportIcon = (sport: string, cls: string) => {
     return <HugeiconsIcon icon={FootballPitchIcon} className={cls} strokeWidth={1.8} />;
 };
 
-const inputCls = "w-full mt-1.5 px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black text-slate-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-1 ring-emerald-500 transition-all";
+const inputCls = "w-full mt-1.5 px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black text-slate-900 dark:text-white outline-hidden focus:border-emerald-500 focus:ring-1 ring-emerald-500 transition-all";
 const labelCls = "block text-[10px] font-black uppercase tracking-widest text-slate-400";
 
 export default function CourtModal({
@@ -57,7 +57,7 @@ export default function CourtModal({
     const valid = form.name.trim() !== '' && form.sport !== '' && form.surface !== '';
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs" onClick={onClose}>
             <div className="bg-white dark:bg-[#0B0F19] rounded-md shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-lg max-h-[90vh] overflow-y-auto custom-scrollbar animate-fadeIn" onClick={e => e.stopPropagation()}>
                 {/* HEADER */}
                 <div className="flex items-center justify-between gap-3 px-6 pt-6 pb-5 border-b border-slate-100 dark:border-white/5">

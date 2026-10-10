@@ -60,7 +60,7 @@ const StatusModal = ({ isOpen, title, message, type, onClose }: any) => {
     const isWarning = type === 'warning';
 
     return (
-        <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn" onClick={onClose}>
+        <div className="fixed inset-0 z-500 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn" onClick={onClose}>
             <div className="bg-white dark:bg-[#0B0F19] rounded-md shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative text-center" onClick={(e) => e.stopPropagation()}>
                 <div className={`absolute top-0 left-0 w-full h-1 ${isError ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-emerald-500'}`}></div>
                 <div className={`w-14 h-14 rounded-md mx-auto mb-4 flex items-center justify-center ${isError ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : isWarning ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-500' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500'}`}>
@@ -658,9 +658,9 @@ export default function CheckInPage() {
 
             {/* === MODAL DE CÁMARA (Overlay Completo — funciona en móvil y web) === */}
             {isCameraOpen && (
-                <div className="fixed inset-0 z-[200] bg-black flex flex-col animate-fadeIn">
+                <div className="fixed inset-0 z-200 bg-black flex flex-col animate-fadeIn">
                     {/* Header Cámara */}
-                    <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-20 bg-gradient-to-b from-black/80 to-transparent">
+                    <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-20 bg-linear-to-b from-black/80 to-transparent">
                         <span className="text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_red]"></span> Escaneando QR
                         </span>
@@ -723,7 +723,7 @@ export default function CheckInPage() {
                         <select
                             value={selectedVenueId}
                             onChange={(e) => setSelectedVenueId(e.target.value)}
-                            className="appearance-none bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-md pl-9 pr-8 py-2 text-[9px] font-black outline-none text-slate-700 dark:text-white uppercase cursor-pointer shadow-sm transition-all focus:border-emerald-500"
+                            className="appearance-none bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-md pl-9 pr-8 py-2 text-[9px] font-black outline-hidden text-slate-700 dark:text-white uppercase cursor-pointer shadow-xs transition-all focus:border-emerald-500"
                         >
                             {venues.map(v => <option key={v.id} value={v.id} className="dark:bg-[#0B0F19]">{v.name}</option>)}
                         </select>
@@ -737,7 +737,7 @@ export default function CheckInPage() {
 
             {/* === KPI GRID PREMIUM COMPACT === */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-slate-100 dark:border-white/5 shadow-sm relative overflow-hidden group">
+                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-slate-100 dark:border-white/5 shadow-xs relative overflow-hidden group">
                     <div className="flex items-center gap-2.5 mb-2">
                         <div className="p-1.5 bg-slate-50 dark:bg-white/5 rounded-md text-slate-400 group-hover:text-emerald-500 transition-colors">
                             <UserGroupIcon className="w-3.5 h-3.5" />
@@ -764,7 +764,7 @@ export default function CheckInPage() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-amber-100 dark:border-amber-500/20 shadow-sm group">
+                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-amber-100 dark:border-amber-500/20 shadow-xs group">
                     <div className="flex items-center gap-2.5 mb-2">
                         <div className="p-1.5 bg-amber-50 dark:bg-amber-500/10 rounded-md text-amber-500">
                             <BanknotesIcon className="w-3.5 h-3.5" />
@@ -777,7 +777,7 @@ export default function CheckInPage() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-red-100 dark:border-red-500/20 shadow-sm group">
+                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-red-100 dark:border-red-500/20 shadow-xs group">
                     <div className="flex items-center gap-2.5 mb-2">
                         <div className="p-1.5 bg-red-50 dark:bg-red-500/10 rounded-md text-red-500">
                             <ExclamationTriangleIcon className="w-3.5 h-3.5" />
@@ -790,7 +790,7 @@ export default function CheckInPage() {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-slate-200 dark:border-white/10 shadow-sm group">
+                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-slate-200 dark:border-white/10 shadow-xs group">
                     <div className="flex items-center gap-2.5 mb-2">
                         <div className="p-1.5 bg-slate-100 dark:bg-white/5 rounded-md text-slate-400">
                             <NoSymbolIcon className="w-3.5 h-3.5" />
@@ -821,7 +821,7 @@ export default function CheckInPage() {
                     <input
                         type="text"
                         placeholder="Buscar por código de reserva o nombre..."
-                        className="w-full h-12 pl-10 pr-24 bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder:normal-case placeholder:font-medium shadow-sm transition-all text-slate-800 dark:text-white"
+                        className="w-full h-12 pl-10 pr-24 bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder:normal-case placeholder:font-medium shadow-xs transition-all text-slate-800 dark:text-white"
                         value={manualCode}
                         onChange={(e) => setManualCode(e.target.value)}
                     />
@@ -863,7 +863,7 @@ export default function CheckInPage() {
                     <input
                         type="text"
                         placeholder="Filtrar por nombre o cancha..."
-                        className="w-full pl-9 pr-4 py-2 bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold text-slate-800 dark:text-white outline-none focus:border-emerald-500 transition-colors shadow-sm"
+                        className="w-full pl-9 pr-4 py-2 bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold text-slate-800 dark:text-white outline-hidden focus:border-emerald-500 transition-colors shadow-xs"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -872,7 +872,7 @@ export default function CheckInPage() {
 
             {/* === LISTA DE RESERVAS FINANCE STYLE COMPACT === */}
             <div className="bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 overflow-hidden">
-                <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/2 flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <h3 className="text-[9px] font-black text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-2 shrink-0">
                         <ClockIcon className="w-3.5 h-3.5 text-emerald-500" /> Registro de Hoy
                     </h3>
@@ -913,7 +913,7 @@ export default function CheckInPage() {
                             const isNoShow = isBookingNoShow(booking) || isLateNoShow;
 
                             return (
-                                <div key={booking.id} className={`group flex items-center gap-4 p-3.5 transition-all hover:bg-slate-50/50 dark:hover:bg-white/[0.01] ${(isCheckedIn || booking.status === 'cancelled' || isLateNoShow) ? 'opacity-50 grayscale-[0.5]' : ''}`}>
+                                <div key={booking.id} className={`group flex items-center gap-4 p-3.5 transition-all hover:bg-slate-50/50 dark:hover:bg-white/1 ${(isCheckedIn || booking.status === 'cancelled' || isLateNoShow) ? 'opacity-50 grayscale-[0.5]' : ''}`}>
                                     {/* INDICADOR DE HORA COMPACT */}
                                     <div className="flex flex-col items-center justify-center w-12 h-12 rounded-md bg-slate-900 dark:bg-white text-white dark:text-slate-900 shrink-0 group-hover:scale-105 transition-transform">
                                         <span className="text-[11px] font-black tracking-tighter">{booking.startTimeStr || formatTime(booking.startTime)}</span>
@@ -1044,7 +1044,7 @@ export default function CheckInPage() {
 
             {/* === MODAL DE CONFIRMACIÓN DE CHECK-IN === */}
             {isConfirmModalOpen && selectedBookingForConfirm && (
-                <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+                <div className="fixed inset-0 z-300 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
                     <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-md overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10 animate-scaleIn">
                         {/* Header Modal FINANCE STYLE */}
                         <div className="p-8 pb-4 text-center">
@@ -1118,7 +1118,7 @@ export default function CheckInPage() {
                                         <select 
                                             value={selectedPaymentMethod} 
                                             onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                                            className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-4 py-3 text-[10px] font-black uppercase text-slate-700 dark:text-white outline-none cursor-pointer appearance-none"
+                                            className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-4 py-3 text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer appearance-none"
                                         >
                                             <option value="cash" className="dark:bg-[#0B0F19]">Efectivo</option>
                                             <option value="transfer" className="dark:bg-[#0B0F19]">Transferencia</option>
@@ -1140,7 +1140,7 @@ export default function CheckInPage() {
                             <button
                                 onClick={confirmCheckIn}
                                 disabled={!!processingId}
-                                className={`flex-[2] py-3.5 rounded-md text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 ${confirmActionType === 'pay' ? 'bg-amber-500 text-white shadow-amber-500/20' : 'bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950'}`}
+                                className={`flex-2 py-3.5 rounded-md text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 ${confirmActionType === 'pay' ? 'bg-amber-500 text-white shadow-amber-500/20' : 'bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950'}`}
                             >
                                 {processingId ? (
                                     <ArrowPathIcon className="w-4 h-4 animate-spin" />

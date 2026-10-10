@@ -15,7 +15,7 @@ function PlayerNavItem({ href, icon: Icon, active, isDark, children }: { href: s
     return (
         <Link href={href} aria-current={active ? 'page' : undefined}
             className={`group relative flex items-center gap-3.5 w-full min-h-[48px] pl-4 pr-3 py-3 text-[15px] font-semibold rounded-md transition-all ${active
-                ? (isDark ? 'text-[#00df82] bg-gradient-to-r from-[#00df82]/15 to-transparent' : 'text-emerald-700 bg-gradient-to-r from-emerald-500/10 to-transparent')
+                ? (isDark ? 'text-[#00df82] bg-linear-to-r from-[#00df82]/15 to-transparent' : 'text-emerald-700 bg-linear-to-r from-emerald-500/10 to-transparent')
                 : (isDark ? 'text-slate-400 hover:text-white hover:bg-white/5' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100')}`}>
             {active && <span className={`absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full ${isDark ? 'bg-[#00df82]' : 'bg-emerald-500'}`} />}
             <Icon size={22} />
@@ -65,8 +65,8 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
         // PWA siempre en formato celular: ancho estándar de móvil (430 px) centrado y alto completo.
         // El marco exterior no hace scroll y su transform contiene los elementos 'fixed'
         // (barra inferior, modales, botón de pago), que así quedan pegados a sus bordes.
-        <div className={`min-h-[100dvh] ${isDark ? 'bg-[#01040A]' : 'bg-slate-200'}`}>
-        <div className={`player-shell relative mx-auto w-full max-w-[430px] h-[100dvh] overflow-hidden [transform:translateZ(0)] ${isDark ? 'bg-[#020611] text-slate-200' : 'bg-[#F8FAFC] text-slate-900'} transition-colors duration-300`}>
+        <div className={`min-h-dvh ${isDark ? 'bg-[#01040A]' : 'bg-slate-200'}`}>
+        <div className={`player-shell relative mx-auto w-full max-w-[430px] h-dvh overflow-hidden transform-[translateZ(0)] ${isDark ? 'bg-[#020611] text-slate-200' : 'bg-[#F8FAFC] text-slate-900'} transition-colors duration-300`}>
         <div className="h-full overflow-y-auto overflow-x-hidden no-scrollbar">
             {mobileOpen && (
                 <div className={` fixed inset-0 z-50 flex flex-col ${isDark ? 'bg-[#0A101D] text-slate-300' : 'bg-white text-slate-700'}`}>
@@ -79,7 +79,7 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
                     </div>
                     <nav className="flex-1 overflow-y-auto px-2.5 py-3" onClick={(e) => { if ((e.target as HTMLElement).closest('a')) setMobileOpen(false); }}>
                         {profile && (
-                            <Link href="/player/perfil" className={`flex items-center gap-3 p-3 mb-3 rounded-md border ${isDark ? 'border-white/5 bg-white/[0.03]' : 'border-slate-200/70 bg-slate-50'}`}>
+                            <Link href="/player/perfil" className={`flex items-center gap-3 p-3 mb-3 rounded-md border ${isDark ? 'border-white/5 bg-white/3' : 'border-slate-200/70 bg-slate-50'}`}>
                                 <div className="w-12 h-12 rounded-full bg-emerald-500/15 flex items-center justify-center overflow-hidden shrink-0">
                                     {profile.photoURL ? <Image src={profile.photoURL} alt="" width={48} height={48} className="object-cover w-full h-full" /> : <User size={18} className="text-emerald-500" />}
                                 </div>
@@ -159,7 +159,7 @@ export default function PlayerLayoutClient({ children }: { children: React.React
                 {/* Logo + Rings */}
                 <div className="relative flex flex-col items-center">
                     <div className="relative w-32 h-32 sm:w-40 sm:h-40">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/30 to-blue-500/10 rounded-full blur-[80px] animate-pulse" />
+                        <div className="absolute inset-0 bg-linear-to-tr from-emerald-500/30 to-blue-500/10 rounded-full blur-[80px] animate-pulse" />
                         <div className="absolute inset-0 border-2 border-emerald-500/20 rounded-full animate-[spin_8s_linear_infinite]" />
                         <div className="absolute inset-4 border border-emerald-500/10 rounded-full animate-[spin_6s_linear_infinite_reverse]" />
                         <div className="absolute inset-[30%] bg-emerald-500/30 rounded-full blur-2xl animate-pulse" />

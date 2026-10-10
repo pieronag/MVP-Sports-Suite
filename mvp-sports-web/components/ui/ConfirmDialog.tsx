@@ -65,7 +65,7 @@ export default function ConfirmDialog({
   return (
     <ModalPortal>
     <div
-      className="fixed inset-0 z-[600] flex items-center justify-center p-4 bg-slate-900/80 dark:bg-black/80 backdrop-blur-xl animate-in fade-in duration-200"
+      className="fixed inset-0 z-600 flex items-center justify-center p-4 bg-slate-900/80 dark:bg-black/80 backdrop-blur-xl animate-in fade-in duration-200"
       role="presentation"
       onClick={() => !loading && onCancel()}
     >
