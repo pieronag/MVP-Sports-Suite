@@ -3,6 +3,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
+import HeroMobile from "../components/landing/HeroMobile";
 import TrustBand from "../components/landing/TrustBand";
 import HowItWorks from "../components/landing/HowItWorks";
 import AppFunctions from "../components/landing/AppFunctions";
@@ -30,6 +31,7 @@ export default function Home() {
 
       {/* HERO */}
       <Hero onRegisterClick={() => setIsRegisterOpen(true)} />
+      <HeroMobile onRegisterClick={() => setIsRegisterOpen(true)} />
 
       {/* TRUST / STATS BAND */}
       <TrustBand />
