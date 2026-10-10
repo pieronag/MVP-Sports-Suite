@@ -34,6 +34,7 @@ import {
     UserGroupIcon,
     UserIcon,
 } from '@hugeicons/core-free-icons';
+import { PASSWORD_MIN, passwordIssue } from "@/utils/password";
 
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
@@ -71,7 +72,7 @@ const PasswordModal = ({ isOpen, onClose, onConfirm, memberName }: any) => {
     if (!isOpen) return null;
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (password.length < 6) return;
+        if (passwordIssue(password)) return;
         setIsSaving(true);
         await onConfirm(password);
         setIsSaving(false);
@@ -98,7 +99,7 @@ const PasswordModal = ({ isOpen, onClose, onConfirm, memberName }: any) => {
                     </div>
                     <div className="flex gap-3">
                         <button type="button" onClick={onClose} className="flex-1 px-4 py-3 text-[10px] font-bold uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">CANCELAR</button>
-                        <button type="submit" disabled={isSaving || password.length < 6} className="flex-2 px-6 py-3 text-[10px] font-bold uppercase rounded-md text-white bg-emerald-600 disabled:opacity-50 flex items-center justify-center gap-2">
+                        <button type="submit" disabled={isSaving || !!passwordIssue(password)} className="flex-2 px-6 py-3 text-[10px] font-bold uppercase rounded-md text-white bg-emerald-600 disabled:opacity-50 flex items-center justify-center gap-2">
                             {isSaving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" /> : <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" />}
                             ACTUALIZAR
                         </button>
@@ -123,6 +124,8 @@ export default function StaffPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
+    const [passwordConfirm, setPasswordConfirm] = useState('');
+    const [showConfirm, setShowConfirm] = useState(false);
     const [formData, setFormData] = useState({ fullName: '', rut: '', jobTitle: '', email: '', phone: '', role: 'manager', password: '', status: 'active' as 'active' | 'inactive', tenantIds: [] as string[] });
 
     const notify = (msg: string, type: 'success' | 'error') => setNotification({ msg, type });
@@ -198,6 +201,7 @@ export default function StaffPage() {
         e.preventDefault();
         if (formData.tenantIds.length === 0) return notify("Selecciona al menos un recinto", "error");
         if (!formData.fullName || !formData.email) return notify("Faltan datos", "error");
+        if (!editingId) { const pwIssue = passwordIssue(formData.password, passwordConfirm); if (pwIssue) return notify(pwIssue, "error"); }
         setIsSaving(true);
         try {
             let staffPayload: any = { 
@@ -603,9 +607,15 @@ export default function StaffPage() {
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Contraseña Inicial</label>
                                     <div className="relative">
                                         <HugeiconsIcon icon={LockIcon} className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.8} />
-                                        <input type={showPassword ? "text" : "password"} required minLength={6} value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder="Mínimo 6 caracteres" className="w-full pl-9 pr-10 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
+                                        <input type={showPassword ? "text" : "password"} required minLength={PASSWORD_MIN} value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder="Mínimo 6 caracteres" className="w-full pl-9 pr-10 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
                                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-[#00df82]">
                                             {showPassword ? <HugeiconsIcon icon={EyeOffIcon} className="w-4 h-4" /> : <HugeiconsIcon icon={EyeIcon} className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                    <div className="relative mt-2">
+                                        <input type={showConfirm ? "text" : "password"} required value={passwordConfirm} onChange={e => setPasswordConfirm(e.target.value)} placeholder="Repite la contraseña" aria-label="Repite la contraseña" className="w-full pl-4 pr-10 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-900 dark:text-white outline-hidden" />
+                                        <button type="button" onClick={() => setShowConfirm(!showConfirm)} aria-label={showConfirm ? "Ocultar contraseña" : "Mostrar contraseña"} className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-[#00df82]">
+                                            {showConfirm ? <HugeiconsIcon icon={EyeOffIcon} className="w-4 h-4" /> : <HugeiconsIcon icon={EyeIcon} className="w-4 h-4" />}
                                         </button>
                                     </div>
                                 </div>

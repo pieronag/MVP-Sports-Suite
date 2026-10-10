@@ -12,6 +12,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
 import { ChevronLeft, ChevronRight, Save, User, Phone, ShieldCheck, Calendar, Ruler, Weight, Lock, LogOut, Eye, EyeOff, AlertCircle, CheckCircle2, X, Shield, Award, Target, Sun, Moon, Activity, MapPin, Heart } from "@/components/player/icons";
 import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
+import { PASSWORD_MIN, passwordIssue } from "@/utils/password";
 
 const SPORT_POSITIONS: Record<string, string[]> = {
   "Fútbol": ["Arquero", "Defensa", "Lateral", "Volante", "Delantero"],
@@ -264,8 +265,8 @@ export default function PreferenciasPage() {
 
   const handleChangePassword = async () => {
     if (!currentPassword || !newPassword || !confirmNewPassword) { showFeedbackMsg("error", "Completa todos los campos."); return; }
-    if (newPassword !== confirmNewPassword) { showFeedbackMsg("error", "Las contraseñas no coinciden."); return; }
-    if (newPassword.length < 6) { showFeedbackMsg("error", "Mínimo 6 caracteres."); return; }
+    const pwIssue = passwordIssue(newPassword, confirmNewPassword);
+    if (pwIssue) { showFeedbackMsg("error", pwIssue); return; }
     setPasswordLoading(true);
     try {
       const cu = auth.currentUser;
@@ -279,7 +280,7 @@ export default function PreferenciasPage() {
     } catch (error: any) {
       let msg = "Error al cambiar la contraseña.";
       if (error.code === "auth/wrong-password") msg = "La contraseña actual es incorrecta.";
-      else if (error.code === "auth/weak-password") msg = "Contraseña muy débil (mínimo 6 caracteres).";
+      else if (error.code === "auth/weak-password") msg = `Contraseña muy débil (mínimo ${PASSWORD_MIN} caracteres).`;
       showFeedbackMsg("error", msg);
     } finally { setPasswordLoading(false); }
   };

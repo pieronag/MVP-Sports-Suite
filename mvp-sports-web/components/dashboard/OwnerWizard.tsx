@@ -21,6 +21,7 @@ import {
     CheckmarkCircle02Icon,
     Cancel01Icon,
 } from "@hugeicons/core-free-icons";
+import { PASSWORD_MIN, passwordIssue } from "@/utils/password";
 
 export interface OwnerFormState {
     name: string;
@@ -62,6 +63,8 @@ interface OwnerWizardProps {
 export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose, onSubmit }: OwnerWizardProps) {
     const [step, setStep] = useState(1);
     const [form, setForm] = useState<OwnerFormState>(initial);
+    const [passwordConfirm, setPasswordConfirm] = useState("");
+    const [showConfirm, setShowConfirm] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
@@ -88,7 +91,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
 
     const step1Valid = form.name.trim().length >= 3 && emailValid(form.email) && form.phone.trim().length >= 8;
     const step2Valid = form.company.trim().length >= 2 && form.rut.trim().length >= 6;
-    const step3Valid = mode === "edit" ? true : form.password.trim().length >= 6;
+    const step3Valid = mode === "edit" ? true : !passwordIssue(form.password, passwordConfirm);
 
     if (!open) return null;
 
@@ -252,7 +255,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                                                         type={showPassword ? "text" : "password"}
                                                         value={form.password}
                                                         onChange={(e) => set({ password: e.target.value })}
-                                                        placeholder="Mínimo 6 caracteres"
+                                                        placeholder={`Mínimo ${PASSWORD_MIN} caracteres`}
                                                         autoComplete="new-password"
                                                         className="w-full pl-10 pr-11 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-emerald-500 dark:focus:border-[#00df82] focus:ring-2 focus:ring-emerald-500/15 outline-hidden transition-all"
                                                     />
@@ -265,8 +268,24 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                                                         <HugeiconsIcon icon={showPassword ? ViewOffIcon : ViewIcon} className="w-4 h-4" strokeWidth={1.8} />
                                                     </button>
                                                 </div>
-                                                {form.password.length > 0 && form.password.length < 6 && (
-                                                    <p className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">Mínimo 6 caracteres.</p>
+                                                <div className="relative">
+                                                <input
+                                                    id="owner-password-confirm"
+                                                    type={showConfirm ? "text" : "password"}
+                                                    value={passwordConfirm}
+                                                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                                                    placeholder="Repite la contraseña"
+                                                    aria-label="Repite la contraseña"
+                                                    autoComplete="new-password"
+                                                    className="w-full pl-4 pr-11 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-900 dark:text-white outline-hidden focus:border-[#00df82]"
+                                                />
+                                                <button type="button" onClick={() => setShowConfirm((v) => !v)} aria-label={showConfirm ? "Ocultar contraseña" : "Mostrar contraseña"}
+                                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#00df82] transition-colors cursor-pointer">
+                                                    <HugeiconsIcon icon={showConfirm ? ViewOffIcon : ViewIcon} className="w-4 h-4" strokeWidth={1.8} />
+                                                </button>
+                                                </div>
+                                                {form.password.length > 0 && passwordIssue(form.password, passwordConfirm) && (form.password.length < PASSWORD_MIN || passwordConfirm) && (
+                                                    <p className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">{passwordIssue(form.password, passwordConfirm)}</p>
                                                 )}
                                             </div>
                                         )}

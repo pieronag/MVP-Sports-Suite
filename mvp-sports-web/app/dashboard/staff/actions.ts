@@ -1,5 +1,6 @@
 "use server";
 import { adminAuth as getAdminAuth, adminDb } from "@/services/server/firebase-admin";
+import { PASSWORD_MIN, passwordIssue } from "@/utils/password";
 
 /**
  * Verifica la identidad y el rol del llamador de la server action.
@@ -74,8 +75,8 @@ export async function updateStaffPassword(uid: string, newPassword: string, idTo
             return { success: false, error: "UID, contraseña y token son obligatorios" };
         }
 
-        if (newPassword.length < 6) {
-            return { success: false, error: "La contraseña debe tener al menos 6 caracteres" };
+        if (passwordIssue(newPassword)) {
+            return { success: false, error: passwordIssue(newPassword) as string };
         }
 
         const authorizedUid = await isAuthorizedManager(idToken);

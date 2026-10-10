@@ -17,6 +17,7 @@ import {
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '@/utils/cropImage';
 import { SectionCard } from '@/components/ui/DashboardWidgets';
+import { PASSWORD_MIN, passwordIssue } from "@/utils/password";
 
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructive = false }: any) => {
     if (!isOpen) return null;
@@ -209,8 +210,8 @@ export default function ProfilePage() {
     const handlePasswordUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user || !user.email) return;
-        if (passForm.new !== passForm.confirm) { addToast("Las nuevas contraseñas no coinciden", 'error'); return; }
-        if (passForm.new.length < 6) { addToast("La contraseña debe tener al menos 6 caracteres", 'error'); return; }
+        const pwIssue = passwordIssue(passForm.new, passForm.confirm);
+        if (pwIssue) { addToast(pwIssue, 'error'); return; }
         setPassLoading(true);
         try {
             const credential = EmailAuthProvider.credential(user.email, passForm.current);

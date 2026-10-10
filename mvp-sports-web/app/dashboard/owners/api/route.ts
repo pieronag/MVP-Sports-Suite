@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { adminAuth as getAdminAuth } from '@/services/server/firebase-admin';
 import { isSuperAdminCaller } from '@/services/server/server-auth';
+import { passwordIssue } from '@/utils/password';
 
 export async function POST(request: Request) {
   try {
@@ -13,6 +14,9 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const { action, email, password, uid, displayName, role } = body;
+    if ((action === 'create' || action === 'updatePassword') && password && passwordIssue(String(password))) {
+      return NextResponse.json({ error: passwordIssue(String(password)) }, { status: 400 });
+    }
 
     // --- 1. CREAR USUARIO (AUTH) ---
     if (action === 'create') {

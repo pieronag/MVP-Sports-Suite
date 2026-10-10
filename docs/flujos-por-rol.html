@@ -1,0 +1,242 @@
+<title>MVP Sports · Flujos por rol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: pestañas por rol; cada rol muestra su diagrama de proceso y la lista de pantallas y reglas que lo sostienen. */
+:root{
+  --bg:#f5f7f6; --surface:#ffffff; --line:#dbe2de; --fg:#16201b; --muted:#5a6a61;
+  --accent:#0a8f5a; --accent-soft:#e2f3eb; --warn:#a46600; --warn-soft:#fbefd9;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1411; --surface:#151d19; --line:#26312b; --fg:#e4ebe6; --muted:#93a39a;
+  --accent:#2fd18b; --accent-soft:#16332a; --warn:#e3a23b; --warn-soft:#33270f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1411; --surface:#151d19; --line:#26312b; --fg:#e4ebe6; --muted:#93a39a;
+  --accent:#2fd18b; --accent-soft:#16332a; --warn:#e3a23b; --warn-soft:#33270f; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px;padding-block:32px 64px;display:grid;gap:28px}
+h1,h2,h3{margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:28px;font-weight:700}
+h2{font-size:20px;font-weight:600}
+h3{font-size:14px;font-weight:600}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:70ch;margin:8px 0 0}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+a.tab{text-decoration:none;}
+.tab{font:500 14px var(--sans);padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.tab:hover{border-color:var(--accent);color:var(--accent)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.panel{display:grid;gap:18px;scroll-margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:20px}
+.diagram{overflow-x:auto}
+.diagram pre{margin:0;background:transparent;text-align:center}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.cols > *{min-width:0}
+ul{margin:8px 0 0;padding-left:18px;display:grid;gap:6px}
+li{color:var(--fg)}
+li span{color:var(--muted)}
+code{font:13px var(--mono);background:var(--bg);padding:1px 6px;border-radius:4px}
+.access{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.access code{border:1px solid var(--line)}
+.rule{background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);border-radius:6px;padding:12px 14px;color:var(--fg)}
+.rule b{color:var(--warn)}
+.who{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.who span{color:var(--muted);font-size:14px}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Plataforma web · estado al 10 oct 2026</div>
+    <h1>Flujos de proceso por rol</h1>
+    <p class="lede">Cómo usa la plataforma cada tipo de usuario, con las pantallas que puede abrir y las reglas que aplica el sistema. Refleja los cambios recientes: pago 100% online, cancelación hasta 24 horas antes, sin reservas manuales y registro con Google.</p>
+  </header>
+
+  <nav class="tabs" aria-label="Ir al rol">
+    <a class="tab" href="#jugador">Jugador</a>
+    <a class="tab" href="#dueno">Dueño del recinto</a>
+    <a class="tab" href="#manager">Mánager</a>
+    <a class="tab" href="#staff">Staff</a>
+    <a class="tab" href="#admin">Administrador</a>
+    <a class="tab" href="#sistema">Sistema</a>
+  </nav>
+
+  <!-- JUGADOR -->
+  <section class="panel" id="jugador">
+    <div class="who"><h2>Jugador</h2><span>App web en /player · instalable como PWA</span></div>
+    <div class="card diagram"><pre class="mermaid">
+flowchart TD
+  A[Landing] --> B{Crear cuenta}
+  B -->|Google| C[Entra de inmediato]
+  B -->|Correo y contraseña| D[Verifica su correo] --> E[Inicia sesión] --> C
+  C --> F[Onboarding: deporte, comuna y nivel]
+  F --> G[Busca recinto en clubes o mapa]
+  G --> H[Elige cancha, día y hora]
+  H --> I{¿Perfil completo para pagar?}
+  I -->|No| J[Completa teléfono, RUT y fecha de nacimiento] --> K
+  I -->|Sí| K[Paga con tarjeta en la app]
+  K --> L{Mercado Pago}
+  L -->|Validación del banco| M[3D Secure] --> L
+  L -->|Rechazado| K
+  L -->|Aprobado| N[Reserva confirmada y ticket QR]
+  N --> O{¿Cancela?}
+  O -->|24 h o más antes| P[Reembolso del 97%]
+  O -->|Menos de 24 h| Q[No se puede cancelar]
+  N --> R[Llega al recinto: check-in con QR]
+  R --> S[Juega] --> T[Valora el recinto y suma XP]
+  Q --> R
+    </pre></div>
+    <div class="cols">
+      <div class="card"><h3>Otros flujos del jugador</h3><ul>
+        <li>Torneos y academias <span>· inscripción pagada con el mismo pago con tarjeta</span></li>
+        <li>Equipos <span>· crear, invitar con código, chat del equipo</span></li>
+        <li>Partidos <span>· buscar jugadores o rivales, desafíos con chat</span></li>
+        <li>Estadísticas <span>· registrar partidos, XP, niveles y logros</span></li>
+        <li>Ranking <span>· por ciudad, general y por temporada</span></li>
+        <li>Billetera <span>· pagos y tarjetas guardadas en Mercado Pago</span></li>
+        <li>Ajustes <span>· datos personales, contraseña, eliminar cuenta</span></li>
+      </ul></div>
+      <div class="card"><h3>Reglas que aplica el sistema</h3><ul>
+        <li>No existen reservas pendientes de pago <span>· sin pago aprobado no hay reserva</span></li>
+        <li>La cancelación la valida el servidor <span>· 24 h de anticipación y check-in no hecho</span></li>
+        <li>Otros jugadores solo ven datos deportivos <span>· nombre, foto, ciudad, nivel y XP</span></li>
+        <li>Eliminar la cuenta borra perfil y actividad <span>· reservas y pagos quedan anonimizados</span></li>
+      </ul></div>
+    </div>
+  </section>
+
+  <!-- DUEÑO -->
+  <section class="panel" id="dueno">
+    <div class="who"><h2>Dueño del recinto</h2><span>Panel en /dashboard · rol owner</span></div>
+    <div class="card diagram"><pre class="mermaid">
+flowchart TD
+  A[Contacta por WhatsApp o elige un plan] --> B[El administrador crea su cuenta y su recinto]
+  B --> C[Inicia sesión con correo]
+  C --> D[Configura el complejo: datos, horarios y tarifas]
+  D --> E[Conecta su cuenta de Mercado Pago]
+  E --> F[Crea sus canchas]
+  F --> G[Invita a sus mánagers]
+  G --> H[Recibe reservas pagadas online]
+  H --> I[El dinero llega directo a su Mercado Pago]
+  H --> J[Gestiona torneos, academias y cupones]
+  H --> K[Revisa finanzas y opiniones]
+  I --> L[Día 1 de cada mes: factura de MVP Sports]
+  L --> M[Paga en 10 días]
+    </pre></div>
+    <div class="cols">
+      <div class="card"><h3>Pantallas</h3>
+        <div class="access"><code>/dashboard</code><code>calendar</code><code>checkin</code><code>courts</code><code>staff</code><code>finance</code><code>marketing/coupons</code><code>tournaments</code><code>academy</code><code>feedback</code><code>billing-subscription</code><code>settings/complex</code><code>profile</code><code>report-issue</code></div>
+      </div>
+      <div class="card"><h3>Responsabilidades</h3><ul>
+        <li>Mantener precios, horarios y canchas al día</li>
+        <li>Prestar el servicio reservado <span>· si cancela, el jugador recibe el 100%</span></li>
+        <li>Resolver reembolsos manuales <span>· cuando el automático falla (código MVP-REFUND)</span></li>
+        <li>Pagar la factura mensual <span>· cargo fijo más comisión por reserva</span></li>
+      </ul></div>
+    </div>
+  </section>
+
+  <!-- MANAGER -->
+  <section class="panel" id="manager">
+    <div class="who"><h2>Mánager</h2><span>Panel en /dashboard · rol manager, asignado a uno o más recintos</span></div>
+    <div class="card diagram"><pre class="mermaid">
+flowchart TD
+  A[El dueño lo invita] --> B[Inicia sesión con correo]
+  B --> C[Elige su recinto]
+  C --> D[Panel del día: ocupación, ingresos y próximas reservas]
+  D --> E[Calendario: revisa reservas por cancha]
+  D --> F[Check-in: escanea el QR del jugador]
+  F --> G{¿Reserva válida y pagada?}
+  G -->|Sí| H[Registra asistencia] --> I[Partido en curso]
+  G -->|No| J[Rechaza el ingreso]
+  I --> K[Cierre del partido]
+  D --> L[Reporta un problema a soporte]
+    </pre></div>
+    <div class="cols">
+      <div class="card"><h3>Pantallas</h3>
+        <div class="access"><code>/dashboard</code><code>calendar</code><code>checkin</code><code>profile</code><code>report-issue</code></div>
+      </div>
+      <div class="card"><h3>Qué ya no hace</h3><ul>
+        <li>No crea reservas manuales <span>· toda reserva nace de un pago online</span></li>
+        <li>No cobra en mesón <span>· no hay pago en el recinto</span></li>
+      </ul></div>
+    </div>
+  </section>
+
+  <!-- STAFF -->
+  <section class="panel" id="staff">
+    <div class="who"><h2>Staff</h2><span>Rol staff</span></div>
+    <div class="card diagram"><pre class="mermaid">
+flowchart TD
+  A[El dueño lo registra como personal] --> B[Inicia sesión]
+  B --> C[Ve su perfil]
+  B --> D[Reporta un problema]
+    </pre></div>
+    <div class="rule"><b>Por definir.</b> Hoy el rol staff solo tiene acceso a su perfil y a reportar problemas: no puede hacer check-in ni ver el calendario. Si debe operar la entrada, hay que darle acceso a <code>checkin</code> o asignarle el rol de mánager.</div>
+  </section>
+
+  <!-- ADMIN -->
+  <section class="panel" id="admin">
+    <div class="who"><h2>Administrador de la plataforma</h2><span>Roles admin y superadmin · Orion Technology SpA</span></div>
+    <div class="card diagram"><pre class="mermaid">
+flowchart TD
+  A[Nuevo cliente B2B] --> B[Crea al dueño y su recinto]
+  B --> C[Asigna el plan]
+  C --> D[Seguimiento: métricas de la plataforma]
+  D --> E[Día 1: genera facturas del mes]
+  E --> F{¿Pagó en 10 días?}
+  F -->|Sí| G[Recinto activo]
+  F -->|No| H[Suspende el panel hasta regularizar]
+  D --> I[Usuarios: revisa y suspende cuentas]
+  D --> J[Atiende reportes de recintos]
+  D --> K[Revisa la auditoría de cambios]
+  D --> L[Ajusta reglas de gamificación]
+    </pre></div>
+    <div class="cols">
+      <div class="card"><h3>Pantallas</h3>
+        <div class="access"><code>metrics</code><code>tenants</code><code>owners</code><code>users</code><code>users/analytics</code><code>invoices</code><code>reports</code><code>audit</code><code>gamification</code><code>settings</code><code>+ todo lo del dueño</code></div>
+      </div>
+      <div class="card"><h3>Solicitudes de datos (Ley 21.719)</h3><ul>
+        <li>Llegan a soporte@mvpsports.cl</li>
+        <li>Respuesta en máximo 30 días corridos <span>· prorrogable una vez</span></li>
+        <li>Acceso, rectificación, supresión, oposición, portabilidad y bloqueo</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <!-- SISTEMA -->
+  <section class="panel" id="sistema">
+    <div class="who"><h2>Sistema</h2><span>Procesos automáticos en el servidor (Vercel)</span></div>
+    <div class="card diagram"><pre class="mermaid">
+flowchart TD
+  A[Jugador paga] --> B[Servidor calcula el precio desde el recinto]
+  B --> C[Cobro en Mercado Pago]
+  C --> D[Verifica pago: referencia y monto]
+  D -->|Coincide y aprobado| E[Crea la reserva confirmada]
+  D -->|No coincide| F[Marca el pago como inconsistente]
+  G[Webhook de Mercado Pago] --> D
+  H[Cancelación del jugador] --> I{¿24 h o más y sin check-in?}
+  I -->|Sí| J[Reembolso del 97% por API]
+  J -->|Falla| K[Código MVP-REFUND para reclamo manual]
+  I -->|No| L[Rechaza la cancelación]
+  M[Cron diario 07:00 UTC] --> N[Borra pagos online abandonados]
+  M --> O[Cancela lo pendiente de pago y libera cupos]
+    </pre></div>
+    <div class="cols">
+      <div class="card"><h3>Reglas de Firestore</h3><ul>
+        <li>Reservas de cancha <span>· solo las crea el servidor</span></li>
+        <li>Partidos internos <span>· el jugador los registra sin recinto ni pago</span></li>
+        <li>Perfiles completos <span>· solo el titular y el personal</span></li>
+        <li>Credenciales de Mercado Pago <span>· colección privada, nunca en lectura pública</span></li>
+      </ul></div>
+      <div class="card"><h3>Pendiente</h3><ul>
+        <li>Publicar las reglas locales en Firebase</li>
+        <li>Calcular XP y logros en el servidor</li>
+        <li>Limitar al personal a los jugadores de su recinto</li>
+        <li>Notificaciones push <span>· falta la clave VAPID</span></li>
+      </ul></div>
+    </div>
+  </section>
+</div>
+

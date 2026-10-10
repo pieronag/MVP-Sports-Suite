@@ -16,6 +16,7 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import ModalPortal from '@/components/ui/ModalPortal';
 import OwnerWizard, { EMPTY_OWNER_FORM, OwnerFormState } from '@/components/dashboard/OwnerWizard';
 import OwnerProfileModal from '@/components/dashboard/OwnerProfileModal';
+import { PASSWORD_MIN, passwordIssue } from "@/utils/password";
 
 interface Owner {
     id: string;
@@ -199,7 +200,8 @@ export default function Page() {
 
     const handleManualPasswordUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!passwordOwner || manualPassword.length < 6) return addToast("Mínimo 6 caracteres", "error");
+        if (!passwordOwner) return;
+        if (passwordIssue(manualPassword)) return addToast(passwordIssue(manualPassword) as string, "error");
         setIsSubmitting(true);
         try {
             const res = await fetch('/dashboard/owners/api', {
@@ -581,7 +583,7 @@ export default function Page() {
                                         type="text"
                                         value={manualPassword}
                                         onChange={e => setManualPassword(e.target.value)}
-                                        placeholder="Mínimo 6 caracteres"
+                                        placeholder={`Mínimo ${PASSWORD_MIN} caracteres`}
                                         className="w-full px-3.5 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 outline-hidden transition-all"
                                     />
                                 </div>

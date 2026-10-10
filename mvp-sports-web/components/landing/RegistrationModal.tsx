@@ -9,21 +9,23 @@ import { doc, setDoc } from "firebase/firestore";
 import { emailService } from "@/services/client/emailService";
 import { newPlayerDoc, signInWithGoogle } from "@/services/client/accountService";
 import GoogleButton from "@/components/shared/GoogleButton";
+import { PASSWORD_MIN, passwordIssue } from "@/utils/password";
 
 // Registro en un paso: entrar rápido y completar teléfono, RUT y fecha de nacimiento antes del primer pago.
 export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const router = useRouter();
-  const [form, setForm] = useState({ displayName: "", email: "", password: "" });
+  const [form, setForm] = useState({ displayName: "", email: "", password: "", confirm: "" });
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState<"" | "email" | "google">("");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!isOpen) return;
-    setForm({ displayName: "", email: "", password: "" });
-    setAcceptTerms(false); setSuccess(false); setError(""); setShowPassword(false);
+    setForm({ displayName: "", email: "", password: "", confirm: "" });
+    setAcceptTerms(false); setSuccess(false); setError(""); setShowPassword(false); setShowConfirm(false);
     document.body.classList.add("overflow-hidden");
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
@@ -33,7 +35,8 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
   if (!isOpen) return null;
 
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim());
-  const valid = form.displayName.trim().length >= 2 && emailOk && form.password.length >= 6 && acceptTerms;
+  const pwIssue = passwordIssue(form.password, form.confirm);
+  const valid = form.displayName.trim().length >= 2 && emailOk && !pwIssue && acceptTerms;
 
   const handleGoogle = async () => {
     if (!acceptTerms) { setError("Acepta los Términos y la Política de Privacidad para continuar."); return; }
@@ -104,13 +107,24 @@ export default function RegistrationModal({ isOpen, onClose }: { isOpen: boolean
               <Input label="Correo" name="email" type="email" value={form.email} onChange={(e: any) => setForm({ ...form, email: e.target.value })} placeholder="usuario@email.com" autoComplete="email" />
               <Input
                 label="Contraseña" name="password" type={showPassword ? "text" : "password"} value={form.password}
-                onChange={(e: any) => setForm({ ...form, password: e.target.value })} placeholder="Mínimo 6 caracteres" autoComplete="new-password"
+                onChange={(e: any) => setForm({ ...form, password: e.target.value })} placeholder={`Mínimo ${PASSWORD_MIN} caracteres`} autoComplete="new-password"
                 rightSlot={
                   <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"} className="text-slate-400 hover:text-[#00df82] cursor-pointer">
                     <HugeiconsIcon icon={showPassword ? ViewOffIcon : ViewIcon} className="w-4 h-4" strokeWidth={1.8} />
                   </button>
                 }
               />
+              <Input label="Repite la contraseña" name="confirm" type={showConfirm ? "text" : "password"} value={form.confirm}
+                onChange={(e: any) => setForm({ ...form, confirm: e.target.value })} placeholder="Escríbela de nuevo" autoComplete="new-password"
+                rightSlot={
+                  <button type="button" onClick={() => setShowConfirm(!showConfirm)} aria-label={showConfirm ? "Ocultar contraseña" : "Mostrar contraseña"} className="text-slate-400 hover:text-[#00df82] cursor-pointer">
+                    <HugeiconsIcon icon={showConfirm ? ViewOffIcon : ViewIcon} className="w-4 h-4" strokeWidth={1.8} />
+                  </button>
+                }
+              />
+              {form.password && pwIssue && (form.password.length < PASSWORD_MIN || form.confirm) && (
+                <p className="text-[11px] font-semibold text-amber-400">{pwIssue}</p>
+              )}
               {error && (
                 <div role="alert" className="flex items-center gap-2 rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-[11px] font-bold text-red-300">
                   <HugeiconsIcon icon={AlertCircleIcon} className="w-4 h-4 shrink-0" strokeWidth={1.8} /> {error}
