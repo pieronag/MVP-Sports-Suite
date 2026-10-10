@@ -133,35 +133,29 @@ export default function Navbar({ onRegisterClick }: { onRegisterClick: () => voi
           isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
         }`}
       >
-        <div className="flex flex-col h-full pt-28 pb-10 px-8">
-          <div className="flex flex-col gap-2">
+        <div className="flex flex-col h-full pt-24 pb-10 px-6">
+          <nav className="flex flex-col gap-1 space-y-2">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="px-4 py-4 text-lg font-black text-white uppercase tracking-[0.2em] rounded-md hover:bg-white/5 hover:text-[#00df82] transition-colors"
+                className="px-4 py-4 text-base font-black text-white uppercase tracking-[0.2em] rounded-md hover:bg-white/5 hover:text-[#00df82] transition-colors"
               >
                 {link.label}
               </Link>
             ))}
-          </div>
+          </nav>
 
-          <div className="mt-auto flex flex-col gap-3">
-            <Link
-              href="/login"
-              className="py-4 text-center text-sm font-black uppercase tracking-[0.2em] text-white border border-white/10 rounded-md hover:bg-white/5"
-            >
-              Ingresar
-            </Link>
+          <div className="mt-12 pt-8 border-t border-white/10">
             <button
               onClick={() => {
                 onRegisterClick();
                 setIsMobileMenuOpen(false);
               }}
-              className="py-4 text-sm font-black uppercase tracking-[0.2em] text-slate-950 bg-[#00df82] rounded-md shadow-[0_0_35px_rgba(0,223,130,0.35)] cursor-pointer"
+              className="w-full py-4 text-sm font-black uppercase tracking-[0.2em] text-slate-950 bg-[#00df82] rounded-md shadow-[0_0_35px_rgba(0,223,130,0.35)] hover:bg-[#3affa0] transition-all cursor-pointer"
             >
-              Registrarme
+              Comenzar a jugar
             </button>
           </div>
         </div>
