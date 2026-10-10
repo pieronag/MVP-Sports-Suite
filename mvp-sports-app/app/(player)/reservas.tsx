@@ -24,7 +24,7 @@ import { teamService, Team } from '../../services/teamService';
 import { tournamentService } from '../../services/tournamentService';
 import { db, functions } from '../../services/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { httpsCallable } from 'firebase/functions';
+import { postApi } from '../../services/apiClient';
 
 const getSantiagoDateTime = (date: Date) => {
     try {
@@ -293,10 +293,7 @@ export default function MisReservasScreen() {
         try {
             if (isPaid && !isLessThan4Hours) {
                 // LLAMAR A LA CLOUD FUNCTION DE REEMBOLSO PARCIAL AUTOMÁTICO
-                const refundFn = httpsCallable(functions, 'refundBookingPayment');
-                const res = await refundFn({ bookingId: bookingToCancel });
-                
-                const resultData = res.data as { success: boolean; refundAmount: number; fee: number; error?: string };
+                const resultData = await postApi<{ success: boolean; refundAmount: number; fee: number; error?: string }>('/api/bookings/refund', { bookingId: bookingToCancel });
                 
                 loadData();
                 setShowCancelModal(false);

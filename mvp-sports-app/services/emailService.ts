@@ -1,5 +1,5 @@
-import { auth, functions } from './firebase';
-import { httpsCallable } from 'firebase/functions';
+import { auth } from './firebase';
+import { postApi } from './apiClient';
 import { sendEmailVerification, sendPasswordResetEmail } from 'firebase/auth';
 
 export const emailService = {
@@ -18,14 +18,7 @@ export const emailService = {
     try {
       console.log(`[EmailService] Intentando enviar correo de tipo: ${type} a ${cleanEmail} usando Cloud Function...`);
       
-      const sendEmailFn = httpsCallable(functions, 'sendAuthEmail');
-      const response = await sendEmailFn({
-        email: cleanEmail,
-        type,
-        name: displayName
-      });
-
-      const data = response.data as any;
+      const data: any = await postApi('/api/auth/email', { email: cleanEmail, type, name: displayName });
       
       if (data && data.success) {
         console.log(`[EmailService] Correo enviado exitosamente vía Cloud Function. Método: ${data.method}`);

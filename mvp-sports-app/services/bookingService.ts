@@ -1,3 +1,4 @@
+import { syncBookingSlots } from './apiClient';
 import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { bookingSchema } from './schemas';
@@ -128,6 +129,7 @@ export const bookingService = {
 
             const docRef = doc(db, 'bookings', bookingId);
             await setDoc(docRef, cleanData);
+            await syncBookingSlots(bookingId);
 
             await auditService.logAuditEvent({
                 action: 'RESERVA_CREAR_MOVIL',
@@ -174,6 +176,7 @@ export const bookingService = {
         const cleanData = { ...data };
         Object.keys(cleanData).forEach(key => (cleanData as any)[key] === undefined && delete (cleanData as any)[key]);
         await updateDoc(ref, cleanData as any);
+        await syncBookingSlots(bookingId);
     },
 
     async cancelBooking(params: { bookingId: string; cancelledBy: string }) {
@@ -343,6 +346,7 @@ export const bookingService = {
                 checkInTime: Timestamp.now(),
                 status: 'active'
             });
+            await syncBookingSlots(bookingId);
 
             await auditService.logAuditEvent({
                 action: 'RESERVA_CHECKIN_MOVIL',
@@ -376,6 +380,7 @@ export const bookingService = {
                 if (surveyData.feedback !== undefined) updateData.feedback = surveyData.feedback;
             }
             await updateDoc(ref, updateData);
+            await syncBookingSlots(bookingId);
 
             await auditService.logAuditEvent({
                 action: 'RESERVA_CHECKOUT_MOVIL',
