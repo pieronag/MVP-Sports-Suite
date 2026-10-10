@@ -50,16 +50,16 @@ export default function Hero({ onRegisterClick }: { onRegisterClick: () => void 
               Reserva canchas en segundos, paga online y administra tus partidos desde un solo lugar.
             </p>
 
-            <div className="flex flex-col gap-3 md:flex-row md:gap-3.5 justify-center md:justify-start animate-in fade-in slide-in-from-bottom-8 duration-700 stagger-3">
+            <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 animate-in fade-in slide-in-from-bottom-8 duration-700 stagger-3">
               <button
                 onClick={onRegisterClick}
-                className="group w-full md:w-auto px-6 md:px-9 py-3.5 md:py-4 bg-[#00df82] text-slate-950 font-black rounded-md hover:bg-[#3affa0] active:scale-95 transition-all shadow-[0_0_35px_rgba(0,223,130,0.35)] hover:shadow-[0_0_50px_rgba(0,223,130,0.5)] uppercase tracking-[0.18em] text-[10px] md:text-[11px] cursor-pointer"
+                className="w-full sm:w-auto px-8 md:px-10 py-3.5 md:py-4 bg-[#00df82] text-slate-950 font-black rounded-md hover:bg-[#3affa0] hover:scale-[1.03] active:scale-95 transition-all shadow-[0_0_40px_rgba(0,223,130,0.35)] uppercase tracking-[0.18em] text-[11px] cursor-pointer"
               >
-                Comenzar a jugar
+                Crear cuenta gratis
               </button>
               <Link
                 href="#owners"
-                className="w-full md:w-auto px-6 md:px-9 py-3.5 md:py-4 bg-white/3 text-white font-black rounded-md border border-white/12 hover:bg-white/8 hover:border-white/20 transition-all uppercase tracking-[0.18em] text-[10px] md:text-[11px] backdrop-blur-xl text-center"
+                className="w-full sm:w-auto px-8 md:px-10 py-3.5 md:py-4 bg-white/3 text-white font-black rounded-md border border-white/12 hover:bg-white/8 transition-all uppercase tracking-[0.18em] text-[11px] backdrop-blur-xl text-center"
               >
                 Soy recinto deportivo
               </Link>
