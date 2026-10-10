@@ -77,6 +77,17 @@ export default function MapaPage() {
 
   useEffect(() => { venueService.getVenues().then(setRawVenues).catch(console.error).finally(() => setLoading(false)); }, []);
 
+  // Sin ubicación: centrar en los recintos de la comuna del jugador (o en todos), no en Santiago
+  useEffect(() => {
+    if (!geoError || userLocation || !rawVenues.length) return;
+    const n = (v: string) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+    const city = n((profile as any)?.city);
+    const pts = rawVenues.map(extractCoords).filter((c: any) => c.lat && c.lng);
+    const local = rawVenues.filter((v: any) => city && n(v.commune || v.comuna || v.city) === city).map(extractCoords).filter((c: any) => c.lat && c.lng);
+    const use = local.length ? local : pts;
+    if (use.length) setCenter({ lat: use.reduce((a: number, c: any) => a + c.lat, 0) / use.length, lng: use.reduce((a: number, c: any) => a + c.lng, 0) / use.length });
+  }, [geoError, userLocation, rawVenues, profile]);
+
   useEffect(() => {
     if (!rawVenues.length) return;
     const filtered = rawVenues.filter((v) => {
@@ -180,7 +191,7 @@ export default function MapaPage() {
           </button>
         </div>
         {geoError && (
-          <p className="text-amber-400 text-[11px] font-medium text-center mb-2">No se pudo obtener tu ubicación. Usando Santiago por defecto.</p>
+          <p className={`text-[12px] font-medium text-center mb-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Sin acceso a tu ubicación: te mostramos los recintos de tu zona.</p>
         )}
         {/* Filters */}
         <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-none">
@@ -206,7 +217,7 @@ export default function MapaPage() {
       </div>
 
       {/* Venue List */}
-      <SectionPill label="Clubes Cercanos" />
+      <SectionPill label={userLocation ? "Recintos cercanos" : "Recintos"} />
       <div className="px-5 pb-8 space-y-4">
         {venues.length === 0 ? (
           <div className="py-16 flex flex-col items-center">

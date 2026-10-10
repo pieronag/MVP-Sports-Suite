@@ -18,13 +18,13 @@ import { userService } from "@/services/player/userService";
 import { teamService } from "@/services/player/teamService";
 
 const RANGOS_CONFIG = [
-  { id: 'bronze', name: 'BRONCE', min: 0, color: '#cd7f32' },
-  { id: 'silver', name: 'PLATA', min: 1000, color: '#94A3B8' },
-  { id: 'gold', name: 'ORO', min: 3000, color: '#f59e0b' },
-  { id: 'platinum', name: 'PLATINO', min: 6000, color: '#3b82f6' },
-  { id: 'diamond', name: 'DIAMANTE', min: 10000, color: '#0ea5e9' },
-  { id: 'elite', name: 'ELITE', min: 15000, color: '#10b981' },
-  { id: 'legend', name: 'LEYENDA', min: 25000, color: '#8b5cf6' }
+  { id: 'bronze', name: 'Bronce', min: 0, color: '#cd7f32' },
+  { id: 'silver', name: 'Plata', min: 1000, color: '#94A3B8' },
+  { id: 'gold', name: 'Oro', min: 3000, color: '#f59e0b' },
+  { id: 'platinum', name: 'Platino', min: 6000, color: '#3b82f6' },
+  { id: 'diamond', name: 'Diamante', min: 10000, color: '#0ea5e9' },
+  { id: 'elite', name: 'Elite', min: 15000, color: '#10b981' },
+  { id: 'legend', name: 'Leyenda', min: 25000, color: '#8b5cf6' }
 ];
 
 const DEFAULT_BADGE_XP: Record<string, number> = { bronze: 200, silver: 500, gold: 1000 };
@@ -184,14 +184,10 @@ export default function EstadisticasPage() {
   const analytics = useMemo(() => {
     const puntosTotales = userProfile?.xp || 0;
     const tiersFromSettings = gamification?.tiers;
-    const rankConfig = tiersFromSettings
-      ? [
-          { id: 'bronze', name: 'BRONCE', min: Number(tiersFromSettings.bronze) || 0, color: '#cd7f32' },
-          { id: 'silver', name: 'PLATA', min: Number(tiersFromSettings.silver) || 1000, color: '#94A3B8' },
-          { id: 'gold', name: 'ORO', min: Number(tiersFromSettings.gold) || 5000, color: '#f59e0b' },
-          { id: 'elite', name: 'ELITE', min: Number(tiersFromSettings.elite) || 10000, color: '#10b981' },
-        ]
-      : RANGOS_CONFIG;
+    // Mismos 7 rangos que Inicio y Perfil (gamificationService.calculateTier)
+    const t = tiersFromSettings || {};
+    const rankConfig = RANGOS_CONFIG.map((r) => ({ ...r, min: Number((t as any)[r.id] ?? r.min) || r.min }));
+    rankConfig[0].min = Number((t as any).bronze) || 0;
     let rangoActual = rankConfig[0];
     let siguienteRango = rankConfig[1];
     for (let i = rankConfig.length - 1; i >= 0; i--) {

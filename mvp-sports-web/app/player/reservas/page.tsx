@@ -79,19 +79,20 @@ const getFormattedDate = (date: any) => {
 };
 
 const getStatusInfo = (booking: any, C: any) => {
-  if (!booking) return { label: "DESCONOCIDO", color: C.sub };
+  if (!booking) return { label: "Sin estado", color: C.sub };
   const isNoShow = booking.status === "no-show" || booking.paymentStatus === "no-show" || booking.noShow === true;
-  if (isNoShow) return { label: "CANCELADO POR INASISTENCIA", color: "#f43f5e" };
+  if (isNoShow) return { label: "No asististe", color: "#f43f5e" };
   if (booking.status === "cancelled") {
-    if (booking.paymentStatus === "refund_failed") return { label: "DEVOLUCIÓN FALLIDA", color: "#f43f5e" };
-    if (booking.paymentStatus === "refunded") return { label: "DEVOLUCIÓN", color: "#10b981" };
-    if (booking.cancelledBy) return { label: "CANCELADO POR JUGADOR", color: "#f43f5e" };
-    return { label: "ANULADO", color: "#f43f5e" };
+    if (booking.paymentStatus === "refund_failed") return { label: "Devolución fallida", color: "#f43f5e" };
+    if (booking.paymentStatus === "refunded") return { label: "Reembolsada", color: "#10b981" };
+    if (booking.cancelledBy === "staff") return { label: "Anulada por el recinto", color: "#f43f5e" };
+    if (booking.cancelledBy) return { label: "Cancelada", color: "#f43f5e" };
+    return { label: "Anulada", color: "#f43f5e" };
   }
-  if ((booking.status === "active" || booking.checkIn) && !booking.checkOut) return { label: "EN JUEGO", color: "#3b82f6" };
-  if (booking.status === "completed" || booking.status === "past" || booking.checkOut === true) return { label: "FINALIZADO", color: C.sub };
-  if (booking.paymentStatus === "pending") return { label: "PAGO PENDIENTE", color: "#f59e0b" };
-  if (booking.status === "confirmed") return { label: "CONFIRMADO", color: "#10b981" };
+  if ((booking.status === "active" || booking.checkIn) && !booking.checkOut) return { label: "En juego", color: "#3b82f6" };
+  if (booking.status === "completed" || booking.status === "past" || booking.checkOut === true) return { label: "Jugada", color: C.sub };
+  if (booking.paymentStatus === "pending") return { label: "Reservada", color: "#f59e0b" };
+  if (booking.status === "confirmed") return { label: "Confirmada", color: "#10b981" };
   return { label: "PENDIENTE", color: "#f59e0b" };
 };
 
@@ -339,7 +340,7 @@ export default function ReservasPage() {
 
       {/* List */}
       <div className="px-0.5 pb-4">
-        <SectionPill label={activeTab === "activas" ? "Próximos Partidos" : "Partidos Finalizados"} />
+        <SectionPill label={activeTab === "activas" ? "Próximos partidos" : "Historial"} />
 
         {paginatedList.length === 0 && (
           <div className="px-5 mt-6">
@@ -364,56 +365,37 @@ export default function ReservasPage() {
           const showMapsAndTicket = (!isCompleted && !isCancelled) || b.paymentStatus === "refund_failed";
 
           return (
-            <div key={b.id} className="mx-5 mb-6 last:mb-0">
+            <div key={b.id} className="mx-5 mb-3 last:mb-0">
               <GlowCard isDark={isDark}>
-                <div className="p-5">
-                  {/* Header Row */}
-                  <div className="flex items-start gap-3 mb-4">
-                    <div className="w-[46px] h-[46px] rounded-md flex items-center justify-center shrink-0 mt-0.5" style={{ backgroundColor: sportInfo.color + "15" }}>
-                      <sportInfo.icon size={24} color={sportInfo.color} />
+                <div className="p-4">
+                  {/* Resumen compacto: fecha · recinto/cancha · hora y valor · estado */}
+                  <div className="flex items-start gap-3.5">
+                    <div className={`w-[54px] shrink-0 rounded-md text-center py-2 ${isDark ? "bg-white/[0.05]" : "bg-slate-100"}`}>
+                      <p className={`text-[20px] font-bold leading-none ${textClr}`}>{dateInfo.day}</p>
+                      <p className={`text-[11px] font-semibold mt-1 ${subClr}`}>{dateInfo.month}</p>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-[15px] font-semibold leading-tight truncate ${textClr}`}>{venueName || b.tenantName}</p>
-                      <span className={`inline-block text-[11px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-md mt-1.5`} style={{ backgroundColor: sportInfo.color + "15", color: sportInfo.color }}>
-                        {(b.sport || "").toUpperCase()}
-                      </span>
-                      <div className="flex items-center gap-1 mt-1">
-                        <MapPin size={8} className={subClr} />
-                        <span className={`text-[11px] font-medium ${subClr}`}>{b.courtName}</span>
+                      <div className="flex items-start justify-between gap-2">
+                        <p className={`text-[15px] font-semibold leading-tight truncate ${textClr}`}>{venueName || b.tenantName}</p>
+                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md shrink-0" style={{ backgroundColor: status.color + "18", color: status.color }}>{status.label}</span>
                       </div>
-                    </div>
-                    <span className="text-[11px] font-semibold tracking-[0.5px] px-2.5 py-1.5 rounded-md text-center leading-tight shrink-0" style={{ backgroundColor: status.color + "15", border: `1px solid ${status.color}20`, color: status.color }}>
-                      {status.label}
-                    </span>
-                  </div>
-
-                  {/* Detail Grid */}
-                  <div className="grid grid-cols-2 gap-2.5 mb-4">
-                    <div className={`p-3 rounded-md border ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
-                      <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${subClr}`}>FECHA</span>
-                      <p className={`text-[12px] font-semibold mt-0.5 ${textClr}`}>{dateInfo.full}</p>
-                    </div>
-                    <div className={`p-3 rounded-md border ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
-                      <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${subClr}`}>HORARIO</span>
-                      <p className={`text-[12px] font-semibold mt-0.5 ${textClr}`}>{b.startTime} HRS</p>
-                    </div>
-                    <div className={`p-3 rounded-md border ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
-                      <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${subClr}`}>VALOR</span>
-                      <p className={`text-[13px] font-semibold mt-0.5 ${textClr}`}>${new Intl.NumberFormat("es-CL").format(b.totalPrice || b.price || 0)}</p>
-                    </div>
-                    <div className={`p-3 rounded-md border ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
-                      <span className={`text-[11px] font-semibold uppercase tracking-[0.06em] ${subClr}`}>PAGO</span>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: b.paymentStatus === "paid" ? "#10b981" : b.paymentStatus === "refunded" ? "#10b981" : b.paymentStatus === "refund_failed" ? "#ef4444" : "#f59e0b" }} />
-                        <span className="text-[12px] font-semibold" style={{ color: b.paymentStatus === "paid" ? "#10b981" : b.paymentStatus === "refunded" ? "#10b981" : b.paymentStatus === "refund_failed" ? "#ef4444" : "#f59e0b" }}>
-                          {b.paymentStatus === "paid" ? "PAGADO" : b.paymentStatus === "refunded" ? "REEMBOLSADO" : b.paymentStatus === "refund_failed" ? "ERROR REEMBOLSO" : "PENDIENTE"}
-                        </span>
-                      </div>
+                      <p className={`text-[13px] mt-0.5 truncate ${subClr}`}>
+                        <span style={{ color: sportInfo.color }} className="font-semibold capitalize">{b.sport}</span> · {b.courtName}
+                      </p>
+                      <p className={`text-[13px] font-semibold mt-1.5 ${textClr}`}>
+                        {b.startTime} hrs · ${new Intl.NumberFormat("es-CL").format(b.totalPrice || b.price || 0)}
+                      </p>
+                      {!isCancelled && b.paymentStatus !== "paid" && (
+                        <p className="text-[12px] font-semibold mt-1" style={{ color: b.paymentStatus === "refunded" ? "#10b981" : b.paymentStatus === "refund_failed" ? "#ef4444" : "#f59e0b" }}>
+                          {b.paymentStatus === "refunded" ? "Reembolsado" : b.paymentStatus === "refund_failed" ? "Error en el reembolso" : b.paymentMethod === "cash" ? "Pagas en el recinto" : "Pago pendiente"}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-2 pt-3.5" style={{ borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0"}` }}>
+                  {(showMapsAndTicket || isConfirmed || isActive) && (
+                  <div className="flex gap-2 pt-3.5 mt-4" style={{ borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0"}` }}>
                     {isConfirmed && !b.checkIn && (
                       <button onClick={() => handleCheckIn(b)} className="flex-1 h-[46px] rounded-md bg-emerald-500 flex items-center justify-center gap-2 text-white font-semibold text-[12px] uppercase transition-all active:scale-[0.98]">
                         <ShieldCheck size={15} /> INGRESAR
@@ -448,6 +430,7 @@ export default function ReservasPage() {
                       </button>
                     )}
                   </div>
+                  )}
                 </div>
               </GlowCard>
             </div>

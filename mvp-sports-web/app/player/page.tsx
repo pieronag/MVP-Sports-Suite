@@ -93,7 +93,7 @@ export default function PlayerDashboard() {
             {photoURL ? <Image src={photoURL} alt="" width={48} height={48} className="object-cover w-full h-full" /> : <span className="text-base font-semibold text-emerald-500">{initials}</span>}
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className={`text-[22px] font-heading font-black tracking-tight truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>Hola, {firstName}</h1>
+            <h1 className={`text-[20px] font-heading font-black tracking-tight truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>Hola, {firstName}</h1>
             <p className={`text-[13px] font-medium ${muted}`}>
               <span className="text-emerald-500 font-semibold">{tier.name}</span> · {ovr} OVR · {xp.toLocaleString("es-CL")} XP
             </p>

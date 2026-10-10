@@ -89,8 +89,8 @@ export default function TicketPage() {
   const isCancelled = booking.status === "cancelled";
 
   const statusBadge = (status: string) => {
-    const colors: Record<string, string> = { paid: "#10b981", refunded: "#10b981", refund_failed: "#ef4444", pending: "#f59e0b", "no-show": "#f43f5e" };
-    const labels: Record<string, string> = { paid: "Pagado", refunded: "Devuelto", refund_failed: "Dev. Fallida", pending: "Pendiente", "no-show": "No Show" };
+    const colors: Record<string, string> = { paid: "#10b981", refunded: "#10b981", refund_failed: "#ef4444", pending: "#f59e0b", "no-show": "#f43f5e", cancelled: "#f43f5e" };
+    const labels: Record<string, string> = { paid: "Pagado", refunded: "Devuelto", refund_failed: "Dev. Fallida", pending: "Pendiente", "no-show": "No asististe", cancelled: "Cancelada" };
     const c = colors[status] || "#94a3b8";
     return <span className="text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-md" style={{ backgroundColor: `${c}15`, color: c }}>{labels[status] || status}</span>;
   };
@@ -98,9 +98,9 @@ export default function TicketPage() {
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Hero Banner */}
-      <div className="h-56 relative flex items-start justify-center pt-10" style={{ background: `linear-gradient(180deg, ${activeColor}, ${activeColor}70, transparent)` }}>
+      <div className="h-56 relative flex items-start justify-center pt-10" style={{ background: `linear-gradient(180deg, ${isCancelled ? "#475569" : activeColor}, ${isCancelled ? "#475569" : activeColor}70, transparent)` }}>
         <div className="w-20 h-20 rounded-md flex items-center justify-center mt-2" style={{ backgroundColor: "rgba(255,255,255,0.2)", border: "1px solid rgba(255,255,255,0.3)" }}>
-          {isRefundFailed ? <AlertCircle color="white" size={40} /> : <CheckCircle color="white" size={40} />}
+          {isRefundFailed ? <AlertCircle color="white" size={40} /> : isCancelled ? <X color="white" size={40} /> : <CheckCircle color="white" size={40} />}
         </div>
         <div className="absolute bottom-0 left-0 right-0 flex justify-center pb-12">
           <div className="text-center">
@@ -137,7 +137,7 @@ export default function TicketPage() {
           <div className="p-5 space-y-3">
             {[
               { label: "ID Reserva", val: bookingId || "—" },
-              { label: "Estado", val: statusBadge(booking?.paymentStatus || "") },
+              { label: "Estado", val: statusBadge(isCancelled && booking?.paymentStatus === "pending" ? "cancelled" : booking?.paymentStatus || "") },
               { label: "Método", val: ["card", "webpay", "online", "mercadopago"].includes((booking as any)?.paymentMethod || "") ? "Tarjeta Online" : "Pago Recinto" },
               { label: "Código", val: `#${(bookingId || "").slice(-6).toUpperCase()}` },
             ].map((r) => (
@@ -159,7 +159,7 @@ export default function TicketPage() {
         </GlowCard>
 
         {/* Pending notice */}
-        {booking?.paymentStatus === "pending" && (
+        {booking?.paymentStatus === "pending" && !isCancelled && (
           <div className="flex items-center gap-3 p-4 rounded-md bg-amber-500/10 border border-amber-500/20">
             <AlertCircle size={18} className="text-amber-400 shrink-0" />
             <p className="text-amber-400 text-[12px] font-semibold uppercase">Paga en el recinto antes del partido.</p>
@@ -174,7 +174,8 @@ export default function TicketPage() {
           </div>
         )}
 
-        {/* QR Code */}
+        {/* QR Code (solo sirve para ingresar: no en reservas canceladas) */}
+        {!isCancelled && (
         <div className="flex flex-col items-center py-3">
           <GlowCard isDark={isDark}>
             <div className="p-6 flex flex-col items-center">
@@ -185,6 +186,7 @@ export default function TicketPage() {
             </div>
           </GlowCard>
         </div>
+        )}
 
         {/* Actions */}
         <div className="space-y-3 pt-2">
