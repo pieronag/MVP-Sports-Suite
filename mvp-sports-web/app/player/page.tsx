@@ -15,6 +15,7 @@ import {
 } from "@/components/player/icons";
 import { venueService } from "@/services/player/venueService";
 import { getMatchWeather, MatchWeather } from "@/services/player/weather";
+import Onboarding from "@/components/player/Onboarding";
 
 // Solo destinos que no están en la barra inferior (Inicio, Reservas, Mapa, Perfil, Más)
 const quickItems = [
@@ -83,6 +84,7 @@ export default function PlayerDashboard() {
   const [nextBooking, setNextBooking] = useState<Booking | null>(null);
   const [allBookings, setAllBookings] = useState<Booking[]>([]);
   const [now, setNow] = useState(() => Date.now());
+  const [onboarded, setOnboarded] = useState(false);
   const [venues, setVenues] = useState<any[]>([]);
   const [weather, setWeather] = useState<MatchWeather | null>(null);
   useEffect(() => { venueService.getVenues().then(setVenues).catch(() => {}); }, []);
@@ -223,6 +225,11 @@ export default function PlayerDashboard() {
           </div>
           <ChevronRight size={18} className={muted} />
         </Link>
+
+        {/* Onboarding: solo si faltan deporte o comuna */}
+        {user?.uid && profile && (!(profile as any).mainSport || !(profile as any).city) && !onboarded && (
+          <Onboarding uid={user.uid} isDark={isDark} initial={{ mainSport: (profile as any).mainSport, city: (profile as any).city }} onDone={() => setOnboarded(true)} />
+        )}
 
         {/* Acción principal */}
         <Link href="/player/clubes" className="block rounded-md bg-emerald-500 active:scale-[0.99] transition-transform">
