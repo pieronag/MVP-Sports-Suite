@@ -62,7 +62,7 @@ export default function PlayerLayout() {
             screenOptions={{
                 headerShown: false,
                 animation: 'slide_from_right',
-                contentStyle: { backgroundColor: theme === 'dark' ? '#020617' : '#F8FAFC' }
+                contentStyle: { backgroundColor: theme === 'dark' ? '#020611' : '#F8FAFC' }
             }}
         >
             <Stack.Screen name="index" options={{ presentation: 'card' }} />

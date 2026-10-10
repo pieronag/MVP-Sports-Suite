@@ -41,8 +41,8 @@ const COLORS = {
         sub: '#64748B'
     },
     dark: {
-        bg: '#020617',
-        card: '#0F172A',
+        bg: '#020611',
+        card: '#0A101D',
         border: '#1E293B',
         text: '#F8FAFC',
         sub: '#94A3B8'
@@ -549,7 +549,7 @@ export default function PerfilScreen() {
 
             {/* ═══ VISTA DE CAPTURA PLAYER CARD (ESTILO TOPPS NOW 2026 - ELONGATED) ═══ */}
             <View style={{ position: 'absolute', left: -5000 }}>
-                <View ref={cardRef} collapsable={false} style={{ width: 750, height: 1250, backgroundColor: '#020617', borderRadius: 0, overflow: 'hidden' }}>
+                <View ref={cardRef} collapsable={false} style={{ width: 750, height: 1250, backgroundColor: '#020611', borderRadius: 0, overflow: 'hidden' }}>
 
                     {/* PLAYER IMAGE AS FULL BACKGROUND */}
                     <Image
@@ -618,7 +618,7 @@ export default function PerfilScreen() {
 
                         {/* Dark Info Bar (Full Width Banner) */}
                         <View style={{
-                            backgroundColor: '#020617',
+                            backgroundColor: '#020611',
                             width: '100%',
                             height: 90,
                             marginTop: -20,

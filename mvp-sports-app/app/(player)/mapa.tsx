@@ -26,8 +26,8 @@ const THEME = {
         sub: '#64748B'
     },
     dark: {
-        bg: '#020617',
-        card: '#0F172A',
+        bg: '#020611',
+        card: '#0A101D',
         border: 'rgba(255,255,255,0.05)',
         text: '#F8FAFC',
         sub: '#94A3B8'
@@ -389,9 +389,9 @@ export default function MapaBusquedaScreen() {
 
 // ESTILO DE MAPA DARK ELITE PRO
 const DARK_MAP_STYLE = [
-    { "elementType": "geometry", "stylers": [{ "color": "#020617" }] },
+    { "elementType": "geometry", "stylers": [{ "color": "#020611" }] },
     { "elementType": "labels.text.fill", "stylers": [{ "color": "#64748B" }] },
-    { "elementType": "labels.text.stroke", "stylers": [{ "color": "#020617" }] },
+    { "elementType": "labels.text.stroke", "stylers": [{ "color": "#020611" }] },
     { "featureType": "administrative", "geometry": "geometry", "stylers": [{ "color": "#1e293b" }] },
     { "featureType": "poi", "stylers": [{ "visibility": "off" }] },
     { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#0f172a" }] },

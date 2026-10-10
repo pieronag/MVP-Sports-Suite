@@ -27,8 +27,8 @@ const COLORS = {
         inputBg: '#F1F5F9'
     },
     dark: {
-        bg: '#020617',
-        card: '#0F172A',
+        bg: '#020611',
+        card: '#0A101D',
         border: '#1E293B',
         text: '#F8FAFC',
         sub: '#94A3B8',

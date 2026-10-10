@@ -30,8 +30,8 @@ const THEME = {
         sub: '#64748B'
     },
     dark: {
-        bg: '#020617',
-        card: '#0F172A',
+        bg: '#020611',
+        card: '#0A101D',
         border: 'rgba(255,255,255,0.05)',
         text: '#F8FAFC',
         sub: '#94A3B8'
