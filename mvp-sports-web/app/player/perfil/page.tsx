@@ -367,6 +367,19 @@ export default function PerfilPage() {
         </button>
       </div>
 
+      {/* Perfil público para compartir */}
+      <div className="px-5 mb-4">
+        <button onClick={async () => {
+          const url = `${window.location.origin}/jugador/${(profile as any)?.uid}`;
+          const text = `Mira mi perfil en MVP Sports: ${ovr} OVR`;
+          if ((navigator as any).share) { try { await (navigator as any).share({ title: "Mi perfil MVP", text, url }); return; } catch { return; } }
+          await navigator.clipboard?.writeText(url).catch(() => {});
+          window.open(url, "_blank", "noopener");
+        }} className={`w-full h-11 rounded-md text-[13px] font-semibold flex items-center justify-center gap-2 border ${isDark ? "border-white/[0.08] text-slate-200" : "border-slate-200 text-slate-700"}`}>
+          <Share2 size={16} /> Compartir mi perfil
+        </button>
+      </div>
+
       {/* Tu Carta MVP */}
       <div className="flex items-center gap-3 px-6 mb-4 mt-2">
         <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
