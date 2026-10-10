@@ -1,3 +1,4 @@
+import { PLAYER } from '../../../src/theme/player';
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import {
     View, Text, ScrollView, TouchableOpacity, ActivityIndicator,
@@ -94,7 +95,7 @@ export default function VenueDetailsScreen() {
     const { user, theme, profile } = useAuth();
     const router = useRouter();
     const isDark = theme === 'dark';
-    const C = isDark ? THEME.dark : THEME.light;
+    const C = { ...(isDark ? THEME.dark : THEME.light), soft: isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9' };
     const accent = THEME.accent;
     const scrollViewRef = useRef<ScrollView>(null);
     const userLoc = useUserLocation();
@@ -144,7 +145,7 @@ export default function VenueDetailsScreen() {
 
     const handleBack = useCallback(() => {
         if (bookingStep > 1) {
-            setBookingStep(prev => prev - 1);
+            setBookingStep(prev => (prev === 4 ? 2 : prev - 1));
         } else {
             router.back();
         }
@@ -178,10 +179,35 @@ export default function VenueDetailsScreen() {
         fetchSlots();
     }, [id, selectedCourtId, selectedDate]);
 
+    // Paso "Día y hora": horarios de todas las canchas del deporte; la cancha libre se asigna sola
+    const [slotsByCourt, setSlotsByCourt] = useState<Record<string, string[]>>({});
+    const [loadingAll, setLoadingAll] = useState(false);
+    useEffect(() => {
+        if (!id || bookingStep !== 2 || !selectedSport || !selectedDate) return;
+        let alive = true;
+        const norm = (v: string) => v ? v.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase() : '';
+        const sel = norm(selectedSport);
+        const list = courts.filter((c: any) => { const cs = norm(c.sport || ''); return (cs.includes(sel) || sel.includes(cs)) && c.status !== 'maintenance' && c.status !== 'occupied'; });
+        setLoadingAll(true);
+        Promise.all(list.map((c) => bookingService.getAvailableTimeSlots(id as string, c.id, selectedDate).then((t) => [c.id, t] as const).catch(() => [c.id, [] as string[]] as const)))
+            .then((pairs) => { if (alive) setSlotsByCourt(Object.fromEntries(pairs)); })
+            .finally(() => { if (alive) setLoadingAll(false); });
+        return () => { alive = false; };
+    }, [id, bookingStep, selectedSport, selectedDate, courts]);
+
     const availableSports = useMemo(() => {
         if (!venue?.pricing) return [];
         return Object.keys(venue.pricing).sort();
     }, [venue]);
+
+    const [autoSport, setAutoSport] = useState(false);
+    useEffect(() => {
+        if (autoSport || availableSports.length === 0) return;
+        const n = (v: string) => String(v || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+        const pick = availableSports.length === 1 ? availableSports[0] : availableSports.find((sp) => n(sp) === n((profile as any)?.mainSport));
+        if (pick) { setSelectedSport(pick); setBookingStep(2); }
+        setAutoSport(true);
+    }, [availableSports, profile, autoSport]);
 
     const filteredCourts = useMemo(() => {
         if (!selectedSport) return [];
@@ -418,7 +444,18 @@ export default function VenueDetailsScreen() {
 
                 {/* RESERVA WIZARD PRO */}
                 <View style={{ marginTop: 30 }}>
-                    <SectionLabel label={`Reserva • Paso ${bookingStep} / 4`} accent={accent} />
+                    <View style={{ flexDirection: 'row', gap: 6, paddingHorizontal: 20, marginBottom: 16 }}>
+                        {['Deporte', 'Día y hora', 'Confirmar'].map((label, i) => {
+                            const cur = bookingStep === 1 ? 0 : bookingStep === 4 ? 2 : 1;
+                            const done = cur > i, current = cur === i;
+                            return (
+                                <View key={label} style={{ flex: 1, gap: 6, alignItems: 'center' }}>
+                                    <View style={{ height: 4, alignSelf: 'stretch', borderRadius: 2, backgroundColor: done || current ? accent : C.soft }} />
+                                    <Text style={{ fontSize: PLAYER.font.xs, fontWeight: '600', color: current ? C.text : done ? accent : C.sub }}>{label}</Text>
+                                </View>
+                            );
+                        })}
+                    </View>
                     
                     {bookingStep === 1 && (
                         <View style={{ paddingHorizontal: 30 }}>
@@ -438,47 +475,89 @@ export default function VenueDetailsScreen() {
                         </View>
                     )}
 
-                    {bookingStep === 2 && (
-                        <View style={{ paddingHorizontal: 30 }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 25 }}>
-                                <View><Text style={{ color: C.text, fontSize: 22, fontWeight: '900' }}>¿Qué cancha prefieres?</Text><Text style={{ color: activeSportInfo.color, fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2 }}>{selectedSport}</Text></View>
-                                <TouchableOpacity onPress={() => setBookingStep(1)} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : C.border, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}><ChevronLeft color={accent} size={20} /></TouchableOpacity>
-                            </View>
-                            <View style={{ gap: 12 }}>
-                                {filteredCourts.map(court => (
-                                    <TouchableOpacity key={court.id} onPress={() => { setSelectedCourtId(court.id); setBookingStep(3); }} style={{ height: 85, backgroundColor: C.card, borderRadius: 25, borderWidth: 1, borderColor: selectedCourtId === court.id ? activeSportInfo.color : C.border, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 25, shadowColor: activeSportInfo.color, shadowOpacity: selectedCourtId === court.id ? 0.15 : 0, shadowRadius: 10 }}>
-                                        <View style={{ width: 45, height: 45, borderRadius: 12, backgroundColor: activeSportInfo.color + '10', alignItems: 'center', justifyContent: 'center' }}><activeSportInfo.courtIcon color={activeSportInfo.color} size={20} /></View>
-                                        <View style={{ flex: 1, marginLeft: 20 }}><Text style={{ color: C.text, fontSize: 17, fontWeight: '900' }}>{court.name}</Text><Text style={{ color: C.sub, fontSize: 10, fontWeight: '800', textTransform: 'uppercase' }}>Infraestructura Pro</Text></View>
-                                        <ChevronRight color={C.sub} size={20} />
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
-                        </View>
-                    )}
-
-                    {bookingStep === 3 && (
-                        <View style={{ paddingHorizontal: 30 }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 25 }}><Text style={{ color: C.text, fontSize: 22, fontWeight: '900' }}>Define tu Horario</Text><TouchableOpacity onPress={() => setBookingStep(2)} style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : C.border, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}><ChevronLeft color={accent} size={20} /></TouchableOpacity></View>
-                            
-                            <View style={{ backgroundColor: C.card, borderRadius: 30, padding: 20, borderWidth: 1, borderColor: C.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 25, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 10 }}>
-                                <TouchableOpacity onPress={() => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() - 1); const today = new Date(getOperationalDate() + 'T00:00:00'); if (d >= today) setSelectedDate(getLocalISODate(d)); }} style={{ width: 44, height: 44, borderRadius: 15, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}><ChevronLeft color={activeSportInfo.color} size={20} /></TouchableOpacity>
-                                <View style={{ alignItems: 'center' }}><Text style={{ color: C.sub, fontSize: 10, fontWeight: '900', textTransform: 'uppercase' }}>{new Date(selectedDate + 'T12:00:00').toLocaleDateString('es-CL', { weekday: 'long' })}</Text><Text style={{ color: C.text, fontSize: 20, fontWeight: '900', letterSpacing: -1 }}>{new Date(selectedDate + 'T12:00:00').toLocaleDateString('es-CL', { day: 'numeric', month: 'long' })}</Text></View>
-                                <TouchableOpacity onPress={() => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() + 1); setSelectedDate(getLocalISODate(d)); }} style={{ width: 44, height: 44, borderRadius: 15, backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : '#F8FAFC', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.border }}><ChevronRight color={activeSportInfo.color} size={20} /></TouchableOpacity>
-                            </View>
-
-                            {loadingSlots ? <ActivityIndicator color={accent} style={{ margin: 40 }} /> : (
-                                <View>
-                                    <SlotGroup title="Mañana" icon={<Sunrise color={accent} size={14} />} slots={groupedSlots.mañana} selectedTime={selectedTime} onSelect={(t: string) => { setSelectedTime(t); setBookingStep(4); }} C={C} activeColor={activeSportInfo.color} selectedDate={selectedDate} isDark={isDark} />
-                                    <SlotGroup title="Tarde" icon={<Sun color={accent} size={14} />} slots={groupedSlots.tarde} selectedTime={selectedTime} onSelect={(t: string) => { setSelectedTime(t); setBookingStep(4); }} C={C} activeColor={activeSportInfo.color} selectedDate={selectedDate} isDark={isDark} />
-                                    <SlotGroup title="Noche" icon={<Moon color={accent} size={14} />} slots={groupedSlots.noche} selectedTime={selectedTime} onSelect={(t: string) => { setSelectedTime(t); setBookingStep(4); }} C={C} activeColor={activeSportInfo.color} selectedDate={selectedDate} isDark={isDark} />
+                    {bookingStep === 2 && (() => {
+                        const order = (t: string) => { const [h, m] = t.split(':').map(Number); return h < 6 ? (h + 24) * 60 + m : h * 60 + m; };
+                        const isToday = selectedDate === getOperationalDate();
+                        const nowMin = order(`${new Date().getHours()}:${new Date().getMinutes()}`);
+                        const allTimes = Array.from(new Set(Object.values(slotsByCourt).flat())).filter((t) => !isToday || order(t) > nowMin).sort((a, b) => order(a) - order(b));
+                        const courtsAt = (t: string) => filteredCourts.filter((c) => (slotsByCourt[c.id] || []).includes(t));
+                        const priceOf = (c: any, t: string) => Number(venue?.pricing?.[selectedSport!]?.[t] || venue?.pricing?.[selectedSport!]?.default || c?.price || 0);
+                        const periodOf = (t: string) => { const h = Number(t.split(':')[0]); return h >= 6 && h < 12 ? 'Mañana' : h >= 12 && h < 18 ? 'Tarde' : 'Noche'; };
+                        const free = selectedTime ? courtsAt(selectedTime) : [];
+                        const pick = (t: string) => { setSelectedTime(t); const f = courtsAt(t); if (!f.some((c) => c.id === selectedCourtId)) setSelectedCourtId(f[0]?.id || null); };
+                        const shiftDay = (delta: number) => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() + delta); const today = new Date(getOperationalDate() + 'T00:00:00'); if (d >= today) { setSelectedDate(getLocalISODate(d)); setSelectedTime(null); } };
+                        return (
+                            <View style={{ paddingHorizontal: 20 }}>
+                                <View style={{ backgroundColor: C.card, borderRadius: PLAYER.radius, padding: 12, borderWidth: 1, borderColor: C.border, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                                    <TouchableOpacity accessibilityLabel="Día anterior" onPress={() => shiftDay(-1)} style={{ width: 40, height: 40, borderRadius: PLAYER.radius, alignItems: 'center', justifyContent: 'center', backgroundColor: C.soft }}><ChevronLeft color={accent} size={18} /></TouchableOpacity>
+                                    <View style={{ alignItems: 'center' }}>
+                                        <Text style={{ color: C.sub, fontSize: PLAYER.font.xs, fontWeight: '600', textTransform: 'capitalize' }}>{isToday ? 'Hoy' : new Date(selectedDate + 'T12:00:00').toLocaleDateString('es-CL', { weekday: 'long' })}</Text>
+                                        <Text style={{ color: C.text, fontSize: PLAYER.font.xl, fontWeight: '700' }}>{new Date(selectedDate + 'T12:00:00').toLocaleDateString('es-CL', { day: 'numeric', month: 'long' })}</Text>
+                                    </View>
+                                    <TouchableOpacity accessibilityLabel="Día siguiente" onPress={() => shiftDay(1)} style={{ width: 40, height: 40, borderRadius: PLAYER.radius, alignItems: 'center', justifyContent: 'center', backgroundColor: C.soft }}><ChevronRight color={accent} size={18} /></TouchableOpacity>
                                 </View>
-                            )}
-                        </View>
-                    )}
+
+                                {filteredCourts.length === 0 ? (
+                                    <Text style={{ color: C.sub, fontSize: PLAYER.font.md, textAlign: 'center', paddingVertical: 24 }}>No hay canchas disponibles para este deporte</Text>
+                                ) : loadingAll ? (
+                                    <ActivityIndicator color={accent} style={{ margin: 32 }} />
+                                ) : allTimes.length === 0 ? (
+                                    <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+                                        <Text style={{ color: C.sub, fontSize: PLAYER.font.md }}>No quedan horarios este día</Text>
+                                        <TouchableOpacity onPress={() => shiftDay(1)} style={{ marginTop: 12, paddingHorizontal: 20, height: 40, borderRadius: PLAYER.radius, backgroundColor: accent, justifyContent: 'center' }}><Text style={{ color: 'white', fontWeight: '600', fontSize: PLAYER.font.md }}>Ver el día siguiente</Text></TouchableOpacity>
+                                    </View>
+                                ) : (
+                                    <View>
+                                        {['Mañana', 'Tarde', 'Noche'].map((period) => {
+                                            const times = allTimes.filter((t) => periodOf(t) === period);
+                                            if (!times.length) return null;
+                                            return (
+                                                <View key={period} style={{ marginBottom: 14 }}>
+                                                    <Text style={{ color: C.sub, fontSize: PLAYER.font.sm, fontWeight: '600', marginBottom: 8 }}>{period}</Text>
+                                                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                                                        {times.map((t) => {
+                                                            const on = selectedTime === t;
+                                                            return (
+                                                                <TouchableOpacity key={t} onPress={() => pick(t)} style={{ width: '23%', height: 44, borderRadius: PLAYER.radius, alignItems: 'center', justifyContent: 'center', backgroundColor: on ? accent : C.soft }}>
+                                                                    <Text style={{ color: on ? 'white' : C.text, fontSize: PLAYER.font.base, fontWeight: '600' }}>{t}</Text>
+                                                                </TouchableOpacity>
+                                                            );
+                                                        })}
+                                                    </View>
+                                                </View>
+                                            );
+                                        })}
+
+                                        {selectedTime && free.length > 0 && (
+                                            <View style={{ borderTopWidth: 1, borderTopColor: C.border, paddingTop: 14, marginTop: 4 }}>
+                                                <Text style={{ color: C.sub, fontSize: PLAYER.font.sm, fontWeight: '600', marginBottom: 8 }}>{free.length === 1 ? 'Cancha disponible' : `Cancha · ${free.length} libres a las ${selectedTime}`}</Text>
+                                                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                                                    {free.map((c: any) => {
+                                                        const on = selectedCourtId === c.id;
+                                                        return (
+                                                            <TouchableOpacity key={c.id} onPress={() => setSelectedCourtId(c.id)} style={{ paddingHorizontal: 14, paddingVertical: 10, borderRadius: PLAYER.radius, borderWidth: 1, borderColor: on ? accent : C.border, backgroundColor: on ? accent + '1A' : 'transparent' }}>
+                                                                <Text style={{ color: C.text, fontSize: PLAYER.font.md, fontWeight: '600' }}>{c.name}</Text>
+                                                                <Text style={{ color: accent, fontSize: PLAYER.font.sm, fontWeight: '600' }}>${priceOf(c, selectedTime).toLocaleString('es-CL')}</Text>
+                                                                {c.surface ? <Text style={{ color: C.sub, fontSize: PLAYER.font.xs }}>{c.surface}</Text> : null}
+                                                            </TouchableOpacity>
+                                                        );
+                                                    })}
+                                                </ScrollView>
+                                                <TouchableOpacity disabled={!selectedCourtId} onPress={() => setBookingStep(4)} style={{ marginTop: 14, height: 48, borderRadius: PLAYER.radius, backgroundColor: accent, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8, opacity: selectedCourtId ? 1 : 0.5 }}>
+                                                    <Text style={{ color: 'white', fontSize: PLAYER.font.base, fontWeight: '700' }}>Continuar</Text>
+                                                    <ChevronRight color="white" size={16} />
+                                                </TouchableOpacity>
+                                            </View>
+                                        )}
+                                    </View>
+                                )}
+                            </View>
+                        );
+                    })()}
 
                     {bookingStep === 4 && (
                         <View style={{ paddingHorizontal: 30 }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 25 }}><Text style={{ color: C.text, fontSize: 24, fontWeight: '900' }}>Resumen Elite</Text><TouchableOpacity onPress={() => setBookingStep(3)} style={{ backgroundColor: activeSportInfo.color + '15', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 10 }}><Text style={{ color: activeSportInfo.color, fontWeight: '900', fontSize: 11 }}>EDITAR</Text></TouchableOpacity></View>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 25 }}><Text style={{ color: C.text, fontSize: 24, fontWeight: '900' }}>Resumen Elite</Text><TouchableOpacity onPress={() => setBookingStep(2)} style={{ backgroundColor: activeSportInfo.color + '15', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 10 }}><Text style={{ color: activeSportInfo.color, fontWeight: '900', fontSize: 11 }}>EDITAR</Text></TouchableOpacity></View>
                             
                             <View style={{ backgroundColor: C.card, borderRadius: 35, padding: 30, borderWidth: 1, borderColor: activeSportInfo.color + '30', shadowColor: activeSportInfo.color, shadowOpacity: 0.1, shadowRadius: 20 }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 25 }}>
