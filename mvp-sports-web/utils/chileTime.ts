@@ -16,3 +16,20 @@ export function hoursUntilStart(booking: any, now: Date = new Date()): number | 
   if (!date || isNaN(date.getTime()) || !booking.startTime) return null;
   return (chileWallClock(date, booking.startTime) - chileWallClock(now)) / 3_600_000;
 }
+
+// Instante de "fecha + hora" en America/Santiago (el offset cambia -03/-04 según horario de verano)
+export function chileDateTime(dateStr: string, h: number, m: number, addDays = 0): Date {
+  const [y, mo, d] = dateStr.split("-").map(Number);
+  for (const offset of [3, 4]) {
+    const candidate = new Date(Date.UTC(y, mo - 1, d + addDays, h + offset, m));
+    const hourInChile = Number(new Intl.DateTimeFormat("en-US", { timeZone: "America/Santiago", hour: "numeric", hourCycle: "h23" }).format(candidate));
+    if (hourInChile === h) return candidate;
+  }
+  return new Date(Date.UTC(y, mo - 1, d + addDays, h + 3, m));
+}
+
+// Inicio real de un bloque del día operativo (antes de las 06:00 pertenece al día siguiente)
+export function slotInstant(dateStr: string, time: string): Date {
+  const [h, m] = time.split(":").map(Number);
+  return chileDateTime(dateStr, h, m || 0, h < 6 ? 1 : 0);
+}

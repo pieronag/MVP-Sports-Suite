@@ -1,6 +1,8 @@
 import "server-only";
 import crypto from "crypto";
 import { couponIssue, couponUses } from "@/utils/coupon";
+import { chileDateTime } from "@/utils/chileTime";
+import { courtBlockedAt } from "@/utils/courtAvailability";
 import { syncBooking } from "@/services/server/bookingProjections";
 import { adminDb } from "@/services/server/firebase-admin";
 import { resolveMercadoPagoToken } from "@/services/server/tenant-secrets";
@@ -34,17 +36,6 @@ async function resolveCoupon(code: string | undefined, tenantId: string, price: 
   const issue = couponIssue(c, { tenantId, price });
   if (issue) throw new PaymentError(issue);
   return { id: doc.id, code: c.code as string, discount: Number(c.discount) || 0, type: (c.type || "percentage") as string };
-}
-
-// Instante de "fecha + hora" en America/Santiago (el offset cambia -03/-04 según horario de verano)
-function chileDateTime(dateStr: string, h: number, m: number, addDays = 0): Date {
-  const [y, mo, d] = dateStr.split("-").map(Number);
-  for (const offset of [3, 4]) {
-    const candidate = new Date(Date.UTC(y, mo - 1, d + addDays, h + offset, m));
-    const hourInChile = Number(new Intl.DateTimeFormat("en-US", { timeZone: "America/Santiago", hour: "numeric", hourCycle: "h23" }).format(candidate));
-    if (hourInChile === h) return candidate;
-  }
-  return new Date(Date.UTC(y, mo - 1, d + addDays, h + 3, m));
 }
 
 const VALID_DATE =/^\d{4}-\d{2}-\d{2}$/;
@@ -90,6 +81,10 @@ export async function buildBookingCheckout(uid: string, input: BookingCheckoutIn
   // Fecha real del bloque (antes de las 06:00 pertenece al día siguiente)
   const [sh, sm] = startTime.split(":").map(Number);
   const bookingDate = chileDateTime(date, sh, sm || 0, sh < 6 ? 1 : 0);
+
+  if (courtBlockedAt(court, bookingDate.getTime(), bookingDate.getTime() + 3_600_000)) {
+    throw new PaymentError("Esa cancha está en mantenimiento en ese horario", 409);
+  }
 
   // Bloque ya tomado
   const taken = await db.collection("bookings")

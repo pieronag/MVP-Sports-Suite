@@ -1,5 +1,7 @@
 "use client";
 import WhatsappLogo from "@/components/icons/WhatsappLogo";
+import { courtBlockedAt } from "@/utils/courtAvailability";
+import { slotInstant } from "@/utils/chileTime";
 import { GlowCard, SectionPill } from "@/components/player/ui";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -339,10 +341,13 @@ export default function VenueDetailPage() {
   );
 
   // Paso 3: primero la hora (todas las canchas del deporte), luego la cancha libre se asigna sola
-  const bookableCourts = filteredCourts.filter((c: any) => c.status !== "maintenance" && c.status !== "occupied");
+  const bookableCourts = filteredCourts.filter((c: any) => c.status !== "occupied");
   const slotOrder = (t: string) => { const [h, m] = t.split(":").map(Number); return h < 6 ? (h + 24) * 60 + m : h * 60 + m; };
   const allTimes = Array.from(new Set(Object.values(slotsByCourt).flat())).sort((a, b) => slotOrder(a) - slotOrder(b));
-  const courtsAt = (t: string) => bookableCourts.filter((c) => (slotsByCourt[c.id] || []).includes(t));
+  const courtsAt = (t: string) => {
+    const start = slotInstant(selectedDate, t).getTime();
+    return bookableCourts.filter((c) => (slotsByCourt[c.id] || []).includes(t) && !courtBlockedAt(c, start, start + 3_600_000));
+  };
   const pickTime = (t: string) => {
     setSelectedTime(t);
     const free = courtsAt(t);
@@ -373,7 +378,7 @@ export default function VenueDetailPage() {
             <p className={`text-[13px] font-medium py-6 text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay canchas disponibles para este deporte</p>
           ) : loadingAllSlots ? (
             <div className="flex justify-center py-8"><div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
-          ) : allTimes.filter((t) => !isPastSlot(t)).length === 0 ? (
+          ) : allTimes.filter((t) => !isPastSlot(t) && courtsAt(t).length > 0).length === 0 ? (
             <div className="py-6 text-center">
               <p className={`text-[13px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>No quedan horarios este día</p>
               <button onClick={() => setDateOffset((d) => d + 1)} className="mt-3 px-5 h-10 rounded-md text-[12px] font-semibold bg-emerald-500 text-white">Ver el día siguiente</button>
@@ -381,7 +386,7 @@ export default function VenueDetailPage() {
           ) : (
             <div className="space-y-4">
               {Object.keys(periods).map((pk) => {
-                const times = allTimes.filter((t) => periodOf(t) === pk && !isPastSlot(t));
+                const times = allTimes.filter((t) => periodOf(t) === pk && !isPastSlot(t) && courtsAt(t).length > 0);
                 if (!times.length) return null;
                 return (
                   <div key={pk}>
