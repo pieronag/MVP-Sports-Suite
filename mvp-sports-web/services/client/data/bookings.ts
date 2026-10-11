@@ -1,6 +1,6 @@
 // Acceso a reservas desde el navegador. Las pantallas usan estas funciones en vez de consultar Firestore directo:
 // devuelven siempre el modelo normalizado (types/booking.ts).
-import { collection, getDocs, onSnapshot, query, where, Timestamp, type QueryConstraint } from "firebase/firestore";
+import { collection, getDocs, limit, onSnapshot, orderBy, query, where, Timestamp, type QueryConstraint } from "firebase/firestore";
 import { db } from "@/services/client/firebase";
 import { normalizeBooking } from "@/utils/bookingModel";
 import type { Booking, RawDoc } from "@/types/booking";
@@ -49,4 +49,14 @@ export function watchBookings(tenantIds: string[], range: BookingRange, onData: 
     if (parts.size === qs.length) emit();
   }, (e) => { parts.set(i, new Map()); onError?.(e); if (parts.size === qs.length) emit(); }));
   return () => unsubs.forEach((u) => u());
+}
+
+// Administración: reservas de toda la plataforma en un rango (sin rango, las más recientes hasta `max`)
+export async function listAllBookings(range: BookingRange = {}, max = 5000): Promise<Booking[]> {
+  const c: QueryConstraint[] = [];
+  if (range.from) c.push(where("date", ">=", Timestamp.fromDate(range.from)));
+  if (range.to) c.push(where("date", "<=", Timestamp.fromDate(range.to)));
+  c.push(orderBy("date", "desc"), limit(max));
+  const snap = await getDocs(query(collection(db, "bookings"), ...c));
+  return snap.docs.map((d) => normalizeBooking(d.id, d.data() as RawDoc));
 }

@@ -1,5 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { listAllBookings } from "@/services/client/data/bookings";
+import { countsAsIncome } from "@/utils/bookingModel";
+import { chileDateTime } from "@/utils/chileTime";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -40,6 +43,7 @@ export default function MetricsPage() {
     const [planCommissions, setPlanCommissions] = useState<Record<string, number>>({});
     const [rawInvoices, setRawInvoices] = useState<any[]>([]);
     const [rawBookings, setRawBookings] = useState<any[]>([]);
+    const [bookingsError, setBookingsError] = useState('');
     const [rawTenants, setRawTenants] = useState<any[]>([]);
     const [financialData, setFinancialData] = useState<any[]>([]);
     const [tenantsDebt, setTenantsDebt] = useState<any[]>([]);
@@ -61,9 +65,6 @@ export default function MetricsPage() {
         const unsubInvoices = onSnapshot(query(collection(db, "invoices"), orderBy("issueDate", "desc")), (snap: any) => {
             setRawInvoices(snap.docs.map((d: any) => ({ ...d.data(), id: d.id })));
         });
-        const unsubBookings = onSnapshot(query(collection(db, "bookings"), orderBy("date", "desc"), limit(1000)), (snap: any) => {
-            setRawBookings(snap.docs.map((d: any) => ({ ...d.data(), id: d.id })));
-        });
         const unsubSettings = onSnapshot(doc(db, "settings", "global"), (snap: any) => {
             if (!snap.exists()) return;
             const data = snap.data();
@@ -82,7 +83,7 @@ export default function MetricsPage() {
         const unsubTenants = onSnapshot(collection(db, "tenants"), (snap: any) => {
             setRawTenants(snap.docs.map((d: any) => ({ ...d.data(), id: d.id })));
         });
-        return () => { unsubInvoices(); unsubBookings(); unsubSettings(); unsubTenants(); };
+        return () => { unsubInvoices(); unsubSettings(); unsubTenants(); };
     }, [selectedMonth]);
 
     const globalRate = commissionRate;
@@ -103,6 +104,26 @@ export default function MetricsPage() {
         if (key && planPrices[key] !== undefined) return planPrices[key];
         return 0;
     };
+
+    // Reservas del mes elegido y del anterior; solo las que generan ingreso (antes: últimas 1000 de todo tipo,
+    // incluidas anuladas, reembolsadas y checkouts sin pagar, que inflaban el volumen y las comisiones)
+    useEffect(() => {
+        let active = true;
+        const [y, m] = selectedMonth.split('-').map(Number);
+        const ymd = (yy: number, mm: number) => `${yy}-${String(mm).padStart(2, '0')}-01`;
+        const prev = new Date(Date.UTC(y, m - 2, 1));
+        const next = new Date(Date.UTC(y, m, 1));
+        const from = chileDateTime(ymd(prev.getUTCFullYear(), prev.getUTCMonth() + 1), 0, 0);
+        const to = new Date(chileDateTime(ymd(next.getUTCFullYear(), next.getUTCMonth() + 1), 0, 0).getTime() - 1);
+        listAllBookings({ from, to })
+            .then(list => {
+                if (!active) return;
+                setRawBookings(list.filter(countsAsIncome).map(b => ({ ...b.raw, id: b.id, totalPrice: b.price, price: b.price, date: { toDate: () => b.start || new Date(0) } })));
+                setBookingsError('');
+            })
+            .catch((e) => { console.error(e); if (active) setBookingsError('No se pudieron cargar las reservas del periodo.'); });
+        return () => { active = false; };
+    }, [selectedMonth]);
 
     useEffect(() => {
         if (rawInvoices.length === 0 && rawBookings.length === 0 && rawTenants.length === 0) return;
@@ -347,6 +368,9 @@ export default function MetricsPage() {
 
     return (
         <div className="w-full space-y-6 pb-12 animate-fadeIn relative">
+            {bookingsError && (
+                <div role="alert" className="p-4 rounded-md border border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-400 text-[11px] font-bold">{bookingsError}</div>
+            )}
             {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
                 <div>

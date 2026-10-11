@@ -1,5 +1,9 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { listAllBookings } from "@/services/client/data/bookings";
+import { isReal, countsAsIncome } from "@/utils/bookingModel";
+import { chileDateTime } from "@/utils/chileTime";
+import type { Booking } from "@/types/booking";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     Calendar03Icon,
@@ -89,7 +93,8 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [tenantsMap, setTenantsMap] = useState<Record<string, string>>({});
     const [tenantPlanMap, setTenantPlanMap] = useState<Record<string, string>>({});
-    const [rawBookings, setRawBookings] = useState<any[]>([]);
+    const [rawBookings, setRawBookings] = useState<Booking[]>([]);
+    const [bookingsError, setBookingsError] = useState('');
     const [rawInvoices, setRawInvoices] = useState<any[]>([]);
     const [recentBookings, setRecentBookings] = useState<any[]>([]);
     const [commissionRate, setCommissionRate] = useState(8);
@@ -163,10 +168,6 @@ export default function AdminDashboard() {
             setRawInvoices(invoicesSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
         }, (error: any) => console.error("Error invoices snapshot:", error));
 
-        const qBookings = query(collection(db, "bookings"), orderBy("date", "desc"), limit(1000));
-        const unsubscribeBookings = onSnapshot(qBookings, (bookingsSnap: any) => {
-            setRawBookings(bookingsSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
-        }, (error: any) => console.error("Error bookings snapshot:", error));
 
         // Conteo agregado cada 60 s (antes: listener en vivo sobre TODOS los usuarios, con sus fotos)
         const refreshUsers = () => getCountFromServer(collection(db, "users"))
@@ -205,16 +206,27 @@ export default function AdminDashboard() {
         }, (error: any) => console.error("Error settings snapshot:", error));
 
         return () => {
-            unsubscribeTenants(); unsubscribeInvoices(); unsubscribeBookings();
+            unsubscribeTenants(); unsubscribeInvoices();
             unsubUsers(); unsubAudit(); unsubSettings();
         };
     }, [selectedMonth, refreshKey, planList]);
 
+    // Reservas del mes elegido (antes: las últimas 1000 de toda la plataforma, que se quedaban cortas)
+    useEffect(() => {
+        let active = true;
+        const [y, m] = selectedMonth.split('-').map(Number);
+        const next = new Date(Date.UTC(y, m, 1));
+        const ymd = (yy: number, mm: number) => `${yy}-${String(mm).padStart(2, '0')}-01`;
+        const range = isHistorical ? {} : { from: chileDateTime(ymd(y, m), 0, 0), to: new Date(chileDateTime(ymd(next.getUTCFullYear(), next.getUTCMonth() + 1), 0, 0).getTime() - 1) };
+        listAllBookings(range)
+            .then(list => { if (active) { setRawBookings(list.filter(isReal)); setBookingsError(''); } })
+            .catch((e) => { console.error(e); if (active) setBookingsError('No se pudieron cargar las reservas de la plataforma.'); });
+        return () => { active = false; };
+    }, [selectedMonth, isHistorical, refreshKey]);
+
     useEffect(() => {
         if (rawInvoices.length === 0 && rawBookings.length === 0) return;
         const [year, month] = selectedMonth.split('-').map(Number);
-        const startOfMonth = new Date(year, month - 1, 1);
-        const endOfMonth = new Date(year, month, 0, 23, 59, 59);
 
         let calculatedRevenue = 0;
         let totalRevenueAllTime = 0;
@@ -238,15 +250,12 @@ export default function AdminDashboard() {
             }
         });
 
-        const filteredBookings = rawBookings.filter(b => {
-            if (isHistorical) return (b.status === 'confirmed' || b.status === 'completed');
-            const bDate = b.date?.toDate ? b.date.toDate() : new Date(b.date);
-            return bDate >= startOfMonth && bDate <= endOfMonth && (b.status === 'confirmed' || b.status === 'completed');
-        });
+        // Reservas que generan ingreso: pagadas vigentes (con o sin check-in) e inasistencias
+        const filteredBookings = rawBookings.filter(countsAsIncome);
 
         const monthBookingsRevenue = filteredBookings.reduce((acc, b) => {
-            const p = Number(b.totalPrice || b.price || 0);
-            if (b.commissionFee) return acc + Number(b.commissionFee);
+            const p = b.price;
+            if (b.raw.commissionFee) return acc + Number(b.raw.commissionFee);
             const planRef = (tenantPlanMap[b.tenantId] || '').toLowerCase();
             const plan = planList.find(pl => pl.id.toLowerCase() === planRef || pl.name.toLowerCase() === planRef);
             const rate = plan ? plan.commission : commissionRate;
@@ -267,14 +276,15 @@ export default function AdminDashboard() {
         const tRev: any = {};
         filteredBookings.forEach(b => {
             const tid = b.tenantId || 'desconocido';
-            tRev[tid] = (tRev[tid] || 0) + (Number(b.totalPrice || b.price || 0));
+            tRev[tid] = (tRev[tid] || 0) + b.price;
         });
         setTopTenants(Object.keys(tRev).map(tid => {
             const name = tenantsMap[tid] || filteredBookings.find(b => b.tenantId === tid)?.tenantName || 'Recinto externo';
             return { name, value: tRev[tid] };
         }).sort((a, b) => b.value - a.value).slice(0, 5));
 
-        setRecentBookings(filteredBookings.slice(0, 8));
+        // Vista de tabla: campos crudos + los normalizados (precio, estado de pago)
+        setRecentBookings(filteredBookings.slice(0, 8).map(b => ({ ...b.raw, id: b.id, totalPrice: b.price, startTime: b.startTime, date: b.raw.date, paymentStatus: b.isNoShow ? 'no-show' : b.payment })));
         const usageDensity = kpis.tenants > 0 ? filteredBookings.length / kpis.tenants : 0;
         const bookingsByTenant: any = {};
         filteredBookings.forEach(b => {
@@ -315,6 +325,12 @@ export default function AdminDashboard() {
 
     return (
         <div className="w-full space-y-6 pb-10 text-left relative animate-fadeIn">
+            {bookingsError && (
+                <div role="alert" className="flex items-center justify-between gap-3 p-4 rounded-md border border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-400">
+                    <p className="text-[11px] font-bold">{bookingsError}</p>
+                    <button onClick={() => setRefreshKey(k => k + 1)} className="px-4 py-2 rounded-md bg-red-500 text-white text-[10px] font-bold uppercase">Reintentar</button>
+                </div>
+            )}
             {/* CABECERA */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
                 <div>
@@ -583,9 +599,6 @@ export default function AdminDashboard() {
                                         <td className="px-6 py-4 text-center">
                                             <div className="flex flex-col items-center gap-1">
                                                 <span className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{formatCLP(b.totalPrice || b.price || 0)}</span>
-                                                {Number(b.deposit) > 0 && b.paymentStatus === 'partial' && (
-                                                    <span className="text-[9px] font-bold text-amber-500 uppercase">Seña: {formatCLP(b.deposit)}</span>
-                                                )}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
