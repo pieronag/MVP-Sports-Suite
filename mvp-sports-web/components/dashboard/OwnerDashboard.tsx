@@ -1,6 +1,5 @@
 "use client";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { isRealBooking } from "@/utils/bookingPolicy";
 import React, { useState, useEffect } from 'react';
 import {
     Add01Icon,
@@ -24,11 +23,14 @@ import {
     UserGroupIcon,
     Wrench01Icon,
 } from '@hugeicons/core-free-icons';
-import { collection, query, where, orderBy, Timestamp, onSnapshot, or } from 'firebase/firestore';
-import { db } from '@/services/client/firebase';
 import { useAuth } from '@/context/AuthContext';
 import { PanelGlass, TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';
 import { ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
+import { watchBookings } from '@/services/client/data/bookings';
+import { watchOwnedVenues, watchCourtsInMaintenance, type VenueSummary, type CourtMaintenance } from '@/services/client/data/venues';
+import { isReal, bookingLabel } from '@/utils/bookingModel';
+import { rangeFor, summarizeRevenue, type TimeRange } from '@/utils/revenueSummary';
+import type { Booking } from '@/types/booking';
 
 // --- UTILIDADES ---
 const formatCLP = (amount: number) => {
@@ -42,205 +44,68 @@ const formatCLP = (amount: number) => {
 const VOLT = '#00df82';
 const VOLT_DARK = '#00c16f';
 
-// --- INTERFACES ---
-interface Booking {
-    id: string;
-    totalPrice: number;
-    date: Timestamp;
-    status: string;
-    paymentStatus: string;
-    tenantId: string;
-    tenantName?: string;
-    clientName: string;
-    courtName: string;
-    startTime: string;
-    checkIn?: boolean;
-}
-
-interface Venue {
-    id: string;
-    name: string;
-    address: string;
-    status: string;
-    pricing?: {
-        [sport: string]: { [hour: string]: number }
-    };
-}
+const BADGE_STYLE: Record<string, string> = {
+    'Pagado': 'bg-emerald-500 text-white', 'Anulada': 'bg-slate-500 text-white', 'Reembolsado': 'bg-sky-500 text-white',
+    'Inasistencia': 'bg-red-500 text-white', 'Error en reembolso': 'bg-amber-500 text-white',
+};
 
 export default function OwnerDashboard() {
     const { user } = useAuth();
 
     const [loading, setLoading] = useState(true);
-    const [kpis, setKpis] = useState({
-        revenueMonth: 0,
-        revenueToday: 0,
-        bookingsMonth: 0,
-        activeVenues: 0,
-        pendingPayments: 0,
-        maintenanceCount: 0
-    });
-    const [revenueHistory, setRevenueHistory] = useState<any[]>([]);
-    const [venuesDistribution, setVenuesDistribution] = useState<any[]>([]);
-    const [myVenues, setMyVenues] = useState<Venue[]>([]);
-    const [recentBookings, setRecentBookings] = useState<Booking[]>([]);
+    const [myVenues, setMyVenues] = useState<VenueSummary[]>([]);
+    const [bookings, setBookings] = useState<Booking[]>([]);
+    const [maintenanceAlerts, setMaintenanceAlerts] = useState<CourtMaintenance[]>([]);
 
     const [selectedVenueId, setSelectedVenueId] = useState<string>('all');
-    const [timeRange, setTimeRange] = useState<'today' | '7d' | '30d' | 'month'>('month');
-    const [paymentFilter, setPaymentFilter] = useState<'all' | 'paid' | 'pending' | 'partial' | 'noshow'>('all');
-    const [maintenanceAlerts, setMaintenanceAlerts] = useState<any[]>([]);
+    const [timeRange, setTimeRange] = useState<TimeRange>('month');
+    const [paymentFilter, setPaymentFilter] = useState<'all' | 'paid' | 'noshow'>('all');
     const [toast, setToast] = useState<{ msg: string, type: 'success' | 'error' | 'info' } | null>(null);
 
     const showToast = (msg: string, type: 'success' | 'error' | 'info') => {
         setToast({ msg, type });
-        setTimeout(() => setToast(null), 3000);
+        setTimeout(() => setToast(null), 4000);
+    };
+    const onLoadError = (e: Error) => {
+        console.error(e);
+        showToast((e as any)?.code === 'permission-denied' ? 'No tienes permiso para ver estos datos' : 'No se pudieron cargar los datos. Revisa tu conexión.', 'error');
+        setLoading(false);
     };
 
-    // --- CARGA DE DATOS (REAL-TIME) ---
+    // --- CARGA DE DATOS (EN VIVO) ---
     useEffect(() => {
         if (!user?.uid) return;
+        return watchOwnedVenues(user.uid, (v) => { setMyVenues(v); if (!v.length) setLoading(false); }, onLoadError);
+    }, [user?.uid]);
 
+    const venueIds = selectedVenueId === 'all' ? myVenues.map(v => v.id) : [selectedVenueId];
+    const venueKey = venueIds.join(',');
+
+    useEffect(() => {
+        if (!venueIds.length) return;
         setLoading(true);
-        const qTenants = query(collection(db, "tenants"), or(where("ownerId", "==", user.uid), where("ownerIds", "array-contains", user.uid)));
-        const unsubscribeTenants = onSnapshot(qTenants, (snap) => {
-            const venuesList = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Venue));
-            setMyVenues(venuesList);
-            setKpis(prev => ({ ...prev, activeVenues: venuesList.filter(v => v.status === 'Activo').length }));
+        const unsubB = watchBookings(venueIds, rangeFor(timeRange), (list) => { setBookings(list.filter(isReal)); setLoading(false); }, onLoadError);
+        const unsubM = watchCourtsInMaintenance(venueIds, setMaintenanceAlerts, onLoadError);
+        return () => { unsubB(); unsubM(); };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [venueKey, timeRange]);
 
-            if (venuesList.length === 0) {
-                setLoading(false);
-                return;
-            }
-
-            const now = new Date();
-            let startDate: Date;
-            let endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-
-            if (timeRange === 'today') {
-                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-                endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-            } else if (timeRange === '7d') {
-                startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                endDate = now;
-            } else if (timeRange === '30d') {
-                startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-                endDate = now;
-            } else {
-                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-            }
-
-            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-            const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-            const venueIds = selectedVenueId === 'all' ? venuesList.map(v => v.id) : [selectedVenueId];
-
-            const limitedVenueIds = venueIds.slice(0, 30);
-            if (venueIds.length > 30) {
-                console.warn(`OwnerDashboard: más de 30 recintos. Mostrando datos de los primeros 30.`);
-            }
-            const qBookings = query(
-                collection(db, "bookings"),
-                where("tenantId", "in", limitedVenueIds),
-                where("date", ">=", Timestamp.fromDate(startDate)),
-                where("date", "<=", Timestamp.fromDate(endDate))
-            );
-
-            const unsubscribeBookings = onSnapshot(qBookings, (bSnap) => {
-                const bookings: Booking[] = bSnap.docs.map(d => {
-                    const data = d.data();
-                    const dateTs = data.date || data.startTime || Timestamp.now();
-                    return {
-                        id: d.id,
-                        ...data,
-                        date: dateTs,
-                        totalPrice: Number(data.totalPrice || data.price || 0),
-                    } as Booking;
-                }).filter(isRealBooking);
-
-                let totalRevenue = 0;
-                let todayRev = 0;
-                let pendingRev = 0;
-                const historyMap: { [key: string]: number } = {};
-                const venueRevMap: { [key: string]: number } = {};
-
-                bookings.forEach(b => {
-                    if (b.status !== 'cancelled' && b.paymentStatus !== 'refunded') {
-                        const amt = b.totalPrice;
-                        const bDate = b.date.toDate();
-                        totalRevenue += amt;
-                        if (b.paymentStatus !== 'paid') pendingRev += amt;
-                        if (bDate >= startOfToday && bDate <= endOfToday) todayRev += amt;
-                        const dayKey = bDate.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit' });
-                        historyMap[dayKey] = (historyMap[dayKey] || 0) + amt;
-                        const vName = venuesList.find(v => v.id === b.tenantId)?.name || 'VARIOS';
-                        venueRevMap[vName] = (venueRevMap[vName] || 0) + amt;
-                    }
-                });
-
-                const chartData = Object.keys(historyMap).map(k => ({ name: k, valor: historyMap[k] }));
-                chartData.sort((a, b) => {
-                    const [dA, mA] = a.name.split('/').map(Number);
-                    const [dB, mB] = b.name.split('/').map(Number);
-                    return mA !== mB ? mA - mB : dA - dB;
-                });
-
-                setKpis(prev => ({
-                    ...prev,
-                    revenueMonth: totalRevenue,
-                    revenueToday: todayRev,
-                    bookingsMonth: bookings.filter(b => b.status !== 'cancelled' && b.paymentStatus !== 'refunded').length,
-                    pendingPayments: pendingRev,
-                }));
-                setRevenueHistory(chartData);
-                setVenuesDistribution(Object.keys(venueRevMap).map(k => ({ name: k, value: venueRevMap[k] })));
-                setRecentBookings(bookings.sort((a, b) => b.date.seconds - a.date.seconds).slice(0, 8));
-                setLoading(false);
-            }, (error) => {
-                console.error("Error bookings snapshot:", error);
-                setLoading(false);
-            });
-
-            const qM = query(collection(db, "maintenance"), where("tenantId", "in", venueIds.slice(0, 30)), where("endDate", ">=", Timestamp.now()));
-            const unsubscribeM = onSnapshot(qM, (mSnap) => {
-                const allMaintenance = mSnap.docs.map(d => ({
-                    id: d.id,
-                    ...d.data(),
-                    venueName: venuesList.find(v => v.id === d.data().tenantId)?.name || 'RECINTO'
-                }));
-                setMaintenanceAlerts(allMaintenance);
-                setKpis(prev => ({ ...prev, maintenanceCount: allMaintenance.length }));
-            });
-
-            return () => { unsubscribeBookings(); unsubscribeM(); };
-        }, (error) => {
-            console.error("Error tenants snapshot:", error);
-            setLoading(false);
-        });
-
-        return () => unsubscribeTenants();
-    }, [user, selectedVenueId, timeRange]);
-
-    const paymentBadge = (b: Booking) => {
-        const isNoShow = b.status === 'no-show' ||
-            b.paymentStatus === 'no-show' ||
-            ((b as any).notes && ((b as any).notes.toLowerCase().includes('no-show') || (b as any).notes.toLowerCase().includes('inasistencia')));
-        const ps = isNoShow ? 'no-show' : (b.paymentStatus || 'pending').toLowerCase();
-        if (ps === 'refunded') return { style: 'bg-sky-500 text-white', label: 'Reembolsado' };
-        if (b.status === 'cancelled') return { style: 'bg-slate-500 text-white', label: 'Anulada' };
-        if (ps === 'paid') return { style: 'bg-emerald-500 text-white', label: 'Pagado' };
-        if (ps === 'partial') return { style: 'bg-sky-500 text-white', label: 'Parcial' };
-        if (ps === 'no-show') return { style: 'bg-red-500 text-white', label: 'No-show' };
-        return { style: 'bg-amber-500 text-white', label: 'Pendiente' };
+    const venueName = (id: string) => myVenues.find(v => v.id === id)?.name || 'Recinto';
+    const summary = summarizeRevenue(bookings, venueName);
+    const kpis = {
+        revenueMonth: summary.revenue,
+        revenueToday: summary.revenueToday,
+        bookingsMonth: summary.incomeCount,
+        activeVenues: myVenues.filter(v => v.status === 'Activo').length,
+        maintenanceCount: maintenanceAlerts.length,
     };
+    const revenueHistory = summary.byDay;
+    const venuesDistribution = summary.byVenue;
+    const recentBookings = [...bookings].sort((a, b) => (b.start?.getTime() || 0) - (a.start?.getTime() || 0)).slice(0, 8);
 
-    const matchesPaymentFilter = (b: Booking): boolean => {
-        if (paymentFilter === 'all') return true;
-        const isNoShow = b.status === 'no-show' ||
-            b.paymentStatus === 'no-show' ||
-            ((b as any).notes && ((b as any).notes.toLowerCase().includes('no-show') || (b as any).notes.toLowerCase().includes('inasistencia')));
-        const ps = isNoShow ? 'no-show' : (b.paymentStatus || 'pending').toLowerCase();
-        if (paymentFilter === 'noshow') return ps === 'no-show';
-        return ps === paymentFilter;
-    };
+    const paymentBadge = (b: Booking) => { const label = bookingLabel(b); return { label, style: BADGE_STYLE[label] || 'bg-slate-500 text-white' }; };
+    const matchesPaymentFilter = (b: Booking): boolean =>
+        paymentFilter === 'all' ? true : paymentFilter === 'noshow' ? b.isNoShow : (b.payment === 'paid' && b.state !== 'cancelled' && !b.isNoShow);
     const visibleBookings = recentBookings.filter(matchesPaymentFilter);
 
     return (
@@ -313,7 +178,7 @@ export default function OwnerDashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <TarjetaKpi titulo={`Ingresos (${timeRange === 'today' ? 'hoy' : timeRange === '7d' ? '7 días' : timeRange === '30d' ? '30 días' : 'mes'})`} valor={formatCLP(kpis.revenueMonth)} sub={`${kpis.bookingsMonth} ${kpis.bookingsMonth === 1 ? 'reserva' : 'reservas'}`} icono={<HugeiconsIcon icon={BoltIcon} className="w-6 h-6" strokeWidth={1.6} />} brillo />
                 <TarjetaKpi titulo="Cierres hoy" valor={formatCLP(kpis.revenueToday)} sub="Venta directa" icono={<HugeiconsIcon icon={MoneyBag01Icon} className="w-6 h-6" strokeWidth={1.6} />} />
-                <TarjetaKpi titulo="Mantenimiento" valor={kpis.maintenanceCount} sub="Recintos en mantención" icono={<HugeiconsIcon icon={Wrench01Icon} className="w-6 h-6" strokeWidth={1.6} />} />
+                <TarjetaKpi titulo="Mantenimiento" valor={kpis.maintenanceCount} sub="Canchas en mantención" icono={<HugeiconsIcon icon={Wrench01Icon} className="w-6 h-6" strokeWidth={1.6} />} />
             </div>
 
             {myVenues.length === 0 ? (
@@ -450,7 +315,7 @@ export default function OwnerDashboard() {
                                                     </div>
                                                 </div>
                                                 <div className="text-right shrink-0">
-                                                    <p className="text-[10px] font-black text-slate-900 dark:text-white leading-none mb-1.5 font-mono">{formatCLP(b.totalPrice)}</p>
+                                                    <p className="text-[10px] font-black text-slate-900 dark:text-white leading-none mb-1.5 font-mono">{formatCLP(b.price)}</p>
                                                     <span className={`text-[7px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-md ${badge.style}`}>{badge.label}</span>
                                                 </div>
                                             </div>
@@ -473,8 +338,8 @@ export default function OwnerDashboard() {
                                 <div className="space-y-3">
                                     {maintenanceAlerts.map(m => (
                                         <div key={m.id} className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
-                                            <span className="text-slate-700 dark:text-slate-300 truncate max-w-[120px]">{m.courtName}</span>
-                                            <span className="text-amber-600 dark:text-amber-400 font-mono">Fin: {m.endDate.toDate().toLocaleDateString('es-CL')}</span>
+                                            <span className="text-slate-700 dark:text-slate-300 truncate max-w-[120px]">{m.name} · {venueName(m.tenantId)}</span>
+                                            <span className="text-amber-600 dark:text-amber-400 font-mono">{m.activeNow ? 'Hasta' : 'Desde'} {(m.activeNow ? m.until : m.from)?.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' }) || '—'}</span>
                                         </div>
                                     ))}
                                 </div>
