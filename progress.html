@@ -88,9 +88,8 @@ td.pct{font:500 14px var(--mono);font-variant-numeric:tabular-nums;white-space:n
     <ol class="road">
       <li><b>Publicar las reglas de Firestore <span class="tag">seguridad · ley 21.719</span></b><span>Cierran las fugas de datos, protegen la experiencia y dejan los perfiles privados solo al titular y a los administradores.</span></li>
       <li><b>Auditoría de la base con datos reales <span class="tag">refactor bd</span></b><span>Correr el script de auditoría y decidir qué campos eliminar; luego una migración versionada.</span></li>
-      <li><b>Prueba de punta a punta de pagos <span class="tag">jugador</span></b><span>Reserva, torneo y academia con tarjeta de prueba; cancelación con más y menos de 24 h; webhook.</span></li>
-      <li><b>Revisión del panel por rol <span class="tag">panel</span></b><span>Admin, dueño y mánager con sus cuentas reales: cada pantalla, sus permisos y sus números.</span></li>
-      <li><b>Refactor del código <span class="tag">deuda técnica</span></b><span>Dividir las páginas de más de 1.000 líneas y revisar las escrituras que aún hace el panel directamente (canchas, torneos, cupones).</span></li>
+      <li><b>Guion de pruebas con sesión y pago <span class="tag">todos los roles</span></b><span>26 pasos en el guion de pruebas: pagos con tarjetas de prueba, cancelación, check-in, inasistencia, alta de personal y webhook.</span></li>
+            <li><b>Refactor del código <span class="tag">deuda técnica</span></b><span>Dividir las páginas de más de 1.000 líneas y revisar las escrituras que aún hace el panel directamente (canchas, torneos, cupones).</span></li>
       <li><b>Notificaciones push <span class="tag">pendiente</span></b><span>Necesita la clave VAPID.</span></li>
     </ol>
   </section>
@@ -151,6 +150,7 @@ const AREAS = [
   ["Pagos con Mercado Pago", "y","y","p","n","Webhook con firma, 3D Secure, reembolsos. Endpoints responden; sin pago real probado."],
   ["Limpieza diaria (cron)", "y","y","n","n","Cancela lo pendiente de pago y libera cupos."],
   ["Reglas de Firestore", "y","x","n","n","Perfiles privados solo para el titular y administradores; XP protegida. Falta publicarlas."],
+  ["Pruebas automáticas", "y","x","y","x","41 unitarias (cancelación, check-in, reembolso, contraseñas, experiencia) y 58 de punta a punta en desktop y mobile; todas pasan."],
   ["Estructura del código", "y","x","y","x","Servicios separados en servidor y cliente; código muerto eliminado; compila y 20 tests pasan."],
   ["Base de datos", "p","x","n","n","Script de auditoría listo; falta correrlo con la clave de servicio."],
   ["Entorno local", "p","x","n","x","La clave de Firebase Admin de .env.local está incompleta."],

@@ -1,0 +1,170 @@
+<title>MVP Sports · Guion de pruebas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: resumen de avance arriba; por rol, una lista de pasos con acción, resultado esperado, marca pasa/falla y nota. */
+:root{
+  --bg:#f5f7f6; --surface:#ffffff; --line:#dbe2de; --fg:#16201b; --muted:#5a6a61;
+  --accent:#0a8f5a; --ok:#0a8f5a; --ok-soft:#e2f3eb; --bad:#b4322a; --bad-soft:#f9e3e1;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1411; --surface:#151d19; --line:#26312b; --fg:#e4ebe6; --muted:#93a39a;
+  --accent:#2fd18b; --ok:#2fd18b; --ok-soft:#16332a; --bad:#ef6b61; --bad-soft:#3a1a18; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1411; --surface:#151d19; --line:#26312b; --fg:#e4ebe6; --muted:#93a39a;
+  --accent:#2fd18b; --ok:#2fd18b; --ok-soft:#16332a; --bad:#ef6b61; --bad-soft:#3a1a18; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:980px;margin:0 auto;padding-inline:20px;padding-block:32px 64px;display:grid;gap:28px}
+h1,h2{margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:28px;font-weight:700} h2{font-size:19px;font-weight:600}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--muted);max-width:70ch;margin:8px 0 0}
+.summary{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.pill{font:500 13px var(--mono);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-variant-numeric:tabular-nums}
+.pill.ok{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.pill.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.status{color:var(--muted);font-size:13px}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;flex:1 1 200px;display:flex}
+.bar i{display:block;height:100%}
+section{display:grid;gap:10px}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:grid;grid-template-columns:52px minmax(0,1fr);gap:4px 12px}
+.step.ok{border-left:4px solid var(--ok)} .step.bad{border-left:4px solid var(--bad)}
+.id{font:600 13px var(--mono);color:var(--muted);padding-top:2px}
+.body{min-width:0;display:grid;gap:6px}
+.act{font-weight:600}
+.exp{color:var(--muted);font-size:14px}
+.exp b{color:var(--fg);font-weight:500}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:4px}
+button{font:500 13px var(--sans);padding:6px 12px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer}
+button[aria-pressed="true"].pass{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+button[aria-pressed="true"].fail{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.5;cursor:not-allowed}
+textarea{width:100%;min-height:38px;font:14px var(--sans);padding:8px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--fg);resize:vertical}
+.note{font-size:13px;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px}
+code{font:13px var(--mono);background:var(--bg);padding:1px 6px;border-radius:4px}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Pruebas con sesión y pago · producción o staging</div>
+    <h1>Guion de pruebas por rol</h1>
+    <p class="lede">Lo que las pruebas automáticas no pueden cubrir: cuentas reales, pagos con tarjetas de prueba de Mercado Pago y acciones del personal. Marca cada paso y anota lo que viste cuando falle. Los resultados quedan guardados y Claude los puede leer para corregir.</p>
+  </header>
+
+  <div class="card summary" aria-live="polite">
+    <span class="pill" id="s-total">– pasos</span>
+    <span class="pill ok" id="s-ok">0 pasan</span>
+    <span class="pill bad" id="s-bad">0 fallan</span>
+    <div class="bar" aria-hidden="true"><i id="b-ok" style="background:var(--ok)"></i><i id="b-bad" style="background:var(--bad)"></i></div>
+    <span class="status" id="db-status">Conectando con el registro de resultados…</span>
+  </div>
+
+  <div id="groups"></div>
+
+  <div class="card note">Tarjetas de prueba de Mercado Pago Chile: usa como nombre del titular <code>APRO</code> para un pago aprobado y <code>OTHE</code> para uno rechazado, con los números de tarjeta de prueba que entrega Mercado Pago en tu panel de desarrollador.</div>
+</div>
+
+<script>
+const GROUPS = [
+ { name: "Antes de empezar", steps: [
+  ["P1","Publicar las reglas de Firestore (firebase deploy --only firestore:rules).","El comando termina sin errores."],
+  ["P2","Activar Google en Firebase Authentication y agregar mvpsports.cl a los dominios autorizados.","El proveedor Google aparece como habilitado."],
+  ["P3","Subir los commits (git push) y esperar el deploy de Vercel.","El deploy queda en estado Ready."],
+  ["P4","En el recinto de prueba, credenciales de prueba de Mercado Pago activas.","El checkout de ese recinto muestra el pago con tarjeta."],
+ ]},
+ { name: "Jugador", steps: [
+  ["J1","Crear cuenta con Google desde la landing.","Entra directo a la app <b>sin pedir teléfono ni RUT</b>."],
+  ["J2","Crear cuenta con correo: probar contraseña de 7 caracteres y dos contraseñas distintas.","El botón queda deshabilitado con el aviso correspondiente; con 8+ iguales se crea y llega el correo de verificación."],
+  ["J3","Iniciar sesión con esa cuenta antes y después de verificar el correo.","Antes: pide verificar. Después: entra a la app."],
+  ["J4","Elegir recinto, cancha y horario, y llegar al pago.","Aparece \"Completa tu perfil para pagar\". Al guardar los datos <b>vuelve al pago</b>."],
+  ["J5","Pagar con tarjeta APRO.","Pago aprobado, ticket con QR y la reserva en Mis reservas con el monto correcto."],
+  ["J6","Pagar con tarjeta OTHE.","Mensaje de rechazo claro y <b>no se crea reserva</b>."],
+  ["J7","Cancelar una reserva con más de 24 h de anticipación.","Se cancela y se reembolsa el 97%; aparece en la billetera como reembolsado y en Mercado Pago."],
+  ["J8","Intentar cancelar una reserva que empieza en menos de 24 h.","Aviso: solo se puede cancelar hasta 24 horas antes. La reserva sigue activa."],
+  ["J9","Inscribirse a un torneo y a una clase de academia pagados.","Solo se ofrece pago con tarjeta; tras pagar queda inscrito."],
+  ["J10","Crear un equipo, invitar a otro jugador y chatear; abrir el ranking.","Se ven nombres, fotos y niveles de otros, nunca su correo, teléfono ni RUT."],
+  ["J11","Registrar un partido interno en Estadísticas.","La experiencia sube en unos segundos para todos los participantes."],
+  ["J12","Eliminar la cuenta desde Ajustes.","Pide la contraseña, cierra la sesión; el jugador desaparece de sus equipos y búsquedas."],
+ ]},
+ { name: "Mánager", steps: [
+  ["M1","Iniciar sesión como mánager y abrir el panel.","Indicadores sin \"por cobrar\"; el calendario no tiene botón de nueva reserva."],
+  ["M2","Hacer check-in (QR o código) de una reserva pagada, dentro de las 2 h previas.","Ingreso registrado; la experiencia del jugador sube."],
+  ["M3","Intentar el check-in más de 2 h antes.","Aviso: el ingreso se habilita 2 horas antes."],
+  ["M4","Marcar inasistencia en una reserva ya iniciada sin ingreso.","Reserva cancelada, strike al jugador y su experiencia baja."],
+  ["M5","Intentar el check-in en un recinto donde no trabaja (URL o QR de otro recinto).","Aviso: no trabajas en este recinto."],
+ ]},
+ { name: "Dueño del recinto", steps: [
+  ["D1","Editar horarios y tarifas del complejo.","Los precios nuevos se reflejan en el checkout del jugador."],
+  ["D2","Crear un mánager con contraseña: probar 7 caracteres y confirmación distinta.","Rechaza ambos casos; con 8+ iguales se crea y puede iniciar sesión."],
+  ["D3","Abrir Finanzas, Torneos y Academia.","Sin \"por cobrar\" ni botones de datos demo; los montos coinciden con los pagos."],
+ ]},
+ { name: "Administrador", steps: [
+  ["A1","Crear un dueño y su recinto con el asistente.","Pide contraseña de 8+ dos veces; el dueño inicia sesión."],
+  ["A2","Usuarios → Sincronizar ELO.","Termina sin error y la experiencia de los jugadores refleja sus reservas."],
+  ["A3","Revisar la auditoría tras los pasos del mánager.","Aparecen el check-in y la inasistencia."],
+ ]},
+ { name: "Sistema", steps: [
+  ["S1","Pagar y cerrar la app antes de que termine (o con validación del banco).","La reserva se confirma igual por el webhook de Mercado Pago."],
+  ["S2","Esperar la limpieza nocturna (o ejecutar el cron desde Vercel).","Responde con la cantidad de jugadores recalculados y no quedan reservas pendientes de pago."],
+ ]},
+];
+
+const results = {};
+let db = null;
+const $ = (id) => document.getElementById(id);
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function render() {
+  $("groups").innerHTML = GROUPS.map((g) => `<section><div class="eyebrow">${g.steps.length} pasos</div><h2>${g.name}</h2>${g.steps.map(([id, act, exp]) => {
+    const r = results[id] || {};
+    return `<div class="step ${r.status === "pass" ? "ok" : r.status === "fail" ? "bad" : ""}" data-id="${id}">
+      <div class="id">${id}</div>
+      <div class="body"><div class="act">${act}</div><div class="exp">Esperado: ${exp}</div>
+        <div class="row">
+          <button class="pass" aria-pressed="${r.status === "pass"}" data-set="pass" ${db ? "" : "disabled"}>Pasa</button>
+          <button class="fail" aria-pressed="${r.status === "fail"}" data-set="fail" ${db ? "" : "disabled"}>Falla</button>
+          ${r.status ? `<button data-set="" ${db ? "" : "disabled"}>Limpiar</button>` : ""}
+        </div>
+        <textarea id="note-${id}" placeholder="Qué viste (pantalla, mensaje, monto)…" aria-label="Nota del paso ${id}" ${db ? "" : "disabled"}>${esc(r.note || "")}</textarea>
+      </div></div>`;
+  }).join("")}</section>`).join("");
+  const all = GROUPS.flatMap((g) => g.steps.map((s) => s[0]));
+  const ok = all.filter((id) => results[id]?.status === "pass").length, bad = all.filter((id) => results[id]?.status === "fail").length;
+  $("s-total").textContent = `${all.length} pasos`; $("s-ok").textContent = `${ok} pasan`; $("s-bad").textContent = `${bad} fallan`;
+  $("b-ok").style.width = `${(ok / all.length) * 100}%`; $("b-bad").style.width = `${(bad / all.length) * 100}%`;
+}
+
+async function save(id, patch) {
+  const next = { ...(results[id] || {}), ...patch, updatedAt: new Date().toISOString() };
+  try { await db.collection("results").doc(id).set(next); }
+  catch (e) { $("db-status").textContent = "No se pudo guardar: " + (e?.message || e?.code || "error"); }
+}
+
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-set]"); if (!b || !db) return;
+  const id = b.closest(".step").dataset.id;
+  save(id, { status: b.dataset.set || null });
+});
+document.addEventListener("change", (e) => {
+  if (!e.target.matches("textarea") || !db) return;
+  const id = e.target.closest(".step").dataset.id;
+  save(id, { note: e.target.value.slice(0, 2000) });
+});
+
+render();
+(async () => {
+  db = await window.claude?.use?.("db") ?? null;
+  if (!db) { $("db-status").textContent = "Inicia sesión en claude.ai para guardar resultados."; render(); return; }
+  $("db-status").textContent = "Resultados guardados automáticamente.";
+  render();
+  db.collection("results").onSnapshot((snap) => {
+    snap.docs.forEach((d) => { results[d.id] = d.data() || {}; });
+    const active = document.activeElement?.id; render();
+    if (active) document.getElementById(active)?.focus();
+  }, () => { $("db-status").textContent = "Se perdió la conexión con el registro de resultados."; });
+})();
+</script>
