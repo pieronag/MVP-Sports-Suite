@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { postApi } from "@/services/client/apiClient";
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
     Search01Icon,
@@ -242,11 +243,11 @@ export default function Page() {
         const next = ownerToToggle.status === 'Activo' ? 'suspended' : 'active';
         const uiNext = ownerToToggle.status === 'Activo' ? 'Suspendido' : 'Activo';
         try {
-            await updateDoc(doc(db, "users", ownerToToggle.id), { status: next });
+            await postApi('/api/admin/user-status', { uid: ownerToToggle.id, status: next });
             setOwners(prev => prev.map(o => o.id === ownerToToggle.id ? { ...o, status: uiNext } : o));
             setOwnerToToggle(null);
             addToast(`Dueño ${uiNext.toLowerCase()}`, 'success');
-        } catch (e) { addToast("Error al cambiar el estado", 'error'); } finally { setIsToggling(false); }
+        } catch (e: any) { addToast(e?.message || "Error al cambiar el estado", 'error'); } finally { setIsToggling(false); }
     };
 
     const filteredOwners = owners.filter(o => {

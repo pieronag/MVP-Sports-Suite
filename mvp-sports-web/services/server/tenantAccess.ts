@@ -12,6 +12,8 @@ export async function worksAtTenant(uid: string, tenantId: string): Promise<bool
   const role = String(user.role || "").toLowerCase();
   if (role === "admin" || role === "superadmin") return true;
   if (!STAFF_ROLES.includes(role)) return false;
+  // Personal suspendido no opera aunque conserve una sesión abierta
+  if (String(user.status || "").toLowerCase() === "inactive") return false;
   const tenant = t.data() || {};
   return user.tenantId === tenantId || (user.tenantIds || []).includes(tenantId) || tenant.ownerId === uid || (tenant.ownerIds || []).includes(uid);
 }

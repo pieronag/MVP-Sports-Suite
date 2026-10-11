@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { postApi } from "@/services/client/apiClient";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     Settings01Icon,
@@ -347,7 +348,8 @@ export default function SettingsPage() {
             onConfirm: async () => {
                 setModal(prev => ({ ...prev, show: false }));
                 try {
-                    await updateDoc(doc(db, 'users', member.uid), { status: 'disabled', role: 'user' });
+                    await postApi('/api/admin/user-status', { uid: member.uid, status: 'disabled' });
+                    await updateDoc(doc(db, 'users', member.uid), { role: 'player' });
                     await auditService.logAuditEvent({
                         action: 'STAFF_ACCESS_REMOVED',
                         module: 'STAFF',

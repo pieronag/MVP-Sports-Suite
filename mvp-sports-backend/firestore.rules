@@ -119,11 +119,6 @@ service cloud.firestore {
     }
 
     // Owner gestionando a su personal: el rol resultante solo puede ser manager
-    function isOwnerManagingManager() {
-      return isOwner()
-        && request.resource.data.get('role', 'manager') == 'manager'
-        && (resource == null || resource.data.get('role', 'manager') in ['manager', 'player', 'user']);
-    }
 
     function isStaff() {
       let role = getRole();
@@ -136,28 +131,14 @@ service cloud.firestore {
     
     // Perfiles unificados (App y Web)
     match /profiles/{userId} {
-      // Contiene correo, teléfono, RUT y fecha de nacimiento: solo el titular y los administradores.
-      // Los demás (jugadores y personal de recintos) ven el perfil público vía /api/public-profiles;
-      // check-in e inasistencias pasan por el servidor.
+      // Perfil antiguo de la app: mismas reglas que users (solo el titular y la administración)
       allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
-      allow create: if isAuthenticated() && (
-        isSuperAdmin() ||
-        (request.auth.uid == userId && isSafeSelfCreate()) ||
-        isOwnerManagingManager()
-      );
-      // El propio usuario puede eliminar su cuenta (requisito de las tiendas de apps)
-      allow delete: if request.auth != null && (request.auth.uid == userId || isSuperAdmin() || (isOwner() && resource.data.get('role', '') == 'manager'));
-      allow update: if isAuthenticated() && (
-        isSuperAdmin() ||
-        (request.auth.uid == userId && !touchesPrivileged()) ||
-        isOwnerManagingManager() ||
-        (isStaff() && !touchesPrivileged())
-      );
-
-      // Subcolecciones (tarjetas, estadísticas, transacciones, etc.)
+      allow create: if isAuthenticated() && (isSuperAdmin() || (request.auth.uid == userId && isSafeSelfCreate()));
+      allow delete: if isSuperAdmin();
+      allow update: if isAuthenticated() && (isSuperAdmin() || (request.auth.uid == userId && !touchesPrivileged()));
+      // Subcolecciones (tarjetas, estadísticas, transacciones): solo el titular y la administración
       match /{subcollection=**} {
-        allow read: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
-        allow write: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
+        allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
       }
     }
 
@@ -166,28 +147,24 @@ service cloud.firestore {
       // Los demás (jugadores y personal de recintos) ven el perfil público vía /api/public-profiles;
       // check-in e inasistencias pasan por el servidor.
       allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
-      allow create: if isAuthenticated() && (
-        isSuperAdmin() ||
-        (request.auth.uid == userId && isSafeSelfCreate()) ||
-        isOwnerManagingManager()
-      );
-      // El propio usuario puede eliminar su cuenta (requisito de las tiendas de apps)
-      allow delete: if request.auth != null && (request.auth.uid == userId || isSuperAdmin() || (isOwner() && resource.data.get('role', '') == 'manager'));
-      allow update: if isAuthenticated() && (
-        isSuperAdmin() ||
-        (request.auth.uid == userId && !touchesPrivileged()) ||
-        isOwnerManagingManager() ||
-        (isStaff() && !touchesPrivileged())
-      );
+      // El personal de recintos se crea, edita y elimina por /api/staff (el servidor verifica que los
+      // recintos sean del dueño). Antes un dueño podía convertir a cualquier jugador en mánager de
+      // cualquier recinto y el personal podía editar perfiles ajenos.
+      allow create: if isAuthenticated() && (isSuperAdmin() || (request.auth.uid == userId && isSafeSelfCreate()));
+      // El propio usuario elimina su cuenta por /api/account/delete
+      allow delete: if isSuperAdmin();
+      allow update: if isAuthenticated() && (isSuperAdmin() || (request.auth.uid == userId && !touchesPrivileged()));
       match /{subcollection=**} {
-        allow read: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
-        allow write: if isAuthenticated() && (request.auth.uid == userId || isStaff() || isSuperAdmin());
+        allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
       }
     }
 
+    // Ficha del personal (RUT, teléfono): la ven el propio miembro, el personal de sus recintos y la administración.
+    // Se escribe solo desde el servidor (/api/staff).
     match /staff/{staffId} {
-      allow read: if isAuthenticated();
-      allow write: if isManager() || isSuperAdmin();
+      allow read: if isAuthenticated() && (
+        resource.data.get('uid', '') == request.auth.uid || worksAtTenant(resource.data.get('tenantId', '')));
+      allow write: if false;
     }
 
     // ==========================================

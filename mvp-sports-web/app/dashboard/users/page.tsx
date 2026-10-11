@@ -321,10 +321,10 @@ export default function Page() {
   const toggleUserStatus = async (id: string, currentStatus: string) => {
     const newStatus = currentStatus === 'Activo' ? 'suspended' : 'active';
     try {
-      await updateDoc(doc(db, "users", id), { status: newStatus });
+      await postApi('/api/admin/user-status', { uid: id, status: newStatus });
       addToast(`Jugador ${newStatus === 'active' ? 'habilitado' : 'suspendido'}`, "success");
       fetchUsers();
-    } catch (error) { addToast("Error al cambiar estado", "error"); }
+    } catch (error: any) { addToast(error?.message || "Error al cambiar estado", "error"); }
   };
 
   const handleToggleStatus = async () => {
@@ -438,7 +438,8 @@ export default function Page() {
         setConfirmModal(p => ({ ...p, isOpen: false }));
         setIsBulkLoading(true);
         try {
-          await Promise.all(ids.map(id => updateDoc(doc(db, "users", id), { status: suspend ? 'suspended' : 'active' })));
+          const r = await postApi<{ updated: number; failed: { error?: string }[] }>('/api/admin/user-status', { uids: ids, status: suspend ? 'suspended' : 'active' });
+          if (r.failed?.length) addToast(`${r.failed.length} no se pudieron cambiar: ${r.failed[0]?.error || ''}`, 'error');
           addToast(`${ids.length} jugador${ids.length === 1 ? '' : 'es'} ${suspend ? 'suspendido(s)' : 'activado(s)'}`, 'success');
           setSelectedIds(new Set());
           fetchUsers();

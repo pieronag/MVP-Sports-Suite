@@ -205,98 +205,32 @@ export default function StaffPage() {
         if (!editingId) { const pwIssue = passwordIssue(formData.password, passwordConfirm); if (pwIssue) return notify(pwIssue, "error"); }
         setIsSaving(true);
         try {
-            let staffPayload: any = { 
-                fullName: formData.fullName, 
-                rut: formData.rut, 
-                jobTitle: formData.jobTitle, 
-                email: formData.email, 
-                phone: formData.phone, 
-                role: 'manager', 
-                status: formData.status, 
-                tenantIds: formData.tenantIds,
-                tenantId: formData.tenantIds[0] || ""
+            const fields = {
+                fullName: formData.fullName, rut: formData.rut, jobTitle: formData.jobTitle,
+                phone: formData.phone, tenantIds: formData.tenantIds,
             };
             if (editingId) {
-                await updateDoc(doc(db, "staff", editingId), staffPayload);
-                const staffSnap = await getDoc(doc(db, "staff", editingId));
-                if (staffSnap.exists() && staffSnap.data().uid) {
-                    try {
-                        await updateDoc(doc(db, "users", staffSnap.data().uid), { 
-                            fullName: formData.fullName, 
-                            rut: formData.rut, 
-                            jobTitle: formData.jobTitle, 
-                            phone: formData.phone, 
-                            status: formData.status, 
-                            tenantIds: formData.tenantIds,
-                            tenantId: formData.tenantIds[0] || ""
-                        });
-                    } catch (userErr) {
-                        console.error("Error updating user document:", userErr);
-                    }
-                }
+                await postApi('/api/staff/update', { staffId: editingId, ...fields, status: formData.status });
                 notify("Actualizado con éxito", "success");
-                await auditService.logAuditEvent({
-                    action: 'STAFF_EDITAR',
-                    module: 'Administración/Personal',
-                    details: `Edición de datos del personal: ${formData.fullName} (${formData.email})`,
-                    severity: 'MEDIUM',
-                    status: 'SUCCESS'
-                });
             } else {
-                const secondaryAppName = "secondaryAppForUserCreation";
-                let secondaryApp = getApps().find(app => app.name === secondaryAppName) || initializeApp(getApp().options, secondaryAppName);
-                const secondaryAuth = getAuth(secondaryApp);
-                try {
-                    const userCredential = await createUserWithEmailAndPassword(secondaryAuth, formData.email, formData.password);
-                    const newUid = userCredential.user.uid;
-                    await signOut(secondaryAuth);
-                    await setDoc(doc(db, "users", newUid), { 
-                        uid: newUid, 
-                        email: formData.email, 
-                        fullName: formData.fullName, 
-                        rut: formData.rut, 
-                        jobTitle: formData.jobTitle, 
-                        phone: formData.phone, 
-                        role: 'manager', 
-                        tenantIds: formData.tenantIds, 
-                        tenantId: formData.tenantIds[0] || "",
-                        status: 'active', 
-                        createdAt: new Date() 
-                    });
-                    await addDoc(collection(db, "staff"), { ...staffPayload, uid: newUid, createdAt: new Date() });
-                    notify("Creado con éxito", "success");
-                    await auditService.logAuditEvent({
-                        action: 'STAFF_CREAR',
-                        module: 'Administración/Personal',
-                        details: `Creación de nuevo miembro de staff: ${formData.fullName} (${formData.email})`,
-                        severity: 'MEDIUM',
-                        status: 'SUCCESS'
-                    });
-                } catch (err: any) { 
-                    const code = String(err?.code || '');
-                    notify(code === 'auth/email-already-in-use' ? 'Ese correo ya tiene una cuenta en MVP Sports.'
-                        : code === 'auth/invalid-email' ? 'El correo no es válido.'
-                        : code === 'auth/weak-password' ? 'La contraseña es muy débil.'
-                        : 'No se pudo crear el acceso. Intenta de nuevo.', "error"); 
-                    setIsSaving(false); 
-                    await auditService.logAuditEvent({
-                        action: 'STAFF_CREAR',
-                        module: 'Administración/Personal',
-                        details: `Falla al crear autenticación de staff ${formData.fullName}: ${err.message || err}`,
-                        severity: 'MEDIUM',
-                        status: 'FAILED'
-                    });
-                    return; 
-                }
+                await postApi('/api/staff', { ...fields, email: formData.email, password: formData.password, passwordConfirm });
+                notify("Creado con éxito", "success");
             }
-            await refetchAllStaff();
-            setIsModalOpen(false);
-        } catch (e: any) { 
-            notify("Error al guardar", "error"); 
             await auditService.logAuditEvent({
                 action: editingId ? 'STAFF_EDITAR' : 'STAFF_CREAR',
                 module: 'Administración/Personal',
-                details: `Falla al guardar staff en base de datos: ${e.message || e}`,
+                details: `${editingId ? 'Edición' : 'Alta'} de personal: ${formData.fullName} (${formData.email})`,
+                severity: 'MEDIUM',
+                status: 'SUCCESS'
+            });
+            await refetchAllStaff();
+            setIsModalOpen(false);
+        } catch (e: any) {
+            notify(e?.message || "Error al guardar", "error");
+            await auditService.logAuditEvent({
+                action: editingId ? 'STAFF_EDITAR' : 'STAFF_CREAR',
+                module: 'Administración/Personal',
+                details: `Falla al guardar personal ${formData.fullName}: ${e?.message || e}`,
                 severity: 'MEDIUM',
                 status: 'FAILED'
             });
@@ -308,12 +242,11 @@ export default function StaffPage() {
         setConfirmData({
             isOpen: true,
             title: `${newStatus === 'active' ? 'Activar' : 'Suspender'} Usuario`,
-            message: `¿Confirmas cambiar el acceso de ${member.fullName}?`,
+            message: newStatus === 'inactive' ? `${member.fullName} no podrá ingresar ni operar hasta que lo reactives. Se cerrarán sus sesiones abiertas.` : `${member.fullName} podrá volver a ingresar.`,
             isDestructive: newStatus === 'inactive',
             action: async () => {
                 try {
-                    await updateDoc(doc(db, "staff", member.id), { status: newStatus });
-                    if (member.uid) await updateDoc(doc(db, "users", member.uid), { status: newStatus });
+                    await postApi('/api/staff/update', { staffId: member.id, status: newStatus });
                     setStaffList(prev => prev.map(s => s.id === member.id ? { ...s, status: newStatus } : s));
                     notify("Estado actualizado", "success");
                     await auditService.logAuditEvent({
@@ -324,7 +257,7 @@ export default function StaffPage() {
                         status: 'SUCCESS'
                     });
                 } catch (e: any) { 
-                    notify("Error al cambiar estado", "error"); 
+                    notify(e?.message || "Error al cambiar estado", "error"); 
                     await auditService.logAuditEvent({
                         action: 'STAFF_ESTADO',
                         module: 'Administración/Personal',
