@@ -171,25 +171,25 @@ export default function ReservasPage() {
   const handleSaveSurvey = async (rating: number, feedback: string) => {
     if (!surveyBooking?.id) return;
     try {
-      await bookingService.checkOut(surveyBooking.id, { rating, feedback });
-      await venueService.submitVenueFeedback(
-        surveyBooking.tenantId,
-        surveyBooking.id,
-        rating,
-        feedback,
-        (profile as any)?.displayName || "Jugador MVP",
-        { sport: surveyBooking.sport, bookingDate: surveyBooking.date, bookingTime: surveyBooking.startTime }
-      );
-      loadData();
-      setShowSurveyModal(false);
-      setFbType("success");
-      setFbMsg("¡Gracias por tu valoración! Partido finalizado con éxito.");
-      setFbVisible(true);
+      await bookingService.checkOut(surveyBooking.id);
     } catch {
       setFbType("error");
-      setFbMsg("Ocurrió un error al procesar el cierre. Intenta de nuevo.");
+      setFbMsg("No pudimos registrar tu salida. Intenta de nuevo.");
       setFbVisible(true);
+      return;
     }
+    // La salida ya quedó registrada; la reseña se valida en el servidor
+    try {
+      await venueService.submitVenueFeedback(surveyBooking.tenantId, surveyBooking.id, rating, feedback);
+      setFbType("success");
+      setFbMsg("¡Gracias por tu valoración! Partido finalizado con éxito.");
+    } catch (e: any) {
+      setFbType("error");
+      setFbMsg(`Partido finalizado, pero no se guardó tu reseña: ${e?.message || "intenta más tarde"}`);
+    }
+    loadData();
+    setShowSurveyModal(false);
+    setFbVisible(true);
   };
 
   const handleCancel = (bookingId: string) => {

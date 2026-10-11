@@ -130,12 +130,10 @@ export const bookingService = {
         return Array.from(allDocsMap.values()).map(d => ({ id: d.id, ...d.data() } as Booking));
     },
 
-    async checkOut(bookingId: string, surveyData?: { rating?: number; feedback?: string }) {
+    // Salida del partido (las reglas solo la permiten si el recinto registró el ingreso)
+    async checkOut(bookingId: string) {
         const ref = doc(db, 'bookings', bookingId);
-        const updateData: any = { checkOut: true, checkOutTime: Timestamp.now(), status: 'completed' };
-        if (surveyData?.rating !== undefined) updateData.rating = surveyData.rating;
-        if (surveyData?.feedback !== undefined) updateData.feedback = surveyData.feedback;
-        await updateDoc(ref, updateData);
+        await updateDoc(ref, { checkOut: true, checkOutTime: Timestamp.now(), status: 'completed' });
         invalidate('bookings:');
         await syncBookingSlots(bookingId);
     },

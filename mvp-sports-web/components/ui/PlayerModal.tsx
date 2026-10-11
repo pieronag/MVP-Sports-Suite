@@ -1,5 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import { normalizeBooking, isReal } from "@/utils/bookingModel";
+import type { Booking } from "@/types/booking";
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
     UserCircleIcon, Clock01Icon, Certificate01Icon, Mail01Icon,
@@ -133,26 +135,20 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
     const fetchHistory = async () => {
         setLoadingHistory(true);
         try {
-            const queries: any[] = [query(collection(db, "bookings"), where("userId", "==", user.id), limit(200))];
-            queries.push(query(collection(db, "bookings"), where("playerId", "==", user.id), limit(200)));
-            if (user.email) queries.push(query(collection(db, "bookings"), where("createdBy", "==", user.email), limit(200)));
-            if (user.name) queries.push(query(collection(db, "bookings"), where("clientName", "==", user.name), limit(200)));
+            // Solo reservas ligadas a su cuenta (titular o participante). Antes también se buscaba por nombre,
+            // lo que mezclaba reservas de otras personas con el mismo nombre.
+            const queries = [
+                query(collection(db, "bookings"), where("userId", "==", user.id), limit(200)),
+                query(collection(db, "bookings"), where("participantIds", "array-contains", user.id), limit(200)),
+            ];
+            const snapshots = await Promise.all(queries.map(q => getDocs(q).catch(() => null)));
+            const map = new Map<string, Booking>();
+            snapshots.forEach(snap => snap?.docs.forEach(d => map.set(d.id, normalizeBooking(d.id, d.data()))));
 
-            const snapshots = await Promise.all(queries.map(q => getDocs(q).catch(() => ({ docs: [] as any[] }))));
-            const map = new Map<string, any>();
-            snapshots.forEach(snap => snap.docs.forEach((d: any) => { if (!map.has(d.id)) map.set(d.id, d); }));
-
-            const matches = Array.from(map.values()).map(d => {
-                const data = d.data();
-                const dateObj = data.date?.seconds ? new Date(data.date.seconds * 1000) : (data.date?.toDate ? data.date.toDate() : new Date());
-                const isNoShow = data.status === 'no-show' || data.paymentStatus === 'no-show' || data.noShow === true ||
-                    (data.notes && (data.notes.toLowerCase().includes('no-show') || data.notes.toLowerCase().includes('inasistencia')));
-                let displayStatus = 'pending';
-                if (isNoShow) displayStatus = 'no-show';
-                else if (data.status === 'completed' || data.checkIn || data.checkOut === true) displayStatus = 'completed';
-                else if (data.status === 'confirmed') displayStatus = 'confirmed';
-                else if (data.status === 'cancelled') displayStatus = 'cancelled';
-                return { id: d.id, ...data, displayStatus, dateObj, formattedDate: dateObj.toLocaleDateString('es-CL') };
+            const matches = Array.from(map.values()).filter(isReal).map(b => {
+                const dateObj = b.start || new Date(0);
+                const displayStatus = b.isNoShow ? 'no-show' : b.state === 'cancelled' ? 'cancelled' : b.state === 'completed' || b.checkedIn ? 'completed' : 'confirmed';
+                return { ...b.raw, id: b.id, totalPrice: b.price, startTime: b.startTime, displayStatus, dateObj, formattedDate: dateObj.toLocaleDateString('es-CL') };
             }).filter(m => ['completed', 'cancelled', 'no-show'].includes(m.displayStatus));
 
             setHistory(matches.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime()));

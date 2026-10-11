@@ -1,6 +1,7 @@
 import { cached } from '@/services/client/player/cache';
-import { collection, query, where, getDocs, documentId, doc, getDoc, addDoc, updateDoc, Timestamp, orderBy } from 'firebase/firestore';
-import { db, auth } from '@/services/client/firebase';
+import { collection, query, where, getDocs, documentId, doc, getDoc, orderBy } from 'firebase/firestore';
+import { db } from '@/services/client/firebase';
+import { postApi } from '@/services/client/apiClient';
 
 export interface Tenant {
     id: string;
@@ -109,24 +110,9 @@ export const venueService = {
         return snap.docs.map(d => ({ id: d.id, ...d.data() } as Court));
     },
 
-    async submitVenueFeedback(tenantId: string, bookingId: string, rating: number, comment: string, userName: string, extraInfo?: { sport?: string; bookingDate?: any; bookingTime?: string }) {
-        const tenantRef = doc(db, 'tenants', tenantId);
-        const tenantSnap = await getDoc(tenantRef);
-        if (!tenantSnap.exists()) return;
-        const tenantData = tenantSnap.data();
-        const reviewsRef = collection(db, 'reviews');
-        await addDoc(reviewsRef, {
-            venueId: tenantId, venueName: tenantData.name || 'Recinto', bookingId, rating, comment, userName, userId: auth.currentUser?.uid || null,
-            ownerId: tenantData.ownerId || null, date: Timestamp.now(),
-            sport: extraInfo?.sport || null, bookingDate: extraInfo?.bookingDate || null, bookingTime: extraInfo?.bookingTime || null
-        });
-        try {
-            const qReviews = query(collection(db, 'reviews'), where('venueId', '==', tenantId));
-            const snapReviews = await getDocs(qReviews);
-            const ratings = snapReviews.docs.map(d => d.data().rating || 0).filter(Boolean);
-            const avg = ratings.length > 0 ? Math.round((ratings.reduce((a, b) => a + b, 0) / ratings.length) * 10) / 10 : 0;
-            await updateDoc(tenantRef, { rating: avg, totalFeedbacks: ratings.length });
-        } catch {}
+    // La reseña la valida y guarda el servidor (solo quien jugó, una por reserva) y recalcula el promedio del recinto
+    async submitVenueFeedback(_tenantId: string, bookingId: string, rating: number, comment: string) {
+        await postApi('/api/reviews', { bookingId, rating, comment });
     },
 
     async getVenueFeedback(tenantId: string) {

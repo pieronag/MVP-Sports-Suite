@@ -1,5 +1,6 @@
 "use client";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
+import { postApi } from "@/services/client/apiClient";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     Alert02Icon,
@@ -18,7 +19,7 @@ import {
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/client/firebase';
-import { collection, getDocs, query, where, orderBy, doc, updateDoc, Timestamp, or } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy, doc, updateDoc, Timestamp, or, limit } from 'firebase/firestore';
 import { TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';
 
 const inputCls = "w-full px-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-hidden text-slate-800 dark:text-white focus:border-emerald-500/40 transition-all";
@@ -70,12 +71,13 @@ export default function FeedbackPage() {
 
             if (venueIds.length === 0) { setLoading(false); return; }
 
-            const qReviews = query(collection(db, "reviews"), where("ownerId", "==", user.uid), orderBy("date", "desc"));
-            const snapReviews = await getDocs(qReviews);
-            const reviewsList = snapReviews.docs.map(d => ({ id: d.id, ...d.data() }));
+            // Por recinto (antes por ownerId: los co-dueños no veían las reseñas)
+            const chunks = Array.from({ length: Math.ceil(venueIds.length / 30) }, (_, i) => venueIds.slice(i * 30, i * 30 + 30));
+            const reviewSnaps = await Promise.all(chunks.map(ids => getDocs(query(collection(db, "reviews"), where("venueId", "in", ids)))));
+            const reviewsList = reviewSnaps.flatMap(sn => sn.docs.map(d => ({ id: d.id, ...d.data() })));
 
-            const qBookings = query(collection(db, "bookings"), where("tenantId", "in", venueIds.slice(0, 10)), orderBy("date", "desc"));
-            const snapBookings = await getDocs(qBookings);
+            // Reseñas antiguas guardadas solo en la reserva (se migrarán a 'reviews'); se leen las 300 más recientes
+            const snapBookings = await getDocs(query(collection(db, "bookings"), where("tenantId", "in", venueIds.slice(0, 30)), orderBy("date", "desc"), limit(300)));
             const bookingsWithRating = snapBookings.docs.map(d => ({ id: d.id, ...d.data() })).filter((b: any) => b.rating > 0);
 
             const normalizedBookings = bookingsWithRating.map((b: any) => ({
@@ -114,8 +116,9 @@ export default function FeedbackPage() {
             });
 
             setReviews(uniqueFeedback);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error al cargar feedback:", error);
+            setNotification({ msg: error?.code === 'permission-denied' ? 'No tienes permiso para ver estas reseñas' : 'No se pudieron cargar las reseñas', type: 'error' });
         } finally {
             setLoading(false);
         }
@@ -137,14 +140,18 @@ export default function FeedbackPage() {
         setIsSubmittingReply(true);
         try {
             const review = reviews.find(r => r.id === reviewId);
-            const ref = doc(db, review?.isFromBooking ? "bookings" : "reviews", reviewId);
-            await updateDoc(ref, { reply: replyText, replyDate: Timestamp.now() });
+            if (review?.isFromBooking) {
+                // Reseña antigua guardada en la reserva
+                await updateDoc(doc(db, "bookings", reviewId), { reply: replyText.trim(), replyDate: Timestamp.now() });
+            } else {
+                await postApi('/api/reviews/reply', { reviewId, reply: replyText });
+            }
             setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, reply: replyText } : r));
             setReplyingId(null);
             setReplyText('');
             setNotification({ msg: "Respuesta publicada correctamente", type: 'success' });
-        } catch (error) {
-            setNotification({ msg: "Error al publicar la respuesta", type: 'error' });
+        } catch (error: any) {
+            setNotification({ msg: error?.message || "Error al publicar la respuesta", type: 'error' });
         } finally {
             setIsSubmittingReply(false);
         }
@@ -256,7 +263,7 @@ export default function FeedbackPage() {
             ) : (
                 <SectionCard
                     title="Opiniones de clientes"
-                    subtitle={`${filteredReviews.length} opinión(es) en la vista`}
+                    subtitle={`${filteredReviews.length} ${filteredReviews.length === 1 ? "opinión" : "opiniones"} en la vista`}
                     icon={<HugeiconsIcon icon={Message02Icon} className="w-5 h-5" strokeWidth={1.8} />}
                     bodyClassName="p-5"
                 >
