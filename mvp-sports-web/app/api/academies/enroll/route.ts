@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     }
 
     await adminDb().runTransaction((tx) =>
-      commitEnrollment(tx, draft, { paymentStatus: draft.price > 0 ? "pending" : "paid", method: "venue" }),
+      commitEnrollment(tx, draft, { paymentStatus: "paid", method: "free" }) // solo clases gratis llegan aquí,
     );
     return NextResponse.json({ ok: true, enrollmentId: draft.enrollmentId });
   } catch (error: any) {

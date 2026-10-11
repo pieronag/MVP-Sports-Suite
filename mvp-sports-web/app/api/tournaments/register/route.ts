@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     }
 
     await adminDb().runTransaction((tx) =>
-      commitRegistration(tx, draft, { paymentStatus: draft.price > 0 ? "pending" : "paid", method: "venue" }),
+      commitRegistration(tx, draft, { paymentStatus: "paid", method: "free" }) // solo torneos gratis llegan aquí,
     );
     return NextResponse.json({ ok: true, registrationId: draft.regId });
   } catch (error: any) {

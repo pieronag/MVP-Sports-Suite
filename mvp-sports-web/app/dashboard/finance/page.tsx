@@ -1,11 +1,11 @@
 "use client";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
-import { isRealBooking } from "@/utils/bookingPolicy";
 import { HugeiconsIcon } from "@hugeicons/react";
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { db } from '@/services/client/firebase';
-import { collection, getDocs, query, where, onSnapshot, or } from 'firebase/firestore';
+import { listIncome } from '@/services/client/data/income';
+import { incomeTotals, type IncomeItem, type IncomeKind } from '@/utils/incomeModel';
+import { chileDateTime, chileToday } from '@/utils/chileTime';
 import Link from 'next/link';
 import {
     ArrowLeft01Icon,
@@ -21,6 +21,8 @@ import {
     DocumentCodeIcon,
     FileExportIcon,
     MoneyBag01Icon,
+    Mortarboard01Icon,
+    RefreshIcon,
     Search01Icon,
     TrophyIcon,
 } from '@hugeicons/core-free-icons';
@@ -32,29 +34,10 @@ const loadPdf = async () => {
 };
 
 // --- INTERFACES ---
-interface Transaction {
-    id: string;
-    type: 'reserva' | 'torneo';
-    amount: number;
-    date: Date;
-    clientName: string;
-    clientPhone: string;
-    details: string;
-    status: string;
-    venueName: string;
-    paymentStatus: string;
-    sport: string;
-    courtName: string;
-    timeRange: string;
-    duration: number;
-    paymentMethod: string;
-    remainingBalance: number;
-}
-
 interface Venue {
     id: string;
     name: string;
-    features?: any;
+    features?: { analytics?: boolean };
 }
 
 const formatCLP = (amount: number) => {
@@ -70,223 +53,114 @@ const MONTHS = [
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
-// Ingreso real: inscripciones, reservas pagadas no anuladas e inasistencias (el pago se retiene). Lo reembolsado no suma.
-const countsAsIncome = (t: Transaction) =>
-    t.type === 'torneo' || t.paymentStatus === 'no-show' || (t.paymentStatus === 'paid' && t.status !== 'cancelled');
-
-const computeStats = (list: Transaction[]) => {
-    return list.reduce((acc, curr) => {
-        if (countsAsIncome(curr)) {
-            acc.totalRevenue += curr.amount;
-            if (curr.type === 'reserva') acc.reservaRevenue += curr.amount;
-            else acc.torneoRevenue += curr.amount;
-        }
-        return acc;
-    }, { totalRevenue: 0, reservaRevenue: 0, torneoRevenue: 0, pendingRevenue: 0 });
+const KIND_LABEL: Record<IncomeKind, string> = { reserva: 'Reserva', torneo: 'Torneo', academia: 'Academia' };
+const KIND_TONE: Record<IncomeKind, string> = {
+    reserva: 'bg-blue-500/5 text-blue-500 border-blue-500/10',
+    torneo: 'bg-emerald-500/5 text-emerald-600 border-emerald-500/10',
+    academia: 'bg-indigo-500/5 text-indigo-500 border-indigo-500/10',
 };
-
-const statusLabel = (t: Transaction) => {
-    const ps = (t.paymentStatus || 'pending').toLowerCase();
-    if (t.type !== 'torneo' && t.status === 'cancelled' && ps !== 'refunded') return 'ANULADA';
-    if (t.type === 'torneo' || ps === 'paid') return 'PAGADO';
-    if (ps === 'partial') return 'PARCIAL';
-    if (ps === 'refunded') return 'REEMBOLSADO';
-    if (ps === 'no-show') return 'NO-SHOW';
-    return 'PENDIENTE';
+const LABEL_TONE: Record<string, string> = {
+    'Pagado': 'text-emerald-500 bg-emerald-500/10 border-emerald-500/10',
+    'Anulada': 'text-slate-500 bg-slate-500/10 border-slate-500/10',
+    'Reembolsado': 'text-rose-500 bg-rose-500/10 border-rose-500/10',
+    'Inasistencia': 'text-red-500 bg-red-500/10 border-red-500/10',
+    'Error en reembolso': 'text-amber-500 bg-amber-500/10 border-amber-500/10',
 };
+const StatusBadge = ({ label }: { label: string }) => (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] font-bold uppercase border ${LABEL_TONE[label] || 'text-slate-500 bg-slate-500/10 border-slate-500/10'}`}>
+        <span className="w-1.5 h-1.5 rounded-full bg-current" />{label}
+    </span>
+);
+const paymentLabel = (t: IncomeItem) => (t.amount > 0 ? 'Mercado Pago' : 'Gratis');
 
-const paymentMethodLabel = (m: string) => {
-    const v = (m || '').toLowerCase();
-    if (v === 'cash' || v === 'efectivo') return 'Efectivo';
-    if (v === 'transfer' || v === 'transferencia') return 'Transferencia';
-    if (v === 'mercadopago' || v === 'mp') return 'Mercado Pago';
-    if (v === 'webpay') return 'WebPay';
-    if (v === 'card' || v === 'tarjeta') return 'Tarjeta';
-    if (v === 'online') return 'Online';
-    return v || '—';
-};
-
-const paymentMethodTone = (m: string) => {
-    const v = (m || '').toLowerCase();
-    if (v === 'cash' || v === 'efectivo') return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/10';
-    if (v === 'transfer' || v === 'transferencia') return 'text-sky-500 bg-sky-500/10 border-sky-500/10';
-    if (v === 'mercadopago' || v === 'mp') return 'text-sky-500 bg-sky-500/10 border-sky-500/10';
-    if (v === 'webpay') return 'text-indigo-500 bg-indigo-500/10 border-indigo-500/10';
-    if (v === 'card' || v === 'tarjeta') return 'text-violet-500 bg-violet-500/10 border-violet-500/10';
-    return 'text-slate-400 bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10';
+// Mes calendario de Chile [inicio, fin]
+const monthBounds = (year: number, month: number) => {
+    const ymd = (y: number, m: number) => `${y}-${String(m + 1).padStart(2, '0')}-01`;
+    const next = new Date(Date.UTC(year, month + 1, 1));
+    return { from: chileDateTime(ymd(year, month), 0, 0), to: new Date(chileDateTime(ymd(next.getUTCFullYear(), next.getUTCMonth()), 0, 0).getTime() - 1) };
 };
 
 export default function FinancePage() {
     const { user } = useAuth();
-    const [loading, setLoading] = useState(true);
+    const nowChile = chileToday();
     const [myVenues, setMyVenues] = useState<Venue[]>([]);
+    const [venuesLoaded, setVenuesLoaded] = useState(false);
     const [selectedVenueId, setSelectedVenueId] = useState<string>('all');
-    const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
-    const [filterType, setFilterType] = useState<'all' | 'reserva' | 'torneo' | 'pending'>('all');
+    const [items, setItems] = useState<IncomeItem[]>([]);
+    const [loadedKey, setLoadedKey] = useState('');
+    const [loadError, setLoadError] = useState('');
+    const [reloadTick, setReloadTick] = useState(0);
+    const [filterType, setFilterType] = useState<'all' | IncomeKind>('all');
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [selectedMonth, setSelectedMonth] = useState(Number(nowChile.slice(5, 7)) - 1);
+    const [selectedYear, setSelectedYear] = useState(Number(nowChile.slice(0, 4)));
     const [rowLimit, setRowLimit] = useState(20);
 
-    // 1. Cargar recintos del dueño
+    // 1. Recintos del dueño
     useEffect(() => {
         if (!user?.uid) return;
         let active = true;
         getOwnedTenantsSnap(user.uid).then((snap) => {
             if (!active) return;
-            const list = snap.docs.map(d => ({ id: d.id, name: d.data().name, features: d.data().features || {} } as Venue));
-            setMyVenues(list);
-        });
+            setMyVenues(snap.docs.map(d => ({ id: d.id, name: d.data().name || 'Recinto', features: d.data().features || {} })));
+        }).catch(() => { if (active) setLoadError('No se pudieron cargar tus recintos.'); })
+          .finally(() => { if (active) setVenuesLoaded(true); });
         return () => { active = false; };
-    }, [user]);
+    }, [user?.uid]);
 
-    // 2. Cargar transacciones (todas, se filtran por mes en cliente)
+    // 2. Movimientos del mes elegido y del anterior (para comparar)
+    const venueIds = selectedVenueId === 'all' ? myVenues.map(v => v.id) : [selectedVenueId];
+    const queryKey = `${venueIds.join(',')}|${selectedYear}-${selectedMonth}|${reloadTick}`;
     useEffect(() => {
-        if (!user?.uid || myVenues.length === 0) {
-            setLoading(false);
-            return;
-        }
+        if (!venueIds.length) return;
+        let active = true;
+        const prev = new Date(Date.UTC(selectedYear, selectedMonth - 1, 1));
+        const from = monthBounds(prev.getUTCFullYear(), prev.getUTCMonth()).from;
+        const to = monthBounds(selectedYear, selectedMonth).to;
+        listIncome(venueIds, from, to)
+            .then((list) => { if (active) { setItems(list); setLoadError(''); } })
+            .catch((e) => {
+                console.error(e);
+                if (active) setLoadError(e?.code === 'permission-denied' ? 'No tienes permiso para ver estos movimientos.' : 'No se pudieron cargar los movimientos. Revisa tu conexión.');
+            })
+            .finally(() => { if (active) setLoadedKey(queryKey); });
+        return () => { active = false; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [queryKey]);
 
-        setLoading(true);
-        const venueIds = selectedVenueId === 'all' ? myVenues.map(v => v.id) : [selectedVenueId];
-
-        const qBookings = query(
-            collection(db, "bookings"),
-            where("tenantId", "in", venueIds.slice(0, 30))
-        );
-
-        const unsubBookings = onSnapshot(qBookings, async (bSnap) => {
-            const allBookings: Transaction[] = bSnap.docs.filter(d => isRealBooking(d.data())).map(doc => {
-                const data = doc.data();
-                const isNoShow = data.status === 'no-show' ||
-                    data.paymentStatus === 'no-show' ||
-                    (data.notes && (data.notes.toLowerCase().includes('no-show') || data.notes.toLowerCase().includes('inasistencia')));
-
-                return {
-                    id: doc.id,
-                    type: 'reserva' as const,
-                    amount: Number(data.totalPrice || data.price || 0),
-                    date: data.date?.toDate() || new Date(),
-                    clientName: data.clientName || 'Cliente Externo',
-                    clientPhone: data.clientPhone || '',
-                    details: `${data.courtName || 'Cancha'} - ${data.startTime || '--:--'}`,
-                    status: data.status,
-                    venueName: myVenues.find(v => v.id === data.tenantId)?.name || 'Recinto',
-                    paymentStatus: isNoShow ? 'no-show' : (data.paymentStatus || 'pending'),
-                    sport: data.sport || 'General',
-                    courtName: data.courtName || 'Cancha',
-                    timeRange: `${data.startTime || '--:--'} - ${data.endTime || '--:--'}`,
-                    duration: Number(data.duration || 1),
-                    paymentMethod: data.paymentMethod || 'mercadopago',
-                    remainingBalance: Number(data.remainingBalance || 0)
-                };
-            });
-
-            const qTournaments = query(
-                collection(db, "tournaments"),
-                where("tenantId", "in", venueIds.slice(0, 30))
-            );
-            const tSnap = await getDocs(qTournaments);
-            const tIds = tSnap.docs.map(d => d.id);
-
-            let tournamentRegs: Transaction[] = [];
-            if (tIds.length > 0) {
-                const chunks = [];
-                for (let i = 0; i < tIds.length; i += 10) {
-                    chunks.push(tIds.slice(i, i + 10));
-                }
-
-                for (const chunk of chunks) {
-                    const qRegs = query(
-                        collection(db, "tournament_registrations"),
-                        where("tournamentId", "in", chunk)
-                    );
-                    const rSnap = await getDocs(qRegs);
-                    const regs = rSnap.docs.map(doc => {
-                        const data = doc.data();
-                        const tInfo = tSnap.docs.find(d => d.id === data.tournamentId)?.data();
-                        return {
-                            id: doc.id,
-                            type: 'torneo' as const,
-                            amount: Number(data.paidAmount || 0),
-                            date: data.createdAt?.toDate() || new Date(),
-                            clientName: data.teamName || data.userName || 'Equipo',
-                            clientPhone: data.contactPhone || '',
-                            details: `Torneo: ${tInfo?.name || 'Copa MVP'}`,
-                            status: data.status,
-                            venueName: myVenues.find(v => v.id === tInfo?.tenantId)?.name || 'Recinto',
-                            paymentStatus: 'paid',
-                            sport: 'Torneo',
-                            courtName: 'Varias',
-                            timeRange: '',
-                            duration: 0,
-                            paymentMethod: 'online',
-                            remainingBalance: 0
-                        } as Transaction;
-                    });
-                    tournamentRegs = [...tournamentRegs, ...regs];
-                }
-            }
-
-            const consolidated = [...allBookings, ...tournamentRegs].sort((a, b) => b.date.getTime() - a.date.getTime());
-            setAllTransactions(consolidated);
-            setLoading(false);
-        });
-
-        return () => unsubBookings();
-    }, [user, myVenues, selectedVenueId]);
+    const loading = !venuesLoaded || (myVenues.length > 0 && loadedKey !== queryKey);
+    const venueName = (id: string) => myVenues.find(v => v.id === id)?.name || 'Recinto';
 
     // 3. Derivados por mes
-    const currentTransactions = useMemo(
-        () => allTransactions
-            .filter(t => t.date.getMonth() === selectedMonth && t.date.getFullYear() === selectedYear)
-            .sort((a, b) => b.date.getTime() - a.date.getTime()),
-        [allTransactions, selectedMonth, selectedYear]
-    );
+    const { from: curFrom, to: curTo } = monthBounds(selectedYear, selectedMonth);
+    const currentTransactions = items.filter(t => t.date >= curFrom && t.date <= curTo);
+    const prevTransactions = items.filter(t => t.date < curFrom);
+    const stats = incomeTotals(currentTransactions);
+    const prevStats = incomeTotals(prevTransactions);
 
-    const { prevYear, prevMonth } = useMemo(() => {
-        const d = new Date(selectedYear, selectedMonth - 1, 1);
-        return { prevYear: d.getFullYear(), prevMonth: d.getMonth() };
-    }, [selectedYear, selectedMonth]);
-
-    const prevTransactions = useMemo(
-        () => allTransactions.filter(t => t.date.getMonth() === prevMonth && t.date.getFullYear() === prevYear),
-        [allTransactions, prevMonth, prevYear]
-    );
-
-    const stats = useMemo(() => computeStats(currentTransactions), [currentTransactions]);
-    const prevStats = useMemo(() => computeStats(prevTransactions), [prevTransactions]);
-
-    const trendPct = prevStats.totalRevenue > 0
-        ? Math.round(((stats.totalRevenue - prevStats.totalRevenue) / prevStats.totalRevenue) * 100)
-        : (stats.totalRevenue > 0 ? 100 : 0);
+    const trendPct = prevStats.total > 0
+        ? Math.round(((stats.total - prevStats.total) / prevStats.total) * 100)
+        : (stats.total > 0 ? 100 : 0);
     const trendUp = trendPct >= 0;
-    const showTrend = prevStats.totalRevenue > 0 || stats.totalRevenue > 0;
-
+    const showTrend = prevStats.total > 0 || stats.total > 0;
 
     // 4. Filtros de la tabla
-    const filteredTransactions = useMemo(() => currentTransactions.filter(t => {
-        const matchesType = filterType === 'all' || t.type === filterType ||
-            (filterType === 'pending' && t.paymentStatus !== 'paid' && t.type !== 'torneo');
-        const q = searchTerm.trim().toLowerCase();
-        const matchesSearch = q === '' ||
-            t.clientName.toLowerCase().includes(q) ||
-            t.details.toLowerCase().includes(q) ||
-            t.venueName.toLowerCase().includes(q);
-        return matchesType && matchesSearch;
-    }), [currentTransactions, filterType, searchTerm]);
-
+    const q = searchTerm.trim().toLowerCase();
+    const filteredTransactions = currentTransactions.filter(t =>
+        (filterType === 'all' || t.kind === filterType) &&
+        (q === '' || t.clientName.toLowerCase().includes(q) || t.detail.toLowerCase().includes(q) || venueName(t.tenantId).toLowerCase().includes(q))
+    );
     const visibleTransactions = filteredTransactions.slice(0, rowLimit);
 
-    useEffect(() => { setRowLimit(20); }, [filterType, searchTerm, selectedMonth, selectedYear, selectedVenueId]);
-
     const changeMonth = (dir: number) => {
-        const next = new Date(selectedYear, selectedMonth + dir, 1);
-        setSelectedMonth(next.getMonth());
-        setSelectedYear(next.getFullYear());
+        const next = new Date(Date.UTC(selectedYear, selectedMonth + dir, 1));
+        setSelectedMonth(next.getUTCMonth());
+        setSelectedYear(next.getUTCFullYear());
+        setRowLimit(20);
     };
+    const isCurrentMonth = selectedYear * 12 + selectedMonth >= Number(nowChile.slice(0, 4)) * 12 + Number(nowChile.slice(5, 7)) - 1;
 
-    const sumVisible = visibleTransactions.reduce((acc, t) => acc + (countsAsIncome(t) ? t.amount : 0), 0);
+    const sumVisible = filteredTransactions.reduce((acc, t) => acc + (t.counts ? t.amount : 0), 0);
 
     // 5. Exportaciones
     const generatePDF = async () => {
@@ -328,27 +202,22 @@ export default function FinancePage() {
 
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.text(`Ingresos Totales (Pagados): ${formatCLP(stats.totalRevenue)}`, 15, 68);
-        doc.text(`Canchas / Reservas: ${formatCLP(stats.reservaRevenue)}`, 15, 74);
-        doc.text(`Inscripciones / Torneos: ${formatCLP(stats.torneoRevenue)}`, 15, 80);
+        doc.text(`Ingresos totales: ${formatCLP(stats.total)}`, 15, 68);
+        doc.text(`Reservas de canchas: ${formatCLP(stats.reserva)}`, 15, 74);
+        doc.text(`Torneos: ${formatCLP(stats.torneo)}   ·   Academias: ${formatCLP(stats.academia)}`, 15, 80);
 
-        const tableData = filteredTransactions.map(t => {
-            const sport = t.type === 'torneo' ? 'TORNEO' : (t.sport || 'FÚTBOL');
-            const court = t.type === 'torneo' ? 'VARIAS' : (t.courtName || 'PISTA');
-
-            return [
-                t.date.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-                t.clientName.toUpperCase(),
-                `${sport.toUpperCase()} - ${court.toUpperCase()}`,
-                paymentMethodLabel(t.paymentMethod).toUpperCase(),
-                formatCLP(t.amount),
-                statusLabel(t)
-            ];
-        });
+        const tableData = filteredTransactions.map(t => [
+            t.date.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+            t.clientName.toUpperCase(),
+            (t.kind === 'reserva' ? `${t.sport} - ${t.courtName}` : t.detail).toUpperCase(),
+            paymentLabel(t).toUpperCase(),
+            formatCLP(t.amount),
+            t.label.toUpperCase(),
+        ]);
 
         autoTable(doc, {
             startY: 95,
-            head: [['FECHA', 'CLIENTE / EQUIPO', 'DEPORTE - CANCHA', 'PAGO', 'MONTO', 'ESTADO']],
+            head: [['FECHA', 'CLIENTE / EQUIPO', 'DETALLE', 'PAGO', 'MONTO', 'ESTADO']],
             body: tableData,
             styles: { fontSize: 8, font: 'helvetica', cellPadding: 3 },
             headStyles: { fillColor: [0, 223, 130], textColor: [0, 0, 0], fontStyle: 'bold' },
@@ -363,12 +232,12 @@ export default function FinancePage() {
         const rows = filteredTransactions.map(t => [
             t.date.toLocaleDateString('es-CL'),
             t.clientName,
-            t.venueName,
-            t.type === 'reserva' ? `Cancha · ${t.sport}` : 'Torneo',
-            t.courtName,
-            paymentMethodLabel(t.paymentMethod),
+            venueName(t.tenantId),
+            t.kind === 'reserva' ? `Cancha · ${t.sport}` : KIND_LABEL[t.kind],
+            t.kind === 'reserva' ? t.courtName : t.detail,
+            paymentLabel(t),
             String(t.amount),
-            statusLabel(t)
+            t.label,
         ]);
         const csv = [header, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(';')).join('\n');
         const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -437,13 +306,13 @@ export default function FinancePage() {
                 {/* CONTROLES */}
                 <div className="flex flex-wrap items-center gap-2">
                     <div className="flex items-center gap-0.5 bg-white dark:bg-[#0B0F19] px-1.5 py-1 rounded-md border border-slate-200 dark:border-white/5 shadow-xs">
-                        <button onClick={() => changeMonth(-1)} className="p-1.5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-all" title="Mes anterior">
+                        <button onClick={() => changeMonth(-1)} aria-label="Mes anterior" className="p-1.5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-all" title="Mes anterior">
                             <HugeiconsIcon icon={ArrowLeft01Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                         </button>
                         <span className="px-1 text-[11px] font-bold uppercase tracking-wide text-slate-700 dark:text-white whitespace-nowrap select-none">
                             {MONTHS[selectedMonth]} <span className="text-slate-400">{selectedYear}</span>
                         </span>
-                        <button onClick={() => changeMonth(1)} className="p-1.5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-all" title="Mes siguiente">
+                        <button onClick={() => changeMonth(1)} disabled={isCurrentMonth} aria-label="Mes siguiente" className="p-1.5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-all disabled:opacity-30 disabled:pointer-events-none" title="Mes siguiente">
                             <HugeiconsIcon icon={ArrowRight01Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                         </button>
                     </div>
@@ -459,28 +328,28 @@ export default function FinancePage() {
                 </div>
             </div>
 
+            {loadError && (
+                <div role="alert" className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-md border border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-400">
+                    <p className="text-[11px] font-bold">{loadError}</p>
+                    <button onClick={() => setReloadTick(t => t + 1)} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-red-500 text-white text-[10px] font-bold uppercase tracking-wider">
+                        <HugeiconsIcon icon={RefreshIcon} className="w-3.5 h-3.5" strokeWidth={2} /> Reintentar
+                    </button>
+                </div>
+            )}
+
             {/* KPI GRID */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <TarjetaKpi
                     label={`INGRESOS ${MONTHS[selectedMonth].toUpperCase()}`}
-                    value={formatCLP(stats.totalRevenue)}
-                    sub="Monto total pagado"
+                    value={formatCLP(stats.total)}
+                    sub="Total pagado"
                     icon={<HugeiconsIcon icon={MoneyBag01Icon} />}
                     trend={showTrend ? { value: `${trendPct >= 0 ? '+' : ''}${trendPct}%`, isUp: trendUp } : undefined}
                     brillo
                 />
-                <TarjetaKpi
-                    label="RESERVAS CANCHAS"
-                    value={formatCLP(stats.reservaRevenue)}
-                    sub="Arriendos normales"
-                    icon={<HugeiconsIcon icon={Calendar03Icon} />}
-                />
-                <TarjetaKpi
-                    label="INSCRIPCIONES"
-                    value={formatCLP(stats.torneoRevenue)}
-                    sub="Torneos y ligas"
-                    icon={<HugeiconsIcon icon={TrophyIcon} />}
-                />
+                <TarjetaKpi label="RESERVAS" value={formatCLP(stats.reserva)} sub="Arriendo de canchas" icon={<HugeiconsIcon icon={Calendar03Icon} />} />
+                <TarjetaKpi label="TORNEOS" value={formatCLP(stats.torneo)} sub="Inscripciones" icon={<HugeiconsIcon icon={TrophyIcon} />} />
+                <TarjetaKpi label="ACADEMIAS" value={formatCLP(stats.academia)} sub="Clases" icon={<HugeiconsIcon icon={Mortarboard01Icon} />} />
             </div>
 
             {/* TENDENCIA + EXPORTACIÓN */}
@@ -514,18 +383,18 @@ export default function FinancePage() {
             <PanelGlass className="p-0 overflow-hidden">
                 <div className="flex flex-col lg:flex-row justify-between items-center gap-4 p-6 bg-slate-50/50 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
                     <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                        <div className="flex bg-white dark:bg-[#020611] p-1 rounded-md border border-slate-200 dark:border-white/10">
-                            {(['all', 'reserva', 'torneo'] as const).map((type) => (
+                        <div className="flex w-full sm:w-auto overflow-x-auto bg-white dark:bg-[#020611] p-1 rounded-md border border-slate-200 dark:border-white/10">
+                            {(['all', 'reserva', 'torneo', 'academia'] as const).map((type) => (
                                 <button
                                     key={type}
                                     onClick={() => setFilterType(type)}
-                                    className={`flex-1 lg:flex-none px-5 py-2 text-[10px] font-bold uppercase rounded-md transition-all ${
+                                    className={`flex-1 lg:flex-none whitespace-nowrap px-4 py-2 text-[10px] font-bold uppercase rounded-md transition-all ${
                                         filterType === type
                                             ? 'bg-slate-900 text-white dark:bg-[#00df82] dark:text-black'
                                             : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'
                                     }`}
                                 >
-                                    {type === 'all' ? 'Ver Todo' : type === 'reserva' ? 'Reservas' : 'Torneos'}
+                                    {type === 'all' ? 'Todo' : type === 'reserva' ? 'Reservas' : type === 'torneo' ? 'Torneos' : 'Academias'}
                                 </button>
                             ))}
                         </div>
@@ -546,7 +415,32 @@ export default function FinancePage() {
                     </div>
                 </div>
 
-                <div className="overflow-x-auto">
+                {/* Móvil: tarjetas */}
+                <div className="md:hidden divide-y divide-slate-100 dark:divide-white/5">
+                    {loading ? (
+                        <p className="py-16 text-center text-[10px] font-bold text-slate-400 uppercase animate-pulse">Cargando movimientos...</p>
+                    ) : visibleTransactions.length === 0 ? (
+                        <EmptyState />
+                    ) : visibleTransactions.map((t) => (
+                        <div key={`${t.kind}-${t.id}`} className="p-4 flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border ${KIND_TONE[t.kind]}`}>{KIND_LABEL[t.kind]}</span>
+                                    <span className="text-[10px] font-mono text-slate-400">{t.date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })}{t.timeRange ? ` · ${t.timeRange}` : ''}</span>
+                                </div>
+                                <p className="text-[12px] font-bold text-slate-900 dark:text-white uppercase truncate">{t.clientName}</p>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{t.kind === 'reserva' ? `${t.sport} · ${t.courtName}` : t.detail} · {venueName(t.tenantId)}</p>
+                            </div>
+                            <div className="text-right shrink-0 space-y-1.5">
+                                <p className={`text-[12px] font-black font-mono ${t.counts ? 'text-slate-900 dark:text-white' : 'text-slate-400 line-through'}`}>{formatCLP(t.amount)}</p>
+                                <StatusBadge label={t.label} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Escritorio: tabla */}
+                <div className="hidden md:block overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50/30 dark:bg-white/1">
@@ -554,8 +448,7 @@ export default function FinancePage() {
                                 <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cliente</th>
                                 <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Recinto</th>
                                 <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tipo</th>
-                                <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Deporte</th>
-                                <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cancha</th>
+                                <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Detalle</th>
                                 <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pago</th>
                                 <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Monto</th>
                                 <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">Estado</th>
@@ -564,98 +457,34 @@ export default function FinancePage() {
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={9} className="px-6 py-20 text-center text-[10px] font-bold text-slate-400 uppercase animate-pulse">Cargando registros...</td>
+                                    <td colSpan={8} className="px-6 py-20 text-center text-[10px] font-bold text-slate-400 uppercase animate-pulse">Cargando movimientos...</td>
                                 </tr>
                             ) : visibleTransactions.length > 0 ? (
                                 visibleTransactions.map((t) => (
-                                    <tr key={t.id} className="hover:bg-slate-50/50 dark:hover:bg-white/2 transition-colors group text-[11px]">
+                                    <tr key={`${t.kind}-${t.id}`} className="hover:bg-slate-50/50 dark:hover:bg-white/2 transition-colors text-[11px]">
                                         <td className="px-5 py-4">
                                             <div className="flex flex-col">
-                                                <span className="font-bold text-slate-800 dark:text-white">
-                                                    {t.date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })}
-                                                </span>
+                                                <span className="font-bold text-slate-800 dark:text-white">{t.date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })}</span>
                                                 <span className="text-[9px] text-slate-400 font-mono">{t.date.toLocaleDateString('es-CL', { year: 'numeric' })}</span>
                                                 {t.timeRange && <span className="text-[9px] text-slate-400 font-mono mt-0.5">{t.timeRange}</span>}
                                             </div>
                                         </td>
                                         <td className="px-5 py-4">
-                                            <span className="font-bold text-slate-900 dark:text-white uppercase truncate block max-w-[140px]">
-                                                {t.clientName}
-                                            </span>
+                                            <span className="font-bold text-slate-900 dark:text-white uppercase truncate block max-w-[160px]">{t.clientName}</span>
                                             {t.clientPhone && <p className="text-[9px] text-slate-400 font-mono">{t.clientPhone}</p>}
                                         </td>
-                                        <td className="px-5 py-4">
-                                            <span className="text-slate-500 dark:text-slate-300 uppercase truncate block max-w-[110px]">
-                                                {t.venueName}
-                                            </span>
-                                        </td>
-                                        <td className="px-5 py-4">
-                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border w-fit ${
-                                                t.type === 'reserva'
-                                                    ? 'bg-blue-500/5 text-blue-500 border-blue-500/10'
-                                                    : 'bg-emerald-500/5 text-emerald-600 border-emerald-500/10'
-                                            }`}>
-                                                {t.type === 'reserva' ? 'Reserva' : 'Torneo'}
-                                            </span>
-                                        </td>
-                                        <td className="px-5 py-4">
-                                            <span className="text-slate-600 dark:text-slate-300 uppercase font-bold truncate block max-w-[100px]">
-                                                {t.sport}
-                                            </span>
-                                        </td>
-                                        <td className="px-5 py-4">
-                                            <span className="text-slate-500 dark:text-slate-400 uppercase truncate block max-w-[130px]">
-                                                {t.courtName}
-                                            </span>
-                                            {t.duration > 0 && <p className="text-[9px] text-slate-400 font-mono">{t.duration}h</p>}
-                                        </td>
-                                        <td className="px-5 py-4">
-                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border ${paymentMethodTone(t.paymentMethod)}`}>
-                                                {paymentMethodLabel(t.paymentMethod)}
-                                            </span>
-                                        </td>
+                                        <td className="px-5 py-4"><span className="text-slate-500 dark:text-slate-300 uppercase truncate block max-w-[120px]">{venueName(t.tenantId)}</span></td>
+                                        <td className="px-5 py-4"><span className={`inline-flex px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border ${KIND_TONE[t.kind]}`}>{KIND_LABEL[t.kind]}</span></td>
+                                        <td className="px-5 py-4"><span className="text-slate-600 dark:text-slate-300 uppercase truncate block max-w-[200px]">{t.kind === 'reserva' ? `${t.sport} · ${t.courtName}` : t.detail}</span></td>
+                                        <td className="px-5 py-4"><span className="text-[10px] font-bold uppercase text-sky-500">{paymentLabel(t)}</span></td>
                                         <td className="px-5 py-4 text-right">
-                                            <span className="font-bold text-slate-900 dark:text-white font-mono block whitespace-nowrap">
-                                                {formatCLP(t.amount)}
-                                            </span>
-                                            {t.paymentStatus === 'partial' && t.remainingBalance > 0 && (
-                                                <span className="text-[9px] font-bold text-amber-500 font-mono uppercase whitespace-nowrap">Queda {formatCLP(t.remainingBalance)}</span>
-                                            )}
+                                            <span className={`font-bold font-mono block whitespace-nowrap ${t.counts ? 'text-slate-900 dark:text-white' : 'text-slate-400 line-through'}`}>{formatCLP(t.amount)}</span>
                                         </td>
-                                        <td className="px-5 py-4">
-                                            <div className="flex justify-center">
-                                                {(() => {
-                                                    const ps = (t.paymentStatus || 'pending').toLowerCase();
-                                                    if (t.type !== 'torneo' && t.status === 'cancelled' && ps !== 'refunded') {
-                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-bold uppercase text-slate-500 bg-slate-500/10 border border-slate-500/10"><div className="w-1.5 h-1.5 rounded-full bg-slate-500"></div>Anulada</div>;
-                                                    } else if (t.type === 'torneo' || ps === 'paid') {
-                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 border border-emerald-500/10"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Pagado</div>;
-                                                    } else if (ps === 'partial') {
-                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-bold uppercase text-sky-500 bg-sky-500/10 border border-sky-500/10"><div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>Parcial</div>;
-                                                    } else if (ps === 'refunded') {
-                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-bold uppercase text-rose-500 bg-rose-500/10 border border-rose-500/10"><div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div>Reembolsado</div>;
-                                                    } else if (ps === 'no-show') {
-                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-bold uppercase text-red-500 bg-red-500/10 border border-red-500/10"><div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>No-Show</div>;
-                                                    } else {
-                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-bold uppercase text-amber-500 bg-amber-500/10 border border-amber-500/10"><div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>Pendiente</div>;
-                                                    }
-                                                })()}
-                                            </div>
-                                        </td>
+                                        <td className="px-5 py-4 text-center"><StatusBadge label={t.label} /></td>
                                     </tr>
                                 ))
                             ) : (
-                                <tr>
-                                    <td colSpan={9}>
-                                        <div className="py-24 text-center space-y-3">
-                                            <div className="w-16 h-16 bg-slate-50 dark:bg-white/5 rounded-md flex items-center justify-center mx-auto text-slate-300 border border-slate-200 dark:border-white/10">
-                                                <HugeiconsIcon icon={Cash01Icon} className="w-8 h-8" strokeWidth={1.4} />
-                                            </div>
-                                            <p className="text-[12px] font-black uppercase text-slate-400 tracking-widest">Sin movimientos en este periodo</p>
-                                            <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Prueba con otro mes o recinto</p>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <tr><td colSpan={8}><EmptyState /></td></tr>
                             )}
                         </tbody>
                     </table>
@@ -663,7 +492,7 @@ export default function FinancePage() {
 
                 {filteredTransactions.length > 0 && (
                     <div className="px-6 py-4 border-t border-slate-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-white/2">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total del listado ({visibleTransactions.length})</p>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total cobrado del listado ({filteredTransactions.length})</p>
                         <p className="text-[10px] font-black font-mono text-emerald-600 dark:text-[#00df82]">{formatCLP(sumVisible)}</p>
                     </div>
                 )}
@@ -677,6 +506,18 @@ export default function FinancePage() {
                     </button>
                 )}
             </PanelGlass>
+        </div>
+    );
+}
+
+function EmptyState() {
+    return (
+        <div className="py-20 text-center space-y-3 px-4">
+            <div className="w-14 h-14 bg-slate-50 dark:bg-white/5 rounded-md flex items-center justify-center mx-auto text-slate-300 border border-slate-200 dark:border-white/10">
+                <HugeiconsIcon icon={Cash01Icon} className="w-7 h-7" strokeWidth={1.4} />
+            </div>
+            <p className="text-[12px] font-black uppercase text-slate-400 tracking-widest">Sin movimientos en este periodo</p>
+            <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Prueba con otro mes o recinto</p>
         </div>
     );
 }

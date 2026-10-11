@@ -64,7 +64,7 @@ export async function buildRegistration(uid: string, tournamentId: string, teamI
 export async function commitRegistration(
   tx: Transaction,
   draft: Omit<RegistrationDraft, "title" | "returnUrl">,
-  payment: { paymentStatus: "paid" | "pending"; method: "mercadopago" | "venue"; paymentRecordId?: string },
+  payment: { paymentStatus: "paid" | "pending"; method: "mercadopago" | "free"; paymentRecordId?: string },
 ) {
   const db = adminDb();
   const regRef = db.collection("tournament_registrations").doc(draft.regId);

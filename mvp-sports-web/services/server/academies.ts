@@ -64,7 +64,7 @@ export async function buildEnrollment(uid: string, classId: string): Promise<Enr
 export async function commitEnrollment(
   tx: Transaction,
   draft: Omit<EnrollmentDraft, "title" | "returnUrl">,
-  payment: { paymentStatus: "paid" | "pending"; method: "mercadopago" | "venue"; paymentRecordId?: string },
+  payment: { paymentStatus: "paid" | "pending"; method: "mercadopago" | "free"; paymentRecordId?: string },
   // Con un pago ya aprobado se inscribe aunque el cupo se haya llenado entretanto
   // (mejor un alumno extra que un cobro sin inscripción).
   enforceCapacity = true,
