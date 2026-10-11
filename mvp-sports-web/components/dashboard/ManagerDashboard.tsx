@@ -1,8 +1,13 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { watchBookings } from "@/services/client/data/bookings";
+import { isReal, bookingLabel } from "@/utils/bookingModel";
+import { chileDateTime, operatingDay } from "@/utils/chileTime";
+import { summarizeDay, type CourtRef } from "@/utils/daySummary";
+import type { Booking } from "@/types/booking";
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/client/firebase';
-import { collection, query, where, orderBy, limit, doc, getDoc, addDoc, Timestamp, onSnapshot, getDocs } from 'firebase/firestore';
+import { collection, query, where, Timestamp, onSnapshot, getDocs } from 'firebase/firestore';
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     AlertCircleIcon,
@@ -29,38 +34,12 @@ const ChartBarIcon = ({ className }: { className?: string }) => <HugeiconsIcon i
 const BoltIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={FlashIcon} className={className} strokeWidth={1.6} />;
 const SparklesIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={SparklesIconHi} className={className} strokeWidth={1.6} />;
 const TicketIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Ticket01Icon} className={className} strokeWidth={1.6} />;
-import { collectedAmount, pendingAmount, durationHours, dayOpenHours } from '@/utils/bookingMath';
+import { dayOpenHours } from '@/utils/bookingMath';
 import Link from 'next/link';
 import MetricCard from './MetricCard';
 import { PanelGlass, TarjetaKpi } from '@/components/ui/DashboardWidgets';
 
 // --- INTERFACES ---
-interface Booking {
-    id: string;
-    courtId: string;
-    courtName: string;
-    clientName: string;
-    date: Timestamp;
-    startTime: string;
-    endTime?: string;
-    duration?: number;
-    status: string;
-    paymentStatus: string;
-    price: number;
-    totalPrice?: number;
-    deposit?: number;
-    sport?: string;
-    notes?: string;
-}
-
-interface CourtStatus {
-    id: string;
-    name: string;
-    sport?: string;
-    isOccupied: boolean;
-    currentBooking?: string;
-    endTime?: Date;
-}
 
 export default function ManagerDashboard() {
     const { user, firestoreUser } = useAuth();
@@ -72,20 +51,13 @@ export default function ManagerDashboard() {
     const [selectedTenantId, setSelectedTenantId] = useState<string>('');
     const [selectedTenantName, setSelectedTenantName] = useState<string>('Cargando...');
 
-    // Métricas
-    const [stats, setStats] = useState({
-        todayCount: 0,
-        activeNow: 0,
-        revenueToday: 0,
-        pendingRevenue: 0,
-        occupancyRate: 0,
-        avgTicket: 0
-    });
-
-    const [nextBookings, setNextBookings] = useState<Booking[]>([]);
-    const [courtStatuses, setCourtStatuses] = useState<CourtStatus[]>([]);
+    const [courts, setCourts] = useState<CourtRef[]>([]);
+    const [dayBookings, setDayBookings] = useState<Booking[]>([]);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-    const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+    // Día operativo en hora de Chile (antes con toISOString(), que después de las 21:00 mostraba el día siguiente)
+    const [selectedDate, setSelectedDate] = useState<string>(operatingDay().day);
+    const [now, setNow] = useState(() => new Date());
+    useEffect(() => { const t = setInterval(() => setNow(new Date()), 60_000); return () => clearInterval(t); }, []);
 
 
 
@@ -131,104 +103,31 @@ export default function ManagerDashboard() {
 
     useEffect(() => {
         if (!selectedTenantId) return;
-        setLoading(true);
-        setErrorMsg(null);
-
-        const courtsQ = query(collection(db, "courts"), where("tenantId", "==", selectedTenantId));
-        const unsubscribeCourts = onSnapshot(courtsQ, (courtsSnap) => {
-            const courtsList = courtsSnap.docs.map(d => ({
-                id: d.id,
-                name: d.data().name,
-                sport: d.data().sport || d.data().category || '',
-                isOccupied: false
-            } as CourtStatus));
-
-            const [y, m, d] = selectedDate.split('-').map(Number);
-            const startOfDay = new Date(y, m - 1, d, 0, 0, 0);
-            const endOfDay = new Date(y, m - 1, d, 23, 59, 59);
-
-            const qBookings = query(
-                collection(db, "bookings"),
-                where("tenantId", "==", selectedTenantId),
-                where("date", ">=", Timestamp.fromDate(startOfDay)),
-                where("date", "<=", Timestamp.fromDate(endOfDay))
-            );
-
-            const unsubscribeBookings = onSnapshot(qBookings, (bSnap) => {
-                const todayDocs = bSnap.docs.map(doc => {
-                    const data = doc.data();
-                    const dateTs = data.date || data.startTime || Timestamp.now();
-                    const startStr = typeof data.startTime === 'string' ? data.startTime : (dateTs ? `${dateTs.toDate().getHours().toString().padStart(2, '0')}:${dateTs.toDate().getMinutes().toString().padStart(2, '0')}` : '00:00');
-                    return { id: doc.id, ...data, date: dateTs, startTime: startStr } as Booking;
-                });
-
-                const nowTime = new Date();
-                let activeNowCount = 0;
-
-                const updatedCourtStatus = courtsList.map(court => {
-                    const activeBooking = todayDocs.find(b => {
-                        if (b.courtId !== court.id || b.status === 'cancelled') return false;
-                        const hourStart = parseInt(b.startTime.split(':')[0]) || 0;
-                        const start = new Date(startOfDay.getTime());
-                        start.setHours(hourStart, 0, 0);
-                        const end = new Date(start.getTime() + durationHours(b) * 3600000);
-                        return nowTime >= start && nowTime < end;
-                    });
-                    if (activeBooking) {
-                        activeNowCount++;
-                        const hourStart = parseInt(activeBooking.startTime.split(':')[0]) || 0;
-                        const bookingEnd = new Date(startOfDay.getTime());
-                        bookingEnd.setTime(bookingEnd.getTime() + (hourStart + durationHours(activeBooking)) * 3600000);
-                        return { ...court, isOccupied: true, currentBooking: activeBooking.clientName, endTime: bookingEnd };
-                    }
-                    return court;
-                });
-
-                // Mismas reglas que Agenda (utils/bookingMath)
-                const revenue = todayDocs.reduce((acc, curr) => acc + collectedAmount(curr), 0);
-                const pending = todayDocs.reduce((acc, curr) => acc + pendingAmount(curr), 0);
-                const totalHoursBooked = todayDocs.reduce((acc, curr) => acc + (curr.status !== 'cancelled' ? durationHours(curr) : 0), 0);
-                // Capacidad según el horario real del recinto ese día (igual que la Agenda)
-                const venue = myVenues.find(v => v.id === selectedTenantId);
-                const totalCapacityHours = Math.max(1, courtsList.length * dayOpenHours(venue, selectedDate).slots.length);
-                const occupancy = Math.round((totalHoursBooked / totalCapacityHours) * 100);
-
-                setStats({
-                    todayCount: todayDocs.filter(b => b.status !== 'cancelled').length,
-                    activeNow: activeNowCount,
-                    revenueToday: revenue,
-                    pendingRevenue: pending,
-                    occupancyRate: occupancy,
-                    avgTicket: todayDocs.filter(b => b.status !== 'cancelled' && b.paymentStatus !== 'pending').length > 0 
-                        ? Math.round(revenue / todayDocs.filter(b => b.status !== 'cancelled' && b.paymentStatus !== 'pending').length) 
-                        : 0
-                });
-                setCourtStatuses(updatedCourtStatus);
-                setNextBookings(todayDocs.filter(b => {
-                    if (b.status === 'cancelled') return false;
-                    const h = parseInt(b.startTime.split(':')[0]) || 0;
-                    const end = new Date(startOfDay.getTime());
-                    end.setHours(h + 1, 0, 0);
-                    return end > nowTime;
-                }).sort((a,b) => {
-                    const hourA = parseInt(a.startTime.split(':')[0]) || 0;
-                    const hourB = parseInt(b.startTime.split(':')[0]) || 0;
-                    return hourA - hourB;
-                }).slice(0, 5));
-                setLoading(false);
-            }, (err) => {
-                console.error("Error bookings snapshot:", err);
-                setLoading(false);
-            });
-
-            return () => unsubscribeBookings();
-        }, (err) => {
-            console.error("Error courts snapshot:", err);
+        const onErr = (e: Error & { code?: string }) => {
+            console.error(e);
+            setErrorMsg(e.code === 'permission-denied' ? 'Tu cuenta no tiene permisos sobre este recinto.' : 'No se pudieron cargar los datos del recinto.');
             setLoading(false);
-        });
+        };
+        const unsubCourts = onSnapshot(query(collection(db, "courts"), where("tenantId", "==", selectedTenantId)), (snap) => {
+            setCourts(snap.docs.map(d => ({ id: d.id, name: d.data().name || 'Cancha', sport: d.data().sport || d.data().category || '' }))
+                .sort((x, y) => x.name.localeCompare(y.name)));
+        }, onErr);
+        const from = chileDateTime(selectedDate, 6, 0);
+        const to = new Date(chileDateTime(selectedDate, 6, 0, 1).getTime() - 1);
+        const unsubBookings = watchBookings([selectedTenantId], { from, to }, (list) => {
+            setDayBookings(list.filter(isReal));
+            setErrorMsg(null);
+            setLoading(false);
+        }, onErr);
+        return () => { unsubCourts(); unsubBookings(); };
+    }, [selectedTenantId, selectedDate, refreshTrigger]);
 
-        return () => unsubscribeCourts();
-    }, [selectedTenantId, selectedDate, refreshTrigger, myVenues]);
+    const venue = myVenues.find(v => v.id === selectedTenantId);
+    const summary = summarizeDay(dayBookings, courts, dayOpenHours(venue, selectedDate).slots.length, now);
+    const stats = summary;
+    const courtStatuses = summary.courtStatuses;
+    const nextBookings = summary.nextBookings;
+    const BADGE: Record<string, string> = { 'Pagado': 'bg-emerald-500 text-white', 'Inasistencia': 'bg-red-500 text-white', 'Reembolsado': 'bg-rose-500 text-white', 'Anulada': 'bg-slate-500 text-white', 'Error en reembolso': 'bg-amber-500 text-white' };
 
     const formatMoney = (amount: number) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }).format(amount);
     const formatTime = (ts: Timestamp | Date | string) => {
@@ -378,7 +277,7 @@ export default function ManagerDashboard() {
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
                                                     <span className="font-black text-slate-900 dark:text-white font-mono text-xs">{formatTime(b.startTime)}</span>
-                                                    <span className="text-[7px] font-bold text-slate-400 uppercase">{b.date?.toDate ? b.date.toDate().toLocaleDateString('es-CL') : 'HOY'}</span>
+                                                    <span className="text-[7px] font-bold text-slate-400 uppercase">{b.start ? b.start.toLocaleDateString('es-CL') : 'HOY'}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
@@ -395,33 +294,13 @@ export default function ManagerDashboard() {
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex flex-col items-end">
-                                                    <span className="font-black text-slate-900 dark:text-white text-xs">{formatMoney(b.totalPrice || b.price || 0)}</span>
-                                                    {Number(b.deposit) > 0 && b.paymentStatus === 'partial' && (
-                                                        <span className="text-[7px] font-bold text-amber-500 uppercase">Seña: {formatMoney(b.deposit || 0)}</span>
-                                                    )}
+                                                    <span className="font-black text-slate-900 dark:text-white text-xs">{formatMoney(b.price)}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                {(() => {
-                                                    const isNoShow = b.status === 'no-show' || 
-                                                                     b.paymentStatus === 'no-show' || 
-                                                                     (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia')));
-                                                    const ps = isNoShow ? 'no-show' : (b.paymentStatus || 'pending').toLowerCase();
-                                                    
-                                                    let style = 'bg-amber-500 text-white';
-                                                    let label = 'PENDIENTE';
-                                                    
-                                                    if (ps === 'paid') { style = 'bg-emerald-500 text-white'; label = 'PAGADO'; }
-                                                    else if (ps === 'partial') { style = 'bg-sky-500 text-white'; label = 'PARCIAL'; }
-                                                    else if (ps === 'no-show') { style = 'bg-red-500 text-white'; label = 'NO-SHOW'; }
-                                                    else if (ps === 'refunded') { style = 'bg-rose-500 text-white'; label = 'REEMBOLSADO'; }
-                                                    
-                                                    return (
-                                                        <span className={`px-2.5 py-0.5 rounded-md text-[7px] font-black uppercase tracking-widest ${style}`}>
-                                                            {label}
-                                                        </span>
-                                                    );
-                                                })()}
+                                                <span className={`px-2.5 py-0.5 rounded-md text-[7px] font-black uppercase tracking-widest ${BADGE[bookingLabel(b)] || 'bg-slate-500 text-white'}`}>
+                                                    {bookingLabel(b)}
+                                                </span>
                                             </td>
                                         </tr>
                                     )) : (
@@ -443,10 +322,10 @@ export default function ManagerDashboard() {
                             <div>
                                 <div className="flex justify-between items-center mb-3">
                                     <span className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">Liquidación</span>
-                                    <span className="text-[10px] font-black text-emerald-600">{nextBookings.filter(b => b.paymentStatus === 'paid').length}/{nextBookings.length}</span>
+                                    <span className="text-[10px] font-black text-emerald-600">{nextBookings.filter(b => b.payment === 'paid').length}/{nextBookings.length}</span>
                                 </div>
                                 <div className="w-full h-1.5 bg-slate-50 dark:bg-white/5 rounded-full overflow-hidden">
-                                    <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${nextBookings.length > 0 ? (nextBookings.filter(b => b.paymentStatus === 'paid').length / nextBookings.length * 100) : 0}%` }}></div>
+                                    <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${nextBookings.length > 0 ? (nextBookings.filter(b => b.payment === 'paid').length / nextBookings.length * 100) : 0}%` }}></div>
                                 </div>
                             </div>
                             
