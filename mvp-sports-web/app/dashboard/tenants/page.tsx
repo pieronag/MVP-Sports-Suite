@@ -1,4 +1,5 @@
 "use client";
+import { normalizeVenue } from "@/utils/venueModel";
 import React, { useState, useEffect } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -207,7 +208,7 @@ export default function Page() {
                     imageURL: data.imageURL || data.imageUrl || "",
                     plan: data.planId || data.plan || "",
                     mrr: resolvePlanPrice(data.planId || data.plan), status: data.status,
-                    infra: { courts: courtsByTenant.get(tenantId) || 0, staff: staffList.length, sports: data.sports || [], scheduleSummary: scheduleStr },
+                    infra: { courts: courtsByTenant.get(tenantId) || 0, staff: staffList.length, sports: normalizeVenue(tenantId, data).sports, scheduleSummary: scheduleStr },
                     todayStats: { bookings: 0, capacity: 0 }, debt: data.debtStatus === "Vencido" ? resolvePlanPrice(data.planId || data.plan) : 0,
                     lastSync: "En línea", staffMembers: staffList,
                     transbankConfig: data.transbankConfig || { commerceCode: "", apiKey: "" },

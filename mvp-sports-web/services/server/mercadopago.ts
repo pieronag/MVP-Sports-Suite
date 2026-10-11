@@ -2,6 +2,7 @@ import "server-only";
 import crypto from "crypto";
 import { couponIssue, couponUses } from "@/utils/coupon";
 import { chileDateTime } from "@/utils/chileTime";
+import { isWithinOpenHours } from "@/utils/venueSchedule";
 import { courtBlockedAt } from "@/utils/courtAvailability";
 import { syncBooking } from "@/services/server/bookingProjections";
 import { adminDb } from "@/services/server/firebase-admin";
@@ -70,6 +71,7 @@ export async function buildBookingCheckout(uid: string, input: BookingCheckoutIn
   if (!court || court.tenantId !== tenantId) throw new PaymentError("Cancha no encontrada", 404);
   if (tenant.isMercadopagoActive === false) throw new PaymentError("Este recinto no tiene pagos online habilitados");
 
+  if (!isWithinOpenHours(tenant, date, startTime)) throw new PaymentError("El recinto no atiende en ese horario");
   const basePrice = priceFromTenantConfig(tenant, sport, date, startTime);
   if (basePrice <= 0) throw new PaymentError("El recinto no tiene tarifa para ese horario");
 

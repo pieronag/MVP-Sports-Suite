@@ -3,6 +3,7 @@ import { collection, onSnapshot, or, query, where } from "firebase/firestore";
 import { db } from "@/services/client/firebase";
 import { courtBlockedAt } from "@/utils/courtAvailability";
 import { toDate } from "@/utils/bookingModel";
+import { normalizeVenue } from "@/utils/venueModel";
 import type { RawDoc } from "@/types/booking";
 
 export interface VenueSummary { id: string; name: string; address: string; status: string; raw: RawDoc }
@@ -13,7 +14,8 @@ export function watchOwnedVenues(uid: string, onData: (v: VenueSummary[]) => voi
   const q = query(collection(db, "tenants"), or(where("ownerId", "==", uid), where("ownerIds", "array-contains", uid)));
   return onSnapshot(q, (snap) => onData(snap.docs.map((d) => {
     const x = d.data();
-    return { id: d.id, name: x.name || "Recinto", address: x.address || "", status: x.status || "", raw: x };
+    const v = normalizeVenue(d.id, x);
+    return { id: d.id, name: v.name, address: v.address, status: x.status || "", raw: x };
   }).sort((a, b) => a.name.localeCompare(b.name))), onError);
 }
 

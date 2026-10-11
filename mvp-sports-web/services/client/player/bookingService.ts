@@ -1,5 +1,6 @@
 import { cached, invalidate } from '@/services/client/player/cache';
 import { syncBookingSlots } from '@/services/client/apiClient';
+import { openHours } from "@/utils/venueSchedule";
 import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { db, auth } from '@/services/client/firebase';
 
@@ -45,29 +46,9 @@ export const bookingService = {
         try {
             const tenantDocRef = doc(db, 'tenants', tenantId);
             const tenantSnap = await getDoc(tenantDocRef);
-            let openTime = '08:00', closeTime = '23:00';
-            if (tenantSnap.exists()) {
-                const tData = tenantSnap.data();
-                if (tData.openTime) openTime = tData.openTime;
-                if (tData.closeTime) closeTime = tData.closeTime;
-            }
-            const [y, m, d] = dateStr.split('-').map(Number);
-            const bookingDate = new Date(y, m - 1, d);
-            const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-            const dayName = daysOfWeek[bookingDate.getDay()];
-            if (tenantSnap.exists() && tenantSnap.data().schedule?.[dayName]) {
-                const dayConfig = tenantSnap.data().schedule[dayName];
-                if (dayConfig.isOpen === false) return [];
-                if (dayConfig.open) openTime = dayConfig.open;
-                if (dayConfig.close) closeTime = dayConfig.close;
-            }
-            const dynamicSlots: string[] = [];
-            let openHour = parseInt(openTime.split(':')[0]) || 8;
-            let closeHour = parseInt(closeTime.split(':')[0]) || 23;
-            let adjustedClose = closeHour;
-            if (adjustedClose <= openHour) adjustedClose += 24;
-            for (let i = openHour; i < adjustedClose; i++) dynamicSlots.push(`${(i % 24).toString().padStart(2, '0')}:00`);
-            slots = dynamicSlots;
+            if (!tenantSnap.exists()) return [];
+            slots = openHours(tenantSnap.data(), dateStr).slots;
+            if (!slots.length) return [];
             // Horarios ocupados desde la proyección pública (bookings ya no es legible por jugadores)
             const slotSnap = await getDoc(doc(db, 'court_slots', `${courtId}_${dateStr}`)).catch(() => null);
             const occupiedTimes = Object.keys((slotSnap?.data() as any)?.taken || {});

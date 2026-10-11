@@ -2,6 +2,7 @@ import { cached } from '@/services/client/player/cache';
 import { collection, query, where, getDocs, documentId, doc, getDoc, orderBy } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
 import { postApi } from '@/services/client/apiClient';
+import { normalizeVenue } from '@/utils/venueModel';
 
 export interface Tenant {
     id: string;
@@ -45,24 +46,17 @@ const processTenantData = (id: string, raw: any): Tenant => {
         basketball: 'https://images.unsplash.com/photo-1544919982-b61976f0ba4a',
         general: 'https://images.unsplash.com/photo-1595435064215-68d148332009',
     };
-    const sport = raw?.sports?.[0]?.toLowerCase() || 'general';
-    const nestedImageUrl = raw.coordinates?.imageURL || raw.coordinates?.imageUrl;
-    const directImageUrl = raw.imageUrl || raw.imageURL;
-    let finalImageUrl = nestedImageUrl || directImageUrl || stockImages[sport] || stockImages.general;
-    const rawCoords = raw.coordinates || raw.location || raw;
-    const coords = {
-        ...raw.coordinates,
-        lat: Number(rawCoords?.lat ?? rawCoords?.latitude ?? rawCoords?._lat ?? 0),
-        lng: Number(rawCoords?.lng ?? rawCoords?.longitude ?? rawCoords?._long ?? 0)
-    };
+    const v = normalizeVenue(id, raw);
+    const sport = (v.sports[0] || 'general').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
     return {
         id, ...raw, name: raw.name || 'Sin Nombre',
-        imageUrl: finalImageUrl,
-        rating: raw.rating ?? 0,
-        coordinates: coords,
-        address: raw.coordinates?.fullAddress || raw.address || 'Ubicación no disponible',
+        imageUrl: v.imageUrl || stockImages[sport] || stockImages.general,
+        rating: v.rating,
+        sports: v.sports,
+        coordinates: { ...raw.coordinates, lat: v.location?.lat ?? 0, lng: v.location?.lng ?? 0 },
+        address: v.address || 'Ubicación no disponible',
         features: raw.features || { seo: true, topPosition: false, ads: false, analytics: true },
-        gallery: Array.isArray(raw.gallery) ? raw.gallery : [],
+        gallery: v.gallery,
         openTime: raw.openTime,
         closeTime: raw.closeTime,
         schedule: raw.schedule,
@@ -78,7 +72,7 @@ export const venueService = {
         const tenantsRef = collection(db, 'tenants');
         const querySnapshot = await getDocs(tenantsRef);
         return querySnapshot.docs
-            .filter(doc => { const s = (doc.data().status || '').toLowerCase(); return s !== 'suspended' && s !== 'suspendido' && s !== 'inactive'; })
+            .filter(doc => normalizeVenue(doc.id, doc.data()).state === 'active')
             .map(doc => processTenantData(doc.id, doc.data()))
             .sort((a, b) => ((b.features?.topPosition ? 1 : 0) - (a.features?.topPosition ? 1 : 0)) || ((b as any).priorityScore ?? 10) - ((a as any).priorityScore ?? 10));
     },
