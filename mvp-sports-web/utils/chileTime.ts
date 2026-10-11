@@ -1,4 +1,3 @@
-import "server-only";
 
 // Hora de pared en Chile como instante comparable (la diferencia entre dos de estos es la real)
 export function chileWallClock(d: Date, time?: string): number {
@@ -11,9 +10,9 @@ export function chileWallClock(d: Date, time?: string): number {
 }
 
 // Horas que faltan para el inicio de la reserva (negativo si ya empezó); null si faltan datos
-export function hoursUntilStart(booking: any): number | null {
+export function hoursUntilStart(booking: any, now: Date = new Date()): number | null {
   const raw = booking.date;
   const date: Date | null = raw?.toDate ? raw.toDate() : raw ? new Date(/^\d{4}-\d{2}-\d{2}$/.test(String(raw)) ? `${raw}T12:00:00Z` : raw) : null;
   if (!date || isNaN(date.getTime()) || !booking.startTime) return null;
-  return (chileWallClock(date, booking.startTime) - chileWallClock(new Date())) / 3_600_000;
+  return (chileWallClock(date, booking.startTime) - chileWallClock(now)) / 3_600_000;
 }

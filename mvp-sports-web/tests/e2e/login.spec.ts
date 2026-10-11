@@ -1,37 +1,31 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Login Page", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/login");
-  });
+// No se envían credenciales: el login real contra Firebase se prueba manualmente.
+test.describe("Login", () => {
+  test.beforeEach(async ({ page }) => { await page.goto("/login"); });
 
-  test("shows login form", async ({ page }) => {
-    await expect(page.locator("text=INICIAR SESIÓN")).toBeVisible();
+  test("muestra Google, correo y contraseña", async ({ page }) => {
+    await expect(page.getByRole("button", { name: /ingresar con google/i })).toBeVisible();
     await expect(page.locator('input[type="email"]')).toBeVisible();
     await expect(page.locator('input[type="password"]')).toBeVisible();
   });
 
-  test("shows error with invalid credentials", async ({ page }) => {
-    await page.fill('input[type="email"]', "invalid@test.com");
-    await page.fill('input[type="password"]', "wrongpassword");
-    await page.click('button[type="submit"]');
-    await expect(page.getByText(/credenciales incorrectas|demasiados intentos/i)).toBeVisible({ timeout: 10000 });
-  });
-
-  test("navigates to landing page", async ({ page }) => {
-    await page.click("text=Volver al Inicio");
-    await expect(page).toHaveURL("/");
-  });
-
-  test("has link to terms and privacy", async ({ page }) => {
-    await expect(page.locator("text=Términos")).toBeVisible();
-    await expect(page.locator("text=Privacidad")).toBeVisible();
+  test("tiene enlaces a términos y privacidad", async ({ page }) => {
+    await expect(page.getByRole("link", { name: /términos/i }).first()).toHaveAttribute("href", "/terms");
+    await expect(page.getByRole("link", { name: /privacidad/i }).first()).toHaveAttribute("href", "/privacy");
   });
 });
 
-test.describe("Dashboard Access", () => {
-  test("redirects unauthenticated users", async ({ page }) => {
-    await page.goto("/dashboard");
-    await expect(page).toHaveURL(/.*login.*/);
+test.describe("Rutas protegidas", () => {
+  for (const path of ["/dashboard", "/dashboard/checkin", "/dashboard/calendar", "/player", "/player/reservas", "/player/checkout", "/player/ranking"]) {
+    test(`${path} redirige al login sin sesión`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page).toHaveURL(/\/login/, { timeout: 20_000 });
+    });
+  }
+
+  test("la reserva manual ya no existe", async ({ page }) => {
+    const res = await page.goto("/dashboard/manual-booking");
+    expect(res?.status()).toBe(404);
   });
 });

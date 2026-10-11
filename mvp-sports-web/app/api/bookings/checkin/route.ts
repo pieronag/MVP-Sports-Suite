@@ -3,7 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/services/server/firebase-admin";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { syncBooking } from "@/services/server/bookingProjections";
-import { hoursUntilStart } from "@/services/server/chileTime";
+import { canCheckIn, canMarkNoShow } from "@/utils/bookingPolicy";
 import { worksAtTenant } from "@/services/server/tenantAccess";
 import { recomputePlayer } from "@/services/server/gamification";
 
@@ -21,18 +21,12 @@ export async function POST(request: Request) {
   const b = (await ref.get()).data();
   if (!b) return NextResponse.json({ error: "No se encontró la reserva." }, { status: 404 });
   if (!(await worksAtTenant(caller.uid, b.tenantId))) return NextResponse.json({ error: "No trabajas en este recinto." }, { status: 403 });
-  if (b.status === "cancelled") return NextResponse.json({ error: "La reserva está cancelada." }, { status: 409 });
-  if (b.checkIn) return NextResponse.json({ error: "El jugador ya ingresó." }, { status: 409 });
-  const h = hoursUntilStart(b);
-  if (h === null) return NextResponse.json({ error: "La reserva no tiene horario." }, { status: 409 });
+  const decision = action === "checkin" ? canCheckIn(b) : canMarkNoShow(b);
+  if (!decision.ok) return NextResponse.json({ error: decision.reason }, { status: 409 });
 
   if (action === "checkin") {
-    if (b.paymentStatus !== "paid") return NextResponse.json({ error: "La reserva no tiene un pago online aprobado." }, { status: 409 });
-    if (h > 2) return NextResponse.json({ error: "Demasiado temprano: el ingreso se habilita 2 horas antes." }, { status: 409 });
-    if (h < -0.25) return NextResponse.json({ error: "Pasaron más de 15 minutos del inicio: la reserva se considera inasistencia." }, { status: 409 });
     await ref.update({ checkIn: true, checkInTime: FieldValue.serverTimestamp(), checkInBy: caller.uid, status: "active" });
   } else {
-    if (h > 0) return NextResponse.json({ error: "La reserva aún no comienza." }, { status: 409 });
     await ref.update({ status: "cancelled", noShow: true, noShowBy: caller.uid, updatedAt: FieldValue.serverTimestamp() });
     if (b.userId) await db.collection("users").doc(b.userId).update({ strikes: FieldValue.increment(1), lastStrikeAt: FieldValue.serverTimestamp() }).catch(() => undefined);
   }

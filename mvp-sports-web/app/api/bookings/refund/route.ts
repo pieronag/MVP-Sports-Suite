@@ -4,7 +4,7 @@ import { adminDb } from "@/services/server/firebase-admin";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { allowRequest } from "@/services/server/rateLimit";
 import { syncBooking } from "@/services/server/bookingProjections";
-import { hoursUntilStart } from "@/services/server/chileTime";
+import { canPlayerCancel, refundFor } from "@/utils/bookingPolicy";
 
 // Token Mercado Pago del recinto (tenant_secrets) o de la plataforma (settings_private)
 async function resolveMercadoPagoToken(tenantId?: string): Promise<string | undefined> {
@@ -16,8 +16,6 @@ async function resolveMercadoPagoToken(tenantId?: string): Promise<string | unde
   const priv = (await db.collection("settings_private").doc("global").get()).data();
   return priv?.mercadopagoAccessToken || process.env.MERCADOPAGO_ACCESS_TOKEN || undefined;
 }
-
-const CANCEL_MIN_HOURS = 24;
 
 // Única vía para que un jugador cancele: solo hasta 24 h antes, reembolsando lo pagado menos 3% de comisión.
 export async function POST(request: Request) {
@@ -35,14 +33,8 @@ export async function POST(request: Request) {
     const bookingData = (await bookingRef.get()).data();
     if (!bookingData) return NextResponse.json({ error: "No se encontró la reserva." }, { status: 404 });
     if (bookingData.userId !== caller.uid) return NextResponse.json({ error: "No tienes permisos sobre esta reserva." }, { status: 403 });
-    if (bookingData.status === "cancelled") return NextResponse.json({ error: "La reserva ya está cancelada." }, { status: 409 });
-    if (bookingData.checkIn || ["active", "completed", "past", "no-show"].includes(bookingData.status)) {
-      return NextResponse.json({ error: "La reserva ya comenzó, no se puede cancelar." }, { status: 409 });
-    }
-    const hoursLeft = hoursUntilStart(bookingData);
-    if (hoursLeft === null || hoursLeft < CANCEL_MIN_HOURS) {
-      return NextResponse.json({ error: `Las reservas solo se pueden cancelar hasta ${CANCEL_MIN_HOURS} horas antes del partido.` }, { status: 409 });
-    }
+    const decision = canPlayerCancel(bookingData);
+    if (!decision.ok) return NextResponse.json({ error: decision.reason }, { status: 409 });
 
     const paymentSnap = await db.collection("payments").where("bookingId", "==", String(bookingId)).limit(1).get();
     const paymentDoc = paymentSnap.empty ? null : paymentSnap.docs[0];
@@ -60,8 +52,7 @@ export async function POST(request: Request) {
       originalAmount = paymentData?.amount || originalAmount;
     }
 
-    const fee = Math.round(originalAmount * 0.03);
-    const refundAmount = Math.max(0, originalAmount - fee);
+    const { fee, refund: refundAmount } = refundFor(originalAmount);
     let refundResult: any;
     const mpPaymentId = paymentData?.mercadopagoPaymentId;
     if (paymentData?.method === "mercadopago" && paymentData?.status === "approved" && mpPaymentId) {
