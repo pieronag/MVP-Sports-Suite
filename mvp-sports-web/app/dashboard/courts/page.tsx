@@ -1,5 +1,9 @@
 "use client";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
+import { postApi } from "@/services/client/apiClient";
+import { listBookings } from "@/services/client/data/bookings";
+import { normalizeBooking, isReal } from "@/utils/bookingModel";
+import { chileDateTime } from "@/utils/chileTime";
 import { courtBlockedAt } from "@/utils/courtAvailability";
 import { uploadImage } from "@/services/client/imageUpload";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -193,6 +197,16 @@ const maintenanceWindow = (c: any) => {
     if (!b) return 'Sin fecha de término';
     if (a && day(a) === day(b)) return `${day(a)} · ${hour(a)} – ${hour(b)}`;
     return `${a ? day(a) + ' – ' : 'Hasta '}${day(b)}`;
+};
+
+// Ventana del formulario de mantenimiento en hora de Chile
+const maintenanceRange = (f: { type: string; date: string; startTime: string; endTime: string; endDate: string }) => {
+    const hm = (t: string) => t.split(':').map(Number) as [number, number];
+    if (f.type === 'hours') {
+        const [sh, sm] = hm(f.startTime); const [eh, em] = hm(f.endTime);
+        return { start: chileDateTime(f.date, sh, sm || 0), end: chileDateTime(f.date, eh, em || 0) };
+    }
+    return { start: chileDateTime(f.date, 0, 0), end: new Date(chileDateTime(f.endDate, 0, 0, 1).getTime() - 1) };
 };
 
 export default function CourtsPage() {
@@ -629,16 +643,13 @@ export default function CourtsPage() {
         const courtToDelete = courts.find(c => c.id === courtId);
         // No dejar reservas huérfanas: bloquear si hay reservas vigentes desde hoy
         try {
-            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const now = new Date();
             // Solo filtro por cancha (no requiere índice compuesto); la fecha se filtra aquí
             const snap = await getDocs(query(collection(db, "bookings"), where("courtId", "==", courtId)));
-            const active = snap.docs.filter(d => {
-                const b = d.data();
-                const when = b.date?.toDate ? b.date.toDate() : new Date(b.date);
-                return b.status !== 'cancelled' && when >= today;
-            }).length;
+            const active = snap.docs.map(d => normalizeBooking(d.id, d.data()))
+                .filter(b => isReal(b) && b.state !== 'cancelled' && !b.isNoShow && b.start && b.start >= now).length;
             if (active > 0) {
-                showToast(`No se puede eliminar: tiene ${active} reserva(s) vigente(s). Ponla en mantenimiento o reubica esas reservas primero.`, 'error');
+                showToast(`No se puede eliminar: tiene ${active} ${active === 1 ? 'reserva pagada próxima' : 'reservas pagadas próximas'}. Ponla en mantenimiento (se anulan con devolución) o espera a que pasen.`, 'error');
                 return;
             }
         } catch (e) {
@@ -683,28 +694,46 @@ export default function CourtsPage() {
     const handleOpenMaintenance = (court: Court) => { setMaintenanceCourt(court); setMaintenanceConflicts([]); setIsMaintenanceModalOpen(true); };
     const checkMaintenanceConflicts = async () => {
         if (!maintenanceCourt || !selectedVenue) return;
-        let start = maintenanceForm.type === 'hours' ? new Date(`${maintenanceForm.date}T${maintenanceForm.startTime}`) : new Date(`${maintenanceForm.date}T00:00:00`);
-        let end = maintenanceForm.type === 'hours' ? new Date(`${maintenanceForm.date}T${maintenanceForm.endTime}`) : new Date(`${maintenanceForm.endDate}T23:59:59`);
+        const { start, end } = maintenanceRange(maintenanceForm);
+        if (!(end > start)) { showToast("El término debe ser posterior al inicio", 'error'); return []; }
         try {
-            const q = query(collection(db, "bookings"), where("tenantId", "==", selectedVenue.id), where("courtId", "==", maintenanceCourt.id), where("date", ">=", Timestamp.fromDate(start)), where("date", "<=", Timestamp.fromDate(end)));
-            const snap = await getDocs(q);
-            const active = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter((d: any) => d.status !== 'cancelled');
+            // Reservas pagadas y vigentes de esa cancha que se cruzan con la ventana (incluye las que empiezan antes)
+            const list = await listBookings([selectedVenue.id], { from: new Date(start.getTime() - 4 * 3600000), to: end });
+            const active = list.filter(b => b.courtId === maintenanceCourt.id && isReal(b) && b.state !== 'cancelled' && !b.isNoShow && b.start
+                && b.start < end && new Date(b.start.getTime() + 3600000) > start)
+                .map(b => ({ ...b.raw, id: b.id, clientName: b.clientName, startTime: b.startTime, price: b.price, start: b.start }));
             setMaintenanceConflicts(active);
-            showToast(active.length > 0 ? `Se detectaron ${active.length} reservas.` : "Estado limpio", active.length > 0 ? 'info' : 'success');
-        } catch (e) { console.error(e); }
+            showToast(active.length > 0 ? `Hay ${active.length} ${active.length === 1 ? 'reserva pagada' : 'reservas pagadas'} en ese periodo.` : "Sin reservas en ese periodo", active.length > 0 ? 'info' : 'success');
+            return active;
+        } catch (e: any) {
+            console.error(e);
+            showToast(e?.code === 'permission-denied' ? "No tienes permisos para revisar estas reservas" : "No se pudieron revisar las reservas. Intenta de nuevo.", 'error');
+            return null;
+        }
     };
     const handleConfirmMaintenance = async () => {
         if (!maintenanceCourt) return;
-        
-        if (maintenanceConflicts.length > 0) {
+        // Siempre se revisa antes de bloquear (aunque no se haya pulsado "Verificar conflictos")
+        const conflicts = await checkMaintenanceConflicts();
+        if (conflicts === null || conflicts === undefined) return;
+        if (conflicts.length > 0) {
+            const total = conflicts.reduce((acc: number, c: any) => acc + Number(c.price || 0), 0);
             setConfirmData({
                 isOpen: true,
-                title: "Conflicto de Reservas",
-                message: `Hay ${maintenanceConflicts.length} reservas activas en este periodo. ¿Confirmas el inicio de mantenimiento de todas formas?`,
+                title: "Hay reservas pagadas",
+                message: `${conflicts.length === 1 ? 'Hay 1 reserva pagada' : `Hay ${conflicts.length} reservas pagadas`} en ese periodo (${conflicts.map((c: any) => `${c.clientName} ${c.startTime}`).join(', ')}). Si continúas, se anularán y se devolverá el 100% ($${formatPrice(total)}) a cada cliente por Mercado Pago.`,
                 isDestructive: true,
                 action: async () => {
-                    await executeMaintenanceUpdate();
                     setConfirmData(prev => ({ ...prev, isOpen: false }));
+                    const failed: string[] = [];
+                    for (const c of conflicts) {
+                        try {
+                            const r = await postApi<{ success: boolean }>('/api/bookings/cancel', { bookingId: c.id, reason: 'Mantenimiento de cancha' });
+                            if (!r.success) failed.push(`${c.clientName} ${c.startTime} (reembolso pendiente)`);
+                        } catch (e: any) { failed.push(`${c.clientName} ${c.startTime}: ${e?.message || 'error'}`); }
+                    }
+                    await executeMaintenanceUpdate();
+                    if (failed.length) showToast(`Mantenimiento activado. Revisa: ${failed.join('; ')}`, 'error');
                 }
             });
             return;
@@ -715,8 +744,7 @@ export default function CourtsPage() {
     const executeMaintenanceUpdate = async () => {
         if (!maintenanceCourt) return;
         try {
-            const start = maintenanceForm.type === 'hours' ? new Date(`${maintenanceForm.date}T${maintenanceForm.startTime}`) : new Date(`${maintenanceForm.date}T00:00:00`);
-            const end = maintenanceForm.type === 'hours' ? new Date(`${maintenanceForm.date}T${maintenanceForm.endTime}`) : new Date(`${maintenanceForm.endDate}T23:59:59`);
+            const { start, end } = maintenanceRange(maintenanceForm);
             const mData = { status: 'maintenance', maintenanceUntil: end, maintenanceStart: start };
             await updateDoc(doc(db, "courts", maintenanceCourt.id), mData);
             setCourts(prev => prev.map(c => c.id === maintenanceCourt.id ? { ...c, ...mData } : c));

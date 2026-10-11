@@ -138,13 +138,13 @@ export default function MaintenanceModal({
                     {conflicts.length > 0 && (
                         <div className="p-3.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 rounded-md">
                             <p className="text-[9px] font-black text-red-600 dark:text-red-400 uppercase flex items-center gap-1.5 mb-2">
-                                <HugeiconsIcon icon={Alert02Icon} className="w-3.5 h-3.5" strokeWidth={2} /> {conflicts.length} Reservas Afectadas
+                                <HugeiconsIcon icon={Alert02Icon} className="w-3.5 h-3.5" strokeWidth={2} /> {conflicts.length} {conflicts.length === 1 ? "reserva pagada afectada" : "reservas pagadas afectadas"}
                             </p>
                             <div className="max-h-28 overflow-y-auto custom-scrollbar space-y-1.5">
                                 {conflicts.map(c => (
                                     <div key={c.id} className="flex items-center justify-between px-2.5 py-1.5 bg-white/60 dark:bg-black/20 rounded-md border border-red-100 dark:border-red-500/10">
-                                        <p className="text-[9px] text-slate-600 dark:text-slate-300 font-mono font-black">{c.clientName}</p>
-                                        <p className="text-[9px] text-red-500 font-mono font-black">{c.displayTime || '??:??'}</p>
+                                        <p className="text-[9px] text-slate-600 dark:text-slate-300 font-mono font-black">{String(c.clientName || 'Cliente').toUpperCase()}</p>
+                                        <p className="text-[9px] text-red-500 font-mono font-black">{c.displayTime || c.startTime || '—'}</p>
                                     </div>
                                 ))}
                             </div>
