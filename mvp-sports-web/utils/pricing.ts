@@ -1,7 +1,10 @@
+import { canonicalSport } from "@/utils/sports";
 // Tarifa de un bloque: la usan el checkout (cliente) y el servidor de pagos, así siempre coinciden.
 // Tarifa del bloque horario más cercano según la configuración del recinto
 export function priceFromTenantConfig(tenant: any, sport: string, dateStr: string, timeStr: string): number {
-  const pricing = tenant?.pricing?.[sport];
+  // Las claves pueden venir con variantes históricas ("Padel"/"Pádel"): se compara por nombre oficial
+  const all = tenant?.pricing || {};
+  const pricing = all[sport] ?? all[Object.keys(all).find((k) => canonicalSport(k) === canonicalSport(sport)) ?? ""];
   if (!pricing) return 0;
   const day = new Date(`${dateStr}T12:00:00`).getDay();
   const schedule = day === 0 || day === 6 ? pricing.weekend : pricing.weekday;

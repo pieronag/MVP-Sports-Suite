@@ -1,5 +1,6 @@
 "use client";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
+import { canonicalSport } from "@/utils/sports";
 import { postApi } from "@/services/client/apiClient";
 import { listBookings } from "@/services/client/data/bookings";
 import { normalizeBooking, isReal } from "@/utils/bookingModel";
@@ -10,7 +11,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/client/firebase';
-import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc, or } from 'firebase/firestore';
+import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc, or, deleteField } from 'firebase/firestore';
 import { auditService } from '@/services/client/auditService';
 import {
     Add01Icon,
@@ -93,6 +94,7 @@ interface Venue {
     id: string;
     name: string;
     address: string;
+    imageUrl?: string;
     imageURL?: string;
     activeSports: string[];
     amenities: string[];
@@ -209,6 +211,17 @@ const maintenanceRange = (f: { type: string; date: string; startTime: string; en
     return { start: chileDateTime(f.date, 0, 0), end: new Date(chileDateTime(f.endDate, 0, 0, 1).getTime() - 1) };
 };
 
+// Une las tarifas por nombre oficial del deporte; si hay "Pádel" y "Padel", gana la que ya tenía el nombre oficial
+const mergePricing = (matrix: Record<string, any>, sports: string[]) => {
+    const out: Record<string, any> = {};
+    for (const [k, v] of Object.entries(matrix)) {
+        const c = canonicalSport(k);
+        if (!sports.some(x => canonicalSport(x) === c)) continue;
+        if (!(c in out) || k === c) out[c] = v;
+    }
+    return out;
+};
+
 export default function CourtsPage() {
     const { user, role, firestoreUser } = useAuth();
 
@@ -221,8 +234,8 @@ export default function CourtsPage() {
     const [activeTab, setActiveTab] = useState<'config' | 'courts'>('config');
     const [dirty, setDirty] = useState(false);
     const markDirty = () => setDirty(true);
-    const [confirmData, setConfirmData] = useState<{ isOpen: boolean, title: string, message: string, action: () => void, isDestructive: boolean }>({ 
-        isOpen: false, title: '', message: '', action: () => { }, isDestructive: false 
+    const [confirmData, setConfirmData] = useState<{ isOpen: boolean, title: string, message: string, action: () => void, isDestructive: boolean }>({
+        isOpen: false, title: '', message: '', action: () => { }, isDestructive: false
     });
 
     // CONFIGURACIÓN
@@ -236,7 +249,7 @@ export default function CourtsPage() {
     const [venueImageLoading, setVenueImageLoading] = useState(false);
 
     // HELPER PARA NORMALIZAR DEPORTES (TILDES Y MAYUSCULAS)
-    const normalizeSport = (str: string) => str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : '';
+    const normalizeSport = (str: string) => canonicalSport(str);
     const isSportSelected = (sport: string) => selectedSports.some(s => normalizeSport(s) === normalizeSport(sport));
 
     // FILTRO Y MODAL
@@ -299,7 +312,10 @@ export default function CourtsPage() {
                 const venueData = docTenant.data() as Omit<Venue, 'id'>;
                 const qCourts = query(collection(db, "courts"), where("tenantId", "==", docTenant.id));
                 const snapCourts = await getDocs(qCourts);
-                venuesList.push({ id: docTenant.id, ...venueData, realCourtCount: snapCourts.size });
+                // Imagen principal: imageUrl (la vigente) o imageURL (variante antigua); deportes con nombre oficial
+                const image = venueData.imageUrl || venueData.imageURL;
+                venuesList.push({ id: docTenant.id, ...venueData, imageUrl: image, imageURL: image,
+                    activeSports: [...new Set((venueData.activeSports || []).map(canonicalSport))], realCourtCount: snapCourts.size });
             }));
             setVenues(venuesList);
             if (venuesList.length > 0) {
@@ -340,7 +356,7 @@ export default function CourtsPage() {
             setWeeklySchedule(loadedSchedule);
             setSelectedSports(selectedVenue.activeSports || []);
             setSelectedAmenities(selectedVenue.amenities || []);
-            
+
             // Migración/Carga de precios avanzada
             const loadedPricing = selectedVenue.pricing || {};
             const normalizedPricing: SportPricing = {};
@@ -365,11 +381,11 @@ export default function CourtsPage() {
             setVenueImageLoading(true);
             try {
                 const compressedBase64 = await compressImage(e.target.files[0]);
-                await updateDoc(doc(db, "tenants", selectedVenue.id), { imageURL: compressedBase64 });
-                setSelectedVenue({ ...selectedVenue, imageURL: compressedBase64 });
-                setVenues(prev => prev.map(v => v.id === selectedVenue.id ? { ...v, imageURL: compressedBase64 } : v));
+                await updateDoc(doc(db, "tenants", selectedVenue.id), { imageUrl: compressedBase64, imageURL: deleteField() });
+                setSelectedVenue({ ...selectedVenue, imageUrl: compressedBase64, imageURL: compressedBase64 });
+                setVenues(prev => prev.map(v => v.id === selectedVenue.id ? { ...v, imageUrl: compressedBase64, imageURL: compressedBase64 } : v));
                 showToast("Portada actualizada", 'success');
-                
+
                 await auditService.logAuditEvent({
                     action: 'RECINTO_IMAGEN',
                     module: 'Infraestructura/Canchas',
@@ -377,8 +393,8 @@ export default function CourtsPage() {
                     severity: 'LOW',
                     status: 'SUCCESS'
                 });
-            } catch (error: any) { 
-                showToast("Error al procesar", 'error'); 
+            } catch (error: any) {
+                showToast("Error al procesar", 'error');
                 await auditService.logAuditEvent({
                     action: 'RECINTO_IMAGEN',
                     module: 'Infraestructura/Canchas',
@@ -540,12 +556,12 @@ export default function CourtsPage() {
         try {
             let minOpenStr = '08:00';
             let maxCloseStr = '23:00';
-            
+
             const openDays = Object.values(weeklySchedule).filter(day => day.isOpen);
             if (openDays.length > 0) {
                 const sortedOpens = [...openDays].sort((a, b) => a.open.localeCompare(b.open));
                 minOpenStr = sortedOpens[0].open;
-                
+
                 const sortedCloses = [...openDays].sort((a, b) => {
                     const parseToMinutes = (timeStr: string) => {
                         const [h, m] = timeStr.split(':').map(Number);
@@ -556,11 +572,12 @@ export default function CourtsPage() {
                 maxCloseStr = sortedCloses[0].close;
             }
 
-            const updateData = { 
-                schedule: weeklySchedule, 
-                activeSports: selectedSports, 
-                amenities: selectedAmenities, 
-                pricing: pricingMatrix,
+            const updateData = {
+                schedule: weeklySchedule,
+                activeSports: [...new Set(selectedSports.map(canonicalSport))],
+                amenities: selectedAmenities,
+                // Precios por deporte con el nombre oficial (antes convivían "Pádel" y "Padel")
+                pricing: mergePricing(pricingMatrix, selectedSports),
                 openTime: minOpenStr,
                 closeTime: maxCloseStr,
                 openingHours: `${minOpenStr} - ${maxCloseStr}`
@@ -578,8 +595,8 @@ export default function CourtsPage() {
                 severity: 'LOW',
                 status: 'SUCCESS'
             });
-        } catch (error: any) { 
-            showToast("Error al sincronizar", 'error'); 
+        } catch (error: any) {
+            showToast("Error al sincronizar", 'error');
             await auditService.logAuditEvent({
                 action: 'RECINTO_EDITAR',
                 module: 'Infraestructura/Canchas',
@@ -599,7 +616,7 @@ export default function CourtsPage() {
     const handleSaveCourt = async () => {
         if (!selectedVenue || !courtForm.name || !courtForm.sport || !courtForm.surface) return showToast("Faltan parámetros", 'error');
         try {
-            const courtData = { tenantId: selectedVenue.id, ...courtForm, status: 'active' };
+            const courtData = { tenantId: selectedVenue.id, ...courtForm, sport: canonicalSport(courtForm.sport), status: 'active' };
             if (editingCourtId) {
                 await updateDoc(doc(db, "courts", editingCourtId), courtData);
                 setCourts(prev => prev.map(c => c.id === editingCourtId ? { ...c, ...courtData } : c));
@@ -627,8 +644,8 @@ export default function CourtsPage() {
                 });
             }
             setIsCourtModalOpen(false);
-        } catch (error: any) { 
-            showToast("Error al integrar", 'error'); 
+        } catch (error: any) {
+            showToast("Error al integrar", 'error');
             const isEdit = !!editingCourtId;
             await auditService.logAuditEvent({
                 action: isEdit ? 'CANCHA_EDITAR' : 'CANCHA_CREAR',
@@ -676,8 +693,8 @@ export default function CourtsPage() {
                         severity: 'MEDIUM',
                         status: 'SUCCESS'
                     });
-                } catch (e: any) { 
-                    showToast("Error al eliminar", 'error'); 
+                } catch (e: any) {
+                    showToast("Error al eliminar", 'error');
                     await auditService.logAuditEvent({
                         action: 'CANCHA_ELIMINAR',
                         module: 'Infraestructura/Canchas',
@@ -758,8 +775,8 @@ export default function CourtsPage() {
                 severity: 'LOW',
                 status: 'SUCCESS'
             });
-        } catch (e: any) { 
-            showToast("Error", 'error'); 
+        } catch (e: any) {
+            showToast("Error", 'error');
             await auditService.logAuditEvent({
                 action: 'CANCHA_MANTENIMIENTO_INICIAR',
                 module: 'Infraestructura/Canchas',
@@ -783,8 +800,8 @@ export default function CourtsPage() {
                 severity: 'LOW',
                 status: 'SUCCESS'
             });
-        } catch (e: any) { 
-            showToast("Falla técnica", 'error'); 
+        } catch (e: any) {
+            showToast("Falla técnica", 'error');
             await auditService.logAuditEvent({
                 action: 'CANCHA_MANTENIMIENTO_FINALIZAR',
                 module: 'Infraestructura/Canchas',
@@ -872,8 +889,8 @@ export default function CourtsPage() {
                     </div>
 
                     <div className="flex items-center gap-2 p-1.5 rounded-md">
-                        <button 
-                            onClick={fetchVenues} 
+                        <button
+                            onClick={fetchVenues}
                             className="px-6 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[9px] uppercase tracking-[0.2em] rounded-md transition-all hover:brightness-110 active:scale-95 shadow-xl shadow-emerald-500/20 flex items-center gap-2"
                         >
                             <HugeiconsIcon icon={RefreshIcon} className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> ACTUALIZAR RED
@@ -908,13 +925,13 @@ export default function CourtsPage() {
 return (
         <div className="w-full space-y-6 pb-28 text-left relative animate-fadeIn">
             {toast && <div className={`fixed top-6 right-6 px-6 py-3.5 rounded-md shadow-2xl text-[10px] font-black uppercase tracking-widest z-1000 text-white flex items-center gap-3 animate-slideIn ${toast.type === 'success' ? 'bg-emerald-500 dark:bg-[#00df82] dark:text-black' : 'bg-red-600'}`}>{toast.type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" /> : <HugeiconsIcon icon={Alert02Icon} className="w-4 h-4" />} {toast.msg}</div>}
-            <ConfirmModal 
-                isOpen={confirmData.isOpen} 
-                title={confirmData.title} 
-                message={confirmData.message} 
-                onConfirm={confirmData.action} 
-                onCancel={() => setConfirmData(prev => ({ ...prev, isOpen: false }))} 
-                isDestructive={confirmData.isDestructive} 
+            <ConfirmModal
+                isOpen={confirmData.isOpen}
+                title={confirmData.title}
+                message={confirmData.message}
+                onConfirm={confirmData.action}
+                onCancel={() => setConfirmData(prev => ({ ...prev, isOpen: false }))}
+                isDestructive={confirmData.isDestructive}
             />
 
             {/* BREADCRUMB */}
@@ -932,8 +949,8 @@ return (
                 <div className="relative p-6 lg:p-8">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                         <div className="flex items-center gap-5">
-                            <button 
-                                onClick={() => setSelectedVenue(null)} 
+                            <button
+                                onClick={() => setSelectedVenue(null)}
                                 className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-white/5 rounded-md transition-all active:scale-95 hover:border-emerald-400/40 border border-slate-200 dark:border-white/10 text-slate-400 group shrink-0"
                                 title="Volver a recintos"
                             >
@@ -955,14 +972,14 @@ return (
                         </div>
 
                         <div className="flex items-center gap-3 p-1 bg-slate-100 dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 w-fit">
-                            <button 
-                                onClick={() => setActiveTab('config')} 
+                            <button
+                                onClick={() => setActiveTab('config')}
                                 className={`flex items-center gap-2.5 px-6 py-3 text-[10px] font-black uppercase rounded-md transition-all ${activeTab === 'config' ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}
                             >
                                 <HugeiconsIcon icon={Settings01Icon} className="w-4 h-4" /> Infraestructura
                             </button>
-                            <button 
-                                onClick={() => isConfigured ? setActiveTab('courts') : showToast("Define los deportes primero", 'error')} 
+                            <button
+                                onClick={() => isConfigured ? setActiveTab('courts') : showToast("Define los deportes primero", 'error')}
                                 className={`flex items-center gap-2.5 px-6 py-3 text-[10px] font-black uppercase rounded-md transition-all ${activeTab === 'courts' ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}
                             >
                                 <HugeiconsIcon icon={Grid02Icon} className="w-4 h-4" /> Gestión de canchas
@@ -1312,7 +1329,7 @@ return (
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
                             {sortedCourts.map(c => {
                                 const sportAccent: any = {
@@ -1457,8 +1474,8 @@ return (
                                 {dirty ? 'Cambios sin guardar' : 'Infraestructura sincronizada'}
                             </p>
                         </div>
-                        <button 
-                            onClick={handleSaveConfig} 
+                        <button
+                            onClick={handleSaveConfig}
                             disabled={!dirty}
                             className="flex items-center gap-2 px-8 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[10px] uppercase tracking-[0.2em] rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-40"
                         >

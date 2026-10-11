@@ -9,7 +9,7 @@ export function newPlayerDoc(user: Pick<User, "uid" | "email" | "displayName" | 
     photoURL: user.photoURL || "",
     role: "player",
     status: "active",
-    createdAt: new Date().toISOString(),
+    createdAt: new Date(),
     xp: 0,
     level: 1,
     tier: "BRONCE",

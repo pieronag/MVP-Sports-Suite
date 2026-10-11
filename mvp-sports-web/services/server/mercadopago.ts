@@ -1,5 +1,6 @@
 import "server-only";
 import crypto from "crypto";
+import { canonicalSport } from "@/utils/sports";
 import { couponIssue, couponUses } from "@/utils/coupon";
 import { chileDateTime } from "@/utils/chileTime";
 import { isWithinOpenHours } from "@/utils/venueSchedule";
@@ -121,7 +122,7 @@ export async function buildBookingCheckout(uid: string, input: BookingCheckoutIn
     discountApplied: coupon?.discount || 0,
     source: "web_app",
     createdBy: user.email || uid,
-    sport,
+    sport: canonicalSport(sport),
     ...(input.teamId ? { teamId: input.teamId } : {}),
   };
 

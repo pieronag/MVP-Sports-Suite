@@ -307,7 +307,6 @@ export default function Page() {
                 region: form.region, commune: form.commune, address: form.address,
                 fullAddress: `${form.address}, ${form.commune}, ${form.region}`,
                 coordinates: { lat: form.lat, lng: form.lng },
-                imageURL: form.imagePreview || "https://placehold.co/600x400/10b981/ffffff?text=Club+Sport",
                 imageUrl: form.imagePreview || "https://placehold.co/600x400/10b981/ffffff?text=Club+Sport",
                 plan: form.plan, planId, planPrice: price,
             };
