@@ -3,7 +3,7 @@
 import { collection, getDocs, onSnapshot, query, where, Timestamp, type QueryConstraint } from "firebase/firestore";
 import { db } from "@/services/client/firebase";
 import { normalizeBooking } from "@/utils/bookingModel";
-import type { Booking } from "@/types/booking";
+import type { Booking, RawDoc } from "@/types/booking";
 
 export interface BookingRange { from?: Date; to?: Date }
 
@@ -30,7 +30,7 @@ export async function listBookings(tenantIds: string[], range: BookingRange = {}
   if (!tenantIds.length) return [];
   const snaps = await Promise.all(queriesFor(tenantIds, range).map((q) => getDocs(q).catch(() => null)));
   const map = new Map<string, Booking>();
-  for (const s of snaps) s?.docs.forEach((d) => map.set(d.id, normalizeBooking(d.id, d.data() as Record<string, any>)));
+  for (const s of snaps) s?.docs.forEach((d) => map.set(d.id, normalizeBooking(d.id, d.data() as RawDoc)));
   return sortByStart([...map.values()]);
 }
 
@@ -45,7 +45,7 @@ export function watchBookings(tenantIds: string[], range: BookingRange, onData: 
     onData(sortByStart([...all.values()]));
   };
   const unsubs = qs.map((q, i) => onSnapshot(q, (snap) => {
-    parts.set(i, new Map(snap.docs.map((d) => [d.id, normalizeBooking(d.id, d.data() as Record<string, any>)])));
+    parts.set(i, new Map(snap.docs.map((d) => [d.id, normalizeBooking(d.id, d.data() as RawDoc)])));
     if (parts.size === qs.length) emit();
   }, (e) => { parts.set(i, new Map()); onError?.(e); if (parts.size === qs.length) emit(); }));
   return () => unsubs.forEach((u) => u());

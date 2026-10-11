@@ -52,7 +52,8 @@ const BADGE_STYLE: Record<string, string> = {
 export default function OwnerDashboard() {
     const { user } = useAuth();
 
-    const [loading, setLoading] = useState(true);
+    const [venuesLoaded, setVenuesLoaded] = useState(false);
+    const [loadedKey, setLoadedKey] = useState('');
     const [myVenues, setMyVenues] = useState<VenueSummary[]>([]);
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [maintenanceAlerts, setMaintenanceAlerts] = useState<CourtMaintenance[]>([]);
@@ -66,16 +67,15 @@ export default function OwnerDashboard() {
         setToast({ msg, type });
         setTimeout(() => setToast(null), 4000);
     };
-    const onLoadError = (e: Error) => {
+    const onLoadError = (e: Error & { code?: string }) => {
         console.error(e);
-        showToast((e as any)?.code === 'permission-denied' ? 'No tienes permiso para ver estos datos' : 'No se pudieron cargar los datos. Revisa tu conexión.', 'error');
-        setLoading(false);
+        showToast(e.code === 'permission-denied' ? 'No tienes permiso para ver estos datos' : 'No se pudieron cargar los datos. Revisa tu conexión.', 'error');
     };
 
     // --- CARGA DE DATOS (EN VIVO) ---
     useEffect(() => {
         if (!user?.uid) return;
-        return watchOwnedVenues(user.uid, (v) => { setMyVenues(v); if (!v.length) setLoading(false); }, onLoadError);
+        return watchOwnedVenues(user.uid, (v) => { setMyVenues(v); setVenuesLoaded(true); }, (e) => { setVenuesLoaded(true); onLoadError(e); });
     }, [user?.uid]);
 
     const venueIds = selectedVenueId === 'all' ? myVenues.map(v => v.id) : [selectedVenueId];
@@ -83,13 +83,15 @@ export default function OwnerDashboard() {
 
     useEffect(() => {
         if (!venueIds.length) return;
-        setLoading(true);
-        const unsubB = watchBookings(venueIds, rangeFor(timeRange), (list) => { setBookings(list.filter(isReal)); setLoading(false); }, onLoadError);
+        const key = `${venueKey}|${timeRange}`;
+        const unsubB = watchBookings(venueIds, rangeFor(timeRange), (list) => { setBookings(list.filter(isReal)); setLoadedKey(key); }, (e) => { setLoadedKey(key); onLoadError(e); });
         const unsubM = watchCourtsInMaintenance(venueIds, setMaintenanceAlerts, onLoadError);
         return () => { unsubB(); unsubM(); };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [venueKey, timeRange]);
 
+    // Cargando hasta que responden los recintos y la consulta del rango/recinto elegido
+    const loading = !venuesLoaded || (myVenues.length > 0 && loadedKey !== `${venueKey}|${timeRange}`);
     const venueName = (id: string) => myVenues.find(v => v.id === id)?.name || 'Recinto';
     const summary = summarizeRevenue(bookings, venueName);
     const kpis = {

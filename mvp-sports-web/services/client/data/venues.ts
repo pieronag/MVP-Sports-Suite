@@ -2,11 +2,12 @@
 import { collection, onSnapshot, or, query, where } from "firebase/firestore";
 import { db } from "@/services/client/firebase";
 import { courtBlockedAt } from "@/utils/courtAvailability";
+import { toDate } from "@/utils/bookingModel";
+import type { RawDoc } from "@/types/booking";
 
-export interface VenueSummary { id: string; name: string; address: string; status: string; raw: Record<string, any> }
+export interface VenueSummary { id: string; name: string; address: string; status: string; raw: RawDoc }
 export interface CourtMaintenance { id: string; tenantId: string; name: string; from: Date | null; until: Date | null; activeNow: boolean }
 
-const toDate = (v: any): Date | null => (v?.toDate ? v.toDate() : v?.seconds ? new Date(v.seconds * 1000) : v ? new Date(v) : null);
 
 export function watchOwnedVenues(uid: string, onData: (v: VenueSummary[]) => void, onError?: (e: Error) => void) {
   const q = query(collection(db, "tenants"), or(where("ownerId", "==", uid), where("ownerIds", "array-contains", uid)));

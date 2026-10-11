@@ -1,18 +1,19 @@
-import type { Booking, BookingState, PaymentState } from "@/types/booking";
+import type { Booking, BookingState, PaymentState, RawDoc } from "@/types/booking";
 
-const toDate = (v: any): Date | null => {
+export const toDate = (v: unknown): Date | null => {
+  const x = v as RawDoc | null;
   if (!v) return null;
-  if (typeof v?.toDate === "function") return v.toDate();
-  if (typeof v?.seconds === "number") return new Date(v.seconds * 1000);
+  if (typeof x?.toDate === "function") return x.toDate();
+  if (typeof x?.seconds === "number") return new Date(x.seconds * 1000);
   if (v instanceof Date) return v;
-  const d = new Date(v);
+  const d = new Date(v as string | number);
   return isNaN(d.getTime()) ? null : d;
 };
 const chileHHMM = (d: Date) => new Intl.DateTimeFormat("es-CL", { timeZone: "America/Santiago", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(d);
-const hhmm = (v: any): string => (typeof v === "string" && /^\d{1,2}:\d{2}$/.test(v) ? v.padStart(5, "0") : "");
+const hhmm = (v: unknown): string => (typeof v === "string" && /^\d{1,2}:\d{2}$/.test(v) ? v.padStart(5, "0") : "");
 
 // Documento de Firestore (cualquier variante histórica) → modelo de la aplicación
-export function normalizeBooking(id: string, d: Record<string, any>): Booking {
+export function normalizeBooking(id: string, d: RawDoc): Booking {
   const ps = String(d.paymentStatus || "").toLowerCase();
   const notes = String(d.notes || "").toLowerCase();
   const isNoShow = d.status === "no-show" || ps === "no-show" || d.noShow === true || notes.includes("no-show") || notes.includes("inasistencia");
