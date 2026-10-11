@@ -60,7 +60,7 @@ td.pct{font:500 14px var(--mono);font-variant-numeric:tabular-nums;white-space:n
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">Plataforma web completa · 10 oct 2026</div>
+    <div class="eyebrow">Plataforma web completa · 11 oct 2026</div>
     <h1>MVP Sports · Estado real del desarrollo</h1>
     <p class="lede">Cada módulo se mide con cuatro criterios en lugar de una estimación. Reemplaza el informe anterior, que daba por avanzadas secciones que no estaban conectadas a datos y que ya fueron eliminadas.</p>
   </header>
@@ -77,7 +77,7 @@ td.pct{font:500 14px var(--mono);font-variant-numeric:tabular-nums;white-space:n
 
   <div class="alert">
     <b>Bloqueo antes de producción</b>
-    <span>Las dos fugas de datos ya están cerradas en las reglas, pero esas reglas no están publicadas en Firebase: hasta publicarlas, producción sigue con las anteriores.</span>
+    <span>Las reglas nuevas cierran más de 15 accesos indebidos (pagos, liquidaciones, roles, propiedad de recintos, experiencia), pero no están publicadas en Firebase: hasta publicarlas, producción sigue con las anteriores. Además, el cobro con Mercado Pago falla por credenciales del recinto de prueba.</span>
   </div>
 
   <div id="tables"></div>
@@ -86,11 +86,12 @@ td.pct{font:500 14px var(--mono);font-variant-numeric:tabular-nums;white-space:n
     <div class="eyebrow">Ruta al 100%</div>
     <h2>Orden recomendado</h2>
     <ol class="road">
-      <li><b>Publicar las reglas de Firestore <span class="tag">seguridad · ley 21.719</span></b><span>Cierran las fugas de datos, protegen la experiencia y dejan los perfiles privados solo al titular y a los administradores.</span></li>
-      <li><b>Auditoría de la base con datos reales <span class="tag">refactor bd</span></b><span>Correr el script de auditoría y decidir qué campos eliminar; luego una migración versionada.</span></li>
-      <li><b>Guion de pruebas con sesión y pago <span class="tag">todos los roles</span></b><span>26 pasos en el guion de pruebas: pagos con tarjetas de prueba, cancelación, check-in, inasistencia, alta de personal y webhook.</span></li>
-            <li><b>Refactor del código <span class="tag">deuda técnica</span></b><span>Dividir las páginas de más de 1.000 líneas y revisar las escrituras que aún hace el panel directamente (canchas, torneos, cupones).</span></li>
-      <li><b>Notificaciones push <span class="tag">pendiente</span></b><span>Necesita la clave VAPID.</span></li>
+      <li><b>Publicar las reglas de Firestore <span class="tag">tú · seguridad</span></b><span>firebase deploy --only firestore:rules. Activa casi todas las correcciones de seguridad.</span></li>
+      <li><b>Credenciales de Mercado Pago del recinto de prueba <span class="tag">tú · pagos</span></b><span>Desbloquea pago, reembolsos, cupones e inscripciones pagadas.</span></li>
+      <li><b>Google en Firebase Auth y git push <span class="tag">tú</span></b><span>Dominio mvpsports.cl autorizado; subir los commits.</span></li>
+      <li><b>Reestructuración de la base <span class="tag">en curso</span></b><span>Script de migración con respaldo y modo de prueba.</span></li>
+      <li><b>Experiencia en celular de los paneles <span class="tag">superadmin · dueño · mánager</span></b><span>Tablas como tarjetas, filtros y acciones al alcance del pulgar.</span></li>
+      <li><b>Pruebas con sesión de mánager y superadmin <span class="tag">tú inicias sesión</span></b><span>Y los flujos con pago real.</span></li>
     </ol>
   </section>
 </div>
@@ -99,61 +100,66 @@ td.pct{font:500 14px var(--mono);font-variant-numeric:tabular-nums;white-space:n
 // e: construido · d: datos reales · v: probado en navegador · f: flujo completo probado. y=sí p=parcial n=no x=no aplica
 const AREAS = [
  { name:"Sitio público", items:[
-  ["Landing", "y","y","y","x","Mobile y desktop revisados midiendo cada sección; planes leídos desde la base."],
+  ["Landing", "y","y","y","x","Mobile y desktop revisados; íconos unificados; textos sin 'por cobrar'."],
   ["Términos y Privacidad", "y","y","y","x","Ley 21.719, pago solo online, cancelación 24 h, datos de Orion Technology SpA. Falta revisión de un abogado."],
  ]},
  { name:"Cuenta y acceso", items:[
-  ["Registro y login", "y","y","y","n","Un paso con Google o correo; contraseña de 8+ caracteres con confirmación. Falta un registro real de punta a punta."],
+  ["Registro y login", "y","y","y","n","Cada rol va a su inicio en cualquier dispositivo (antes en celular todos iban a /player). Falta probar el ingreso en celular por rol."],
+  ["Roles y permisos", "y","y","y","x","Un solo módulo de permisos con pruebas; sin bucles de redirección. Guardia probada con dueño."],
   ["Verificación de correo y recuperación", "y","y","n","n","Resend con respaldo de Firebase."],
   ["Eliminación de cuenta", "y","y","n","n","Vía del servidor: borra y anonimiza en todas las colecciones."],
-  ["Datos antes del primer pago", "y","y","n","n","Teléfono, RUT y fecha de nacimiento se piden en el pago y vuelve a él al guardarlos."],
+  ["Datos antes del primer pago", "y","y","y","x","Teléfono, RUT y fecha de nacimiento se piden en el pago y vuelve a él."],
  ]},
  { name:"App del jugador", items:[
-  ["Inicio", "y","y","y","x","Onboarding de deporte, comuna y nivel probado con sesión real."],
-  ["Clubes y mapa", "y","y","y","x","Filtros del onboarding aplicados; recinto y horarios probados."],
-  ["Checkout y pago con tarjeta", "y","y","y","n","Pide datos antes del primer pago y vuelve al checkout. El cobro falla por credenciales de Mercado Pago del recinto (no es código)."],
-  ["Reservas y cancelación", "y","y","y","p","Probado: menos de 24 h bloqueado en app y servidor; más de 24 h aceptado. Falta el reembolso real en Mercado Pago."],
+  ["Inicio", "y","y","y","x","Próxima reserva solo si está pagada."],
+  ["Clubes y mapa", "y","y","y","x","Horario del día con la misma regla que el servidor; días cerrados sin horas."],
+  ["Checkout y pago con tarjeta", "y","y","y","n","El servidor valida horario, mantenimiento y cupón. El cobro falla por credenciales de Mercado Pago del recinto (no es código)."],
+  ["Reservas y cancelación", "y","y","y","p","Menos de 24 h bloqueado; más de 24 h aceptado. Ingreso solo con código QR del recinto (se quitó el auto check-in). Falta el reembolso real."],
   ["Ticket con QR", "y","y","n","n",""],
   ["Equipos y chat", "y","y","n","n","Miembros desde perfiles públicos."],
-  ["Partidos y desafíos", "y","y","n","n","Restaurado tras el error de la sesión anterior."],
-  ["Torneos", "y","y","n","n","Inscripción pagada solo online."],
-  ["Academias", "y","y","n","n","Inscripción pagada solo online."],
-  ["Estadísticas y logros", "y","y","y","p","XP recalculada al instante tras check-in e inasistencia; partidos internos sin probar."],
+  ["Partidos y desafíos", "y","p","n","n","Aún consulta la base directo en varias partes (pendiente del refactor)."],
+  ["Torneos", "y","y","n","n","Inscripciones respetan apertura y cierre en hora de Chile."],
+  ["Academias", "y","y","n","n","Clase ligada a su recinto (cobro a la cuenta correcta)."],
+  ["Estadísticas y logros", "y","y","y","p","Solo da XP lo verificado por el recinto; partidos internos ya no suman; goles acotados."],
   ["Ranking", "y","y","n","x","Lee perfiles públicos desde el servidor."],
   ["Perfil y preferencias", "y","y","n","x",""],
-  ["Billetera y tarjetas guardadas", "y","y","n","n","Sin montos por pagar en el recinto."],
+  ["Reseñas", "y","y","n","n","Por el servidor: solo quien jugó, una por reserva; promedio calculado en el servidor."],
+  ["Billetera y tarjetas guardadas", "y","y","n","n",""],
   ["Reporte de problemas", "y","y","n","x",""],
   ["Notificaciones push", "p","n","n","n","Falta la clave VAPID."],
  ]},
  { name:"Panel del recinto", items:[
-  ["Calendario", "y","y","y","x","Sin reservas manuales; leyenda corregida."],
-  ["Check-in", "y","y","y","y","Probado de punta a punta: ingreso, demasiado temprano, repetido, inasistencia con strike y recálculo de XP."],
-  ["Canchas", "y","y","n","x",""],
-  ["Personal", "y","y","n","x",""],
-  ["Finanzas", "y","y","n","x","Sin indicadores de por cobrar (pago 100% online)."],
-  ["Cupones", "y","y","n","x",""],
-  ["Torneos (gestión)", "y","y","n","x","Sin botón de datos demo."],
-  ["Academia (gestión)", "y","y","n","x","Sin botón de datos demo."],
-  ["Opiniones", "y","y","n","x",""],
+  ["Panel del dueño", "y","y","y","x","Solo reservas pagadas; anuladas no suman; KPI de mantenimiento real; sin suscripciones duplicadas."],
+  ["Calendario", "y","y","y","p","Día operativo en hora de Chile. Anular devuelve el 100% en el servidor; probado el rechazo, falta un reembolso real."],
+  ["Check-in", "y","y","y","y","Probado de punta a punta; ya no marca pagado por registros de pago rechazados."],
+  ["Canchas y mantenimiento", "y","y","y","y","Probado: mantenimiento programado, con conflicto (anula con devolución) y restaurar."],
+  ["Personal", "y","y","y","y","Alta, suspensión y eliminación por el servidor probadas; suspender deshabilita la cuenta."],
+  ["Finanzas", "y","y","y","x","Reservas, torneos y academias del mes; desktop y celular revisados."],
+  ["Cupones", "y","y","y","p","Crear, validar y eliminar probados; el servidor respeta vigencia, usos y mínimo. Falta un pago con cupón."],
+  ["Torneos (gestión)", "y","y","y","y","Crear, validar, editar y eliminar probados; no se borra con equipos pagados."],
+  ["Academia (gestión)", "y","y","y","y","Crear, suspender y eliminar probados; recinto obligatorio; fechas sin desfase."],
+  ["Opiniones", "y","y","y","x","Por recinto (co-dueños incluidos); respuesta por el servidor."],
+  ["Suscripción y plan", "y","y","y","p","Agendar y deshacer por el servidor probados; el cron aplica el cambio."],
   ["Configuración del complejo", "y","y","n","x",""],
+  ["Panel del mánager", "y","y","n","x","Fecha en hora de Chile; canchas en uso al instante. Falta probar con sesión de mánager."],
  ]},
  { name:"Panel de administración", items:[
-  ["Resumen", "y","y","n","x",""],
-  ["Recintos y dueños", "y","y","n","x",""],
-  ["Usuarios y analítica", "y","y","n","x",""],
-  ["Métricas", "y","y","n","x",""],
-  ["Facturas y suscripciones", "y","y","n","n","Cobro mensual día 1."],
-  ["Auditoría y reportes", "y","y","n","x",""],
-  ["Gamificación (reglas)", "y","y","n","x","La sincronización masiva usa el cálculo del servidor."],
+  ["Resumen", "y","y","n","x","Cuenta reservas con check-in e inasistencias; solo el mes elegido."],
+  ["Recintos y dueños", "y","y","n","x","Suspender dueño deshabilita su cuenta."],
+  ["Usuarios y analítica", "y","y","n","x","Suspender jugador deshabilita su cuenta; historial sin búsqueda por nombre."],
+  ["Métricas", "y","y","n","x","Volumen y comisiones solo con ingreso real."],
+  ["Liquidaciones", "y","y","n","n","Comisión sobre el ingreso real del mes; datos reales de la empresa."],
+  ["Auditoría y reportes", "y","y","n","x","Auditoría solo se agrega y registra quién escribió."],
+  ["Gamificación (reglas)", "y","y","n","x",""],
  ]},
  { name:"Plataforma", items:[
-  ["Pagos con Mercado Pago", "y","y","p","n","Webhook con firma, 3D Secure, reembolsos. Endpoints responden; sin pago real probado."],
-  ["Limpieza diaria (cron)", "y","y","n","n","Cancela lo pendiente de pago y libera cupos."],
-  ["Reglas de Firestore", "y","x","n","n","Perfiles privados solo para el titular y administradores; XP protegida. Falta publicarlas."],
-  ["Pruebas automáticas", "y","x","y","x","41 unitarias (cancelación, check-in, reembolso, contraseñas, experiencia) y 58 de punta a punta en desktop y mobile; todas pasan."],
-  ["Estructura del código", "y","x","y","x","Servicios separados en servidor y cliente; código muerto eliminado; compila y 20 tests pasan."],
-  ["Base de datos", "p","x","n","n","Script de auditoría listo; falta correrlo con la clave de servicio."],
-  ["Entorno local", "p","x","n","x","La clave de Firebase Admin de .env.local está incompleta."],
+  ["Pagos con Mercado Pago", "y","y","p","n","Webhook con firma, 3D Secure, reembolso del jugador (97%) y del recinto (100%). Sin pago real probado."],
+  ["Limpieza diaria (cron)", "y","y","n","n","Cancela lo pendiente, inasistencias, recálculo de XP y cambios de plan."],
+  ["Reglas de Firestore", "y","x","n","n","Accesos por recinto, campos protegidos y escrituras sensibles solo por el servidor. Falta publicarlas (sin emulador local para probarlas)."],
+  ["Capa de datos y modelos", "y","y","y","x","Reservas, ingresos, recintos, horario y roles con un solo modelo; 18 pantallas migradas."],
+  ["Pruebas automáticas", "y","x","y","x","87 unitarias y 58 de punta a punta en desktop y mobile; todas pasan."],
+  ["Base de datos", "p","x","n","n","Pendiente: unificar campos duplicados, migrar reseñas antiguas, unir Pádel/Padel y quitar colecciones sin uso."],
+  ["Experiencia en celular (paneles)", "p","x","p","x","Finanzas adaptada; faltan las demás pantallas de superadmin, dueño y mánager."],
  ]},
 ];
 const W={e:40,d:30,v:15,f:15}, V={y:1,p:.5,n:0};
