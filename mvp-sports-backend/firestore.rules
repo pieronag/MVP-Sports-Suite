@@ -136,9 +136,10 @@ service cloud.firestore {
     
     // Perfiles unificados (App y Web)
     match /profiles/{userId} {
-      // Contiene correo, teléfono, RUT y fecha de nacimiento: solo el titular y el personal.
-      // Los demás jugadores ven el perfil público vía /api/public-profiles.
-      allow read: if isAuthenticated() && (request.auth.uid == userId || isStaff());
+      // Contiene correo, teléfono, RUT y fecha de nacimiento: solo el titular y los administradores.
+      // Los demás (jugadores y personal de recintos) ven el perfil público vía /api/public-profiles;
+      // check-in e inasistencias pasan por el servidor.
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
       allow create: if isAuthenticated() && (
         isSuperAdmin() ||
         (request.auth.uid == userId && isSafeSelfCreate()) ||
@@ -161,9 +162,10 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      // Contiene correo, teléfono, RUT y fecha de nacimiento: solo el titular y el personal.
-      // Los demás jugadores ven el perfil público vía /api/public-profiles.
-      allow read: if isAuthenticated() && (request.auth.uid == userId || isStaff());
+      // Contiene correo, teléfono, RUT y fecha de nacimiento: solo el titular y los administradores.
+      // Los demás (jugadores y personal de recintos) ven el perfil público vía /api/public-profiles;
+      // check-in e inasistencias pasan por el servidor.
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
       allow create: if isAuthenticated() && (
         isSuperAdmin() ||
         (request.auth.uid == userId && isSafeSelfCreate()) ||

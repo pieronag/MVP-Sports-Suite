@@ -446,16 +446,10 @@ export default function CheckInPage() {
         setProcessingId(booking.id);
 
         try {
-            const updateData: any = {};
-                updateData.checkIn = true;
-                updateData.checkInTime = Timestamp.now();
-                updateData.status = 'active';
-                
-                await updateDoc(doc(db, "bookings", booking.id), updateData);
-                await syncBookingSlots(booking.id);
+                // El servidor valida recinto, pago y horario, y recalcula la experiencia del jugador
+                await postApi('/api/bookings/checkin', { bookingId: booking.id, action: 'checkin' });
                 setBookings(prev => prev.map(b => b.id === booking.id ? { ...b, checkIn: true, status: 'active' } : b));
-                if (booking.userId) postApi('/api/players/recompute', { uids: [booking.userId] }).catch(() => undefined);
-                
+
                 await auditService.logAuditEvent({
                     action: 'RESERVA_CHECKIN',
                     module: 'Acceso/CheckIn',
@@ -478,10 +472,7 @@ export default function CheckInPage() {
                 status: 'FAILED'
             });
 
-            const errorMsg = error?.code === 'permission-denied'
-                ? "Permiso denegado. Tu cuenta no tiene privilegios para modificar esta reserva."
-                : "Hubo un error al procesar el ingreso. Reintenta.";
-            setStatusModal({ isOpen: true, title: "Falla de Sistema", message: errorMsg, type: 'error' });
+            setStatusModal({ isOpen: true, title: "No se pudo registrar el ingreso", message: error?.message || "Hubo un error al procesar el ingreso. Reintenta.", type: 'error' });
         } finally {
             setProcessingId(null);
         }
@@ -491,48 +482,20 @@ export default function CheckInPage() {
         if (!booking.id) return;
         setProcessingId(booking.id);
         try {
-            const batchData: any = {
-                status: 'cancelled',
-                noShow: true,
-                updatedAt: Timestamp.now()
-            };
-
-            // 1. Actualizar Reserva
-            await updateDoc(doc(db, "bookings", booking.id), batchData);
-            await syncBookingSlots(booking.id);
+            // El servidor cancela la reserva, suma el strike y recalcula la experiencia
+            await postApi('/api/bookings/checkin', { bookingId: booking.id, action: 'noshow' });
 
             await auditService.logAuditEvent({
                 action: 'RESERVA_NOSHOW',
                 module: 'Acceso/CheckIn',
-                details: `Reserva ${booking.id} de ${booking.clientName} marcada como No-Show.`,
+                details: `Reserva ${booking.id} de ${booking.clientName} marcada como No-Show (strike aplicado al jugador).`,
                 severity: 'MEDIUM',
                 status: 'SUCCESS'
             });
 
-            // 2. Aplicar Strike al Usuario si existe
-            if (booking.userId) {
-                const userRef = doc(db, 'users', booking.userId);
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    await updateDoc(userRef, {
-                        strikes: (userSnap.data().strikes || 0) + 1,
-                        lastStrikeAt: Timestamp.now()
-                    });
-
-                    await auditService.logAuditEvent({
-                        action: 'JUGADOR_STRIKE',
-                        module: 'Acceso/CheckIn',
-                        details: `Strike aplicado al usuario ${booking.userId} por inasistencia (No-Show) a la reserva ${booking.id}.`,
-                        severity: 'HIGH',
-                        status: 'SUCCESS'
-                    });
-                }
-            }
-
             setBookings(prev => prev.map(b =>
                 b.id === booking.id ? { ...b, status: 'cancelled', noShow: true } : b
             ));
-            if (booking.userId) postApi('/api/players/recompute', { uids: [booking.userId] }).catch(() => undefined);
 
             setStatusModal({
                 isOpen: true,
@@ -550,7 +513,7 @@ export default function CheckInPage() {
                 status: 'FAILED'
             });
 
-            setStatusModal({ isOpen: true, title: "Falla de Sistema", message: "No se pudo registrar el No-Show.", type: 'error' });
+            setStatusModal({ isOpen: true, title: "No se pudo registrar", message: error?.message || "No se pudo registrar el No-Show.", type: 'error' });
         } finally {
             setProcessingId(null);
         }

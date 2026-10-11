@@ -4,6 +4,7 @@ import { adminDb } from "@/services/server/firebase-admin";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { allowRequest } from "@/services/server/rateLimit";
 import { syncBooking } from "@/services/server/bookingProjections";
+import { hoursUntilStart } from "@/services/server/chileTime";
 
 // Token Mercado Pago del recinto (tenant_secrets) o de la plataforma (settings_private)
 async function resolveMercadoPagoToken(tenantId?: string): Promise<string | undefined> {
@@ -17,23 +18,6 @@ async function resolveMercadoPagoToken(tenantId?: string): Promise<string | unde
 }
 
 const CANCEL_MIN_HOURS = 24;
-
-// Hora de pared en Chile como instante comparable (la diferencia entre dos de estos es la real)
-function chileWallClock(d: Date, time?: string): number {
-  const p = Object.fromEntries(
-    new Intl.DateTimeFormat("en-US", { timeZone: "America/Santiago", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", hourCycle: "h23" })
-      .formatToParts(d).map((x) => [x.type, Number(x.value)])
-  );
-  const [h, m] = time ? time.split(":").map(Number) : [p.hour, p.minute];
-  return Date.UTC(p.year, p.month - 1, p.day, h || 0, m || 0);
-}
-
-function hoursUntilStart(booking: any): number | null {
-  const raw = booking.date;
-  const date: Date | null = raw?.toDate ? raw.toDate() : raw ? new Date(/^\d{4}-\d{2}-\d{2}$/.test(String(raw)) ? `${raw}T12:00:00Z` : raw) : null;
-  if (!date || isNaN(date.getTime()) || !booking.startTime) return null;
-  return (chileWallClock(date, booking.startTime) - chileWallClock(new Date())) / 3_600_000;
-}
 
 // Única vía para que un jugador cancele: solo hasta 24 h antes, reembolsando lo pagado menos 3% de comisión.
 export async function POST(request: Request) {
