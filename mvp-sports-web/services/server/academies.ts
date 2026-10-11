@@ -1,5 +1,6 @@
 import "server-only";
 import { FieldValue, type Transaction } from "firebase-admin/firestore";
+import { chileToday } from "@/utils/chileTime";
 import { adminDb } from "@/services/server/firebase-admin";
 import { PaymentError, SITE_URL } from "@/services/server/mercadopago";
 
@@ -43,7 +44,7 @@ export async function buildEnrollment(uid: string, classId: string): Promise<Enr
   if (c.isVisibleInApp === false) throw new PaymentError("La clase no está disponible");
   if (eSnap.exists && eSnap.data()?.status !== "cancelled") throw new PaymentError("Ya estás inscrito en esta clase", 409);
   if (c.maxStudents && Number(c.enrolledStudents || 0) >= Number(c.maxStudents)) throw new PaymentError("No quedan cupos", 409);
-  if (c.endDate && new Date(`${c.endDate}T23:59:59-03:00`) < new Date()) throw new PaymentError("La clase ya terminó");
+  if (c.endDate && chileToday() > String(c.endDate)) throw new PaymentError("La clase ya terminó");
 
   const u = uSnap.data() || {};
   return {

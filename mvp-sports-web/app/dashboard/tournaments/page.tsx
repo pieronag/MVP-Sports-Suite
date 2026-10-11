@@ -607,7 +607,7 @@ export default function ChampionshipsPage() {
                                     <button onClick={() => handleOpenEdit(t)} className="py-2 flex items-center justify-center gap-1 bg-white dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 text-[8px] font-black uppercase tracking-widest hover:text-slate-900 dark:hover:text-white hover:border-amber-400/40 transition-all active:scale-95" title="Editar">
                                         <HugeiconsIcon icon={PencilEdit02Icon} className="w-3 h-3" /> Editar
                                     </button>
-                                    <button onClick={() => setTournamentToDelete(t.id)} className="py-2 flex items-center justify-center gap-1 bg-white dark:bg-white/5 rounded-md border border-red-100 dark:border-red-500/20 text-red-400 text-[8px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95" title="Eliminar">
+                                    <button onClick={() => ((t.teams?.length || t.enrolledTeams || 0) > 0) ? addToast("Tiene equipos inscritos con pago: no se puede eliminar", 'error') : setTournamentToDelete(t.id)} className="py-2 flex items-center justify-center gap-1 bg-white dark:bg-white/5 rounded-md border border-red-100 dark:border-red-500/20 text-red-400 text-[8px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95" title="Eliminar">
                                         <HugeiconsIcon icon={Delete02Icon} className="w-3 h-3" /> Borrar
                                     </button>
                                 </div>

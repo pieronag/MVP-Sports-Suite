@@ -1,5 +1,7 @@
 "use client";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { academyIssue } from "@/utils/academy";
+import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/client/firebase';
@@ -27,6 +29,7 @@ import {
     UserIcon,
     Notification01Icon,
     Coins01Icon,
+    Building01Icon,
 } from '@hugeicons/core-free-icons';
 import { PanelGlass, TarjetaKpi } from '@/components/ui/DashboardWidgets';
 import { SoccerIcon, PadelIcon, TennisIcon, BasketballIcon, VolleyballIcon } from '@/components/icons/SportsIcons';
@@ -94,11 +97,12 @@ export default function AcademyPage() {
     const [statusConfirm, setStatusConfirm] = useState<{ isOpen: boolean, classId: string | null, name: string, nextStatus: 'active' | 'suspended' }>({ isOpen: false, classId: null, name: '', nextStatus: 'active' });
 
     const INITIAL_FORM_STATE = {
-        name: '', instructor: '', sport: 'Pádel', ageGroup: 'libre', price: '',
+        name: '', instructor: '', tenantId: '', sport: 'Pádel', ageGroup: 'libre', price: '',
         maxStudents: 20, startDate: '', endDate: '', startTime: '',
         endTime: '', daysOfWeek: [] as string[], description: '', alertDays: 3
     };
     const [formData, setFormData] = useState(INITIAL_FORM_STATE);
+    const [tenants, setTenants] = useState<any[]>([]);
 
     const WEEK_DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
@@ -110,20 +114,23 @@ export default function AcademyPage() {
         setLoading(true);
         try {
             const q = query(collection(db, "academy_classes"), where("ownerId", "==", user.uid));
-            const snap = await getDocs(q);
+            const [snap, snapT] = await Promise.all([getDocs(q), getOwnedTenantsSnap(user.uid)]);
             setClasses(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+            setTenants(snapT.docs.map(d => ({ id: d.id, ...(d.data() as any) })));
         } catch (e) { console.error(e); } finally { setLoading(false); }
     };
 
     useEffect(() => { fetchData(); }, [user]);
+    // Con un solo recinto queda elegido por defecto
+    useEffect(() => { if (tenants.length === 1) setFormData(f => (f.tenantId ? f : { ...f, tenantId: tenants[0].id })); }, [tenants, isModalOpen]);
 
     // ACCIONES
     const handleCreateOrUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user?.uid) return;
 
-        if (formData.daysOfWeek.length === 0) return addToast("Selecciona al menos un día", 'error');
-        if (!formData.name || !formData.instructor) return addToast("Faltan datos de la clase", 'error');
+        const issue = academyIssue(formData);
+        if (issue) return addToast(issue, 'error');
 
         setSaving(true);
         try {
@@ -198,13 +205,13 @@ export default function AcademyPage() {
     };
 
     const handleOpenEdit = (c: any) => {
-        setFormData({ ...INITIAL_FORM_STATE, ...c, price: c.price?.toString() || '' });
+        setFormData({ ...INITIAL_FORM_STATE, ...c, tenantId: c.tenantId || (tenants.length === 1 ? tenants[0].id : ''), price: c.price?.toString() || '' });
         setEditId(c.id); setIsEditing(true); setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
         setIsModalOpen(false); setIsEditing(false); setEditId(null);
-        setFormData(INITIAL_FORM_STATE);
+        setFormData({ ...INITIAL_FORM_STATE, tenantId: tenants.length === 1 ? tenants[0].id : '' });
     };
 
     const formatCLP = (n: number) => n.toLocaleString('es-CL');
@@ -212,7 +219,13 @@ export default function AcademyPage() {
         const map: any = { libre: 'Todos los niveles', infantil: 'Infantil (Sub-12)', juvenil: 'Juvenil (Sub-17)', adultos: 'Adultos' };
         return map[g] || g || '—';
     };
-    const fmtDate = (d: any) => d ? new Date(d).toLocaleDateString('es-CL', { day: '2-digit', month: 'short' }) : '—';
+    // AAAA-MM-DD es una fecha de calendario: se arma en hora local para no correrla un día
+    const fmtDate = (d: any) => {
+        if (!d) return '—';
+        const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(d));
+        const dt = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(d);
+        return dt.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' });
+    };
     const SPORT_STYLE: any = {
         'Fútbol': { gradient: 'from-emerald-500 to-teal-600', chip: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-[#00df82] border-emerald-100 dark:border-emerald-500/20' },
         'Pádel': { gradient: 'from-orange-500 to-amber-600', chip: 'bg-orange-50 dark:bg-orange-500/10 text-orange-600 border-orange-100 dark:border-orange-500/20' },
@@ -322,7 +335,7 @@ export default function AcademyPage() {
                                     <div className="absolute bottom-3 left-3 right-3">
                                         <h3 className="text-base font-black text-white uppercase truncate drop-shadow-lg font-heading">{c.name}</h3>
                                         <p className="text-[9px] font-bold text-white/90 uppercase mt-0.5 flex items-center gap-1.5">
-                                            <HugeiconsIcon icon={UserIcon} className="w-3 h-3" strokeWidth={2} /> Prof. {c.instructor}
+                                            <HugeiconsIcon icon={UserIcon} className="w-3 h-3" strokeWidth={2} /> {/^prof/i.test(c.instructor || "") ? c.instructor : `Prof. ${c.instructor || ""}`}
                                         </p>
                                     </div>
                                 </div>
@@ -381,7 +394,7 @@ export default function AcademyPage() {
                                                 <HugeiconsIcon icon={PlayCircleIcon} className="w-3 h-3" /> Reactivar
                                             </button>
                                         )}
-                                        <button onClick={() => setClassToDelete(c.id)} className="py-2 flex items-center justify-center gap-1.5 bg-white dark:bg-white/5 rounded-md border border-red-100 dark:border-red-500/20 text-red-400 text-[8px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95" title="Eliminar">
+                                        <button onClick={() => Number(c.enrolledStudents || 0) > 0 ? addToast("Tiene alumnos con pago: suspéndela en vez de eliminarla", 'error') : setClassToDelete(c.id)} className="py-2 flex items-center justify-center gap-1.5 bg-white dark:bg-white/5 rounded-md border border-red-100 dark:border-red-500/20 text-red-400 text-[8px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95" title="Eliminar">
                                             <HugeiconsIcon icon={Delete02Icon} className="w-3 h-3" /> Eliminar
                                         </button>
                                     </div>
@@ -443,6 +456,10 @@ export default function AcademyPage() {
                                     </div>
                                     <InputGroupPremium label="Nombre de la Clase" value={formData.name} onChange={(e: any) => setFormData({ ...formData, name: e.target.value })} icon={<HugeiconsIcon icon={IdentityCardIcon} className="w-4 h-4" />} placeholder="Ej: Escuela de Pádel" />
                                     <InputGroupPremium label="Instructor Principal" value={formData.instructor} onChange={(e: any) => setFormData({ ...formData, instructor: e.target.value })} icon={<HugeiconsIcon icon={UserIcon} className="w-4 h-4" />} placeholder="Prof. Nombre" />
+                                    <InputGroupPremium label="Recinto" type="select" value={formData.tenantId} onChange={(e: any) => setFormData({ ...formData, tenantId: e.target.value })} icon={<HugeiconsIcon icon={Building01Icon} className="w-4 h-4" />}>
+                                        <option value="">SELECCIONAR...</option>
+                                        {tenants.map(t => <option key={t.id} value={t.id}>{String(t.name || 'Recinto').toUpperCase()}</option>)}
+                                    </InputGroupPremium>
                                     <InputGroupPremium label="Nivel Académico" type="select" value={formData.ageGroup} onChange={(e: any) => setFormData({ ...formData, ageGroup: e.target.value })} icon={<HugeiconsIcon icon={Grid02Icon} className="w-4 h-4" />}>
                                         <option value="libre">TODOS LOS NIVELES</option>
                                         <option value="infantil">INFANTIL (SUB-12)</option>
@@ -512,7 +529,7 @@ export default function AcademyPage() {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-black uppercase text-slate-900 dark:text-white truncate font-heading">{formData.name || 'Nombre de la clase'}</p>
-                                        <p className="text-[9px] font-bold text-indigo-500 uppercase mt-0.5">Prof. {formData.instructor || 'Instructor'} · {formData.sport} · {ageGroupLabel(formData.ageGroup)}</p>
+                                        <p className="text-[9px] font-bold text-indigo-500 uppercase mt-0.5">{/^prof/i.test(formData.instructor) ? formData.instructor : `Prof. ${formData.instructor || 'Instructor'}`} · {formData.sport} · {ageGroupLabel(formData.ageGroup)}</p>
                                     </div>
                                     <div className="text-right shrink-0">
                                         <p className="text-sm font-black text-emerald-600 dark:text-[#00df82] font-mono">${formatCLP(Number(formData.price) || 0)}</p>

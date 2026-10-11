@@ -33,3 +33,6 @@ export function slotInstant(dateStr: string, time: string): Date {
   const [h, m] = time.split(":").map(Number);
   return chileDateTime(dateStr, h, m || 0, h < 6 ? 1 : 0);
 }
+
+// Día calendario de hoy en Chile (AAAA-MM-DD), para comparar con fechas guardadas sin hora
+export const chileToday = (now: Date = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: "America/Santiago" }).format(now);
