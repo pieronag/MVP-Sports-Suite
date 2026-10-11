@@ -52,7 +52,7 @@ interface ModalConfig { show: boolean; title: string; message: string; type: 'co
 
 const DEFAULT_SETTINGS: SettingsData = {
     platformName: 'MVP Sports Suite', supportEmail: 'central@mvpsports.cl', maintenanceMode: false,
-    corporateData: { rut: '76.123.456-7', razonSocial: 'MVP SPORTS CHILE SpA', direccion: 'Av. Las Condes 1234', giro: 'Servicios Tecnológicos', representante: 'Director General', emailFacturacion: 'admin@mvp.cl' },
+    corporateData: { rut: '78.392.951-1', razonSocial: 'ORION TECHNOLOGY SpA', direccion: 'San Pedro 1417, Rancagua', giro: 'Desarrollo de Software', representante: 'Representante legal', emailFacturacion: 'soporte@mvpsports.cl' },
     plans: [
         { id: 'free', name: 'Free', price: 0, commission: 4.0, priorityScore: 10, features: {} },
         { id: 'basic', name: 'Básico', price: 29990, commission: 3.0, priorityScore: 30, features: { topPosition: true } },
@@ -61,7 +61,7 @@ const DEFAULT_SETTINGS: SettingsData = {
     ],
     paymentGateways: { mercadoPago: true },
     legal: { terms: 'Términos y condiciones de uso de la plataforma...', privacy: 'Política de privacidad y tratamiento de datos...' },
-    sii: { enabled: false, testMode: true, taxRate: 19, rutEmpresa: '76.123.456-7', enableForTenants: false }
+    sii: { enabled: false, testMode: true, taxRate: 19, rutEmpresa: '78.392.951-1', enableForTenants: false }
 };
 
 const benefitCatalog = [

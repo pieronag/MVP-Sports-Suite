@@ -1,5 +1,18 @@
 "use client";
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { listAllBookings, listBookings } from "@/services/client/data/bookings";
+import { countsAsIncome } from "@/utils/bookingModel";
+import { invoiceFor } from "@/utils/invoiceCalc";
+import type { RawDoc } from "@/types/booking";
+import { chileDateTime } from "@/utils/chileTime";
+
+// Mes AAAA-MM en hora de Chile
+const monthRange = (ym: string) => {
+    const [y, m] = (ym || '').split('-').map(Number);
+    const next = new Date(Date.UTC(y, m, 1));
+    const first = (yy: number, mm: number) => `${yy}-${String(mm).padStart(2, '0')}-01`;
+    return { from: chileDateTime(first(y, m), 0, 0), to: new Date(chileDateTime(first(next.getUTCFullYear(), next.getUTCMonth() + 1), 0, 0).getTime() - 1) };
+};
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     Search01Icon,
@@ -57,7 +70,6 @@ interface Invoice {
 
 export default function Page() {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
-    const [bookings, setBookings] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState('Todas');
     const [searchTerm, setSearchTerm] = useState('');
@@ -122,9 +134,6 @@ export default function Page() {
             });
             setInvoices(loadedInvoices);
 
-            const qBook = query(collection(db, "bookings"), where("paymentStatus", "==", "paid"));
-            const bookSnap = await getDocs(qBook);
-            setBookings(bookSnap.docs.map(d => ({ ...d.data(), id: d.id })));
         } catch (error) {
             console.error("Error:", error);
         } finally {
@@ -173,16 +182,7 @@ export default function Page() {
             const tenantsSnap = await getDocs(collection(db, "tenants"));
             const tenants = tenantsSnap.docs.map(d => ({ ...d.data(), id: d.id }));
 
-            const qBookings = query(collection(db, "bookings"), where("paymentStatus", "==", "paid"));
-            const bookingsSnap = await getDocs(qBookings);
-            const allBookings = bookingsSnap.docs.map(d => ({ ...d.data(), id: d.id }));
-
-            const [selYear, selMonth] = selectedMonth.split('-').map(Number);
-            const monthlyBookings = allBookings.filter(b => {
-                const bDate = (b as any).date?.toDate ? (b as any).date.toDate() : ((b as any).date?.seconds ? new Date((b as any).date.seconds * 1000) : null);
-                if (!bDate) return false;
-                return bDate.getFullYear() === selYear && (bDate.getMonth() + 1) === selMonth;
-            });
+            const monthlyBookings = await listAllBookings(monthRange(selectedMonth), 20000);
 
             const qInvoices = query(collection(db, "invoices"), where("rawDate", "==", selectedMonth));
             const existingInvoicesSnap = await getDocs(qInvoices);
@@ -196,28 +196,23 @@ export default function Page() {
 
             for (let i = 0; i < toProcess.length; i++) {
                 const t = toProcess[i];
-                const planConfig = globalPlans.find((p: any) => (p.id || '').toLowerCase() === (t.planId || t.plan || '').toLowerCase() || (p.name || '').toLowerCase() === (t.planId || t.plan || '').toLowerCase());
-                const commRate = planConfig ? (planConfig.commission ?? globalCommissionRate) : globalCommissionRate;
-                const planCost = planConfig ? Number(planConfig.price || 0) : 0;
-
-                const tBookings = monthlyBookings.filter(b => (b as any).tenantId === t.id);
-                const revenue = tBookings.reduce((acc, curr) => acc + (Number((curr as any).totalPrice || 0)), 0);
-                const commTotal = Math.round(revenue * (commRate / 100));
-                const total = commTotal + planCost;
-
+                const { amount: total, breakdown } = invoiceFor(t, monthlyBookings, globalPlans, globalCommissionRate);
                 if (total <= 0) continue;
 
                 await addDoc(collection(db, "invoices"), {
                     tenantId: t.id, tenantName: t.name, ownerName: t.ownerName || "Sin Dueño",
                     ownerEmail: t.ownerEmail || "", amount: total, status: "Pendiente",
                     rawDate: selectedMonth, issueDate: serverTimestamp(), dueDate: new Date(new Date().setDate(new Date().getDate() + 5)),
-                    details: `Liquidación MVP - ${selectedMonth} (Solo Reservas Pagadas)`,
-                    breakdown: { planName: planConfig?.name || "Base", planCost, commissionRate: commRate, commissionTotal: commTotal, totalBookings: tBookings.length, totalRevenue: revenue }
+                    details: `Liquidación MVP - ${selectedMonth}`,
+                    breakdown
                 });
             }
             showAlert("Completado", "Generación finalizada considerando solo transacciones pagadas.");
             fetchData();
-        } catch (error) { showAlert("Error", "Error en el proceso."); } finally { setIsGenerating(false); }
+        } catch (error: any) {
+            console.error(error);
+            showAlert("Error", error?.code === 'permission-denied' ? "Tu cuenta no tiene permisos para generar liquidaciones." : "No se pudo completar la generación. Revisa tu conexión e inténtalo de nuevo.");
+        } finally { setIsGenerating(false); }
     };
 
     const handleToggleStatus = async (inv: Invoice) => {
@@ -245,11 +240,11 @@ const buildPdf = async (inv: Invoice) => {
         const b = inv.breakdown || {};
         const corp = globalSettings?.corporateData || {
             razonSocial: 'ORION TECHNOLOGY SpA',
-            rut: '76.123.456-7',
-            direccion: 'Centenario 611',
-            emailFacturacion: 'contacto@oriontechnology.cl',
+            rut: '78.392.951-1',
+            direccion: 'San Pedro 1417, Rancagua',
+            emailFacturacion: 'soporte@mvpsports.cl',
             giro: 'Desarrollo de Software',
-            representante: 'Director General'
+            representante: 'Representante legal'
         };
         const supportEmail = globalSettings?.supportEmail || 'soporte@mvpsports.cl';
         const platformName = globalSettings?.platformName || 'MVP Sports Suite';
@@ -261,13 +256,10 @@ const buildPdf = async (inv: Invoice) => {
         };
 
         // ============ DATOS DEL PERIODO ============
-        const [selYear, selMonth] = inv.rawDate.split('-').map(Number);
-        const paidBookings = bookings.filter(book => {
-            const bDate = book.date?.toDate ? book.date.toDate() : (book.date?.seconds ? new Date(book.date.seconds * 1000) : null);
-            return book.tenantId === inv.tenantId &&
-                bDate && bDate.getFullYear() === selYear && (bDate.getMonth() + 1) === selMonth &&
-                book.paymentStatus === 'paid';
-        });
+        const paidBookings = inv.tenantId
+            ? (await listBookings([inv.tenantId], monthRange(inv.rawDate))).filter(countsAsIncome)
+                .map((bk): RawDoc => ({ ...bk.raw, id: bk.id, totalPrice: bk.price, startTime: bk.startTime, date: { toDate: () => bk.start || new Date(0) } }))
+            : [];
         const commRate = b.commissionRate || 0;
         const totalBookings = b.totalBookings || paidBookings.length || 0;
         const grossRevenue = b.totalRevenue || paidBookings.reduce((acc, bk) => acc + Number(bk.totalPrice || 0), 0);
