@@ -58,8 +58,11 @@ export const auditService = {
             const role = params.role || 'user';
             const email = params.email || currentUser?.email || 'sistema@mvpsports.cl';
 
+            // Sin sesión no se puede auditar (las reglas exigen que userId sea quien escribe)
+            if (!currentUser) return;
             await addDoc(collection(db, 'audit'), {
                 traceId,
+                userId: currentUser.uid,
                 action: params.action,
                 module: params.module,
                 details: params.details,

@@ -1,5 +1,6 @@
 "use client";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
+import { postApi } from "@/services/client/apiClient";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { LifebuoyIcon } from '@hugeicons/core-free-icons';
 import React, { useState, useEffect } from 'react';
@@ -109,25 +110,11 @@ export default function BillingPage() {
 
                 const now = new Date();
                 const processedTenants = await Promise.all(tenantsList.map(async (t) => {
-                    if (t.pendingPlanId && t.scheduledChangeDate) {
-                        const scheduledDate = toDate(t.scheduledChangeDate);
-                        if (now >= scheduledDate) {
-                            const selectedPlan = loadedPlans.find(p => p.id === t.pendingPlanId);
-                            const updateData = {
-                                planId: t.pendingPlanId,
-                                plan: t.pendingPlanName,
-                                pendingPlanId: null,
-                                pendingPlanName: null,
-                                pendingPlanPrice: null,
-                                pendingBillingCycle: null,
-                                scheduledChangeDate: null,
-                                lastPlanChange: Timestamp.fromDate(now),
-                                commission: selectedPlan ? selectedPlan.commission : undefined,
-                                priorityScore: selectedPlan ? selectedPlan.priorityScore : undefined,
-                                features: selectedPlan ? selectedPlan.features : undefined
-                            };
-                            await updateDoc(doc(db, "tenants", t.id), updateData);
-                            return { ...t, ...updateData, plan: updateData.plan ?? undefined } as Tenant;
+                    if (t.pendingPlanId && t.scheduledChangeDate && now >= toDate(t.scheduledChangeDate)) {
+                        const r = await postApi<{ applied: boolean }>('/api/billing/plan', { action: 'apply', tenantId: t.id }).catch(() => null);
+                        if (r?.applied) {
+                            const fresh = await getDoc(doc(db, "tenants", t.id));
+                            return { ...t, ...fresh.data(), id: t.id } as Tenant;
                         }
                     }
                     return t;
@@ -145,25 +132,22 @@ export default function BillingPage() {
         const { planId, planName } = confirmModal;
         setConfirmModal(null); setProcessingPlan(planId);
         try {
-            const now = new Date();
-            let scheduledDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-            if (billingCycle === 'annual') scheduledDate = new Date(now.getFullYear() + 1, 0, 1);
-            const selectedPlan = plans.find(p => p.id === planId);
-            const planPrice = selectedPlan ? (billingCycle === 'annual' ? Math.round(selectedPlan.price * 0.8) : selectedPlan.price) : 0;
-            await updateDoc(doc(db, "tenants", selectedTenantId), { pendingPlanId: planId, pendingPlanName: planName, pendingPlanPrice: planPrice, pendingBillingCycle: billingCycle, scheduledChangeDate: Timestamp.fromDate(scheduledDate) });
+            // El servidor valida el plan, calcula el precio y la fecha en que rige
+            const r = await postApi<{ scheduledChangeDate: string; price: number }>('/api/billing/plan', { action: 'schedule', tenantId: selectedTenantId, planId, cycle: billingCycle });
+            const scheduledDate = new Date(r.scheduledChangeDate);
             setTenants(prev => prev.map(t => t.id === selectedTenantId ? { ...t, pendingPlanId: planId, pendingPlanName: planName, scheduledChangeDate: Timestamp.fromDate(scheduledDate) } : t));
             showToast(`Cambio agendado para el ${scheduledDate.toLocaleDateString('es-CL', { day: 'numeric', month: 'long' })}`, 'success');
-        } catch (e) { showToast("Error al procesar cambio", 'error'); } finally { setProcessingPlan(null); }
+        } catch (e: any) { showToast(e?.message || "Error al procesar cambio", 'error'); } finally { setProcessingPlan(null); }
     };
 
     const cancelScheduledChange = async () => {
         if (!selectedTenantId) return;
         setProcessingPlan('canceling');
         try {
-            await updateDoc(doc(db, "tenants", selectedTenantId), { pendingPlanId: null, pendingPlanName: null, pendingPlanPrice: null, pendingBillingCycle: null, scheduledChangeDate: null });
+            await postApi('/api/billing/plan', { action: 'cancel', tenantId: selectedTenantId });
             setTenants(prev => prev.map(t => t.id === selectedTenantId ? { ...t, pendingPlanId: undefined, pendingPlanName: undefined, scheduledChangeDate: undefined } : t));
             showToast("Cambio cancelado", 'success');
-        } catch (e) { showToast("Error", 'error'); } finally { setProcessingPlan(null); }
+        } catch (e: any) { showToast(e?.message || "No se pudo cancelar el cambio", 'error'); } finally { setProcessingPlan(null); }
     };
 
     const fetchInvoices = async () => {

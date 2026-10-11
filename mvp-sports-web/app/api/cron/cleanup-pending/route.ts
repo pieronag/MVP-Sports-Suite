@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
+import { applyAllDuePlanChanges } from "@/services/server/billing";
 import { adminDb } from "@/services/server/firebase-admin";
 import { slotOf, rebuildCourtDay } from "@/services/server/bookingProjections";
 import { recomputePlayer } from "@/services/server/gamification";
@@ -89,5 +90,8 @@ export async function GET(request: Request) {
   let recomputed = 0;
   for (const uid of players) if (await recomputePlayer(uid).catch(() => null)) recomputed++;
 
-  return NextResponse.json({ ok: true, deleted, cancelledBookings, cancelledRegs, cancelledEnrollments, noShows, recomputed });
+  // Cambios de plan agendados que ya corresponden
+  const plansApplied = await applyAllDuePlanChanges().catch(() => 0);
+
+  return NextResponse.json({ ok: true, deleted, cancelledBookings, cancelledRegs, cancelledEnrollments, noShows, recomputed, plansApplied });
 }

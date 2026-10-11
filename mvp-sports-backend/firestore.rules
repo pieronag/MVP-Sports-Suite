@@ -175,8 +175,16 @@ service cloud.firestore {
       allow read: if true;
       // Las credenciales nunca se guardan aquí (lectura pública): van a tenant_secrets
       allow create: if isSuperAdmin() && !hasTenantSecretFields();
-      allow update: if !hasTenantSecretFields() && (canManageTenant(tenantId) || (isAuthenticated() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'totalFeedbacks'])));
+      allow update: if !hasTenantSecretFields() && (isSuperAdmin() ||
+        (canManageTenant(tenantId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(tenantProtectedKeys())));
       allow delete: if isSuperAdmin();
+    }
+
+    // Propiedad, plan, funciones contratadas, estado y reputación: solo administración o servidor
+    function tenantProtectedKeys() {
+      return ['ownerId', 'ownerIds', 'plan', 'planId', 'billingCycle', 'pendingPlanId', 'pendingPlanName', 'pendingPlanPrice',
+              'pendingBillingCycle', 'scheduledChangeDate', 'lastPlanChange', 'features', 'commission', 'priorityScore',
+              'status', 'debt', 'debtStatus', 'rating', 'totalFeedbacks', 'ratingUpdatedAt'];
     }
 
     function hasTenantSecretFields() {
@@ -281,7 +289,7 @@ service cloud.firestore {
     // ==========================================
     
     match /payments/{paymentId} {
-      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isManager() || isSuperAdmin());
+      allow read: if isAuthenticated() && (resource.data.get('userId', '') == request.auth.uid || worksAtTenant(resource.data.get('tenantId', '')));
       allow create: if isSuperAdmin();
       allow update, delete: if isSuperAdmin();
     }
@@ -292,7 +300,7 @@ service cloud.firestore {
     }
 
     match /invoices/{invoiceId} {
-      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isManager() || isSuperAdmin());
+      allow read: if isAuthenticated() && (resource.data.get('userId', '') == request.auth.uid || canManageTenant(resource.data.get('tenantId', '')));
       allow write: if isSuperAdmin();
     }
 
@@ -358,8 +366,8 @@ service cloud.firestore {
     match /matchmaking/{entryId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
-      allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || isOwner() || isSuperAdmin());
-      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isOwner() || isSuperAdmin());
+      allow update: if isAuthenticated() && (resource.data.userId == request.auth.uid || isSuperAdmin());
+      allow delete: if isAuthenticated() && (resource.data.userId == request.auth.uid || isSuperAdmin());
     }
 
     match /challenges/{challengeId} {
@@ -390,7 +398,7 @@ service cloud.firestore {
     // Inscripciones: las crea el servidor (/api/tournaments/register) tras validar
     // capitán, cupos y pago. El personal del recinto puede marcar cobros en el lugar.
     match /tournament_registrations/{id} {
-      allow read: if isAuthenticated() && (resource.data.get('userId', '') == request.auth.uid || isStaff());
+      allow read: if isAuthenticated() && (resource.data.get('userId', '') == request.auth.uid || worksAtTenant(resource.data.get('tenantId', '')));
       allow create: if false;
       allow update: if worksAtTenant(resource.data.get('tenantId', '')) || isSuperAdmin();
       allow delete: if canManageTenant(resource.data.get('tenantId', ''));
@@ -398,7 +406,7 @@ service cloud.firestore {
 
     // Inscripciones a academias: las crea el servidor (/api/academies/enroll)
     match /academy_enrollments/{id} {
-      allow read: if isAuthenticated() && (resource.data.get('userId', '') == request.auth.uid || isStaff());
+      allow read: if isAuthenticated() && (resource.data.get('userId', '') == request.auth.uid || canManageScoped(resource.data));
       allow create: if false;
       allow update: if isSuperAdmin() || (isStaff() && (
         canManageScoped(resource.data) || resource.data.get('ownerId', '') == request.auth.uid));
@@ -423,9 +431,9 @@ service cloud.firestore {
     }
 
     match /reports/{reportId} {
-      allow read: if isManager() || isSuperAdmin();
-      allow create: if isAuthenticated();
-      allow update: if isManager() || isSuperAdmin();
+      allow read: if isAuthenticated() && (resource.data.get('userId', '') == request.auth.uid || isSuperAdmin());
+      allow create: if isAuthenticated() && request.resource.data.get('userId', '') == request.auth.uid;
+      allow update: if isSuperAdmin();
       allow delete: if isSuperAdmin();
     }
 
@@ -435,8 +443,9 @@ service cloud.firestore {
     }
 
     match /audit/{id} {
-      allow read: if isStaff() || isSuperAdmin();
-      allow write: if isStaff() || isSuperAdmin();
+      allow read: if isSuperAdmin();
+      allow create: if isStaff() && request.resource.data.get('userId', request.auth.uid) == request.auth.uid;
+      allow update, delete: if false;
     }
   }
 }
