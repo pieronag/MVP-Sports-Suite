@@ -83,3 +83,20 @@ describe("isRealBooking", () => {
     expect(isRealBooking({})).toBe(false);
   });
 });
+
+import { canVenueCancel, fullRefund } from "../utils/bookingPolicy";
+describe("canVenueCancel", () => {
+  const now = new Date("2026-10-20T15:00:00Z"); // 12:00 Chile
+  const at = (time: string, extra = {}) => ({ date: "2026-10-20", startTime: time, paymentStatus: "paid", ...extra });
+  it("puede anular aunque falten menos de 24 h, y hasta que termine el bloque", () => {
+    expect(canVenueCancel(at("13:00"), now).ok).toBe(true);
+    expect(canVenueCancel(at("11:30"), now).ok).toBe(true);
+    expect(canVenueCancel(at("10:30"), now).ok).toBe(false);
+  });
+  it("no si ya está anulada, con inasistencia o el jugador ingresó", () => {
+    expect(canVenueCancel(at("19:00", { status: "cancelled" }), now).ok).toBe(false);
+    expect(canVenueCancel(at("19:00", { status: "no-show" }), now).ok).toBe(false);
+    expect(canVenueCancel(at("19:00", { checkIn: true }), now).ok).toBe(false);
+  });
+  it("devuelve el 100% sin comisión", () => { expect(fullRefund(18000)).toEqual({ fee: 0, refund: 18000 }); });
+});

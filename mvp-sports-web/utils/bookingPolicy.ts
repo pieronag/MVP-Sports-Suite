@@ -16,6 +16,19 @@ export function canPlayerCancel(b: any, now = new Date()): Decision {
   return { ok: true };
 }
 
+// El recinto puede anular hasta que termine el bloque (1 h), salvo que el jugador ya haya ingresado.
+// Como la anulación es del recinto, se devuelve el 100% del pago.
+export function canVenueCancel(b: any, now = new Date()): Decision {
+  if (b.status === "cancelled") return { ok: false, reason: "La reserva ya está anulada." };
+  if (b.status === "no-show" || b.paymentStatus === "no-show") return { ok: false, reason: "La reserva ya quedó como inasistencia." };
+  if (b.checkIn || ["active", "completed"].includes(b.status)) return { ok: false, reason: "El jugador ya ingresó: no se puede anular." };
+  const h = hoursUntilStart(b, now);
+  if (h !== null && h < -1) return { ok: false, reason: "La reserva ya terminó." };
+  return { ok: true };
+}
+
+export const fullRefund = (amount: number) => ({ fee: 0, refund: Math.max(0, Math.round(amount)) });
+
 export function refundFor(amount: number) {
   const fee = Math.round(amount * REFUND_FEE);
   return { fee, refund: Math.max(0, amount - fee) };

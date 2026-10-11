@@ -1,6 +1,8 @@
 "use client";
-import { syncBookingSlots } from "@/services/client/apiClient";
-import { isRealBooking } from "@/utils/bookingPolicy";
+import { postApi } from "@/services/client/apiClient";
+import { listBookings } from "@/services/client/data/bookings";
+import { isReal } from "@/utils/bookingModel";
+import { chileDateTime } from "@/utils/chileTime";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -176,48 +178,31 @@ export default function MasterCalendar() {
             const courtsList = snapCourts.docs.map(d => ({ id: d.id, ...d.data() } as Court));
             setDashboardCourts(courtsList.sort((a, b) => a.name.localeCompare(b.name)));
 
-            const baseD = new Date(selectedDate + "T00:00:00");
-            const start = new Date(baseD);
-            start.setHours(6, 0, 0, 0);
-            const end = new Date(baseD);
-            end.setDate(end.getDate() + 1);
-            end.setHours(5, 59, 59, 999);
-            const [snapByDate, snapByStartTime] = await Promise.all([
-                getDocs(query(collection(db, "bookings"), where("tenantId", "==", selectedVenueId), where("date", ">=", Timestamp.fromDate(start)), where("date", "<=", Timestamp.fromDate(end)))).catch(() => ({ docs: [] as any[] })),
-                getDocs(query(collection(db, "bookings"), where("tenantId", "==", selectedVenueId), where("startTime", ">=", Timestamp.fromDate(start)), where("startTime", "<=", Timestamp.fromDate(end)))).catch(() => ({ docs: [] as any[] }))
-            ]);
-
-            const allDocsMap = new Map<string, any>();
-            [...snapByDate.docs, ...snapByStartTime.docs].forEach(d => { if (!allDocsMap.has(d.id)) allDocsMap.set(d.id, d); });
-
-            const bookingsList = Array.from(allDocsMap.values()).filter(d => isRealBooking(d.data())).map(d => {
-                const data = d.data();
-                const tsField = data.date || data.startTime;
-                const dateObj = tsField?.toDate ? tsField.toDate() : new Date();
-                
-                let displayTime = typeof data.startTime === 'string' ? data.startTime : `${dateObj.getHours().toString().padStart(2, '0')}:00`;
-                
-                let extractedHour = dateObj.getHours() + (dateObj.getMinutes() / 60);
-                if (typeof data.startTime === 'string' && data.startTime.includes(':')) {
-                    const [h, m] = data.startTime.split(':').map(Number);
-                    extractedHour = h + (m / 60);
-                }
-
-                // Ajuste para bloques de madrugada en la grilla visual
-                if (extractedHour < 6) {
-                    extractedHour += 24;
-                }
-
-                return { 
-                    id: d.id, 
-                    ...data, 
-                    finalPrice: data.totalPrice || data.price || data.amount || 0, 
-                    displayTime, 
-                    extractedHour 
+            // Día operativo del recinto: de 06:00 a 05:59 del día siguiente (hora de Chile)
+            const start = chileDateTime(selectedDate, 6, 0);
+            const end = new Date(chileDateTime(selectedDate, 6, 0, 1).getTime() - 1);
+            const list = await listBookings([selectedVenueId], { from: start, to: end });
+            const bookingsList = list.filter(isReal).map(b => {
+                const [h, m] = (b.startTime || '00:00').split(':').map(Number);
+                return {
+                    ...b.raw,
+                    id: b.id,
+                    clientName: b.clientName,
+                    courtName: b.courtName,
+                    startTime: b.startTime,
+                    paymentStatus: b.payment,
+                    status: b.state === 'cancelled' ? 'cancelled' : b.raw.status,
+                    finalPrice: b.price,
+                    displayTime: b.startTime,
+                    // Bloques de madrugada van al final de la grilla
+                    extractedHour: (h < 6 ? h + 24 : h) + (m || 0) / 60,
                 };
             });
             setBookings(bookingsList);
-        } catch (e) { console.error(e); } finally { setLoading(false); }
+        } catch (e: any) {
+            console.error(e);
+            setConfirmData({ isOpen: true, title: 'No se pudo cargar la agenda', message: e?.code === 'permission-denied' ? 'Tu cuenta no tiene permisos sobre este recinto.' : 'Revisa tu conexión e inténtalo nuevamente.', isDestructive: false, showCancel: false, action: () => setConfirmData(prev => ({ ...prev, isOpen: false })) });
+        } finally { setLoading(false); }
     };
 
     useEffect(() => { loadDashboardData(); }, [selectedVenueId, selectedDate]);
@@ -225,29 +210,26 @@ export default function MasterCalendar() {
     // Anular una reserva (cliente cancela o ingreso por error). Libera el horario
     // sin marcar inasistencia ni penalizar al jugador.
     const requestCancelBooking = (b: any) => {
+        const paid = b.paymentStatus === 'paid' ? Number(b.finalPrice || 0) : 0;
         setConfirmData({
             isOpen: true,
             title: "Anular reserva",
-            message: `¿Anular la reserva #${b.id} de ${b.clientName || 'cliente'} (${b.startTime})? El horario quedará disponible.` +
-                (collectedAmount(b) > 0 ? ` Ya se cobraron ${formatCLP(collectedAmount(b))}: la devolución al cliente se gestiona aparte.` : ''),
+            message: `¿Anular la reserva #${b.id} de ${b.clientName || 'cliente'} (${b.startTime})? El horario quedará disponible` +
+                (paid > 0 ? ` y se devolverán ${formatCLP(paid)} (100%) al cliente por Mercado Pago.` : '.'),
             isDestructive: true,
             showCancel: true,
             action: async () => {
                 setConfirmData(prev => ({ ...prev, isOpen: false }));
+                const done = (title: string, message: string) => setConfirmData({ isOpen: true, title, message, isDestructive: false, showCancel: false, action: () => setConfirmData(prev => ({ ...prev, isOpen: false })) });
                 try {
-                    await updateDoc(doc(db, "bookings", b.id), {
-                        status: 'cancelled',
-                        cancelledBy: 'staff',
-                        cancelledByUser: user?.email || user?.uid || null,
-                        cancelledAt: Timestamp.now(),
-                        updatedAt: Timestamp.now(),
-                    });
-                    await syncBookingSlots(b.id);
-                    await auditService.logAuditEvent({ action: 'RESERVA_ANULAR', module: 'Operación/Agenda', details: `Reserva ${b.id} anulada por personal (${b.clientName || ''} ${b.startTime})`, severity: 'MEDIUM', status: 'SUCCESS' });
+                    const r = await postApi<{ success: boolean; refundAmount: number; error: string | null }>('/api/bookings/cancel', { bookingId: b.id });
+                    await auditService.logAuditEvent({ action: 'RESERVA_ANULAR', module: 'Operación/Agenda', details: `Reserva ${b.id} anulada por personal (${b.clientName || ''} ${b.startTime}); devuelto ${r.refundAmount}`, severity: 'MEDIUM', status: r.success ? 'SUCCESS' : 'FAILED' });
                     setSelectedBooking(null);
                     loadDashboardData();
+                    if (r.success) done("Reserva anulada", r.refundAmount > 0 ? `Se devolvieron ${formatCLP(r.refundAmount)} al cliente.` : 'El horario quedó disponible.');
+                    else done("Reserva anulada, reembolso pendiente", `La reserva se anuló, pero Mercado Pago no confirmó la devolución (${r.error || 'sin detalle'}). Quedó marcada como "Error en reembolso" para revisarla.`);
                 } catch (e: any) {
-                    setConfirmData({ isOpen: true, title: "No se pudo anular", message: e?.code === 'permission-denied' ? 'Tu cuenta no tiene permisos sobre esta reserva.' : 'Inténtalo nuevamente.', isDestructive: false, showCancel: false, action: () => setConfirmData(prev => ({ ...prev, isOpen: false })) });
+                    done("No se pudo anular", e?.message || 'Inténtalo nuevamente.');
                 }
             },
         });
