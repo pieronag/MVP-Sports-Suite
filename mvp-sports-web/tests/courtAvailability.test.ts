@@ -21,3 +21,15 @@ describe("courtBlockedAt", () => {
     expect(slotInstant("2026-10-20", "01:00").toISOString()).toBe("2026-10-21T04:00:00.000Z");
   });
 });
+
+import { operatingDay } from "../utils/chileTime";
+describe("operatingDay", () => {
+  it("de 06:00 a 05:59; la madrugada pertenece al día anterior", () => {
+    const tarde = operatingDay(new Date("2026-10-20T23:00:00Z")); // 20:00 Chile
+    expect(tarde.day).toBe("2026-10-20");
+    expect(tarde.from.toISOString()).toBe("2026-10-20T09:00:00.000Z");
+    expect(tarde.to.toISOString()).toBe("2026-10-21T08:59:59.999Z");
+    expect(operatingDay(new Date("2026-10-21T05:30:00Z")).day).toBe("2026-10-20"); // 02:30 Chile
+    expect(operatingDay(new Date("2026-10-21T09:30:00Z")).day).toBe("2026-10-21"); // 06:30 Chile
+  });
+});

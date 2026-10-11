@@ -36,3 +36,14 @@ export function slotInstant(dateStr: string, time: string): Date {
 
 // Día calendario de hoy en Chile (AAAA-MM-DD), para comparar con fechas guardadas sin hora
 export const chileToday = (now: Date = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: "America/Santiago" }).format(now);
+
+// Día operativo de un recinto: antes de las 06:00 sigue siendo el día anterior. Devuelve AAAA-MM-DD y su ventana.
+export function operatingDay(now: Date = new Date()): { day: string; from: Date; to: Date } {
+  const hour = Number(new Intl.DateTimeFormat("en-US", { timeZone: "America/Santiago", hour: "numeric", hourCycle: "h23" }).format(now));
+  let day = chileToday(now);
+  if (hour < 6) {
+    const [y, m, d] = day.split("-").map(Number);
+    day = new Date(Date.UTC(y, m - 1, d - 1)).toISOString().slice(0, 10);
+  }
+  return { day, from: chileDateTime(day, 6, 0), to: new Date(chileDateTime(day, 6, 0, 1).getTime() - 1) };
+}

@@ -1,5 +1,8 @@
 "use client";
 import { postApi, syncBookingSlots } from "@/services/client/apiClient";
+import { listBookings } from "@/services/client/data/bookings";
+import { isReal } from "@/utils/bookingModel";
+import { operatingDay } from "@/utils/chileTime";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import React, { useState, useEffect, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -166,103 +169,31 @@ export default function CheckInPage() {
         if (!selectedVenueId) return;
         setLoading(true);
         try {
-            const now = getChileNow();
-            if (now.getHours() < 6) {
-                now.setDate(now.getDate() - 1);
-            }
-            const startOfDay = new Date(now);
-            startOfDay.setHours(6, 0, 0, 0);
-            const endOfDay = new Date(now);
-            endOfDay.setDate(endOfDay.getDate() + 1);
-            endOfDay.setHours(5, 59, 59, 999);
-            // Query por campo 'date' (Timestamp)
-            const q1 = query(
-                collection(db, "bookings"),
-                where("tenantId", "==", selectedVenueId),
-                where("date", ">=", Timestamp.fromDate(startOfDay)),
-                where("date", "<=", Timestamp.fromDate(endOfDay))
-            );
-            // Query por campo 'startTime' como Timestamp (reservas antiguas)
-            const q2 = query(
-                collection(db, "bookings"),
-                where("tenantId", "==", selectedVenueId),
-                where("startTime", ">=", Timestamp.fromDate(startOfDay)),
-                where("startTime", "<=", Timestamp.fromDate(endOfDay))
-            );
-
-            const [snap1, snap2] = await Promise.all([
-                getDocs(q1).catch(() => ({ docs: [] as any[] })),
-                getDocs(q2).catch(() => ({ docs: [] as any[] }))
-            ]);
-
-            // Merge + deduplicate
-            const allDocsMap = new Map<string, any>();
-            [...snap1.docs, ...snap2.docs].forEach(d => {
-                if (!allDocsMap.has(d.id)) allDocsMap.set(d.id, d);
-            });
-
-            const list = Array.from(allDocsMap.values()).map(d => {
-                const data = d.data();
-                // Normalize date/startTime fields
-                const dateTs = data.date && data.date.toDate ? data.date : (data.startTime && data.startTime.toDate ? data.startTime : Timestamp.now());
-                const endTs = data.endTime && typeof data.endTime !== 'string' ? data.endTime : (dateTs ? Timestamp.fromDate(new Date(dateTs.toDate().getTime() + 3600000)) : null);
-
+            // Día operativo (06:00 a 05:59, hora de Chile). El estado de pago lo define el servidor en la reserva.
+            const { from, to } = operatingDay();
+            const list = await listBookings([selectedVenueId], { from, to });
+            const updatedList = list.filter(isReal).map(b => {
+                const start = b.start ? Timestamp.fromDate(b.start) : Timestamp.now();
                 return {
-                    id: d.id,
-                    ...data,
-                    price: data.price !== undefined ? data.price : (data.totalPrice || 0),
-                    sport: data.sport || data.category || '',
-                    date: dateTs,
-                    startTime: dateTs,
-                    endTime: endTs,
-                    startTimeStr: typeof data.startTime === 'string' ? data.startTime : null,
-                    endTimeStr: typeof data.endTime === 'string' ? data.endTime : null
+                    ...b.raw,
+                    id: b.id,
+                    clientName: b.clientName,
+                    courtName: b.courtName,
+                    price: b.price,
+                    sport: b.sport || b.raw.category || '',
+                    paymentStatus: b.isNoShow ? 'no-show' : b.payment,
+                    date: start,
+                    startTime: start,
+                    endTime: Timestamp.fromDate(new Date(start.toDate().getTime() + 3600000)),
+                    startTimeStr: b.startTime || null,
+                    endTimeStr: b.endTime || null,
                 } as Booking;
             });
 
-            // Obtener todos los bookingIds para buscar pagos en la colección 'payments'
-            const bookingIds = list.map(b => b.id);
-            const paidBookingIds = new Set<string>();
-
-            if (bookingIds.length > 0) {
-                const chunks: string[][] = [];
-                for (let i = 0; i < bookingIds.length; i += 30) {
-                    chunks.push(bookingIds.slice(i, i + 30));
-                }
-
-                const paymentSnaps = await Promise.all(
-                    chunks.map(chunk => 
-                        getDocs(query(
-                            collection(db, "payments"),
-                            where("bookingId", "in", chunk)
-                        )).catch(() => ({ docs: [] as any[] }))
-                    )
-                );
-
-                paymentSnaps.forEach(snap => {
-                    snap.docs.forEach(doc => {
-                        const payData = doc.data();
-                        if (payData && payData.bookingId) {
-                            paidBookingIds.add(payData.bookingId);
-                        }
-                    });
-                });
-            }
-
-            // Actualizar localmente el estado de pago a 'paid' si existe registro en 'payments'
-            const updatedList = list.map(b => {
-                if (paidBookingIds.has(b.id)) {
-                    return {
-                        ...b,
-                        paymentStatus: 'paid'
-                    } as Booking;
-                }
-                return b;
-            });
-
             setBookings(updatedList);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error fetching bookings:", error);
+            setStatusModal({ isOpen: true, title: "No se pudieron cargar las reservas", message: error?.code === 'permission-denied' ? 'Tu cuenta no tiene permisos sobre este recinto.' : 'Revisa tu conexión e inténtalo nuevamente.', type: 'error' });
         } finally {
             setLoading(false);
         }
