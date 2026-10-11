@@ -512,19 +512,17 @@ export default function FinancePage() {
                 <div className="flex flex-col lg:flex-row justify-between items-center gap-4 p-6 bg-slate-50/50 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
                     <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                         <div className="flex bg-white dark:bg-[#020611] p-1 rounded-md border border-slate-200 dark:border-white/10">
-                            {(['all', 'reserva', 'torneo', 'pending'] as const).map((type) => (
+                            {(['all', 'reserva', 'torneo'] as const).map((type) => (
                                 <button
                                     key={type}
                                     onClick={() => setFilterType(type)}
                                     className={`flex-1 lg:flex-none px-5 py-2 text-[10px] font-bold uppercase rounded-md transition-all ${
                                         filterType === type
-                                            ? type === 'pending'
-                                                ? 'bg-amber-500 text-white dark:bg-amber-500 dark:text-slate-950'
-                                                : 'bg-slate-900 text-white dark:bg-[#00df82] dark:text-black'
+                                            ? 'bg-slate-900 text-white dark:bg-[#00df82] dark:text-black'
                                             : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'
                                     }`}
                                 >
-                                    {type === 'all' ? 'Ver Todo' : type === 'reserva' ? 'Reservas' : type === 'torneo' ? 'Torneos' : 'Pendientes'}
+                                    {type === 'all' ? 'Ver Todo' : type === 'reserva' ? 'Reservas' : 'Torneos'}
                                 </button>
                             ))}
                         </div>

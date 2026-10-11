@@ -93,7 +93,7 @@ const PasswordModal = ({ isOpen, onClose, onConfirm, memberName }: any) => {
                         <label className="text-[10px] font-bold text-emerald-700 dark:text-[#00df82] uppercase tracking-wide block mb-1.5">Nueva Contraseña</label>
                         <div className="relative">
                             <HugeiconsIcon icon={LockIcon} className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2" />
-                            <input type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-9 pr-10 py-3 bg-white dark:bg-[#0B0F19] border border-emerald-200 dark:border-emerald-500/30 rounded-md text-xs font-bold outline-hidden" placeholder="Mínimo 6 caracteres" />
+                            <input type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-9 pr-10 py-3 bg-white dark:bg-[#0B0F19] border border-emerald-200 dark:border-emerald-500/30 rounded-md text-xs font-bold outline-hidden" placeholder={`Mínimo ${PASSWORD_MIN} caracteres`} />
                             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600">{showPassword ? <HugeiconsIcon icon={EyeOffIcon} className="w-5 h-5" /> : <HugeiconsIcon icon={EyeIcon} className="w-5 h-5" />}</button>
                         </div>
                     </div>
@@ -607,7 +607,7 @@ export default function StaffPage() {
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Contraseña Inicial</label>
                                     <div className="relative">
                                         <HugeiconsIcon icon={LockIcon} className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.8} />
-                                        <input type={showPassword ? "text" : "password"} required minLength={PASSWORD_MIN} value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder="Mínimo 6 caracteres" className="w-full pl-9 pr-10 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
+                                        <input type={showPassword ? "text" : "password"} required minLength={PASSWORD_MIN} value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder={`Mínimo ${PASSWORD_MIN} caracteres`} className="w-full pl-9 pr-10 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
                                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-[#00df82]">
                                             {showPassword ? <HugeiconsIcon icon={EyeOffIcon} className="w-4 h-4" /> : <HugeiconsIcon icon={EyeIcon} className="w-4 h-4" />}
                                         </button>

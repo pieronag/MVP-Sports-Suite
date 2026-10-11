@@ -292,8 +292,6 @@ export default function OwnerDashboard() {
                         {([
                             { id: 'all' as const, label: 'Todas' },
                             { id: 'paid' as const, label: 'Pagadas' },
-                            { id: 'pending' as const, label: 'Pendientes' },
-                            { id: 'partial' as const, label: 'Parciales' },
                             { id: 'noshow' as const, label: 'No-show' },
                         ]).map(f => (
                             <button
