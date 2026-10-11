@@ -146,7 +146,7 @@ flowchart TD
   B --> C[Elige su recinto]
   C --> D[Panel del día: ocupación, ingresos y próximas reservas]
   D --> E[Calendario: revisa reservas por cancha]
-  D --> F[Check-in: escanea el QR del jugador]
+  D --> F[Check-in: escanea el QR del jugador; lo valida el servidor]
   F --> G{¿Pagada online y en su horario?}
   G -->|Sí| H[Registra asistencia] --> I[Partido en curso]
   G -->|Sin pago| J[Aparece como Sin pago online: no puede ingresar]
@@ -231,14 +231,14 @@ flowchart TD
       <div class="card"><h3>Reglas de Firestore</h3><ul>
         <li>Reservas de cancha <span>· solo las crea el servidor</span></li>
         <li>Partidos internos <span>· el jugador los registra sin recinto ni pago</span></li>
-        <li>Perfiles completos <span>· solo el titular y el personal; los demás ven el perfil público vía servidor</span></li>
+        <li>Perfiles completos <span>· solo el titular y los administradores; el resto ve el perfil público vía servidor</span></li>
+        <li>Check-in e inasistencias <span>· los registra el servidor tras validar recinto, pago y horario</span></li>
         <li>Experiencia y logros <span>· solo los escribe el servidor; nadie puede editar los suyos ni los de otro</span></li>
         <li>Credenciales de Mercado Pago <span>· colección privada, nunca en lectura pública</span></li>
       </ul></div>
       <div class="card"><h3>Pendiente</h3><ul>
         <li>Publicar las reglas locales en Firebase</li>
-                <li>Limitar al personal a los jugadores de su recinto</li>
-        <li>Notificaciones push <span>· falta la clave VAPID</span></li>
+                        <li>Notificaciones push <span>· falta la clave VAPID</span></li>
       </ul></div>
     </div>
   </section>
