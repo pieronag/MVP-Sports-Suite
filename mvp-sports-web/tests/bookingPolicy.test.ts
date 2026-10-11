@@ -71,3 +71,15 @@ describe("inasistencia", () => {
     expect(canMarkNoShow(startingIn(-0.5, { checkIn: true }), NOW).ok).toBe(false);
   });
 });
+
+import { isRealBooking } from "../utils/bookingPolicy";
+describe("isRealBooking", () => {
+  it("solo cuentan reservas pagadas, reembolsadas o con inasistencia", () => {
+    expect(isRealBooking({ paymentStatus: "paid" })).toBe(true);
+    expect(isRealBooking({ paymentStatus: "refunded", status: "cancelled" })).toBe(true);
+    expect(isRealBooking({ paymentStatus: "no-show" })).toBe(true);
+    expect(isRealBooking({ paymentStatus: "pending" })).toBe(false);
+    expect(isRealBooking({ paymentStatus: "partial" })).toBe(false);
+    expect(isRealBooking({})).toBe(false);
+  });
+});

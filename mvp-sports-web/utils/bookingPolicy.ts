@@ -40,3 +40,10 @@ export function canMarkNoShow(b: any, now = new Date()): Decision {
   if (h > 0) return { ok: false, reason: "La reserva aún no comienza." };
   return { ok: true };
 }
+
+// Pago 100% online: una reserva existe solo si se pagó (o quedó registrada como reembolso o inasistencia).
+// Los checkout sin terminar ("pending") no son reservas y no se muestran ni suman ingresos.
+export function isRealBooking(b: { paymentStatus?: string; status?: string; noShow?: boolean }): boolean {
+  const ps = String(b.paymentStatus || "").toLowerCase();
+  return ps === "paid" || ps === "refunded" || ps === "no-show" || b.status === "no-show" || b.noShow === true;
+}

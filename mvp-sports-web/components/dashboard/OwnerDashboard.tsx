@@ -1,5 +1,6 @@
 "use client";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { isRealBooking } from "@/utils/bookingPolicy";
 import React, { useState, useEffect } from 'react';
 import {
     Add01Icon,
@@ -153,7 +154,7 @@ export default function OwnerDashboard() {
                         date: dateTs,
                         totalPrice: Number(data.totalPrice || data.price || 0),
                     } as Booking;
-                });
+                }).filter(isRealBooking);
 
                 let totalRevenue = 0;
                 let todayRev = 0;
@@ -162,7 +163,7 @@ export default function OwnerDashboard() {
                 const venueRevMap: { [key: string]: number } = {};
 
                 bookings.forEach(b => {
-                    if (b.status !== 'cancelled') {
+                    if (b.status !== 'cancelled' && b.paymentStatus !== 'refunded') {
                         const amt = b.totalPrice;
                         const bDate = b.date.toDate();
                         totalRevenue += amt;
@@ -186,7 +187,7 @@ export default function OwnerDashboard() {
                     ...prev,
                     revenueMonth: totalRevenue,
                     revenueToday: todayRev,
-                    bookingsMonth: bookings.length,
+                    bookingsMonth: bookings.filter(b => b.status !== 'cancelled' && b.paymentStatus !== 'refunded').length,
                     pendingPayments: pendingRev,
                 }));
                 setRevenueHistory(chartData);
@@ -223,6 +224,8 @@ export default function OwnerDashboard() {
             b.paymentStatus === 'no-show' ||
             ((b as any).notes && ((b as any).notes.toLowerCase().includes('no-show') || (b as any).notes.toLowerCase().includes('inasistencia')));
         const ps = isNoShow ? 'no-show' : (b.paymentStatus || 'pending').toLowerCase();
+        if (ps === 'refunded') return { style: 'bg-sky-500 text-white', label: 'Reembolsado' };
+        if (b.status === 'cancelled') return { style: 'bg-slate-500 text-white', label: 'Anulada' };
         if (ps === 'paid') return { style: 'bg-emerald-500 text-white', label: 'Pagado' };
         if (ps === 'partial') return { style: 'bg-sky-500 text-white', label: 'Parcial' };
         if (ps === 'no-show') return { style: 'bg-red-500 text-white', label: 'No-show' };
@@ -308,7 +311,7 @@ export default function OwnerDashboard() {
 
             {/* KPI GRID */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <TarjetaKpi titulo={`Ingresos (${timeRange === 'today' ? 'hoy' : timeRange === '7d' ? '7d' : 'mes'})`} valor={formatCLP(kpis.revenueMonth)} sub={`${kpis.bookingsMonth} reservas`} icono={<HugeiconsIcon icon={BoltIcon} className="w-6 h-6" strokeWidth={1.6} />} brillo />
+                <TarjetaKpi titulo={`Ingresos (${timeRange === 'today' ? 'hoy' : timeRange === '7d' ? '7 días' : timeRange === '30d' ? '30 días' : 'mes'})`} valor={formatCLP(kpis.revenueMonth)} sub={`${kpis.bookingsMonth} ${kpis.bookingsMonth === 1 ? 'reserva' : 'reservas'}`} icono={<HugeiconsIcon icon={BoltIcon} className="w-6 h-6" strokeWidth={1.6} />} brillo />
                 <TarjetaKpi titulo="Cierres hoy" valor={formatCLP(kpis.revenueToday)} sub="Venta directa" icono={<HugeiconsIcon icon={MoneyBag01Icon} className="w-6 h-6" strokeWidth={1.6} />} />
                 <TarjetaKpi titulo="Mantenimiento" valor={kpis.maintenanceCount} sub="Recintos en mantención" icono={<HugeiconsIcon icon={Wrench01Icon} className="w-6 h-6" strokeWidth={1.6} />} />
             </div>
@@ -427,7 +430,7 @@ export default function OwnerDashboard() {
                     <div className="lg:col-span-4 space-y-6">
                         <SectionCard
                             title="Últimas reservas"
-                            subtitle={`${visibleBookings.length} reserva(s)${paymentFilter !== 'all' ? ' · filtro de pago' : ''}`}
+                            subtitle={`${visibleBookings.length} ${visibleBookings.length === 1 ? "reserva" : "reservas"}${paymentFilter !== 'all' ? ' · filtro de pago' : ''}`}
                             icon={<HugeiconsIcon icon={Clock01Icon} className="w-5 h-5" strokeWidth={1.8} />}
                             className="min-h-[400px]"
                             bodyClassName="p-5"

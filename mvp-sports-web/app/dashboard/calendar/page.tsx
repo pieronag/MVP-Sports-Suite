@@ -1,5 +1,6 @@
 "use client";
 import { syncBookingSlots } from "@/services/client/apiClient";
+import { isRealBooking } from "@/utils/bookingPolicy";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -189,7 +190,7 @@ export default function MasterCalendar() {
             const allDocsMap = new Map<string, any>();
             [...snapByDate.docs, ...snapByStartTime.docs].forEach(d => { if (!allDocsMap.has(d.id)) allDocsMap.set(d.id, d); });
 
-            const bookingsList = Array.from(allDocsMap.values()).map(d => {
+            const bookingsList = Array.from(allDocsMap.values()).filter(d => isRealBooking(d.data())).map(d => {
                 const data = d.data();
                 const tsField = data.date || data.startTime;
                 const dateObj = tsField?.toDate ? tsField.toDate() : new Date();
@@ -258,7 +259,6 @@ export default function MasterCalendar() {
         switch (paymentStatus) {
             case 'paid': return 'bg-emerald-50 dark:bg-emerald-500/15 border-emerald-500/40 dark:border-[#00df82]/40 text-emerald-800 dark:text-emerald-300';
             case 'pending': return 'bg-sky-50 dark:bg-sky-500/15 border-sky-500/40 text-sky-800 dark:text-sky-300';
-            case 'partial': return 'bg-amber-50 dark:bg-amber-500/15 border-amber-500/40 text-amber-800 dark:text-amber-300';
             default: return 'bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/15 text-slate-700 dark:text-slate-200';
         }
     };
@@ -348,9 +348,6 @@ export default function MasterCalendar() {
                                                     <p className="text-[7px] font-black uppercase opacity-40 mb-0.5">#{b.id.slice(-4).toUpperCase()}</p>
                                                     <h5 className="text-[10px] font-black leading-tight uppercase truncate">{b.clientName || 'S/N'}</h5>
                                                 </div>
-                                                {b.paymentStatus !== 'paid' && b.status !== 'cancelled' && (
-                                                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0 mt-0.5" />
-                                                )}
                                             </div>
                                             <div className="flex justify-between items-end pt-1 border-t border-black/10 dark:border-white/10">
                                                 <span className="text-[8px] font-black opacity-70">{b.displayTime}</span>
@@ -433,31 +430,23 @@ export default function MasterCalendar() {
                                 <div className="flex items-center justify-between">
                                     <span className={`px-2.5 py-1 rounded-md text-[8px] font-black uppercase border ${
                                         selectedBooking.paymentStatus === 'paid' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-[#00df82]' :
-                                        selectedBooking.paymentStatus === 'pending' ? 'bg-sky-500/10 border-sky-500 text-sky-600 dark:text-sky-400' :
-                                        'bg-amber-500/10 border-amber-500 text-amber-600 dark:text-amber-400'
+                                        selectedBooking.paymentStatus === 'refunded' ? 'bg-sky-500/10 border-sky-500 text-sky-600 dark:text-sky-400' :
+                                        'bg-red-500/10 border-red-500 text-red-600 dark:text-red-400'
                                     }`}>
-                                        {selectedBooking.paymentStatus === 'paid' ? 'Pagado total' :
-                                         selectedBooking.paymentStatus === 'pending' ? 'Pago pendiente' : 'Abono parcial'}
+                                        {selectedBooking.paymentStatus === 'paid' ? 'Pagado online' :
+                                         selectedBooking.paymentStatus === 'refunded' ? 'Reembolsado' : 'Inasistencia'}
                                     </span>
-                                    <span className="text-[9px] font-black text-slate-400 uppercase">{selectedBooking.paymentMethod || '—'}</span>
+                                    <span className="text-[9px] font-black text-slate-400 uppercase">Mercado Pago</span>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3 pt-1">
                                     <div>
                                         <p className="text-[8px] font-black text-slate-400 uppercase mb-0.5">Monto del turno</p>
                                         <p className="text-base font-black text-slate-900 dark:text-white font-mono">{formatCLP(selectedBooking.finalPrice)}</p>
                                     </div>
-                                    {selectedBooking.paymentStatus !== 'paid' && (
-                                        <div>
-                                            <p className="text-[8px] font-black text-slate-400 uppercase mb-0.5">Por cobrar</p>
-                                            <p className="text-base font-black text-amber-600 dark:text-amber-400 font-mono animate-pulse">{formatCLP(selectedBooking.finalPrice - (selectedBooking.deposit || 0))}</p>
-                                        </div>
-                                    )}
-                                    {selectedBooking.paymentStatus === 'paid' && (
-                                        <div>
-                                            <p className="text-[8px] font-black text-slate-400 uppercase mb-0.5">Abono</p>
-                                            <p className="text-base font-black text-slate-900 dark:text-white font-mono">{formatCLP(selectedBooking.deposit || selectedBooking.finalPrice)}</p>
-                                        </div>
-                                    )}
+                                    <div>
+                                        <p className="text-[8px] font-black text-slate-400 uppercase mb-0.5">Cobrado</p>
+                                        <p className="text-base font-black text-slate-900 dark:text-white font-mono">{formatCLP(selectedBooking.paymentStatus === 'refunded' ? 0 : selectedBooking.finalPrice)}</p>
+                                    </div>
                                 </div>
                             </div>
 

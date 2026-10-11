@@ -896,14 +896,6 @@ export default function CheckInPage() {
 
                                     {/* ACCIONES COMPACT */}
                                     <div className="shrink-0 flex items-center gap-4">
-                                        {!isPaid && booking.status !== 'cancelled' && !isLateNoShow && (
-                                            <div className="text-right hidden sm:block">
-                                                <p className="text-[8px] font-black text-amber-500 uppercase mb-0.5">Por Cobrar</p>
-                                                <p className="text-[10px] font-black text-amber-600 dark:text-amber-400">
-                                                    {formatMoney(booking.remainingBalance !== undefined ? booking.remainingBalance : (booking.price - (booking.deposit || 0)))}
-                                                </p>
-                                            </div>
-                                        )}
 
                                         <div className="flex items-center gap-2">
                                             {isCheckedIn ? (

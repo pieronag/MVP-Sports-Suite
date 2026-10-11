@@ -74,7 +74,7 @@ export default function AdminPreview({ onRegisterClick }: { onRegisterClick: () 
               </h3>
             </div>
             <p className="relative z-10 text-xs md:text-sm text-slate-400 leading-relaxed">
-              Ingresos diarios, ocupación de canchas, ticket promedio y montos por cobrar. Todo
+              Ingresos diarios, ocupación de canchas, ticket promedio y pagos recibidos. Todo
               conciliado con los pagos online.
             </p>
             <HugeiconsIcon

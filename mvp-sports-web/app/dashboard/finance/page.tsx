@@ -1,5 +1,6 @@
 "use client";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
+import { isRealBooking } from "@/utils/bookingPolicy";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -69,15 +70,16 @@ const MONTHS = [
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
+// Ingreso real: inscripciones, reservas pagadas no anuladas e inasistencias (el pago se retiene). Lo reembolsado no suma.
+const countsAsIncome = (t: Transaction) =>
+    t.type === 'torneo' || t.paymentStatus === 'no-show' || (t.paymentStatus === 'paid' && t.status !== 'cancelled');
+
 const computeStats = (list: Transaction[]) => {
     return list.reduce((acc, curr) => {
-        const isPaid = curr.paymentStatus === 'paid' || curr.type === 'torneo';
-        if (isPaid) {
+        if (countsAsIncome(curr)) {
             acc.totalRevenue += curr.amount;
             if (curr.type === 'reserva') acc.reservaRevenue += curr.amount;
             else acc.torneoRevenue += curr.amount;
-        } else {
-            acc.pendingRevenue += curr.amount;
         }
         return acc;
     }, { totalRevenue: 0, reservaRevenue: 0, torneoRevenue: 0, pendingRevenue: 0 });
@@ -85,6 +87,7 @@ const computeStats = (list: Transaction[]) => {
 
 const statusLabel = (t: Transaction) => {
     const ps = (t.paymentStatus || 'pending').toLowerCase();
+    if (t.type !== 'torneo' && t.status === 'cancelled' && ps !== 'refunded') return 'ANULADA';
     if (t.type === 'torneo' || ps === 'paid') return 'PAGADO';
     if (ps === 'partial') return 'PARCIAL';
     if (ps === 'refunded') return 'REEMBOLSADO';
@@ -153,7 +156,7 @@ export default function FinancePage() {
         );
 
         const unsubBookings = onSnapshot(qBookings, async (bSnap) => {
-            const allBookings: Transaction[] = bSnap.docs.map(doc => {
+            const allBookings: Transaction[] = bSnap.docs.filter(d => isRealBooking(d.data())).map(doc => {
                 const data = doc.data();
                 const isNoShow = data.status === 'no-show' ||
                     data.paymentStatus === 'no-show' ||
@@ -174,7 +177,7 @@ export default function FinancePage() {
                     courtName: data.courtName || 'Cancha',
                     timeRange: `${data.startTime || '--:--'} - ${data.endTime || '--:--'}`,
                     duration: Number(data.duration || 1),
-                    paymentMethod: data.paymentMethod || 'cash',
+                    paymentMethod: data.paymentMethod || 'mercadopago',
                     remainingBalance: Number(data.remainingBalance || 0)
                 };
             });
@@ -283,7 +286,7 @@ export default function FinancePage() {
         setSelectedYear(next.getFullYear());
     };
 
-    const sumVisible = visibleTransactions.reduce((acc, t) => acc + t.amount, 0);
+    const sumVisible = visibleTransactions.reduce((acc, t) => acc + (countsAsIncome(t) ? t.amount : 0), 0);
 
     // 5. Exportaciones
     const generatePDF = async () => {
@@ -623,7 +626,9 @@ export default function FinancePage() {
                                             <div className="flex justify-center">
                                                 {(() => {
                                                     const ps = (t.paymentStatus || 'pending').toLowerCase();
-                                                    if (t.type === 'torneo' || ps === 'paid') {
+                                                    if (t.type !== 'torneo' && t.status === 'cancelled' && ps !== 'refunded') {
+                                                        return <div className="flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-bold uppercase text-slate-500 bg-slate-500/10 border border-slate-500/10"><div className="w-1.5 h-1.5 rounded-full bg-slate-500"></div>Anulada</div>;
+                                                    } else if (t.type === 'torneo' || ps === 'paid') {
                                                         return <div className="flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-bold uppercase text-emerald-500 bg-emerald-500/10 border border-emerald-500/10"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>Pagado</div>;
                                                     } else if (ps === 'partial') {
                                                         return <div className="flex items-center gap-1.5 px-3 py-1 rounded-md text-[9px] font-bold uppercase text-sky-500 bg-sky-500/10 border border-sky-500/10"><div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div>Parcial</div>;
