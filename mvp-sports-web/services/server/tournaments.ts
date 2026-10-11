@@ -1,5 +1,6 @@
 import "server-only";
 import { FieldValue, type Transaction } from "firebase-admin/firestore";
+import { registrationState } from "@/utils/tournament";
 import { adminDb } from "@/services/server/firebase-admin";
 import { PaymentError, SITE_URL } from "@/services/server/mercadopago";
 
@@ -35,9 +36,9 @@ export async function buildRegistration(uid: string, tournamentId: string, teamI
   if (team.ownerId !== uid) throw new PaymentError("Solo el capitán puede inscribir al equipo", 403);
   if (t.status === "finished") throw new PaymentError("El torneo ya terminó");
   if (t.isVisibleInApp === false) throw new PaymentError("El torneo no está disponible");
-  if (t.registrationEndDate && new Date(`${t.registrationEndDate}T23:59:59-03:00`) < new Date()) {
-    throw new PaymentError("Las inscripciones están cerradas");
-  }
+  const reg = registrationState(t);
+  if (reg === "closed") throw new PaymentError("Las inscripciones están cerradas");
+  if (reg === "not_open") throw new PaymentError("Las inscripciones aún no abren");
   const teams: any[] = t.teams || [];
   if (teams.some((x) => x.id === teamId)) throw new PaymentError("Tu equipo ya está inscrito", 409);
   if (t.maxTeams && teams.length >= Number(t.maxTeams)) throw new PaymentError("No quedan cupos", 409);

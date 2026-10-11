@@ -1,5 +1,6 @@
 "use client";
 import { GlowCard, SectionPill } from "@/components/player/ui";
+import { registrationState } from "@/utils/tournament";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Trophy, Users, CalendarDays, CreditCard, CheckCircle2, X, Shield, Award, Info } from "@/components/player/icons";
@@ -72,7 +73,8 @@ export default function TorneosPage() {
 
   const myTeamIds = useMemo(() => new Set(myTeams.map(t => t.id)), [myTeams]);
   const myRegistered = (t: any) => (t.teams || []).find((x: any) => myTeamIds.has(x.id));
-  const isClosed = (t: any) => t.status === "finished" || t.status === "completed" || (t.registrationEndDate && new Date(`${t.registrationEndDate}T23:59:59`) < new Date());
+  const isClosed = (t: any) => registrationState(t) === "closed";
+  const notOpen = (t: any) => registrationState(t) === "not_open";
   const isFull = (t: any) => !!t.maxTeams && (t.teams?.length || t.enrolledTeams || 0) >= Number(t.maxTeams);
   // Equipos del capitán que coinciden con el deporte del torneo
   const eligibleTeams = (t: any) => myTeams.filter(team => team.ownerId === user?.uid && (!t.sport || norm(team.sport).includes(norm(t.sport).slice(0, 5)) || norm(t.sport).includes(norm(team.sport).slice(0, 5))));
@@ -128,6 +130,7 @@ export default function TorneosPage() {
             <span className={`flex items-center gap-1.5 ${sub}`}><Users size={14} /> {count}/{t.maxTeams || "∞"}</span>
             {reg ? <span className="flex items-center gap-1 font-semibold text-emerald-500"><CheckCircle2 size={14} /> Inscrito</span>
               : isClosed(t) ? <span className={`font-semibold ${sub}`}>Cerrado</span>
+              : notOpen(t) ? <span className={`font-semibold ${sub}`}>Abre el {fmtDate(t.registrationStartDate)}</span>
               : isFull(t) ? <span className="font-semibold text-rose-500">Sin cupos</span>
               : <span className="font-semibold" style={{ color: ACCENT }}>Inscribirse</span>}
           </div>
@@ -226,6 +229,8 @@ export default function TorneosPage() {
                 <div className="p-3 rounded-md bg-emerald-500/10 text-emerald-500 text-[13px] font-semibold flex items-center gap-2"><CheckCircle2 size={18} /> {reg.name} ya está inscrito</div>
               ) : closed ? (
                 <div className={`p-3 rounded-md text-[13px] font-semibold ${isDark ? "bg-white/4 text-slate-400" : "bg-slate-100 text-slate-500"}`}>Las inscripciones están cerradas</div>
+              ) : notOpen(t) ? (
+                <div className={`p-3 rounded-md text-[13px] font-semibold ${isDark ? "bg-white/4 text-slate-400" : "bg-slate-100 text-slate-500"}`}>Las inscripciones abren el {fmtDate(t.registrationStartDate)}</div>
               ) : full ? (
                 <div className="p-3 rounded-md bg-rose-500/10 text-rose-500 text-[13px] font-semibold">No quedan cupos</div>
               ) : eligible.length === 0 ? (

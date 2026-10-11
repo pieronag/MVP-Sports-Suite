@@ -1,5 +1,6 @@
 "use client";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
+import { tournamentIssue } from "@/utils/tournament";
 import { uploadImage } from "@/services/client/imageUpload";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useRef } from 'react';
@@ -301,10 +302,12 @@ export default function ChampionshipsPage() {
         if (!user?.uid) return;
         setLoading(true);
         try {
-            const snap = await getDocs(collection(db, "tournaments"));
-            const list = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter((t: any) => t.ownerId === user.uid || !t.ownerId);
-            setTournaments(list);
+            // Solo los torneos de sus recintos (antes también aparecían los torneos sin dueño de otros recintos)
             const snapT = await getOwnedTenantsSnap(user.uid);
+            const myTenantIds = new Set(snapT.docs.map(d => d.id));
+            const snap = await getDocs(collection(db, "tournaments"));
+            const list = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter((t: any) => t.ownerId === user.uid || myTenantIds.has(t.tenantId));
+            setTournaments(list);
             setTenants(snapT.docs.map(d => ({ id: d.id, ...d.data() })));
         } catch (e) { console.error(e); } finally { setLoading(false); }
     };
@@ -327,6 +330,8 @@ export default function ChampionshipsPage() {
     const handleCreateOrUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user?.uid) return;
+        const issue = tournamentIssue(formData);
+        if (issue) { addToast(issue, 'error'); return; }
         setSaving(true);
         try {
             const payload = {
