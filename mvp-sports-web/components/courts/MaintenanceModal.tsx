@@ -5,7 +5,7 @@ import {
     Wrench01Icon,
     Cancel01Icon,
     RefreshIcon,
-    Calendar01Icon,
+    Calendar03Icon,
     Alert02Icon,
     CheckmarkCircle02Icon,
 } from '@hugeicons/core-free-icons';
@@ -77,7 +77,7 @@ export default function MaintenanceModal({
                             <div className="col-span-2">
                                 <label className={labelCls}>Fecha</label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 dark:text-white/20 pointer-events-none"><HugeiconsIcon icon={Calendar01Icon} className="w-4 h-4" strokeWidth={1.8} /></span>
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 dark:text-white/20 pointer-events-none"><HugeiconsIcon icon={Calendar03Icon} className="w-4 h-4" strokeWidth={1.8} /></span>
                                     <input
                                         type="date"
                                         value={form.date}

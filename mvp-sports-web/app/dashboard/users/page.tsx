@@ -2,13 +2,31 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-  Search01Icon, BlockedIcon, CheckmarkCircle02Icon, TrophyIcon,
-  UserGroupIcon, RefreshIcon, UserCircleIcon,
-  SparklesIcon, BarChartIcon, Clock01Icon,
-  FireIcon, Mortarboard01Icon, Alert02Icon, Grid02Icon, ListViewIcon,
-  Certificate01Icon, UserMultipleIcon,
-  ArrowDown01Icon, Medal01Icon, Activity01Icon, CrownIcon,
-  Download01Icon, SquareIcon, CheckmarkSquare02Icon, ArrowUpDownIcon, Cancel01Icon,
+    Search01Icon,
+    BlockedIcon,
+    CheckmarkCircle02Icon,
+    TrophyIcon,
+    UserGroupIcon,
+    RefreshIcon,
+    UserCircleIcon,
+    SparklesIcon,
+    BarChartIcon,
+    Clock01Icon,
+    FireIcon,
+    Mortarboard01Icon,
+    Alert02Icon,
+    Grid02Icon,
+    ListViewIcon,
+    Certificate01Icon,
+    ArrowDown01Icon,
+    Medal01Icon,
+    Activity01Icon,
+    CrownIcon,
+    Download01Icon,
+    SquareIcon,
+    CheckmarkSquare02Icon,
+    ArrowUpDownIcon,
+    Cancel01Icon,
 } from '@hugeicons/core-free-icons';
 import { collection, getDocs, doc, updateDoc, query, where, getDoc } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
@@ -608,7 +626,7 @@ export default function Page() {
         ) : filteredUsers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <span className="w-16 h-16 rounded-md bg-slate-100 dark:bg-white/5 flex items-center justify-center">
-              <HugeiconsIcon icon={UserMultipleIcon} className="w-8 h-8 text-slate-300 dark:text-white/15" strokeWidth={1.5} />
+              <HugeiconsIcon icon={UserGroupIcon} className="w-8 h-8 text-slate-300 dark:text-white/15" strokeWidth={1.5} />
             </span>
             <div className="text-center">
               <p className="text-[12px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">No hay jugadores que coincidan</p>

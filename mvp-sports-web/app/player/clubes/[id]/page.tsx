@@ -1,4 +1,5 @@
 "use client";
+import WhatsappLogo from "@/components/icons/WhatsappLogo";
 import { GlowCard, SectionPill } from "@/components/player/ui";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -649,7 +650,7 @@ export default function VenueDetailPage() {
               )}
               {venueData?.whatsapp && (
                 <a href={`https://wa.me/${venueData.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
-                  <MessageCircle size={12} className="text-emerald-500" />
+                  <WhatsappLogo className="w-3 h-3 text-emerald-500" />
                   <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>WhatsApp</span>
                 </a>
               )}

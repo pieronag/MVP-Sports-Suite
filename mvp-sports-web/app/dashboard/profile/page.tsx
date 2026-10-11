@@ -8,11 +8,25 @@ import { signOut, updatePassword, EmailAuthProvider, reauthenticateWithCredentia
 import { useRouter } from 'next/navigation';
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-    UserCircleIcon, Mail01Icon, PhoneIcon, Building01Icon,
-    IdentityCardIcon, RefreshIcon, Camera01Icon, Key01Icon,
-    BellIcon, CheckmarkCircle02Icon, Briefcase01Icon, GlobeIcon,
-    Clock01Icon, Logout01Icon, Cancel01Icon, Alert02Icon,
-    InfoIcon, ShieldCheckIcon, ArrowRight01Icon,
+    UserCircleIcon,
+    Mail01Icon,
+    CallIcon,
+    Building01Icon,
+    IdentityCardIcon,
+    RefreshIcon,
+    Camera01Icon,
+    Key01Icon,
+    Notification01Icon,
+    CheckmarkCircle02Icon,
+    Briefcase01Icon,
+    GlobeIcon,
+    Clock01Icon,
+    Logout01Icon,
+    Cancel01Icon,
+    Alert02Icon,
+    InformationCircleIcon,
+    ShieldCheckIcon,
+    ArrowRight01Icon,
 } from '@hugeicons/core-free-icons';
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '@/utils/cropImage';
@@ -242,9 +256,9 @@ export default function ProfilePage() {
 
     const prefToggles = [
         { key: 'notificationsEnabled' as const, label: 'Novedades por correo', desc: 'Recibe novedades y promociones de la plataforma', icon: <HugeiconsIcon icon={Mail01Icon} className="w-4 h-4" strokeWidth={1.8} />, enabled: profile.notificationsEnabled },
-        { key: 'emailBookings' as const, label: 'Alertas de reservas', desc: 'Aviso por correo cuando hay una reserva nueva', icon: <HugeiconsIcon icon={BellIcon} className="w-4 h-4" strokeWidth={1.8} />, enabled: profile.emailBookings },
+        { key: 'emailBookings' as const, label: 'Alertas de reservas', desc: 'Aviso por correo cuando hay una reserva nueva', icon: <HugeiconsIcon icon={Notification01Icon} className="w-4 h-4" strokeWidth={1.8} />, enabled: profile.emailBookings },
         { key: 'weeklySummary' as const, label: 'Resumen semanal', desc: 'Reporte semanal de actividad de tu negocio', icon: <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={1.8} />, enabled: profile.weeklySummary },
-        { key: 'systemNotifications' as const, label: 'Alertas del sistema', desc: 'Notificaciones técnicas y de mantenimiento', icon: <HugeiconsIcon icon={InfoIcon} className="w-4 h-4" strokeWidth={1.8} />, enabled: profile.systemNotifications },
+        { key: 'systemNotifications' as const, label: 'Alertas del sistema', desc: 'Notificaciones técnicas y de mantenimiento', icon: <HugeiconsIcon icon={InformationCircleIcon} className="w-4 h-4" strokeWidth={1.8} />, enabled: profile.systemNotifications },
     ];
 
     return (
@@ -255,7 +269,7 @@ export default function ProfilePage() {
             <div className="fixed top-6 right-6 z-200 flex flex-col gap-3 pointer-events-none">
                 {toasts.map(toast => (
                     <div key={toast.id} className={`pointer-events-auto flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${toast.type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:border-emerald-500/50 dark:text-emerald-400' : toast.type === 'error' ? 'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:border-red-500/50 dark:text-red-400' : 'bg-white/90 border-blue-500 text-blue-700 dark:bg-[#0B0F19]/90 dark:border-blue-500/50 dark:text-blue-400'}`}>
-                        {toast.type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5" strokeWidth={2} /> : toast.type === 'error' ? <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5" strokeWidth={2} /> : <HugeiconsIcon icon={InfoIcon} className="w-5 h-5" strokeWidth={2} />}
+                        {toast.type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5" strokeWidth={2} /> : toast.type === 'error' ? <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5" strokeWidth={2} /> : <HugeiconsIcon icon={InformationCircleIcon} className="w-5 h-5" strokeWidth={2} />}
                         <span className="text-[10px] font-black uppercase tracking-wider">{toast.message}</span>
                     </div>
                 ))}
@@ -344,13 +358,13 @@ export default function ProfilePage() {
                             <Field label="Correo corporativo" icon={<HugeiconsIcon icon={Mail01Icon} className="w-4 h-4" strokeWidth={1.8} />}>
                                 <input type="email" value={profile.email} readOnly className={`${inputCls} bg-slate-50 dark:bg-white/5 text-slate-400 cursor-not-allowed`} />
                             </Field>
-                            <Field label="Teléfono de contacto" icon={<HugeiconsIcon icon={PhoneIcon} className="w-4 h-4" strokeWidth={1.8} />}>
+                            <Field label="Teléfono de contacto" icon={<HugeiconsIcon icon={CallIcon} className="w-4 h-4" strokeWidth={1.8} />}>
                                 <input type="tel" value={profile.phone} onChange={(e) => { setProfile({ ...profile, phone: e.target.value }); setDirty(true); }} placeholder="+56 9 xxxx xxxx" className={inputCls} />
                             </Field>
                         </div>
                     </SectionCard>
 
-                    <SectionCard title="Preferencias y alertas" subtitle="Los cambios en toggles se guardan al instante" icon={<HugeiconsIcon icon={BellIcon} className="w-5 h-5" strokeWidth={1.8} />} bodyClassName="p-6 space-y-3">
+                    <SectionCard title="Preferencias y alertas" subtitle="Los cambios en toggles se guardan al instante" icon={<HugeiconsIcon icon={Notification01Icon} className="w-5 h-5" strokeWidth={1.8} />} bodyClassName="p-6 space-y-3">
                         {prefToggles.map(t => (
                             <div key={t.key} className="flex items-center justify-between p-4 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 transition-all hover:border-emerald-400/40">
                                 <div className="flex items-center gap-3">

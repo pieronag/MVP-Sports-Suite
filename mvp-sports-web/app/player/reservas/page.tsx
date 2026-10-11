@@ -6,7 +6,7 @@ import {
   ChevronLeft, Calendar, Clock, MapPin, CheckCircle2, AlertCircle,
   XCircle, ArrowRight, Navigation, Ticket, X, Share2, Stars, Timer,
   ShieldCheck, CalendarDays, Trophy, Medal, Star, Trash2, Loader, Receipt
-} from "@/components/player/icons";
+, Repeat } from "@/components/player/icons";
 import { QRCodeSVG } from "qrcode.react";
 import { usePlayer } from "@/context/PlayerContext";
 import { bookingService } from "@/services/client/player/bookingService";
@@ -394,7 +394,7 @@ export default function ReservasPage() {
                     {(isCompleted || isCancelled) && b.tenantId && b.paymentStatus !== "refund_failed" && (
                       <button onClick={() => router.push(`/player/clubes/${b.tenantId}?sport=${encodeURIComponent(b.sport || "")}`)}
                         className={`flex-1 h-[44px] rounded-md flex items-center justify-center gap-2 font-semibold text-[12px] transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-200" : "bg-slate-100 text-slate-700"}`}>
-                        <CalendarDays size={15} /> Reservar de nuevo
+                        <Repeat size={15} /> Reservar de nuevo
                       </button>
                     )}
                     {isConfirmed && !b.checkIn && inWindow && b.paymentStatus !== "paid" && (

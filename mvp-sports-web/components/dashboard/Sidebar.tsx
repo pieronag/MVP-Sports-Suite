@@ -7,32 +7,33 @@ import { collection, query, where, onSnapshot, or } from "firebase/firestore";
 import { db } from "@/services/client/firebase";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-    PieChartIcon,
     MoneyBag01Icon,
     Building01Icon,
     UserGroupIcon,
-    UserMultipleIcon,
     Flag01Icon,
     FingerPrintIcon,
     Settings01Icon,
-    Home01Icon,
-    Megaphone01Icon,
     Calendar03Icon,
     TrophyIcon,
     Mortarboard01Icon,
-    MapIcon,
     Briefcase01Icon,
     CreditCardIcon,
     DiscountTag01Icon,
-    SlidersHorizontalIcon,
-    TaskDone01Icon,
-    File01Icon,
     SparklesIcon,
     Menu01Icon,
     Cancel01Icon,
-    AlertCircleIcon,
     SquareLock01Icon,
-} from "@hugeicons/core-free-icons";
+    DashboardSquare01Icon,
+    ChartIncreaseIcon,
+    UserStar01Icon,
+    AnalyticsUpIcon,
+    Invoice01Icon,
+    Message02Icon,
+    FootballPitchIcon,
+    Store01Icon,
+    LifebuoyIcon,
+    CalendarCheckIn01Icon,
+} from '@hugeicons/core-free-icons';
 import BrandLogo from "@/components/shared/BrandLogo";
 
 const ICON = "w-[18px] h-[18px]";
@@ -97,15 +98,15 @@ export default function Sidebar() {
                 {(role === 'admin' || role === 'superadmin') && (
                     <>
                         <MenuGroup title="Principal">
-                            <NavItem href="/dashboard" active={pathname === "/dashboard"} icon={PieChartIcon} onClick={() => setMobileOpen(false)}>Panel General</NavItem>
-                            <NavItem href="/dashboard/metrics" active={pathname?.includes("/metrics")} icon={MoneyBag01Icon} onClick={() => setMobileOpen(false)}>Rendimiento Comercial</NavItem>
+                            <NavItem href="/dashboard" active={pathname === "/dashboard"} icon={DashboardSquare01Icon} onClick={() => setMobileOpen(false)}>Panel General</NavItem>
+                            <NavItem href="/dashboard/metrics" active={pathname?.includes("/metrics")} icon={ChartIncreaseIcon} onClick={() => setMobileOpen(false)}>Rendimiento Comercial</NavItem>
                         </MenuGroup>
                         <MenuGroup title="Administración">
-                            <NavItem href="/dashboard/owners" active={pathname?.includes("/owners")} icon={UserMultipleIcon} onClick={() => setMobileOpen(false)}>Dueños de Recinto</NavItem>
+                            <NavItem href="/dashboard/owners" active={pathname?.includes("/owners")} icon={UserStar01Icon} onClick={() => setMobileOpen(false)}>Dueños de Recinto</NavItem>
                             <NavItem href="/dashboard/tenants" active={pathname?.includes("/tenants")} icon={Building01Icon} onClick={() => setMobileOpen(false)}>Red de Recintos</NavItem>
                             <NavItem href="/dashboard/users" active={pathname === "/dashboard/users"} icon={UserGroupIcon} onClick={() => setMobileOpen(false)}>Comunidad de Jugadores</NavItem>
-                            <NavItem href="/dashboard/users/analytics" active={pathname?.includes("/users/analytics")} icon={PieChartIcon} onClick={() => setMobileOpen(false)}>Analítica de Jugadores</NavItem>
-                            <NavItem href="/dashboard/invoices" active={pathname?.includes("/invoices")} icon={File01Icon} onClick={() => setMobileOpen(false)}>Facturación y Cobros</NavItem>
+                            <NavItem href="/dashboard/users/analytics" active={pathname?.includes("/users/analytics")} icon={AnalyticsUpIcon} onClick={() => setMobileOpen(false)}>Analítica de Jugadores</NavItem>
+                            <NavItem href="/dashboard/invoices" active={pathname?.includes("/invoices")} icon={Invoice01Icon} onClick={() => setMobileOpen(false)}>Facturación y Cobros</NavItem>
                         </MenuGroup>
                         <MenuGroup title="Control y auditoría">
                             <NavItem href="/dashboard/reports" active={pathname?.includes("/reports")} icon={Flag01Icon} onClick={() => setMobileOpen(false)}>Reportes y Conflictos</NavItem>
@@ -120,14 +121,14 @@ export default function Sidebar() {
                 {role === 'owner' && (
                     <>
                         <MenuGroup title="Principal">
-                            <NavItem href="/dashboard" active={pathname === "/dashboard"} icon={Home01Icon} onClick={() => setMobileOpen(false)}>Panel General</NavItem>
-                            <NavItem href="/dashboard/feedback" active={pathname?.includes("/feedback")} icon={Megaphone01Icon} onClick={() => setMobileOpen(false)}>Opiniones de Clientes</NavItem>
+                            <NavItem href="/dashboard" active={pathname === "/dashboard"} icon={DashboardSquare01Icon} onClick={() => setMobileOpen(false)}>Panel General</NavItem>
+                            <NavItem href="/dashboard/feedback" active={pathname?.includes("/feedback")} icon={Message02Icon} onClick={() => setMobileOpen(false)}>Opiniones de Clientes</NavItem>
                         </MenuGroup>
                         <MenuGroup title="Operación deportiva">
                             <NavItem href="/dashboard/calendar" active={pathname?.includes("/calendar")} icon={Calendar03Icon} onClick={() => setMobileOpen(false)}>Agenda de Canchas</NavItem>
                             <NavItem href="/dashboard/tournaments" active={pathname?.includes("/tournaments")} icon={TrophyIcon} onClick={() => setMobileOpen(false)}>Torneos y Ligas</NavItem>
                             <NavItem href="/dashboard/academy" active={pathname?.includes("/academy")} icon={Mortarboard01Icon} onClick={() => setMobileOpen(false)}>Academias Deportivas</NavItem>
-                            <NavItem href="/dashboard/courts" active={pathname?.includes("/courts")} icon={MapIcon} onClick={() => setMobileOpen(false)}>Canchas e Instalaciones</NavItem>
+                            <NavItem href="/dashboard/courts" active={pathname?.includes("/courts")} icon={FootballPitchIcon} onClick={() => setMobileOpen(false)}>Canchas e Instalaciones</NavItem>
                         </MenuGroup>
                         <MenuGroup title="Finanzas y equipo">
                             <NavItem href="/dashboard/finance" active={pathname?.includes("/finance")} icon={MoneyBag01Icon} onClick={() => setMobileOpen(false)} locked={activeTenant && activeTenant.features && activeTenant.features.analytics === false}>Control Financiero</NavItem>
@@ -136,20 +137,20 @@ export default function Sidebar() {
                             <NavItem href="/dashboard/marketing/coupons" active={pathname?.includes("/marketing/coupons")} icon={DiscountTag01Icon} onClick={() => setMobileOpen(false)} locked={activeTenant && activeTenant.features && activeTenant.features.marketing === false}>Promociones y Cupones</NavItem>
                         </MenuGroup>
                         <MenuGroup title="Configuración">
-                            <NavItem href="/dashboard/settings/complex" active={pathname?.includes("/settings/complex")} icon={SlidersHorizontalIcon} onClick={() => setMobileOpen(false)}>Perfil del Recinto</NavItem>
+                            <NavItem href="/dashboard/settings/complex" active={pathname?.includes("/settings/complex")} icon={Store01Icon} onClick={() => setMobileOpen(false)}>Perfil del Recinto</NavItem>
                         </MenuGroup>
                     </>
                 )}
                 {role === 'manager' && (
                     <MenuGroup title="Operación diaria">
-                        <NavItem href="/dashboard" active={pathname === "/dashboard"} icon={Home01Icon} onClick={() => setMobileOpen(false)}>Resumen del Día</NavItem>
+                        <NavItem href="/dashboard" active={pathname === "/dashboard"} icon={DashboardSquare01Icon} onClick={() => setMobileOpen(false)}>Resumen del Día</NavItem>
                         <NavItem href="/dashboard/calendar" active={pathname?.includes("/calendar")} icon={Calendar03Icon} onClick={() => setMobileOpen(false)}>Agenda de Canchas</NavItem>
-                        <NavItem href="/dashboard/checkin" active={pathname?.includes("/checkin")} icon={TaskDone01Icon} onClick={() => setMobileOpen(false)}>Check-in de Accesos</NavItem>
+                        <NavItem href="/dashboard/checkin" active={pathname?.includes("/checkin")} icon={CalendarCheckIn01Icon} onClick={() => setMobileOpen(false)}>Check-in de Accesos</NavItem>
                     </MenuGroup>
                 )}
 
                 <MenuGroup title="Soporte">
-                    <NavItem href="/dashboard/report-issue" active={pathname === "/dashboard/report-issue"} icon={AlertCircleIcon} onClick={() => setMobileOpen(false)} locked={role === 'owner' && activeTenant && activeTenant.features && activeTenant.features.support === false}>Soporte Técnico</NavItem>
+                    <NavItem href="/dashboard/report-issue" active={pathname === "/dashboard/report-issue"} icon={LifebuoyIcon} onClick={() => setMobileOpen(false)} locked={role === 'owner' && activeTenant && activeTenant.features && activeTenant.features.support === false}>Soporte Técnico</NavItem>
                 </MenuGroup>
             </nav>
 

@@ -9,12 +9,12 @@ import { collectedAmount, durationHours } from '@/utils/bookingMath';
 import { auditService } from '@/services/client/auditService';
 import {
     Add01Icon,
-    Alert01Icon,
+    Alert02Icon,
     Building01Icon,
     Calendar03Icon,
     Cancel01Icon,
     CheckmarkCircle02Icon,
-    ChevronDownIcon,
+    ArrowDown01Icon,
     Clock01Icon,
     ComputerIcon,
     Message02Icon,

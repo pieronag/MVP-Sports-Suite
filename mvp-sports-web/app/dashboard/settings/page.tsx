@@ -19,7 +19,7 @@ import {
     Add01Icon,
     UserCircleIcon,
     ShieldCheckIcon,
-    TrashIcon,
+    Delete02Icon,
     TrophyIcon,
     BoltIcon,
     InformationCircleIcon,
@@ -31,6 +31,7 @@ import {
     IdentityCardIcon,
     ArrowUpRight01Icon,
     CreditCardIcon,
+    FloppyDiskIcon,
 } from '@hugeicons/core-free-icons';
 import { doc, getDoc, updateDoc, collection, query, where, getDocs, getCountFromServer, serverTimestamp, writeBatch, setDoc, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
@@ -467,7 +468,7 @@ export default function SettingsPage() {
                         disabled={saving || isExecuting || !dirty}
                         className="flex items-center gap-2 px-6 py-3 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[11px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-40"
                     >
-                        {saving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> : <HugeiconsIcon icon={CheckmarkBadge01Icon} className="w-4 h-4" strokeWidth={2} />}
+                        {saving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> : <HugeiconsIcon icon={FloppyDiskIcon} className="w-4 h-4" strokeWidth={2} />}
                         Guardar cambios
                     </button>
                 </div>
@@ -579,7 +580,7 @@ export default function SettingsPage() {
                                         </div>
 
                                         <button onClick={() => removePlan(idx)} className="mt-5 flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[8px] font-black uppercase text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all">
-                                            <HugeiconsIcon icon={TrashIcon} className="w-3.5 h-3.5" strokeWidth={2} />
+                                            <HugeiconsIcon icon={Delete02Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                                             Eliminar plan
                                         </button>
                                     </div>
@@ -772,7 +773,7 @@ export default function SettingsPage() {
                                                 title={isSelf(a.uid) ? 'No puedes quitarte tu propio acceso' : 'Quitar acceso'}
                                                 className="p-2 text-slate-300 hover:text-red-500 transition-colors rounded-md hover:bg-red-50 dark:hover:bg-red-500/10 disabled:opacity-30 disabled:hover:text-slate-300 disabled:hover:bg-transparent"
                                             >
-                                                <HugeiconsIcon icon={TrashIcon} className="w-4 h-4" strokeWidth={1.8} />
+                                                <HugeiconsIcon icon={Delete02Icon} className="w-4 h-4" strokeWidth={1.8} />
                                             </button>
                                         </div>
                                     </div>

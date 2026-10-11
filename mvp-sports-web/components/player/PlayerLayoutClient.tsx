@@ -8,7 +8,7 @@ import { PlayerProvider, usePlayer } from "@/context/PlayerContext";
 import PwaSupport from "@/components/player/PwaSupport";
 import BrandLogo from "@/components/shared/BrandLogo";
 import VerifyEmailGate, { needsEmailVerification } from "@/components/player/VerifyEmailGate";
-import { Home, Calendar, MapPin, User, LogOut, Sun, Moon, Menu, X, Building2, Shield, TrendingUp, GraduationCap, Trophy, CreditCard, ClipboardList, Settings, Swords, Ranking } from "@/components/player/icons";
+import { Home, Calendar, MapPin, User, LogOut, Sun, Moon, Menu, X, Building2, Shield, TrendingUp, GraduationCap, Trophy, CreditCard, LifeBuoy, Settings, Swords, Ranking } from "@/components/player/icons";
 
 // Ítem de menú con el estilo del dashboard (barra verde a la izquierda cuando está activo)
 function PlayerNavItem({ href, icon: Icon, active, isDark, children }: { href: string; icon: any; active: boolean; isDark: boolean; children: React.ReactNode }) {
@@ -54,7 +54,7 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
         { href: '/player/estadisticas', icon: TrendingUp, label: 'Estadísticas' },
         { href: '/player/billetera', icon: CreditCard, label: 'Pagos' },
         { href: '/player/preferencias', icon: Settings, label: 'Ajustes' },
-        { href: '/player/reporte', icon: ClipboardList, label: 'Soporte' },
+        { href: '/player/reporte', icon: LifeBuoy, label: 'Soporte' },
     ];
     // Partidos vive bajo /player/equipos: que Equipos no se marque activo ahí
     const isMenuActive = (href: string) => href === '/player/equipos' ? pathname === '/player/equipos' || /^\/player\/equipos\/(?!partidos)/.test(pathname) : pathname.startsWith(href);

@@ -6,11 +6,23 @@ import {
     PieChart, Pie, Cell
 } from 'recharts';
 import {
-    MoneyBag01Icon, ChartIncreaseIcon, CreditCardIcon, GlobalIcon,
-    Clock01Icon, Calendar03Icon, Wallet01Icon, ChartLineData01Icon,
-    Alert02Icon, BarChartIcon, Store01Icon,
-    ArrowUpRight01Icon, ArrowDownRight01Icon, Download01Icon, CreditCardPosIcon,
-    ArrowLeft01Icon, ArrowRight01Icon,
+    MoneyBag01Icon,
+    ChartIncreaseIcon,
+    CreditCardIcon,
+    GlobeIcon,
+    Clock01Icon,
+    Calendar03Icon,
+    Wallet01Icon,
+    ChartLineData01Icon,
+    Alert02Icon,
+    BarChartIcon,
+    Store01Icon,
+    ArrowUpRight01Icon,
+    ArrowDownRight01Icon,
+    Download01Icon,
+    CreditCardPosIcon,
+    ArrowLeft01Icon,
+    ArrowRight01Icon,
 } from '@hugeicons/core-free-icons';
 import { collection, query, orderBy, limit, onSnapshot, doc } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
@@ -386,7 +398,7 @@ export default function MetricsPage() {
                     titulo="Clientes (GMV)"
                     valor={formatCLP(kpis.gmv)}
                     sub="Procesado"
-                    icono={<HugeiconsIcon icon={GlobalIcon} className={ic} strokeWidth={1.6} />}
+                    icono={<HugeiconsIcon icon={GlobeIcon} className={ic} strokeWidth={1.6} />}
                     brillo
                     trend={prevKpis.gmv > 0 ? { value: `${kpis.gmv >= prevKpis.gmv ? '+' : ''}${Math.round(((kpis.gmv - prevKpis.gmv) / prevKpis.gmv) * 100)}%`, isUp: kpis.gmv >= prevKpis.gmv } : undefined}
                 />

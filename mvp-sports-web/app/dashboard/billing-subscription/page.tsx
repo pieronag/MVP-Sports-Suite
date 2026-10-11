@@ -9,7 +9,7 @@ import { collection, getDocs, getDoc, query, where, orderBy, doc, updateDoc, onS
 import {
     BarChartIcon,
     Building01Icon,
-    Calendar01Icon,
+    Calendar03Icon,
     Cancel01Icon,
     CheckmarkCircle02Icon,
     DocumentCodeIcon,
@@ -222,7 +222,7 @@ export default function BillingPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <TarjetaKpi titulo="Sedes" valor={tenants.length.toString()} sub="Infraestructura activa" icon={<HugeiconsIcon icon={Building01Icon} />} />
                 <TarjetaKpi titulo="Costo Mensual" valor={formatPrice(tenants.reduce((acc, t) => { const p = plans.find(pl => pl.id === t.planId); return acc + (p?.price || 0); }, 0))} sub="Total de planes" icon={<HugeiconsIcon icon={MoneyBag01Icon} />} brillo />
-                <TarjetaKpi titulo="Próximo Cobro" valor={String(nextBilling.getDate()).padStart(2, '0')} sub={`${monthYear(nextBilling)} · ${weekdayShort(nextBilling)}`} icon={<HugeiconsIcon icon={Calendar01Icon} />} />
+                <TarjetaKpi titulo="Próximo Cobro" valor={String(nextBilling.getDate()).padStart(2, '0')} sub={`${monthYear(nextBilling)} · ${weekdayShort(nextBilling)}`} icon={<HugeiconsIcon icon={Calendar03Icon} />} />
             </div>
 
             {/* AVISO */}

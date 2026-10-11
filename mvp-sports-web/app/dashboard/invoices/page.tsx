@@ -13,13 +13,12 @@ import {
     ReceiptIcon,
     FilterIcon,
     PrinterIcon,
-    TrashIcon,
+    Delete02Icon,
     Mail01Icon,
-    RotateCcwIcon,
     RefreshIcon,
     Alert02Icon,
-    ChevronDownIcon,
-    EyeIcon,
+    ArrowDown01Icon,
+    ViewIcon,
     Cancel01Icon,
 } from '@hugeicons/core-free-icons';
 import { collection, getDocs, query, orderBy, where, addDoc, serverTimestamp, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
@@ -704,7 +703,7 @@ f(true);
                         >
                             <HugeiconsIcon icon={Download01Icon} className="w-4 h-4" strokeWidth={2} />
                             Exportar
-                            <HugeiconsIcon icon={ChevronDownIcon} className={`w-3.5 h-3.5 transition-transform ${exportMenuOpen ? 'rotate-180' : ''}`} strokeWidth={2} />
+                            <HugeiconsIcon icon={ArrowDown01Icon} className={`w-3.5 h-3.5 transition-transform ${exportMenuOpen ? 'rotate-180' : ''}`} strokeWidth={2} />
                         </button>
                         {exportMenuOpen && (
                             <div className="absolute right-0 top-[calc(100%+6px)] z-30 w-52 rounded-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-2xl shadow-slate-200/60 dark:shadow-black/40 p-1.5 animate-fadeIn">
@@ -904,17 +903,17 @@ f(true);
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-1">
                                             <button onClick={() => openPreview(inv)} title="Ver liquidación" className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] rounded-md transition-all">
-                                                <HugeiconsIcon icon={EyeIcon} className="w-4 h-4" strokeWidth={1.8} />
+                                                <HugeiconsIcon icon={ViewIcon} className="w-4 h-4" strokeWidth={1.8} />
                                             </button>
                                             <button onClick={() => handleDeleteInvoice(inv.id)} title="Eliminar" className="p-2 hover:bg-red-50 text-red-400 rounded-md transition-all dark:hover:bg-red-500/10">
-                                                <HugeiconsIcon icon={TrashIcon} className="w-4 h-4" strokeWidth={1.8} />
+                                                <HugeiconsIcon icon={Delete02Icon} className="w-4 h-4" strokeWidth={1.8} />
                                             </button>
                                             <button
                                                 onClick={() => handleToggleStatus(inv)}
                                                 title={inv.status === 'Pagada' ? 'Marcar como pendiente' : 'Marcar como pagada'}
                                                 className={`p-2 rounded-md transition-all ${inv.status === 'Pagada' ? 'hover:bg-amber-50 text-amber-500 dark:hover:bg-amber-500/10' : 'hover:bg-emerald-50 text-emerald-500 dark:hover:bg-emerald-500/10'}`}
                                             >
-                                                <HugeiconsIcon icon={inv.status === 'Pagada' ? RotateCcwIcon : CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={1.8} />
+                                                <HugeiconsIcon icon={inv.status === 'Pagada' ? RefreshIcon : CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={1.8} />
                                             </button>
                                         </div>
                                     </td>
@@ -979,7 +978,7 @@ f(true);
                     <div className="flex items-center justify-between gap-3 mb-3 w-full max-w-5xl mx-auto" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center gap-2 min-w-0">
                             <span className="flex items-center justify-center w-8 h-8 rounded-md bg-emerald-500/15 border border-emerald-500/25 shrink-0">
-                                <HugeiconsIcon icon={EyeIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
+                                <HugeiconsIcon icon={ViewIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
                             </span>
                             <div className="min-w-0">
                                 <p className="text-[11px] font-black uppercase text-white tracking-wider truncate font-heading">

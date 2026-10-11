@@ -4,9 +4,22 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import ModalPortal from "@/components/ui/ModalPortal";
 import { usePlans } from "@/components/landing/usePlans";
 import {
-    Building01Icon, MapPinIcon, UserGroupIcon, StarIcon, Clock01Icon,
-    MoneyBag01Icon, Cancel01Icon, CrownIcon, Shield01Icon, CheckmarkCircle02Icon,
-    Alert02Icon, GlobalIcon, PencilEdit02Icon, CallIcon, Mail01Icon, Delete01Icon,
+    Building01Icon,
+    MapPinIcon,
+    UserGroupIcon,
+    StarIcon,
+    Clock01Icon,
+    MoneyBag01Icon,
+    Cancel01Icon,
+    CrownIcon,
+    Shield01Icon,
+    CheckmarkCircle02Icon,
+    Alert02Icon,
+    GlobeIcon,
+    PencilEdit02Icon,
+    CallIcon,
+    Mail01Icon,
+    Delete02Icon,
 } from "@hugeicons/core-free-icons";
 
 interface TenantProfileModalProps {
@@ -55,7 +68,7 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
     const infoRows = [
         { icon: MapPinIcon, label: "Ubicación", value: `${tenant.commune || "—"}, ${tenant.region || "—"}` },
         { icon: Building01Icon, label: "Dirección", value: tenant.address || "Sin dirección registrada" },
-        { icon: GlobalIcon, label: "Coordenadas", value: hasCoords ? `${tenant.coordinates.lat.toFixed(4)}, ${tenant.coordinates.lng.toFixed(4)}` : "Sin geolocalizar", tone: hasCoords ? "ok" : "warn" },
+        { icon: GlobeIcon, label: "Coordenadas", value: hasCoords ? `${tenant.coordinates.lat.toFixed(4)}, ${tenant.coordinates.lng.toFixed(4)}` : "Sin geolocalizar", tone: hasCoords ? "ok" : "warn" },
         { icon: Clock01Icon, label: "Horario", value: tenant.infra?.scheduleSummary || "No definido" },
         { icon: UserGroupIcon, label: "Dueños", value: tenant.owners?.length ? tenant.owners.join(", ") : "Sin dueños asignados" },
     ];
@@ -185,7 +198,7 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
                     <div className="px-5 sm:px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/70 dark:bg-white/2 flex items-center justify-between gap-2.5 shrink-0">
                         {onDelete && (
                             <button onClick={() => onDelete(tenant)} aria-label="Eliminar recinto" className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-md text-[11px] font-black uppercase tracking-wider border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-500/30 dark:text-red-400 dark:hover:bg-red-500/10 transition-all cursor-pointer">
-                                <HugeiconsIcon icon={Delete01Icon} className="w-4 h-4" strokeWidth={2} />
+                                <HugeiconsIcon icon={Delete02Icon} className="w-4 h-4" strokeWidth={2} />
                                 Eliminar
                             </button>
                         )}

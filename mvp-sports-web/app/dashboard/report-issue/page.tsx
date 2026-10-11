@@ -20,6 +20,7 @@ import {
     Message02Icon,
     Cancel01Icon,
     ArrowRight01Icon,
+    SentIcon,
 } from '@hugeicons/core-free-icons';
 
 interface UserReport {
@@ -355,7 +356,7 @@ export default function ReportIssuePage() {
 
                                     <div className="pt-2">
                                         <button type="submit" disabled={submitting} className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[10px] uppercase rounded-md tracking-wider transition-all disabled:opacity-50 shadow-lg shadow-emerald-500/10 hover:brightness-110 active:scale-[0.99]">
-                                            {submitting ? (<><HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> Enviando ticket...</>) : (<><HugeiconsIcon icon={Ticket01Icon} className="w-4 h-4" strokeWidth={2} /> Enviar reporte de soporte</>)}
+                                            {submitting ? (<><HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> Enviando ticket...</>) : (<><HugeiconsIcon icon={SentIcon} className="w-4 h-4" strokeWidth={2} /> Enviar reporte de soporte</>)}
                                         </button>
                                     </div>
                                 </form>

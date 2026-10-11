@@ -17,19 +17,19 @@ import {
     Building01Icon,
     Cancel01Icon,
     CheckmarkCircle02Icon,
-    EyeIcon,
-    EyeOffIcon,
+    ViewIcon,
+    ViewOffIcon,
     Grid02Icon,
     IdentityCardIcon,
-    LockIcon,
+    SquareLock01Icon,
     Mail01Icon,
     PencilEdit02Icon,
-    PhoneIcon,
+    CallIcon,
     PowerIcon,
     RefreshIcon,
     Search01Icon,
     ShieldCheckIcon,
-    TrashIcon,
+    Delete02Icon,
     UserCircleIcon,
     UserGroupIcon,
     UserIcon,
@@ -92,9 +92,9 @@ const PasswordModal = ({ isOpen, onClose, onConfirm, memberName }: any) => {
                     <div className="bg-emerald-50 dark:bg-emerald-500/10 p-4 rounded-md border border-emerald-100 dark:border-emerald-500/20">
                         <label className="text-[10px] font-bold text-emerald-700 dark:text-[#00df82] uppercase tracking-wide block mb-1.5">Nueva Contraseña</label>
                         <div className="relative">
-                            <HugeiconsIcon icon={LockIcon} className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <HugeiconsIcon icon={SquareLock01Icon} className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2" />
                             <input type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-9 pr-10 py-3 bg-white dark:bg-[#0B0F19] border border-emerald-200 dark:border-emerald-500/30 rounded-md text-xs font-bold outline-hidden" placeholder={`Mínimo ${PASSWORD_MIN} caracteres`} />
-                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600">{showPassword ? <HugeiconsIcon icon={EyeOffIcon} className="w-5 h-5" /> : <HugeiconsIcon icon={EyeIcon} className="w-5 h-5" />}</button>
+                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600"><HugeiconsIcon icon={showPassword ? ViewOffIcon : ViewIcon} className="w-4 h-4" strokeWidth={1.8} /></button>
                         </div>
                     </div>
                     <div className="flex gap-3">
@@ -517,7 +517,7 @@ export default function StaffPage() {
                                 {member.rut && <p className="text-[9px] text-slate-400 font-mono mb-3">RUT: {member.rut}</p>}
                                 <div className="space-y-2 text-[10px] font-bold uppercase text-slate-500 mb-4">
                                     <p className="flex items-center gap-2 truncate"><HugeiconsIcon icon={Mail01Icon} className="w-3.5 h-3.5 shrink-0" /> {member.email}</p>
-                                    <p className="flex items-center gap-2"><HugeiconsIcon icon={PhoneIcon} className="w-3.5 h-3.5 shrink-0" /> {member.phone || '---'}</p>
+                                    <p className="flex items-center gap-2"><HugeiconsIcon icon={CallIcon} className="w-3.5 h-3.5 shrink-0" /> {member.phone || '---'}</p>
                                 </div>
                                 {(member.tenantIds || []).length > 0 && (
                                     <div className="flex flex-wrap gap-1.5">
@@ -537,13 +537,13 @@ export default function StaffPage() {
                                     <HugeiconsIcon icon={PencilEdit02Icon} className="w-4 h-4" />
                                 </button>
                                 <button onClick={() => setPasswordModal({ isOpen: true, member })} className="flex-1 py-2 flex items-center justify-center bg-white dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 text-slate-400 hover:text-emerald-500 hover:border-emerald-400/40 transition-all" title="Cambiar clave">
-                                    <HugeiconsIcon icon={LockIcon} className="w-4 h-4" />
+                                    <HugeiconsIcon icon={SquareLock01Icon} className="w-4 h-4" />
                                 </button>
                                 <button onClick={() => requestToggleStatus(member)} className="flex-1 py-2 flex items-center justify-center bg-white dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 text-slate-400 hover:text-blue-500 transition-all" title="Cambiar estado">
                                     <HugeiconsIcon icon={PowerIcon} className="w-4 h-4" />
                                 </button>
                                 <button onClick={() => requestDelete(member.id, member.uid)} className="flex-1 py-2 flex items-center justify-center bg-white dark:bg-white/5 rounded-md border border-red-100 dark:border-red-500/20 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all" title="Eliminar">
-                                    <HugeiconsIcon icon={TrashIcon} className="w-4 h-4" />
+                                    <HugeiconsIcon icon={Delete02Icon} className="w-4 h-4" />
                                 </button>
                             </div>
                         </div>
@@ -606,16 +606,16 @@ export default function StaffPage() {
                                 <div>
                                     <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Contraseña Inicial</label>
                                     <div className="relative">
-                                        <HugeiconsIcon icon={LockIcon} className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.8} />
+                                        <HugeiconsIcon icon={SquareLock01Icon} className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.8} />
                                         <input type={showPassword ? "text" : "password"} required minLength={PASSWORD_MIN} value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder={`Mínimo ${PASSWORD_MIN} caracteres`} className="w-full pl-9 pr-10 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
                                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-[#00df82]">
-                                            {showPassword ? <HugeiconsIcon icon={EyeOffIcon} className="w-4 h-4" /> : <HugeiconsIcon icon={EyeIcon} className="w-4 h-4" />}
+                                            <HugeiconsIcon icon={showPassword ? ViewOffIcon : ViewIcon} className="w-4 h-4" strokeWidth={1.8} />
                                         </button>
                                     </div>
                                     <div className="relative mt-2">
                                         <input type={showConfirm ? "text" : "password"} required value={passwordConfirm} onChange={e => setPasswordConfirm(e.target.value)} placeholder="Repite la contraseña" aria-label="Repite la contraseña" className="w-full pl-4 pr-10 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm text-slate-900 dark:text-white outline-hidden" />
                                         <button type="button" onClick={() => setShowConfirm(!showConfirm)} aria-label={showConfirm ? "Ocultar contraseña" : "Mostrar contraseña"} className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-600 dark:text-[#00df82]">
-                                            {showConfirm ? <HugeiconsIcon icon={EyeOffIcon} className="w-4 h-4" /> : <HugeiconsIcon icon={EyeIcon} className="w-4 h-4" />}
+                                            <HugeiconsIcon icon={showConfirm ? ViewOffIcon : ViewIcon} className="w-4 h-4" strokeWidth={1.8} />
                                         </button>
                                     </div>
                                 </div>

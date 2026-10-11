@@ -8,7 +8,7 @@ import {
     CrownIcon,
     BarChartIcon,
     Download01Icon,
-    UserMultipleIcon,
+    UserGroupIcon,
     Search01Icon,
     ArrowDown01Icon,
     DocumentCodeIcon,
@@ -399,7 +399,7 @@ export default function PlayerAnalyticsPage() {
             <SectionCard
                 title="Ranking global"
                 subtitle="Atletas por valoración (OVR)"
-                icon={<HugeiconsIcon icon={UserMultipleIcon} className="w-5 h-5" strokeWidth={1.8} />}
+                icon={<HugeiconsIcon icon={UserGroupIcon} className="w-5 h-5" strokeWidth={1.8} />}
                 bodyClassName="p-0"
                 action={
                     <div className="flex items-center gap-2">
@@ -467,7 +467,7 @@ export default function PlayerAnalyticsPage() {
                     </table>
                     {filteredRanking.length === 0 && (
                         <div className="py-14 text-center">
-                            <HugeiconsIcon icon={UserMultipleIcon} className="w-9 h-9 text-slate-200 dark:text-white/10 mx-auto mb-3" strokeWidth={1.6} />
+                            <HugeiconsIcon icon={UserGroupIcon} className="w-9 h-9 text-slate-200 dark:text-white/10 mx-auto mb-3" strokeWidth={1.6} />
                             <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Sin atletas para mostrar</p>
                         </div>
                     )}

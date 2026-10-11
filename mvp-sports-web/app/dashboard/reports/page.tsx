@@ -19,7 +19,7 @@ import {
     FilterIcon,
     CheckmarkCircle02Icon,
     ArrowUpRight01Icon,
-} from '@hugeicons/core-free-icons';
+ViewIcon, } from '@hugeicons/core-free-icons';
 import { collection, getDocs, query, orderBy, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
 import { useAuth } from '@/context/AuthContext';
@@ -418,7 +418,7 @@ export default function Page() {
                                                 title="Ver detalle"
                                                 className="p-2 text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] hover:bg-slate-100 dark:hover:bg-white/5 rounded-md transition-all"
                                             >
-                                                <HugeiconsIcon icon={ArrowUpRight01Icon} className="w-4 h-4" strokeWidth={1.8} />
+                                                <HugeiconsIcon icon={ViewIcon} className="w-4 h-4" strokeWidth={1.8} />
                                             </button>
                                         )}
                                     </td>

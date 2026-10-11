@@ -2,12 +2,26 @@
 import React, { useState, useEffect } from 'react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
-    Search01Icon, CallIcon, Mail01Icon,
-    CheckmarkCircle02Icon, Alert02Icon, Add01Icon, PencilEdit02Icon,
-    Cancel01Icon, IdentityCardIcon, InformationCircleIcon,
-    Key01Icon, RefreshIcon, Copy01Icon, MoneyBag01Icon, UserMultipleIcon,
-    CheckmarkBadge01Icon, Building01Icon,
-    Grid02Icon, ListViewIcon, UserCircleIcon,
+    Search01Icon,
+    CallIcon,
+    Mail01Icon,
+    CheckmarkCircle02Icon,
+    Alert02Icon,
+    Add01Icon,
+    PencilEdit02Icon,
+    Cancel01Icon,
+    IdentityCardIcon,
+    InformationCircleIcon,
+    Key01Icon,
+    RefreshIcon,
+    Copy01Icon,
+    MoneyBag01Icon,
+    UserGroupIcon,
+    CheckmarkBadge01Icon,
+    Building01Icon,
+    Grid02Icon,
+    ListViewIcon,
+    UserCircleIcon,
 } from '@hugeicons/core-free-icons';
 import { collection, getDocs, doc, updateDoc, deleteDoc, query, where, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '@/services/client/firebase';
@@ -274,7 +288,7 @@ export default function Page() {
 
             {/* KPI */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <TarjetaKpi titulo="Total dueños" valor={owners.length.toString()} sub="Global" icono={<HugeiconsIcon icon={UserMultipleIcon} className={ic} strokeWidth={1.6} />} brillo />
+                <TarjetaKpi titulo="Total dueños" valor={owners.length.toString()} sub="Global" icono={<HugeiconsIcon icon={UserGroupIcon} className={ic} strokeWidth={1.6} />} brillo />
                 <TarjetaKpi titulo="Ingresos MRR" valor={formatCLP(owners.reduce((a, o) => a + o.totalMrr, 0))} sub="Proyectado" icono={<HugeiconsIcon icon={MoneyBag01Icon} className={ic} strokeWidth={1.6} />} />
                 <TarjetaKpi titulo="En mora" valor={owners.filter(o => o.debt > 0).length.toString()} sub="Requiere atención" icono={<HugeiconsIcon icon={Alert02Icon} className={`${ic} text-red-500`} strokeWidth={1.6} />} />
                 <TarjetaKpi titulo="Ticket promedio" valor={formatCLP(owners.length > 0 ? owners.reduce((a, o) => a + o.totalMrr, 0) / owners.length : 0)} sub="Mensual" icono={<HugeiconsIcon icon={InformationCircleIcon} className={ic} strokeWidth={1.6} />} />
@@ -325,7 +339,7 @@ export default function Page() {
             ) : filteredOwners.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
                     <span className="w-16 h-16 rounded-md bg-slate-100 dark:bg-white/5 flex items-center justify-center">
-                        <HugeiconsIcon icon={UserMultipleIcon} className="w-8 h-8 text-slate-300 dark:text-white/15" strokeWidth={1.5} />
+                        <HugeiconsIcon icon={UserGroupIcon} className="w-8 h-8 text-slate-300 dark:text-white/15" strokeWidth={1.5} />
                     </span>
                     <div className="text-center">
                         <p className="text-[12px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">No hay dueños que coincidan</p>

@@ -9,7 +9,6 @@ import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateD
 import { auditService } from '@/services/client/auditService';
 import {
     Add01Icon,
-    Alert01Icon,
     Alert02Icon,
     BarChartIcon,
     BlockedIcon,
@@ -17,9 +16,9 @@ import {
     Calendar03Icon,
     Cancel01Icon,
     CheckmarkCircle02Icon,
-    ChevronDownIcon,
-    ChevronLeftIcon,
-    ChevronRightIcon,
+    ArrowDown01Icon,
+    ArrowLeft01Icon,
+    ArrowRight01Icon,
     Clock01Icon,
     CloudUploadIcon,
     DocumentCodeIcon,
@@ -28,18 +27,18 @@ import {
     IdentityCardIcon,
     Image01Icon,
     InformationCircleIcon,
-    LockIcon,
+    SquareLock01Icon,
     MapPinIcon,
     MoneyBag01Icon,
     PencilEdit02Icon,
-    PhoneIcon,
+    CallIcon,
     PlayCircleIcon,
     PowerIcon,
     RefreshIcon,
     ShieldCheckIcon,
     SparklesIcon,
     StarIcon,
-    TrashIcon,
+    Delete02Icon,
     TrophyIcon,
     UserGroupIcon,
     UserIcon,
@@ -604,7 +603,7 @@ export default function ChampionshipsPage() {
                                         <HugeiconsIcon icon={PencilEdit02Icon} className="w-3 h-3" /> Editar
                                     </button>
                                     <button onClick={() => setTournamentToDelete(t.id)} className="py-2 flex items-center justify-center gap-1 bg-white dark:bg-white/5 rounded-md border border-red-100 dark:border-red-500/20 text-red-400 text-[8px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95" title="Eliminar">
-                                        <HugeiconsIcon icon={TrashIcon} className="w-3 h-3" /> Borrar
+                                        <HugeiconsIcon icon={Delete02Icon} className="w-3 h-3" /> Borrar
                                     </button>
                                 </div>
                             </div>
@@ -720,7 +719,7 @@ export default function ChampionshipsPage() {
                                     <InputGroupPremium label={sportCfg.teamHint} type="select" value={formData.teamSize} onChange={(e: any) => setFormData({ ...formData, teamSize: Number(e.target.value) })} icon={<HugeiconsIcon icon={UserIcon} className="w-4 h-4" />}>
                                         {sportCfg.teamSizes.map((n: number) => <option key={n} value={n}>{n} {n === 1 ? 'JUGADOR (SINGLES)' : n === 2 ? 'JUGADORES (PAREJAS)' : 'JUGADORES'}</option>)}
                                     </InputGroupPremium>
-                                    <InputGroupPremium label="WhatsApp Organizador" value={formData.contactPhone} onChange={(e: any) => setFormData({ ...formData, contactPhone: e.target.value })} icon={<HugeiconsIcon icon={PhoneIcon} className="w-4 h-4 text-emerald-500" />} placeholder="+56 9..." />
+                                    <InputGroupPremium label="WhatsApp Organizador" value={formData.contactPhone} onChange={(e: any) => setFormData({ ...formData, contactPhone: e.target.value })} icon={<HugeiconsIcon icon={CallIcon} className="w-4 h-4 text-emerald-500" />} placeholder="+56 9..." />
                                 </div>
 
                                 {/* COLUMNA 3: CALENDARIO Y PREMIOS */}
@@ -1001,7 +1000,7 @@ export default function ChampionshipsPage() {
                                                     </div>
                                                     {drawAnimation.remainingTeams.length > 0 ? (
                                                         <button onClick={nextPair} className="px-12 py-4 rounded-full bg-white text-slate-900 font-black text-[11px] uppercase tracking-[0.25em] shadow-xl hover:bg-slate-100 active:scale-95 transition-all flex items-center gap-3">
-                                                            Siguiente Sorteo <HugeiconsIcon icon={ChevronRightIcon} className="w-5 h-5" />
+                                                            Siguiente Sorteo <HugeiconsIcon icon={ArrowRight01Icon} className="w-5 h-5" />
                                                         </button>
                                                     ) : (
                                                         <button onClick={handleFinalizeDraw} className="px-12 py-4 rounded-full bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[11px] uppercase tracking-[0.25em] shadow-xl shadow-emerald-500/30 hover:brightness-110 active:scale-95 transition-all flex items-center gap-3">
@@ -1061,7 +1060,7 @@ export default function ChampionshipsPage() {
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className="px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-500 text-[10px] font-black font-mono">{drawAnimation.completedMatches.length}</span>
-                                            <HugeiconsIcon icon={ChevronRightIcon} className="w-4 h-4 text-slate-400" />
+                                            <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4 text-slate-400" />
                                         </div>
                                     </button>
 
@@ -1192,13 +1191,13 @@ export default function ChampionshipsPage() {
                                                     ))}
                                                 </div>
                                                 <div className="flex items-center justify-center gap-5 pt-6 border-t border-slate-100 dark:border-white/5 shrink-0">
-                                                    <button aria-label="Anterior" onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: Math.max(1, p.selectedRound - 1) }))} className="p-3 rounded-md bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 disabled:opacity-20" disabled={fixtureModal.selectedRound <= 1}><HugeiconsIcon icon={ChevronLeftIcon} className="w-5 h-5 text-slate-900 dark:text-white" /></button>
+                                                    <button aria-label="Anterior" onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: Math.max(1, p.selectedRound - 1) }))} className="p-3 rounded-md bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 disabled:opacity-20" disabled={fixtureModal.selectedRound <= 1}><HugeiconsIcon icon={ArrowLeft01Icon} className="w-5 h-5 text-slate-900 dark:text-white" /></button>
                                                     <div className="flex items-center gap-2">
                                                         {Array.from({ length: totalRounds }).map((_, i) => (
                                                             <button key={i} onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: i + 1 }))} className={`w-9 h-9 rounded-md text-[11px] font-black uppercase transition-all ${fixtureModal.selectedRound === i + 1 ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/25' : 'bg-slate-100 dark:bg-white/5 text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10'}`}>{i + 1}</button>
                                                         ))}
                                                     </div>
-                                                    <button aria-label="Siguiente" onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: Math.min(totalRounds, p.selectedRound + 1) }))} className="p-3 rounded-md bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 disabled:opacity-20" disabled={fixtureModal.selectedRound >= totalRounds}><HugeiconsIcon icon={ChevronRightIcon} className="w-5 h-5 text-slate-900 dark:text-white" /></button>
+                                                    <button aria-label="Siguiente" onClick={() => setFixtureModal((p: any) => ({ ...p, selectedRound: Math.min(totalRounds, p.selectedRound + 1) }))} className="p-3 rounded-md bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all active:scale-95 disabled:opacity-20" disabled={fixtureModal.selectedRound >= totalRounds}><HugeiconsIcon icon={ArrowRight01Icon} className="w-5 h-5 text-slate-900 dark:text-white" /></button>
                                                 </div>
                                             </>
                                         )}
@@ -1379,7 +1378,7 @@ function InputGroupPremium({ label, value, onChange, placeholder, icon, readOnly
                 ) : (
                     <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2.5 rounded-md border text-[10px] font-bold transition-all outline-hidden ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white focus:border-amber-500'}`} />
                 )}
-                {type === 'select' && <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"><HugeiconsIcon icon={ChevronDownIcon} className="w-3 h-3" /></div>}
+                {type === 'select' && <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"><HugeiconsIcon icon={ArrowDown01Icon} className="w-3 h-3" /></div>}
             </div>
         </div>
     );

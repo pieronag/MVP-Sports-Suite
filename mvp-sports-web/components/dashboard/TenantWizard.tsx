@@ -21,7 +21,7 @@ import {
     RefreshIcon,
     PencilEdit02Icon,
     MoneyBag01Icon,
-    GlobalIcon,
+    GlobeIcon,
     CheckmarkCircle02Icon,
 } from "@hugeicons/core-free-icons";
 
@@ -394,7 +394,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                         <div className="flex items-center justify-between gap-3 mb-3">
                                             <div className="flex items-center gap-2.5 min-w-0">
                                                 <span className={`w-9 h-9 rounded-md flex items-center justify-center shrink-0 ${hasCoords ? "bg-emerald-500/15 text-emerald-600 dark:text-[#00df82]" : "bg-slate-200/70 dark:bg-white/5 text-slate-400"}`}>
-                                                    <HugeiconsIcon icon={GlobalIcon} className="w-4.5 h-4.5" strokeWidth={1.8} />
+                                                    <HugeiconsIcon icon={GlobeIcon} className="w-4.5 h-4.5" strokeWidth={1.8} />
                                                 </span>
                                                 <div className="min-w-0">
                                                     <p className="text-[11px] font-black uppercase tracking-wider text-slate-900 dark:text-white">Geolocalización</p>

@@ -19,6 +19,7 @@ import {
     CheckmarkBadge01Icon,
     InformationCircleIcon,
     ArrowRight01Icon,
+    FloppyDiskIcon,
 } from '@hugeicons/core-free-icons';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
@@ -195,7 +196,7 @@ export default function GamificationSettingsPage() {
                         disabled={saving || !dirty}
                         className="flex items-center gap-2 px-6 py-3 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[11px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-40"
                     >
-                        {saving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> : <HugeiconsIcon icon={CheckmarkBadge01Icon} className="w-4 h-4" strokeWidth={2} />}
+                        {saving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> : <HugeiconsIcon icon={FloppyDiskIcon} className="w-4 h-4" strokeWidth={2} />}
                         Guardar cambios
                     </button>
                 </div>

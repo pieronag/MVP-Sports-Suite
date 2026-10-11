@@ -15,7 +15,7 @@ import {
     BarChartIcon,
     BoltIcon,
     Building01Icon,
-    Calendar01Icon,
+    Calendar03Icon,
     Camera01Icon,
     Cancel01Icon,
     CheckmarkCircle02Icon,
@@ -30,7 +30,7 @@ import {
     RefreshIcon,
     Settings01Icon,
     SignalIcon,
-    TrashIcon,
+    Delete02Icon,
     TrophyIcon,
     UserGroupIcon,
     Wrench01Icon,
@@ -1027,7 +1027,7 @@ return (
                                                 <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
                                                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                     <button aria-label="Eliminar" onClick={() => handleRemoveGalleryImage(idx)} className="p-1.5 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors shadow-lg">
-                                                        <HugeiconsIcon icon={TrashIcon} className="w-3.5 h-3.5" strokeWidth={1.8} />
+                                                        <HugeiconsIcon icon={Delete02Icon} className="w-3.5 h-3.5" strokeWidth={1.8} />
                                                     </button>
                                                 </div>
                                             </div>
@@ -1306,7 +1306,7 @@ return (
                                             </div>
                                             <div className="flex gap-1.5">
                                                 <button onClick={() => handleOpenEdit(c)} className="p-2 bg-slate-50 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-emerald-400/40 border border-transparent transition-all" title="Editar"><HugeiconsIcon icon={PencilEdit02Icon} className="w-3.5 h-3.5" /></button>
-                                                <button onClick={() => handleDeleteCourt(c.id)} className="p-2 bg-slate-50 dark:bg-white/5 rounded-md text-slate-400 hover:text-red-500 border border-transparent transition-all" title="Eliminar"><HugeiconsIcon icon={TrashIcon} className="w-3.5 h-3.5" /></button>
+                                                <button onClick={() => handleDeleteCourt(c.id)} className="p-2 bg-slate-50 dark:bg-white/5 rounded-md text-slate-400 hover:text-red-500 border border-transparent transition-all" title="Eliminar"><HugeiconsIcon icon={Delete02Icon} className="w-3.5 h-3.5" /></button>
                                             </div>
                                         </div>
 

@@ -3,13 +3,13 @@ import SectionHeading from "./SectionHeading";
 import WhatsappLogo from "../icons/WhatsappLogo";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  MoneyBag01Icon,
-  Calendar03Icon,
-  TrophyIcon,
-  Mortarboard01Icon,
-  DashboardSquare01Icon,
-  DiscountTag01Icon,
-  UserMultipleIcon,
+    MoneyBag01Icon,
+    Calendar03Icon,
+    TrophyIcon,
+    Mortarboard01Icon,
+    DashboardSquare01Icon,
+    DiscountTag01Icon,
+    UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 
 const WHATSAPP_URL = `https://wa.me/56950194398?text=${encodeURIComponent(
@@ -32,7 +32,7 @@ const compactFeatures = [
     border: "hover:border-pink-500/30",
   },
   {
-    icon: UserMultipleIcon,
+    icon: UserGroupIcon,
     title: "Roles y personal",
     description: "Administradores, staff y supervisores con permisos.",
     accent: "text-emerald-400",

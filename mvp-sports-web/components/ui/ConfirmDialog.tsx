@@ -1,7 +1,11 @@
 "use client";
 import React, { useEffect } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Alert02Icon, InformationCircleIcon, Delete01Icon } from "@hugeicons/core-free-icons";
+import {
+    Alert02Icon,
+    InformationCircleIcon,
+    Delete02Icon,
+} from "@hugeicons/core-free-icons";
 import ModalPortal from "./ModalPortal";
 
 export type ConfirmTone = "danger" | "warning" | "default";
@@ -20,7 +24,7 @@ interface ConfirmDialogProps {
 
 const TONES: Record<ConfirmTone, { icon: any; ring: string; iconColor: string; button: string }> = {
   danger: {
-    icon: Delete01Icon,
+    icon: Delete02Icon,
     ring: "bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20",
     iconColor: "text-red-600 dark:text-red-400",
     button: "bg-red-600 hover:bg-red-700 text-white shadow-red-600/20",

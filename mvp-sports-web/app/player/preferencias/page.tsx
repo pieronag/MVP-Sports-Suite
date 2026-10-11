@@ -10,7 +10,7 @@ import { userService } from "@/services/client/player/userService";
 import { auth, db } from "@/services/client/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
-import { ChevronLeft, ChevronRight, Save, User, Phone, ShieldCheck, Calendar, Ruler, Weight, Lock, LogOut, Eye, EyeOff, AlertCircle, CheckCircle2, X, Shield, Award, Target, Sun, Moon, Activity, MapPin, Heart } from "@/components/player/icons";
+import { ChevronLeft, ChevronRight, Trash2, Save, User, Phone, ShieldCheck, Calendar, Ruler, Weight, Lock, LogOut, Eye, EyeOff, AlertCircle, CheckCircle2, X, Shield, Award, Target, Sun, Moon, Activity, MapPin, Heart } from "@/components/player/icons";
 import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
 import { PASSWORD_MIN, passwordIssue } from "@/utils/password";
 
@@ -500,7 +500,7 @@ export default function PreferenciasPage() {
         </button>
         <button onClick={() => setShowDeleteModal(true)}
           className="w-full py-4 rounded-md flex items-center justify-center gap-2.5 font-semibold text-[13px] bg-red-500/10 text-red-400 border border-red-500/20 transition-all active:scale-[0.98] hover:bg-red-500/15">
-          <Shield size={18} /> Eliminar Cuenta
+          <Trash2 size={18} /> Eliminar Cuenta
         </button>
       </div>
 
@@ -549,7 +549,7 @@ export default function PreferenciasPage() {
               <input type={f.show ? "text" : "password"} value={f.value} onChange={(e) => f.set(e.target.value)} placeholder="••••••••"
                 className={`flex-1 p-3.5 text-[13px] font-medium bg-transparent outline-hidden ${isDark ? "text-slate-100" : "text-slate-900"}`}
               />
-              <button onClick={f.toggle} className="px-3.5">{f.show ? <EyeOff size={16} className={isDark ? "text-slate-500" : "text-slate-400"} /> : <Eye size={16} className={isDark ? "text-slate-500" : "text-slate-400"} />}</button>
+              <button onClick={f.toggle} className="px-3.5">{f.show ? <EyeOff size={16} strokeWidth={1.8} className={isDark ? "text-slate-500" : "text-slate-400"} /> : <Eye size={16} strokeWidth={1.8} className={isDark ? "text-slate-500" : "text-slate-400"} />}</button>
             </div>
           </div>
         ))}

@@ -10,7 +10,7 @@ import {
     Message02Icon,
     RefreshIcon,
     Search01Icon,
-    SendIcon,
+    SentIcon,
     StarIcon,
     UserCircleIcon,
     Download01Icon,
@@ -316,7 +316,7 @@ export default function FeedbackPage() {
                                                     <textarea rows={2} value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Escribe tu respuesta..." className={inputCls} autoFocus />
                                                     <div className="flex gap-2">
                                                         <button aria-label="Enviar" onClick={() => handleReply(review.id)} disabled={isSubmittingReply || !replyText.trim()} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[8px] font-black uppercase tracking-wider disabled:opacity-40 active:scale-95 transition-all">
-                                                            <HugeiconsIcon icon={SendIcon} className="w-3 h-3" strokeWidth={2} /> {isSubmittingReply ? 'Enviando...' : 'Publicar'}
+                                                            <HugeiconsIcon icon={SentIcon} className="w-3 h-3" strokeWidth={2} /> {isSubmittingReply ? 'Enviando...' : 'Publicar'}
                                                         </button>
                                                         <button onClick={() => { setReplyingId(null); setReplyText(''); }} className="px-3 py-1.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 text-[8px] font-black uppercase tracking-wider transition-all">Cancelar</button>
                                                     </div>

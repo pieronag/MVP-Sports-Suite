@@ -27,15 +27,16 @@ import {
     MapPinIcon,
     Message02Icon,
     MoneyBag01Icon,
-    PhoneIcon,
+    CallIcon,
     RefreshIcon,
     ScaleIcon,
     Settings01Icon,
     ShieldCheckIcon,
     SparklesIcon,
     StarIcon,
-    TrashIcon,
+    Delete02Icon,
     UserGroupIcon,
+    FloppyDiskIcon,
 } from '@hugeicons/core-free-icons';
 
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
@@ -376,7 +377,7 @@ export default function TenantSettingsPage() {
                         </span>
                     )}
                     <button onClick={handleSave} disabled={saving} className={`px-6 py-3 ${dirty ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 dark:bg-[#00df82]'} text-white dark:text-black font-black text-[10px] uppercase tracking-[0.2em] rounded-md transition-all active:scale-95 shadow-lg ${dirty ? 'shadow-amber-500/30' : 'shadow-emerald-500/30'} flex items-center gap-2.5 disabled:opacity-50`}>
-                        {saving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" /> : <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" />} Guardar
+                        {saving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" /> : <HugeiconsIcon icon={FloppyDiskIcon} className="w-4 h-4" />} Guardar
                     </button>
                 </div>
             </div>
@@ -488,7 +489,7 @@ export default function TenantSettingsPage() {
                                 <SectionStatusChip done={sectionStatus.contacto === 'done'} label={sectionStatus.contacto === 'done' ? 'Completado' : 'Pendiente'} />
                             </div>
                             <div className="p-6 lg:p-7 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                                <InputMini label="WhatsApp" value={formData.whatsapp} onChange={(e: any) => setFormData({ ...formData, whatsapp: e.target.value })} icon={<HugeiconsIcon icon={PhoneIcon} className="w-5 h-5 text-emerald-500" />} />
+                                <InputMini label="WhatsApp" value={formData.whatsapp} onChange={(e: any) => setFormData({ ...formData, whatsapp: e.target.value })} icon={<HugeiconsIcon icon={CallIcon} className="w-5 h-5 text-emerald-500" />} />
                                 <InputMini label="Instagram" value={formData.instagram} onChange={(e: any) => setFormData({ ...formData, instagram: e.target.value })} icon={<HugeiconsIcon icon={FireIcon} className="w-5 h-5 text-pink-500" />} />
                                 <InputMini label="Web Oficial" value={formData.website} onChange={(e: any) => setFormData({ ...formData, website: e.target.value })} icon={<HugeiconsIcon icon={GlobeIcon} className="w-5 h-5 text-sky-500" />} />
                                 <InputMini label="Email de Contacto" value={formData.contactEmail} onChange={(e: any) => setFormData({ ...formData, contactEmail: e.target.value })} icon={<HugeiconsIcon icon={Mail01Icon} className="w-5 h-5 text-amber-500" />} />

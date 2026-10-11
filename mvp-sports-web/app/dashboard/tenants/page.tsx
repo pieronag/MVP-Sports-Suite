@@ -2,12 +2,31 @@
 import React, { useState, useEffect } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-    RefreshIcon, Building01Icon, CheckmarkBadge01Icon, CheckmarkCircle02Icon,
-    Clock01Icon, MoneyBag01Icon, Alert02Icon, Search01Icon, MapPinIcon,
-    BlockedIcon, PencilEdit02Icon, Add01Icon, Delete01Icon, UserGroupIcon,
-    Store01Icon, GlobalIcon, StarIcon, ArrowDown01Icon, Cancel01Icon,
-    Grid02Icon, ListViewIcon, UserCircleIcon,
-    Download01Icon, ArrowDownRight01Icon, ChartIncreaseIcon,
+    RefreshIcon,
+    Building01Icon,
+    CheckmarkBadge01Icon,
+    CheckmarkCircle02Icon,
+    Clock01Icon,
+    MoneyBag01Icon,
+    Alert02Icon,
+    Search01Icon,
+    MapPinIcon,
+    BlockedIcon,
+    PencilEdit02Icon,
+    Add01Icon,
+    Delete02Icon,
+    UserGroupIcon,
+    Store01Icon,
+    GlobeIcon,
+    StarIcon,
+    ArrowDown01Icon,
+    Cancel01Icon,
+    Grid02Icon,
+    ListViewIcon,
+    UserCircleIcon,
+    Download01Icon,
+    ArrowDownRight01Icon,
+    ChartIncreaseIcon,
 } from "@hugeicons/core-free-icons";
 import {
     collection, getDocs, doc, updateDoc, addDoc, deleteDoc,
@@ -446,7 +465,7 @@ export default function Page() {
                 <div className="flex flex-wrap items-center gap-2">
                     {/* Región */}
                     <div className="relative">
-                        <HugeiconsIcon icon={GlobalIcon} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" strokeWidth={1.8} />
+                        <HugeiconsIcon icon={GlobeIcon} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" strokeWidth={1.8} />
                         <select
                             value={regionFilter}
                             onChange={(e) => setRegionFilter(e.target.value)}
@@ -685,7 +704,7 @@ export default function Page() {
                                                 <span className="text-[9px] font-black uppercase tracking-wider hidden sm:inline">{isActive ? 'Suspender' : 'Activar'}</span>
                                             </button>
                                             <button onClick={() => setTenantToDelete(t)} aria-label="Eliminar recinto" className="py-2 px-3 flex items-center justify-center rounded-md border border-red-200 dark:border-red-500/20 bg-white dark:bg-white/5 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95 cursor-pointer">
-                                                <HugeiconsIcon icon={Delete01Icon} className="w-3.5 h-3.5" strokeWidth={2} />
+                                                <HugeiconsIcon icon={Delete02Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                                             </button>
                                         </div>
                                     </div>

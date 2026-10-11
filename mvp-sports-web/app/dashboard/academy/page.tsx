@@ -12,7 +12,7 @@ import {
     Calendar03Icon,
     Cancel01Icon,
     CheckmarkCircle02Icon,
-    ChevronDownIcon,
+    ArrowDown01Icon,
     Clock01Icon,
     Grid02Icon,
     IdentityCardIcon,
@@ -22,10 +22,10 @@ import {
     PlayCircleIcon,
     RefreshIcon,
     ShieldCheckIcon,
-    TrashIcon,
+    Delete02Icon,
     UserGroupIcon,
     UserIcon,
-    BellIcon,
+    Notification01Icon,
     Coins01Icon,
 } from '@hugeicons/core-free-icons';
 import { PanelGlass, TarjetaKpi } from '@/components/ui/DashboardWidgets';
@@ -382,7 +382,7 @@ export default function AcademyPage() {
                                             </button>
                                         )}
                                         <button onClick={() => setClassToDelete(c.id)} className="py-2 flex items-center justify-center gap-1.5 bg-white dark:bg-white/5 rounded-md border border-red-100 dark:border-red-500/20 text-red-400 text-[8px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95" title="Eliminar">
-                                            <HugeiconsIcon icon={TrashIcon} className="w-3 h-3" /> Eliminar
+                                            <HugeiconsIcon icon={Delete02Icon} className="w-3 h-3" /> Eliminar
                                         </button>
                                     </div>
                                 </div>
@@ -485,7 +485,7 @@ export default function AcademyPage() {
                                         <InputGroupPremium label="Fin Temporada" type="date" value={formData.endDate} onChange={(e: any) => setFormData({ ...formData, endDate: e.target.value })} icon={<HugeiconsIcon icon={Calendar03Icon} className="w-4 h-4" />} />
                                     </div>
                                     <div>
-                                        <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2 block flex items-center gap-1.5"><HugeiconsIcon icon={BellIcon} className="w-3.5 h-3.5 text-indigo-500" strokeWidth={2} /> Alerta a alumnos (días antes)</label>
+                                        <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2 block flex items-center gap-1.5"><HugeiconsIcon icon={Notification01Icon} className="w-3.5 h-3.5 text-indigo-500" strokeWidth={2} /> Alerta a alumnos (días antes)</label>
                                         <div className="flex gap-2">
                                             {[1, 2, 3, 7].map(d => (
                                                 <button key={d} type="button" onClick={() => setFormData({ ...formData, alertDays: d })} className={`flex-1 py-2 rounded-md text-[10px] font-black uppercase transition-all ${formData.alertDays === d ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-indigo-500'}`}>{d} día{d > 1 ? 's' : ''}</button>
@@ -588,7 +588,7 @@ function InputGroupPremium({ label, value, onChange, placeholder, icon, readOnly
                 ) : (
                     <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2.5 rounded-md border text-[10px] font-bold transition-all outline-hidden ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white focus:border-indigo-500'}`} />
                 )}
-                {type === 'select' && <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"><HugeiconsIcon icon={ChevronDownIcon} className="w-3 h-3" /></div>}
+                {type === 'select' && <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"><HugeiconsIcon icon={ArrowDown01Icon} className="w-3 h-3" /></div>}
             </div>
         </div>
     );

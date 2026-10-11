@@ -3,9 +3,20 @@ import React, { useEffect } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import ModalPortal from "@/components/ui/ModalPortal";
 import {
-    UserMultipleIcon, IdentityCardIcon, Mail01Icon, CallIcon, MapPinIcon,
-    Building01Icon, Store01Icon, MoneyBag01Icon, Alert02Icon,
-    CheckmarkCircle02Icon, Cancel01Icon, Key01Icon, PencilEdit02Icon, Delete01Icon,
+    UserGroupIcon,
+    IdentityCardIcon,
+    Mail01Icon,
+    CallIcon,
+    MapPinIcon,
+    Building01Icon,
+    Store01Icon,
+    MoneyBag01Icon,
+    Alert02Icon,
+    CheckmarkCircle02Icon,
+    Cancel01Icon,
+    Key01Icon,
+    PencilEdit02Icon,
+    Delete02Icon,
 } from "@hugeicons/core-free-icons";
 
 interface OwnerProfileModalProps {
@@ -119,7 +130,7 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
                         {/* Información */}
                         <div className="rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
                             <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
-                                <HugeiconsIcon icon={UserMultipleIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
+                                <HugeiconsIcon icon={UserGroupIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
                                 <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Información del dueño</span>
                             </div>
                             <div className="divide-y divide-slate-100 dark:divide-white/5">
@@ -167,7 +178,7 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
                             )}
                             {onDelete && (
                                 <button onClick={() => onDelete(owner)} aria-label="Eliminar dueño" className="inline-flex items-center justify-center px-3 py-2.5 rounded-md border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all cursor-pointer">
-                                    <HugeiconsIcon icon={Delete01Icon} className="w-4 h-4" strokeWidth={2} />
+                                    <HugeiconsIcon icon={Delete02Icon} className="w-4 h-4" strokeWidth={2} />
                                 </button>
                             )}
                             <button onClick={() => onEdit(owner)} className="ml-auto inline-flex items-center gap-2 px-6 py-2.5 rounded-md bg-[#00df82] text-slate-950 text-[11px] font-black uppercase tracking-wider shadow-[0_0_25px_-8px_rgba(0,223,130,0.7)] hover:bg-[#3affa0] active:scale-95 transition-all cursor-pointer">

@@ -12,11 +12,11 @@ import {
     Calendar03Icon,
     Cancel01Icon,
     CheckmarkCircle02Icon,
-    LockIcon,
+    SquareLock01Icon,
     PencilEdit02Icon,
     RefreshIcon,
     SparklesIcon,
-    TrashIcon,
+    Delete02Icon,
 } from '@hugeicons/core-free-icons';
 import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
 import { auditService } from '@/services/client/auditService';
@@ -481,7 +481,7 @@ export default function CouponsPage() {
                                                     <HugeiconsIcon icon={PencilEdit02Icon} className="w-4 h-4" />
                                                 </button>
                                                 <button onClick={() => handleDelete(c.id)} className="flex-1 py-2.5 flex items-center justify-center bg-white dark:bg-white/5 rounded-md border border-red-100 dark:border-red-500/20 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all" title="Eliminar">
-                                                    <HugeiconsIcon icon={TrashIcon} className="w-4 h-4" />
+                                                    <HugeiconsIcon icon={Delete02Icon} className="w-4 h-4" />
                                                 </button>
                                             </div>
                                         </div>
