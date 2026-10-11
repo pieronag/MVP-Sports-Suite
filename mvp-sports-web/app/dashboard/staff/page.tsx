@@ -1,5 +1,6 @@
 "use client";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
+import { postApi } from "@/services/client/apiClient";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -272,7 +273,11 @@ export default function StaffPage() {
                         status: 'SUCCESS'
                     });
                 } catch (err: any) { 
-                    notify(err.message, "error"); 
+                    const code = String(err?.code || '');
+                    notify(code === 'auth/email-already-in-use' ? 'Ese correo ya tiene una cuenta en MVP Sports.'
+                        : code === 'auth/invalid-email' ? 'El correo no es válido.'
+                        : code === 'auth/weak-password' ? 'La contraseña es muy débil.'
+                        : 'No se pudo crear el acceso. Intenta de nuevo.', "error"); 
                     setIsSaving(false); 
                     await auditService.logAuditEvent({
                         action: 'STAFF_CREAR',
@@ -342,8 +347,8 @@ export default function StaffPage() {
             isDestructive: true,
             action: async () => {
                 try {
-                    await deleteDoc(doc(db, "staff", id));
-                    if (uid) await deleteDoc(doc(db, "users", uid));
+                    // En el servidor: borra también la cuenta de acceso (si no, podría seguir entrando)
+                    await postApi('/api/staff/delete', { staffId: id });
                     setStaffList(prev => prev.filter(s => s.id !== id));
                     notify("Eliminado", "success");
                     await auditService.logAuditEvent({
@@ -354,7 +359,7 @@ export default function StaffPage() {
                         status: 'SUCCESS'
                     });
                 } catch (e: any) { 
-                    notify("Error al eliminar", "error"); 
+                    notify(e?.message || "Error al eliminar", "error"); 
                     await auditService.logAuditEvent({
                         action: 'STAFF_ELIMINAR',
                         module: 'Administración/Personal',
