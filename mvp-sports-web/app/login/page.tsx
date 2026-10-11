@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { homeFor, normalizeRole } from "@/utils/roles";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -45,9 +46,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-      const isMobile = typeof navigator !== "undefined" && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      const target = isMobile ? "/player" : role && role !== "player" ? "/dashboard" : "/player";
-      router.push(target);
+      // Cada rol a su inicio en cualquier dispositivo (antes en el celular todos iban a /player)
+      if (!role) return;
+      router.push(homeFor(normalizeRole(role)));
     }
   }, [user, router, role]);
 

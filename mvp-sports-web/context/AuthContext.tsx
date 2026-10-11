@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
+import { normalizeRole } from "@/utils/roles";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { ensurePlayerDoc } from "@/services/client/accountService";
@@ -61,16 +62,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             foundUser = await ensurePlayerDoc(currentUser);
             foundRole = (foundUser?.role || "player") as UserRole;
           }
-          // Normalizar rol a minúsculas para que coincida con las reglas de
-          // Firestore y la UI, sin importar la forma en que esté guardado (ej: "SuperAdmin").
-          if (foundRole && typeof foundRole === "string") {
-            foundRole = foundRole.trim().toLowerCase() as UserRole;
-          }
+          // Un solo criterio de roles (utils/roles): 'staff' es personal de recinto, sin rol es jugador
+          foundRole = normalizeRole(foundRole) as UserRole;
           setRole(foundRole);
           setFirestoreUser(foundUser);
         } catch (error: any) {
           console.error("Error buscando rol:", error);
-          setRole(null);
+          // Sin poder leer el rol se usa el de menor privilegio (jugador); las reglas igual protegen los datos
+          setRole("player");
           setFirestoreUser(null);
         }
       } else {
