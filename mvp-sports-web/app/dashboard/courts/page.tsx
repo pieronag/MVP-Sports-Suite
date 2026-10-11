@@ -1,5 +1,6 @@
 "use client";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
+import { courtBlockedAt } from "@/utils/courtAvailability";
 import { uploadImage } from "@/services/client/imageUpload";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useRef } from 'react';
@@ -180,6 +181,18 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructi
             </div>
         </div>
     );
+};
+
+// Mantenimiento: "En pausa" solo dentro de la ventana; antes de ella queda "Programada"
+const pausedNow = (c: any) => c.status === 'maintenance' && courtBlockedAt(c, Date.now(), Date.now() + 1);
+const toDateAny = (v: any) => (v?.seconds ? new Date(v.seconds * 1000) : v ? new Date(v) : null);
+const maintenanceWindow = (c: any) => {
+    const a = toDateAny(c.maintenanceStart), b = toDateAny(c.maintenanceUntil);
+    const day = (d: Date) => d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' });
+    const hour = (d: Date) => d.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
+    if (!b) return 'Sin fecha de término';
+    if (a && day(a) === day(b)) return `${day(a)} · ${hour(a)} – ${hour(b)}`;
+    return `${a ? day(a) + ' – ' : 'Hasta '}${day(b)}`;
 };
 
 export default function CourtsPage() {
@@ -802,7 +815,7 @@ export default function CourtsPage() {
 
     const formatPrice = (n: number) => n.toLocaleString('es-CL');
 
-    const activeCount = courts.filter(c => c.status !== 'maintenance').length;
+    const activeCount = courts.filter(c => !pausedNow(c)).length;
     const maintenanceCount = courts.length - activeCount;
     const noPriceSports = selectedSports.filter(s => courtBasePrice(s) === 0).length;
     const pctActive = courts.length > 0 ? Math.round((activeCount / courts.length) * 100) : 0;
@@ -1302,7 +1315,7 @@ return (
                                         <div className="flex justify-between items-start mb-4">
                                             <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border ${c.status === 'maintenance' ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20 text-red-500' : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-[#00df82]'}`}>
                                                 <span className={`w-1.5 h-1.5 rounded-full ${c.status === 'maintenance' ? 'bg-red-500' : 'bg-emerald-500 dark:bg-[#00df82]'}`} />
-                                                {c.status === 'maintenance' ? 'En pausa' : 'Activo'}
+                                                {pausedNow(c) ? 'En pausa' : c.status === 'maintenance' ? 'Programada' : 'Activo'}
                                             </div>
                                             <div className="flex gap-1.5">
                                                 <button onClick={() => handleOpenEdit(c)} className="p-2 bg-slate-50 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-emerald-400/40 border border-transparent transition-all" title="Editar"><HugeiconsIcon icon={PencilEdit02Icon} className="w-3.5 h-3.5" /></button>
@@ -1335,7 +1348,7 @@ return (
                                         {c.status === 'maintenance' && c.maintenanceUntil && (
                                             <div className="mb-3 px-2.5 py-1.5 rounded-md bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20">
                                                 <p className="text-[9px] font-black uppercase tracking-widest text-red-500 flex items-center gap-1.5">
-                                                    <HugeiconsIcon icon={Alert02Icon} className="w-3 h-3" strokeWidth={2} /> Hasta {new Date(c.maintenanceUntil.seconds ? c.maintenanceUntil.seconds * 1000 : c.maintenanceUntil).toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })}
+                                                    <HugeiconsIcon icon={Alert02Icon} className="w-3 h-3" strokeWidth={2} /> {maintenanceWindow(c)}
                                                 </p>
                                             </div>
                                         )}
