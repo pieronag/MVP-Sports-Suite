@@ -1,5 +1,6 @@
 import { collection, query, where, getDocs, doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
+import { couponIssue } from '@/utils/coupon';
 
 export interface Coupon {
     id: string;
@@ -20,9 +21,8 @@ export const couponService = {
         if (snap.empty) throw new Error('Cupón no encontrado');
         const doc = snap.docs[0];
         const coupon = { id: doc.id, ...doc.data() } as Coupon;
-        if (coupon.tenantId && coupon.tenantId !== tenantId) throw new Error('Este cupón no es válido para este recinto');
-        if (coupon.expiresAt && coupon.expiresAt.toMillis() < Date.now()) throw new Error('Este cupón ha expirado');
-        if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) throw new Error('Este cupón ya no tiene usos disponibles');
+        const issue = couponIssue(coupon, { tenantId, price });
+        if (issue) throw new Error(issue);
         return coupon;
     },
 

@@ -1,5 +1,6 @@
 import "server-only";
 import crypto from "crypto";
+import { couponIssue, couponUses } from "@/utils/coupon";
 import { syncBooking } from "@/services/server/bookingProjections";
 import { adminDb } from "@/services/server/firebase-admin";
 import { resolveMercadoPagoToken } from "@/services/server/tenant-secrets";
@@ -24,15 +25,14 @@ export class PaymentError extends Error {
 export { priceFromTenantConfig } from "@/utils/pricing";
 import { priceFromTenantConfig } from "@/utils/pricing";
 
-async function resolveCoupon(code: string | undefined, tenantId: string) {
+async function resolveCoupon(code: string | undefined, tenantId: string, price: number) {
   if (!code) return null;
   const snap = await adminDb().collection("coupons").where("code", "==", code.trim().toUpperCase()).limit(1).get();
   if (snap.empty) throw new PaymentError("Cupón no encontrado");
   const doc = snap.docs[0];
   const c = doc.data();
-  if (c.tenantId && c.tenantId !== tenantId) throw new PaymentError("Este cupón no es válido para este recinto");
-  if (c.expiresAt?.toMillis && c.expiresAt.toMillis() < Date.now()) throw new PaymentError("Este cupón ha expirado");
-  if (c.usageLimit && (c.usedCount || 0) >= c.usageLimit) throw new PaymentError("Este cupón ya no tiene usos disponibles");
+  const issue = couponIssue(c, { tenantId, price });
+  if (issue) throw new PaymentError(issue);
   return { id: doc.id, code: c.code as string, discount: Number(c.discount) || 0, type: (c.type || "percentage") as string };
 }
 
@@ -82,7 +82,7 @@ export async function buildBookingCheckout(uid: string, input: BookingCheckoutIn
   const basePrice = priceFromTenantConfig(tenant, sport, date, startTime);
   if (basePrice <= 0) throw new PaymentError("El recinto no tiene tarifa para ese horario");
 
-  const coupon = await resolveCoupon(input.couponCode, tenantId);
+  const coupon = await resolveCoupon(input.couponCode, tenantId, basePrice);
   const discount = coupon ? (coupon.type === "fixed" ? coupon.discount : (basePrice * coupon.discount) / 100) : 0;
   const amount = Math.max(0, Math.round(basePrice - discount));
   if (amount <= 0) throw new PaymentError("El monto a pagar debe ser mayor a cero");
@@ -368,7 +368,7 @@ export async function settlePayment(paymentRecordId: string, mpPaymentId: string
         updatedAt: new Date(),
       });
     }
-    if (cRef && coupon?.exists) tx.update(cRef, { usedCount: (coupon.data()?.usedCount || 0) + 1 });
+    if (cRef && coupon?.exists) { const n = couponUses(coupon.data()) + 1; tx.update(cRef, { uses: n, usedCount: n }); }
   });
   if (pay.bookingId) await syncBooking(String(pay.bookingId)).catch((e) => console.error("syncBooking", e));
   return { result: "approved", returnUrl: pay.returnUrl };
