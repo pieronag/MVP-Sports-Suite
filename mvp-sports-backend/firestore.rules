@@ -241,6 +241,18 @@ service cloud.firestore {
       return ['paymentStatus', 'paymentMethod', 'paymentRecordId', 'totalPrice', 'price', 'originalPrice', 'deposit', 'discountApplied', 'refundAmount', 'refundDetails', 'tenantId', 'courtId'];
     }
 
+    // Lo que el jugador puede escribir en su propia reserva: salida y valoración, y el resultado del partido.
+    // Fecha, cancha, pago, ingreso (check-in) e inasistencias los escribe solo el servidor.
+    function bookingPlayerKeys() {
+      return ['checkOut', 'checkOutTime', 'status', 'rating', 'feedback',
+              'goals', 'assists', 'isMVP', 'mvpUserId', 'matchOutcome', 'selectedTeamId', 'teamStats', 'teamAssists',
+              'teamAssignments', 'teamMemberNames', 'participantIds', 'scoreA', 'scoreB', 'winnerTeam', 'isWin'];
+    }
+    // El personal no toca pago ni ingreso desde el navegador (van por /api/bookings/*); sí notas y respuestas a reseñas
+    function bookingServerKeys() {
+      return bookingPaymentKeys().concat(['date', 'startTime', 'endTime', 'userId', 'checkIn', 'checkInTime', 'checkInBy', 'noShow', 'status']);
+    }
+
     // Proyecciones públicas de reservas (sin datos personales), escritas por la Function onBookingWritten
     match /court_slots/{slotId} {
       allow read: if true;
@@ -270,11 +282,13 @@ service cloud.firestore {
         !request.resource.data.keys().hasAny(['tenantId', 'courtId', 'price', 'totalPrice', 'paymentStatus', 'paymentMethod', 'paymentRecordId', 'refundAmount', 'refundDetails']);
       allow update: if isAuthenticated() && (
         (worksAtTenant(resource.data.get('tenantId', '')) &&
-          request.resource.data.get('tenantId', '') == resource.data.get('tenantId', '')) ||
-        ((resource.data.userId == request.auth.uid || resource.data.get('userEmail', '') == request.auth.token.email) &&
-          !request.resource.data.diff(resource.data).affectedKeys().hasAny(bookingPaymentKeys()) &&
-          // Cancelar pasa por el servidor, que aplica la regla de 24 h y el reembolso
-          (request.resource.data.get('status', '') != 'cancelled' || resource.data.get('status', '') == 'cancelled'))
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(bookingServerKeys())) ||
+        (resource.data.get('userId', '') == request.auth.uid &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(bookingPlayerKeys()) &&
+          // El estado solo puede pasar a 'completed' al marcar la salida, y solo si el recinto registró el ingreso
+          (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'checkOut']) ||
+            (request.resource.data.get('status', '') == 'completed' && resource.data.get('checkIn', false) == true) ||
+            resource.data.get('isInternalMatch', false) == true))
       );
       allow delete: if canManageTenant(resource.data.get('tenantId', ''));
     }

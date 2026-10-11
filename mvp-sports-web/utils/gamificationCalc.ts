@@ -24,6 +24,8 @@ export function normalizeSettings(s: any = {}) {
 }
 
 const norm = (x: string) => String(x || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+export const MAX_PER_MATCH = 15;
+const capPerMatch = (v: unknown) => Math.min(MAX_PER_MATCH, Math.max(0, Math.floor(Number(v) || 0)));
 const toDate = (d: any): Date | null => (d?.toDate ? d.toDate() : d ? new Date(d) : null);
 
 export function computeProgress(uid: string, user: any, bookings: any[], cfg: GamificationConfig, now = Date.now()) {
@@ -35,8 +37,10 @@ export function computeProgress(uid: string, user: any, bookings: any[], cfg: Ga
     if (noShow) { if (mine) st.noShows++; continue; }
     if (b.status === "cancelled" || b.status === "rejected") continue;
     const start = toDate(b.date);
-    // Solo cuenta lo que realmente se jugó: con ingreso registrado o partido interno (sin check-in no hay partido)
-    const happened = b.isInternalMatch || b.checkIn || b.checkOut || b.status === "completed";
+    // Solo da experiencia lo verificado en un recinto: ingreso registrado por el personal (check-in).
+    // Los partidos internos los anota el propio jugador: se muestran en sus estadísticas pero no suman XP.
+    if (b.isInternalMatch) continue;
+    const happened = b.checkIn || b.checkOut || b.status === "completed";
     if (!happened) continue;
 
     st.played++;
@@ -52,8 +56,9 @@ export function computeProgress(uid: string, user: any, bookings: any[], cfg: Ga
     } else if (mine && b.matchOutcome) {
       if (b.matchOutcome === "win") st.won++; else if (b.matchOutcome === "loss") st.lost++;
     }
-    st.goals += Number(b.teamStats?.[uid] ?? (mine ? b.goals : 0)) || 0;
-    st.assists += Number(b.teamAssists?.[uid] ?? (mine ? b.assists : 0)) || 0;
+    // Goles y asistencias los informan los jugadores: se acotan por partido para que no se inflen
+    st.goals += capPerMatch(b.teamStats?.[uid] ?? (mine ? b.goals : 0));
+    st.assists += capPerMatch(b.teamAssists?.[uid] ?? (mine ? b.assists : 0));
     if (b.mvpUserId === uid || (mine && b.isMVP && !b.mvpUserId)) st.mvps++;
   }
 

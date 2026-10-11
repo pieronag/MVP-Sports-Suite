@@ -125,8 +125,6 @@ export default function ReservasPage() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState<string | null>(null);
 
-  const [showCheckInModal, setShowCheckInModal] = useState(false);
-  const [bookingForCheckIn, setBookingForCheckIn] = useState<any>(null);
 
   useEffect(() => {
     setHistoryLimit(10);
@@ -161,33 +159,6 @@ export default function ReservasPage() {
   useEffect(() => {
     loadData();
   }, [profile]);
-
-  const handleCheckIn = (booking: any) => {
-    if (booking.paymentStatus !== "paid") {
-      setFbType("error");
-      setFbMsg("Para iniciar el partido debes completar el pago en la recepción del recinto.");
-      setFbVisible(true);
-      return;
-    }
-    setBookingForCheckIn(booking);
-    setShowCheckInModal(true);
-  };
-
-  const confirmCheckIn = async () => {
-    if (!bookingForCheckIn?.id) return;
-    try {
-      await bookingService.checkIn(bookingForCheckIn.id);
-      loadData();
-      setShowCheckInModal(false);
-      setFbType("success");
-      setFbMsg("¡Check-in exitoso! Ya puedes ingresar a la cancha.");
-      setFbVisible(true);
-    } catch {
-      setFbType("error");
-      setFbMsg("No pudimos procesar tu llegada. Inténtalo de nuevo.");
-      setFbVisible(true);
-    }
-  };
 
   const handleCheckOut = (booking: any) => {
     if (!booking.id) return;
@@ -397,12 +368,10 @@ export default function ReservasPage() {
                         <Repeat size={15} /> Reservar de nuevo
                       </button>
                     )}
-                    {isConfirmed && !b.checkIn && inWindow && b.paymentStatus !== "paid" && (
-                      <p className="flex-1 self-center text-[12px] font-semibold text-amber-500">Paga en recepción para ingresar</p>
-                    )}
+                    {/* El ingreso lo registra el recinto escaneando el código (no el jugador) */}
                     {isConfirmed && !b.checkIn && inWindow && b.paymentStatus === "paid" && (
-                      <button onClick={() => handleCheckIn(b)} className="flex-1 h-[46px] rounded-md bg-emerald-500 flex items-center justify-center gap-2 text-white font-semibold text-[11px] uppercase transition-all active:scale-[0.98]">
-                        <ShieldCheck size={15} /> Ingresar
+                      <button onClick={() => { setSelectedBooking(b); setShowTicket(true); }} className="flex-1 h-[46px] rounded-md bg-emerald-500 flex items-center justify-center gap-2 text-white font-semibold text-[11px] uppercase transition-all active:scale-[0.98]">
+                        <ShieldCheck size={15} /> Mostrar código en recepción
                       </button>
                     )}
                     {isActive && !b.checkOut && (
@@ -645,26 +614,6 @@ export default function ReservasPage() {
         </div>
       )}
 
-      {/* CheckIn Modal */}
-      {showCheckInModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-10" onClick={() => setShowCheckInModal(false)}>
-          <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-            <div className="w-20 h-20 rounded-full flex items-center justify-center mb-5" style={{ backgroundColor: "#10b98115" }}>
-              <ShieldCheck color="#10b981" size={40} />
-            </div>
-            <p className={`text-[16px] font-semibold text-center mb-2.5 ${textClr}`}>Confirmar Llegada</p>
-            <p className={`text-[13px] font-semibold text-center mb-7 leading-5 ${subClr}`}>¿Confirmas que ya te encuentras en el recinto para iniciar tu partido?</p>
-            <div className="flex gap-2.5 w-full">
-              <button onClick={() => setShowCheckInModal(false)} className={`flex-1 h-[55px] rounded-md font-semibold text-[11px] border transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-[#94A3B8] border-white/6" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
-                VOLVER
-              </button>
-              <button onClick={confirmCheckIn} className="flex-1 h-[55px] rounded-md font-semibold text-[11px] text-white bg-emerald-500 transition-all active:scale-[0.98]">
-                SÍ, INGRESAR
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

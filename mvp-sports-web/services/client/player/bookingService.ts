@@ -130,13 +130,6 @@ export const bookingService = {
         return Array.from(allDocsMap.values()).map(d => ({ id: d.id, ...d.data() } as Booking));
     },
 
-    async checkIn(bookingId: string) {
-        const ref = doc(db, 'bookings', bookingId);
-        await updateDoc(ref, { checkIn: true, checkInTime: Timestamp.now(), status: 'active' });
-        invalidate('bookings:');
-        await syncBookingSlots(bookingId);
-    },
-
     async checkOut(bookingId: string, surveyData?: { rating?: number; feedback?: string }) {
         const ref = doc(db, 'bookings', bookingId);
         const updateData: any = { checkOut: true, checkOutTime: Timestamp.now(), status: 'completed' };

@@ -50,17 +50,31 @@ describe("computeProgress", () => {
   });
 
   it("otorga logros y su bonificación", () => {
-    const b = { userId: "u1", isInternalMatch: true, date: past(1), startTime: "19:00", teamStats: { u1: 3 } };
+    const b = { userId: "u1", paymentStatus: "paid", checkIn: true, date: past(1), startTime: "19:00", teamStats: { u1: 3 } };
     const p = computeProgress("u1", user, [b], cfg, NOW);
     expect(p.badges).toEqual([{ id: "scorer", tier: "bronze", value: 3 }]);
-    expect(p.xp).toBe(100 + 75 + 50); // partido + 3 goles + logro bronce
+    expect(p.xp).toBe(100 + 50 + 75 + 50); // partido + check-in + 3 goles + logro bronce
   });
 
   it("sube de nivel según los tramos", () => {
-    const many = Array.from({ length: 12 }, (_, i) => ({ userId: "u1", isInternalMatch: true, date: past(i + 1), startTime: "15:00" }));
+    const many = Array.from({ length: 8 }, (_, i) => ({ userId: "u1", paymentStatus: "paid", checkIn: true, date: past(i + 1), startTime: "15:00" }));
     const p = computeProgress("u1", user, many, cfg, NOW);
-    expect(p.xp).toBe(1200);
+    expect(p.xp).toBe(1200); // 8 × (100 + 50)
     expect(p.tier).toBe("PLATA");
     expect(p.ovr).toBeGreaterThan(40);
+  });
+
+  it("los partidos internos (anotados por el jugador) no dan experiencia", () => {
+    const fake = Array.from({ length: 50 }, (_, i) => ({ userId: "u1", isInternalMatch: true, status: "completed", date: past(i + 1), startTime: "19:00", teamStats: { u1: 10 }, mvpUserId: "u1", matchOutcome: "win" }));
+    const p = computeProgress("u1", user, fake, cfg, NOW);
+    expect(p.xp).toBe(0);
+    expect(p.stats.played).toBe(0);
+  });
+
+  it("los goles informados se acotan a 15 por partido", () => {
+    const b = { userId: "u1", paymentStatus: "paid", checkIn: true, date: past(1), startTime: "19:00", teamStats: { u1: 999 }, teamAssists: { u1: -5 } };
+    const p = computeProgress("u1", user, [b], cfg, NOW);
+    expect(p.stats.goals).toBe(15);
+    expect(p.stats.assists).toBe(0);
   });
 });
