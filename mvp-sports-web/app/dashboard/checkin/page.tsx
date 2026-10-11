@@ -943,6 +943,15 @@ export default function CheckInPage() {
                                                             : (booking.cancelledBy === 'staff' ? 'Por Recinto' : 'Por Jugador')
                                                         }
                                                     </span>
+                                                    {isLateNoShow && booking.status !== 'cancelled' && (
+                                                        <button
+                                                            onClick={() => handleNoShow(booking)}
+                                                            disabled={processingId === booking.id}
+                                                            className="mt-1 h-8 px-3 rounded-md text-[9px] font-black uppercase tracking-widest bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
+                                                        >
+                                                            Registrar inasistencia
+                                                        </button>
+                                                    )}
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center gap-2">

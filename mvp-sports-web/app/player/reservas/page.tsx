@@ -576,7 +576,7 @@ export default function ReservasPage() {
             <div className="w-[70px] h-[70px] rounded-full flex items-center justify-center mb-5" style={{ backgroundColor: fbType === "error" ? "#ef444422" : "#10b98122" }}>
               {fbType === "error" ? <XCircle color="#ef4444" size={35} /> : <CheckCircle2 color="#10b981" size={35} />}
             </div>
-            <p className={`text-[16px] font-semibold text-center mb-2.5 ${textClr}`}>{fbType === "error" ? "Oops" : "¡Éxito!"}</p>
+            <p className={`text-[16px] font-semibold text-center mb-2.5 ${textClr}`}>{fbType === "error" ? "No se pudo completar" : "¡Listo!"}</p>
             <p className={`text-[13px] font-semibold text-center mb-6 leading-5 ${subClr}`}>{fbMsg}</p>
             <button onClick={() => setFbVisible(false)} className="w-full h-[50px] rounded-md flex items-center justify-center text-white font-semibold text-[13px] transition-all active:scale-[0.98]" style={{ backgroundColor: fbType === "error" ? "#ef4444" : "#10b981" }}>
               ENTENDIDO

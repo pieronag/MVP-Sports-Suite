@@ -42,6 +42,7 @@ describe("computeProgress", () => {
       { userId: "u1", date: past(3), startTime: "18:00", status: "no-show" },
       { userId: "u1", date: past(4), startTime: "18:00", status: "cancelled" },
       { userId: "u1", date: new Date(NOW + 86_400_000), startTime: "18:00", paymentStatus: "paid" },
+      { userId: "u1", date: past(5), startTime: "18:00", paymentStatus: "paid" }, // pagada y pasada, sin ingreso: no es partido
     ];
     const p = computeProgress("u1", user, bookings, cfg, NOW);
     expect(p.stats).toMatchObject({ played: 1, noShows: 1 });

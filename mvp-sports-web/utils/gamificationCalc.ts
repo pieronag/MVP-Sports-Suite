@@ -35,7 +35,8 @@ export function computeProgress(uid: string, user: any, bookings: any[], cfg: Ga
     if (noShow) { if (mine) st.noShows++; continue; }
     if (b.status === "cancelled" || b.status === "rejected") continue;
     const start = toDate(b.date);
-    const happened = b.isInternalMatch || b.checkIn || b.checkOut || b.status === "completed" || (start && start.getTime() + 60 * 60_000 < now && b.paymentStatus === "paid");
+    // Solo cuenta lo que realmente se jugó: con ingreso registrado o partido interno (sin check-in no hay partido)
+    const happened = b.isInternalMatch || b.checkIn || b.checkOut || b.status === "completed";
     if (!happened) continue;
 
     st.played++;

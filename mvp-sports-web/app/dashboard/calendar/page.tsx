@@ -317,7 +317,7 @@ export default function MasterCalendar() {
 
             <div className="flex-1 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 shadow-xs overflow-hidden flex flex-col min-h-0 relative">
                 <div className="px-5 py-2 border-b border-slate-50 dark:border-white/5 flex flex-wrap gap-4 bg-slate-50/50 dark:bg-white/2">
-                    {[['bg-emerald-500', 'Pagado'], ['bg-sky-500', 'Pendiente'], ['bg-amber-500', 'Abono'], ['bg-slate-400', 'Anulado']].map(([color, label]) => (
+                    {[['bg-emerald-500', 'Pagado'], ['bg-slate-400', 'Anulado']].map(([color, label]) => (
                         <div key={label} className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full ${color}`}></div><span className="text-[9px] font-bold text-slate-400 uppercase">{label}</span></div>
                     ))}
                 </div>
