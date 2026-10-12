@@ -100,3 +100,62 @@ test.describe("Configuración del complejo", () => {
     expect(errors, errors.join("\n")).toEqual([]);
   });
 });
+
+test.describe("Administración (superadmin)", () => {
+  test("todas las pantallas de la plataforma cargan sin errores de permisos", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Basta una vez");
+    test.skip(!(await exists(env.E2E_ADMIN_EMAIL)), "Sin superadmin de prueba");
+    test.setTimeout(180_000);
+    const errors = watchErrors(page);
+    await login(page, env.E2E_ADMIN_EMAIL, env.E2E_ADMIN_PASSWORD);
+    for (const p of ["/dashboard", "/dashboard/metrics", "/dashboard/tenants", "/dashboard/users", "/dashboard/owners", "/dashboard/invoices",
+      "/dashboard/reports", "/dashboard/audit", "/dashboard/gamification", "/dashboard/settings", "/dashboard/users/analytics"]) {
+      await page.goto(p);
+      await expect(page).toHaveURL(new RegExp(`${p.replace(/\//g, "\/")}\/?$`), { timeout: 20_000 });
+      await page.waitForTimeout(2500); // las escuchas de Firestore no dejan la red en reposo
+      await expect(page.getByText(/no tienes permiso|error al cargar/i), p).toHaveCount(0);
+    }
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+});
+
+test.describe("Check-in con el código del ticket", () => {
+  test("recepción escribe el código como sale en el ticket y registra el ingreso", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Escribe en la base: basta una vez");
+    const booking = fs.existsSync(saPath) ? await admin().firestore().collection("bookings").doc("E2ECHECKINAB12CD").get() : null;
+    test.skip(!booking?.exists || !(await exists(env.E2E_MANAGER_EMAIL)), "Sin reserva de prueba para check-in");
+    test.setTimeout(120_000);
+    const errors = watchErrors(page);
+    await login(page, env.E2E_MANAGER_EMAIL, env.E2E_MANAGER_PASSWORD);
+    await page.goto("/dashboard/checkin");
+    await expect(page.getByText("Jugador E2E").first()).toBeVisible({ timeout: 30_000 });
+    await page.getByPlaceholder(/buscar por código de reserva/i).fill("#AB12CD");
+    await page.getByRole("button", { name: /^validar$/i }).click();
+    await page.getByRole("button", { name: /confirmar entrada/i }).click();
+    await expect(page.getByText(/ingreso exitoso/i)).toBeVisible({ timeout: 20_000 });
+    const b = (await admin().firestore().collection("bookings").doc("E2ECHECKINAB12CD").get()).data();
+    expect(b.checkIn).toBeTruthy();
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+});
+
+test.describe("Liquidaciones", () => {
+  test("el superadmin abre una liquidación y descarga su PDF", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Basta una vez");
+    test.skip(!(await exists(env.E2E_ADMIN_EMAIL)), "Sin superadmin de prueba");
+    test.setTimeout(120_000);
+    const errors = watchErrors(page);
+    await login(page, env.E2E_ADMIN_EMAIL, env.E2E_ADMIN_PASSWORD);
+    await page.goto("/dashboard/invoices");
+    const ver = page.getByTitle("Ver liquidación").first();
+    await expect(ver).toBeVisible({ timeout: 30_000 });
+    await ver.click();
+    const download = page.waitForEvent("download");
+    await page.getByRole("button", { name: /descargar/i }).last().click();
+    const file = await (await download).path();
+    const head = fs.readFileSync(file).subarray(0, 5).toString();
+    expect(head).toBe("%PDF-");
+    expect(fs.statSync(file).size).toBeGreaterThan(5_000);
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+});

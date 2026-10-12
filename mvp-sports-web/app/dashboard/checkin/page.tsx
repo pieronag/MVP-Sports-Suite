@@ -452,10 +452,12 @@ export default function CheckInPage() {
 
     const processManualCode = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!manualCode.trim()) return;
+        // El ticket muestra el código como "#AB12CD": se acepta con o sin "#" y espacios
+        const code = manualCode.trim().replace(/^#/, '').replace(/\s+/g, '');
+        if (!code) return;
         const found = bookings.find(b =>
-            b.id.slice(-6).toUpperCase() === manualCode.toUpperCase() ||
-            b.clientName.toLowerCase().includes(manualCode.toLowerCase())
+            b.id.slice(-6).toUpperCase() === code.toUpperCase() ||
+            b.clientName.toLowerCase().includes(manualCode.trim().toLowerCase())
         );
         if (found) {
             if (found.checkIn) setStatusModal({ isOpen: true, title: "Ya Ingresó", message: `${found.clientName} ya registró su entrada anteriormente.`, type: 'warning' });
