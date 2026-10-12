@@ -82,7 +82,7 @@ function getStatusBadge(b: any) {
 
 export default function AdminDashboard() {
     const [kpis, setKpis] = useState({
-        revenue: 0, tenants: 0, totalTenants: 0, users: 0, churn: 0, ltv: 0,
+        revenue: 0, mrr: 0, gmv: 0, tenants: 0, totalTenants: 0, users: 0, churn: 0, ltv: 0,
         mrrGrowth: 0, usageDensity: 0, conversionRate: 0
     });
     const [chartData, setChartData] = useState<any[]>([]);
@@ -137,8 +137,11 @@ export default function AdminDashboard() {
                 color: planList.find(p => p.name === key)?.color || '#cbd5e1'
             })));
 
+            // MRR: lo que pagan cada mes los recintos activos por su plan (antes se mostraba lo facturado en el mes)
+            const mrr = tenants.filter((t: any) => t.status === 'Activo').reduce((acc: number, t: any) => acc + Number(resolvePlan(t)?.price || 0), 0);
             setKpis(prev => ({
                 ...prev,
+                mrr,
                 tenants: activeTenants,
                 totalTenants: totalTenantsCount,
                 churn: isNaN(inactiveRate) ? 0 : inactiveRate,
@@ -299,6 +302,7 @@ export default function AdminDashboard() {
         setKpis(prev => ({
             ...prev,
             revenue: calculatedRevenue,
+            gmv: filteredBookings.reduce((acc, b) => acc + b.price, 0),
             ltv: totalRevenueAllTime > 0 && prev.totalTenants > 0 ? Math.round(totalRevenueAllTime / prev.totalTenants) : 0,
             mrrGrowth,
             usageDensity
@@ -540,8 +544,8 @@ export default function AdminDashboard() {
                 action={
                     <div className="flex items-center gap-5">
                         <div className="text-right">
-                            <p className="text-[11px] md:text-[9px] font-bold text-slate-400 uppercase tracking-wider">Total generado mes</p>
-                            <p className="text-base font-black text-emerald-600 dark:text-[#00df82] font-mono leading-none mt-0.5">{formatCLP(kpis.revenue)}</p>
+                            <p className="text-[11px] md:text-[9px] font-bold text-slate-400 uppercase tracking-wider">Cobrado en reservas</p>
+                            <p className="text-base font-black text-emerald-600 dark:text-[#00df82] font-mono leading-none mt-0.5">{formatCLP(kpis.gmv)}</p>
                         </div>
                         <div className="w-px h-8 bg-slate-100 dark:bg-white/5" />
                         <div className="text-right">

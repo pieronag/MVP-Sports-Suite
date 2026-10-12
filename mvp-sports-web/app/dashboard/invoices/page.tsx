@@ -618,6 +618,8 @@ f(true);
     }, [invoices, filterStatus, searchTerm, selectedMonth, monthAll, planFilter]);
 
     const totalInvoiced = filteredInvoices.reduce((acc, curr) => acc + curr.amount, 0);
+    // Cobrado: solo las liquidaciones pagadas (antes se mostraba el total emitido como "solo pagos aceptados")
+    const totalCollected = filteredInvoices.filter(i => i.status === 'Pagada').reduce((acc, curr) => acc + curr.amount, 0);
     const totalPending = filteredInvoices.filter(i => i.status !== 'Pagada').reduce((acc, curr) => acc + curr.amount, 0);
     const payRate = filteredInvoices.length > 0 ? Math.round((filteredInvoices.filter(i => i.status === 'Pagada').length / filteredInvoices.length) * 100) : 0;
 
@@ -746,7 +748,7 @@ f(true);
 
             {/* KPIs */}
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
-                <TarjetaKpi titulo="Total facturado" valor={formatCLP(totalInvoiced)} sub="Solo pagos aceptados" icono={<HugeiconsIcon icon={MoneyBag01Icon} className={ic} strokeWidth={1.6} />} brillo />
+                <TarjetaKpi titulo="Cobrado" valor={formatCLP(totalCollected)} sub={`De ${formatCLP(totalInvoiced)} emitido`} icono={<HugeiconsIcon icon={MoneyBag01Icon} className={ic} strokeWidth={1.6} />} brillo />
                 <TarjetaKpi titulo="Pendiente" valor={formatCLP(totalPending)} sub="Por recaudar" icono={<HugeiconsIcon icon={Clock01Icon} className={ic} strokeWidth={1.6} />} />
                 <TarjetaKpi titulo="Tasa de pago" valor={`${payRate}%`} sub="Eficiencia" icono={<HugeiconsIcon icon={CheckmarkCircle02Icon} className={ic} strokeWidth={1.6} />} />
                 <TarjetaKpi titulo="Facturas" valor={filteredInvoices.length.toString()} sub="Periodo seleccionado" icono={<HugeiconsIcon icon={ReceiptIcon} className={ic} strokeWidth={1.6} />} />

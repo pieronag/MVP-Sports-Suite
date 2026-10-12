@@ -125,9 +125,18 @@ function sportFieldPatch(d) {
   return p;
 }
 
+// Reglas de experiencia: una sola fuente (settings/global.gamification). Se quitan campos antiguos que nada lee.
+const OLD_GAMIFICATION = ["winPoints", "drawPoints", "lossPoints", "multiplierSuperior", "bronzeThreshold", "silverThreshold", "goldThreshold", "eliteThreshold"];
 function settingsPatch(d, id) {
-  return id === "global" && "primaryColor" in d ? { primaryColor: DEL } : {};
+  if (id !== "global") return {};
+  const p = {};
+  if ("primaryColor" in d) p.primaryColor = DEL;
+  for (const k of OLD_GAMIFICATION) if (d.gamification && k in d.gamification) p[`gamification.${k}`] = DEL;
+  return p;
 }
+
+// Documentos completos que nada usa
+const OBSOLETE_DOCS = ["settings/gamification"];
 
 const PLAN = [
   ["tenants", tenantPatch], ["courts", courtPatch], ["bookings", bookingPatch], ["users", userPatch],
@@ -153,13 +162,24 @@ const PLAN = [
       console.log(`${col}/${doc.id}`);
       for (const [k, v] of Object.entries(patch)) {
         const after = v === DEL ? "(se elimina)" : v instanceof Timestamp ? v.toDate().toISOString() : v?.constructor?.name === "ServerTimestampTransform" || (v && typeof v === "object" && v._methodName) ? "(fecha del servidor)" : JSON.stringify(short(v));
-        console.log(`   ${k}: ${JSON.stringify(short(data[k]))} → ${after}`);
+        const before = k.includes('.') ? k.split('.').reduce((o, x) => (o == null ? o : o[x]), data) : data[k];
+        console.log(`   ${k}: ${JSON.stringify(short(before))} → ${after}`);
       }
     }
     summary.push(`${col}: ${changed} de ${snap.size}`);
   }
+  const deletes = [];
+  for (const docPath of OBSOLETE_DOCS) {
+    const snap = await db.doc(docPath).get();
+    if (!snap.exists) continue;
+    const [col, id] = docPath.split("/");
+    (backup[col] ||= {})[id] = snap.data();
+    deletes.push(snap.ref);
+    console.log(`${docPath}\n   (documento sin uso: se elimina)`);
+  }
+  summary.push(`documentos obsoletos: ${deletes.length}`);
   console.log("\nResumen:\n  " + summary.join("\n  "));
-  if (!APPLY) { console.log(`\n${writes.length} documentos cambiarían. Nada se modificó.`); process.exit(0); }
+  if (!APPLY) { console.log(`\n${writes.length + deletes.length} documentos cambiarían. Nada se modificó.`); process.exit(0); }
 
   const dir = path.join(root, "docs", "backups");
   fs.mkdirSync(dir, { recursive: true });
@@ -172,7 +192,8 @@ const PLAN = [
     writes.slice(i, i + 400).forEach((w) => batch.update(w.ref, w.patch));
     await batch.commit();
   }
+  for (const ref of deletes) await ref.delete();
   await db.collection("settings").doc("schema").set({ version: 2, migratedAt: FieldValue.serverTimestamp(), documents: writes.length }, { merge: true });
-  console.log(`Listo: ${writes.length} documentos actualizados. Versión de esquema: 2.`);
+  console.log(`Listo: ${writes.length} documentos actualizados y ${deletes.length} eliminados. Versión de esquema: 2.`);
   process.exit(0);
 })().catch((e) => { console.error(e); process.exit(1); });

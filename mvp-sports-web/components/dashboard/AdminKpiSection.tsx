@@ -12,6 +12,7 @@ import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
 
 interface KpiData {
     revenue: number;
+    mrr: number;
     tenants: number;
     totalTenants: number;
     mrrGrowth: number;
@@ -33,10 +34,8 @@ export default function AdminKpiSection({ kpis, formatCLP }: AdminKpiSectionProp
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
             <TarjetaKpi
                 titulo="MRR mensual"
-                valor={formatCLP(kpis.revenue)}
-                sub={`ARR proyectado: ${formatCLP(kpis.revenue * 12)}`}
-                tendencia={`${kpis.mrrGrowth.toFixed(1)}%`}
-                tendenciaPositiva={kpis.mrrGrowth >= 0}
+                valor={formatCLP(kpis.mrr)}
+                sub={`ARR proyectado: ${formatCLP(kpis.mrr * 12)} · Facturado: ${formatCLP(kpis.revenue)}`}
                 icono={<HugeiconsIcon icon={MoneyBag01Icon} className={ic} strokeWidth={1.6} />}
                 brillo
             />
