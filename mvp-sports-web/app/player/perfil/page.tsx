@@ -464,11 +464,8 @@ export default function PerfilPage() {
           <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(2,6,23,0.5) 0%, transparent 40%, rgba(2,6,23,0.9) 100%)" }} />
 
           {/* Top Left: MVP Logo (Zoomed & Aligned) */}
-          <div className="absolute" style={{ top: 64, left: 56, display: "flex", alignItems: "center", gap: 14 }}>
-            <img src="/icons/logo-mark.png" alt="" style={{ width: 84, height: 84, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
-            <span style={{ fontSize: 30, fontWeight: 900, letterSpacing: -1, lineHeight: 1 }}>
-              <span style={{ color: "#fff" }}>MVP</span><span style={{ color: "#00df82", marginLeft: 8 }}>SPORTS</span>
-            </span>
+          <div className="absolute" style={{ top: 60, left: 50 }}>
+            <img src="/icons/logo-mark.png" alt="" style={{ width: 150, height: 150, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
           </div>
 
           {/* Top Right: OVR Rating (Refined Style) */}
@@ -476,8 +473,8 @@ export default function PerfilPage() {
             <span style={{ color: "white", fontSize: 140, fontWeight: 900, lineHeight: "140px", textShadow: "0 0 20px rgba(0,0,0,0.6)" }}>{ovr}</span>
             <div style={{ height: 5, width: 140, backgroundColor: "#00df82", marginTop: -5, marginBottom: 10 }} />
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-              <span style={{ color: "#00df82", fontSize: 11, fontWeight: 900, letterSpacing: 4 }}>VALORACIÓN</span>
-              <span style={{ color: "#00df82", fontSize: 11, fontWeight: 900, letterSpacing: 4 }}>GENERAL</span>
+              <span style={{ color: "#00df82", fontSize: 18, fontWeight: 900, letterSpacing: 3 }}>VALORACIÓN</span>
+              <span style={{ color: "#00df82", fontSize: 18, fontWeight: 900, letterSpacing: 3 }}>GENERAL</span>
             </div>
           </div>
 
@@ -504,7 +501,7 @@ export default function PerfilPage() {
             }}>
               <span style={{
                 color: "#000",
-                fontSize: 44,
+                fontSize: 56,
                 fontWeight: 900,
                 textTransform: "uppercase",
                 letterSpacing: -1,
@@ -519,7 +516,7 @@ export default function PerfilPage() {
             <div style={{
               backgroundColor: "#020611",
               width: "100%",
-              height: 90,
+              height: 104,
               marginTop: -20,
               display: "flex",
               alignItems: "center",
@@ -527,7 +524,7 @@ export default function PerfilPage() {
               borderTop: "5px solid #00df82",
               zIndex: 10
             }}>
-              <span style={{ color: "white", fontSize: 22, fontWeight: 900, textTransform: "uppercase", letterSpacing: 4 }}>
+              <span style={{ color: "white", fontSize: 28, fontWeight: 900, textTransform: "uppercase", letterSpacing: 3 }}>
                 {mainSport ? `${mainSport} • ` : ""}NIVEL {tierInfo.name.toUpperCase()} • 2026
               </span>
             </div>
@@ -542,7 +539,7 @@ export default function PerfilPage() {
 
           {/* Bottom Branding */}
           <div className="absolute" style={{ bottom: 65, width: "100%", display: "flex", justifyContent: "center", zIndex: 30 }}>
-            <span style={{ color: "white", fontSize: 12, fontWeight: 900, opacity: 0.5, letterSpacing: 2 }}>TODOS LOS DERECHOS RESERVADOS</span>
+            <span style={{ color: "white", fontSize: 16, fontWeight: 900, opacity: 0.55, letterSpacing: 2 }}>TODOS LOS DERECHOS RESERVADOS</span>
           </div>
         </div>
       </div>
