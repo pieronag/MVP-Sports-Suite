@@ -139,12 +139,15 @@ export default function PerfilPage() {
       await new Promise((r) => requestAnimationFrame(r));
       await new Promise((r) => requestAnimationFrame(r));
       const { toPng } = await import("html-to-image");
-      const dataUrl = await toPng(cardRef.current, {
-        quality: 1,
-        pixelRatio: 2,
-        cacheBust: true,
-        backgroundColor: "transparent",
-      });
+      // Hojas de otros dominios (p. ej. las fuentes que carga Google Maps) no se pueden leer: se apartan durante la captura
+      const foreign = Array.from(document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')).filter((l) => { try { return new URL(l.href).origin !== location.origin; } catch { return false; } });
+      const spots = foreign.map((l) => { const mark = document.createComment(""); l.replaceWith(mark); return { l, mark }; });
+      let dataUrl: string;
+      try {
+        dataUrl = await toPng(cardRef.current, { quality: 1, pixelRatio: 2, cacheBust: true, backgroundColor: "#020611" });
+      } finally {
+        spots.forEach(({ l, mark }) => mark.replaceWith(l));
+      }
       setPreviewUri(dataUrl);
       setShowPreview(true);
     } catch (err) {
@@ -197,8 +200,6 @@ export default function PerfilPage() {
     invited_players: (sRaw as any).invited_players ?? 0,
   };
 
-  const TIER_COLORS: Record<string, string> = { bronce: "#d08a4e", plata: "#cbd5e1", oro: "#fbbf24", platino: "#5eead4", diamante: "#7dd3fc", elite: "#c4b5fd", leyenda: "#f472b6" };
-  const cardTier = { color: TIER_COLORS[String(tierInfo?.name || "").toLowerCase()] || "#34d399" };
   const position = (profile as any)?.position || "Jugador";
   const mainSport = (profile as any)?.mainSport || "";
   const initials = displayName.split(" ").map((w: string) => w.charAt(0).toUpperCase()).slice(0, 2).join("");
@@ -452,68 +453,93 @@ export default function PerfilPage() {
 
       {/* Hidden MVP Card for Capture */}
       <div style={{ position: "fixed", top: 0, left: 0, width: 0, height: 0, overflow: "hidden", zIndex: -999 }}>
-        <div ref={cardRef} className="font-heading" style={{ width: 750, height: 1250, background: "#04120c", overflow: "hidden", position: "relative", borderRadius: 36 }}>
-          {/* Foto a sangre en la mitad superior, fundida hacia el pasto */}
+        <div ref={cardRef} style={{ width: 750, height: 1250, backgroundColor: "#020611", overflow: "hidden", position: "relative" }}>
+          {/* Player Image Background */}
           {photoURL ? (
-            <img src={photoURL} alt="" crossOrigin="anonymous" style={{ position: "absolute", top: 0, left: 0, width: 750, height: 860, objectFit: "cover" }} />
+            <img src={photoURL} alt="" crossOrigin="anonymous" className="absolute inset-0 w-full h-full object-cover" />
           ) : (
-            <div style={{ position: "absolute", top: 0, left: 0, width: 750, height: 860, background: "radial-gradient(120% 80% at 50% 30%, #0f5132 0%, #06281b 55%, #04120c 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ color: "rgba(255,255,255,0.12)", fontSize: 320, fontWeight: 900, letterSpacing: -12 }}>{initials}</span>
-            </div>
+            <div className="absolute inset-0 bg-linear-to-br from-[#0a0a2e] via-[#0f0f3d] to-[#064e3b]" />
           )}
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(4,18,12,0.55) 0%, rgba(4,18,12,0) 22%, rgba(4,18,12,0) 45%, rgba(4,18,12,0.92) 68%, #04120c 76%)" }} />
+          {/* Cinematic Overlay */}
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(2,6,23,0.5) 0%, transparent 40%, rgba(2,6,23,0.9) 100%)" }} />
 
-          {/* Líneas de cancha: círculo central y mitad, apenas visibles */}
-          <svg width="750" height="1250" viewBox="0 0 750 1250" style={{ position: "absolute", inset: 0 }} aria-hidden>
-            <g fill="none" stroke={cardTier.color} strokeOpacity="0.16" strokeWidth="2">
-              <line x1="0" y1="1010" x2="750" y2="1010" />
-              <circle cx="375" cy="1010" r="150" />
-              <circle cx="375" cy="1010" r="5" fill={cardTier.color} fillOpacity="0.3" />
-            </g>
-          </svg>
-
-          {/* Marco interior con el color del rango */}
-          <div style={{ position: "absolute", inset: 22, borderRadius: 24, border: `2px solid ${cardTier.color}`, opacity: 0.55 }} />
-
-          {/* Esquina superior: valoración y posición (convención de carta deportiva) */}
-          <div style={{ position: "absolute", top: 64, left: 64, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-            <span style={{ color: "#fff", fontSize: 168, fontWeight: 900, lineHeight: "150px", letterSpacing: -8, textShadow: "0 6px 30px rgba(0,0,0,0.45)" }}>{ovr}</span>
-            <span style={{ color: cardTier.color, fontSize: 30, fontWeight: 800, marginTop: 14 }}>{position}</span>
-            <div style={{ width: 64, height: 4, background: cardTier.color, marginTop: 18, borderRadius: 2 }} />
-            <span style={{ color: "rgba(255,255,255,0.75)", fontSize: 22, fontWeight: 700, marginTop: 16 }}>{mainSport || "Multideporte"}</span>
+          {/* Top Left: MVP Logo (Zoomed & Aligned) */}
+          <div className="absolute" style={{ top: 60, left: 25, width: 180, height: 120, overflow: "hidden" }}>
+            <img src="/Logo.png" alt="" style={{ width: "130%", height: "130%", position: "absolute", top: "-15%", left: "-15%", objectFit: "contain", filter: "brightness(0) invert(1)" }} />
           </div>
 
-          {/* Esquina superior derecha: marca y rango */}
-          <div style={{ position: "absolute", top: 64, right: 64, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 18 }}>
-            <img src="/Logo.png" alt="" style={{ width: 120, height: 120, objectFit: "contain", filter: "brightness(0) invert(1)", opacity: 0.95 }} />
-            <span style={{ background: cardTier.color, color: "#04120c", fontSize: 22, fontWeight: 900, padding: "8px 18px", borderRadius: 10 }}>{tierInfo.name}</span>
+          {/* Top Right: OVR Rating (Refined Style) */}
+          <div className="absolute" style={{ top: 60, right: 60, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+            <span style={{ color: "white", fontSize: 140, fontWeight: 900, lineHeight: "140px", textShadow: "0 0 20px rgba(0,0,0,0.6)" }}>{ovr}</span>
+            <div style={{ height: 5, width: 140, backgroundColor: "#06b6d4", marginTop: -5, marginBottom: 10 }} />
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+              <span style={{ color: "#06b6d4", fontSize: 11, fontWeight: 900, letterSpacing: 4 }}>VALORACIÓN</span>
+              <span style={{ color: "#06b6d4", fontSize: 11, fontWeight: 900, letterSpacing: 4 }}>GENERAL</span>
+            </div>
           </div>
 
-          {/* Nombre */}
-          <div style={{ position: "absolute", left: 64, right: 64, top: 790 }}>
-            <span style={{ display: "block", color: "rgba(255,255,255,0.6)", fontSize: 24, fontWeight: 700 }}>Carta MVP · Temporada {new Date().getFullYear()}</span>
-            <span style={{ display: "block", color: "#fff", fontSize: displayName.length > 18 ? 64 : 84, fontWeight: 900, lineHeight: 1, letterSpacing: -3, marginTop: 10, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{displayName}</span>
+          {/* Player Position Vertical */}
+          <div className="absolute" style={{ left: -500, top: "42%", width: 1200, display: "flex", justifyContent: "center", transform: "rotate(-90deg)", transformOrigin: "center center" }}>
+            <span style={{ color: "white", fontSize: 110, fontWeight: 900, opacity: 0.4, letterSpacing: 3, textAlign: "center", textTransform: "uppercase" }}>{position}</span>
           </div>
 
-          {/* Estadísticas */}
-          <div style={{ position: "absolute", left: 64, right: 64, top: 960, display: "flex", borderTop: "1px solid rgba(255,255,255,0.14)", borderBottom: "1px solid rgba(255,255,255,0.14)" }}>
-            {[
-              { k: "Partidos", v: stats.matchesPlayed ?? 0 },
-              { k: "Victorias", v: stats.matchesWon ?? 0 },
-              { k: "Goles", v: stats.goals ?? 0 },
-              { k: "XP", v: xp.toLocaleString("es-CL") },
-            ].map((st, i) => (
-              <div key={st.k} style={{ flex: 1, padding: "26px 0", display: "flex", flexDirection: "column", alignItems: "center", borderLeft: i ? "1px solid rgba(255,255,255,0.14)" : "none" }}>
-                <span style={{ color: "#fff", fontSize: 54, fontWeight: 900, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{st.v}</span>
-                <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 20, fontWeight: 700, marginTop: 10 }}>{st.k}</span>
-              </div>
-            ))}
+          {/* Bottom Section: TOPPS NOW STYLE NAMEPLATE */}
+          <div className="absolute bottom-0 w-full" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            {/* Name White Box (Adaptive) */}
+            <div style={{
+              backgroundColor: "white",
+              padding: "22px 0",
+              transform: "skewX(-10deg)",
+              zIndex: 20,
+              boxShadow: "0 15px 40px rgba(0,0,0,0.4)",
+              border: "3px solid #f1f5f9",
+              width: "auto",
+              minWidth: "60%",
+              maxWidth: "90%",
+              display: "flex",
+              justifyContent: "center"
+            }}>
+              <span style={{
+                color: "#000",
+                fontSize: 44,
+                fontWeight: 900,
+                textTransform: "uppercase",
+                letterSpacing: -1,
+                transform: "skewX(10deg)",
+                textAlign: "center",
+                padding: "0 60px",
+                whiteSpace: "nowrap"
+              }}>{displayName}</span>
+            </div>
+
+            {/* Dark Info Bar (Full Width Banner) */}
+            <div style={{
+              backgroundColor: "#020611",
+              width: "100%",
+              height: 90,
+              marginTop: -20,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderTop: "5px solid #06b6d4",
+              zIndex: 10
+            }}>
+              <span style={{ color: "white", fontSize: 22, fontWeight: 900, textTransform: "uppercase", letterSpacing: 4 }}>
+                {mainSport ? `${mainSport} • ` : ""}NIVEL {tierInfo.name.toUpperCase()} • 2026
+              </span>
+            </div>
+
+            {/* Geometric Pattern Bar (Brand Colors: Cyan, Emerald, Blue) */}
+            <div style={{ display: "flex", flexDirection: "row", width: "100%", height: 50 }}>
+              {["#06b6d4", "#10b981", "#3b82f6", "#0891b2", "#059669", "#2563eb", "#06b6d4", "#10b981", "#3b82f6", "#0891b2"].map((c, i) => (
+                <div key={i} style={{ flex: 1, backgroundColor: c }} />
+              ))}
+            </div>
           </div>
 
-          {/* Pie: dominio y número de serie de la carta */}
-          <div style={{ position: "absolute", left: 64, right: 64, bottom: 64, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 22, fontWeight: 800 }}>mvpsports.cl</span>
-            <span style={{ color: "rgba(255,255,255,0.45)", fontSize: 20, fontWeight: 700, fontFamily: "var(--font-fira-code), monospace" }}>N.º {(user?.uid || "000000").slice(-6).toUpperCase()}</span>
+          {/* Bottom Branding */}
+          <div className="absolute" style={{ bottom: 65, width: "100%", display: "flex", justifyContent: "center", zIndex: 30 }}>
+            <span style={{ color: "white", fontSize: 12, fontWeight: 900, opacity: 0.5, letterSpacing: 2 }}>TODOS LOS DERECHOS RESERVADOS</span>
           </div>
         </div>
       </div>

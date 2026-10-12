@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { needsEmailVerification } from "@/components/player/VerifyEmailGate";
 import { homeFor, normalizeRole } from "@/utils/roles";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -46,11 +47,12 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
+      // Mientras handleLogin revisa el correo no se redirige (si no, el aviso de verificar se perdía)
+      if (!role || loading || needsEmailVerification(user, role)) return;
       // Cada rol a su inicio en cualquier dispositivo (antes en el celular todos iban a /player)
-      if (!role) return;
       router.push(homeFor(normalizeRole(role)));
     }
-  }, [user, router, role]);
+  }, [user, router, role, loading]);
 
   const handleResendVerification = async () => {
     if (!email) return;
