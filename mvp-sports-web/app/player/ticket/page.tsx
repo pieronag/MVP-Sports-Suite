@@ -131,7 +131,7 @@ export default function TicketPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[12px] font-semibold animate-pulse">Cargando</p>
+        <p className="text-emerald-600 dark:text-emerald-400 text-[12px] font-semibold animate-pulse">Cargando</p>
       </div>
     );
   }

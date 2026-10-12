@@ -48,14 +48,14 @@ export default function VerifyEmailGate({ user, onVerified }: { user: User; onVe
     };
 
     return (
-        <div className="min-h-screen bg-[#020611] text-slate-200 flex items-center justify-center px-6">
+        <div className="min-h-screen bg-[#F8FAFC] text-slate-800 dark:bg-[#020611] dark:text-slate-200 flex items-center justify-center px-6">
             <div className="w-full max-w-sm text-center space-y-5">
                 <div className="w-16 h-16 mx-auto rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                     <Mail size={30} className="text-emerald-400" />
                 </div>
                 <div>
-                    <h1 className="text-[18px] font-black tracking-tight">Verifica tu <span className="text-[#00df82]">correo</span></h1>
-                    <p className="mt-2 text-[13px] text-slate-400">
+                    <h1 className="text-[18px] font-black tracking-tight">Verifica tu <span className="text-emerald-600 dark:text-[#00df82]">correo</span></h1>
+                    <p className="mt-2 text-[13px] text-slate-500 dark:text-slate-400">
                         Enviamos un enlace de activación a <span className="text-slate-200 font-semibold">{user.email}</span>. Ábrelo para usar tu cuenta.
                     </p>
                 </div>
@@ -64,10 +64,10 @@ export default function VerifyEmailGate({ user, onVerified }: { user: User; onVe
                     <CheckCircle size={16} /> Ya verifiqué mi correo
                 </button>
                 <button onClick={resend} disabled={busy}
-                    className="w-full py-3 rounded-md border border-white/10 text-[12px] font-bold text-slate-300 disabled:opacity-50">
+                    className="w-full py-3 rounded-md border border-slate-300 text-[12px] font-bold text-slate-700 dark:border-white/10 dark:text-slate-300 disabled:opacity-50">
                     Reenviar enlace
                 </button>
-                {status && <p role="status" className="text-[11px] text-slate-400">{status}</p>}
+                {status && <p role="status" className="text-[11px] text-slate-500 dark:text-slate-400">{status}</p>}
                 <button onClick={() => logout()} className="inline-flex items-center gap-2 text-[12px] font-bold text-slate-500 hover:text-red-400">
                     <LogOut size={14} /> Usar otra cuenta
                 </button>

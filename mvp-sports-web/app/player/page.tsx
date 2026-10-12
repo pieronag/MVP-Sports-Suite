@@ -304,28 +304,28 @@ export default function PlayerDashboard() {
 
         {/* Progreso de nivel */}
         {prog && (
-          <Link href="/player/estadisticas" className="relative block rounded-md overflow-hidden border border-white/6 bg-[#020611] p-4 active:opacity-90"
-            style={{ backgroundImage: "radial-gradient(120% 90% at 100% 0%, rgba(0,223,130,0.16), transparent 55%)" }}>
+          <Link href="/player/estadisticas" className={`relative block rounded-md overflow-hidden border p-4 active:opacity-90 ${isDark ? "border-white/6 bg-[#020611]" : "border-slate-200 bg-white"}`}
+            style={{ backgroundImage: `radial-gradient(120% 90% at 100% 0%, ${isDark ? "rgba(0,223,130,0.16)" : "rgba(16,185,129,0.12)"}, transparent 55%)` }}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[12px] font-semibold text-slate-400">Tu nivel</p>
+                <p className={`text-[12px] font-semibold ${muted}`}>Tu nivel</p>
                 <div className="mt-2"><TierBadge name={prog.current} /></div>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-white text-[34px] font-heading font-black leading-none tracking-tight tabular-nums">{ovr}</p>
-                <p className="text-[#00df82] text-[11px] font-semibold mt-0.5">Valoración</p>
+                <p className={`text-[34px] font-heading font-black leading-none tracking-tight tabular-nums ${isDark ? "text-white" : "text-slate-900"}`}>{ovr}</p>
+                <p className={`text-[11px] font-semibold mt-0.5 ${isDark ? "text-[#00df82]" : "text-emerald-600"}`}>Valoración</p>
               </div>
             </div>
             <div className="flex items-baseline justify-between mt-4">
-              <p className="text-[12px] font-semibold text-emerald-400 tabular-nums">{xp.toLocaleString("es-CL")} XP</p>
-              {prog.next && <p className="text-[12px] text-slate-400">Siguiente: <span className="text-slate-200 font-semibold">{prog.next}</span></p>}
+              <p className={`text-[12px] font-semibold tabular-nums ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>{xp.toLocaleString("es-CL")} XP</p>
+              {prog.next && <p className={`text-[12px] ${muted}`}>Siguiente: <span className={`font-semibold ${isDark ? "text-slate-200" : "text-slate-800"}`}>{prog.next}</span></p>}
             </div>
-            <div className="h-2 rounded-full mt-2 overflow-hidden bg-white/[0.06]" role="progressbar" aria-valuenow={prog.pct} aria-valuemin={0} aria-valuemax={100}>
+            <div className={`h-2 rounded-full mt-2 overflow-hidden ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`} role="progressbar" aria-valuenow={prog.pct} aria-valuemin={0} aria-valuemax={100}>
               <div className="h-full rounded-full transition-all" style={{ width: `${prog.pct}%`, background: "linear-gradient(90deg, #10b981, #00df82)" }} />
             </div>
-            <p className="text-[12px] mt-2 text-slate-400">
+            <p className={`text-[12px] mt-2 ${muted}`}>
               {prog.next
-                ? <>Te faltan <span className="font-semibold text-emerald-400">{prog.xpToNext.toLocaleString("es-CL")} XP</span>{matchesToNext ? <> · unos {matchesToNext} partido{matchesToNext > 1 ? "s" : ""}</> : null}</>
+                ? <>Te faltan <span className={`font-semibold ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>{prog.xpToNext.toLocaleString("es-CL")} XP</span>{matchesToNext ? <> · unos {matchesToNext} partido{matchesToNext > 1 ? "s" : ""}</> : null}</>
                 : "Alcanzaste el rango máximo. ¡Defiéndelo!"}
             </p>
           </Link>

@@ -337,7 +337,7 @@ export default function PreferenciasPage() {
       <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-emerald-400 text-[12px] font-semibold animate-pulse">Cargando</p>
+          <p className="text-emerald-600 dark:text-emerald-400 text-[12px] font-semibold animate-pulse">Cargando</p>
         </div>
       </div>
     );
@@ -386,7 +386,7 @@ export default function PreferenciasPage() {
               <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{user?.email}</p>
             </div>
             <div className="flex items-center gap-1 px-3 py-1.5 rounded-md bg-emerald-500/10">
-              <span className="text-emerald-400 text-[11px] font-semibold">{profile?.xp || 0} XP</span>
+              <span className="text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold">{profile?.xp || 0} XP</span>
             </div>
           </div>
         </GlowCard>

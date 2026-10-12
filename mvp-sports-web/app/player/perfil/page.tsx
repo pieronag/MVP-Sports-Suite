@@ -390,7 +390,7 @@ export default function PerfilPage() {
       {/* Tu Carta MVP */}
       <div className="flex items-center gap-3 px-6 mb-4 mt-2">
         <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-        <span className="text-emerald-400 font-semibold text-[12px]">Tu carta MVP</span>
+        <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-[12px]">Tu carta MVP</span>
         <div className="flex-1 h-px bg-linear-to-r from-emerald-500/20 to-transparent" />
       </div>
 

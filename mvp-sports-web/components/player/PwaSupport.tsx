@@ -74,16 +74,16 @@ export default function PwaSupport() {
 
     return (
         <div className="fixed inset-x-3 z-40 bottom-[calc(76px+env(safe-area-inset-bottom))] animate-fadeIn">
-            <div className="flex items-center gap-3 p-3 rounded-md border border-emerald-500/20 bg-[#0A101D] text-slate-200">
+            <div className="flex items-center gap-3 p-3 rounded-md border border-emerald-500/20 bg-white text-slate-800 shadow-lg shadow-slate-900/10 dark:bg-[#0A101D] dark:text-slate-200 dark:shadow-none">
                 <Image src="/icons/pwa-192.png" alt="" width={40} height={40} className="rounded-md shrink-0" />
                 <div className="flex-1 min-w-0">
                     <p className="text-[12px] font-bold">Instala MVP Sports</p>
                     {showIosHint ? (
-                        <p className="text-[11px] text-slate-400 leading-snug">
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
                             Toca <Share size={12} className="inline -mt-0.5" /> y luego «Agregar a inicio».
                         </p>
                     ) : (
-                        <p className="text-[11px] text-slate-400 leading-snug">Acceso directo, pantalla completa y modo sin conexión.</p>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">Acceso directo, pantalla completa y modo sin conexión.</p>
                     )}
                 </div>
                 {!showIosHint && deferred && (

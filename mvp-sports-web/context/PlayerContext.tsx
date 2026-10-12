@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from "./AuthContext";
 import { userService, PlayerProfile } from "@/services/client/player/userService";
 import { doc, onSnapshot, getDoc } from "firebase/firestore";
@@ -30,24 +30,29 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const [profile, setProfile] = useState<PlayerProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+    // El tema elegido en este dispositivo manda; el de la cuenta solo se usa si aquí no hay uno
+    const localTheme = useRef<'dark' | 'light' | null>(null);
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
+        try {
             const saved = localStorage.getItem('mvp-theme');
-            if (saved === 'light' || saved === 'dark') setTheme(saved);
-        }
+            if (saved === 'light' || saved === 'dark') { localTheme.current = saved; setTheme(saved); }
+        } catch { /* sin almacenamiento */ }
     }, []);
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('mvp-theme', theme);
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-        }
+        document.documentElement.classList.toggle('dark', theme === 'dark');
     }, [theme]);
 
     const toggleTheme = useCallback(() => {
-        setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-    }, []);
+        setTheme(prev => {
+            const next = prev === 'dark' ? 'light' : 'dark';
+            localTheme.current = next;
+            try { localStorage.setItem('mvp-theme', next); } catch { /* sin almacenamiento */ }
+            if (user?.uid) userService.updateUserProfile(user.uid, { theme: next }).catch(() => undefined);
+            return next;
+        });
+    }, [user]);
 
     const reloadProfile = useCallback(async () => {
         if (!user?.uid) { setProfile(null); setLoading(false); return; }
@@ -55,7 +60,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         const p = await userService.getUserProfile(user.uid);
         if (p) {
             setProfile(p);
-            if (p.theme === 'light' || p.theme === 'dark') setTheme(p.theme);
+            if (!localTheme.current && (p.theme === 'light' || p.theme === 'dark')) setTheme(p.theme);
         }
         setLoading(false);
     }, [user]);
@@ -66,7 +71,6 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         if (!user?.uid) return;
-        console.log('PlayerProvider: checking profile for uid:', user.uid, 'project:', (db as any)._databaseId?.projectId || (db as any)._persistenceKey || 'unknown');
         const fetchProfile = async () => {
             try {
                 // Primary: users collection (contains full player data)
@@ -74,7 +78,6 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 const snap = await getDoc(ref);
                 if (snap.exists()) {
                     const data = { uid: snap.id, ...snap.data() } as PlayerProfile;
-                    console.log('PlayerProvider: profile loaded from users/', user.uid);
                     setProfile(data);
                     return;
                 }
@@ -83,7 +86,6 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 const profileSnap = await getDoc(profileRef);
                 if (profileSnap.exists()) {
                     const data = { uid: profileSnap.id, ...profileSnap.data() } as PlayerProfile;
-                    console.log('PlayerProvider: profile loaded from profiles/', user.uid);
                     setProfile(data);
                     return;
                 }

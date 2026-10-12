@@ -170,7 +170,7 @@ export default function PlayerLayoutClient({ children }: { children: React.React
                             </div>
                         </div>
                     </div>
-                    <p className="text-emerald-400 font-semibold text-[12px] mt-8 animate-pulse">Cargando...</p>
+                    <p className="text-emerald-600 dark:text-emerald-400 font-semibold text-[12px] mt-8 animate-pulse">Cargando...</p>
                 </div>
             </div>
         );
