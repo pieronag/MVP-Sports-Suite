@@ -19,3 +19,6 @@ playwright-report/
 *service-account*.json
 *serviceAccount*.json
 *-firebase-adminsdk-*.json
+
+# Respaldos de la base (contienen datos personales)
+docs/backups/

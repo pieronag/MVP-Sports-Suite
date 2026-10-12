@@ -112,7 +112,7 @@ export default function Page() {
             const loadedOwners: Owner[] = ownersSnapshot.docs.map(doc => {
                 const data = doc.data();
                 const myTenants = allTenants.filter((t: any) => t.ownerId === doc.id || (t.ownerIds && t.ownerIds.includes(doc.id)));
-                const ownerVenues = myTenants.map((t: any) => ({ name: t.name, plan: t.plan }));
+                const ownerVenues = myTenants.map((t: any) => ({ name: t.name, plan: t.planId || t.plan }));
                 const totalMrr = myTenants.reduce((sum: number, t: any) => sum + resolvePrice(t), 0);
                 const totalDebt = myTenants.filter((t: any) => t.debtStatus === 'Vencido').reduce((sum: number, t: any) => sum + resolvePrice(t), 0);
 

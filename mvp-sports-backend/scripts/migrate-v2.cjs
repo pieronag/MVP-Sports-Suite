@@ -62,7 +62,7 @@ async function tenantPatch(d) {
     const plan = plans.find((x) => key(x.id || "") === ref || key(x.name || "") === ref);
     if (plan) p.planId = plan.id;
   }
-  if (d.planId && d.plan !== undefined) p.plan = DEL;
+  if ((d.planId || p.planId) && d.plan !== undefined) p.plan = DEL; // en la misma pasada en que se crea planId
   // Deportes y tarifas con nombre oficial (si hay "Pádel" y "Padel", gana la que ya tenía el nombre oficial)
   const as = sports([...(d.activeSports || []), ...(d.sports || [])]);
   if (!same(as, d.activeSports || [])) p.activeSports = as;
