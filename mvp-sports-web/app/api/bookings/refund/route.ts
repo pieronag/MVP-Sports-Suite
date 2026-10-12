@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/services/server/firebase-admin";
+import { notifyUser } from "@/services/server/push";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { allowRequest } from "@/services/server/rateLimit";
 import { cancelAndRefund, RefundBusyError } from "@/services/server/refunds";
@@ -23,6 +24,7 @@ export async function POST(request: Request) {
     if (!decision.ok) return NextResponse.json({ error: decision.reason }, { status: 409 });
 
     const r = await cancelAndRefund(String(bookingId), refundFor, { cancelledBy: "player" });
+    if (r.ok && r.refundAmount > 0) await notifyUser(caller.uid, { kind: "booking_refunded", bookingId: String(bookingId), refund: r.refundAmount });
     return NextResponse.json({ success: r.ok, refundAmount: r.refundAmount, fee: r.fee, error: r.error });
   } catch (e) {
     if (e instanceof RefundBusyError) return NextResponse.json({ error: e.message }, { status: 409 });

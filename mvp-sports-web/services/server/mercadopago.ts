@@ -1,5 +1,7 @@
 import "server-only";
 import crypto from "crypto";
+import { notifyUser } from "@/services/server/push";
+import { chileDayLabel } from "@/utils/chileTime";
 import { canonicalSport } from "@/utils/sports";
 import { couponIssue, couponUses } from "@/utils/coupon";
 import { chileDateTime } from "@/utils/chileTime";
@@ -369,6 +371,20 @@ export async function settlePayment(paymentRecordId: string, mpPaymentId: string
     if (cRef && coupon?.exists) { const n = couponUses(coupon.data()) + 1; tx.update(cRef, { uses: n, usedCount: n }); }
   });
   if (pay.bookingId) await syncBooking(String(pay.bookingId)).catch((e) => console.error("syncBooking", e));
+  // Avisos al jugador (nunca bloquean la confirmación del pago)
+  const pb = pay.pendingBookingData;
+  if (pay.bookingId && pb) {
+    const when = pb.date?.toDate ? pb.date.toDate() : new Date(pb.date);
+    await notifyUser(pb.userId, { kind: "booking_confirmed", bookingId: String(pay.bookingId), venue: pb.tenantName || "tu recinto", date: chileDayLabel(when), time: pb.startTime || "" });
+  }
+  if (pay.pendingRegistration) {
+    const t = (await db.collection("tournaments").doc(pay.pendingRegistration.tournamentId).get()).data();
+    await notifyUser(pay.pendingRegistration.userId, { kind: "tournament_registered", tournament: t?.name || "el torneo" });
+  }
+  if (pay.pendingEnrollment) {
+    const c = (await db.collection("academy_classes").doc(pay.pendingEnrollment.classId).get()).data();
+    await notifyUser(pay.pendingEnrollment.userId, { kind: "academy_enrolled", className: c?.name || "tu clase" });
+  }
   return { result: "approved", returnUrl: pay.returnUrl };
 }
 

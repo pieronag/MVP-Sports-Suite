@@ -1,7 +1,7 @@
 // Service worker del área Jugador (scope /player/).
 // Estrategia: navegaciones network-first con fallback offline;
 // estáticos de Next e íconos cache-first; nunca cachea API, auth ni Firestore.
-const VERSION = 'mvp-player-v1';
+const VERSION = 'mvp-player-v2';
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGES_CACHE = `${VERSION}-pages`;
 const OFFLINE_URL = '/player/offline.html';
@@ -26,6 +26,8 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/monitoring')) return;
+  // En desarrollo no se cachea nada (el código cambia en cada edición)
+  if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') return;
 
   if (request.mode === 'navigate') {
     event.respondWith((async () => {
@@ -49,4 +51,32 @@ self.addEventListener('fetch', (event) => {
       return res;
     })());
   }
+});
+
+// Notificaciones push: el servidor envía { title, body, url, tag }
+self.addEventListener('push', (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch { data = { body: event.data && event.data.text() }; }
+  const title = data.title || 'MVP Sports';
+  event.waitUntil(self.registration.showNotification(title, {
+    body: data.body || '',
+    icon: '/icons/pwa-192.png',
+    badge: '/icons/pwa-192.png',
+    tag: data.tag || undefined,
+    renotify: !!data.tag,
+    data: { url: data.url || '/player' },
+  }));
+});
+
+// Al tocar la notificación: enfoca una pestaña abierta de la app o abre la pantalla indicada
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const target = new URL((event.notification.data && event.notification.data.url) || '/player', self.location.origin).href;
+  event.waitUntil((async () => {
+    const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of all) {
+      if (c.url.startsWith(self.location.origin + '/player')) { await c.focus(); return c.navigate(target); }
+    }
+    return self.clients.openWindow(target);
+  })());
 });

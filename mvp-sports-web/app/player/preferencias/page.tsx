@@ -1,5 +1,6 @@
 "use client";
 import { GlowCard, SectionPill } from "@/components/player/ui";
+import PushSettings from "@/components/player/PushSettings";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -457,6 +458,7 @@ export default function PreferenciasPage() {
               options={["De vez en cuando", "1-2 veces por semana", "Casi todos los días"]}
               onSelect={(v) => setFormData((f) => ({ ...f, frequency: v }))}
             />
+            <div className="px-6"><PushSettings isDark={isDark} onMessage={showFeedbackMsg} /></div>
             <button onClick={toggleTheme} className="flex items-center gap-4 px-6 py-4 w-full transition-all hover:bg-white/2">
               <div className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${isDark ? "bg-amber-500/10" : "bg-slate-200"}`}>
                 {isDark ? <Moon size={20} className="text-amber-400" /> : <Sun size={20} className="text-slate-600" />}

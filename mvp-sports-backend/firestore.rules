@@ -239,6 +239,11 @@ service cloud.firestore {
     }
 
     // Proyecciones públicas de reservas (sin datos personales), escritas por la Function onBookingWritten
+    // Suscripciones de notificaciones push: solo el servidor (/api/push)
+    match /push_subscriptions/{id} {
+      allow read, write: if false;
+    }
+
     match /court_slots/{slotId} {
       allow read: if true;
       allow write: if false;

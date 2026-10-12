@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/services/server/firebase-admin";
+import { notifyUser } from "@/services/server/push";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { chargeCard, rejectionMessage, PaymentError } from "@/services/server/mercadopago";
 import { buildEnrollment, commitEnrollment } from "@/services/server/academies";
@@ -39,6 +40,8 @@ export async function POST(request: Request) {
     await adminDb().runTransaction((tx) =>
       commitEnrollment(tx, draft, { paymentStatus: "paid", method: "free" }) // solo clases gratis llegan aquí,
     );
+    const c = (await adminDb().collection("academy_classes").doc(draft.classId).get()).data();
+    await notifyUser(caller.uid, { kind: "academy_enrolled", className: c?.name || "tu clase" });
     return NextResponse.json({ ok: true, enrollmentId: draft.enrollmentId });
   } catch (error: any) {
     if (error instanceof PaymentError) return NextResponse.json({ error: error.message }, { status: error.status });

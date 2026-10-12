@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/services/server/firebase-admin";
+import { notifyUser } from "@/services/server/push";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { chargeCard, rejectionMessage, PaymentError } from "@/services/server/mercadopago";
 import { buildRegistration, commitRegistration } from "@/services/server/tournaments";
@@ -38,6 +39,8 @@ export async function POST(request: Request) {
     await adminDb().runTransaction((tx) =>
       commitRegistration(tx, draft, { paymentStatus: "paid", method: "free" }) // solo torneos gratis llegan aquí,
     );
+    const t = (await adminDb().collection("tournaments").doc(draft.tournamentId).get()).data();
+    await notifyUser(caller.uid, { kind: "tournament_registered", tournament: t?.name || "el torneo" });
     return NextResponse.json({ ok: true, registrationId: draft.regId });
   } catch (error: any) {
     if (error instanceof PaymentError) return NextResponse.json({ error: error.message }, { status: error.status });

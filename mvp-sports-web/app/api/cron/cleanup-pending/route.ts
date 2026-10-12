@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
+import { notifyUser } from "@/services/server/push";
 import { applyAllDuePlanChanges } from "@/services/server/billing";
 import { adminDb } from "@/services/server/firebase-admin";
 import { slotOf, rebuildCourtDay } from "@/services/server/bookingProjections";
@@ -81,6 +82,7 @@ export async function GET(request: Request) {
     if (h === null || h >= -CHECKIN_GRACE_HOURS || !canMarkNoShow(b).ok) continue;
     await d.ref.update({ status: "cancelled", noShow: true, noShowBy: "sistema", updatedAt: FieldValue.serverTimestamp() });
     if (b.userId) await db.collection("users").doc(b.userId).update({ strikes: FieldValue.increment(1), lastStrikeAt: FieldValue.serverTimestamp() }).catch(() => undefined);
+    await notifyUser(b.userId, { kind: "no_show", bookingId: d.id, venue: b.tenantName || "el recinto" });
     noShows++;
   }
 

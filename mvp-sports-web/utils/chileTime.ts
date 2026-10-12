@@ -47,3 +47,6 @@ export function operatingDay(now: Date = new Date()): { day: string; from: Date;
   }
   return { day, from: chileDateTime(day, 6, 0), to: new Date(chileDateTime(day, 6, 0, 1).getTime() - 1) };
 }
+
+// Fecha legible en Chile para los avisos ("13 oct")
+export const chileDayLabel = (d: Date) => new Intl.DateTimeFormat("es-CL", { timeZone: "America/Santiago", day: "numeric", month: "short" }).format(d);

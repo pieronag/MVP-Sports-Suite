@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
+import { notifyUser } from "@/services/server/push";
 import { adminDb } from "@/services/server/firebase-admin";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { syncBooking } from "@/services/server/bookingProjections";
@@ -29,6 +30,7 @@ export async function POST(request: Request) {
   } else {
     await ref.update({ status: "cancelled", noShow: true, noShowBy: caller.uid, updatedAt: FieldValue.serverTimestamp() });
     if (b.userId) await db.collection("users").doc(b.userId).update({ strikes: FieldValue.increment(1), lastStrikeAt: FieldValue.serverTimestamp() }).catch(() => undefined);
+    await notifyUser(b.userId, { kind: "no_show", bookingId: String(bookingId), venue: b.tenantName || "el recinto" });
   }
 
   await syncBooking(String(bookingId)).catch(() => undefined);

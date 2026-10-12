@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/services/server/firebase-admin";
+import { notifyUser } from "@/services/server/push";
+import { chileDayLabel } from "@/utils/chileTime";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { allowRequest } from "@/services/server/rateLimit";
 import { worksAtTenant } from "@/services/server/tenantAccess";
@@ -28,6 +30,8 @@ export async function POST(request: Request) {
       cancelledByUser: caller.email || caller.uid,
       cancelReason: typeof reason === "string" ? reason.slice(0, 200) : null,
     });
+    const when = b.date?.toDate ? b.date.toDate() : new Date(b.date);
+    await notifyUser(b.userId, { kind: "booking_cancelled_by_venue", bookingId, venue: b.tenantName || "El recinto", date: chileDayLabel(when), time: b.startTime || "", refund: r.refundAmount });
     return NextResponse.json({ success: r.ok, refundAmount: r.refundAmount, error: r.error });
   } catch (e) {
     if (e instanceof RefundBusyError) return NextResponse.json({ error: e.message }, { status: 409 });
