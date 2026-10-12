@@ -1,5 +1,6 @@
 "use client";
 import { GlowCard, SectionPill } from "@/components/player/ui";
+import TierBadge from "@/components/player/TierBadge";
 import { uploadImage } from "@/services/client/imageUpload";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -81,7 +82,6 @@ export default function PerfilPage() {
   const [generatingCard, setGeneratingCard] = useState(false);
   const [previewUri, setPreviewUri] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
-  const [cardStyle, setCardStyle] = useState<"clasica" | "nueva">("clasica");
   const [showGlossary, setShowGlossary] = useState(false);
 
   useEffect(() => {
@@ -132,8 +132,7 @@ export default function PerfilPage() {
     }
   };
 
-  const handleGenerateCard = useCallback(async (style?: "clasica" | "nueva") => {
-    if (style) setCardStyle(style);
+  const handleGenerateCard = useCallback(async () => {
     if (!cardRef.current) return;
     setGeneratingCard(true);
     try {
@@ -393,58 +392,49 @@ export default function PerfilPage() {
       </div>
 
       <div className="px-5 mb-8">
-        <div className={`relative rounded-md overflow-hidden transition-all active:scale-[0.99] ${
-          isDark
-            ? "bg-[#0A101D] border border-white/6"
-            : "bg-white border border-slate-200"
-        } ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
-          <div className={`absolute inset-0 rounded-md pointer-events-none ${isDark ? "bg-linear-to-br from-emerald-500/2 to-transparent" : "bg-linear-to-br from-emerald-50/50 to-transparent"}`} />
-          <div className={`p-5 bg-linear-to-br ${
-            isDark
-              ? "from-[#0F172A] via-[#0F172A] to-[#064e3b]"
-              : "from-white via-white to-[#f0fdf4]"
-          }`}>
-            {/* Top row: OVR + Info */}
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-[58px] h-[76px] bg-linear-to-b from-amber-400 to-amber-600 rounded-md flex flex-col items-center justify-center rotate-[-4deg] shrink-0">
-                <span className="text-black/60 font-medium text-[11px] tracking-[0.06em]">OVR</span>
-                <span className="text-black font-bold text-[20px] leading-none mt-0.5">{ovr}</span>
+        <div className="relative rounded-md overflow-hidden bg-[#020611] border border-white/6">
+          {/* Mini carta: foto con degradado, isotipo, valoración y rango */}
+          <div className="relative h-[260px]">
+            {photoURL ? (
+              <img src={photoURL} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center" style={{ background: "radial-gradient(80% 70% at 50% 40%, rgba(0,223,130,0.18), #0A101D 70%)" }}>
+                <span className="text-white/15 text-[96px] font-heading font-black">{initials}</span>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <div className={`w-1.5 h-1.5 rounded-full ${isDark ? "bg-emerald-500" : "bg-emerald-600"}`} />
-                  <span className={`font-semibold text-[12px] ${isDark ? "text-emerald-400/80" : "text-emerald-600/80"}`}>Valoración MVP 2026</span>
-                </div>
-                <p className={`font-semibold text-[15px] ${isDark ? "text-white" : "text-slate-900"}`}>{displayName}</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-500">{tierInfo.name.toUpperCase()}</span>
-                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{xp.toLocaleString("es-CL")} XP</span>
-                </div>
-              </div>
+            )}
+            <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(2,6,17,0.5) 0%, rgba(2,6,17,0) 30%, rgba(2,6,17,0) 50%, rgba(2,6,17,0.9) 85%, #020611 100%)" }} />
+            <img src="/icons/logo-mark.png" alt="" className="absolute top-4 left-4 w-12 h-12 object-contain brightness-0 invert" />
+            <div className="absolute top-3 right-4 text-right">
+              <p className="text-white text-[52px] font-heading font-black leading-none tracking-tight">{ovr}</p>
+              <p className="text-[#00df82] text-[12px] font-semibold">Valoración</p>
             </div>
-
-            {/* Stats Grid */}
-            <div className={`grid grid-cols-4 gap-2 pt-4 border-t ${isDark ? "border-white/6" : "border-slate-200"}`}>
+            <div className="absolute left-4 right-4 bottom-3">
+              <TierBadge name={tierInfo.name} />
+              <p className="text-white text-[26px] font-heading font-black leading-tight tracking-tight mt-2 truncate">{displayName}</p>
+              <p className="text-[#00df82] text-[13px] font-semibold">{[mainSport, position].filter(Boolean).join(" · ")}</p>
+            </div>
+          </div>
+          <div className="px-4 pb-4">
+            <div className="grid grid-cols-4 rounded-md bg-[#0A101D] border border-white/6">
               {[
-                { label: "Partidos", value: stats.matchesPlayed },
-                { label: "Victorias", value: stats.matchesWon },
-                { label: "Goles", value: stats.goals },
-                { label: "MVP", value: stats.mvps },
-              ].map((s) => (
-                <div key={s.label} className="text-center">
-                  <p className={`font-semibold text-[12px] ${isDark ? "text-white" : "text-slate-900"}`}>{s.value}</p>
-                  <p className={`font-medium text-[12px] mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{s.label}</p>
+                { label: "Partidos", value: stats.matchesPlayed ?? 0 },
+                { label: "Victorias", value: stats.matchesWon ?? 0 },
+                { label: "Goles", value: stats.goals ?? 0 },
+                { label: "XP", value: xp.toLocaleString("es-CL") },
+              ].map((st, i) => (
+                <div key={st.label} className={`py-3 text-center ${i ? "border-l border-white/6" : ""}`}>
+                  <p className="text-white text-[18px] font-heading font-black leading-none tabular-nums">{st.value}</p>
+                  <p className="text-slate-400 text-[11px] font-medium mt-1">{st.label}</p>
                 </div>
               ))}
             </div>
-
             {/* Generate CTA */}
             <button onClick={() => handleGenerateCard()} disabled={generatingCard}
               className="w-full mt-4 h-[46px] rounded-md bg-emerald-500 text-white font-semibold text-[12px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600 disabled:opacity-60">
               {generatingCard ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
-                <><Download size={15} /> Generar Carta MVP</>
+                <><Download size={15} /> Generar carta MVP</>
               )}
             </button>
           </div>
@@ -455,97 +445,6 @@ export default function PerfilPage() {
 
       {/* Hidden MVP Card for Capture */}
       <div style={{ position: "fixed", top: 0, left: 0, width: 0, height: 0, overflow: "hidden", zIndex: -999 }}>
-        {cardStyle === "clasica" ? (
-        <div ref={cardRef} className="font-heading" style={{ width: 750, height: 1250, backgroundColor: "#020611", overflow: "hidden", position: "relative" }}>
-          {/* Player Image Background */}
-          {photoURL ? (
-            <img src={photoURL} alt="" crossOrigin="anonymous" className="absolute inset-0 w-full h-full object-cover" />
-          ) : (
-            <div className="absolute inset-0 bg-linear-to-br from-[#0a0a2e] via-[#0f0f3d] to-[#064e3b]" />
-          )}
-          {/* Cinematic Overlay */}
-          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(2,6,23,0.5) 0%, transparent 40%, rgba(2,6,23,0.9) 100%)" }} />
-
-          {/* Top Left: MVP Logo (Zoomed & Aligned) */}
-          <div className="absolute" style={{ top: 60, left: 50 }}>
-            <img src="/icons/logo-mark.png" alt="" style={{ width: 150, height: 150, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
-          </div>
-
-          {/* Top Right: OVR Rating (Refined Style) */}
-          <div className="absolute" style={{ top: 60, right: 60, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-            <span style={{ color: "white", fontSize: 140, fontWeight: 900, lineHeight: "140px", textShadow: "0 0 20px rgba(0,0,0,0.6)" }}>{ovr}</span>
-            <div style={{ height: 5, width: 140, backgroundColor: "#00df82", marginTop: -5, marginBottom: 10 }} />
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-              <span style={{ color: "#00df82", fontSize: 18, fontWeight: 900, letterSpacing: 3 }}>VALORACIÓN</span>
-              <span style={{ color: "#00df82", fontSize: 18, fontWeight: 900, letterSpacing: 3 }}>GENERAL</span>
-            </div>
-          </div>
-
-          {/* Player Position Vertical */}
-          <div className="absolute" style={{ left: -500, top: "42%", width: 1200, display: "flex", justifyContent: "center", transform: "rotate(-90deg)", transformOrigin: "center center" }}>
-            <span style={{ color: "white", fontSize: 110, fontWeight: 900, opacity: 0.4, letterSpacing: 3, textAlign: "center", textTransform: "uppercase" }}>{position}</span>
-          </div>
-
-          {/* Bottom Section: TOPPS NOW STYLE NAMEPLATE */}
-          <div className="absolute bottom-0 w-full" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            {/* Name White Box (Adaptive) */}
-            <div style={{
-              backgroundColor: "white",
-              padding: "22px 0",
-              transform: "skewX(-10deg)",
-              zIndex: 20,
-              boxShadow: "0 15px 40px rgba(0,0,0,0.4)",
-              border: "3px solid #f1f5f9",
-              width: "auto",
-              minWidth: "60%",
-              maxWidth: "90%",
-              display: "flex",
-              justifyContent: "center"
-            }}>
-              <span style={{
-                color: "#000",
-                fontSize: 56,
-                fontWeight: 900,
-                textTransform: "uppercase",
-                letterSpacing: -1,
-                transform: "skewX(10deg)",
-                textAlign: "center",
-                padding: "0 60px",
-                whiteSpace: "nowrap"
-              }}>{displayName}</span>
-            </div>
-
-            {/* Dark Info Bar (Full Width Banner) */}
-            <div style={{
-              backgroundColor: "#020611",
-              width: "100%",
-              height: 104,
-              marginTop: -20,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderTop: "5px solid #00df82",
-              zIndex: 10
-            }}>
-              <span style={{ color: "white", fontSize: 28, fontWeight: 900, textTransform: "uppercase", letterSpacing: 3 }}>
-                {mainSport ? `${mainSport} • ` : ""}NIVEL {tierInfo.name.toUpperCase()} • 2026
-              </span>
-            </div>
-
-            {/* Geometric Pattern Bar (Brand Colors: Cyan, Emerald, Blue) */}
-            <div style={{ display: "flex", flexDirection: "row", width: "100%", height: 50 }}>
-              {["#00df82", "#10b981", "#059669", "#0f766e", "#00df82", "#34d399", "#047857", "#10b981", "#00df82", "#065f46"].map((c, i) => (
-                <div key={i} style={{ flex: 1, backgroundColor: c }} />
-              ))}
-            </div>
-          </div>
-
-          {/* Bottom Branding */}
-          <div className="absolute" style={{ bottom: 65, width: "100%", display: "flex", justifyContent: "center", zIndex: 30 }}>
-            <span style={{ color: "white", fontSize: 16, fontWeight: 900, opacity: 0.55, letterSpacing: 2 }}>TODOS LOS DERECHOS RESERVADOS</span>
-          </div>
-        </div>
-        ) : (
         <div ref={cardRef} className="font-heading" style={{ width: 750, height: 1250, background: "#020611", position: "relative", overflow: "hidden" }}>
           {/* Foto en un marco redondeado, como las cards de la app */}
           <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: "#0A101D" }}>
@@ -564,9 +463,8 @@ export default function PerfilPage() {
               <span style={{ color: "#00df82", fontSize: 24, fontWeight: 800, marginTop: 4 }}>Valoración</span>
             </div>
             {/* Rango sobre la foto */}
-            <div style={{ position: "absolute", left: 60, top: 750, display: "flex", alignItems: "center", gap: 10, background: "rgba(2,6,17,0.7)", border: "1px solid rgba(0,223,130,0.35)", borderRadius: 10, padding: "10px 18px" }}>
-              <span style={{ width: 12, height: 12, borderRadius: 999, background: "#00df82" }} />
-              <span style={{ color: "#fff", fontSize: 24, fontWeight: 800 }}>Nivel {tierInfo.name}</span>
+            <div style={{ position: "absolute", left: 60, top: 742 }}>
+              <TierBadge name={tierInfo.name} scale={2.1} />
             </div>
           </div>
 
@@ -597,20 +495,12 @@ export default function PerfilPage() {
             <span style={{ color: "#64748b", fontSize: 22, fontWeight: 700 }}>mvpsports.cl</span>
           </div>
         </div>
-        )}
       </div>
 
       {/* Preview Modal */}
       {showPreview && previewUri && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 px-6" onClick={() => setShowPreview(false)}>
           <div className="w-full max-w-[340px]" onClick={(e) => e.stopPropagation()}>
-            <div className="grid grid-cols-2 gap-1 p-1 mb-3 rounded-md bg-white/8" role="tablist" aria-label="Estilo de la carta">
-              {([["clasica", "Clásica"], ["nueva", "Nueva"]] as const).map(([id, label]) => (
-                <button key={id} role="tab" aria-selected={cardStyle === id} disabled={generatingCard}
-                  onClick={() => { if (cardStyle !== id) handleGenerateCard(id); }}
-                  className={`h-10 rounded-md text-[13px] font-semibold transition-colors ${cardStyle === id ? "bg-emerald-500 text-white" : "text-slate-300"}`}>{label}</button>
-              ))}
-            </div>
             <div className="overflow-hidden border-2 border-emerald-500/40" style={{ borderRadius: 5, aspectRatio: "3/5", maxHeight: "76vh" }}>
               <img src={previewUri} alt="MVP Card" className="w-full h-full object-contain" />
             </div>
