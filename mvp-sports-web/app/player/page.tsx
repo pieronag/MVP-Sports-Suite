@@ -411,18 +411,6 @@ export default function PlayerDashboard() {
           </div>
         </section>
 
-        {/* Carta MVP */}
-        <Link href="/player/perfil" className={`flex items-center gap-4 rounded-md ${card} p-4 active:scale-[0.99] transition-transform`}>
-          <div className="w-[52px] h-[66px] bg-linear-to-b from-amber-400 to-amber-600 rounded-md flex flex-col items-center justify-center rotate-[-4deg] shrink-0">
-            <span className="text-black/60 font-medium text-[10px]">OVR</span>
-            <span className="text-black font-bold text-[18px] leading-none">{ovr}</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className={`text-[14px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>Tu carta MVP 2026</p>
-            <p className={`text-[12px] ${muted}`}>Genérala y compártela con tus stats</p>
-          </div>
-          <ChevronRight size={18} className={muted} />
-        </Link>
       </div>
     </div>
   );

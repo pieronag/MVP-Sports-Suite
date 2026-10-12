@@ -122,7 +122,7 @@ export default function PerfilPage() {
     if (!file || !user) return;
     setUploading(true);
     try {
-      const url = await uploadImage(file, { folder: "avatars", maxSize: 512 });
+      const url = await uploadImage(file, { folder: "avatars", maxSize: 1440, quality: 0.86 }) // nítida también a tamaño de carta MVP;
       await updateDoc(doc(db, "users", user.uid), { photoURL: url });
       await reloadProfile();
     } catch (err) {
@@ -139,13 +139,16 @@ export default function PerfilPage() {
       // Wait a frame for rendering to settle (font loading, image rasterization)
       await new Promise((r) => requestAnimationFrame(r));
       await new Promise((r) => requestAnimationFrame(r));
+      // Calidad: fuentes cargadas y fotos decodificadas antes de capturar
+      await document.fonts?.ready;
+      await Promise.all(Array.from(cardRef.current.querySelectorAll("img")).map((im) => im.decode().catch(() => undefined)));
       const { toPng } = await import("html-to-image");
       // Hojas de otros dominios (p. ej. las fuentes que carga Google Maps) no se pueden leer: se apartan durante la captura
       const foreign = Array.from(document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')).filter((l) => { try { return new URL(l.href).origin !== location.origin; } catch { return false; } });
       const spots = foreign.map((l) => { const mark = document.createComment(""); l.replaceWith(mark); return { l, mark }; });
       let dataUrl: string;
       try {
-        dataUrl = await toPng(cardRef.current, { quality: 1, pixelRatio: 2, cacheBust: true, backgroundColor: "#020611" });
+        dataUrl = await toPng(cardRef.current, { quality: 1, pixelRatio: 3, cacheBust: true, backgroundColor: "#020611" });
       } finally {
         spots.forEach(({ l, mark }) => mark.replaceWith(l));
       }
@@ -475,7 +478,7 @@ export default function PerfilPage() {
           </div>
 
           {/* Estadísticas en una card, como en el perfil */}
-          <div style={{ position: "absolute", top: 1000, left: 36, right: 36, height: 150, background: "#0A101D", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 18, display: "flex" }}>
+          <div style={{ position: "absolute", top: 1000, left: 36, right: 36, height: 150, background: "#0A101D", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, display: "flex" }}>
             {[
               { k: "Partidos", v: stats.matchesPlayed ?? 0 },
               { k: "Victorias", v: stats.matchesWon ?? 0 },
