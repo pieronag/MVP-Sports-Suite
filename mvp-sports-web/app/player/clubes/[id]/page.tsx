@@ -209,7 +209,7 @@ export default function VenueDetailPage() {
   }, [venue]);
 
   const scheduleSummary = useMemo(() => {
-    if (!venue) return "Lunes a Domingo: 08:00 - 23:00";
+    if (!venue) return "Lunes a domingo: 08:00 - 23:00";
     const s = (venue as any).schedule;
     const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
     const dayNames = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
@@ -695,14 +695,14 @@ export default function VenueDetailPage() {
 
       {/* Rules Modal */}
       {showRules && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowRules(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowRules(false)}>
           <div className={`w-full max-w-sm rounded-md border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className={`flex items-center justify-between px-5 py-4 border-b ${isDark ? "border-white/6" : "border-slate-200"}`}>
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-md flex items-center justify-center bg-red-500/10">
                   <Ban size={16} className="text-red-400" />
                 </div>
-                <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Reglas del Recinto</p>
+                <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Reglas del recinto</p>
               </div>
               <button aria-label="Cerrar" onClick={() => setShowRules(false)} className="w-8 h-8 rounded-md flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
                 <X size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />
@@ -717,7 +717,7 @@ export default function VenueDetailPage() {
               ))}
               {venueData?.cancellationPolicy && (
                 <div className={`p-4 rounded-md border ${isDark ? "bg-amber-500/5 border-amber-500/10" : "bg-amber-50 border-amber-200"}`}>
-                  <p className={`text-[12px] font-semibold mb-1 ${isDark ? "text-amber-400" : "text-amber-600"}`}>Política de Cancelación</p>
+                  <p className={`text-[12px] font-semibold mb-1 ${isDark ? "text-amber-400" : "text-amber-600"}`}>Política de cancelación</p>
                   <p className={`text-[11px] font-medium leading-snug ${isDark ? "text-slate-300" : "text-slate-700"}`}>{venueData.cancellationPolicy}</p>
                 </div>
               )}

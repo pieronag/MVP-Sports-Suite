@@ -94,7 +94,7 @@ const getStatusInfo = (booking: any, C: any) => {
   if (booking.status === "completed" || booking.status === "past" || booking.checkOut === true) return { label: "Jugada", color: C.sub };
   if (booking.paymentStatus === "pending") return { label: "Reservada", color: "#f59e0b" };
   if (booking.status === "confirmed") return { label: "Confirmada", color: "#10b981" };
-  return { label: "PENDIENTE", color: "#f59e0b" };
+  return { label: "Pendiente", color: "#f59e0b" };
 };
 
 
@@ -290,7 +290,7 @@ export default function ReservasPage() {
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10" aria-hidden />
-        <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center">Mis Reservas</h1>
+        <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center">Mis reservas</h1>
         <div className="w-10" />
       </div>
 
@@ -423,42 +423,42 @@ export default function ReservasPage() {
 
       {/* Ticket Modal */}
       {showTicket && selectedBooking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-5" onClick={() => setShowTicket(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowTicket(false)}>
           {selectedBooking.paymentStatus === "refund_failed" ? (
             <div className={`w-full max-w-sm rounded-md border overflow-hidden ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
               <div className={`p-5 border-b flex justify-between items-center ${isDark ? "border-white/6" : "border-slate-200"}`}>
-                <span className={`text-[15px] font-semibold tracking-tight ${textClr}`}>Devolución Pendiente</span>
+                <span className={`text-[15px] font-semibold tracking-tight ${textClr}`}>Devolución pendiente</span>
                 <button aria-label="Cerrar" onClick={() => setShowTicket(false)} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9" }}>
                   <X size={18} className={textClr} />
                 </button>
               </div>
               <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div className="text-center">
-                  <p className="text-red-500 text-[12px] font-semibold mb-1.5">Reversa Automática Fallida</p>
+                  <p className="text-red-500 text-[12px] font-semibold mb-1.5">Reversa automática fallida</p>
                   <p className={`text-[18px] font-semibold tracking-tight ${textClr}`}>${new Intl.NumberFormat("es-CL").format(Number(selectedBooking.totalPrice || selectedBooking.price || 0))}</p>
-                  <p className={`text-[11px] font-semibold ${subClr}`}>Monto Pendiente de Devolución</p>
+                  <p className={`text-[11px] font-semibold ${subClr}`}>Monto pendiente de devolución</p>
                 </div>
                 <div className="space-y-3 pt-5 border-t" style={{ borderColor: isDark ? "rgba(255,255,255,0.08)" : "#E2E8F0" }}>
                   <DetailRow label="Jugador" value={selectedBooking.clientName || "—"} subClr={subClr} textClr={textClr} />
                   <DetailRow label="Recinto" value={selectedBooking.tenantName || "—"} subClr={subClr} textClr={textClr} />
                   <DetailRow label="Cancha" value={selectedBooking.courtName || "—"} subClr={subClr} textClr={textClr} />
                   <DetailRow label="Deporte" value={selectedBooking.sport || "—"} subClr={subClr} textClr={textClr} />
-                  <DetailRow label="Fecha Partido" value={getFormattedDate(selectedBooking.date).full} subClr={subClr} textClr={textClr} />
+                  <DetailRow label="Fecha partido" value={getFormattedDate(selectedBooking.date).full} subClr={subClr} textClr={textClr} />
                   <DetailRow label="Horario" value={`${selectedBooking.startTime} HRS`} subClr={subClr} textClr={textClr} />
-                  <DetailRow label="Método Pago" value="Online (Mercado Pago)" subClr={subClr} textClr={textClr} />
+                  <DetailRow label="Método pago" value="Online (Mercado Pago)" subClr={subClr} textClr={textClr} />
                   <div className="flex justify-between items-center py-0.5">
-                    <span className={`text-[12px] font-semibold ${subClr}`}>Estado Reclamación</span>
-                    <span className="text-red-500 text-[11px] font-semibold">Manual Pendiente</span>
+                    <span className={`text-[12px] font-semibold ${subClr}`}>Estado reclamación</span>
+                    <span className="text-red-500 text-[11px] font-semibold">Manual pendiente</span>
                   </div>
                   <div className="h-px border-t" style={{ borderColor: isDark ? "rgba(255,255,255,0.08)" : "#E2E8F0" }} />
                   <DetailRow label="ID Reserva" value={selectedBooking.id || "—"} subClr={subClr} textClr={textClr} />
                   <div className="flex justify-between items-center py-0.5">
-                    <span className={`text-[12px] font-semibold ${subClr}`}>Código Validación</span>
+                    <span className={`text-[12px] font-semibold ${subClr}`}>Código validación</span>
                     <span className="text-red-500 text-[11px] font-semibold">MVP-REFUND-{(selectedBooking.id || "").substring(0, 8).toUpperCase()}</span>
                   </div>
                 </div>
                 <div className={`p-5 rounded-md border space-y-2 ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
-                  <p className="text-red-500 text-[12px] font-semibold">Instrucciones para Devolución</p>
+                  <p className="text-red-500 text-[12px] font-semibold">Instrucciones para devolución</p>
                   <p className={`text-[11px] font-semibold leading-[14px] ${subClr}`}>
                     Debido a una desconexión temporal con la pasarela de pagos, el sistema automático no pudo reversar tu dinero. Presenta este comprobante de validación digital directamente al administrador o dueño del recinto deportivo para solicitar tu transferencia manual por el monto total indicado arriba.
                   </p>
@@ -503,15 +503,15 @@ export default function ReservasPage() {
                     <X size={20} className={textClr} />
                   </button>
                 </div>
-                <p className={`text-[12px] font-semibold mb-1 ${subClr}`}>RECINTO</p>
+                <p className={`text-[12px] font-semibold mb-1 ${subClr}`}>Recinto</p>
                 <p className={`text-[18px] font-semibold mb-5 ${textClr}`}>{selectedBooking.tenantName}</p>
                 <div className="flex gap-8">
                   <div>
-                    <p className={`text-[12px] font-semibold mb-1 ${subClr}`}>CANCHA</p>
+                    <p className={`text-[12px] font-semibold mb-1 ${subClr}`}>Cancha</p>
                     <p className={`text-[13px] font-semibold ${textClr}`}>{selectedBooking.courtName}</p>
                   </div>
                   <div>
-                    <p className={`text-[12px] font-semibold mb-1 ${subClr}`}>ESTADO</p>
+                    <p className={`text-[12px] font-semibold mb-1 ${subClr}`}>Estado</p>
                     <p className="text-[13px] font-semibold" style={{ color: modalStatus.color }}>{modalStatus.label}</p>
                   </div>
                 </div>
@@ -541,7 +541,7 @@ export default function ReservasPage() {
 
       {/* Feedback Modal */}
       {fbVisible && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-10" onClick={() => setFbVisible(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setFbVisible(false)}>
           <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-[70px] h-[70px] rounded-full flex items-center justify-center mb-5" style={{ backgroundColor: fbType === "error" ? "#ef444422" : "#10b98122" }}>
               {fbType === "error" ? <XCircle color="#ef4444" size={35} /> : <CheckCircle2 color="#10b981" size={35} />}
@@ -557,13 +557,13 @@ export default function ReservasPage() {
 
       {/* Survey Modal */}
       {showSurveyModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowSurveyModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowSurveyModal(false)}>
           <div className={`w-full max-w-sm rounded-md p-7 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col items-center mb-6">
               <div className="w-[60px] h-[60px] rounded-md flex items-center justify-center mb-4" style={{ backgroundColor: "#10b98115" }}>
                 <Star color="#10b981" size={30} fill="#10b981" />
               </div>
-              <p className={`text-[18px] font-semibold ${textClr}`}>Tu Experiencia</p>
+              <p className={`text-[18px] font-semibold ${textClr}`}>Tu experiencia</p>
               <p className={`text-[11px] font-semibold text-center mt-1 ${subClr}`}>¿Qué te pareció el recinto y el servicio hoy?</p>
             </div>
             <div className="flex justify-center gap-2.5 mb-7">
@@ -596,7 +596,7 @@ export default function ReservasPage() {
 
       {/* Cancel Modal */}
       {showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-10" onClick={() => setShowCancelModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowCancelModal(false)}>
           <div className={`w-full max-w-sm rounded-md p-7 border flex flex-col items-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-20 h-20 rounded-full flex items-center justify-center mb-5" style={{ backgroundColor: (cancelModalInfo.danger ? "#ef4444" : "#10b981") + "15" }}>
               <Trash2 size={40} color={cancelModalInfo.danger ? "#ef4444" : "#f59e0b"} />

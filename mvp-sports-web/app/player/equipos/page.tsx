@@ -23,7 +23,7 @@ const SPORTS_CONFIG = [
 function Modal({ isOpen, onClose, children, isDark }: { isOpen: boolean; onClose: () => void; children: React.ReactNode; isDark: boolean }) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={onClose}>
       <div className={`w-full max-w-md rounded-md p-6 ${isDark ? "bg-[#0A101D] border border-white/6" : "bg-white border border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
@@ -99,7 +99,7 @@ export default function EquiposExplorePage() {
                 <Plus color="white" size={22} strokeWidth={2.5} />
               </div>
               <div className="text-left flex-1">
-                <p className={`font-semibold text-[12px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Crear Equipo</p>
+                <p className={`font-semibold text-[12px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Crear equipo</p>
                 <p className={`text-[11px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Funda tu escuadrón</p>
               </div>
               <ArrowRight size={16} className="text-emerald-500 shrink-0" />
@@ -113,7 +113,7 @@ export default function EquiposExplorePage() {
                 <LogIn color="white" size={22} strokeWidth={2.5} />
               </div>
               <div className="text-left flex-1">
-                  <p className={`font-semibold text-[12px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Unirse a Equipo</p>
+                  <p className={`font-semibold text-[12px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Unirse a equipo</p>
                 <p className={`text-[11px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Con código</p>
               </div>
               <ArrowRight size={16} className="text-emerald-500 shrink-0" />
@@ -137,7 +137,7 @@ export default function EquiposExplorePage() {
           </div>
         </button>
 
-        <SectionPill label="Mis Escuadrones" />
+        <SectionPill label="Mis escuadrones" />
 
         {loading ? (
           <div className="flex justify-center py-10">
@@ -159,7 +159,7 @@ export default function EquiposExplorePage() {
                     <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
                     <div className="absolute bottom-4 left-5 right-5">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <span className="bg-emerald-500 px-2.5 py-1 rounded-md text-white font-semibold text-[11px]">{(team.sport || "POLIDEPORTIVO").toUpperCase()}</span>
+                        <span className="bg-emerald-500 px-2.5 py-1 rounded-md text-white font-semibold text-[11px]">{team.sport || "Polideportivo"}</span>
                         {team.ownerId === user?.uid && <span className="bg-white/20 px-2.5 py-1 rounded-md text-white font-semibold text-[12px] border border-white/20">Capitán</span>}
                       </div>
                       <h3 className="text-white text-[16px] font-semibold">{team.name}</h3>
@@ -184,7 +184,7 @@ export default function EquiposExplorePage() {
       {/* Create Team Modal */}
       <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} isDark={isDark}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-heading font-black text-[16px]">Nuevo Equipo</h2>
+          <h2 className="font-heading font-black text-[16px]">Nuevo equipo</h2>
           <button aria-label="Cerrar" onClick={() => setShowCreateModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/6 transition-colors">
             <X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
           </button>
@@ -208,14 +208,14 @@ export default function EquiposExplorePage() {
         </div>
         <button onClick={handleCreateTeam} disabled={actionLoading || !newTeamName.trim()}
           className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
-          {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Crear Equipo"}
+          {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Crear equipo"}
         </button>
       </Modal>
 
       {/* Join by Code Modal */}
       <Modal isOpen={showJoinModal} onClose={() => setShowJoinModal(false)} isDark={isDark}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-heading font-black text-[16px]">Unirse a Equipo</h2>
+          <h2 className="font-heading font-black text-[16px]">Unirse a equipo</h2>
           <button aria-label="Cerrar" onClick={() => setShowJoinModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/6 transition-colors">
             <X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
           </button>

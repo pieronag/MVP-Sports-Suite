@@ -283,8 +283,8 @@ export default function EstadisticasPage() {
       if (isNoShow) ds = 'no-show'; else if (isCompleted) ds = 'completed'; else if (b.status === 'confirmed') ds = 'confirmed'; else if (b.status === 'cancelled') ds = 'cancelled'; else if (b.status === 'pending') ds = 'pending';
       const isWin = bData.isWin === true && isCompleted;
       const isLoss = bData.isWin === false && isCompleted;
-      let rt = 'EN PROCESO', rtp = 'process';
-      if (isWin) { rt = 'VICTORIA'; rtp = 'win'; } else if (isLoss) { rt = 'DERROTA'; rtp = 'loss'; } else if (ds === 'completed') { rt = 'FINALIZADO'; rtp = 'completed'; } else if (ds === 'no-show') { rt = 'INASISTENCIA'; rtp = 'no-show'; } else if (ds === 'cancelled') { rt = 'CANCELADO'; rtp = 'cancelled'; } else if (ds === 'confirmed') { rt = 'CONFIRMADO'; rtp = 'confirmed'; } else if (ds === 'pending') { rt = 'PENDIENTE'; rtp = 'pending'; }
+      let rt = 'En proceso', rtp = 'process';
+      if (isWin) { rt = 'Victoria'; rtp = 'win'; } else if (isLoss) { rt = 'Derrota'; rtp = 'loss'; } else if (ds === 'completed') { rt = 'Finalizado'; rtp = 'completed'; } else if (ds === 'no-show') { rt = 'Inasistencia'; rtp = 'no-show'; } else if (ds === 'cancelled') { rt = 'Cancelado'; rtp = 'cancelled'; } else if (ds === 'confirmed') { rt = 'Confirmado'; rtp = 'confirmed'; } else if (ds === 'pending') { rt = 'Pendiente'; rtp = 'pending'; }
       let matchXP: number | null = null;
       if (ds === 'no-show') { matchXP = -(gamification?.xpPerNoShow || 50); } else if (isCompleted && ds !== 'cancelled') {
         matchXP = 0; const sportKey = b.sport ? b.sport.toLowerCase() : 'futbol';
@@ -347,14 +347,14 @@ export default function EstadisticasPage() {
           <div className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Rango Actual</p>
+                <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Rango actual</p>
                 <p className="text-[16px] font-semibold" style={{ color: analytics.rangoActual.color }}>{analytics.rangoActual.name}</p>
                 <div className="mt-2 px-3 py-1.5 rounded-md border self-start inline-block" style={{ borderColor: isDark ? 'rgba(255,255,255,0.06)' : '#E2E8F0' }}>
                   <span className={`text-[11px] font-semibold ${isDark ? "text-slate-300" : "text-slate-700"}`}>OVR: {analytics.nivel}</span>
                 </div>
               </div>
               <div className="text-right">
-                <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>XP Totales</p>
+                <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>XP total</p>
                 <p className={`text-[16px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{analytics.puntosTotales.toLocaleString()}</p>
                 <p className="text-emerald-500 text-[12px] font-semibold">XP acumulados</p>
               </div>
@@ -362,7 +362,7 @@ export default function EstadisticasPage() {
             <div className="mt-5">
               <div className="flex justify-between mb-2">
                 <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                  {analytics.rangoActual.id === analytics.siguienteRango.id ? 'Nivel máximo' : `SIGUIENTE: ${analytics.siguienteRango.name}`}
+                  {analytics.rangoActual.id === analytics.siguienteRango.id ? 'Nivel máximo' : `Siguiente: ${analytics.siguienteRango.name}`}
                 </span>
                 <span className={`text-[11px] font-semibold ${isDark ? "text-slate-300" : "text-slate-700"}`}>{analytics.progreso}%</span>
               </div>
@@ -374,12 +374,12 @@ export default function EstadisticasPage() {
         </GlowCard>
 
         {/* Physical Stats */}
-        <SectionPill label="Datos Físicos" />
+        <SectionPill label="Datos físicos" />
         <div className="flex gap-3">
           {[
-            { label: 'ALTURA', value: userProfile?.height ? `${userProfile.height} CM` : '---', icon: Ruler },
-            { label: 'PESO', value: userProfile?.weight ? `${userProfile.weight} KG` : '---', icon: Weight },
-            { label: 'PIE', value: userProfile?.dominantFoot || '---', icon: Footprints }
+            { label: 'Altura', value: userProfile?.height ? `${userProfile.height} cm` : '---', icon: Ruler },
+            { label: 'Peso', value: userProfile?.weight ? `${userProfile.weight} kg` : '---', icon: Weight },
+            { label: 'Pie hábil', value: userProfile?.dominantFoot || '---', icon: Footprints }
           ].map((f) => (
             <GlowCard key={f.label} isDark={isDark} className="flex-1">
               <div className="p-4 flex flex-col items-center text-center">
@@ -563,7 +563,7 @@ export default function EstadisticasPage() {
                       {selectedMatch.venueName || selectedMatch.tenantName || 'Recinto'}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="px-2 py-0.5 rounded text-[12px] font-semibold bg-emerald-500/10 text-emerald-500">{selectedMatch.sport || 'FÚTBOL'}</span>
+                      <span className="px-2 py-0.5 rounded text-[12px] font-semibold bg-emerald-500/10 text-emerald-500">{selectedMatch.sport || 'Fútbol'}</span>
                       <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{selectedMatch.startTime || selectedMatch.time || '19:00'}</span>
                     </div>
                   </div>

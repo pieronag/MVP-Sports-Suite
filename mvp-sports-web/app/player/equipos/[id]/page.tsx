@@ -206,7 +206,7 @@ export default function EquipoDetailPage() {
         )}
         <div className="absolute bottom-6 left-6 right-6">
           <div className="flex items-center gap-2 mb-2">
-            <span className="bg-emerald-500 px-3 py-1 rounded-md text-white font-semibold text-[12px] border border-white/10">{team.sport?.toUpperCase() || "GENERAL"}</span>
+            <span className="bg-emerald-500 px-3 py-1 rounded-md text-white font-semibold text-[12px] border border-white/10">{team.sport || "Polideportivo"}</span>
           </div>
           <h1 className="text-white text-[18px] font-heading font-black line-clamp-2 wrap-break-word wrap-anywhere">{team.name}</h1>
         </div>
@@ -261,7 +261,7 @@ export default function EquipoDetailPage() {
         {/* Pending Requests (captain only) */}
         {isOwner && team.joinRequests && team.joinRequests.length > 0 && (
           <>
-            <SectionPill label="Solicitudes Pendientes" />
+            <SectionPill label="Solicitudes pendientes" />
             <GlowCard isDark={isDark}>
               <div className="divide-y divide-emerald-500/5">
                 {(team.joinRequests || []).map((reqUid: string) => {
@@ -328,24 +328,24 @@ export default function EquipoDetailPage() {
         <div className="fixed inset-0 z-50 bg-black/70" onClick={() => setShowMenu(false)}>
           <div className="absolute bottom-0 left-0 right-0 rounded-t-md overflow-hidden" style={{ backgroundColor: isDark ? "#0A101D" : "white" }} onClick={(e) => e.stopPropagation()}>
             <div className="px-5 py-4 border-b" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0" }}>
-              <p className={`font-semibold text-center ${isDark ? "text-slate-100" : "text-slate-900"}`}>Opciones del Equipo</p>
+              <p className={`font-semibold text-center ${isDark ? "text-slate-100" : "text-slate-900"}`}>Opciones del equipo</p>
             </div>
             {isOwner && (
               <button onClick={() => { setShowMenu(false); openEdit(); }} className="flex items-center gap-4 w-full px-6 py-4 transition-all hover:bg-white/2">
                 <div className="w-10 h-10 rounded-md flex items-center justify-center bg-blue-500/10"><Edit size={20} className="text-blue-400" /></div>
-                <span className={`text-[13px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Editar Equipo</span>
+                <span className={`text-[13px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Editar equipo</span>
               </button>
             )}
             {!isOwner && (
               <button onClick={() => { setShowMenu(false); setShowLeaveModal(true); }} className="flex items-center gap-4 w-full px-6 py-4 transition-all hover:bg-white/2">
                 <div className="w-10 h-10 rounded-md flex items-center justify-center bg-red-500/10"><LogOut size={20} className="text-red-400" /></div>
-                <span className={`text-[13px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Salir del Equipo</span>
+                <span className={`text-[13px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>Salir del equipo</span>
               </button>
             )}
             {isOwner && (
               <button onClick={() => { setShowMenu(false); setShowDeleteModal(true); }} className="flex items-center gap-4 w-full px-6 py-4 transition-all hover:bg-white/2">
                 <div className="w-10 h-10 rounded-md flex items-center justify-center bg-red-500/10"><Trash2 size={20} className="text-red-400" /></div>
-                <span className="text-[13px] font-medium text-red-400">Eliminar Equipo</span>
+                <span className="text-[13px] font-medium text-red-400">Eliminar equipo</span>
               </button>
             )}
             <button onClick={() => setShowMenu(false)} className="w-full py-4 text-center text-[13px] font-semibold border-t" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", color: isDark ? "#94A3B8" : "#64748B" }}>Cancelar</button>
@@ -355,10 +355,10 @@ export default function EquipoDetailPage() {
 
       {/* Edit Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowEditModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowEditModal(false)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar Equipo</p>
+              <p className={`font-semibold text-[15px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar equipo</p>
               <button aria-label="Cerrar" onClick={() => setShowEditModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} /></button>
             </div>
             <div className="mb-4">
@@ -378,7 +378,7 @@ export default function EquipoDetailPage() {
               </div>
             </div>
             <button onClick={handleEditSave} disabled={actionLoading || !editName.trim()} className="w-full py-3.5 rounded-md bg-emerald-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50">
-              {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" /> : "Guardar Cambios"}
+              {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" /> : "Guardar cambios"}
             </button>
           </div>
         </div>
@@ -386,7 +386,7 @@ export default function EquipoDetailPage() {
 
       {/* Delete Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setShowDeleteModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowDeleteModal(false)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-red-500/10 flex items-center justify-center mx-auto mb-4"><Trash2 size={32} className="text-red-500" /></div>
             <p className={`text-[15px] font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Eliminar Equipo?</p>
@@ -403,7 +403,7 @@ export default function EquipoDetailPage() {
 
       {/* Leave Modal */}
       {showLeaveModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setShowLeaveModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowLeaveModal(false)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-red-500/10 flex items-center justify-center mx-auto mb-4"><LogOut size={32} className="text-red-500" /></div>
             <p className={`text-[15px] font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Abandonar Equipo?</p>
@@ -420,7 +420,7 @@ export default function EquipoDetailPage() {
 
       {/* Remove Member Modal */}
       {showRemoveModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setShowRemoveModal(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowRemoveModal(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-red-500/10 flex items-center justify-center mx-auto mb-4"><X size={32} className="text-red-500" /></div>
             <p className={`text-[15px] font-semibold mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Eliminar miembro?</p>
@@ -437,7 +437,7 @@ export default function EquipoDetailPage() {
 
       {/* Feedback */}
       {feedback && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setFeedback(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setFeedback(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 ${feedback.type === "success" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
               {feedback.type === "success" ? <CheckCircle2 size={32} className="text-emerald-500" /> : <AlertCircle size={32} className="text-red-500" />}

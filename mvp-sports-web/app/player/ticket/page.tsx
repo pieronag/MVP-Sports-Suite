@@ -173,7 +173,7 @@ export default function TicketPage() {
 
       <div className="px-5 -mt-10 pb-8 space-y-5">
         {/* Resumen de Reserva */}
-        <SectionPill label="Resumen de Reserva" />
+        <SectionPill label="Resumen de reserva" />
 
         {/* Ticket Info */}
         <GlowCard isDark={isDark}>
@@ -294,14 +294,14 @@ export default function TicketPage() {
 
       {/* Claim Modal */}
       {showClaimModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-5" onClick={() => setShowClaimModal(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowClaimModal(false)}>
           <div className={`w-full max-w-sm rounded-md overflow-hidden ${isDark ? "bg-[#0A101D] border border-white/6" : "bg-white border border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="p-5 flex items-center justify-between" style={{ backgroundColor: "#ef4444" }}>
               <div className="flex items-center gap-3">
                 <Receipt size={20} className="text-white" />
                 <div>
                   <p className="text-white text-[12px] font-semibold">MVP Sports Chile</p>
-                  <p className="text-white/70 text-[12px] font-medium">Solicitud de Reembolso</p>
+                  <p className="text-white/70 text-[12px] font-medium">Solicitud de reembolso</p>
                 </div>
               </div>
               <button aria-label="Cerrar" onClick={() => setShowClaimModal(false)} className="w-8 h-8 rounded-md bg-white/20 flex items-center justify-center">
@@ -310,9 +310,9 @@ export default function TicketPage() {
             </div>
             <div className="p-5 space-y-4 max-h-[65vh] overflow-y-auto">
               <div className="text-center">
-                <span className="inline-block px-3 py-1 rounded-md text-[12px] font-semibold bg-red-500/10 text-red-500 border border-red-500/20">Reversa Rechazada</span>
+                <span className="inline-block px-3 py-1 rounded-md text-[12px] font-semibold bg-red-500/10 text-red-500 border border-red-500/20">Reversa rechazada</span>
                 <p className={`text-[18px] font-bold mt-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>${new Intl.NumberFormat("es-CL").format(Number(booking?.totalPrice || 0))}</p>
-                <p className={`text-[12px] font-semibold mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Monto Pendiente de Reintegro Manual</p>
+                <p className={`text-[12px] font-semibold mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Monto pendiente de reintegro manual</p>
               </div>
               <div className={`p-4 rounded-md border space-y-2.5 ${isDark ? "bg-white/2 border-white/6" : "bg-slate-50 border-slate-200"}`}>
                 {[
@@ -332,7 +332,7 @@ export default function TicketPage() {
                   <span className={`text-[11px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{bookingId}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[12px] font-semibold text-red-500">Código Validación</span>
+                  <span className="text-[12px] font-semibold text-red-500">Código validación</span>
                   <span className="text-[11px] font-semibold text-red-500">MVP-REFUND-{(bookingId || "").toUpperCase()}</span>
                 </div>
               </div>

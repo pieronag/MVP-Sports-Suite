@@ -229,17 +229,17 @@ export default function ReportePage() {
                                     <Mail size={20} style={{ color: 'white' }} />
                                 </div>
                                 <span className="text-[11px] font-semibold text-white px-2 py-1 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}>
-                                    SLA GARANTIZADO
+                                    SLA garantizado
                                 </span>
                             </div>
-                            <p className="text-[20px] font-semibold tracking-tight text-white">Centro de Ayuda MVP</p>
+                            <p className="text-[20px] font-semibold tracking-tight text-white">Centro de ayuda MVP</p>
                             <p className="text-[11px] font-semibold mt-1.5 leading-4 text-white/85">
                                 Reporta bugs o incidencias en la app directamente a nuestro equipo de desarrollo.
                             </p>
                         </div>
 
                         {/* CATEGORY */}
-                        <p className="text-[12px] font-semibold mb-3" style={{ color: '#10b981' }}>Categoría del Problema</p>
+                        <p className="text-[12px] font-semibold mb-3" style={{ color: '#10b981' }}>Categoría del problema</p>
                         <div className="flex flex-wrap gap-2 mb-6">
                             {CATEGORIES.map(cat => (
                                 <button key={cat.id} onClick={() => setCategory(cat.id)}
@@ -334,7 +334,7 @@ export default function ReportePage() {
                         <div className="rounded-md p-5 border mb-9" style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#F1F5F9', borderColor: 'rgba(255,255,255,0.08)' }}>
                             <div className="flex items-center mb-2">
                                 <Smartphone size={16} style={{ color: '#10b981' }} />
-                                <p className="text-[12px] font-semibold ml-2 tracking-tight" style={{ color: '#F8FAFC' }}>Información de Diagnóstico</p>
+                                <p className="text-[12px] font-semibold ml-2 tracking-tight" style={{ color: '#F8FAFC' }}>Información de diagnóstico</p>
                             </div>
                             <p className="text-[11px] font-semibold leading-4 mb-4" style={{ color: '#94A3B8' }}>
                                 Los siguientes metadatos se enviarán automáticamente en segundo plano.
@@ -368,7 +368,7 @@ export default function ReportePage() {
                             {submitting ? (
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                             ) : (
-                                <>Enviar Reporte Técnico <ArrowRight size={18} /></>
+                                <>Enviar reporte técnico <ArrowRight size={18} /></>
                             )}
                         </button>
                     </div>

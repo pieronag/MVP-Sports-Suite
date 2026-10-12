@@ -166,7 +166,7 @@ function SelectRow({ icon: Icon, color, label, value, options, onSelect, disable
 function Modal({ isOpen, onClose, children, isDark }: { isOpen: boolean; onClose: () => void; children: React.ReactNode; isDark: boolean }) {
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6 animate-in fade-in duration-200" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={onClose}>
       <div className={`w-full max-w-md rounded-md p-6 ${isDark ? "bg-[#0A101D] border border-white/6" : "bg-white border border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
@@ -245,7 +245,7 @@ export default function PreferenciasPage() {
     if (formData.weight && (w < 30 || w > 200)) { showFeedbackMsg("error", "El peso debe estar entre 30 y 200 kg."); return; }
     const rutClean = cleanRut(formData.rut);
     if (formData.rut && !validateChileanRut(rutClean)) { showFeedbackMsg("error", "El RUT ingresado no es válido."); return; }
-    if (!formData.birthDate) { showFeedbackMsg("error", "La Fecha de Nacimiento es obligatoria."); return; }
+    if (!formData.birthDate) { showFeedbackMsg("error", "La fecha de nacimiento es obligatoria."); return; }
     if (!validateAge(formData.birthDate)) { showFeedbackMsg("error", "Debes ser mayor de edad (18+)."); return; }
     setSaving(true);
     try {
@@ -317,10 +317,10 @@ export default function PreferenciasPage() {
   const inputFields = (section: string) => {
     const fields: Record<string, Array<{ icon: any; color: string; label: string; key: keyof FormData; mask?: (v: string) => string; max?: number; err?: boolean; t?: string }>> = {
       personal: [
-        { icon: User, color: "#3b82f6", label: "Nombre Completo", key: "displayName", max: 60 },
+        { icon: User, color: "#3b82f6", label: "Nombre completo", key: "displayName", max: 60 },
         { icon: Phone, color: "#10b981", label: "Teléfono", key: "phone", mask: maskPhone, max: 13 },
         { icon: ShieldCheck, color: "#6366f1", label: "RUT", key: "rut", mask: maskRut, max: 12, err: formData.rut.length > 3 && !validateChileanRut(formData.rut) },
-        { icon: Calendar, color: "#ec4899", label: "Fecha de Nacimiento (DD/MM/AAAA)", key: "birthDate", mask: maskBirthDate, max: 10, err: formData.birthDate.length === 10 && !validateAge(formData.birthDate) },
+        { icon: Calendar, color: "#ec4899", label: "Fecha de nacimiento (DD/MM/AAAA)", key: "birthDate", mask: maskBirthDate, max: 10, err: formData.birthDate.length === 10 && !validateAge(formData.birthDate) },
         { icon: MapPin, color: "#f59e0b", label: "Ciudad", key: "city", max: 40 },
         { icon: Heart, color: "#f43f5e", label: "Género", key: "gender", max: 20 },
       ],
@@ -362,7 +362,7 @@ export default function PreferenciasPage() {
         <div className="mx-5 mt-5 mb-3 p-4 rounded-md bg-red-500/10 border border-red-500/20">
           <div className="flex items-center gap-2.5 mb-2">
             <AlertCircle size={16} className="text-red-400" />
-            <span className="text-red-400 font-semibold text-[12px]">Perfil Incompleto</span>
+            <span className="text-red-400 font-semibold text-[12px]">Perfil incompleto</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {!formData.displayName && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[12px] font-semibold">Nombre</span>}
@@ -393,7 +393,7 @@ export default function PreferenciasPage() {
       </div>
 
       {/* Personal Info */}
-      <SectionPill label="Información Personal" />
+      <SectionPill label="Información personal" />
       <div className="px-5">
         <GlowCard isDark={isDark}>
           <div className="divide-y divide-emerald-500/5">
@@ -409,7 +409,7 @@ export default function PreferenciasPage() {
       </div>
 
       {/* Physique */}
-      <SectionPill label="Datos Físicos" />
+      <SectionPill label="Datos físicos" />
       <div className="px-5">
         <GlowCard isDark={isDark}>
           <div className="divide-y divide-emerald-500/5">
@@ -425,11 +425,11 @@ export default function PreferenciasPage() {
       </div>
 
       {/* Gaming */}
-      <SectionPill label="Mi Juego" />
+      <SectionPill label="Mi juego" />
       <div className="px-5">
         <GlowCard isDark={isDark}>
           <div className="divide-y divide-emerald-500/5">
-            <SelectRow color="#10b981" label="Deporte Principal" value={formData.mainSport}
+            <SelectRow color="#10b981" label="Deporte principal" value={formData.mainSport}
               options={["Fútbol", "Pádel", "Tenis", "Básquetbol", "Vóleibol"]}
               onSelect={(v) => setFormData((f) => ({ ...f, mainSport: v, position: "" }))}
               sport={formData.mainSport}
@@ -438,7 +438,7 @@ export default function PreferenciasPage() {
               options={getPositions()} disabled={!formData.mainSport}
               onSelect={(v) => setFormData((f) => ({ ...f, position: v }))}
             />
-            <SelectRow icon={Target} color="#3b82f6" label="Lado Hábil" value={formData.dominantFoot}
+            <SelectRow icon={Target} color="#3b82f6" label="Lado hábil" value={formData.dominantFoot}
               options={["Derecho", "Izquierdo", "Ambidiestro"]}
               onSelect={(v) => setFormData((f) => ({ ...f, dominantFoot: v }))}
             />
@@ -451,7 +451,7 @@ export default function PreferenciasPage() {
       <div className="px-5">
         <GlowCard isDark={isDark}>
           <div className="divide-y divide-emerald-500/5">
-            <SelectRow icon={Calendar} color="#3b82f6" label="Horario Preferido" value={formData.favTime}
+            <SelectRow icon={Calendar} color="#3b82f6" label="Horario preferido" value={formData.favTime}
               options={["Mañana", "Tarde", "Noche"]} onSelect={(v) => setFormData((f) => ({ ...f, favTime: v }))}
             />
             <SelectRow icon={Activity} color="#facc15" label="Frecuencia" value={formData.frequency}
@@ -463,7 +463,7 @@ export default function PreferenciasPage() {
               <div className={`w-10 h-10 rounded-md flex items-center justify-center shrink-0 ${isDark ? "bg-amber-500/10" : "bg-slate-200"}`}>
                 {isDark ? <Moon size={20} className="text-amber-400" /> : <Sun size={20} className="text-slate-600" />}
               </div>
-              <span className="flex-1 text-left text-[14px] font-medium">Modo Oscuro</span>
+              <span className="flex-1 text-left text-[14px] font-medium">Modo oscuro</span>
               <div className={`w-11 h-6 rounded-full relative transition-colors duration-300 ${isDark ? "bg-emerald-500" : "bg-slate-300"}`}>
                 <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 shadow-sm ${isDark ? "left-6" : "left-1"}`} />
               </div>
@@ -480,7 +480,7 @@ export default function PreferenciasPage() {
             <div className="w-10 h-10 rounded-md flex items-center justify-center shrink-0 bg-rose-500/15">
               <Lock size={20} className="text-rose-400" />
             </div>
-            <span className="flex-1 text-left text-[14px] font-medium">Cambiar Contraseña</span>
+            <span className="flex-1 text-left text-[14px] font-medium">Cambiar contraseña</span>
             <ChevronRight size={16} className="text-emerald-500" />
           </button>
           <div className={`h-px ${isDark ? "bg-white/6" : "bg-slate-100"}`} />
@@ -534,16 +534,16 @@ export default function PreferenciasPage() {
       {/* Password Modal */}
       <Modal isOpen={showPasswordModal} onClose={() => { setShowPasswordModal(false); setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword(""); }} isDark={isDark}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="font-heading font-black text-[16px]">Cambiar Contraseña</h2>
+          <h2 className="font-heading font-black text-[16px]">Cambiar contraseña</h2>
           <button aria-label="Cerrar" onClick={() => { setShowPasswordModal(false); setCurrentPassword(""); setNewPassword(""); setConfirmNewPassword(""); }}
             className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/6 transition-colors">
             <X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
           </button>
         </div>
         {[
-          { label: "Contraseña Actual", value: currentPassword, set: setCurrentPassword, show: showCurrent, toggle: () => setShowCurrent(!showCurrent) },
-          { label: "Nueva Contraseña", value: newPassword, set: setNewPassword, show: showNew, toggle: () => setShowNew(!showNew) },
-          { label: "Confirmar Nueva", value: confirmNewPassword, set: setConfirmNewPassword, show: showConfirm, toggle: () => setShowConfirm(!showConfirm) },
+          { label: "Contraseña actual", value: currentPassword, set: setCurrentPassword, show: showCurrent, toggle: () => setShowCurrent(!showCurrent) },
+          { label: "Nueva contraseña", value: newPassword, set: setNewPassword, show: showNew, toggle: () => setShowNew(!showNew) },
+          { label: "Confirmar nueva", value: confirmNewPassword, set: setConfirmNewPassword, show: showConfirm, toggle: () => setShowConfirm(!showConfirm) },
         ].map((f) => (
           <div key={f.label} className="mb-4">
             <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>{f.label}</label>
@@ -574,9 +574,9 @@ export default function PreferenciasPage() {
           <h2 className="font-heading font-black text-[16px] mb-2">¿Guardar cambios?</h2>
           <p className={`text-[13px] font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Tienes modificaciones sin guardar.</p>
           <div className="space-y-2.5">
-            <button onClick={() => { setShowUnsavedModal(false); handleSave(); }} className="w-full py-3.5 rounded-md font-semibold text-[13px] bg-emerald-500 text-white hover:bg-emerald-600 transition-all active:scale-[0.98]">Guardar y Salir</button>
-            <button onClick={() => { setShowUnsavedModal(false); setFormData(initialData!); router.back(); }} className="w-full py-3.5 rounded-md font-semibold text-[13px] bg-red-500/10 text-red-400 border border-red-500/20 transition-all active:scale-[0.98]">Descartar Cambios</button>
-            <button onClick={() => setShowUnsavedModal(false)} className={`text-[11px] font-medium py-2 ${isDark ? "text-slate-500" : "text-slate-400"} hover:underline`}>Seguir Editando</button>
+            <button onClick={() => { setShowUnsavedModal(false); handleSave(); }} className="w-full py-3.5 rounded-md font-semibold text-[13px] bg-emerald-500 text-white hover:bg-emerald-600 transition-all active:scale-[0.98]">Guardar y salir</button>
+            <button onClick={() => { setShowUnsavedModal(false); setFormData(initialData!); router.back(); }} className="w-full py-3.5 rounded-md font-semibold text-[13px] bg-red-500/10 text-red-400 border border-red-500/20 transition-all active:scale-[0.98]">Descartar cambios</button>
+            <button onClick={() => setShowUnsavedModal(false)} className={`text-[11px] font-medium py-2 ${isDark ? "text-slate-500" : "text-slate-400"} hover:underline`}>Seguir editando</button>
           </div>
         </div>
       </Modal>

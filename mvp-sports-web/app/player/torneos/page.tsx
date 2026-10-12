@@ -177,7 +177,7 @@ export default function TorneosPage() {
         const closed = isClosed(t), full = isFull(t);
         const prizes = [t.prize1, t.prize2, t.prize3].filter(Boolean);
         return (
-          <div className="fixed inset-0 z-50 flex items-end bg-black/60" onClick={() => !busy && setSelected(null)}>
+          <div className="fixed inset-0 z-50 flex items-end bg-black/70 backdrop-blur-[2px] animate-in fade-in duration-200" onClick={() => !busy && setSelected(null)}>
             <div className={`w-full rounded-t-md p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] max-h-[88vh] overflow-y-auto ${isDark ? "bg-[#0A101D]" : "bg-white"}`} onClick={e => e.stopPropagation()}>
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div>

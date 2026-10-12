@@ -74,10 +74,10 @@ export default function CheckoutPage() {
     try {
       const coupon = await couponService.validateCoupon(couponInput, tenantId || "", Number(price));
       setAppliedCoupon(coupon);
-      setCustomAlert({ visible: true, title: "Cupón Aplicado", message: `Descuento del ${coupon.discount}% aplicado.`, type: "success" });
+      setCustomAlert({ visible: true, title: "Cupón aplicado", message: `Descuento del ${coupon.discount}% aplicado.`, type: "success" });
     } catch (error: any) {
       setAppliedCoupon(null);
-      setCustomAlert({ visible: true, title: "Cupón Inválido", message: error.message, type: "error" });
+      setCustomAlert({ visible: true, title: "Cupón inválido", message: error.message, type: "error" });
     } finally { setValidatingCoupon(false); }
   };
 
@@ -286,12 +286,12 @@ export default function CheckoutPage() {
 
         <div className="flex items-center justify-center gap-2 opacity-60 pt-2">
           <ShieldCheck size={14} style={{ color: activeColor }} />
-          <span className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Transacción Protegida PCI-DSS</span>
+          <span className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Transacción protegida PCI-DSS</span>
         </div>
       </div>
 
       {customAlert.visible && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => { setCustomAlert({ ...customAlert, visible: false }); if (customAlert.onClose) customAlert.onClose(); }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => { setCustomAlert({ ...customAlert, visible: false }); if (customAlert.onClose) customAlert.onClose(); }}>
           <div className={`w-full max-w-sm rounded-md p-6 ${isDark ? "bg-[#0A101D] border border-white/6" : "bg-white border border-slate-200"} text-center`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: (customAlert.type === "success" ? "#10b981" : "#ef4444") + "15" }}>
               {customAlert.type === "success" ? <CheckCircle2 size={32} className="text-emerald-500" /> : <XCircle size={32} className="text-red-500" />}

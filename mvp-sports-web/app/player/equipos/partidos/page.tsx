@@ -367,7 +367,7 @@ export default function PartidosPage() {
             <button onClick={openPublishTeam}
                 className="w-full h-[52px] rounded-md font-semibold text-[12px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
                 style={{ backgroundColor: "#10b981", color: "white" }}>
-                <Swords size={16} /> Publicar mi Equipo
+                <Swords size={16} /> Publicar mi equipo
             </button>
 
             {loading ? (
@@ -395,7 +395,7 @@ export default function PartidosPage() {
                           <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
                           <div className="absolute bottom-3 left-4 right-4">
                             <div className="flex items-center gap-2">
-                              <span className="bg-emerald-500 px-2 py-0.5 rounded-md text-white font-semibold text-[12px]">{entry.sport.toUpperCase()}</span>
+                              <span className="bg-emerald-500 px-2 py-0.5 rounded-md text-white font-semibold text-[12px]">{entry.sport}</span>
                               <span className="bg-black/40 px-2 py-0.5 rounded-md text-white/80 text-[11px] font-medium">{entry.memberCount} jugadores</span>
                             </div>
                           </div>
@@ -529,7 +529,7 @@ export default function PartidosPage() {
                 {/* My published entries */}
                 {myEntries.filter(e => e.status === "active").length > 0 && (
                   <>
-                    <SectionPill label="Mis Publicaciones" />
+                    <SectionPill label="Mis publicaciones" />
                     {myEntries.filter(e => e.status === "active").map(entry => (
                       <GlowCard key={entry.id} isDark={isDark}>
                         <div className="p-4 flex items-center gap-3">
@@ -555,7 +555,7 @@ export default function PartidosPage() {
                 {/* Challenges */}
                 {challenges.length > 0 && (
                   <>
-                    <SectionPill label="Mis Challenges" />
+                    <SectionPill label="Mis challenges" />
                     {challenges.map(c => {
                       const isReceiver = c.receiverId === uid;
                       const otherName = c.type === "team_vs_team"
@@ -620,10 +620,10 @@ export default function PartidosPage() {
 
       {/* Publish Team Modal */}
       {showPublishTeam && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowPublishTeam(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowPublishTeam(false)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Publicar mi Equipo</p>
+              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Publicar mi equipo</p>
               <button aria-label="Cerrar" onClick={() => setShowPublishTeam(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
             </div>
             <div className="mb-4">
@@ -687,7 +687,7 @@ export default function PartidosPage() {
             )}
             <button onClick={handlePublishTeam} disabled={actionLoading || !selectedTeam}
               className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
-              {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Publicar Equipo"}
+              {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Publicar equipo"}
             </button>
           </div>
         </div>
@@ -695,10 +695,10 @@ export default function PartidosPage() {
 
       {/* Publish Player Modal */}
       {showPublishPlayer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowPublishPlayer(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowPublishPlayer(false)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Estoy Disponible</p>
+              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Estoy disponible</p>
               <button aria-label="Cerrar" onClick={() => setShowPublishPlayer(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
             </div>
             <div className={`p-4 rounded-md mb-4 ${isDark ? "bg-white/4" : "bg-slate-50"}`}>
@@ -754,7 +754,7 @@ export default function PartidosPage() {
             </div>
             <button onClick={handlePublishPlayer} disabled={actionLoading || publishSports.length === 0}
               className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
-              {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Publicar Disponibilidad"}
+              {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Publicar disponibilidad"}
             </button>
           </div>
         </div>
@@ -762,7 +762,7 @@ export default function PartidosPage() {
 
       {/* Team Selector Modal */}
       {showTeamSelector && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowTeamSelector(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowTeamSelector(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Retar a {showTeamSelector.teamName}</p>
@@ -785,7 +785,7 @@ export default function PartidosPage() {
 
       {/* Confirm Challenge Modal */}
       {confirmChallenge && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setConfirmChallenge(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setConfirmChallenge(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
               <Swords size={28} className="text-emerald-500" />
@@ -797,7 +797,7 @@ export default function PartidosPage() {
               <button onClick={() => setConfirmChallenge(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
               <button onClick={() => executeChallenge(confirmChallenge.entry, confirmChallenge.team)} disabled={actionLoading}
                 className="flex-1 py-3.5 rounded-md bg-emerald-500 text-white font-semibold text-[13px] disabled:opacity-50 flex items-center justify-center">
-                {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Confirmar Reto"}
+                {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Confirmar reto"}
               </button>
             </div>
           </div>
@@ -806,7 +806,7 @@ export default function PartidosPage() {
 
       {/* Challenge Detail Modal */}
       {showChallengeDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => { setShowChallengeDetail(null); setChallengeTeamData(null); }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => { setShowChallengeDetail(null); setChallengeTeamData(null); }}>
           <div className={`w-full max-w-sm rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="h-[100px] relative bg-linear-to-br from-emerald-800 to-slate-900">
               <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
@@ -861,7 +861,7 @@ export default function PartidosPage() {
 
       {/* Confirm Action Modal (accept/decline challenge) */}
       {confirmAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setConfirmAction(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setConfirmAction(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 ${confirmAction.action === "accept" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
               {confirmAction.action === "accept" ? <CheckCircle2 size={28} className="text-emerald-500" /> : <X size={28} className="text-red-500" />}
@@ -890,7 +890,7 @@ export default function PartidosPage() {
 
       {/* Team Detail Modal */}
       {showTeamDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => { setShowTeamDetail(null); setTeamDetailData(null); }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => { setShowTeamDetail(null); setTeamDetailData(null); }}>
           <div className={`w-full max-w-sm rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="h-[130px] relative" style={{ background: showTeamDetail.teamImageUrl ? `url(${showTeamDetail.teamImageUrl}) center/cover` : `linear-gradient(135deg, #059669, #047857)` }}>
               <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent" />
@@ -982,7 +982,7 @@ export default function PartidosPage() {
 
       {/* Player Detail Modal */}
       {showPlayerDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowPlayerDetail(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowPlayerDetail(null)}>
           <div className={`w-full max-w-sm rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             {/* Photo 1:1 */}
             <div className="relative w-full" style={{ aspectRatio: "1/1", background: showPlayerDetail.photoURL ? `url(${showPlayerDetail.photoURL}) center/cover` : `linear-gradient(135deg, #059669, #047857)` }}>
@@ -1036,7 +1036,7 @@ export default function PartidosPage() {
 
       {/* Confirmar retiro de publicación */}
       {showCloseConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setShowCloseConfirm(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowCloseConfirm(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 bg-red-500/10"><X size={28} className="text-red-500" /></div>
             <p className={`font-semibold text-[14px] mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Retirar publicación?</p>
@@ -1061,10 +1061,10 @@ export default function PartidosPage() {
 
       {/* Edit Entry Modal */}
       {editEntry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" onClick={() => setEditEntry(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setEditEntry(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar Publicación</p>
+              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar publicación</p>
               <button aria-label="Cerrar" onClick={() => setEditEntry(null)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
             </div>
             <div className={`p-4 rounded-md mb-4 ${isDark ? "bg-white/4" : "bg-slate-50"}`}>
@@ -1103,7 +1103,7 @@ export default function PartidosPage() {
             </div>
             <button onClick={handleEditSave} disabled={actionLoading}
               className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
-              {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Guardar Cambios"}
+              {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Guardar cambios"}
             </button>
           </div>
         </div>
@@ -1111,7 +1111,7 @@ export default function PartidosPage() {
 
       {/* Feedback */}
       {feedback && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6" onClick={() => setFeedback(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setFeedback(null)}>
           <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             <div className={`w-14 h-14 rounded-md flex items-center justify-center mx-auto mb-4 ${feedback.type === "success" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
               {feedback.type === "success" ? <CheckCircle2 size={28} className="text-emerald-500" /> : <X size={28} className="text-red-500" />}

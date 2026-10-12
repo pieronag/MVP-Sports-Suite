@@ -251,13 +251,13 @@ export default function PerfilPage() {
       </div>
 
       {/* Season Level */}
-      <SectionPill label="Nivel de Temporada" />
+      <SectionPill label="Nivel de temporada" />
       <div className="px-5 mb-6">
         <GlowCard isDark={isDark}>
           <div className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Rango Actual</p>
+                <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Rango actual</p>
                 <p className="text-emerald-500 text-[16px] font-semibold">{tierInfo.name}</p>
               </div>
               <div className="text-right">
@@ -288,7 +288,7 @@ export default function PerfilPage() {
             {/* OVR */}
             <div className="flex items-center justify-between px-5 py-5">
               <div>
-                <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nivel General</p>
+                <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Nivel general</p>
                 <p className={`text-[22px] font-bold tracking-[-0.06em] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{ovr}</p>
               </div>
               <div className="w-10 h-10 rounded-md bg-emerald-500/15 flex items-center justify-center">
@@ -388,7 +388,7 @@ export default function PerfilPage() {
       {/* Tu Carta MVP */}
       <div className="flex items-center gap-3 px-6 mb-4 mt-2">
         <div className="h-[3px] w-6 rounded-full bg-emerald-500/60" />
-        <span className="text-emerald-400 font-semibold text-[12px]">Tu Carta MVP</span>
+        <span className="text-emerald-400 font-semibold text-[12px]">Tu carta MVP</span>
         <div className="flex-1 h-px bg-linear-to-r from-emerald-500/20 to-transparent" />
       </div>
 
@@ -426,9 +426,9 @@ export default function PerfilPage() {
             {/* Stats Grid */}
             <div className={`grid grid-cols-4 gap-2 pt-4 border-t ${isDark ? "border-white/6" : "border-slate-200"}`}>
               {[
-                { label: "PARTIDOS", value: stats.matchesPlayed },
-                { label: "VICTORIAS", value: stats.matchesWon },
-                { label: "GOLES", value: stats.goals },
+                { label: "Partidos", value: stats.matchesPlayed },
+                { label: "Victorias", value: stats.matchesWon },
+                { label: "Goles", value: stats.goals },
                 { label: "MVP", value: stats.mvps },
               ].map((s) => (
                 <div key={s.label} className="text-center">
@@ -630,7 +630,7 @@ export default function PerfilPage() {
 
       {/* Glossary Modal */}
       {showGlossary && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-5" onClick={() => setShowGlossary(false)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowGlossary(false)}>
           <div className={`w-full max-w-md max-h-[85vh] flex flex-col rounded-md border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
             {/* Header */}
             <div className={`flex items-center justify-between px-5 py-4 border-b shrink-0 ${isDark ? "border-white/6" : "border-slate-200"}`}>
@@ -639,7 +639,7 @@ export default function PerfilPage() {
                   <Medal size={18} className="text-emerald-500" />
                 </div>
                 <div>
-                  <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Galería de Insignias</p>
+                  <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Galería de insignias</p>
                   <p className={`text-[12px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cómo ganar cada insignia</p>
                 </div>
               </div>
