@@ -1,5 +1,6 @@
 "use client";
 import { REGIONS } from "@/utils/chileRegions";
+import { teamPostIssue, playerPostIssue } from "@/utils/matchmaking";
 import { GlowCard, SectionPill, SegmentedTabs } from "@/components/player/ui";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,14 +11,14 @@ import { useAuth } from "@/context/AuthContext";
 import { matchmakingService, MatchEntry, Challenge } from "@/services/client/player/matchmakingService";
 import { teamService } from "@/services/client/player/teamService";
 
-const SPORTS = ["Fútbol", "Pádel", "Tenis", "Básquetbol", "Voleibol", "Futbolito"];
+const SPORTS = ["Fútbol", "Pádel", "Tenis", "Básquetbol", "Vóleibol", "Futbolito"];
 const POSITIONS_BY_SPORT: Record<string, string[]> = {
   "Fútbol": ["Arquero", "Defensa", "Lateral", "Volante", "Delantero"],
   "Futbolito": ["Arquero", "Defensa", "Lateral", "Volante", "Delantero"],
   "Pádel": ["Lado Derecho", "Lado Izquierdo"],
   "Tenis": ["Individual", "Dobles"],
   "Básquetbol": ["Base", "Escolta", "Alero", "Ala-Pívot", "Pívot"],
-  "Voleibol": ["Armador", "Atacante", "Central", "Líbero"],
+  "Vóleibol": ["Armador", "Atacante", "Central", "Líbero"],
 };
 
 
@@ -145,11 +146,11 @@ export default function PartidosPage() {
   };
 
   const handlePublishTeam = async () => {
-    if (!selectedTeam) return;
+    const team = userTeams.find(t => t.id === selectedTeam);
+    const issue = teamPostIssue({ teamId: team?.id, sport: (team && teamSport(team)) || publishSport, region: publishRegion, communes: publishCommunes });
+    if (issue || !team) { setFeedback({ type: "error", msg: issue || "Elige el equipo que quieres publicar." }); return; }
     setActionLoading(true);
     try {
-      const team = userTeams.find(t => t.id === selectedTeam);
-      if (!team) return;
       await matchmakingService.publishTeam({
         teamId: team.id, teamName: team.name, teamImageUrl: (team as any).imageUrl,
         sport: teamSport(team) || publishSport, memberCount: team.members?.length || 1,
@@ -164,12 +165,14 @@ export default function PartidosPage() {
   };
 
   const handlePublishPlayer = async () => {
+    const issue = playerPostIssue({ sports: publishSports, region: publishRegion, communes: publishCommunes });
+    if (issue) { setFeedback({ type: "error", msg: issue }); return; }
     setActionLoading(true);
     try {
       const data: any = {
         userId: uid, displayName: playerName,
         position: playerPosition || "Jugador", ovr: playerOvr || 40, tier: playerTier || "Bronce",
-        sports: publishSports.length > 0 ? publishSports : ["Fútbol"],
+        sports: publishSports,
         description: publishDesc, region: publishRegion, communes: publishCommunes,
       };
       if (playerPhoto) data.photoURL = playerPhoto;

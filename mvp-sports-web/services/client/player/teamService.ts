@@ -1,5 +1,6 @@
 import { getApi } from "@/services/client/apiClient";
 import { collection, query, where, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, arrayUnion, arrayRemove, Timestamp } from 'firebase/firestore';
+import { canonicalSport } from '@/utils/sports';
 import { db } from '@/services/client/firebase';
 
 export interface Team {
@@ -41,6 +42,7 @@ export const teamService = {
         for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
         const docRef = await addDoc(collection(db, 'teams'), {
             ...teamData,
+            sport: canonicalSport(teamData.sport),
             members: [teamData.ownerId],
             joinRequests: [],
             inviteCode: code,
@@ -54,7 +56,7 @@ export const teamService = {
 
     async updateTeam(teamId: string, data: Partial<{ name: string; description: string; sport: string; imageUrl: string }>): Promise<void> {
         const ref = doc(db, 'teams', teamId);
-        await updateDoc(ref, data);
+        await updateDoc(ref, data.sport !== undefined ? { ...data, sport: canonicalSport(data.sport) } : data);
     },
 
     async deleteTeam(teamId: string, ownerId?: string): Promise<void> {
@@ -63,6 +65,9 @@ export const teamService = {
             const pubs = await getDocs(query(collection(db, 'matchmaking'), where('userId', '==', ownerId), where('teamId', '==', teamId)));
             await Promise.all(pubs.docs.map(d => deleteDoc(d.ref)));
         }
+        // El chat se borra antes que el equipo (Firestore no elimina subcolecciones solo)
+        const msgs = await getDocs(collection(db, 'teams', teamId, 'messages')).catch(() => null);
+        if (msgs) await Promise.all(msgs.docs.map(d => deleteDoc(d.ref)));
         const ref = doc(db, 'teams', teamId);
         await deleteDoc(ref);
     },

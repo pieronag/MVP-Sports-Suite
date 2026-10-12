@@ -15,7 +15,7 @@ const SPORTS_CONFIG = [
   { key: "padel", label: "Pádel", icon: PadelIcon },
   { key: "tenis", label: "Tenis", icon: TenisIcon },
   { key: "basquetbol", label: "Básquetbol", icon: BasquetbolIcon },
-  { key: "voleibol", label: "Voleibol", icon: VoleibolIcon },
+  { key: "voleibol", label: "Vóleibol", icon: VoleibolIcon },
 ];
 
 

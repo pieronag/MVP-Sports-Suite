@@ -1,5 +1,6 @@
 import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs, Timestamp, increment } from 'firebase/firestore';
 import { db, auth } from '@/services/client/firebase';
+import { canonicalSport } from '@/utils/sports';
 import { deleteUser } from 'firebase/auth';
 
 export interface PlayerProfile {
@@ -50,9 +51,11 @@ export const userService = {
 
     async updateUserProfile(uid: string, data: Partial<PlayerProfile>): Promise<void> {
         const ref = doc(db, 'users', uid);
-        const cleanData = { ...data };
-        Object.keys(cleanData).forEach(key => (cleanData as any)[key] === undefined && delete (cleanData as any)[key]);
-        await updateDoc(ref, cleanData as any);
+        const cleanData: any = { ...data };
+        Object.keys(cleanData).forEach(key => cleanData[key] === undefined && delete cleanData[key]);
+        if (cleanData.mainSport) cleanData.mainSport = canonicalSport(cleanData.mainSport);
+        if (Array.isArray(cleanData.favSports)) cleanData.favSports = [...new Set(cleanData.favSports.map(canonicalSport))];
+        await updateDoc(ref, cleanData);
     },
 
     // Requiere reautenticar justo antes: el servidor exige un inicio de sesión reciente.

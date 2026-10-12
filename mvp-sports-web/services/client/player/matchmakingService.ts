@@ -1,5 +1,6 @@
 import { collection, query, where, getDocs, addDoc, getDoc, doc, updateDoc, deleteDoc, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
+import { canonicalSport } from '@/utils/sports';
 
 export interface MatchEntry {
     id: string;
@@ -94,7 +95,7 @@ export const matchmakingService = {
     }, userId: string): Promise<string> {
         const mine = await getDocs(query(collection(db, 'matchmaking'), where('userId', '==', userId), where('teamId', '==', data.teamId), where('status', '==', 'active')));
         if (!mine.empty) throw new Error('Este equipo ya está publicado');
-        const clean: any = { type: 'team', teamId: data.teamId, teamName: data.teamName, sport: data.sport, memberCount: data.memberCount, userId, status: 'active', createdAt: Timestamp.now() };
+        const clean: any = { type: 'team', teamId: data.teamId, teamName: data.teamName, sport: canonicalSport(data.sport), memberCount: data.memberCount, userId, status: 'active', createdAt: Timestamp.now() };
         if (data.teamImageUrl) clean.teamImageUrl = data.teamImageUrl;
         if (data.description) clean.description = data.description;
         if (data.region) clean.region = data.region;
@@ -118,7 +119,7 @@ export const matchmakingService = {
             position: data.position || 'Jugador',
             ovr: data.ovr || 40,
             tier: data.tier || 'Bronce',
-            sports: data.sports || [],
+            sports: [...new Set((data.sports || []).map(canonicalSport))],
             status: 'active',
             createdAt: Timestamp.now(),
         };
@@ -162,8 +163,8 @@ export const matchmakingService = {
     async updateEntry(entryId: string, data: Partial<{ sport: string; sports: string[]; description: string; position: string }>): Promise<void> {
         const clean: any = {};
         if (data.description !== undefined) clean.description = data.description;
-        if (data.sport !== undefined) clean.sport = data.sport;
-        if (data.sports !== undefined) clean.sports = data.sports;
+        if (data.sport !== undefined) clean.sport = canonicalSport(data.sport);
+        if (data.sports !== undefined) clean.sports = [...new Set(data.sports.map(canonicalSport))];
         if (data.position !== undefined) clean.position = data.position;
         await updateDoc(doc(db, 'matchmaking', entryId), clean);
     },

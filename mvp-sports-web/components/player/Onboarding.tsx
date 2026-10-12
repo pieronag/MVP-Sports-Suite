@@ -5,7 +5,7 @@ import { userService } from "@/services/client/player/userService";
 import { CheckCircle2, ChevronLeft } from "@/components/player/icons";
 
 // Onboarding de 3 pasos (deporte, comuna, nivel): alimenta las búsquedas por preferencias.
-const SPORTS = ["Fútbol", "Futbolito", "Pádel", "Tenis", "Básquetbol", "Voleibol"];
+const SPORTS = ["Fútbol", "Futbolito", "Pádel", "Tenis", "Básquetbol", "Vóleibol"];
 const LEVELS = [
   { id: "principiante", label: "Principiante", sub: "Juego por diversión" },
   { id: "intermedio", label: "Intermedio", sub: "Juego seguido y me defiendo" },

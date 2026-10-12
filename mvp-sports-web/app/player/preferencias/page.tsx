@@ -19,11 +19,11 @@ const SPORT_POSITIONS: Record<string, string[]> = {
   "Pádel": ["Lado Derecho", "Lado Izquierdo"],
   "Tenis": ["Individual", "Dobles"],
   "Básquetbol": ["Base", "Escolta", "Alero", "Ala-Pívot", "Pívot"],
-  "Voleibol": ["Armador", "Atacante", "Central", "Líbero"],
+  "Vóleibol": ["Armador", "Atacante", "Central", "Líbero"],
 };
 
 const SPORT_ICONS: Record<string, any> = {
-  "Fútbol": FutbolIcon, "Pádel": PadelIcon, "Tenis": TenisIcon, "Básquetbol": BasquetbolIcon, "Voleibol": VoleibolIcon,
+  "Fútbol": FutbolIcon, "Pádel": PadelIcon, "Tenis": TenisIcon, "Básquetbol": BasquetbolIcon, "Vóleibol": VoleibolIcon,
 };
 
 const digits3 = (v: string) => v.replace(/\D/g, "").slice(0, 3);
@@ -429,7 +429,7 @@ export default function PreferenciasPage() {
         <GlowCard isDark={isDark}>
           <div className="divide-y divide-emerald-500/5">
             <SelectRow color="#10b981" label="Deporte Principal" value={formData.mainSport}
-              options={["Fútbol", "Pádel", "Tenis", "Básquetbol", "Voleibol"]}
+              options={["Fútbol", "Pádel", "Tenis", "Básquetbol", "Vóleibol"]}
               onSelect={(v) => setFormData((f) => ({ ...f, mainSport: v, position: "" }))}
               sport={formData.mainSport}
             />

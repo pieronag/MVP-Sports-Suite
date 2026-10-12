@@ -161,7 +161,7 @@ export default function EquipoDetailPage() {
 
   const getProfile = (uid: string) => profiles[uid] || { uid, displayName: "Jugador MVP", photoURL: null, tier: "Bronce", ovr: 40 };
 
-  const SPORTS = ["Fútbol", "Pádel", "Tenis", "Básquetbol", "Voleibol", "Futbolito"];
+  const SPORTS = ["Fútbol", "Pádel", "Tenis", "Básquetbol", "Vóleibol", "Futbolito"];
 
   if (loading) {
     return (
