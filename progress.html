@@ -142,13 +142,13 @@ const AREAS = [
   ["Panel del mánager", "y","y","n","x","Fecha en hora de Chile; canchas en uso al instante. Falta probar con sesión de mánager."],
  ]},
  { name:"Panel de administración", items:[
-  ["Resumen", "y","y","n","x","Cuenta reservas con check-in e inasistencias; solo el mes elegido."],
-  ["Recintos y dueños", "y","y","n","x","Suspender dueño deshabilita su cuenta."],
-  ["Usuarios y analítica", "y","y","n","x","Suspender jugador deshabilita su cuenta; historial sin búsqueda por nombre."],
-  ["Métricas", "y","y","n","x","Volumen y comisiones solo con ingreso real."],
-  ["Liquidaciones", "y","y","n","n","Comisión sobre el ingreso real del mes; datos reales de la empresa."],
-  ["Auditoría y reportes", "y","y","n","x","Auditoría solo se agrega y registra quién escribió."],
-  ["Gamificación (reglas)", "y","y","n","x",""],
+  ["Resumen", "y","y","y","x","MRR real (planes activos) y cobrado en reservas del mes; probado con sesión de superadmin."],
+  ["Recintos y dueños", "y","y","y","x","MRR consistente en panel, recintos y dueños. Suspender dueño deshabilita su cuenta (falta probar con una cuenta de prueba)."],
+  ["Usuarios y analítica", "y","y","y","x","Deportes con nombre oficial; historial sin búsqueda por nombre."],
+  ["Métricas", "y","y","y","x","Volumen y comisiones solo con ingreso real."],
+  ["Liquidaciones", "y","y","y","n","Cobrado = solo pagadas; comisión sobre el ingreso real. Falta generar una liquidación y su PDF."],
+  ["Auditoría y reportes", "y","y","y","x","Auditoría solo se agrega y registra quién escribió."],
+  ["Gamificación (reglas)", "y","y","y","x","Una sola fuente de reglas (settings/global); se eliminaron reglas antiguas sin uso."],
  ]},
  { name:"Plataforma", items:[
   ["Pagos con Mercado Pago", "y","y","p","n","Webhook con firma, 3D Secure, reembolso del jugador (97%) y del recinto (100%). Sin pago real probado."],
@@ -157,7 +157,7 @@ const AREAS = [
   ["Capa de datos y modelos", "y","y","y","x","Reservas, ingresos, recintos, horario y roles con un solo modelo; 18 pantallas migradas."],
   ["Pruebas automáticas", "y","x","y","x","87 unitarias y 58 de punta a punta en desktop y mobile; todas pasan."],
   ["Base de datos", "y","y","y","x","Estructura v2 aplicada: 40 documentos migrados con respaldo; un nombre por campo, deportes oficiales, fechas reales. Documentada en docs/modelo-datos.md."],
-  ["Experiencia en celular (paneles)", "y","x","p","x","Texto mínimo 11 px, indicadores en dos columnas, controles de 44 px, campos sin zoom y barra inferior por rol. Medido en las 12 pantallas del dueño; falta revisar con sesión de mánager y superadmin."],
+  ["Experiencia en celular (paneles)", "y","x","y","x","Texto mínimo 11 px, dos columnas, controles de 44 px, campos sin zoom y barra inferior por rol. Medido con dueño y superadmin; falta mánager."],
  ]},
 ];
 const W={e:40,d:30,v:15,f:15}, V={y:1,p:.5,n:0};
