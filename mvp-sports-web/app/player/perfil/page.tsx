@@ -548,7 +548,7 @@ export default function PerfilPage() {
         ) : (
         <div ref={cardRef} className="font-heading" style={{ width: 750, height: 1250, background: "#020611", position: "relative", overflow: "hidden" }}>
           {/* Foto en un marco redondeado, como las cards de la app */}
-          <div style={{ position: "absolute", top: 36, left: 36, right: 36, height: 760, borderRadius: 18, overflow: "hidden", background: "#0A101D" }}>
+          <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: "#0A101D" }}>
             {photoURL ? (
               <img src={photoURL} alt="" crossOrigin="anonymous" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             ) : (
@@ -556,15 +556,15 @@ export default function PerfilPage() {
                 <span style={{ color: "rgba(255,255,255,0.14)", fontSize: 280, fontWeight: 900, letterSpacing: -10 }}>{initials}</span>
               </div>
             )}
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(2,6,17,0.55) 0%, rgba(2,6,17,0) 28%, rgba(2,6,17,0) 62%, rgba(2,6,17,0.85) 100%)" }} />
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(2,6,17,0.5) 0%, rgba(2,6,17,0) 20%, rgba(2,6,17,0) 56%, rgba(2,6,17,0.85) 68%, #020611 80%)" }} />
             {/* Isotipo y valoración, del mismo porte */}
-            <img src="/icons/logo-mark.png" alt="" style={{ position: "absolute", top: 34, left: 34, width: 130, height: 130, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
-            <div style={{ position: "absolute", top: 26, right: 38, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+            <img src="/icons/logo-mark.png" alt="" style={{ position: "absolute", top: 60, left: 60, width: 130, height: 130, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+            <div style={{ position: "absolute", top: 52, right: 60, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
               <span style={{ color: "#fff", fontSize: 150, fontWeight: 900, lineHeight: 1, letterSpacing: -6 }}>{ovr}</span>
               <span style={{ color: "#00df82", fontSize: 24, fontWeight: 800, marginTop: 4 }}>Valoración</span>
             </div>
             {/* Rango sobre la foto */}
-            <div style={{ position: "absolute", left: 34, bottom: 30, display: "flex", alignItems: "center", gap: 10, background: "rgba(2,6,17,0.7)", border: "1px solid rgba(0,223,130,0.35)", borderRadius: 10, padding: "10px 18px" }}>
+            <div style={{ position: "absolute", left: 60, top: 750, display: "flex", alignItems: "center", gap: 10, background: "rgba(2,6,17,0.7)", border: "1px solid rgba(0,223,130,0.35)", borderRadius: 10, padding: "10px 18px" }}>
               <span style={{ width: 12, height: 12, borderRadius: 999, background: "#00df82" }} />
               <span style={{ color: "#fff", fontSize: 24, fontWeight: 800 }}>Nivel {tierInfo.name}</span>
             </div>
