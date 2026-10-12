@@ -338,19 +338,22 @@ export default function Page() {
   const handleBulkRecalculate = async () => {
     setConfirmModal({
       isOpen: true, title: 'Sincronizar ELO', type: 'info',
-      msg: '¿Quieres actualizar el nivel y valoración de todos los jugadores según el algoritmo oficial?',
+      msg: 'Se recalculará la experiencia, el nivel y los logros de todas las cuentas con las reglas vigentes. Solo cuentan los partidos con ingreso registrado por un recinto: los partidos internos ya no suman, así que algunos niveles bajarán.',
       onConfirm: async () => {
         setConfirmModal(prev => ({ ...prev, isOpen: false }));
         setIsBulkLoading(true);
         try {
           // El servidor recalcula XP, nivel y logros desde las reservas de cada jugador
-          const ids = users.map((u) => u.id);
+          // Todas las cuentas (dueños y personal también juegan), no solo la lista de jugadores
+          const ids = (await getDocs(collection(db, "users"))).docs.map((d) => d.id);
+          let updated = 0;
           for (let k = 0; k < ids.length; k += 25) {
-            await postApi('/api/players/recompute', { uids: ids.slice(k, k + 25) });
+            const r = await postApi<{ updated: number }>('/api/players/recompute', { uids: ids.slice(k, k + 25) });
+            updated += r.updated || 0;
           }
-          addToast("Sincronización masiva completada", "success");
+          addToast(`${updated} ${updated === 1 ? 'cuenta actualizada' : 'cuentas actualizadas'}`, "success");
           fetchUsers();
-        } catch (error) { addToast("Error en sincronización", "error"); } finally { setIsBulkLoading(false); }
+        } catch (error: any) { addToast(error?.message || "Error en sincronización", "error"); } finally { setIsBulkLoading(false); }
       }
     });
   };

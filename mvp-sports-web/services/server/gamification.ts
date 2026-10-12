@@ -24,7 +24,7 @@ export async function recomputePlayer(uid: string): Promise<{ xp: number } | nul
   ]);
   if (!userSnap.exists) return null;
   const user = userSnap.data() || {};
-  if (user.role && !["player", "user"].includes(String(user.role).toLowerCase())) return null;
+  // Se calcula para cualquier cuenta que juegue (dueños y personal también reservan como jugadores)
 
   const bookings = new Map<string, any>();
   [...own.docs, ...joined.docs].forEach((d) => bookings.set(d.id, d.data()));
