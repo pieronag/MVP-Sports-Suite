@@ -389,8 +389,9 @@ export default function ReservasPage() {
                         <XCircle size={18} color="#ef4444" />
                       </button>
                     )}
-                    {showMapsAndTicket && !isActive && (!isConfirmed || b.checkIn || b.paymentStatus === "refund_failed") && (
+                    {showMapsAndTicket && !isActive && (!isConfirmed || !inWindow || b.checkIn || b.paymentStatus === "refund_failed") && (
                       <button
+                        aria-label={b.paymentStatus === "refund_failed" ? "Ver devolución" : "Ver ticket"}
                         onClick={() => { setSelectedBooking(b); setShowTicket(true); }}
                         className={b.paymentStatus === "refund_failed" ? "flex-1 h-[46px] rounded-md bg-red-500 flex items-center justify-center gap-2 text-white font-semibold text-[11px] uppercase transition-all active:scale-[0.98]" : "w-[46px] h-[46px] rounded-md flex items-center justify-center transition-all active:scale-[0.98]"}
                         style={{ backgroundColor: b.paymentStatus === "refund_failed" ? undefined : isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9" }}
