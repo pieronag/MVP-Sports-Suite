@@ -53,7 +53,7 @@ export default function BilleteraPage() {
         <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center ${isDark ? "bg-white/[0.06]" : "bg-slate-100"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Pagos</h1>
+        <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center">Pagos</h1>
         <div className="w-10" />
       </div>
 

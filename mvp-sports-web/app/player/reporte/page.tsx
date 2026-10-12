@@ -143,7 +143,7 @@ export default function ReportePage() {
                 <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
                     <ChevronLeft size={20} className="text-emerald-500" />
                 </button>
-                <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Soporte</h1>
+                <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center">Soporte</h1>
                 <div className="w-10" />
             </div>
 
@@ -158,17 +158,17 @@ export default function ReportePage() {
                             <CheckCircle2 size={52} strokeWidth={1.5} style={{ color: '#10b981' }} />
                         </div>
                         <h2 className="text-[16px] font-heading font-black mb-2" style={{ color: isDark ? '#F8FAFC' : '#0F172A' }}>¡Reporte Recibido!</h2>
-                        <span className="px-3 py-1.5 rounded-md text-[11px] font-semibold tracking-wider mb-4" style={{ backgroundColor: '#10b981', color: 'white' }}>SOPORTE ACTIVO</span>
+                        <span className="px-3 py-1.5 rounded-md text-[11px] font-semibold mb-4" style={{ backgroundColor: '#10b981', color: 'white' }}>Soporte activo</span>
                         <p className="text-[11px] font-medium text-center leading-5 max-w-[280px] mb-8" style={{ color: isDark ? '#94A3B8' : '#64748B' }}>
                             Tu ticket se ha ingresado con éxito. Nuestro equipo de soporte lo atenderá con prioridad.
                         </p>
                         <button onClick={() => setSuccess(false)}
-                            className="w-full h-[52px] rounded-md font-semibold uppercase tracking-wide text-white text-[11px] flex items-center justify-center gap-2 mb-3 transition-all active:scale-[0.98]"
+                            className="w-full h-[52px] rounded-md font-semibold text-white text-[12px] flex items-center justify-center gap-2 mb-3 transition-all active:scale-[0.98]"
                             style={{ backgroundColor: '#10b981' }}>
                             Reportar otro Problema <ArrowRight size={15} />
                         </button>
                         <button onClick={() => setActiveTab('historial')}
-                            className={`w-full h-[52px] rounded-md font-semibold uppercase tracking-wide text-[11px] flex items-center justify-center border transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-[#94A3B8] border-white/6" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
+                            className={`w-full h-[52px] rounded-md font-semibold text-[12px] flex items-center justify-center border transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-[#94A3B8] border-white/6" : "bg-slate-100 text-[#64748B] border-slate-200"}`}>
                             Ver mis Reportes
                         </button>
                     </div>
@@ -191,7 +191,7 @@ export default function ReportePage() {
                                     <div key={report.id} className={`relative rounded-md ${isDark ? "bg-[#0A101D] border border-white/6" : "bg-white border border-slate-200"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
                                         <div className="p-5">
                                             <div className="flex justify-between items-center mb-3">
-                                                <span className="px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wide border"
+                                                <span className="px-2.5 py-1 rounded-md text-[12px] font-semibold border"
                                                     style={{
                                                         backgroundColor: report.status === 'Resuelto' ? '#10b98115' : '#3b82f615',
                                                         borderColor: report.status === 'Resuelto' ? '#10b98130' : '#3b82f630',
@@ -209,7 +209,7 @@ export default function ReportePage() {
                                                 <div className={`mt-3.5 p-4 rounded-md border ${isDark ? "bg-emerald-500/5 border-emerald-500/20" : "bg-emerald-50 border-emerald-200"}`}>
                                                     <div className="flex items-center gap-2 mb-2 pb-2" style={{ borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "#E2E8F0"}` }}>
                                                         <Shield size={14} style={{ color: '#10b981' }} />
-                                                        <span className="text-[11px] font-semibold tracking-wide" style={{ color: '#10b981' }}>SOPORTE MVP ({report.repliedBy || 'Oficial'})</span>
+                                                        <span className="text-[11px] font-semibold" style={{ color: '#10b981' }}>SOPORTE MVP ({report.repliedBy || 'Oficial'})</span>
                                                     </div>
                                                     <p className={`text-[11px] font-medium leading-5 ${isDark ? "text-[#F8FAFC]" : "text-[#0F172A]"}`}>{report.response}</p>
                                                 </div>
@@ -239,7 +239,7 @@ export default function ReportePage() {
                         </div>
 
                         {/* CATEGORY */}
-                        <p className="text-[11px] font-semibold uppercase tracking-wide mb-3" style={{ color: '#10b981' }}>Categoría del Problema</p>
+                        <p className="text-[12px] font-semibold mb-3" style={{ color: '#10b981' }}>Categoría del Problema</p>
                         <div className="flex flex-wrap gap-2 mb-6">
                             {CATEGORIES.map(cat => (
                                 <button key={cat.id} onClick={() => setCategory(cat.id)}
@@ -255,7 +255,7 @@ export default function ReportePage() {
                         </div>
 
                         {/* PRIORITY */}
-                        <p className="text-[11px] font-semibold uppercase tracking-wide mb-3" style={{ color: '#10b981' }}>Gravedad / Prioridad</p>
+                        <p className="text-[12px] font-semibold mb-3" style={{ color: '#10b981' }}>Gravedad / Prioridad</p>
                         <div className="flex flex-wrap gap-2 mb-6">
                             {PRIORITIES.map(prio => (
                                 <button key={prio.id} onClick={() => setPriority(prio.id)}
@@ -271,7 +271,7 @@ export default function ReportePage() {
                         </div>
 
                         {/* SUBJECT */}
-                        <p className="text-[11px] font-semibold uppercase tracking-wide mb-2" style={{ color: '#94A3B8' }}>ASUNTO PRINCIPAL *</p>
+                        <p className="text-[12px] font-semibold mb-2" style={{ color: '#94A3B8' }}>Asunto principal *</p>
                         <div className={inputClass('subject')} style={{ backgroundColor: '#0F172A' }}>
                             <input
                                 placeholder="Ej. error al confirmar partido"
@@ -285,7 +285,7 @@ export default function ReportePage() {
                         </div>
 
                         {/* SCREEN */}
-                        <p className="text-[11px] font-semibold uppercase tracking-wide mb-2" style={{ color: '#94A3B8' }}>PANTALLA O SECCIÓN (OPCIONAL)</p>
+                        <p className="text-[12px] font-semibold mb-2" style={{ color: '#94A3B8' }}>Pantalla o sección (opcional)</p>
                         <div className={inputClass('screen')} style={{ backgroundColor: '#0F172A' }}>
                             <input
                                 placeholder="Ej.: Estadísticas / menú principal"
@@ -300,7 +300,7 @@ export default function ReportePage() {
                         </div>
 
                         {/* DESCRIPTION */}
-                        <p className="text-[11px] font-semibold uppercase tracking-wide mb-2" style={{ color: '#94A3B8' }}>DESCRIPCIÓN DETALLADA *</p>
+                        <p className="text-[12px] font-semibold mb-2" style={{ color: '#94A3B8' }}>Descripción detallada *</p>
                         <div className={textareaClass('description')} style={{ backgroundColor: '#0F172A' }}>
                             <textarea
                                 placeholder="Explica aquí detalladamente qué sucedió..."
@@ -315,7 +315,7 @@ export default function ReportePage() {
                         </div>
 
                         {/* STEPS */}
-                        <p className="text-[11px] font-semibold uppercase tracking-wide mb-2" style={{ color: '#94A3B8' }}>PASOS PARA REPRODUCIR (OPCIONAL)</p>
+                        <p className="text-[12px] font-semibold mb-2" style={{ color: '#94A3B8' }}>PASOS PARA REPRODUCIR (OPCIONAL)</p>
                         <div className={textareaClass('steps')} style={{ backgroundColor: '#0F172A' }}>
                             <textarea
                                 placeholder="1. ir a jugar, 2. click en editar, 3. dar click en guardar..."
@@ -334,7 +334,7 @@ export default function ReportePage() {
                         <div className="rounded-md p-5 border mb-9" style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : '#F1F5F9', borderColor: 'rgba(255,255,255,0.08)' }}>
                             <div className="flex items-center mb-2">
                                 <Smartphone size={16} style={{ color: '#10b981' }} />
-                                <p className="text-[12px] font-semibold uppercase ml-2 tracking-tight" style={{ color: '#F8FAFC' }}>Información de Diagnóstico</p>
+                                <p className="text-[12px] font-semibold ml-2 tracking-tight" style={{ color: '#F8FAFC' }}>Información de Diagnóstico</p>
                             </div>
                             <p className="text-[11px] font-semibold leading-4 mb-4" style={{ color: '#94A3B8' }}>
                                 Los siguientes metadatos se enviarán automáticamente en segundo plano.
@@ -363,7 +363,7 @@ export default function ReportePage() {
                         )}
 
                         <button onClick={handleSubmit} disabled={submitting}
-                            className="w-full h-[60px] rounded-md font-semibold uppercase tracking-wide text-white text-[13px] flex items-center justify-center gap-2.5"
+                            className="w-full h-[60px] rounded-md font-semibold text-white text-[13px] flex items-center justify-center gap-2.5"
                             style={{ backgroundColor: COLORS.accent, opacity: submitting ? 0.6 : 1, boxShadow: '0 10px 20px rgba(16,185,129,0.2)' }}>
                             {submitting ? (
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

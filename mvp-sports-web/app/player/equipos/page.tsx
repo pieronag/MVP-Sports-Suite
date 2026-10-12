@@ -86,7 +86,7 @@ export default function EquiposExplorePage() {
         <button aria-label="Volver" onClick={() => router.push("/player")} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Equipos</h1>
+        <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center">Equipos</h1>
         <div className="w-10" />
       </div>
 
@@ -159,8 +159,8 @@ export default function EquiposExplorePage() {
                     <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
                     <div className="absolute bottom-4 left-5 right-5">
                       <div className="flex items-center gap-2 mb-1.5">
-                        <span className="bg-emerald-500 px-2.5 py-1 rounded-md text-white font-semibold text-[11px] tracking-wide">{(team.sport || "POLIDEPORTIVO").toUpperCase()}</span>
-                        {team.ownerId === user?.uid && <span className="bg-white/20 px-2.5 py-1 rounded-md text-white font-semibold text-[11px] uppercase border border-white/20">CAPITÁN</span>}
+                        <span className="bg-emerald-500 px-2.5 py-1 rounded-md text-white font-semibold text-[11px]">{(team.sport || "POLIDEPORTIVO").toUpperCase()}</span>
+                        {team.ownerId === user?.uid && <span className="bg-white/20 px-2.5 py-1 rounded-md text-white font-semibold text-[12px] border border-white/20">Capitán</span>}
                       </div>
                       <h3 className="text-white text-[16px] font-semibold">{team.name}</h3>
                     </div>
@@ -184,7 +184,7 @@ export default function EquiposExplorePage() {
       {/* Create Team Modal */}
       <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} isDark={isDark}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-heading font-black text-[16px] uppercase">Nuevo Equipo</h2>
+          <h2 className="font-heading font-black text-[16px]">Nuevo Equipo</h2>
           <button aria-label="Cerrar" onClick={() => setShowCreateModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/6 transition-colors">
             <X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
           </button>
@@ -193,7 +193,7 @@ export default function EquiposExplorePage() {
         <input placeholder="Nombre del equipo" maxLength={40} value={newTeamName} onChange={(e) => setNewTeamName(e.target.value)}
           className={`w-full h-12 rounded-md px-4 text-[15px] font-medium outline-hidden border mb-5 ${isDark ? "bg-white/4 text-slate-100 placeholder-slate-600 border-white/6" : "bg-slate-50 text-slate-900 placeholder-slate-400 border-slate-200"}`}
         />
-        <p className={`text-[11px] font-semibold uppercase tracking-wide mb-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</p>
+        <p className={`text-[12px] font-semibold mb-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</p>
         <div className="flex gap-2.5 mb-6 flex-wrap">
           {SPORTS_CONFIG.map((s) => {
             const SportIcon = s.icon;
@@ -207,7 +207,7 @@ export default function EquiposExplorePage() {
           })}
         </div>
         <button onClick={handleCreateTeam} disabled={actionLoading || !newTeamName.trim()}
-          className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] uppercase tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
+          className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
           {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Crear Equipo"}
         </button>
       </Modal>
@@ -215,17 +215,17 @@ export default function EquiposExplorePage() {
       {/* Join by Code Modal */}
       <Modal isOpen={showJoinModal} onClose={() => setShowJoinModal(false)} isDark={isDark}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-heading font-black text-[16px] uppercase">Unirse a Equipo</h2>
+          <h2 className="font-heading font-black text-[16px]">Unirse a Equipo</h2>
           <button aria-label="Cerrar" onClick={() => setShowJoinModal(false)} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/6 transition-colors">
             <X size={16} className={isDark ? "text-slate-400" : "text-slate-500"} />
           </button>
         </div>
         <p className={`text-[13px] font-medium mb-5 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Ingresa el código de invitación de tu equipo.</p>
         <input placeholder="Ej: ABC123" value={joinCode} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} maxLength={6}
-          className={`w-full h-12 rounded-md px-4 text-[16px] font-semibold tracking-wider text-center uppercase outline-hidden border mb-5 ${isDark ? "bg-white/4 text-slate-100 placeholder-slate-600 border-white/6" : "bg-slate-50 text-slate-900 placeholder-slate-400 border-slate-200"}`}
+          className={`w-full h-12 rounded-md px-4 text-[16px] font-semibold text-center outline-hidden border mb-5 ${isDark ? "bg-white/4 text-slate-100 placeholder-slate-600 border-white/6" : "bg-slate-50 text-slate-900 placeholder-slate-400 border-slate-200"}`}
         />
         <button onClick={handleJoinByCode} disabled={actionLoading || joinCode.trim().length < 4}
-          className="w-full h-12 rounded-md bg-indigo-500 text-white font-semibold text-[13px] uppercase tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
+          className="w-full h-12 rounded-md bg-indigo-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
           {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Unirme"}
         </button>
       </Modal>

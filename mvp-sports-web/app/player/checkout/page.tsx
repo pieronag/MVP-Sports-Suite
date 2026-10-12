@@ -126,9 +126,9 @@ export default function CheckoutPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center ${isDark ? "bg-[#020611] text-slate-200" : "bg-[#F8FAFC] text-slate-900"}`}>
         <XCircle size={36} className="text-amber-500" />
-        <p className="font-bold uppercase tracking-wide text-[13px]">Nada que pagar</p>
+        <p className="font-bold text-[13px]">Nada que pagar</p>
         <p className="text-[11px] text-slate-400 max-w-xs">Elige un recinto, cancha y horario para iniciar una reserva.</p>
-        <button onClick={() => router.replace("/player/clubes")} className="mt-2 px-5 py-3 rounded-md bg-emerald-500 text-white text-[11px] font-semibold uppercase tracking-wide">Buscar recintos</button>
+        <button onClick={() => router.replace("/player/clubes")} className="mt-2 px-5 py-3 rounded-md bg-emerald-500 text-white text-[12px] font-semibold">Buscar recintos</button>
       </div>
     );
   }
@@ -138,7 +138,7 @@ export default function CheckoutPage() {
         <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">{isTournament ? "Inscripción" : "Checkout"}</h1>
+        <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center">{isTournament ? "Inscripción" : "Checkout"}</h1>
         <div className="w-10" />
       </div>
 
@@ -152,21 +152,21 @@ export default function CheckoutPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-[15px] font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                  {isTournament ? (tournamentName || "").toUpperCase() : (tenantName || "").toUpperCase()}
+                  {isTournament ? tournamentName || "" : tenantName || ""}
                 </p>
                 <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                  {isTournament ? `${sport || ""}` : `${sport || ""} • ${(courtName || "").toUpperCase()}`}
+                  {isTournament ? `${sport || ""}` : `${sport || ""} • ${courtName || ""}`}
                 </p>
               </div>
             </div>
             <div className={`h-px ${isDark ? "bg-white/6" : "bg-slate-100"}`} />
             {isTournament ? (
               <div className="space-y-3">
-                {[{ icon: Users, label: "Equipo", val: (teamName || "").toUpperCase() }, { icon: Trophy, label: "Modalidad", val: (tournamentType || "LIGA").toUpperCase() }, { icon: MapPin, label: "Recinto", val: (venueName || "POR CONFIRMAR").toUpperCase() }].map((r) => (
+                {[{ icon: Users, label: "Equipo", val: teamName || "" }, { icon: Trophy, label: "Modalidad", val: (tournamentType || "LIGA").toUpperCase() }, { icon: MapPin, label: "Recinto", val: (venueName || "Por confirmar").toUpperCase() }].map((r) => (
                   <div key={r.label} className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       <r.icon size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                      <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{r.label}</span>
+                      <span className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>{r.label}</span>
                     </div>
                     <span className={`text-[11px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{r.val}</span>
                   </div>
@@ -177,21 +177,21 @@ export default function CheckoutPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <Calendar size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                    <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Fecha</span>
+                    <span className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Fecha</span>
                   </div>
                   <span className={`text-[11px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{date ? new Date(date + "T12:00:00").toLocaleDateString("es-CL", { day: "numeric", month: "long" }) : ""}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <Clock size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                    <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Horario</span>
+                    <span className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Horario</span>
                   </div>
                   <span className={`text-[11px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{startTime} HRS</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <MapPin size={14} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                    <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Recinto</span>
+                    <span className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Recinto</span>
                   </div>
                   <span className={`text-[11px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{tenantName || ""}</span>
                 </div>
@@ -200,7 +200,7 @@ export default function CheckoutPage() {
             <div className={`h-px ${isDark ? "bg-white/6" : "bg-slate-100"}`} />
             <div className="flex items-center justify-between">
               <div>
-                <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{appliedCoupon ? "Subtotal" : "Total"}</p>
+                <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>{appliedCoupon ? "Subtotal" : "Total"}</p>
                 {appliedCoupon ? (
                   <>
                     <p className={`text-[13px] font-semibold line-through ${isDark ? "text-slate-500" : "text-slate-400"}`}>${formatMoney(Number(price))}</p>
@@ -224,14 +224,14 @@ export default function CheckoutPage() {
           <div className="p-5">
             <div className="flex items-center gap-2.5">
               <div className={`flex-1 h-12 rounded-md border flex items-center px-4 ${isDark ? "bg-white/4 border-white/6" : "bg-slate-50 border-slate-200"}`}>
-                <input className="w-full bg-transparent text-[11px] font-medium tracking-wide uppercase outline-hidden" style={{ color: appliedCoupon ? "#10b981" : isDark ? "#F8FAFC" : "#0F172A" }}
+                <input className="w-full bg-transparent text-[12px] font-medium outline-hidden" style={{ color: appliedCoupon ? "#10b981" : isDark ? "#F8FAFC" : "#0F172A" }}
                   placeholder="Código" autoFocus={!appliedCoupon} value={couponInput} onChange={(e) => setCouponInput(e.target.value.toUpperCase())} disabled={!!appliedCoupon || validatingCoupon} />
               </div>
               {appliedCoupon ? (
                 <button aria-label="Cerrar" onClick={() => setAppliedCoupon(null)} className="w-12 h-12 rounded-md bg-red-500 flex items-center justify-center transition-all active:scale-90"><X size={18} className="text-white" /></button>
               ) : (
                 <button onClick={handleApplyCoupon} disabled={validatingCoupon || !couponInput.trim()}
-                  className="h-12 px-5 rounded-md flex items-center justify-center text-white font-semibold text-[11px] uppercase tracking-wide transition-all active:scale-[0.98] disabled:opacity-50"
+                  className="h-12 px-5 rounded-md flex items-center justify-center text-white font-semibold text-[12px] transition-all active:scale-[0.98] disabled:opacity-50"
                   style={{ backgroundColor: validatingCoupon || !couponInput.trim() ? (isDark ? "#1E293B" : "#CBD5E1") : activeColor }}>
                   {validatingCoupon ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Aplicar"}
                 </button>
@@ -286,7 +286,7 @@ export default function CheckoutPage() {
 
         <div className="flex items-center justify-center gap-2 opacity-60 pt-2">
           <ShieldCheck size={14} style={{ color: activeColor }} />
-          <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Transacción Protegida PCI-DSS</span>
+          <span className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Transacción Protegida PCI-DSS</span>
         </div>
       </div>
 

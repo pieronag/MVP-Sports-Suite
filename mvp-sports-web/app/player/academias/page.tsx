@@ -98,7 +98,7 @@ export default function AcademiasPage() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: ACCENT }}>{c.sport || "Academia"}</span>
+                <span className="text-[12px] font-semibold" style={{ color: ACCENT }}>{c.sport || "Academia"}</span>
                 {c.ageGroup && <span className={`text-[11px] ${sub}`}>· {AGE[c.ageGroup] || c.ageGroup}</span>}
               </div>
               <p className={`text-[14px] font-semibold leading-snug ${txt}`}>{c.name}</p>
@@ -132,7 +132,7 @@ export default function AcademiasPage() {
         <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Academias</h1>
+        <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center">Academias</h1>
         <div className="w-10" />
       </div>
 
@@ -181,7 +181,7 @@ export default function AcademiasPage() {
             <div className={`w-full rounded-t-md p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] max-h-[85vh] overflow-y-auto ${isDark ? "bg-[#0A101D]" : "bg-white"}`} onClick={e => e.stopPropagation()}>
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: ACCENT }}>{c.sport || "Academia"}</p>
+                  <p className="text-[12px] font-semibold" style={{ color: ACCENT }}>{c.sport || "Academia"}</p>
                   <h2 className={`text-[16px] font-heading font-black ${txt}`}>{c.name}</h2>
                 </div>
                 <button aria-label="Cerrar" onClick={() => setSelected(null)} className={`w-9 h-9 rounded-md flex items-center justify-center ${isDark ? "bg-white/6" : "bg-slate-100"}`}><X size={18} /></button>
@@ -197,7 +197,7 @@ export default function AcademiasPage() {
                   { icon: GraduationCap, label: "Cupos", value: c.maxStudents ? `${free} de ${c.maxStudents}` : "Libres" },
                 ].map(r => (
                   <div key={r.label} className={`p-3 rounded-md border ${isDark ? "border-white/5 bg-white/2" : "border-slate-200 bg-slate-50"}`}>
-                    <p className={`flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide ${sub}`}><r.icon size={13} /> {r.label}</p>
+                    <p className={`flex items-center gap-1.5 text-[12px] font-semibold ${sub}`}><r.icon size={13} /> {r.label}</p>
                     <p className={`mt-1 text-[13px] font-semibold ${txt}`}>{r.value}</p>
                   </div>
                 ))}

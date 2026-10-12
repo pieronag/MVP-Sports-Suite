@@ -114,7 +114,7 @@ export default function TorneosPage() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: ACCENT }}>{t.sport || "Torneo"}</span>
+                <span className="text-[12px] font-semibold" style={{ color: ACCENT }}>{t.sport || "Torneo"}</span>
                 <span className={`text-[11px] ${sub}`}>· {TYPE[t.type] || t.type || "Liga"}</span>
               </div>
               <p className={`text-[14px] font-semibold leading-snug ${txt}`}>{t.name}</p>
@@ -145,7 +145,7 @@ export default function TorneosPage() {
         <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Torneos</h1>
+        <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center">Torneos</h1>
         <div className="w-10" />
       </div>
 
@@ -181,7 +181,7 @@ export default function TorneosPage() {
             <div className={`w-full rounded-t-md p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] max-h-[88vh] overflow-y-auto ${isDark ? "bg-[#0A101D]" : "bg-white"}`} onClick={e => e.stopPropagation()}>
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: ACCENT }}>{t.sport || "Torneo"} · {TYPE[t.type] || t.type || "Liga"}</p>
+                  <p className="text-[12px] font-semibold" style={{ color: ACCENT }}>{t.sport || "Torneo"} · {TYPE[t.type] || t.type || "Liga"}</p>
                   <h2 className={`text-[16px] font-heading font-black ${txt}`}>{t.name}</h2>
                 </div>
                 <button aria-label="Cerrar" onClick={() => setSelected(null)} className={`w-9 h-9 rounded-md flex items-center justify-center ${isDark ? "bg-white/6" : "bg-slate-100"}`}><X size={18} /></button>
@@ -198,7 +198,7 @@ export default function TorneosPage() {
                   { icon: Info, label: "Categoría", value: t.category || "Libre" },
                 ].map(r => (
                   <div key={r.label} className={`p-3 rounded-md border ${isDark ? "border-white/5 bg-white/2" : "border-slate-200 bg-slate-50"}`}>
-                    <p className={`flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide ${sub}`}><r.icon size={13} /> {r.label}</p>
+                    <p className={`flex items-center gap-1.5 text-[12px] font-semibold ${sub}`}><r.icon size={13} /> {r.label}</p>
                     <p className={`mt-1 text-[13px] font-semibold capitalize ${txt}`}>{r.value}</p>
                   </div>
                 ))}
@@ -206,19 +206,19 @@ export default function TorneosPage() {
 
               {prizes.length > 0 && (
                 <div className={`p-3 rounded-md border mb-4 ${isDark ? "border-white/5" : "border-slate-200"}`}>
-                  <p className={`flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide mb-2 ${sub}`}><Award size={13} /> Premios</p>
+                  <p className={`flex items-center gap-1.5 text-[12px] font-semibold mb-2 ${sub}`}><Award size={13} /> Premios</p>
                   {prizes.map((p: string, i: number) => <p key={i} className={`text-[13px] ${txt}`}>{i + 1}° · {p}</p>)}
                 </div>
               )}
               {t.rules && (
                 <div className={`p-3 rounded-md border mb-4 ${isDark ? "border-white/5" : "border-slate-200"}`}>
-                  <p className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${sub}`}>Bases</p>
+                  <p className={`text-[12px] font-semibold mb-1 ${sub}`}>Bases</p>
                   <p className={`text-[13px] whitespace-pre-line ${sub}`}>{t.rules}</p>
                 </div>
               )}
               {(t.teams?.length || 0) > 0 && (
                 <div className={`p-3 rounded-md border mb-4 ${isDark ? "border-white/5" : "border-slate-200"}`}>
-                  <p className={`text-[11px] font-semibold uppercase tracking-wide mb-2 ${sub}`}>Equipos inscritos</p>
+                  <p className={`text-[12px] font-semibold mb-2 ${sub}`}>Equipos inscritos</p>
                   <div className="flex flex-wrap gap-1.5">
                     {t.teams.map((x: any) => <span key={x.id} className={`px-2.5 py-1 rounded-md text-[11px] ${myTeamIds.has(x.id) ? "bg-emerald-500/15 text-emerald-500 font-semibold" : isDark ? "bg-white/5 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{x.name}</span>)}
                   </div>
@@ -240,7 +240,7 @@ export default function TorneosPage() {
                 </div>
               ) : (
                 <div className="space-y-2.5">
-                  <label className={`block text-[11px] font-semibold uppercase tracking-wide ${sub}`}>Equipo</label>
+                  <label className={`block text-[12px] font-semibold ${sub}`}>Equipo</label>
                   <select value={teamId} onChange={e => setTeamId(e.target.value)} className={`w-full h-12 px-3 rounded-md border outline-hidden ${isDark ? "bg-white/4 border-white/10 text-slate-100" : "bg-white border-slate-200 text-slate-900"}`}>
                     {eligible.map(team => <option key={team.id} value={team.id}>{team.name}</option>)}
                   </select>

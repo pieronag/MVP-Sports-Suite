@@ -324,7 +324,7 @@ export default function EstadisticasPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[11px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[12px] font-semibold animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -336,7 +336,7 @@ export default function EstadisticasPage() {
         <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Estadísticas</h1>
+        <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center">Estadísticas</h1>
         <div className="w-10" />
       </div>
 
@@ -347,22 +347,22 @@ export default function EstadisticasPage() {
           <div className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Rango Actual</p>
+                <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Rango Actual</p>
                 <p className="text-[16px] font-semibold" style={{ color: analytics.rangoActual.color }}>{analytics.rangoActual.name}</p>
                 <div className="mt-2 px-3 py-1.5 rounded-md border self-start inline-block" style={{ borderColor: isDark ? 'rgba(255,255,255,0.06)' : '#E2E8F0' }}>
                   <span className={`text-[11px] font-semibold ${isDark ? "text-slate-300" : "text-slate-700"}`}>OVR: {analytics.nivel}</span>
                 </div>
               </div>
               <div className="text-right">
-                <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>XP Totales</p>
+                <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>XP Totales</p>
                 <p className={`text-[16px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{analytics.puntosTotales.toLocaleString()}</p>
-                <p className="text-emerald-500 text-[11px] font-semibold tracking-wide uppercase">XP acumulados</p>
+                <p className="text-emerald-500 text-[12px] font-semibold">XP acumulados</p>
               </div>
             </div>
             <div className="mt-5">
               <div className="flex justify-between mb-2">
                 <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>
-                  {analytics.rangoActual.id === analytics.siguienteRango.id ? 'NIVEL MÁXIMO' : `SIGUIENTE: ${analytics.siguienteRango.name}`}
+                  {analytics.rangoActual.id === analytics.siguienteRango.id ? 'Nivel máximo' : `SIGUIENTE: ${analytics.siguienteRango.name}`}
                 </span>
                 <span className={`text-[11px] font-semibold ${isDark ? "text-slate-300" : "text-slate-700"}`}>{analytics.progreso}%</span>
               </div>
@@ -387,7 +387,7 @@ export default function EstadisticasPage() {
                   <f.icon size={18} className="text-emerald-500" />
                 </div>
                 <p className={`text-[13px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{f.value}</p>
-                <p className={`text-[11px] font-semibold uppercase tracking-wide mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{f.label}</p>
+                <p className={`text-[12px] font-semibold mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{f.label}</p>
               </div>
             </GlowCard>
           ))}
@@ -465,7 +465,7 @@ export default function EstadisticasPage() {
                               <div className="min-w-0">
                                 <div className="flex items-center gap-2">
                                   <span className={`text-[13px] font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{item.badgeName}</span>
-                                  <span className="px-2 py-0.5 rounded text-[11px] font-semibold tracking-wide uppercase" style={{ backgroundColor: `${item.badgeColor}20`, color: item.badgeColor }}>{item.badgeTier}</span>
+                                  <span className="px-2 py-0.5 rounded text-[12px] font-semibold" style={{ backgroundColor: `${item.badgeColor}20`, color: item.badgeColor }}>{item.badgeTier}</span>
                                 </div>
                                 <p className={`text-[11px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{item.badgeDesc}</p>
                               </div>
@@ -473,7 +473,7 @@ export default function EstadisticasPage() {
                             <div className="text-right shrink-0 ml-3">
                               <div className="px-3 py-2 rounded-md text-center border" style={{ borderColor: `${item.badgeColor}25` }}>
                                 <p className="text-[15px] font-bold" style={{ color: item.badgeColor }}>+{item.xpBonus}</p>
-                                <p className="text-[11px] font-semibold tracking-wide uppercase" style={{ color: item.badgeColor }}>XP</p>
+                                <p className="text-[12px] font-semibold" style={{ color: item.badgeColor }}>XP</p>
                               </div>
                             </div>
                           </div>
@@ -486,7 +486,7 @@ export default function EstadisticasPage() {
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <span className="px-2.5 py-1 rounded text-[11px] font-semibold tracking-wide uppercase" style={{ backgroundColor: cs.bg, color: cs.txt }}>{item.resultText}</span>
+                              <span className="px-2.5 py-1 rounded text-[12px] font-semibold" style={{ backgroundColor: cs.bg, color: cs.txt }}>{item.resultText}</span>
                               <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{item.formattedTime}</span>
                             </div>
                             <p className={`text-[13px] font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{item.tenantName || item.bData?.tenantName || 'Partido'}</p>
@@ -498,7 +498,7 @@ export default function EstadisticasPage() {
                             </div>
                             {item.displayStatus === 'completed' && !item.bData?.teamStats && (
                               <button onClick={() => handleOpenStatsModal(item.bData ? { ...item.bData, id: item.id } : item)}
-                                className="mt-3 px-4 py-2 rounded-md text-[11px] font-semibold tracking-wide bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 transition-all active:scale-[0.98]">
+                                className="mt-3 px-4 py-2 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 transition-all active:scale-[0.98]">
                                 REGISTRAR RESULTADO
                               </button>
                             )}
@@ -516,7 +516,7 @@ export default function EstadisticasPage() {
                             ) : item.matchXP !== null ? (
                               <div className={`px-3 py-2 rounded-md text-center border`} style={{ borderColor: item.matchXP >= 0 ? 'rgba(16,185,129,0.2)' : 'rgba(244,63,94,0.2)', backgroundColor: item.matchXP >= 0 ? 'rgba(16,185,129,0.08)' : 'rgba(244,63,94,0.08)' }}>
                                 <p className="text-[15px] font-bold" style={{ color: item.matchXP >= 0 ? '#10b981' : '#f43f5e' }}>{item.matchXP >= 0 ? `+${item.matchXP}` : item.matchXP}</p>
-                                <p className="text-[11px] font-semibold tracking-wide uppercase" style={{ color: item.matchXP >= 0 ? '#10b981' : '#f43f5e' }}>XP</p>
+                                <p className="text-[12px] font-semibold" style={{ color: item.matchXP >= 0 ? '#10b981' : '#f43f5e' }}>XP</p>
                               </div>
                             ) : (
                               <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Procesando</p>
@@ -528,7 +528,7 @@ export default function EstadisticasPage() {
                   })}
                   {filtered.length > visibleCount && (
                     <button onClick={() => setVisibleCount(prev => prev + 10)}
-                      className={`w-full h-12 rounded-md font-semibold text-[11px] uppercase tracking-wide transition-all active:scale-[0.98] ${isDark ? "bg-white/4 text-emerald-500 hover:bg-white/8" : "bg-slate-100 text-emerald-600 hover:bg-slate-200"}`}>
+                      className={`w-full h-12 rounded-md font-semibold text-[12px] transition-all active:scale-[0.98] ${isDark ? "bg-white/4 text-emerald-500 hover:bg-white/8" : "bg-slate-100 text-emerald-600 hover:bg-slate-200"}`}>
                       Cargar 10 más
                     </button>
                   )}
@@ -546,7 +546,7 @@ export default function EstadisticasPage() {
         <div className="fixed inset-0 z-50 overflow-y-auto" style={{ backgroundColor: '#020611' }}>
           <div className="min-h-screen p-5 pt-12">
             <div className="flex items-center justify-between mb-6">
-              <h2 className={`text-[15px] font-heading font-black uppercase ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedMatch ? 'EDITAR' : 'REGISTRAR'} PARTIDO</h2>
+              <h2 className={`text-[15px] font-heading font-black ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedMatch ? 'Editar' : 'Registrar'} partido</h2>
               <button aria-label="Cerrar" onClick={() => setShowStatsModal(false)} className="w-9 h-9 rounded-md flex items-center justify-center bg-white/6">
                 <ChevronLeft size={18} className="text-slate-400" style={{ transform: 'rotate(-90deg)' }} />
               </button>
@@ -563,7 +563,7 @@ export default function EstadisticasPage() {
                       {selectedMatch.venueName || selectedMatch.tenantName || 'Recinto'}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="px-2 py-0.5 rounded text-[11px] font-semibold uppercase bg-emerald-500/10 text-emerald-500">{selectedMatch.sport || 'FÚTBOL'}</span>
+                      <span className="px-2 py-0.5 rounded text-[12px] font-semibold bg-emerald-500/10 text-emerald-500">{selectedMatch.sport || 'FÚTBOL'}</span>
                       <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{selectedMatch.startTime || selectedMatch.time || '19:00'}</span>
                     </div>
                   </div>
@@ -583,9 +583,9 @@ export default function EstadisticasPage() {
                   <GlowCard isDark={isDark}>
                     <div className="p-4 flex items-center justify-center gap-6">
                       <div className="flex-1 text-center">
-                        <p className="text-red-400 text-[11px] font-semibold tracking-wide uppercase mb-1">Equipo A</p>
+                        <p className="text-red-400 text-[12px] font-semibold mb-1">Equipo A</p>
                         {isScorelessSport ? (
-                          winnerTeamInput === 'A' ? <span className="inline-block px-3 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-500">GANADOR</span> : <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>-</p>
+                          winnerTeamInput === 'A' ? <span className="inline-block px-3 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-500">Ganador</span> : <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>-</p>
                         ) : (
                           <p className={`text-[18px] font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{scoreA}</p>
                         )}
@@ -594,9 +594,9 @@ export default function EstadisticasPage() {
                         <span className="text-[11px] font-semibold text-slate-500">VS</span>
                       </div>
                       <div className="flex-1 text-center">
-                        <p className="text-blue-400 text-[11px] font-semibold tracking-wide uppercase mb-1">Equipo B</p>
+                        <p className="text-blue-400 text-[12px] font-semibold mb-1">Equipo B</p>
                         {isScorelessSport ? (
-                          winnerTeamInput === 'B' ? <span className="inline-block px-3 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-500">GANADOR</span> : <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>-</p>
+                          winnerTeamInput === 'B' ? <span className="inline-block px-3 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-500">Ganador</span> : <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>-</p>
                         ) : (
                           <p className={`text-[18px] font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{scoreB}</p>
                         )}
@@ -607,7 +607,7 @@ export default function EstadisticasPage() {
 
                   <GlowCard isDark={isDark}>
                     <div className={`p-4 space-y-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                      <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>
+                      <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>
                         {isScorelessSport && selectedTeamId ? 'Equipo ganador' : 'Resultado'}
                       </p>
                       <div className={`flex rounded-md p-1 gap-1 ${isDark ? "bg-white/4" : "bg-slate-100"}`}>
@@ -632,7 +632,7 @@ export default function EstadisticasPage() {
                                 backgroundColor: sel === opt.key ? colors[opt.key] : 'transparent',
                                 color: sel === opt.key ? 'white' : (isDark ? '#94a3b8' : '#64748b')
                               }}>
-                              {opt.label.toUpperCase()}
+                              {opt.label}
                             </button>
                           );
                         })}
@@ -670,7 +670,7 @@ export default function EstadisticasPage() {
                   <>
                   <GlowCard isDark={isDark}>
                     <div className="p-4">
-                      <p className={`text-[11px] font-semibold uppercase tracking-wide mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipo</p>
+                      <p className={`text-[12px] font-semibold mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipo</p>
                       <div className={`flex rounded-md p-1 gap-1 ${isDark ? "bg-white/4" : "bg-slate-100"}`}>
                         {[{ key: '', label: 'Sin equipo' }, ...userTeams.map((t: any) => ({ key: t.id, label: t.name }))].map((opt) => (
                           <button key={opt.key} onClick={() => {
@@ -689,7 +689,7 @@ export default function EstadisticasPage() {
                   {teamMembers.length > 0 && (
                     <GlowCard isDark={isDark}>
                       <div className="p-4">
-                        <p className={`text-[11px] font-semibold uppercase tracking-wide mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Jugadores</p>
+                        <p className={`text-[12px] font-semibold mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Jugadores</p>
                         <div className="flex gap-1.5 mb-4">
                           {['A', 'B', 'N'].map(t => (
                             <button key={t} onClick={() => setWinnerTeamInput(t as any)}
@@ -731,7 +731,7 @@ export default function EstadisticasPage() {
 
                   {(
                     <div className="flex gap-3">
-                      <button disabled={savingStats} onClick={executeSaveMatchStats} className="flex-1 h-12 rounded-md bg-emerald-500 text-white font-semibold text-[11px] uppercase tracking-wide transition-all active:scale-[0.98]">
+                      <button disabled={savingStats} onClick={executeSaveMatchStats} className="flex-1 h-12 rounded-md bg-emerald-500 text-white font-semibold text-[12px] transition-all active:scale-[0.98]">
                         {savingStats ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" /> : 'Guardar'}
                       </button>
                     </div>

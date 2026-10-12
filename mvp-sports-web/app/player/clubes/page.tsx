@@ -1,5 +1,6 @@
 "use client";
-import { GlowCard, SectionPill } from "@/components/player/ui";
+import VenueCard from "@/components/player/VenueCard";
+import { SectionPill } from "@/components/player/ui";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Search, Star, MapPin, Navigation, Compass } from "@/components/player/icons";
@@ -112,7 +113,7 @@ export default function ExploreClubesPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[11px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[12px] font-semibold animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -124,7 +125,7 @@ export default function ExploreClubesPage() {
           <button aria-label="Volver" onClick={() => router.back()} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
             <ChevronLeft size={20} className="text-emerald-500" />
           </button>
-          <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Recintos</h1>
+          <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center">Recintos</h1>
           <div className="w-10" />
         </div>
         <div className={`flex items-center gap-3 px-4 h-12 rounded-md border ${isDark ? "bg-white/4 border-white/6" : "bg-slate-50 border-slate-200"}`}>
@@ -167,45 +168,8 @@ export default function ExploreClubesPage() {
           const vComuna = data.commune || data.comuna || "Santiago";
           const distance = calcDistance(venue);
           return (
-            <GlowCard key={venue.id} isDark={isDark}>
-              <button onClick={() => router.push(`/player/clubes/${venue.id}`)} className="w-full block text-left">
-                <div className="h-[160px] rounded-md overflow-hidden relative">
-                  <img src={getVenueImage(venue)} alt={venue.name} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
-                  <div className="absolute top-4 left-4 flex flex-wrap gap-1.5">
-                    {allSports.slice(0, 3).map((s: string) => (
-                      <span key={s} className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold tracking-wide uppercase">{s}</span>
-                    ))}
-                    {allSports.length > 3 && <span className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold">+{allSports.length - 3}</span>}
-                  </div>
-                </div>
-              </button>
-              <div className="p-5">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1 min-w-0">
-                    <p className={`text-[16px] font-semibold truncate ${isDark ? "text-slate-100" : "text-slate-900"}`}>{venue.name}</p>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <MapPin size={11} className={isDark ? "text-slate-500" : "text-slate-400"} />
-                      <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{vComuna}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 bg-emerald-500/10 px-2.5 py-1.5 rounded-md shrink-0">
-                    <Star size={12} className="text-emerald-500" fill="currentColor" />
-                    <span className="text-emerald-500 font-semibold text-[11px]">{Number(venue.rating) > 0 ? Number(venue.rating).toFixed(1) : "Nuevo"}</span>
-                  </div>
-                </div>
-                <div className={`flex items-center justify-between pt-4 border-t ${isDark ? "border-white/6" : "border-slate-200"}`}>
-                  <div className="flex items-center gap-1.5">
-                    <Navigation size={13} className="text-emerald-500" />
-                    <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{distance || "Cerca de ti"}</span>
-                  </div>
-                  <button onClick={() => router.push(`/player/clubes/${venue.id}`)}
-                    className="bg-emerald-500 hover:bg-emerald-600 transition-all px-5 h-10 rounded-md font-semibold text-[11px] text-white active:scale-[0.98]">
-                    RESERVAR
-                  </button>
-                </div>
-              </div>
-            </GlowCard>
+            <VenueCard key={venue.id} venue={venue} image={getVenueImage(venue)} sports={allSports} commune={vComuna} distance={distance}
+              isDark={isDark} onClick={() => router.push(`/player/clubes/${venue.id}`)} />
           );
         })}
         {filteredVenues.length === 0 && (

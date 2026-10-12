@@ -101,8 +101,8 @@ function InputRow({ icon: Icon, color, label, value, onChange, error, maxLength,
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <label className={`text-[11px] font-semibold uppercase tracking-wide ${error ? "text-red-500" : (isDark ? "text-slate-500" : "text-slate-400")}`}>{label}</label>
-          {error && <span className="text-[11px] font-bold text-red-500 tracking-wide">INVÁLIDO</span>}
+          <label className={`text-[12px] font-semibold ${error ? "text-red-500" : (isDark ? "text-slate-500" : "text-slate-400")}`}>{label}</label>
+          {error && <span className="text-[11px] font-bold text-red-500">Inválido</span>}
         </div>
         <input type={type} value={value} onChange={(e) => onChange(e.target.value)} maxLength={maxLength}
           className={`w-full bg-transparent text-[15px] font-medium outline-hidden mt-0.5 transition-colors ${error ? "text-red-500 placeholder-red-300" : (isDark ? "text-slate-100 placeholder-slate-600" : "text-slate-900 placeholder-slate-400")}`}
@@ -134,7 +134,7 @@ function SelectRow({ icon: Icon, color, label, value, options, onSelect, disable
           {renderIcon()}
         </div>
         <div className="flex-1 text-left min-w-0">
-          <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>{label}</p>
+          <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>{label}</p>
           <p className={`text-[14px] font-medium truncate ${disabled ? (isDark ? "text-slate-600" : "text-slate-400") : (isDark ? "text-slate-100" : "text-slate-900")}`}>
             {disabled ? "Elige deporte primero..." : (value || "Toca para elegir")}
           </p>
@@ -337,7 +337,7 @@ export default function PreferenciasPage() {
       <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-emerald-400 text-[11px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
+          <p className="text-emerald-400 text-[12px] font-semibold animate-pulse">Cargando</p>
         </div>
       </div>
     );
@@ -350,7 +350,7 @@ export default function PreferenciasPage() {
         <button aria-label="Volver" onClick={handleBack} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
         </button>
-        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Ajustes</h1>
+        <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center">Ajustes</h1>
         <button aria-label="Guardar cambios" onClick={handleSave} disabled={saving}
           className="w-10 h-10 rounded-md flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 transition-all active:scale-90">
           {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Save size={18} className="text-white" />}
@@ -362,14 +362,14 @@ export default function PreferenciasPage() {
         <div className="mx-5 mt-5 mb-3 p-4 rounded-md bg-red-500/10 border border-red-500/20">
           <div className="flex items-center gap-2.5 mb-2">
             <AlertCircle size={16} className="text-red-400" />
-            <span className="text-red-400 font-semibold text-[11px] uppercase tracking-wide">Perfil Incompleto</span>
+            <span className="text-red-400 font-semibold text-[12px]">Perfil Incompleto</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {!formData.displayName && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[11px] font-semibold uppercase tracking-wide">Nombre</span>}
-            {!formData.phone && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[11px] font-semibold uppercase tracking-wide">Teléfono</span>}
-            {!formData.rut && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[11px] font-semibold uppercase tracking-wide">RUT</span>}
-            {(!formData.birthDate || !validateAge(formData.birthDate)) && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[11px] font-semibold uppercase tracking-wide">F. Nacimiento (18+)</span>}
-            {!formData.mainSport && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[11px] font-semibold uppercase tracking-wide">Deporte</span>}
+            {!formData.displayName && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[12px] font-semibold">Nombre</span>}
+            {!formData.phone && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[12px] font-semibold">Teléfono</span>}
+            {!formData.rut && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[12px] font-semibold">RUT</span>}
+            {(!formData.birthDate || !validateAge(formData.birthDate)) && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[12px] font-semibold">F. Nacimiento (18+)</span>}
+            {!formData.mainSport && <span className="px-2.5 py-1 rounded-md bg-red-500/15 text-red-400 text-[12px] font-semibold">Deporte</span>}
           </div>
         </div>
       )}
@@ -546,7 +546,7 @@ export default function PreferenciasPage() {
           { label: "Confirmar Nueva", value: confirmNewPassword, set: setConfirmNewPassword, show: showConfirm, toggle: () => setShowConfirm(!showConfirm) },
         ].map((f) => (
           <div key={f.label} className="mb-4">
-            <label className={`text-[11px] font-semibold uppercase tracking-wide mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>{f.label}</label>
+            <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>{f.label}</label>
             <div className={`flex items-center rounded-md border transition-colors focus-within:border-emerald-500/50 ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`}>
               <input type={f.show ? "text" : "password"} value={f.value} onChange={(e) => f.set(e.target.value)} placeholder="••••••••"
                 className={`flex-1 p-3.5 text-[13px] font-medium bg-transparent outline-hidden ${isDark ? "text-slate-100" : "text-slate-900"}`}

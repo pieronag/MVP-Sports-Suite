@@ -145,7 +145,7 @@ export default function VenueDetailPage() {
   const [slotsByCourt, setSlotsByCourt] = useState<Record<string, string[]>>({});
   const [loadingAllSlots, setLoadingAllSlots] = useState(false);
   useEffect(() => {
-    if (!id || bookingStep !== 3 || !selectedSport || !selectedDate) return;
+    if (!id || bookingStep !== 2 || !selectedSport || !selectedDate) return;
     let alive = true;
     const sel = getSportKey(selectedSport);
     const list = courts.filter((c: any) => { const cs = getSportKey(c.sport || ""); return (cs.includes(sel) || sel.includes(cs)) && c.status !== "maintenance" && c.status !== "occupied"; });
@@ -295,9 +295,10 @@ export default function VenueDetailPage() {
     setAutoSport(true);
   }, [availableSports, profile, autoSport]);
 
-  const STEP_LABELS = ["Deporte", "Día", "Cancha y hora", "Confirmar"];
+  const DAY_KEYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+  const STEP_LABELS = ["Deporte", "Día y hora", "Confirmar"];
   const StepIndicator = () => (
-    <ol className="grid grid-cols-4 gap-1 mb-4" aria-label="Pasos de la reserva">
+    <ol className="grid grid-cols-3 gap-1 mb-4" aria-label="Pasos de la reserva">
       {STEP_LABELS.map((label, i) => {
         const s = i + 1, done = bookingStep > s, current = bookingStep === s;
         return (
@@ -315,7 +316,7 @@ export default function VenueDetailPage() {
   const renderSportSelection = () => (
     <GlowCard isDark={isDark}>
       <div className="p-5">
-        <p className={`text-[11px] font-semibold uppercase tracking-wide mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige un deporte</p>
+        <p className={`text-[12px] font-semibold mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige un deporte</p>
         <div className="flex flex-wrap gap-3">
           {availableSports.map((sport: string) => {
             const info = getSportInfo(sport);
@@ -363,16 +364,28 @@ export default function VenueDetailPage() {
         <div className="p-5">
           <div className="flex items-center justify-between mb-4">
             {renderBackButton()}
-            <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige la hora</p>
+            <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige día y hora</p>
             <div className="w-12" />
           </div>
-          <div className={`flex items-center gap-2 mb-4 p-3 rounded-md border ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
-            <Clock size={14} className="text-emerald-500" />
-            <span className={`text-[11px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>
-              {dateLabel} · {dateDayName} {currentDateInfo.date.toLocaleDateString("es-CL", { day: "numeric", month: "long" })}
-            </span>
-            <button onClick={() => setBookingStep(2)} className="ml-auto text-emerald-500 text-[11px] font-semibold">Cambiar día</button>
+          {/* Tira de días: cambiar de día no saca al jugador del paso */}
+          <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 mb-4" role="tablist" aria-label="Día">
+            {Array.from({ length: 14 }, (_, off) => {
+              const d = getChileDate(off).date;
+              const on = off === dateOffset;
+              const closed = (venue as any)?.schedule?.[DAY_KEYS[d.getDay()]]?.isOpen === false;
+              return (
+                <button key={off} role="tab" aria-selected={on} onClick={() => setDateOffset(off)}
+                  className={`shrink-0 w-[58px] py-2 rounded-md flex flex-col items-center transition-all active:scale-95 ${on ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-200" : "bg-slate-100 text-slate-700"} ${closed && !on ? "opacity-45" : ""}`}>
+                  <span className="text-[11px] font-semibold">{off === 0 ? "Hoy" : off === 1 ? "Mañana" : ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][d.getDay()]}</span>
+                  <span className="text-[18px] font-heading font-black leading-tight tabular-nums">{d.getDate()}</span>
+                  <span className={`text-[11px] font-medium ${on ? "text-white/80" : isDark ? "text-slate-500" : "text-slate-400"}`}>{closed ? "Cerrado" : d.toLocaleDateString("es-CL", { month: "short" }).replace(".", "")}</span>
+                </button>
+              );
+            })}
           </div>
+          {(venue as any)?.schedule?.[DAY_KEYS[currentDateInfo.date.getDay()]]?.isOpen === false && (
+            <p className={`text-[13px] font-medium py-6 text-center ${isDark ? "text-slate-400" : "text-slate-500"}`}>El recinto está cerrado este día. Elige otro.</p>
+          )}
 
           {bookableCourts.length === 0 ? (
             <p className={`text-[13px] font-medium py-6 text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay canchas disponibles para este deporte</p>
@@ -424,7 +437,7 @@ export default function VenueDetailPage() {
                       );
                     })}
                   </div>
-                  <button onClick={() => setBookingStep(4)} disabled={!selectedCourtId}
+                  <button onClick={() => setBookingStep(3)} disabled={!selectedCourtId}
                     className="mt-4 w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50">
                     Continuar <ChevronRight size={16} />
                   </button>
@@ -465,75 +478,6 @@ export default function VenueDetailPage() {
     setSelectedTime(null);
   }, [dateOffset]);
 
-  const renderDateTimeSelection = () => (
-    <GlowCard isDark={isDark}>
-      <div className="p-5">
-        <div className="flex items-center justify-between mb-5">
-          {renderBackButton()}
-          <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige el día</p>
-          <div className="w-12" />
-        </div>
-        {/* Date selector card */}
-        <div className={`p-5 rounded-md border mb-5 ${isDark ? "bg-emerald-500/5 border-emerald-500/10" : "bg-emerald-50 border-emerald-200"}`}>
-          <div className="flex items-center justify-between mb-4">
-            <button aria-label="Volver" onClick={() => { if (dateOffset > 0) setDateOffset(p => p - 1); }} disabled={dateOffset === 0}
-              className={`w-12 h-12 rounded-md flex items-center justify-center transition-all active:scale-90 ${dateOffset === 0 ? "opacity-30" : isDark ? "bg-white/6 hover:bg-white/10" : "bg-white hover:bg-slate-100 shadow-xs"}`}>
-              <ChevronLeft size={18} className="text-emerald-500" />
-            </button>
-            <div className="flex flex-col items-center">
-              <span className={`text-[22px] font-bold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{currentDateInfo.date.getDate()}</span>
-              <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-400" : "text-slate-500"}`}>{currentDateInfo.date.toLocaleDateString("es-CL", { month: "long" })}</span>
-              <span className={`text-[11px] font-bold mt-0.5 ${isDark ? "text-emerald-400" : "text-emerald-600"}`}>{dateLabel} • {dateDayName}</span>
-            </div>
-            <button aria-label="Siguiente" onClick={() => { setDateOffset(p => p + 1); }}
-              className={`w-12 h-12 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-white hover:bg-slate-100 shadow-xs"}`}>
-              <ChevronRight size={18} className="text-emerald-500" />
-            </button>
-          </div>
-          {/* Quick day buttons */}
-          <div className="flex gap-2">
-            {[0, 1, 2, 3, 4, 5, 6].map(offset => {
-              const d = new Date(currentDateInfo.date);
-              d.setDate(currentDateInfo.date.getDate() - dateOffset + offset);
-              const labels = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
-              const isActive = offset === dateOffset;
-              const isPastOffset = offset < dateOffset;
-              return (
-                <button key={offset} onClick={() => { if (!isPastOffset) setDateOffset(offset); }} disabled={isPastOffset}
-                  className={`flex-1 py-2.5 rounded-md flex flex-col items-center transition-all active:scale-95 ${isActive ? "bg-emerald-500 text-white shadow-md" : isPastOffset ? (isDark ? "text-slate-600" : "text-slate-300") : isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"}`}>
-                  <span className="text-[11px] font-semibold uppercase">{labels[d.getDay()]}</span>
-                  <span className="text-[11px] font-bold mt-0.5">{d.getDate()}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-        <div className={`text-center mb-4 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-          <p className="text-[11px] font-medium">
-            {(() => {
-              if (!selectedSport) return "Selecciona un deporte primero";
-              const v = venue as any;
-              // Check if venue is open on selected day
-              const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
-              const dayName = days[currentDateInfo.date.getDay()];
-              const schedule = v?.schedule?.[dayName];
-              const isClosed = schedule?.isOpen === false;
-              if (isClosed) return "0 canchas disponibles • Recinto cerrado este día";
-              const matchingCourts = courts.filter(c => getSportKey(c.sport || "").includes(getSportKey(selectedSport)) && (c as any).status !== "maintenance" && (c as any).status !== "occupied");
-              const count = matchingCourts.length;
-              if (count === 0) return "0 canchas disponibles para " + selectedSport;
-              return `${count} cancha${count > 1 ? "s" : ""} disponible${count > 1 ? "s" : ""} para ${selectedSport}`;
-            })()}
-          </p>
-        </div>
-        <button onClick={() => setBookingStep(3)}
-          className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
-          Ver canchas disponibles <ChevronRight size={16} />
-        </button>
-      </div>
-    </GlowCard>
-  );
-
   const renderSummary = () => {
     if (!confirmationData) return null;
     const info = getSportInfo(selectedSport || "");
@@ -545,7 +489,7 @@ export default function VenueDetailPage() {
         <div className="p-5">
           <div className="flex items-center justify-between mb-5">
             {renderBackButton()}
-            <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-500" : "text-slate-400"}`}>Reserva</p>
+            <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Reserva</p>
             <div className="w-12" />
           </div>
           <div className="space-y-0 divide-y divide-emerald-500/5">
@@ -576,7 +520,7 @@ export default function VenueDetailPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-[15px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{dateDayName} {new Date(`${selectedDate}T12:00:00`).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}</p>
-                <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{selectedTime} HRS</p>
+                <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{selectedTime} hrs · 60 min</p>
               </div>
             </div>
             {/* Price */}
@@ -586,12 +530,12 @@ export default function VenueDetailPage() {
                   <p className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Valor de la reserva</p>
                   <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Pago único • Sin cargos adicionales</p>
                 </div>
-                <p className="text-[22px] font-bold text-emerald-500">${Number(confirmationData.price).toLocaleString("es-CL")}</p>
+                <p className="text-[24px] font-heading font-black tabular-nums text-emerald-500">${Number(confirmationData.price).toLocaleString("es-CL")}</p>
               </div>
             </div>
           </div>
-          <button onClick={handleConfirmBooking} className="w-full mt-5 h-14 rounded-md bg-emerald-500 text-white font-semibold text-[15px] uppercase tracking-wide flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
-            <Zap size={20} /> Confirmar y Reservar
+          <button onClick={handleConfirmBooking} className="w-full mt-5 h-14 rounded-md bg-emerald-500 text-white font-semibold text-[15px] flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
+            <Zap size={20} /> Confirmar y pagar
           </button>
         </div>
       </GlowCard>
@@ -602,7 +546,7 @@ export default function VenueDetailPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[11px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[12px] font-semibold animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -611,42 +555,51 @@ export default function VenueDetailPage() {
 
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-      {/* Hero */}
-      <div className="h-[220px] relative overflow-hidden">
-        <img src={venueData?.imageURL || venueData?.imageUrl || "https://images.unsplash.com/photo-1574629810360-7efbbe195018"} alt={venue?.name} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-black/10" />
-        <button aria-label="Volver" onClick={() => router.back()} className="absolute top-12 left-5 w-10 h-10 rounded-md bg-black/40 border border-white/10 flex items-center justify-center z-10">
-          <ChevronLeft size={20} className="text-white" />
-        </button>
-        <div className="absolute bottom-6 left-6 right-6">
-          <h1 className="text-white text-[22px] font-heading font-black uppercase">{venue?.name}</h1>
-          {venueData?.description && <p className="text-white/60 text-[11px] font-medium mt-1 line-clamp-2">{venueData.description}</p>}
+      {/* Cabecera compacta: lo justo para saber dónde estás; la reserva es lo principal */}
+      <div className="h-[168px] relative overflow-hidden">
+        <img src={venueData?.imageURL || venueData?.imageUrl || "https://images.unsplash.com/photo-1574629810360-7efbbe195018"} alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/45 to-black/20" />
+        <div className="absolute top-12 left-5 right-5 flex items-center justify-between z-10">
+          <button aria-label="Volver" onClick={() => router.back()} className="w-10 h-10 rounded-md bg-black/45 backdrop-blur-sm border border-white/10 flex items-center justify-center">
+            <ChevronLeft size={20} className="text-white" />
+          </button>
+          <div className="flex gap-2">
+            {venueData?.gallery && venueData.gallery.length > 0 && (
+              <button aria-label="Ver galería" onClick={() => setShowGallery(true)} className="w-10 h-10 rounded-md bg-black/45 backdrop-blur-sm border border-white/10 flex items-center justify-center">
+                <Images size={18} className="text-white" />
+              </button>
+            )}
+            {venueCoords && (
+              <button aria-label="Cómo llegar" onClick={handleOpenMaps} className="w-10 h-10 rounded-md bg-black/45 backdrop-blur-sm border border-white/10 flex items-center justify-center">
+                <Navigation size={18} className="text-white" />
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="absolute bottom-4 left-5 right-5">
+          <h1 className="text-white text-[22px] font-heading font-black tracking-tight leading-tight line-clamp-2">{venue?.name}</h1>
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-white/80 text-[12px] font-medium">
+            <span className="flex items-center gap-1"><Star size={12} className="text-amber-400" fill="currentColor" />{Number(venue?.rating) > 0 ? Number(venue?.rating).toFixed(1) : "Nuevo"}</span>
+            {distanceLabel && <><span aria-hidden>·</span><span>{distanceLabel}</span></>}
+            <span aria-hidden>·</span><span className="flex items-center gap-1"><Clock size={12} />Hoy {currentDayHours}</span>
+          </p>
         </div>
       </div>
 
-      <div className="px-5 pb-8 -mt-4 relative z-10 space-y-4">
-        {/* Venue Info Card */}
+      <div className="px-5 pt-5 pb-8 space-y-4">
+        {/* Reserva: primero en la pantalla */}
+        <h2 className={`text-[18px] font-heading font-black tracking-tight ${isDark ? "text-slate-100" : "text-slate-900"}`}>Reserva tu cancha</h2>
+        <StepIndicator />
+        {bookingStep === 1 && renderSportSelection()}
+        {bookingStep === 2 && renderCourtSelection()}
+        {bookingStep === 3 && renderSummary()}
+
+        {/* Información del recinto: debajo de la reserva */}
+        <SectionPill label="Sobre el recinto" />
         <GlowCard isDark={isDark}>
-          <div className="p-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 bg-emerald-500/10 px-3 py-1.5 rounded-md">
-                  <Star size={13} className="text-emerald-500" fill="currentColor" />
-                  <span className="text-emerald-500 font-semibold text-[13px]">{Number(venue?.rating) > 0 ? Number(venue?.rating).toFixed(1) : "Nuevo"}</span>
-                </div>
-                {distanceLabel && (
-                  <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-md bg-emerald-500/5">
-                    <Navigation size={11} className="text-emerald-500" />
-                    <span className="text-emerald-500 text-[11px] font-semibold">{distanceLabel}</span>
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Clock size={12} className="text-emerald-500" />
-                <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Hoy: {currentDayHours}</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
+          <div className="p-5 space-y-4">
+            {venueData?.description && <p className={`text-[13px] leading-relaxed ${isDark ? "text-slate-300" : "text-slate-600"}`}>{venueData.description}</p>}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               {venueData?.phone && (
                 <a href={`tel:${venueData.phone}`} className="flex items-center gap-1.5">
                   <Phone size={12} className="text-emerald-500" />
@@ -677,41 +630,9 @@ export default function VenueDetailPage() {
               {venueData?.isMercadopagoActive && (
                 <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
                   <CreditCard size={11} className="text-emerald-500" />
-                  <span className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? "text-slate-300" : "text-slate-600"}`}>Mercado Pago</span>
+                  <span className={`text-[12px] font-semibold ${isDark ? "text-slate-300" : "text-slate-600"}`}>Mercado Pago</span>
                 </div>
               )}
-            </div>
-            {/* Action buttons row */}
-            <div className="flex gap-2">
-              {venueData?.gallery && venueData.gallery.length > 0 && (
-                <button onClick={() => setShowGallery(true)}
-                  className="flex-1 h-10 rounded-md border text-[11px] font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
-                  style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
-                  <Images size={13} className="text-emerald-500" />
-                  <span className={isDark ? "text-slate-300" : "text-slate-600"}>Galería</span>
-                </button>
-              )}
-              {venueCoords && (
-                <button onClick={handleOpenMaps}
-                  className="flex-1 h-10 rounded-md border text-[11px] font-semibold transition-all active:scale-[0.98] flex items-center justify-center gap-1.5"
-                  style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
-                  <Navigation size={13} className="text-emerald-500" />
-                  <span className={isDark ? "text-slate-300" : "text-slate-600"}>Cómo llegar</span>
-                </button>
-              )}
-            </div>
-            {/* Sports */}
-            <div className="flex flex-wrap gap-2">
-              {availableSports.map((sport: string) => {
-                const info = getSportInfo(sport);
-                const Icon = info.icon;
-                return (
-                  <div key={sport} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border" style={{ backgroundColor: `${info.color}10`, borderColor: `${info.color}20` }}>
-                    <Icon color={info.color} size={14} />
-                    <span className="text-[11px] font-semibold" style={{ color: info.color }}>{sport}</span>
-                  </div>
-                );
-              })}
             </div>
             {/* Amenities */}
             {venueData?.amenities && venueData.amenities.length > 0 && (
@@ -725,14 +646,6 @@ export default function VenueDetailPage() {
             )}
           </div>
         </GlowCard>
-
-        {/* Booking Wizard */}
-        <SectionPill label="Reservar Cancha" />
-        <StepIndicator />
-        {bookingStep === 1 && renderSportSelection()}
-        {bookingStep === 2 && renderDateTimeSelection()}
-        {bookingStep === 3 && renderCourtSelection()}
-        {bookingStep === 4 && renderSummary()}
 
         {/* Reviews */}
         <SectionPill label="Reseñas" />
@@ -754,7 +667,7 @@ export default function VenueDetailPage() {
           <GlowCard isDark={isDark}>
             <div className="py-8 flex flex-col items-center">
               <Star size={28} className={isDark ? "text-slate-600" : "text-slate-300"} />
-              <p className={`text-[11px] font-semibold uppercase tracking-wide mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin reseñas por el momento</p>
+              <p className={`text-[12px] font-semibold mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin reseñas por el momento</p>
             </div>
           </GlowCard>
         )}
@@ -762,7 +675,7 @@ export default function VenueDetailPage() {
         {/* Rules button */}
         {(venueData?.rules?.length > 0 || venueData?.cancellationPolicy) && (
           <button onClick={() => setShowRules(true)}
-            className="w-full h-[44px] rounded-md font-semibold text-[11px] uppercase tracking-wide flex items-center justify-center gap-2 transition-all active:scale-[0.98] border"
+            className="w-full h-[44px] rounded-md font-semibold text-[12px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] border"
             style={{ borderColor: isDark ? "rgba(255,255,255,0.08)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC", color: isDark ? "#94A3B8" : "#64748B" }}>
             <Ban size={14} /> Reglas del Recinto
           </button>
@@ -804,7 +717,7 @@ export default function VenueDetailPage() {
               ))}
               {venueData?.cancellationPolicy && (
                 <div className={`p-4 rounded-md border ${isDark ? "bg-amber-500/5 border-amber-500/10" : "bg-amber-50 border-amber-200"}`}>
-                  <p className={`text-[11px] font-semibold uppercase tracking-wide mb-1 ${isDark ? "text-amber-400" : "text-amber-600"}`}>Política de Cancelación</p>
+                  <p className={`text-[12px] font-semibold mb-1 ${isDark ? "text-amber-400" : "text-amber-600"}`}>Política de Cancelación</p>
                   <p className={`text-[11px] font-medium leading-snug ${isDark ? "text-slate-300" : "text-slate-700"}`}>{venueData.cancellationPolicy}</p>
                 </div>
               )}

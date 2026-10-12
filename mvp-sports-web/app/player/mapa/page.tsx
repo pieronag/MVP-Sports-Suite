@@ -1,4 +1,5 @@
 "use client";
+import VenueCard from "@/components/player/VenueCard";
 import { SectionPill } from "@/components/player/ui";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -174,7 +175,7 @@ export default function MapaPage() {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-400 text-[11px] font-semibold tracking-[0.06em] uppercase animate-pulse">Cargando</p>
+        <p className="text-emerald-400 text-[12px] font-semibold animate-pulse">Cargando</p>
       </div>
     );
   }
@@ -185,7 +186,7 @@ export default function MapaPage() {
       <div className={`px-5 pt-12 pb-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="flex items-center justify-between mb-4">
           <div className="w-10" aria-hidden />
-          <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center text-emerald-500">Mapa</h1>
+          <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center text-emerald-500">Mapa</h1>
           <button aria-label="Usar mi ubicación" onClick={handleLocate} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
             <Locate size={18} className="text-emerald-500" />
           </button>
@@ -228,37 +229,8 @@ export default function MapaPage() {
           venues.map((v) => {
             const ds = v.displaySports.split(" • ");
             return (
-              <button key={v.id} onClick={() => router.push(`/player/clubes/${v.id}`)} className="w-full text-left">
-                <div className={`relative rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"} ${isDark ? "shadow-black/20" : "shadow-slate-200/50"}`}>
-                  <div className="h-[160px] relative">
-                    <img src={getVenueImage(v)} alt={v.name} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/85 to-transparent" />
-                    <div className="absolute top-4 left-4 flex flex-wrap gap-1.5">
-                      {ds.slice(0, 3).map((s: string) => (
-                        <span key={s} className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold tracking-wide uppercase">{s}</span>
-                      ))}
-                      {ds.length > 3 && <span className="bg-emerald-500/90 px-2.5 py-1 rounded-md text-white text-[11px] font-semibold">+{ds.length - 3}</span>}
-                    </div>
-                    <div className="absolute bottom-4 left-5 right-5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-white text-[16px] font-semibold uppercase truncate">{v.name}</p>
-                          <div className="flex items-center gap-2 mt-1.5">
-                            <div className="flex items-center gap-1 bg-emerald-500/20 px-2 py-0.5 rounded-md">
-                              <Star size={10} className="text-emerald-500" fill="currentColor" />
-                              <span className="text-emerald-500 text-[11px] font-semibold">{Number(v.rating) > 0 ? Number(v.rating).toFixed(1) : "Nuevo"}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="bg-white/15 px-3 py-2 rounded-md flex items-center gap-1.5 border border-white/10 shrink-0 ml-3">
-                          <Navigation size={11} className="text-white" />
-                          <span className="text-white text-[11px] font-semibold">{v.distance}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </button>
+              <VenueCard key={v.id} venue={v} image={getVenueImage(v)} sports={ds.filter(Boolean)} commune={(v as any).commune || (v as any).comuna}
+                distance={v.distance} isDark={isDark} onClick={() => router.push(`/player/clubes/${v.id}`)} />
             );
           })
         )}

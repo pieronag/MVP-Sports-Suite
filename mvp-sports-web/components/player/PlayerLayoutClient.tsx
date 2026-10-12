@@ -86,7 +86,7 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
                                 </div>
                                 <div className="min-w-0">
                                     <p className={`text-[15px] font-bold truncate font-heading ${isDark ? 'text-white' : 'text-slate-700'}`}>{profile.displayName || (profile as any).fullName || 'Jugador'}</p>
-                                    <p className="text-[11px] uppercase tracking-[0.12em] font-black text-slate-400">{profile.tier || 'Bronce'} · {profile.xp || 0} XP</p>
+                                    <p className="text-[12px] font-black text-slate-400">{profile.tier || 'Bronce'} · {profile.xp || 0} XP</p>
                                 </div>
                             </Link>
                         )}
@@ -170,7 +170,7 @@ export default function PlayerLayoutClient({ children }: { children: React.React
                             </div>
                         </div>
                     </div>
-                    <p className="text-emerald-400 font-semibold text-[11px] uppercase tracking-[0.4em] mt-8 animate-pulse">Cargando...</p>
+                    <p className="text-emerald-400 font-semibold text-[12px] mt-8 animate-pulse">Cargando...</p>
                 </div>
             </div>
         );

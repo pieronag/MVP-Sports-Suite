@@ -290,7 +290,7 @@ export default function ReservasPage() {
       {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10" aria-hidden />
-        <h1 className="font-heading font-black text-[15px] tracking-tight uppercase flex-1 text-center">Mis Reservas</h1>
+        <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center">Mis Reservas</h1>
         <div className="w-10" />
       </div>
 
@@ -370,12 +370,12 @@ export default function ReservasPage() {
                     )}
                     {/* El ingreso lo registra el recinto escaneando el código (no el jugador) */}
                     {isConfirmed && !b.checkIn && inWindow && b.paymentStatus === "paid" && (
-                      <button onClick={() => { setSelectedBooking(b); setShowTicket(true); }} className="flex-1 h-[46px] rounded-md bg-emerald-500 flex items-center justify-center gap-2 text-white font-semibold text-[11px] uppercase transition-all active:scale-[0.98]">
+                      <button onClick={() => { setSelectedBooking(b); setShowTicket(true); }} className="flex-1 h-[46px] rounded-md bg-emerald-500 flex items-center justify-center gap-2 text-white font-semibold text-[12px] transition-all active:scale-[0.98]">
                         <ShieldCheck size={15} /> Mostrar código en recepción
                       </button>
                     )}
                     {isActive && !b.checkOut && (
-                      <button onClick={() => handleCheckOut(b)} className="flex-1 h-[46px] rounded-md flex items-center justify-center gap-2 text-white font-semibold text-[11px] uppercase transition-all active:scale-[0.98]" style={{ backgroundColor: "#f59e0b" }}>
+                      <button onClick={() => handleCheckOut(b)} className="flex-1 h-[46px] rounded-md flex items-center justify-center gap-2 text-white font-semibold text-[12px] transition-all active:scale-[0.98]" style={{ backgroundColor: "#f59e0b" }}>
                         <CheckCircle2 size={15} /> CHECK-OUT
                       </button>
                     )}
@@ -393,7 +393,7 @@ export default function ReservasPage() {
                       <button
                         aria-label={b.paymentStatus === "refund_failed" ? "Ver devolución" : "Ver ticket"}
                         onClick={() => { setSelectedBooking(b); setShowTicket(true); }}
-                        className={b.paymentStatus === "refund_failed" ? "flex-1 h-[46px] rounded-md bg-red-500 flex items-center justify-center gap-2 text-white font-semibold text-[11px] uppercase transition-all active:scale-[0.98]" : "w-[46px] h-[46px] rounded-md flex items-center justify-center transition-all active:scale-[0.98]"}
+                        className={b.paymentStatus === "refund_failed" ? "flex-1 h-[46px] rounded-md bg-red-500 flex items-center justify-center gap-2 text-white font-semibold text-[12px] transition-all active:scale-[0.98]" : "w-[46px] h-[46px] rounded-md flex items-center justify-center transition-all active:scale-[0.98]"}
                         style={{ backgroundColor: b.paymentStatus === "refund_failed" ? undefined : isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9" }}
                       >
                         {b.paymentStatus === "refund_failed" ? (
@@ -416,7 +416,7 @@ export default function ReservasPage() {
             onClick={() => setHistoryLimit((prev) => prev + 10)}
             className={`mx-6 mt-4 mb-6 h-[55px] rounded-md flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${isDark ? "bg-white/6 border border-white/6 hover:bg-white/10" : "bg-slate-100 border border-slate-200 hover:bg-slate-200"}`}
           >
-            <span className="text-emerald-500 font-semibold text-[11px] uppercase tracking-[0.5px]">Cargar más reservas</span>
+            <span className="text-emerald-500 font-semibold text-[12px]">Cargar más reservas</span>
           </button>
         )}
       </div>
@@ -427,14 +427,14 @@ export default function ReservasPage() {
           {selectedBooking.paymentStatus === "refund_failed" ? (
             <div className={`w-full max-w-sm rounded-md border overflow-hidden ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
               <div className={`p-5 border-b flex justify-between items-center ${isDark ? "border-white/6" : "border-slate-200"}`}>
-                <span className={`text-[15px] font-semibold uppercase tracking-tight ${textClr}`}>Devolución Pendiente</span>
+                <span className={`text-[15px] font-semibold tracking-tight ${textClr}`}>Devolución Pendiente</span>
                 <button aria-label="Cerrar" onClick={() => setShowTicket(false)} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.05)" : "#F1F5F9" }}>
                   <X size={18} className={textClr} />
                 </button>
               </div>
               <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
                 <div className="text-center">
-                  <p className="text-red-500 text-[11px] font-semibold tracking-[1.5px] uppercase mb-1.5">Reversa Automática Fallida</p>
+                  <p className="text-red-500 text-[12px] font-semibold mb-1.5">Reversa Automática Fallida</p>
                   <p className={`text-[18px] font-semibold tracking-tight ${textClr}`}>${new Intl.NumberFormat("es-CL").format(Number(selectedBooking.totalPrice || selectedBooking.price || 0))}</p>
                   <p className={`text-[11px] font-semibold ${subClr}`}>Monto Pendiente de Devolución</p>
                 </div>
@@ -442,23 +442,23 @@ export default function ReservasPage() {
                   <DetailRow label="Jugador" value={selectedBooking.clientName || "—"} subClr={subClr} textClr={textClr} />
                   <DetailRow label="Recinto" value={selectedBooking.tenantName || "—"} subClr={subClr} textClr={textClr} />
                   <DetailRow label="Cancha" value={selectedBooking.courtName || "—"} subClr={subClr} textClr={textClr} />
-                  <DetailRow label="Deporte" value={(selectedBooking.sport || "—").toUpperCase()} subClr={subClr} textClr={textClr} />
+                  <DetailRow label="Deporte" value={selectedBooking.sport || "—"} subClr={subClr} textClr={textClr} />
                   <DetailRow label="Fecha Partido" value={getFormattedDate(selectedBooking.date).full} subClr={subClr} textClr={textClr} />
                   <DetailRow label="Horario" value={`${selectedBooking.startTime} HRS`} subClr={subClr} textClr={textClr} />
                   <DetailRow label="Método Pago" value="Online (Mercado Pago)" subClr={subClr} textClr={textClr} />
                   <div className="flex justify-between items-center py-0.5">
-                    <span className={`text-[11px] font-semibold uppercase tracking-[0.5px] ${subClr}`}>Estado Reclamación</span>
+                    <span className={`text-[12px] font-semibold ${subClr}`}>Estado Reclamación</span>
                     <span className="text-red-500 text-[11px] font-semibold">Manual Pendiente</span>
                   </div>
                   <div className="h-px border-t" style={{ borderColor: isDark ? "rgba(255,255,255,0.08)" : "#E2E8F0" }} />
                   <DetailRow label="ID Reserva" value={selectedBooking.id || "—"} subClr={subClr} textClr={textClr} />
                   <div className="flex justify-between items-center py-0.5">
-                    <span className={`text-[11px] font-semibold uppercase tracking-[0.5px] ${subClr}`}>Código Validación</span>
+                    <span className={`text-[12px] font-semibold ${subClr}`}>Código Validación</span>
                     <span className="text-red-500 text-[11px] font-semibold">MVP-REFUND-{(selectedBooking.id || "").substring(0, 8).toUpperCase()}</span>
                   </div>
                 </div>
                 <div className={`p-5 rounded-md border space-y-2 ${isDark ? "bg-white/3 border-white/6" : "bg-slate-50 border-slate-200"}`}>
-                  <p className="text-red-500 text-[11px] font-semibold tracking-[0.5px] uppercase">Instrucciones para Devolución</p>
+                  <p className="text-red-500 text-[12px] font-semibold">Instrucciones para Devolución</p>
                   <p className={`text-[11px] font-semibold leading-[14px] ${subClr}`}>
                     Debido a una desconexión temporal con la pasarela de pagos, el sistema automático no pudo reversar tu dinero. Presenta este comprobante de validación digital directamente al administrador o dueño del recinto deportivo para solicitar tu transferencia manual por el monto total indicado arriba.
                   </p>
@@ -485,7 +485,7 @@ export default function ReservasPage() {
                       alert("No se pudo copiar el texto.");
                     }
                   }}
-                  className="w-full h-[55px] rounded-md flex items-center justify-center gap-2 text-white font-semibold text-[11px] uppercase"
+                  className="w-full h-[55px] rounded-md flex items-center justify-center gap-2 text-white font-semibold text-[12px]"
                   style={{ backgroundColor: "#25D366" }}
                 >
                   <Share2 size={16} /> COMPARTIR COMPROBANTE
@@ -503,15 +503,15 @@ export default function ReservasPage() {
                     <X size={20} className={textClr} />
                   </button>
                 </div>
-                <p className={`text-[11px] font-semibold uppercase tracking-[1.5px] mb-1 ${subClr}`}>RECINTO</p>
+                <p className={`text-[12px] font-semibold mb-1 ${subClr}`}>RECINTO</p>
                 <p className={`text-[18px] font-semibold mb-5 ${textClr}`}>{selectedBooking.tenantName}</p>
                 <div className="flex gap-8">
                   <div>
-                    <p className={`text-[11px] font-semibold uppercase tracking-[0.06em] mb-1 ${subClr}`}>CANCHA</p>
+                    <p className={`text-[12px] font-semibold mb-1 ${subClr}`}>CANCHA</p>
                     <p className={`text-[13px] font-semibold ${textClr}`}>{selectedBooking.courtName}</p>
                   </div>
                   <div>
-                    <p className={`text-[11px] font-semibold uppercase tracking-[0.06em] mb-1 ${subClr}`}>ESTADO</p>
+                    <p className={`text-[12px] font-semibold mb-1 ${subClr}`}>ESTADO</p>
                     <p className="text-[13px] font-semibold" style={{ color: modalStatus.color }}>{modalStatus.label}</p>
                   </div>
                 </div>
@@ -520,7 +520,7 @@ export default function ReservasPage() {
                 <div className="bg-white p-5 rounded-md shadow-xs">
                   {selectedBooking.id && <QRCodeSVG value={selectedBooking.id} size={150} fgColor="#0F172A" bgColor="white" />}
                 </div>
-                <p className={`text-[11px] font-semibold uppercase tracking-[4px] mt-6 ${subClr}`}>ID: {(selectedBooking.id as string)?.slice(-8).toUpperCase()}</p>
+                <p className={`text-[12px] font-semibold mt-6 ${subClr}`}>ID: {(selectedBooking.id as string)?.slice(-8).toUpperCase()}</p>
               </div>
               <div className="p-7">
                 <div className="flex gap-2">
@@ -563,7 +563,7 @@ export default function ReservasPage() {
               <div className="w-[60px] h-[60px] rounded-md flex items-center justify-center mb-4" style={{ backgroundColor: "#10b98115" }}>
                 <Star color="#10b981" size={30} fill="#10b981" />
               </div>
-              <p className={`text-[18px] font-semibold uppercase ${textClr}`}>Tu Experiencia</p>
+              <p className={`text-[18px] font-semibold ${textClr}`}>Tu Experiencia</p>
               <p className={`text-[11px] font-semibold text-center mt-1 ${subClr}`}>¿Qué te pareció el recinto y el servicio hoy?</p>
             </div>
             <div className="flex justify-center gap-2.5 mb-7">
@@ -621,7 +621,7 @@ export default function ReservasPage() {
 
 const DetailRow = ({ label, value, subClr, textClr }: any) => (
   <div className="flex justify-between items-center py-0.5">
-    <span className={`text-[11px] font-semibold uppercase tracking-[0.5px] ${subClr}`}>{label}</span>
+    <span className={`text-[12px] font-semibold ${subClr}`}>{label}</span>
     <span className={`text-[11px] font-semibold ${textClr}`}>{value}</span>
   </div>
 );

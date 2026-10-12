@@ -105,7 +105,7 @@ export default function ChatEquiposPage() {
           grouped.map((g, gi) => (
             <div key={`g-${gi}`}>
               <div className="flex justify-center my-4">
-                <span className={`px-3 py-1 rounded-md text-[11px] font-semibold uppercase ${isDark ? "bg-white/6 text-slate-500" : "bg-slate-100 text-slate-500"}`}>{g.dateLabel}</span>
+                <span className={`px-3 py-1 rounded-md text-[12px] font-semibold ${isDark ? "bg-white/6 text-slate-500" : "bg-slate-100 text-slate-500"}`}>{g.dateLabel}</span>
               </div>
               {g.messages.map((msg) => {
                 const isMe = msg.senderId === user?.uid;
