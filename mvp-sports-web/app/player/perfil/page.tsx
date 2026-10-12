@@ -81,6 +81,7 @@ export default function PerfilPage() {
   const [generatingCard, setGeneratingCard] = useState(false);
   const [previewUri, setPreviewUri] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [cardStyle, setCardStyle] = useState<"clasica" | "nueva">("clasica");
   const [showGlossary, setShowGlossary] = useState(false);
 
   useEffect(() => {
@@ -131,7 +132,8 @@ export default function PerfilPage() {
     }
   };
 
-  const handleGenerateCard = useCallback(async () => {
+  const handleGenerateCard = useCallback(async (style?: "clasica" | "nueva") => {
+    if (style) setCardStyle(style);
     if (!cardRef.current) return;
     setGeneratingCard(true);
     try {
@@ -437,7 +439,7 @@ export default function PerfilPage() {
             </div>
 
             {/* Generate CTA */}
-            <button onClick={handleGenerateCard} disabled={generatingCard}
+            <button onClick={() => handleGenerateCard()} disabled={generatingCard}
               className="w-full mt-4 h-[46px] rounded-md bg-emerald-500 text-white font-semibold text-[12px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] hover:bg-emerald-600 disabled:opacity-60">
               {generatingCard ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -453,6 +455,7 @@ export default function PerfilPage() {
 
       {/* Hidden MVP Card for Capture */}
       <div style={{ position: "fixed", top: 0, left: 0, width: 0, height: 0, overflow: "hidden", zIndex: -999 }}>
+        {cardStyle === "clasica" ? (
         <div ref={cardRef} className="font-heading" style={{ width: 750, height: 1250, backgroundColor: "#020611", overflow: "hidden", position: "relative" }}>
           {/* Player Image Background */}
           {photoURL ? (
@@ -542,12 +545,72 @@ export default function PerfilPage() {
             <span style={{ color: "white", fontSize: 16, fontWeight: 900, opacity: 0.55, letterSpacing: 2 }}>TODOS LOS DERECHOS RESERVADOS</span>
           </div>
         </div>
+        ) : (
+        <div ref={cardRef} className="font-heading" style={{ width: 750, height: 1250, background: "#020611", position: "relative", overflow: "hidden" }}>
+          {/* Foto en un marco redondeado, como las cards de la app */}
+          <div style={{ position: "absolute", top: 36, left: 36, right: 36, height: 760, borderRadius: 18, overflow: "hidden", background: "#0A101D" }}>
+            {photoURL ? (
+              <img src={photoURL} alt="" crossOrigin="anonymous" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(80% 70% at 50% 40%, rgba(0,223,130,0.18), #0A101D 70%)" }}>
+                <span style={{ color: "rgba(255,255,255,0.14)", fontSize: 280, fontWeight: 900, letterSpacing: -10 }}>{initials}</span>
+              </div>
+            )}
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(2,6,17,0.55) 0%, rgba(2,6,17,0) 28%, rgba(2,6,17,0) 62%, rgba(2,6,17,0.85) 100%)" }} />
+            {/* Isotipo y valoración, del mismo porte */}
+            <img src="/icons/logo-mark.png" alt="" style={{ position: "absolute", top: 34, left: 34, width: 130, height: 130, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+            <div style={{ position: "absolute", top: 26, right: 38, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+              <span style={{ color: "#fff", fontSize: 150, fontWeight: 900, lineHeight: 1, letterSpacing: -6 }}>{ovr}</span>
+              <span style={{ color: "#00df82", fontSize: 24, fontWeight: 800, marginTop: 4 }}>Valoración</span>
+            </div>
+            {/* Rango sobre la foto */}
+            <div style={{ position: "absolute", left: 34, bottom: 30, display: "flex", alignItems: "center", gap: 10, background: "rgba(2,6,17,0.7)", border: "1px solid rgba(0,223,130,0.35)", borderRadius: 10, padding: "10px 18px" }}>
+              <span style={{ width: 12, height: 12, borderRadius: 999, background: "#00df82" }} />
+              <span style={{ color: "#fff", fontSize: 24, fontWeight: 800 }}>Nivel {tierInfo.name}</span>
+            </div>
+          </div>
+
+          {/* Nombre y posición */}
+          <div style={{ position: "absolute", top: 830, left: 60, right: 60 }}>
+            <span style={{ display: "block", color: "#fff", fontSize: displayName.length > 18 ? 62 : 76, fontWeight: 900, lineHeight: 1.02, letterSpacing: -2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{displayName}</span>
+            <span style={{ display: "block", color: "#00df82", fontSize: 28, fontWeight: 700, marginTop: 10 }}>{[mainSport, position].filter(Boolean).join(" · ")}</span>
+          </div>
+
+          {/* Estadísticas en una card, como en el perfil */}
+          <div style={{ position: "absolute", top: 1000, left: 36, right: 36, height: 150, background: "#0A101D", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 18, display: "flex" }}>
+            {[
+              { k: "Partidos", v: stats.matchesPlayed ?? 0 },
+              { k: "Victorias", v: stats.matchesWon ?? 0 },
+              { k: "Goles", v: stats.goals ?? 0 },
+              { k: "XP", v: xp.toLocaleString("es-CL") },
+            ].map((st, i) => (
+              <div key={st.k} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", borderLeft: i ? "1px solid rgba(255,255,255,0.06)" : "none" }}>
+                <span style={{ color: "#fff", fontSize: 52, fontWeight: 900, lineHeight: 1 }}>{st.v}</span>
+                <span style={{ color: "#94a3b8", fontSize: 22, fontWeight: 600, marginTop: 10 }}>{st.k}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Pie */}
+          <div style={{ position: "absolute", left: 60, right: 60, bottom: 40, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ color: "#64748b", fontSize: 22, fontWeight: 700 }}>Temporada {new Date().getFullYear()}</span>
+            <span style={{ color: "#64748b", fontSize: 22, fontWeight: 700 }}>mvpsports.cl</span>
+          </div>
+        </div>
+        )}
       </div>
 
       {/* Preview Modal */}
       {showPreview && previewUri && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 px-6" onClick={() => setShowPreview(false)}>
           <div className="w-full max-w-[340px]" onClick={(e) => e.stopPropagation()}>
+            <div className="grid grid-cols-2 gap-1 p-1 mb-3 rounded-md bg-white/8" role="tablist" aria-label="Estilo de la carta">
+              {([["clasica", "Clásica"], ["nueva", "Nueva"]] as const).map(([id, label]) => (
+                <button key={id} role="tab" aria-selected={cardStyle === id} disabled={generatingCard}
+                  onClick={() => { if (cardStyle !== id) handleGenerateCard(id); }}
+                  className={`h-10 rounded-md text-[13px] font-semibold transition-colors ${cardStyle === id ? "bg-emerald-500 text-white" : "text-slate-300"}`}>{label}</button>
+              ))}
+            </div>
             <div className="overflow-hidden border-2 border-emerald-500/40" style={{ borderRadius: 5, aspectRatio: "3/5", maxHeight: "76vh" }}>
               <img src={previewUri} alt="MVP Card" className="w-full h-full object-contain" />
             </div>
