@@ -248,15 +248,15 @@ export default function PreferenciasPage() {
     if (!validateAge(formData.birthDate)) { showFeedbackMsg("error", "Debes ser mayor de edad (18+)."); return; }
     setSaving(true);
     try {
-      const toSave: any = { ...formData, displayName: formData.displayName.trim(), rut: rutClean, height: formData.height ? Number(formData.height) : undefined, weight: formData.weight ? Number(formData.weight) : undefined, updatedAt: new Date().toISOString() };
+      const toSave: any = { ...formData, displayName: formData.displayName.trim(), rut: rutClean, height: formData.height ? Number(formData.height) : undefined, weight: formData.weight ? Number(formData.weight) : undefined, updatedAt: new Date() };
       Object.keys(toSave).forEach((k) => toSave[k] === undefined && delete toSave[k]);
       await userService.updateUserProfile(user.uid, toSave);
       await reloadProfile();
       setInitialData({ ...formData });
-      showFeedbackMsg("success", "Cambios sincronizados correctamente.");
-      // Si venía desde un pago, vuelve a él
+      showFeedbackMsg("success", "Cambios guardados.");
+      // Solo si venía desde un pago vuelve a él; si no, se queda en Ajustes
       const back = new URLSearchParams(window.location.search).get("volver");
-      setTimeout(() => { setShowFeedback(false); router.replace(back && back.startsWith("/player") ? back : "/player"); }, 1500);
+      setTimeout(() => { setShowFeedback(false); if (back && back.startsWith("/player")) router.replace(back); }, 1500);
     } catch { showFeedbackMsg("error", "Error al guardar."); }
     finally { setSaving(false); }
   };
