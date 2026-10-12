@@ -102,10 +102,10 @@ const AREAS = [
   ["Términos y Privacidad", "y","y","y","x","Ley 21.719, pago solo online, cancelación 24 h, datos de Orion Technology SpA. Falta revisión de un abogado."],
  ]},
  { name:"Cuenta y acceso", items:[
-  ["Registro y login", "y","y","y","n","Cada rol va a su inicio en cualquier dispositivo (antes en celular todos iban a /player). Falta probar el ingreso en celular por rol."],
+  ["Registro y login", "y","y","y","y","Probado en escritorio y celular (Playwright): mánager entra a su panel y no abre finanzas ni administración. Corregido: el aviso de verificar el correo se perdía por la redirección."],
   ["Roles y permisos", "y","y","y","x","Un solo módulo de permisos con pruebas; sin bucles de redirección. Guardia probada con dueño."],
-  ["Verificación de correo y recuperación", "y","y","n","n","Resend con respaldo de Firebase."],
-  ["Eliminación de cuenta", "y","y","n","n","Vía del servidor: borra y anonimiza en todas las colecciones."],
+  ["Verificación de correo y recuperación", "y","y","y","y","Sin verificar no entra (con aviso); verificado entra. Recuperar contraseña muestra el aviso neutro. El correo real no se puede abrir en pruebas automáticas."],
+  ["Eliminación de cuenta", "y","y","y","y","Flujo completo probado: registro por la pantalla → Ajustes → Eliminar con contraseña → se borra en Auth y Firestore y ya no puede ingresar."],
   ["Datos antes del primer pago", "y","y","y","x","Teléfono, RUT y fecha de nacimiento se piden en el pago y vuelve a él."],
  ]},
  { name:"App del jugador", items:[

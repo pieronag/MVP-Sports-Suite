@@ -453,7 +453,7 @@ export default function PerfilPage() {
 
       {/* Hidden MVP Card for Capture */}
       <div style={{ position: "fixed", top: 0, left: 0, width: 0, height: 0, overflow: "hidden", zIndex: -999 }}>
-        <div ref={cardRef} style={{ width: 750, height: 1250, backgroundColor: "#020611", overflow: "hidden", position: "relative" }}>
+        <div ref={cardRef} className="font-heading" style={{ width: 750, height: 1250, backgroundColor: "#020611", overflow: "hidden", position: "relative" }}>
           {/* Player Image Background */}
           {photoURL ? (
             <img src={photoURL} alt="" crossOrigin="anonymous" className="absolute inset-0 w-full h-full object-cover" />
@@ -464,17 +464,20 @@ export default function PerfilPage() {
           <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(2,6,23,0.5) 0%, transparent 40%, rgba(2,6,23,0.9) 100%)" }} />
 
           {/* Top Left: MVP Logo (Zoomed & Aligned) */}
-          <div className="absolute" style={{ top: 60, left: 25, width: 180, height: 120, overflow: "hidden" }}>
-            <img src="/Logo.png" alt="" style={{ width: "130%", height: "130%", position: "absolute", top: "-15%", left: "-15%", objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+          <div className="absolute" style={{ top: 64, left: 56, display: "flex", alignItems: "center", gap: 14 }}>
+            <img src="/icons/logo-mark.png" alt="" style={{ width: 84, height: 84, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+            <span style={{ fontSize: 30, fontWeight: 900, letterSpacing: -1, lineHeight: 1 }}>
+              <span style={{ color: "#fff" }}>MVP</span><span style={{ color: "#00df82", marginLeft: 8 }}>SPORTS</span>
+            </span>
           </div>
 
           {/* Top Right: OVR Rating (Refined Style) */}
           <div className="absolute" style={{ top: 60, right: 60, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
             <span style={{ color: "white", fontSize: 140, fontWeight: 900, lineHeight: "140px", textShadow: "0 0 20px rgba(0,0,0,0.6)" }}>{ovr}</span>
-            <div style={{ height: 5, width: 140, backgroundColor: "#06b6d4", marginTop: -5, marginBottom: 10 }} />
+            <div style={{ height: 5, width: 140, backgroundColor: "#00df82", marginTop: -5, marginBottom: 10 }} />
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-              <span style={{ color: "#06b6d4", fontSize: 11, fontWeight: 900, letterSpacing: 4 }}>VALORACIÓN</span>
-              <span style={{ color: "#06b6d4", fontSize: 11, fontWeight: 900, letterSpacing: 4 }}>GENERAL</span>
+              <span style={{ color: "#00df82", fontSize: 11, fontWeight: 900, letterSpacing: 4 }}>VALORACIÓN</span>
+              <span style={{ color: "#00df82", fontSize: 11, fontWeight: 900, letterSpacing: 4 }}>GENERAL</span>
             </div>
           </div>
 
@@ -521,7 +524,7 @@ export default function PerfilPage() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              borderTop: "5px solid #06b6d4",
+              borderTop: "5px solid #00df82",
               zIndex: 10
             }}>
               <span style={{ color: "white", fontSize: 22, fontWeight: 900, textTransform: "uppercase", letterSpacing: 4 }}>
@@ -531,7 +534,7 @@ export default function PerfilPage() {
 
             {/* Geometric Pattern Bar (Brand Colors: Cyan, Emerald, Blue) */}
             <div style={{ display: "flex", flexDirection: "row", width: "100%", height: 50 }}>
-              {["#06b6d4", "#10b981", "#3b82f6", "#0891b2", "#059669", "#2563eb", "#06b6d4", "#10b981", "#3b82f6", "#0891b2"].map((c, i) => (
+              {["#00df82", "#10b981", "#059669", "#0f766e", "#00df82", "#34d399", "#047857", "#10b981", "#00df82", "#065f46"].map((c, i) => (
                 <div key={i} style={{ flex: 1, backgroundColor: c }} />
               ))}
             </div>
