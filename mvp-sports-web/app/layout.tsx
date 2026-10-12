@@ -44,6 +44,10 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#020611",
+  width: "device-width",
+  initialScale: 1,
+  // Sin zoom automático al enfocar campos en iOS (el pellizco para ampliar sigue disponible)
+  maximumScale: 1,
 };
 
 export default function RootLayout({

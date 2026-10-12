@@ -20,6 +20,8 @@ export const viewport: Viewport = {
   viewportFit: "cover",
   width: "device-width",
   initialScale: 1,
+  // Sin zoom automático al enfocar campos en iOS (el pellizco para ampliar sigue disponible)
+  maximumScale: 1,
 };
 
 export default function PlayerLayout({ children }: { children: React.ReactNode }) {

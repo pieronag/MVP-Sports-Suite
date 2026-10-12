@@ -466,13 +466,13 @@
   }
 
   /* PWA jugador: estándares móviles.
-   - Campos con letra >= 16px: con menos, iOS hace zoom automático al enfocar.
+   - Campos a 14 px como los valores de la app; el zoom de iOS al enfocar se evita con maximum-scale.
    - Sin resaltado azul al tocar; desplazamiento con inercia. */
   .player-shell
     input:not([type='checkbox']):not([type='radio']):not([type='range']),
   .player-shell textarea,
   .player-shell select {
-    font-size: max(16px, 1em) !important;
+    font-size: 14px;
   }
   .player-shell {
     -webkit-tap-highlight-color: transparent;
@@ -533,9 +533,9 @@
   .dashboard-shell main :where(button, select, [role="tab"], a.btn) {
     min-height: 44px;
   }
-  /* 16 px evita el zoom automático de iOS al enfocar un campo */
+  /* Campos a 14 px en táctil (el zoom de iOS al enfocar se evita con maximum-scale) */
   .dashboard-shell :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 
