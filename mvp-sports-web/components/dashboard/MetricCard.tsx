@@ -21,13 +21,13 @@ export default function MetricCard({ label, value, icon: Icon, color, subtext }:
     return (
         <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-xl border border-slate-200 dark:border-white/5 shadow-xs hover:border-slate-300 transition-colors">
             <div className="flex justify-between items-center mb-2">
-                <p className="text-[9px] font-extrabold uppercase text-slate-400 tracking-wider truncate">{label}</p>
+                <p className="text-[11px] md:text-[9px] font-extrabold uppercase text-slate-400 tracking-wider truncate">{label}</p>
                 <div className={`p-1.5 rounded-lg ${colors[color]}`}>
                     <Icon className="w-3.5 h-3.5" />
                 </div>
             </div>
             <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-none pt-1">{value}</h3>
-            {subtext && <p className="text-[8px] font-bold text-slate-400 mt-1">{subtext}</p>}
+            {subtext && <p className="text-[11px] md:text-[8px] font-bold text-slate-400 mt-1">{subtext}</p>}
         </div>
     );
 }

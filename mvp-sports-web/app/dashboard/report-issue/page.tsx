@@ -247,7 +247,7 @@ export default function ReportIssuePage() {
                             </p>
                         </div>
                         <Link href="/dashboard/billing-subscription">
-                            <span className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all">
+                            <span className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-xs md:text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all">
                                 Mejorar plan
                             </span>
                         </Link>
@@ -289,10 +289,10 @@ export default function ReportIssuePage() {
                                 Hemos registrado tu incidencia en nuestra central de soporte. Nuestro equipo técnico la revisará a la brevedad.
                             </p>
                             <div className="flex gap-4 justify-center flex-wrap">
-                                <button onClick={() => setSuccess(false)} className="px-6 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[10px] uppercase rounded-md tracking-wider transition-all shadow-lg shadow-emerald-500/20 hover:brightness-110 active:scale-95">
+                                <button onClick={() => setSuccess(false)} className="px-6 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-xs md:text-[10px] uppercase rounded-md tracking-wider transition-all shadow-lg shadow-emerald-500/20 hover:brightness-110 active:scale-95">
                                     Reportar otro problema
                                 </button>
-                                <button onClick={() => setActiveTab('list')} className="px-6 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white font-black text-[10px] uppercase rounded-md tracking-wider transition-all hover:border-emerald-400/40">
+                                <button onClick={() => setActiveTab('list')} className="px-6 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white font-black text-xs md:text-[10px] uppercase rounded-md tracking-wider transition-all hover:border-emerald-400/40">
                                     Ver mis reportes
                                 </button>
                             </div>
@@ -305,7 +305,7 @@ export default function ReportIssuePage() {
                             <SectionCard title="Nuevo reporte de soporte" subtitle="Describe el problema para que podamos ayudarte" icon={<HugeiconsIcon icon={Ticket01Icon} className="w-5 h-5" strokeWidth={1.8} />} bodyClassName="p-6">
                                 <form onSubmit={handleSubmit} className="space-y-5">
                                     {errorMsg && (
-                                        <div className="p-4 rounded-md bg-red-50 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20 text-red-600 dark:text-red-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-2">
+                                        <div className="p-4 rounded-md bg-red-50 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20 text-red-600 dark:text-red-400 text-xs md:text-[10px] font-black uppercase tracking-wider flex items-center gap-2">
                                             <HugeiconsIcon icon={Alert02Icon} className="w-4 h-4 shrink-0" strokeWidth={2} />
                                             {errorMsg}
                                         </div>
@@ -313,7 +313,7 @@ export default function ReportIssuePage() {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                         <div>
-                                            <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Categoría</label>
+                                            <label className="block text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Categoría</label>
                                             <select value={category} onChange={(e) => setCategory(e.target.value)} className={inputCls}>
                                                 <option value="Bug">Error del sistema (Bug)</option>
                                                 <option value="Facturación">Problemas de facturación o pago</option>
@@ -323,7 +323,7 @@ export default function ReportIssuePage() {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Gravedad / prioridad</label>
+                                            <label className="block text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Gravedad / prioridad</label>
                                             <select value={priority} onChange={(e) => setPriority(e.target.value)} className={inputCls}>
                                                 <option value="Baja">Baja (consulta general o sugerencia)</option>
                                                 <option value="Media">Media (afecta parcialmente la navegación)</option>
@@ -335,27 +335,27 @@ export default function ReportIssuePage() {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                         <div>
-                                            <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Asunto principal</label>
+                                            <label className="block text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Asunto principal</label>
                                             <input type="text" placeholder="Ej. error al confirmar arriendo de cancha" value={subject} onChange={(e) => setSubject(e.target.value)} className={`${inputCls}`} required />
                                         </div>
                                         <div>
-                                            <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Pantalla / módulo del error</label>
+                                            <label className="block text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Pantalla / módulo del error</label>
                                             <input type="text" placeholder="Ej. calendario / detalle de factura" value={screen} onChange={(e) => setScreen(e.target.value)} className={`${inputCls}`} />
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Descripción detallada del problema</label>
+                                        <label className="block text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Descripción detallada del problema</label>
                                         <textarea rows={4} placeholder="Explica aquí qué pasó detalladamente..." value={description} onChange={(e) => setDescription(e.target.value)} className={inputCls} required />
                                     </div>
 
                                     <div>
-                                        <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Pasos para reproducir (opcional)</label>
+                                        <label className="block text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Pasos para reproducir (opcional)</label>
                                         <textarea rows={3} placeholder="Ej: 1. ir a agenda, 2. click en hora 18:00, 3. elegir cliente y dar guardar" value={steps} onChange={(e) => setSteps(e.target.value)} className={`${inputCls}`} />
                                     </div>
 
                                     <div className="pt-2">
-                                        <button type="submit" disabled={submitting} className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[10px] uppercase rounded-md tracking-wider transition-all disabled:opacity-50 shadow-lg shadow-emerald-500/10 hover:brightness-110 active:scale-[0.99]">
+                                        <button type="submit" disabled={submitting} className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-xs md:text-[10px] uppercase rounded-md tracking-wider transition-all disabled:opacity-50 shadow-lg shadow-emerald-500/10 hover:brightness-110 active:scale-[0.99]">
                                             {submitting ? (<><HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> Enviando ticket...</>) : (<><HugeiconsIcon icon={SentIcon} className="w-4 h-4" strokeWidth={2} /> Enviar reporte de soporte</>)}
                                         </button>
                                     </div>
@@ -369,41 +369,41 @@ export default function ReportIssuePage() {
                                 <div className="flex items-start gap-3">
                                     <HugeiconsIcon icon={ComputerIcon} className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" strokeWidth={1.8} />
                                     <div>
-                                        <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest leading-none">Navegador & sistema</p>
-                                        <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 mt-1">{getBrowserAndOS().browser} ({getBrowserAndOS().os})</p>
+                                        <p className="text-[11px] md:text-[8px] text-slate-400 uppercase font-black tracking-widest leading-none">Navegador & sistema</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-800 dark:text-slate-200 mt-1">{getBrowserAndOS().browser} ({getBrowserAndOS().os})</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3">
                                     <HugeiconsIcon icon={ComputerIcon} className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" strokeWidth={1.8} />
                                     <div>
-                                        <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest leading-none">Resolución / ventana</p>
-                                        <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 mt-1">{typeof window !== 'undefined' ? `${window.screen.width}x${window.screen.height}` : 'Desconocida'} / {typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : 'Desconocida'}</p>
+                                        <p className="text-[11px] md:text-[8px] text-slate-400 uppercase font-black tracking-widest leading-none">Resolución / ventana</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-800 dark:text-slate-200 mt-1">{typeof window !== 'undefined' ? `${window.screen.width}x${window.screen.height}` : 'Desconocida'} / {typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : 'Desconocida'}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3">
                                     <HugeiconsIcon icon={UserCircleIcon} className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" strokeWidth={1.8} />
                                     <div>
-                                        <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest leading-none">Usuario reportante</p>
-                                        <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 mt-1">{firestoreUser?.fullName || user?.displayName || user?.email || 'Cargando...'}</p>
+                                        <p className="text-[11px] md:text-[8px] text-slate-400 uppercase font-black tracking-widest leading-none">Usuario reportante</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-800 dark:text-slate-200 mt-1">{firestoreUser?.fullName || user?.displayName || user?.email || 'Cargando...'}</p>
                                         <span className="text-[7.5px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-widest">Rol: {role || 'Cargando...'}</span>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-3">
                                     <HugeiconsIcon icon={Building01Icon} className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" strokeWidth={1.8} />
                                     <div>
-                                        <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest leading-none">Recinto vinculado</p>
-                                        <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 mt-1 uppercase">{tenantInfo.name}</p>
+                                        <p className="text-[11px] md:text-[8px] text-slate-400 uppercase font-black tracking-widest leading-none">Recinto vinculado</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-800 dark:text-slate-200 mt-1 uppercase">{tenantInfo.name}</p>
                                         <span className="text-[7.5px] font-black text-slate-400 uppercase font-mono">ID: {tenantInfo.id}</span>
                                     </div>
                                 </div>
                             </SectionCard>
 
                             <div className="rounded-md bg-emerald-500/5 border border-emerald-500/15 p-5">
-                                <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase mb-2 flex items-center gap-1.5 font-heading">
+                                <h4 className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase mb-2 flex items-center gap-1.5 font-heading">
                                     <HugeiconsIcon icon={Ticket01Icon} className="w-3.5 h-3.5 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
                                     Compromiso de SLA
                                 </h4>
-                                <p className="text-[9px] text-slate-500 dark:text-slate-400 leading-normal">
+                                <p className="text-[11px] md:text-[9px] text-slate-500 dark:text-slate-400 leading-normal">
                                     Los tickets de prioridad <strong className="text-emerald-600 dark:text-[#00df82]">Crítica</strong> se derivan de inmediato al equipo de ingeniería (respuesta menor a 1 hora). Prioridades <strong>Baja</strong> o <strong>Media</strong> se resuelven en un plazo máximo de 24 horas hábiles.
                                 </p>
                             </div>
@@ -415,13 +415,13 @@ export default function ReportIssuePage() {
                     {loadingReports ? (
                         <div className="flex flex-col items-center justify-center py-24 text-slate-400 rounded-md">
                             <HugeiconsIcon icon={RefreshIcon} className="w-8 h-8 text-emerald-500 animate-spin mb-4" strokeWidth={1.6} />
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Sincronizando tus tickets...</p>
+                            <p className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400">Sincronizando tus tickets...</p>
                         </div>
                     ) : reportsList.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-24 text-slate-400 border-2 border-dashed border-slate-200 dark:border-white/5 rounded-md bg-slate-50/50 dark:bg-white/2">
                             <HugeiconsIcon icon={Message02Icon} className="w-12 h-12 mb-4 text-slate-300 dark:text-slate-700" strokeWidth={1.4} />
-                            <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">No has enviado ningún reporte de incidencia aún.</p>
-                            <button onClick={() => setActiveTab('create')} className="mt-4 px-5 py-2 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[9px] uppercase rounded-md tracking-wider transition-all hover:brightness-110">
+                            <p className="text-xs md:text-[10px] font-black uppercase tracking-wider text-slate-500">No has enviado ningún reporte de incidencia aún.</p>
+                            <button onClick={() => setActiveTab('create')} className="mt-4 px-5 py-2 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[11px] md:text-[9px] uppercase rounded-md tracking-wider transition-all hover:brightness-110">
                                 Reportar primer problema
                             </button>
                         </div>
@@ -431,40 +431,40 @@ export default function ReportIssuePage() {
                                 <div key={ticket.id} className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-6 transition-all hover:border-emerald-400/30">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/5 pb-4 mb-4">
                                         <div className="flex items-center gap-2.5">
-                                            <span className="text-[9px] font-black font-mono text-emerald-600 dark:text-[#00df82] bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
+                                            <span className="text-[11px] md:text-[9px] font-black font-mono text-emerald-600 dark:text-[#00df82] bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20">
                                                 ID: #{ticket.id.slice(0, 8).toUpperCase()}
                                             </span>
-                                            <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500">{ticket.category}</span>
+                                            <span className="text-xs md:text-[10px] font-black uppercase text-slate-400 dark:text-slate-500">{ticket.category}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border ${getPriorityStyle(ticket.priority)}`}>Prioridad {ticket.priority}</span>
-                                            <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border ${getStatusBadge(ticket.status)}`}>{ticket.status}</span>
+                                            <span className={`px-2 py-0.5 rounded-md text-[11px] md:text-[9px] font-bold uppercase border ${getPriorityStyle(ticket.priority)}`}>Prioridad {ticket.priority}</span>
+                                            <span className={`px-2 py-0.5 rounded-md text-[11px] md:text-[9px] font-bold uppercase border ${getStatusBadge(ticket.status)}`}>{ticket.status}</span>
                                         </div>
                                     </div>
 
                                     <div className="space-y-3">
                                         <div>
                                             <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase leading-tight mb-1 font-heading">{ticket.subject}</h3>
-                                            <p className="text-[9px] text-slate-400 flex items-center gap-1 font-semibold uppercase tracking-wider">
+                                            <p className="text-[11px] md:text-[9px] text-slate-400 flex items-center gap-1 font-semibold uppercase tracking-wider">
                                                 <HugeiconsIcon icon={Clock01Icon} className="w-3.5 h-3.5" strokeWidth={1.8} /> Enviado: {ticket.createdAtFormatted}
                                             </p>
                                         </div>
 
                                         <div className="bg-slate-50 dark:bg-white/2 p-4 rounded-md space-y-2 border border-slate-200 dark:border-white/5">
                                             <div>
-                                                <h4 className="text-[8px] font-black uppercase tracking-widest text-slate-400">Descripción del problema:</h4>
+                                                <h4 className="text-[11px] md:text-[8px] font-black uppercase tracking-widest text-slate-400">Descripción del problema:</h4>
                                                 <p className="text-xs text-slate-600 dark:text-slate-300 font-medium whitespace-pre-line mt-1">{ticket.description}</p>
                                             </div>
                                             {ticket.stepsToReproduce && ticket.stepsToReproduce !== 'No especificados' && (
                                                 <div className="pt-2 border-t border-slate-100 dark:border-white/5">
-                                                    <h4 className="text-[8px] font-black uppercase tracking-widest text-slate-400">Pasos para reproducir:</h4>
+                                                    <h4 className="text-[11px] md:text-[8px] font-black uppercase tracking-widest text-slate-400">Pasos para reproducir:</h4>
                                                     <p className="text-[11px] text-slate-500 dark:text-slate-400 whitespace-pre-line mt-1">{ticket.stepsToReproduce}</p>
                                                 </div>
                                             )}
                                             {ticket.screen && ticket.screen !== 'No especificada' && (
                                                 <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex gap-1 items-center">
-                                                    <h4 className="text-[8px] font-black uppercase tracking-widest text-slate-400">Módulo / pantalla:</h4>
-                                                    <span className="text-[10px] text-slate-600 dark:text-slate-300 font-bold uppercase">{ticket.screen}</span>
+                                                    <h4 className="text-[11px] md:text-[8px] font-black uppercase tracking-widest text-slate-400">Módulo / pantalla:</h4>
+                                                    <span className="text-xs md:text-[10px] text-slate-600 dark:text-slate-300 font-bold uppercase">{ticket.screen}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -474,19 +474,19 @@ export default function ReportIssuePage() {
                                                 <div className="flex items-center justify-between border-b border-emerald-500/10 pb-2">
                                                     <div className="flex items-center gap-1.5">
                                                         <HugeiconsIcon icon={Wrench01Icon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82] shrink-0" strokeWidth={1.8} />
-                                                        <h4 className="text-[9px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-wider">Respuesta oficial del soporte</h4>
+                                                        <h4 className="text-[11px] md:text-[9px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-wider">Respuesta oficial del soporte</h4>
                                                     </div>
-                                                    {ticket.repliedAt && <span className="text-[8px] text-slate-400 dark:text-slate-500 font-mono font-bold">{formatDate(ticket.repliedAt)}</span>}
+                                                    {ticket.repliedAt && <span className="text-[11px] md:text-[8px] text-slate-400 dark:text-slate-500 font-mono font-bold">{formatDate(ticket.repliedAt)}</span>}
                                                 </div>
                                                 <p className="text-xs text-slate-700 dark:text-slate-200 font-bold leading-relaxed whitespace-pre-line">{ticket.response}</p>
                                                 {ticket.repliedBy && (
-                                                    <div className="text-[8px] text-slate-400 uppercase tracking-widest font-black text-right pt-1">
+                                                    <div className="text-[11px] md:text-[8px] text-slate-400 uppercase tracking-widest font-black text-right pt-1">
                                                         Respondido por: <span className="text-emerald-600 dark:text-[#00df82]">{ticket.repliedBy}</span>
                                                     </div>
                                                 )}
                                             </div>
                                         ) : (
-                                            <div className="p-3 rounded-md border border-slate-200 dark:border-white/5 bg-slate-50/50 text-[10px] text-slate-400 font-black uppercase tracking-wider flex items-center gap-2">
+                                            <div className="p-3 rounded-md border border-slate-200 dark:border-white/5 bg-slate-50/50 text-xs md:text-[10px] text-slate-400 font-black uppercase tracking-wider flex items-center gap-2">
                                                 <HugeiconsIcon icon={Clock01Icon} className="w-4 h-4 text-slate-400 animate-pulse" strokeWidth={1.8} />
                                                 Esperando respuesta del soporte técnico...
                                             </div>

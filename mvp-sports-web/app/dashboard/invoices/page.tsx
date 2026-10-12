@@ -707,8 +707,8 @@ f(true);
                                         <HugeiconsIcon icon={Download01Icon} className="w-4 h-4" strokeWidth={1.8} />
                                     </span>
                                     <span className="flex flex-col min-w-0">
-                                        <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-wider">CSV (Excel)</span>
-                                        <span className="text-[9px] text-slate-400">Listado filtrado</span>
+                                        <span className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-wider">CSV (Excel)</span>
+                                        <span className="text-[11px] md:text-[9px] text-slate-400">Listado filtrado</span>
                                     </span>
                                 </button>
                                 <button
@@ -719,8 +719,8 @@ f(true);
                                         <HugeiconsIcon icon={PrinterIcon} className="w-4 h-4" strokeWidth={1.8} />
                                     </span>
                                     <span className="flex flex-col min-w-0">
-                                        <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-wider">PDF</span>
-                                        <span className="text-[9px] text-slate-400">Primera liquidación</span>
+                                        <span className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-wider">PDF</span>
+                                        <span className="text-[11px] md:text-[9px] text-slate-400">Primera liquidación</span>
                                     </span>
                                 </button>
                             </div>
@@ -745,7 +745,7 @@ f(true);
             </div>
 
             {/* KPIs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                 <TarjetaKpi titulo="Total facturado" valor={formatCLP(totalInvoiced)} sub="Solo pagos aceptados" icono={<HugeiconsIcon icon={MoneyBag01Icon} className={ic} strokeWidth={1.6} />} brillo />
                 <TarjetaKpi titulo="Pendiente" valor={formatCLP(totalPending)} sub="Por recaudar" icono={<HugeiconsIcon icon={Clock01Icon} className={ic} strokeWidth={1.6} />} />
                 <TarjetaKpi titulo="Tasa de pago" valor={`${payRate}%`} sub="Eficiencia" icono={<HugeiconsIcon icon={CheckmarkCircle02Icon} className={ic} strokeWidth={1.6} />} />
@@ -762,7 +762,7 @@ f(true);
                             placeholder="Buscar recinto, dueño o email..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400 transition-all shadow-xs"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-xs md:text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400 transition-all shadow-xs"
                         />
                     </div>
                     <div className="flex items-center rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 overflow-hidden">
@@ -788,7 +788,7 @@ f(true);
                     </div>
                     <button
                         onClick={() => { setMonthAll(!monthAll); setSelectedMonth(getPreviousMonth()); }}
-                        className={`flex items-center gap-2 px-3.5 py-2.5 rounded-md text-[10px] font-black uppercase tracking-wider transition-all ${monthAll ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black' : 'bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-[#00df82]'}`}
+                        className={`flex items-center gap-2 px-3.5 py-2.5 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider transition-all ${monthAll ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black' : 'bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-[#00df82]'}`}
                     >
                         <HugeiconsIcon icon={Calendar03Icon} className="w-4 h-4" strokeWidth={1.8} />
                         Ver todo
@@ -800,7 +800,7 @@ f(true);
                         <select
                             value={planFilter}
                             onChange={(e) => setPlanFilter(e.target.value)}
-                            className="bg-transparent text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white"
+                            className="bg-transparent text-xs md:text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white"
                         >
                             {plansList.map(p => <option key={p} value={p}>{p}</option>)}
                         </select>
@@ -810,7 +810,7 @@ f(true);
                             <button
                                 key={f}
                                 onClick={() => setFilterStatus(f)}
-                                className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-md transition-all ${filterStatus === f ? "bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black" : "text-slate-400 hover:text-slate-700 dark:hover:text-white"}`}
+                                className={`px-4 py-1.5 text-[11px] md:text-[9px] font-black uppercase rounded-md transition-all ${filterStatus === f ? "bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black" : "text-slate-400 hover:text-slate-700 dark:hover:text-white"}`}
                             >
                                 {f}
                             </button>
@@ -835,13 +835,13 @@ f(true);
                     <table className="w-full text-left min-w-[1000px]">
                         <thead>
                             <tr className="bg-slate-50/60 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Centro operativo</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Administración</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Periodo</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Plan / Comisión</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Monto</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Estado</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Acciones</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Centro operativo</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Administración</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Periodo</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Plan / Comisión</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Monto</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Estado</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -850,8 +850,8 @@ f(true);
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
                                             <p className="text-[11px] font-black text-slate-900 dark:text-white uppercase leading-none mb-1">{inv.tenant}</p>
-                                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter font-mono">ID: {inv.id.slice(0, 8)}</p>
-                                            <span className="mt-1 text-[8px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-tighter">
+                                            <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-tighter font-mono">ID: {inv.id.slice(0, 8)}</p>
+                                            <span className="mt-1 text-[11px] md:text-[8px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-tighter">
                                                 {inv.breakdown?.totalBookings || 0} reservas pagadas
                                             </span>
                                         </div>
@@ -859,21 +859,21 @@ f(true);
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
                                             <p className="text-[11px] font-black text-slate-900 dark:text-white uppercase">{inv.owner}</p>
-                                            <p className="text-[9px] font-bold text-slate-400 uppercase truncate max-w-[160px]">{inv.ownerEmail}</p>
+                                            <p className="text-[11px] md:text-[9px] font-bold text-slate-400 uppercase truncate max-w-[160px]">{inv.ownerEmail}</p>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         <div className="inline-flex flex-col items-center">
-                                            <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase font-mono">{monthShort(inv.rawDate)}</p>
-                                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Vence: {inv.dueDate}</p>
+                                            <p className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase font-mono">{monthShort(inv.rawDate)}</p>
+                                            <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Vence: {inv.dueDate}</p>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col gap-1">
-                                            <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase border w-fit ${planBadgeStyle(inv.breakdown?.planName)}`}>
+                                            <span className={`px-2 py-0.5 rounded-md text-[11px] md:text-[8px] font-black uppercase border w-fit ${planBadgeStyle(inv.breakdown?.planName)}`}>
                                                 {inv.breakdown?.planName?.toUpperCase() || 'BASE'}
                                             </span>
-                                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">
+                                            <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-tighter">
                                                 Com. {inv.breakdown?.commissionRate || 0}% · Base {formatCLP(inv.breakdown?.totalRevenue || 0)}
                                             </p>
                                         </div>
@@ -881,13 +881,13 @@ f(true);
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex flex-col items-end">
                                             <p className="text-sm font-black text-slate-900 dark:text-white font-mono">{formatCLP(inv.amount)}</p>
-                                            <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">
+                                            <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">
                                                 Plan {formatCLP(inv.breakdown?.planCost || 0)} + Com. {formatCLP(inv.breakdown?.commissionTotal || 0)}
                                             </p>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-center">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] font-black uppercase border ${statusStyle(inv.status)}`}>
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] md:text-[9px] font-black uppercase border ${statusStyle(inv.status)}`}>
                                             <span className={`w-1.5 h-1.5 rounded-full ${statusDot(inv.status)}`} />
                                             {inv.status.toUpperCase()}
                                         </span>
@@ -931,12 +931,12 @@ f(true);
                             <HugeiconsIcon icon={ReceiptIcon} className="w-8 h-8 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.6} />
                         </div>
                         <h3 className="relative z-10 text-xl font-black uppercase text-slate-900 dark:text-white mb-2 tracking-tighter font-heading">Liquidación masiva</h3>
-                        <p className="relative z-10 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8 leading-relaxed px-4">
+                        <p className="relative z-10 text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8 leading-relaxed px-4">
                             Se generarán las facturas considerando <strong>únicamente pagos aceptados</strong> para el periodo {monthAll ? 'seleccionado' : selectedMonth}.
                         </p>
                         <div className="relative z-10 flex gap-4">
-                            <button onClick={() => setShowConfirmModal(false)} className="flex-1 py-3 text-[9px] font-black uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10 transition-all">Cancelar</button>
-                            <button onClick={handleGenerateBulk} disabled={isGenerating} className="flex-1 py-3 text-[9px] font-black uppercase rounded-md text-white bg-emerald-500 dark:bg-[#00df82] dark:text-black shadow-lg shadow-emerald-500/25 active:scale-95 transition-all disabled:opacity-60">
+                            <button onClick={() => setShowConfirmModal(false)} className="flex-1 py-3 text-[11px] md:text-[9px] font-black uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10 transition-all">Cancelar</button>
+                            <button onClick={handleGenerateBulk} disabled={isGenerating} className="flex-1 py-3 text-[11px] md:text-[9px] font-black uppercase rounded-md text-white bg-emerald-500 dark:bg-[#00df82] dark:text-black shadow-lg shadow-emerald-500/25 active:scale-95 transition-all disabled:opacity-60">
                                 {isGenerating ? 'Generando...' : 'Proceder'}
                             </button>
                         </div>
@@ -951,12 +951,12 @@ f(true);
                             <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-7 h-7 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.6} />
                         </div>
                         <h3 className="text-lg font-black uppercase text-slate-900 dark:text-white mb-2 tracking-tighter font-heading">{modalConfig.title}</h3>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 leading-relaxed">{modalConfig.message}</p>
+                        <p className="text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 leading-relaxed">{modalConfig.message}</p>
                         <div className="flex gap-4">
                             {modalConfig.type === 'confirm' && (
-                                <button onClick={() => setModalConfig({ ...modalConfig, isOpen: false })} className="flex-1 py-3 text-[9px] font-black uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10 transition-all">Cancelar</button>
+                                <button onClick={() => setModalConfig({ ...modalConfig, isOpen: false })} className="flex-1 py-3 text-[11px] md:text-[9px] font-black uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10 transition-all">Cancelar</button>
                             )}
-                            <button onClick={() => { modalConfig.onConfirm?.(); setModalConfig({ ...modalConfig, isOpen: false }); }} className={`flex-1 py-3 text-[9px] font-black uppercase rounded-md transition-all ${modalConfig.type === 'confirm' ? 'bg-emerald-500 dark:bg-[#00df82] dark:text-black text-white shadow-lg shadow-emerald-500/25 active:scale-95' : 'bg-emerald-500 dark:bg-[#00df82] dark:text-black text-white shadow-lg shadow-emerald-500/25 active:scale-95'}`}>
+                            <button onClick={() => { modalConfig.onConfirm?.(); setModalConfig({ ...modalConfig, isOpen: false }); }} className={`flex-1 py-3 text-[11px] md:text-[9px] font-black uppercase rounded-md transition-all ${modalConfig.type === 'confirm' ? 'bg-emerald-500 dark:bg-[#00df82] dark:text-black text-white shadow-lg shadow-emerald-500/25 active:scale-95' : 'bg-emerald-500 dark:bg-[#00df82] dark:text-black text-white shadow-lg shadow-emerald-500/25 active:scale-95'}`}>
                                 {modalConfig.type === 'confirm' ? 'Confirmar' : 'Entendido'}
                             </button>
                         </div>
@@ -976,13 +976,13 @@ f(true);
                                 <p className="text-[11px] font-black uppercase text-white tracking-wider truncate font-heading">
                                     Liquidacin  {preview.inv?.tenant}
                                 </p>
-                                <p className="text-[9px] font-bold uppercase text-slate-400 tracking-wider">Periodo {preview.inv?.rawDate}</p>
+                                <p className="text-[11px] md:text-[9px] font-bold uppercase text-slate-400 tracking-wider">Periodo {preview.inv?.rawDate}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                             <button
                                 onClick={() => preview.inv && handleDownload(preview.inv)}
-                                className="flex items-center gap-2 px-3.5 py-2 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all"
+                                className="flex items-center gap-2 px-3.5 py-2 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-xs md:text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all"
                             >
                                 <HugeiconsIcon icon={Download01Icon} className="w-4 h-4" strokeWidth={2} />
                                 Descargar

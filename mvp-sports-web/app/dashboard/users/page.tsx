@@ -498,7 +498,7 @@ export default function Page() {
             'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
         }`}>
             <HugeiconsIcon icon={notification.type === 'success' ? CheckmarkCircle02Icon : Alert02Icon} className="w-5 h-5" strokeWidth={1.8} />
-            <span className="text-[10px] font-black uppercase tracking-wider">{notification.msg}</span>
+            <span className="text-xs md:text-[10px] font-black uppercase tracking-wider">{notification.msg}</span>
         </div>
       )}
 
@@ -526,7 +526,7 @@ export default function Page() {
       </div>
 
       {/* KPI GRID */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
           <TarjetaKpi titulo="Jugadores" valor={users.length.toString()} sub="Base total" icono={<HugeiconsIcon icon={UserGroupIcon} className="w-6 h-6" strokeWidth={1.6} />} brillo />
           <TarjetaKpi titulo="Capitanes" valor={users.filter(u => u.role === 'Capitán').length.toString()} sub="Líderes de equipo" icono={<HugeiconsIcon icon={Mortarboard01Icon} className="w-6 h-6" strokeWidth={1.6} />} />
           <TarjetaKpi titulo="OVR promedio" valor={(users.length > 0 ? Math.round(users.reduce((a, b) => a + b.ovr, 0) / users.length) : 0).toString()} sub="Nivel global" icono={<HugeiconsIcon icon={BarChartIcon} className="w-6 h-6" strokeWidth={1.6} />} brillo />
@@ -542,7 +542,7 @@ export default function Page() {
           <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-white/5 p-1 rounded-md border border-slate-100 dark:border-white/10">
                   {["Todos", "Capitanes", "Sin equipo", "Suspendidos"].map((f) => (
-                    <button key={f} onClick={() => setFilter(f)} className={`px-3 py-1.5 text-[10px] font-black uppercase rounded-md transition-all whitespace-nowrap cursor-pointer ${filter === f ? "bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-xs" : "text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}>{f}</button>
+                    <button key={f} onClick={() => setFilter(f)} className={`px-3 py-1.5 text-xs md:text-[10px] font-black uppercase rounded-md transition-all whitespace-nowrap cursor-pointer ${filter === f ? "bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-xs" : "text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}>{f}</button>
                   ))}
               </div>
               <div className="relative">
@@ -570,7 +570,7 @@ export default function Page() {
               </div>
               <button onClick={exportCSV} aria-label="Exportar CSV" title="Exportar CSV" className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-md text-slate-500 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-white/10 transition-all cursor-pointer border border-slate-200 dark:border-white/10">
                   <HugeiconsIcon icon={Download01Icon} className="w-4 h-4" strokeWidth={1.8} />
-                  <span className="text-[10px] font-black uppercase tracking-wider hidden sm:inline">CSV</span>
+                  <span className="text-xs md:text-[10px] font-black uppercase tracking-wider hidden sm:inline">CSV</span>
               </button>
               <button onClick={fetchUsers} aria-label="Refrescar" className="p-2.5 rounded-md text-slate-500 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-white/10 transition-all cursor-pointer border border-slate-200 dark:border-white/10">
                   <HugeiconsIcon icon={RefreshIcon} className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} strokeWidth={1.8} />
@@ -597,7 +597,7 @@ export default function Page() {
                           onClick={() => handleBulkStatus(true)}
                           disabled={activeCount === 0}
                           title={activeCount === 0 ? 'No hay activos seleccionados' : `Suspender ${activeCount}`}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                           <HugeiconsIcon icon={BlockedIcon} className="w-3.5 h-3.5" strokeWidth={2} />Suspender{activeCount > 0 ? ` (${activeCount})` : ''}
                       </button>
@@ -605,7 +605,7 @@ export default function Page() {
                           onClick={() => handleBulkStatus(false)}
                           disabled={suspendedCount === 0}
                           title={suspendedCount === 0 ? 'No hay suspendidos seleccionados' : `Activar ${suspendedCount}`}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-[#00df82] hover:bg-emerald-500/10 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-[#00df82] hover:bg-emerald-500/10 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                           <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-3.5 h-3.5" strokeWidth={2} />Activar{suspendedCount > 0 ? ` (${suspendedCount})` : ''}
                       </button>
@@ -650,9 +650,9 @@ export default function Page() {
                       <SortableTh label="Valoración" active={sortKey === 'ovr'} onClick={() => toggleSort('ovr')} align="center" />
                       <SortableTh label="Partidos / récord" active={sortKey === 'played'} onClick={() => toggleSort('played')} />
                       <SortableTh label="Goles / MVP" active={sortKey === 'goals'} onClick={() => toggleSort('goals')} />
-                      <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Equipos</th>
-                      <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Estado</th>
-                      <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">Acciones</th>
+                      <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Equipos</th>
+                      <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Estado</th>
+                      <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -674,11 +674,11 @@ export default function Page() {
                               <div className="min-w-0">
                                 <div className="flex items-center gap-1.5 flex-wrap">
                                   <span className="font-black text-[12px] text-slate-900 dark:text-white uppercase truncate leading-none">{user.name}</span>
-                                  {user.role === 'Capitán' && <span className="px-1.5 py-0.5 bg-amber-500 text-slate-950 rounded-md text-[8px] font-black uppercase tracking-wider">CAP</span>}
-                                  {user.mainSport && <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-md text-[8px] font-black uppercase tracking-wider">{user.mainSport}</span>}
-                                  {user.position && <span className="px-1.5 py-0.5 bg-cyan-500/10 text-cyan-500 dark:text-cyan-400 rounded-md text-[8px] font-black uppercase tracking-wider">{user.position}</span>}
+                                  {user.role === 'Capitán' && <span className="px-1.5 py-0.5 bg-amber-500 text-slate-950 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">CAP</span>}
+                                  {user.mainSport && <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">{user.mainSport}</span>}
+                                  {user.position && <span className="px-1.5 py-0.5 bg-cyan-500/10 text-cyan-500 dark:text-cyan-400 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">{user.position}</span>}
                                 </div>
-                                <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 truncate block mt-1">{user.email}</span>
+                                <span className="text-xs md:text-[10px] font-medium text-slate-400 dark:text-slate-500 truncate block mt-1">{user.email}</span>
                               </div>
                             </div>
                           </td>
@@ -688,7 +688,7 @@ export default function Page() {
                               <div className={`px-2.5 py-1 rounded-md text-[11px] font-black shadow-xs border ${getOvrColor(user.tier)}`}>
                                 {user.ovr} OVR
                               </div>
-                              <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">{user.tier}</span>
+                              <span className="text-[11px] md:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">{user.tier}</span>
                             </div>
                           </td>
 
@@ -698,7 +698,7 @@ export default function Page() {
                                 <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">
                                   {user.stats.played} PJ · <span className="text-emerald-500">{user.stats.won}W</span> / <span className="text-red-400">{user.stats.lost}L</span>
                                 </span>
-                                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono">({winRate}%)</span>
+                                <span className="text-xs md:text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono">({winRate}%)</span>
                               </div>
                               <div className="w-32 h-1 bg-slate-100 dark:bg-white/5 rounded-md overflow-hidden">
                                 <div className="h-full bg-emerald-500 rounded-md" style={{ width: `${winRate}%` }}></div>
@@ -710,11 +710,11 @@ export default function Page() {
                             <div className="flex items-center gap-4">
                               <div className="flex items-center gap-1.5">
                                 <HugeiconsIcon icon={FireIcon} className="w-3.5 h-3.5 text-rose-500" strokeWidth={1.8} />
-                                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">{user.stats.goals || 0} <span className="text-[9px] font-bold text-slate-400 uppercase">Goles</span></span>
+                                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">{user.stats.goals || 0} <span className="text-[11px] md:text-[9px] font-bold text-slate-400 uppercase">Goles</span></span>
                               </div>
                               <div className="flex items-center gap-1.5">
                                 <HugeiconsIcon icon={TrophyIcon} className="w-3.5 h-3.5 text-amber-500" strokeWidth={1.8} />
-                                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">{user.stats.mvp || 0} <span className="text-[9px] font-bold text-slate-400 uppercase">MVP</span></span>
+                                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">{user.stats.mvp || 0} <span className="text-[11px] md:text-[9px] font-bold text-slate-400 uppercase">MVP</span></span>
                               </div>
                             </div>
                           </td>
@@ -723,21 +723,21 @@ export default function Page() {
                             <div className="flex flex-wrap gap-1 max-w-[160px]">
                               {user.teamList.length > 0 ? (
                                 user.teamList.map((t, idx) => (
-                                  <span key={idx} className="px-2 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[9px] font-black rounded-md uppercase border border-indigo-500/10 tracking-wide">{t}</span>
+                                  <span key={idx} className="px-2 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[11px] md:text-[9px] font-black rounded-md uppercase border border-indigo-500/10 tracking-wide">{t}</span>
                                 ))
                               ) : (
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Libre</span>
+                                <span className="text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Libre</span>
                               )}
                             </div>
                           </td>
 
                           <td className="py-4 px-6">
                             <div className="flex flex-col gap-1">
-                              <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase w-fit border ${user.status === 'Activo' ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-700 dark:text-[#00df82]' : 'bg-red-500/10 border-red-500/25 text-red-600 dark:text-red-400'}`}>
+                              <span className={`px-2 py-1 rounded-md text-[11px] md:text-[9px] font-black uppercase w-fit border ${user.status === 'Activo' ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-700 dark:text-[#00df82]' : 'bg-red-500/10 border-red-500/25 text-red-600 dark:text-red-400'}`}>
                                 {user.status}
                               </span>
                               {(user.strikes || 0) > 0 && (
-                                <span className="px-2 py-0.5 bg-rose-500 text-white rounded-md text-[9px] font-black uppercase flex items-center gap-1 w-fit">
+                                <span className="px-2 py-0.5 bg-rose-500 text-white rounded-md text-[11px] md:text-[9px] font-black uppercase flex items-center gap-1 w-fit">
                                   <HugeiconsIcon icon={BlockedIcon} className="w-3 h-3" strokeWidth={2} />
                                   {user.strikes} {user.strikes === 1 ? 'Strike' : 'Strikes'}
                                 </span>
@@ -746,7 +746,7 @@ export default function Page() {
                           </td>
 
                           <td className="py-4 px-6 text-right">
-                            <button onClick={() => openPlayer(user, 'perfil')} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:text-emerald-600 dark:hover:text-[#00df82] hover:border-emerald-300 dark:hover:border-[#00df82]/30 hover:bg-emerald-50 dark:hover:bg-[#00df82]/10 transition-all active:scale-95 cursor-pointer">
+                            <button onClick={() => openPlayer(user, 'perfil')} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:text-emerald-600 dark:hover:text-[#00df82] hover:border-emerald-300 dark:hover:border-[#00df82]/30 hover:bg-emerald-50 dark:hover:bg-[#00df82]/10 transition-all active:scale-95 cursor-pointer">
                               <HugeiconsIcon icon={UserCircleIcon} className="w-4 h-4" strokeWidth={1.8} />
                               Perfil
                             </button>
@@ -778,17 +778,17 @@ export default function Page() {
                         <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center font-black text-slate-500 dark:text-slate-400 text-lg overflow-hidden">
                           {user.photoURL ? <img src={user.photoURL} className="w-full h-full object-cover" alt={user.name} /> : user.name.charAt(0).toUpperCase()}
                         </div>
-                        <div className={`absolute -bottom-1 -right-1 min-w-[26px] h-[26px] px-1 rounded-md border-2 border-white dark:border-slate-900 flex items-center justify-center font-black text-[10px] shadow-xs ${getOvrColor(user.tier)}`}>
+                        <div className={`absolute -bottom-1 -right-1 min-w-[26px] h-[26px] px-1 rounded-md border-2 border-white dark:border-slate-900 flex items-center justify-center font-black text-xs md:text-[10px] shadow-xs ${getOvrColor(user.tier)}`}>
                           {user.ovr}
                         </div>
                       </div>
 
                       <div className="flex flex-col items-end gap-1.5 min-w-0">
-                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border ${user.status === 'Activo' ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-700 dark:text-[#00df82]' : 'bg-red-500/10 border-red-500/25 text-red-600 dark:text-red-400'}`}>
+                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-wider border ${user.status === 'Activo' ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-700 dark:text-[#00df82]' : 'bg-red-500/10 border-red-500/25 text-red-600 dark:text-red-400'}`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${user.status === 'Activo' ? 'bg-emerald-500' : 'bg-red-500'}`} />
                           {user.status}
                         </span>
-                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border border-transparent ${getOvrColor(user.tier)}`}>{user.tier}</span>
+                        <span className={`px-2 py-0.5 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-wider border border-transparent ${getOvrColor(user.tier)}`}>{user.tier}</span>
                       </div>
                     </div>
 
@@ -796,19 +796,19 @@ export default function Page() {
                       {user.name}
                     </h3>
                     {user.email && (
-                      <p className="text-[10px] text-slate-400 truncate mt-0.5">{user.email}</p>
+                      <p className="text-xs md:text-[10px] text-slate-400 truncate mt-0.5">{user.email}</p>
                     )}
 
                     <div className="flex flex-wrap items-center gap-1.5 mt-2">
                       {user.role === 'Capitán' && (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-500 text-slate-950 rounded-md text-[8px] font-black uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-500 text-slate-950 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">
                           <HugeiconsIcon icon={CrownIcon} className="w-2.5 h-2.5" strokeWidth={2.5} /> Capitán
                         </span>
                       )}
-                      {user.mainSport && <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-md text-[8px] font-black uppercase tracking-wider">{user.mainSport}</span>}
-                      {user.position && <span className="px-1.5 py-0.5 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 rounded-md text-[8px] font-black uppercase tracking-wider">{user.position}</span>}
+                      {user.mainSport && <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">{user.mainSport}</span>}
+                      {user.position && <span className="px-1.5 py-0.5 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">{user.position}</span>}
                       {(user.strikes || 0) > 0 && (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-rose-500 text-white rounded-md text-[8px] font-black uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-rose-500 text-white rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">
                           <HugeiconsIcon icon={BlockedIcon} className="w-2.5 h-2.5" strokeWidth={2.5} />
                           {user.strikes} {user.strikes === 1 ? 'strike' : 'strikes'}
                         </span>
@@ -820,36 +820,36 @@ export default function Page() {
                   <div className="px-4 pb-3 grid grid-cols-3 gap-1.5">
                     <div className="px-2 py-2.5 rounded-md bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5 text-center">
                       <span className="block text-[15px] font-black text-slate-900 dark:text-white leading-none font-mono">{user.stats.played || 0}</span>
-                      <span className="block text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-1">Partidos</span>
+                      <span className="block text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-1">Partidos</span>
                     </div>
                     <div className="px-2 py-2.5 rounded-md bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5 text-center">
                       <span className={`block text-[15px] font-black leading-none font-mono ${user.winRate >= 50 ? 'text-emerald-600 dark:text-[#00df82]' : 'text-slate-900 dark:text-white'}`}>{user.winRate}%</span>
-                      <span className="block text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-1">Victorias</span>
+                      <span className="block text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-1">Victorias</span>
                     </div>
                     <div className="px-2 py-2.5 rounded-md bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5 text-center">
                       <span className="block text-[15px] font-black text-slate-900 dark:text-white leading-none font-mono">{user.stats.goals || 0}</span>
-                      <span className="block text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-1">Goles</span>
+                      <span className="block text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-1">Goles</span>
                     </div>
                   </div>
 
                   {/* Detalles */}
                   <div className="px-4 pb-3 flex flex-col gap-2">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-slate-400 min-w-0">
+                      <span className="inline-flex items-center gap-1.5 text-xs md:text-[10px] font-semibold text-slate-400 min-w-0">
                         <HugeiconsIcon icon={UserGroupIcon} className="w-3.5 h-3.5 shrink-0" strokeWidth={1.8} />
                         <span className="truncate">{user.teamList.length > 0 ? user.teamList.join(', ') : 'Agente libre'}</span>
                       </span>
-                      <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400 shrink-0">
+                      <span className="inline-flex items-center gap-1.5 text-xs md:text-[10px] font-bold text-slate-400 shrink-0">
                         <HugeiconsIcon icon={Certificate01Icon} className="w-3.5 h-3.5 text-amber-500" strokeWidth={1.8} />
                         <span className="font-mono text-slate-900 dark:text-white">{user.badges.length}</span>
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-slate-400">
+                      <span className="inline-flex items-center gap-1.5 text-xs md:text-[10px] font-semibold text-slate-400">
                         <HugeiconsIcon icon={FireIcon} className="w-3.5 h-3.5 text-rose-500" strokeWidth={1.8} />
                         {user.goalsPerMatch} goles/partido
                       </span>
-                      <span className="text-[10px] font-semibold text-slate-400">Desde {user.joined}</span>
+                      <span className="text-xs md:text-[10px] font-semibold text-slate-400">Desde {user.joined}</span>
                     </div>
                   </div>
 
@@ -857,7 +857,7 @@ export default function Page() {
                   <div className="mt-auto border-t border-slate-100 dark:border-white/5">
                     <button onClick={() => openPlayer(user, 'perfil')} className="w-full px-4 py-3 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] hover:bg-emerald-50 dark:hover:bg-[#00df82]/10 transition-all cursor-pointer">
                       <HugeiconsIcon icon={UserCircleIcon} className="w-4 h-4" strokeWidth={2} />
-                      <span className="text-[10px] font-black uppercase tracking-wider">Ver perfil completo</span>
+                      <span className="text-xs md:text-[10px] font-black uppercase tracking-wider">Ver perfil completo</span>
                     </button>
                   </div>
                 </div>
@@ -933,7 +933,7 @@ function SortableTh({ label, active, onClick, align = 'left' }: { label: string;
     <th className={`py-4 px-6 ${align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'}`}>
       <button
         onClick={onClick}
-        className={`inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer ${active ? 'text-emerald-600 dark:text-[#00df82]' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-white'}`}
+        className={`inline-flex items-center gap-1.5 text-xs md:text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer ${active ? 'text-emerald-600 dark:text-[#00df82]' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-white'}`}
       >
         {label}
         {active && <HugeiconsIcon icon={ArrowUpDownIcon} className="w-3 h-3" strokeWidth={2} />}

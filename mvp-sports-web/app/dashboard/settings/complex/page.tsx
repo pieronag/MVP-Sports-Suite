@@ -44,7 +44,7 @@ const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 
     return (
         <div className={`fixed top-5 right-5 z-160 flex items-center gap-3 px-4 py-3 rounded-md shadow-xl border animate-slideIn ${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-[#00df82] dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
             {type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5" /> : <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5" />}
-            <span className="text-[10px] font-bold uppercase tracking-widest">{message}</span>
+            <span className="text-xs md:text-[10px] font-bold uppercase tracking-widest">{message}</span>
         </div>
     );
 };
@@ -363,7 +363,7 @@ export default function TenantSettingsPage() {
                 <div>
                     <div className="flex items-center gap-2 mb-1">
                         <span className="w-6 h-[2px] bg-emerald-500 rounded-md"></span>
-                        <p className="text-[10px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Infraestructura & Control Operativo</p>
+                        <p className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Infraestructura & Control Operativo</p>
                     </div>
                     <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">
                         Configuración <span className="text-emerald-500 dark:text-[#00df82]">Complejo</span>
@@ -372,11 +372,11 @@ export default function TenantSettingsPage() {
 
                 <div className="flex items-center gap-3">
                     {dirty && (
-                        <span className="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-[9px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-md">
+                        <span className="hidden sm:inline-flex items-center gap-2 px-3 py-2 text-[11px] md:text-[9px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-md">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Cambios sin guardar
                         </span>
                     )}
-                    <button onClick={handleSave} disabled={saving} className={`px-6 py-3 ${dirty ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 dark:bg-[#00df82]'} text-white dark:text-black font-black text-[10px] uppercase tracking-[0.2em] rounded-md transition-all active:scale-95 shadow-lg ${dirty ? 'shadow-amber-500/30' : 'shadow-emerald-500/30'} flex items-center gap-2.5 disabled:opacity-50`}>
+                    <button onClick={handleSave} disabled={saving} className={`px-6 py-3 ${dirty ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 dark:bg-[#00df82]'} text-white dark:text-black font-black text-xs md:text-[10px] uppercase tracking-[0.2em] rounded-md transition-all active:scale-95 shadow-lg ${dirty ? 'shadow-amber-500/30' : 'shadow-emerald-500/30'} flex items-center gap-2.5 disabled:opacity-50`}>
                         {saving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" /> : <HugeiconsIcon icon={FloppyDiskIcon} className="w-4 h-4" />} Guardar
                     </button>
                 </div>
@@ -399,7 +399,7 @@ export default function TenantSettingsPage() {
                                 <HugeiconsIcon icon={Building01Icon} className="w-5 h-5" strokeWidth={1.8} />
                             </div>
                             <div>
-                                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-0.5">Recinto activo</p>
+                                <p className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-0.5">Recinto activo</p>
                                 <p className="text-[11px] font-black uppercase text-slate-900 dark:text-white font-heading">{tenants.find(t => t.id === selectedTenantId)?.name || 'Seleccionar'}</p>
                             </div>
                         </div>
@@ -421,7 +421,7 @@ export default function TenantSettingsPage() {
                                 const active = activeSection === s.id;
                                 const done = sectionStatus[s.id] === 'done';
                                 return (
-                                    <button key={s.id} onClick={() => scrollToSection(s.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-all ${active ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
+                                    <button key={s.id} onClick={() => scrollToSection(s.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-md text-xs md:text-[10px] font-black uppercase tracking-widest transition-all ${active ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
                                         <HugeiconsIcon icon={s.icon} className="w-4 h-4" strokeWidth={1.8} />
                                         {s.label}
                                         <span className={`w-1.5 h-1.5 rounded-full ${done ? 'bg-emerald-500 dark:bg-black/60' : active ? 'bg-white/30' : 'bg-slate-300 dark:bg-white/15'}`} />
@@ -439,7 +439,7 @@ export default function TenantSettingsPage() {
                                     <span className="w-10 h-10 rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-[#00df82] shrink-0"><HugeiconsIcon icon={Building01Icon} className="w-5 h-5" strokeWidth={1.8} /></span>
                                     <div>
                                         <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white font-heading">Identidad de Marca</h3>
-                                        <p className="text-[10px] font-bold text-slate-400">Presencia pública del recinto</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-400">Presencia pública del recinto</p>
                                     </div>
                                 </div>
                                 <SectionStatusChip done={sectionStatus.identidad === 'done'} label={sectionStatus.identidad === 'done' ? 'Completado' : 'Pendiente'} />
@@ -450,7 +450,7 @@ export default function TenantSettingsPage() {
                                     <InputMini label="Dirección Pública" value={formData.address} onChange={(e: any) => setFormData({ ...formData, address: e.target.value })} icon={<HugeiconsIcon icon={MapPinIcon} className="w-5 h-5" />} />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Reseña del Club</label>
+                                    <label className="text-xs md:text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Reseña del Club</label>
                                     <textarea rows={4} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-5 py-4 bg-slate-50 dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-hidden focus:ring-1 focus:ring-emerald-500/30 resize-none transition-all" placeholder="Misión del complejo..." />
                                 </div>
                             </div>
@@ -463,7 +463,7 @@ export default function TenantSettingsPage() {
                                     <span className="w-10 h-10 rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-[#00df82] shrink-0"><HugeiconsIcon icon={IdentityCardIcon} className="w-5 h-5" strokeWidth={1.8} /></span>
                                     <div>
                                         <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white font-heading">Marco Legal</h3>
-                                        <p className="text-[10px] font-bold text-slate-400">Facturación y datos tributarios</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-400">Facturación y datos tributarios</p>
                                     </div>
                                 </div>
                                 <SectionStatusChip done={sectionStatus.legal === 'done'} label={sectionStatus.legal === 'done' ? 'Completado' : 'Pendiente'} />
@@ -483,7 +483,7 @@ export default function TenantSettingsPage() {
                                     <span className="w-10 h-10 rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-[#00df82] shrink-0"><HugeiconsIcon icon={Message02Icon} className="w-5 h-5" strokeWidth={1.8} /></span>
                                     <div>
                                         <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white font-heading">Canales de Comunicación</h3>
-                                        <p className="text-[10px] font-bold text-slate-400">Contacto directo y redes</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-400">Contacto directo y redes</p>
                                     </div>
                                 </div>
                                 <SectionStatusChip done={sectionStatus.contacto === 'done'} label={sectionStatus.contacto === 'done' ? 'Completado' : 'Pendiente'} />
@@ -503,7 +503,7 @@ export default function TenantSettingsPage() {
                                     <span className="w-10 h-10 rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-[#00df82] shrink-0"><HugeiconsIcon icon={Clock01Icon} className="w-5 h-5" strokeWidth={1.8} /></span>
                                     <div>
                                         <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white font-heading">Operación</h3>
-                                        <p className="text-[10px] font-bold text-slate-400">Horarios, servicios y reglamento</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-400">Horarios, servicios y reglamento</p>
                                     </div>
                                 </div>
                                 <SectionStatusChip done={sectionStatus.operacion === 'done'} label={sectionStatus.operacion === 'done' ? 'Configurado' : 'Pendiente'} />
@@ -513,32 +513,32 @@ export default function TenantSettingsPage() {
                                     <div className="p-4 bg-white dark:bg-[#020611] rounded-md border border-slate-200 dark:border-white/10">
                                         <div className="flex items-center gap-3 mb-3">
                                             <HugeiconsIcon icon={Clock01Icon} className="w-4 h-4 text-emerald-500" />
-                                            <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase">Horario de Red</span>
+                                            <span className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase">Horario de Red</span>
                                         </div>
                                         <div className="grid grid-cols-2 gap-2">
                                             <div>
-                                                <label className="text-[8px] font-black uppercase text-slate-400 tracking-widest mb-1 block">Apertura</label>
+                                                <label className="text-[11px] md:text-[8px] font-black uppercase text-slate-400 tracking-widest mb-1 block">Apertura</label>
                                                 <input type="time" value={formData.openTime} onChange={e => setFormData({ ...formData, openTime: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black outline-hidden focus:border-emerald-500" />
                                             </div>
                                             <div>
-                                                <label className="text-[8px] font-black uppercase text-slate-400 tracking-widest mb-1 block">Cierre</label>
+                                                <label className="text-[11px] md:text-[8px] font-black uppercase text-slate-400 tracking-widest mb-1 block">Cierre</label>
                                                 <input type="time" value={formData.closeTime} onChange={e => setFormData({ ...formData, closeTime: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black outline-hidden focus:border-emerald-500" />
                                             </div>
                                         </div>
                                         <p className="text-[11px] font-mono text-emerald-600 dark:text-[#00df82] font-black mt-3">{formData.openTime} — {formData.closeTime}</p>
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-1.5">Política de Cancelación</label>
-                                        <textarea rows={3} value={formData.cancellationPolicy} onChange={e => setFormData({ ...formData, cancellationPolicy: e.target.value })} className="w-full px-4 py-3 bg-slate-50 dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-hidden resize-none" placeholder="Condiciones de cancelación..." />
+                                        <label className="text-xs md:text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-1.5">Política de Cancelación</label>
+                                        <textarea rows={3} value={formData.cancellationPolicy} onChange={e => setFormData({ ...formData, cancellationPolicy: e.target.value })} className="w-full px-4 py-3 bg-slate-50 dark:bg-[#020611] border border-slate-200 dark:border-white/10 rounded-md text-xs md:text-[10px] font-bold outline-hidden resize-none" placeholder="Condiciones de cancelación..." />
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Servicios Disponibles</label>
+                                    <label className="text-xs md:text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Servicios Disponibles</label>
                                     <div className="grid grid-cols-2 gap-2.5">
                                         {['WiFi', 'Parking', 'Duchas', 'Luz LED', 'Café', 'Pro Shop'].map(item => {
                                             const on = formData.amenities.includes(item);
                                             return (
-                                                <button key={item} onClick={() => { const exists = formData.amenities.includes(item); setFormData({ ...formData, amenities: exists ? formData.amenities.filter(i => i !== item) : [...formData.amenities, item] }); }} className={`flex items-center gap-2 px-3 py-3 rounded-md text-[10px] font-bold uppercase tracking-widest border transition-all ${on ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black border-emerald-500 dark:border-[#00df82] shadow-lg shadow-emerald-500/20' : 'bg-slate-50 dark:bg-white/5 border-transparent text-slate-400 hover:border-emerald-500/30'}`}>
+                                                <button key={item} onClick={() => { const exists = formData.amenities.includes(item); setFormData({ ...formData, amenities: exists ? formData.amenities.filter(i => i !== item) : [...formData.amenities, item] }); }} className={`flex items-center gap-2 px-3 py-3 rounded-md text-xs md:text-[10px] font-bold uppercase tracking-widest border transition-all ${on ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black border-emerald-500 dark:border-[#00df82] shadow-lg shadow-emerald-500/20' : 'bg-slate-50 dark:bg-white/5 border-transparent text-slate-400 hover:border-emerald-500/30'}`}>
                                                     {on && <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-3.5 h-3.5" strokeWidth={2.5} />} {item}
                                                 </button>
                                             );
@@ -546,14 +546,14 @@ export default function TenantSettingsPage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Reglamento Interno</label>
+                                    <label className="text-xs md:text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Reglamento Interno</label>
                                     <div className="grid grid-cols-1 gap-2 pr-1 max-h-64 overflow-y-auto custom-scrollbar">
                                         {[
                                             'Prohibido fumar en el recinto', 'Prohibido el consumo de alcohol', 'No se permiten mascotas', 'Uso de calzado deportivo obligatorio', 'No ingresar comida a las canchas', 'Prohibido el uso de parlantes', 'Respetar horario de inicio y fin', 'Menores con supervisión adulta', 'Prohibido envases de vidrio', 'Mantener la limpieza del lugar', 'Prohibido estoperoles de aluminio', 'Estacionar solo en zonas señalizadas', 'Se reserva el derecho de admisión'
                                         ].map(rule => {
                                             const on = formData.rules.includes(rule);
                                             return (
-                                                <button key={rule} onClick={() => { const exists = formData.rules.includes(rule); setFormData({ ...formData, rules: exists ? formData.rules.filter(r => r !== rule) : [...formData.rules, rule] }); }} className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-md border text-[9px] font-bold uppercase transition-all ${on ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600' : 'bg-slate-50 dark:bg-white/5 border-transparent text-slate-400'}`}>
+                                                <button key={rule} onClick={() => { const exists = formData.rules.includes(rule); setFormData({ ...formData, rules: exists ? formData.rules.filter(r => r !== rule) : [...formData.rules, rule] }); }} className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-md border text-[11px] md:text-[9px] font-bold uppercase transition-all ${on ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600' : 'bg-slate-50 dark:bg-white/5 border-transparent text-slate-400'}`}>
                                                     <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${on ? 'bg-emerald-500 dark:bg-[#00df82] border-emerald-500' : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/20'}`}>
                                                         {on && <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-3 h-3 text-white dark:text-black" strokeWidth={2.5} />}
                                                     </div>
@@ -573,7 +573,7 @@ export default function TenantSettingsPage() {
                                     <span className="w-10 h-10 rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-[#00df82] shrink-0"><HugeiconsIcon icon={CreditCardIcon} className="w-5 h-5" strokeWidth={1.8} /></span>
                                     <div>
                                         <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white font-heading">Integraciones de Pago</h3>
-                                        <p className="text-[10px] font-bold text-slate-400">Pasarelas para cobros online</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-400">Pasarelas para cobros online</p>
                                     </div>
                                 </div>
                                 <SectionStatusChip done={sectionStatus.integraciones === 'done'} label={sectionStatus.integraciones === 'done' ? 'Activo' : 'Sin configurar'} />
@@ -588,9 +588,9 @@ export default function TenantSettingsPage() {
                                                 <div>
                                                     <div className="flex items-center gap-2">
                                                         <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest leading-none">Mercado Pago</h4>
-                                                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-[#00df82] text-[7px] font-black uppercase tracking-widest border border-emerald-500/20">Recomendada</span>
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-[#00df82] text-[11px] md:text-[7px] font-black uppercase tracking-widest border border-emerald-500/20">Recomendada</span>
                                                     </div>
-                                                    {isMpGloballyDisabled && <p className="text-[7px] font-black text-red-500 uppercase tracking-widest mt-1">Desactivado por Plataforma</p>}
+                                                    {isMpGloballyDisabled && <p className="text-[11px] md:text-[7px] font-black text-red-500 uppercase tracking-widest mt-1">Desactivado por Plataforma</p>}
                                                 </div>
                                             </div>
                                             <ToggleMini enabled={isMpActive} onChange={() => setFormData({ ...formData, isMercadopagoActive: !formData.isMercadopagoActive })} disabled={isMpGloballyDisabled} color="bg-emerald-500 shadow-emerald-500/20" />
@@ -599,7 +599,7 @@ export default function TenantSettingsPage() {
                                             <div className="space-y-4 animate-fadeIn">
                                                 <InputMini label="Public Key" value={formData.mercadopagoPublicKey} onChange={(e: any) => setFormData({ ...formData, mercadopagoPublicKey: e.target.value })} icon={<HugeiconsIcon icon={Key01Icon} className="w-4 h-4 text-emerald-500" />} />
                                                 <InputMini label="Access Token" type="password" placeholder={secretsConfigured.mercadopagoAccessToken ? '•••••••• configurado (escribe para reemplazar)' : 'APP_USR-...'} value={formData.mercadopagoAccessToken} onChange={(e: any) => setFormData({ ...formData, mercadopagoAccessToken: e.target.value })} icon={<HugeiconsIcon icon={ShieldCheckIcon} className="w-4 h-4 text-emerald-500" />} />
-                                                <button onClick={() => simulateApiTest('mercadopago')} className="w-full py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[9px] font-black uppercase tracking-widest rounded-md hover:brightness-110 transition-all shadow-lg shadow-emerald-500/20">Verificar API</button>
+                                                <button onClick={() => simulateApiTest('mercadopago')} className="w-full py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[11px] md:text-[9px] font-black uppercase tracking-widest rounded-md hover:brightness-110 transition-all shadow-lg shadow-emerald-500/20">Verificar API</button>
                                             </div>
                                         )}
                                     </div>
@@ -614,9 +614,9 @@ export default function TenantSettingsPage() {
                                             <div className="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
                                             <div className="w-2.5 h-2.5 rounded-full bg-emerald-400"></div>
                                         </div>
-                                        <span className="font-mono text-[9px] font-black text-slate-500 uppercase tracking-widest">Terminal de Diagnóstico v2.4</span>
+                                        <span className="font-mono text-[11px] md:text-[9px] font-black text-slate-500 uppercase tracking-widest">Terminal de Diagnóstico v2.4</span>
                                     </div>
-                                    <div ref={terminalRef} className="p-4 flex-1 overflow-y-auto no-scrollbar font-mono text-[10px] space-y-1.5 text-slate-400">
+                                    <div ref={terminalRef} className="p-4 flex-1 overflow-y-auto no-scrollbar font-mono text-xs md:text-[10px] space-y-1.5 text-slate-400">
                                         {terminalLines.map((line, i) => (
                                             <div key={i} className={`flex gap-2 ${line.type === 'error' ? 'text-red-400' : line.type === 'success' ? 'text-[#00df82]' : line.type === 'command' ? 'text-white dark:text-[#00df82]' : 'text-slate-500'}`}>
                                                 <span className="opacity-40">[{new Date().toLocaleTimeString([], { hour12: false })}]</span>
@@ -635,16 +635,16 @@ export default function TenantSettingsPage() {
                                     <div className="relative z-10">
                                         <div className="flex items-center gap-3 mb-4">
                                             <div className="w-8 h-8 rounded-md bg-emerald-500/20 flex items-center justify-center text-emerald-500"><HugeiconsIcon icon={ShieldCheckIcon} className="w-5 h-5" /></div>
-                                            <h4 className="text-[10px] font-black uppercase text-white tracking-[0.2em]">Protocolo de Seguridad Bancaria</h4>
+                                            <h4 className="text-xs md:text-[10px] font-black uppercase text-white tracking-[0.2em]">Protocolo de Seguridad Bancaria</h4>
                                         </div>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase leading-relaxed max-w-2xl">
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-400 uppercase leading-relaxed max-w-2xl">
                                             Para activar la recaudación automática, ingresa las credenciales de producción de tu pasarela. MVP Sports utiliza cifrado <span className="text-emerald-400">AES-256 GCM</span> para proteger tus tokens.
                                         </p>
                                         <div className="flex flex-wrap gap-4 mt-4">
                                             {['TLS 1.3 Activo', 'Cifrado de Extremo a Extremo', 'Certificación PCI DSS'].map(tag => (
                                                 <div key={tag} className="flex items-center gap-2">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                                                    <span className="text-[8px] font-black text-slate-500 uppercase">{tag}</span>
+                                                    <span className="text-[11px] md:text-[8px] font-black text-slate-500 uppercase">{tag}</span>
                                                 </div>
                                             ))}
                                         </div>
@@ -661,11 +661,11 @@ export default function TenantSettingsPage() {
                 <div className="max-w-6xl mx-auto pointer-events-auto rounded-md bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-md border border-slate-200 dark:border-white/10 shadow-2xl px-5 py-3.5 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-2.5">
                         <span className={`w-2 h-2 rounded-full ${dirty ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500 dark:bg-[#00df82]'}`} />
-                        <p className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                        <p className="text-xs md:text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
                             {dirty ? 'Cambios sin guardar' : 'Configuración sincronizada'}
                         </p>
                     </div>
-                    <button onClick={handleSave} disabled={saving} className="flex items-center gap-2.5 px-8 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[10px] uppercase tracking-[0.2em] rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-40">
+                    <button onClick={handleSave} disabled={saving} className="flex items-center gap-2.5 px-8 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-xs md:text-[10px] uppercase tracking-[0.2em] rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-40">
                         {saving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" /> : <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" />} Sincronizar cambios
                     </button>
                 </div>
@@ -677,7 +677,7 @@ export default function TenantSettingsPage() {
 function InputMini({ label, value, icon, onChange, type = "text", placeholder = "" }: any) {
     return (
         <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">{label}</label>
+            <label className="text-xs md:text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">{label}</label>
             <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-500 transition-colors scale-90">{icon}</div>
                 <input
@@ -707,7 +707,7 @@ function ToggleMini({ enabled, onChange, color = 'bg-emerald-500 shadow-emerald-
 
 function SectionStatusChip({ done, label }: { done: boolean, label: string }) {
     return (
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[8px] font-black uppercase tracking-widest border shrink-0 ${done ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-[#00df82] border-emerald-100 dark:border-emerald-500/20' : 'bg-slate-50 dark:bg-white/5 text-slate-400 border-slate-200 dark:border-white/10'}`}>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-widest border shrink-0 ${done ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-[#00df82] border-emerald-100 dark:border-emerald-500/20' : 'bg-slate-50 dark:bg-white/5 text-slate-400 border-slate-200 dark:border-white/10'}`}>
             <span className={`w-1.5 h-1.5 rounded-full ${done ? 'bg-emerald-500 dark:bg-[#00df82]' : 'bg-slate-300 dark:bg-white/20'}`} />
             {label}
         </span>

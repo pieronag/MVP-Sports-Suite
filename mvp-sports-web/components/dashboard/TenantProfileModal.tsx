@@ -96,10 +96,10 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
                         )}
                         <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-black/20" />
 
-                        <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border border-white/15 backdrop-blur-sm shadow-lg ${planStyle}`}>
+                        <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider border border-white/15 backdrop-blur-sm shadow-lg ${planStyle}`}>
                             {planLabel}
                         </span>
-                        <span className={`absolute top-3 left-3 mt-9 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border backdrop-blur-sm shadow-lg ${isActive ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/30" : "bg-red-500/20 text-red-300 border-red-400/30"}`}>
+                        <span className={`absolute top-3 left-3 mt-9 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider border backdrop-blur-sm shadow-lg ${isActive ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/30" : "bg-red-500/20 text-red-300 border-red-400/30"}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-400" : "bg-red-400"}`} />
                             {tenant.status}
                         </span>
@@ -122,7 +122,7 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
                                 <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-black/55 backdrop-blur-sm border border-white/15">
                                     <HugeiconsIcon icon={StarIcon} className="w-3.5 h-3.5 text-amber-400" strokeWidth={2} />
                                     <span className="text-sm font-black text-white font-mono">{rating.toFixed(1)}</span>
-                                    <span className="text-[9px] font-bold text-slate-300 uppercase">({tenant.totalFeedbacks ?? 0})</span>
+                                    <span className="text-[11px] md:text-[9px] font-bold text-slate-300 uppercase">({tenant.totalFeedbacks ?? 0})</span>
                                 </span>
                             )}
                         </div>
@@ -134,19 +134,19 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                             <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2 text-center">
                                 <span className="block text-xl font-black text-slate-900 dark:text-white font-mono leading-none">{tenant.infra?.courts ?? 0}</span>
-                                <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Canchas</span>
+                                <span className="block text-[11px] md:text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Canchas</span>
                             </div>
                             <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2 text-center">
                                 <span className="block text-xl font-black text-slate-900 dark:text-white font-mono leading-none">{tenant.infra?.staff ?? 0}</span>
-                                <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Staff</span>
+                                <span className="block text-[11px] md:text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Staff</span>
                             </div>
                             <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2 text-center">
                                 <span className="block text-xl font-black text-slate-900 dark:text-white font-mono leading-none">{tenant.totalFeedbacks ?? 0}</span>
-                                <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Reseñas</span>
+                                <span className="block text-[11px] md:text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Reseñas</span>
                             </div>
                             <div className="p-3 rounded-md border border-emerald-500/25 bg-emerald-500/5 text-center">
                                 <span className="block text-xl font-black text-emerald-600 dark:text-[#00df82] font-mono leading-none">${(planPrice / 1000).toFixed(0)}k</span>
-                                <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">MRR</span>
+                                <span className="block text-[11px] md:text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">MRR</span>
                             </div>
                         </div>
 
@@ -154,13 +154,13 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
                         <div className="rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
                             <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
                                 <HugeiconsIcon icon={Building01Icon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
-                                <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Información del recinto</span>
+                                <span className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Información del recinto</span>
                             </div>
                             <div className="divide-y divide-slate-100 dark:divide-white/5">
                                 {infoRows.map((row) => (
                                     <div key={row.label} className="flex items-center gap-3 px-4 py-3">
                                         <HugeiconsIcon icon={row.icon} className={`w-4 h-4 shrink-0 ${row.tone === "warn" ? "text-amber-500" : "text-slate-400"}`} strokeWidth={1.8} />
-                                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 w-24 shrink-0">{row.label}</span>
+                                        <span className="text-xs md:text-[10px] font-black uppercase tracking-wider text-slate-400 w-24 shrink-0">{row.label}</span>
                                         <span className={`text-[12px] font-semibold truncate ${row.tone === "warn" ? "text-amber-600 dark:text-amber-400" : "text-slate-900 dark:text-white"}`}>{row.value}</span>
                                     </div>
                                 ))}
@@ -172,9 +172,9 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
                             <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
                                 <span className="flex items-center gap-2">
                                     <HugeiconsIcon icon={UserGroupIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
-                                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Dueños</span>
+                                    <span className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Dueños</span>
                                 </span>
-                                <span className="text-[10px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{tenant.owners?.length ?? 0}</span>
+                                <span className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{tenant.owners?.length ?? 0}</span>
                             </div>
                             <div className="p-4 space-y-3">
                                 {tenant.owners?.length > 0 ? tenant.owners.map((o: string, idx: number) => (
@@ -184,7 +184,7 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
                                         </span>
                                         <div className="min-w-0">
                                             <p className="text-[12px] font-bold text-slate-900 dark:text-white truncate">{o}</p>
-                                            {tenant.ownerEmails?.[idx] && <p className="text-[10px] text-slate-400 truncate">{tenant.ownerEmails[idx]}</p>}
+                                            {tenant.ownerEmails?.[idx] && <p className="text-xs md:text-[10px] text-slate-400 truncate">{tenant.ownerEmails[idx]}</p>}
                                         </div>
                                     </div>
                                 )) : (

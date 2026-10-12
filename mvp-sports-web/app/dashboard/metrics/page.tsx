@@ -322,14 +322,14 @@ export default function MetricsPage() {
     const trendBadge = (current: number, prev: number) => {
         if (prev === 0 && current === 0) return null;
         if (prev === 0) return (
-            <span className="inline-flex items-center gap-0.5 text-[10px] font-black text-emerald-600 dark:text-[#00df82]">
+            <span className="inline-flex items-center gap-0.5 text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82]">
                 <HugeiconsIcon icon={ArrowUpRight01Icon} className="w-3 h-3" strokeWidth={2.4} />NUEVO
             </span>
         );
         const diff = ((current - prev) / prev) * 100;
         const up = diff >= 0;
         return (
-            <span className={`inline-flex items-center gap-0.5 text-[10px] font-black font-mono ${up ? 'text-emerald-600 dark:text-[#00df82]' : 'text-rose-600 dark:text-rose-400'}`}>
+            <span className={`inline-flex items-center gap-0.5 text-xs md:text-[10px] font-black font-mono ${up ? 'text-emerald-600 dark:text-[#00df82]' : 'text-rose-600 dark:text-rose-400'}`}>
                 <HugeiconsIcon icon={up ? ArrowUpRight01Icon : ArrowDownRight01Icon} className="w-3 h-3" strokeWidth={2.4} />
                 {up ? '+' : ''}{diff.toFixed(0)}%
             </span>
@@ -417,7 +417,7 @@ export default function MetricsPage() {
             </div>
 
             {/* KPIs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                 <TarjetaKpi
                     titulo="Clientes (GMV)"
                     valor={formatCLP(kpis.gmv)}
@@ -460,8 +460,8 @@ export default function MetricsPage() {
                     bodyClassName="p-5"
                     action={
                         <div className="flex gap-4">
-                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-[#00df82]" /><span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-300">Comisiones</span></div>
-                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-indigo-600" /><span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-300">Planes</span></div>
+                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-[#00df82]" /><span className="text-xs md:text-[10px] font-bold uppercase text-slate-500 dark:text-slate-300">Comisiones</span></div>
+                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-indigo-600" /><span className="text-xs md:text-[10px] font-bold uppercase text-slate-500 dark:text-slate-300">Planes</span></div>
                         </div>
                     }
                 >
@@ -500,7 +500,7 @@ export default function MetricsPage() {
                             </PieChart>
                         </ResponsiveContainer>
                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cobrado</span>
+                            <span className="text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cobrado</span>
                             <span className="text-3xl font-black text-slate-900 dark:text-white leading-none font-mono">{collectionStats[0]?.value ?? 0}%</span>
                         </div>
                     </div>
@@ -554,7 +554,7 @@ export default function MetricsPage() {
                             <div key={t.name + i} className="space-y-1.5">
                                 <div className="flex items-center justify-between gap-3">
                                     <div className="flex items-center gap-2 min-w-0">
-                                        <span className="text-[10px] font-black text-slate-400 font-mono w-4 shrink-0">#{i + 1}</span>
+                                        <span className="text-xs md:text-[10px] font-black text-slate-400 font-mono w-4 shrink-0">#{i + 1}</span>
                                         <span className="text-[11px] font-bold uppercase truncate text-slate-900 dark:text-white">{t.name}</span>
                                     </div>
                                     <span className="text-[11px] font-black font-mono text-slate-900 dark:text-white shrink-0">
@@ -587,11 +587,11 @@ export default function MetricsPage() {
                         <table className="w-full text-left min-w-[640px]">
                             <thead>
                                 <tr className="bg-slate-50/60 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
-                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Recinto</th>
-                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Monto</th>
-                                    <th className="px-6 py-4 text-[10px] font-black text-emerald-500 uppercase tracking-wider text-right">Comisión</th>
-                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Método</th>
-                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Hace</th>
+                                    <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Recinto</th>
+                                    <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Monto</th>
+                                    <th className="px-6 py-4 text-xs md:text-[10px] font-black text-emerald-500 uppercase tracking-wider text-right">Comisión</th>
+                                    <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Método</th>
+                                    <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Hace</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -601,11 +601,11 @@ export default function MetricsPage() {
                                         <td className="px-6 py-4 text-right text-[11px] font-bold text-slate-500 dark:text-slate-400 font-mono">{formatCLP(tx.amount)}</td>
                                         <td className="px-6 py-4 text-right text-[11px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{formatCLP(tx.fee)}</td>
                                         <td className="px-6 py-4 text-center">
-                                            <span className={`text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider ${methodStyle(tx.method)}`}>
+                                            <span className={`text-xs md:text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider ${methodStyle(tx.method)}`}>
                                                 {tx.methodLabel}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-right text-[10px] text-slate-400 uppercase font-medium font-mono">{tx.time}</td>
+                                        <td className="px-6 py-4 text-right text-xs md:text-[10px] text-slate-400 uppercase font-medium font-mono">{tx.time}</td>
                                     </tr>
                                 )) : (
                                     <tr>
@@ -630,10 +630,10 @@ export default function MetricsPage() {
                         <table className="w-full text-left min-w-[560px]">
                             <thead>
                                 <tr className="bg-slate-50/60 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
-                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Centro operativo</th>
-                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Comisión</th>
-                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Total</th>
-                                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Estado</th>
+                                    <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Centro operativo</th>
+                                    <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Comisión</th>
+                                    <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Total</th>
+                                    <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Estado</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -643,7 +643,7 @@ export default function MetricsPage() {
                                         <td className="px-6 py-4 text-right text-[11px] font-bold text-emerald-500 font-mono">{formatCLP(t.commission)}</td>
                                         <td className="px-6 py-4 text-right text-[11px] font-black text-slate-900 dark:text-white font-mono">{formatCLP(t.totalDebt)}</td>
                                         <td className="px-6 py-4 text-center">
-                                            <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider border ${t.status === 'Pendiente' ? 'bg-amber-50 border-amber-500/30 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400' : 'bg-red-50 border-red-500/30 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
+                                            <span className={`px-2.5 py-1 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider border ${t.status === 'Pendiente' ? 'bg-amber-50 border-amber-500/30 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400' : 'bg-red-50 border-red-500/30 text-red-600 dark:bg-red-500/10 dark:text-red-400'}`}>
                                                 {t.status}
                                             </span>
                                         </td>

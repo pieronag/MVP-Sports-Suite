@@ -41,7 +41,7 @@ export default function RevenueChart({ data, isHistorical, revenue, formatCLP }:
                             <h2 className="text-xl font-mono font-black text-emerald-600 dark:text-[#00df82]">
                                 {formatCLP(revenue / getDaysInCurrentMonth())}
                             </h2>
-                            <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Promedio por día</p>
+                            <p className="text-xs md:text-[10px] text-slate-400 uppercase font-bold tracking-wider">Promedio por día</p>
                         </>
                     )}
                 </div>

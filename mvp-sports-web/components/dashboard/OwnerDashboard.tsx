@@ -116,7 +116,7 @@ export default function OwnerDashboard() {
                 <div className={`fixed top-6 right-6 z-100 p-4 rounded-md shadow-2xl backdrop-blur-xl border animate-slideIn ${toast.type === 'success' ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black' : toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-slate-900 text-white'}`}>
                     <div className="flex items-center gap-3">
                         <HugeiconsIcon icon={toast.type === 'success' ? CheckmarkCircle02Icon : InformationCircleIcon} className="w-5 h-5" strokeWidth={2} />
-                        <p className="text-[10px] font-black uppercase tracking-widest">{toast.msg}</p>
+                        <p className="text-xs md:text-[10px] font-black uppercase tracking-widest">{toast.msg}</p>
                     </div>
                 </div>
             )}
@@ -141,7 +141,7 @@ export default function OwnerDashboard() {
                         <select
                             value={selectedVenueId}
                             onChange={(e) => setSelectedVenueId(e.target.value)}
-                            className="bg-transparent text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer appearance-none pr-3 py-2"
+                            className="bg-transparent text-xs md:text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer appearance-none pr-3 py-2"
                         >
                             <option value="all">Todos los recintos</option>
                             {myVenues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
@@ -152,7 +152,7 @@ export default function OwnerDashboard() {
                             <button
                                 key={t}
                                 onClick={() => setTimeRange(t)}
-                                className={`px-3 py-1.5 text-[9px] font-black uppercase rounded-md transition-all ${timeRange === t ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}
+                                className={`px-3 py-1.5 text-[11px] md:text-[9px] font-black uppercase rounded-md transition-all ${timeRange === t ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}
                             >
                                 {t === 'today' ? 'Hoy' : t === '7d' ? '7 días' : t === '30d' ? '30 días' : 'Mes'}
                             </button>
@@ -167,7 +167,7 @@ export default function OwnerDashboard() {
                             <button
                                 key={f.id}
                                 onClick={() => setPaymentFilter(f.id)}
-                                className={`px-3 py-1.5 text-[9px] font-black uppercase rounded-md transition-all ${paymentFilter === f.id ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}
+                                className={`px-3 py-1.5 text-[11px] md:text-[9px] font-black uppercase rounded-md transition-all ${paymentFilter === f.id ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}
                             >
                                 {f.label}
                             </button>
@@ -177,7 +177,7 @@ export default function OwnerDashboard() {
             </div>
 
             {/* KPI GRID */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                 <TarjetaKpi titulo={`Ingresos (${timeRange === 'today' ? 'hoy' : timeRange === '7d' ? '7 días' : timeRange === '30d' ? '30 días' : 'mes'})`} valor={formatCLP(kpis.revenueMonth)} sub={`${kpis.bookingsMonth} ${kpis.bookingsMonth === 1 ? 'reserva' : 'reservas'}`} icono={<HugeiconsIcon icon={BoltIcon} className="w-6 h-6" strokeWidth={1.6} />} brillo />
                 <TarjetaKpi titulo="Cierres hoy" valor={formatCLP(kpis.revenueToday)} sub="Venta directa" icono={<HugeiconsIcon icon={MoneyBag01Icon} className="w-6 h-6" strokeWidth={1.6} />} />
                 <TarjetaKpi titulo="Mantenimiento" valor={kpis.maintenanceCount} sub="Canchas en mantención" icono={<HugeiconsIcon icon={Wrench01Icon} className="w-6 h-6" strokeWidth={1.6} />} />
@@ -201,7 +201,7 @@ export default function OwnerDashboard() {
                             action={
                                 <div className="text-right">
                                     <h2 className="text-xl font-black text-emerald-600 dark:text-[#00df82] font-mono tracking-tighter leading-none">{formatCLP(kpis.revenueMonth)}</h2>
-                                    <p className="text-[8px] text-slate-400 uppercase font-black tracking-widest mt-1">Total periodo</p>
+                                    <p className="text-[11px] md:text-[8px] text-slate-400 uppercase font-black tracking-widest mt-1">Total periodo</p>
                                 </div>
                             }
                         >
@@ -242,10 +242,10 @@ export default function OwnerDashboard() {
                                     {myVenues.map((venue, i) => (
                                         <div key={i} className="flex flex-col gap-2 p-4 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 transition-all hover:border-emerald-400/40">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase truncate leading-none">{venue.name}</span>
-                                                <span className={`px-2.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest ${venue.status === 'Activo' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>{venue.status}</span>
+                                                <span className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase truncate leading-none">{venue.name}</span>
+                                                <span className={`px-2.5 py-0.5 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-widest ${venue.status === 'Activo' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>{venue.status}</span>
                                             </div>
-                                            <p className="text-[8px] text-slate-400 font-black uppercase truncate flex items-center gap-2">
+                                            <p className="text-[11px] md:text-[8px] text-slate-400 font-black uppercase truncate flex items-center gap-2">
                                                 <HugeiconsIcon icon={MapPinIcon} className="w-3.5 h-3.5 text-slate-300" strokeWidth={1.8} /> {venue.address}
                                             </p>
                                         </div>
@@ -278,7 +278,7 @@ export default function OwnerDashboard() {
                                         <div className="w-1/2 space-y-3 overflow-y-auto no-scrollbar pr-1">
                                             {venuesDistribution.map((v, i) => (
                                                 <div key={i} className="flex flex-col gap-0.5">
-                                                    <span className="text-[8px] font-black text-slate-400 uppercase truncate leading-none tracking-widest">{v.name}</span>
+                                                    <span className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase truncate leading-none tracking-widest">{v.name}</span>
                                                     <span className="text-xs font-black text-slate-900 dark:text-white font-mono">{formatCLP(v.value)}</span>
                                                 </div>
                                             ))}
@@ -286,7 +286,7 @@ export default function OwnerDashboard() {
                                     </div>
                                 ) : (
                                     <div className="h-full flex items-center justify-center text-center">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sin ingresos en el periodo</p>
+                                        <p className="text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sin ingresos en el periodo</p>
                                     </div>
                                 )}
                             </SectionCard>
@@ -309,16 +309,16 @@ export default function OwnerDashboard() {
                                         <div key={b.id} className="p-4 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 transition-all hover:border-emerald-400/40 shadow-xs">
                                             <div className="flex justify-between items-start gap-3">
                                                 <div className="min-w-0">
-                                                    <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase truncate mb-1 leading-none">{b.clientName}</p>
+                                                    <p className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase truncate mb-1 leading-none">{b.clientName}</p>
                                                     <div className="flex flex-wrap items-center gap-2 mt-1.5">
-                                                        <span className="text-[8px] text-slate-400 font-black uppercase tracking-tighter">{b.courtName}</span>
+                                                        <span className="text-[11px] md:text-[8px] text-slate-400 font-black uppercase tracking-tighter">{b.courtName}</span>
                                                         <div className="w-1 h-1 rounded-full bg-slate-300"></div>
-                                                        <span className="text-[8px] text-emerald-600 dark:text-[#00df82] font-black">{b.startTime}</span>
+                                                        <span className="text-[11px] md:text-[8px] text-emerald-600 dark:text-[#00df82] font-black">{b.startTime}</span>
                                                     </div>
                                                 </div>
                                                 <div className="text-right shrink-0">
-                                                    <p className="text-[10px] font-black text-slate-900 dark:text-white leading-none mb-1.5 font-mono">{formatCLP(b.price)}</p>
-                                                    <span className={`text-[7px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-md ${badge.style}`}>{badge.label}</span>
+                                                    <p className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white leading-none mb-1.5 font-mono">{formatCLP(b.price)}</p>
+                                                    <span className={`text-[11px] md:text-[7px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-md ${badge.style}`}>{badge.label}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -326,7 +326,7 @@ export default function OwnerDashboard() {
                                 }) : (
                                     <div className="py-12 text-center">
                                         <HugeiconsIcon icon={Clock01Icon} className="w-9 h-9 text-slate-200 dark:text-white/10 mx-auto mb-3" strokeWidth={1.6} />
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sin reservas en el periodo</p>
+                                        <p className="text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sin reservas en el periodo</p>
                                     </div>
                                 )}
                             </div>
@@ -334,12 +334,12 @@ export default function OwnerDashboard() {
 
                         {maintenanceAlerts.length > 0 && (
                             <div className="p-5 rounded-md bg-amber-500/10 border border-amber-500/20">
-                                <h3 className="text-[9px] font-black uppercase text-amber-600 dark:text-amber-400 flex items-center gap-2 mb-4 tracking-widest">
+                                <h3 className="text-[11px] md:text-[9px] font-black uppercase text-amber-600 dark:text-amber-400 flex items-center gap-2 mb-4 tracking-widest">
                                     <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5" strokeWidth={1.8} /> Mantenimiento
                                 </h3>
                                 <div className="space-y-3">
                                     {maintenanceAlerts.map(m => (
-                                        <div key={m.id} className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
+                                        <div key={m.id} className="flex justify-between items-center text-[11px] md:text-[9px] font-black uppercase tracking-widest">
                                             <span className="text-slate-700 dark:text-slate-300 truncate max-w-[120px]">{m.name} · {venueName(m.tenantId)}</span>
                                             <span className="text-amber-600 dark:text-amber-400 font-mono">{m.activeNow ? 'Hasta' : 'Desde'} {(m.activeNow ? m.until : m.from)?.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' }) || '—'}</span>
                                         </div>

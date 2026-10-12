@@ -266,7 +266,7 @@ export default function Page() {
             {notification && (
                 <div className={`fixed top-6 right-6 z-420 flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${notification.type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-emerald-400 dark:border-emerald-500/50' : 'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'}`}>
                     <HugeiconsIcon icon={notification.type === 'success' ? CheckmarkCircle02Icon : Alert02Icon} className="w-5 h-5" strokeWidth={1.8} />
-                    <span className="text-[10px] font-black uppercase tracking-wider">{notification.msg}</span>
+                    <span className="text-xs md:text-[10px] font-black uppercase tracking-wider">{notification.msg}</span>
                 </div>
             )}
 
@@ -288,7 +288,7 @@ export default function Page() {
             </div>
 
             {/* KPI */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                 <TarjetaKpi titulo="Total dueños" valor={owners.length.toString()} sub="Global" icono={<HugeiconsIcon icon={UserGroupIcon} className={ic} strokeWidth={1.6} />} brillo />
                 <TarjetaKpi titulo="Ingresos MRR" valor={formatCLP(owners.reduce((a, o) => a + o.totalMrr, 0))} sub="Proyectado" icono={<HugeiconsIcon icon={MoneyBag01Icon} className={ic} strokeWidth={1.6} />} />
                 <TarjetaKpi titulo="En mora" valor={owners.filter(o => o.debt > 0).length.toString()} sub="Requiere atención" icono={<HugeiconsIcon icon={Alert02Icon} className={`${ic} text-red-500`} strokeWidth={1.6} />} />
@@ -304,7 +304,7 @@ export default function Page() {
                 <div className="flex flex-wrap items-center gap-2">
                     <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-white/5 p-1 rounded-md border border-slate-100 dark:border-white/10">
                         {['Todos', 'Morosos', 'Suspendidos'].map(f => (
-                            <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-[10px] font-black uppercase rounded-md transition-all whitespace-nowrap cursor-pointer ${filter === f ? 'bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-xs' : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}>{f}</button>
+                            <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-xs md:text-[10px] font-black uppercase rounded-md transition-all whitespace-nowrap cursor-pointer ${filter === f ? 'bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-xs' : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}>{f}</button>
                         ))}
                     </div>
                     <div className="flex items-center gap-1 bg-slate-50 dark:bg-white/5 p-1 rounded-md border border-slate-100 dark:border-white/10">
@@ -385,20 +385,20 @@ export default function Page() {
                                         )}
                                         <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/10 to-black/35" />
 
-                                        <span className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border backdrop-blur-sm shadow-xs ${tierStyle}`}>
+                                        <span className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-wider border backdrop-blur-sm shadow-xs ${tierStyle}`}>
                                             {owner.tier}
                                         </span>
 
                                         <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-black/55 backdrop-blur-sm border border-white/15">
                                             <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-400' : 'bg-red-400'}`} />
-                                            <span className="text-[9px] font-black text-white uppercase tracking-wider">{owner.status}</span>
+                                            <span className="text-[11px] md:text-[9px] font-black text-white uppercase tracking-wider">{owner.status}</span>
                                         </span>
                                     </div>
 
                                     {/* Contenido */}
                                     <div className="flex-1 min-w-0 flex flex-col p-4">
                                         <h3 className="font-black text-slate-900 dark:text-white text-[15px] uppercase leading-tight truncate font-heading">{owner.name}</h3>
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1 mt-1 truncate">
+                                        <p className="text-xs md:text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1 mt-1 truncate">
                                             <HugeiconsIcon icon={Building01Icon} className="w-3 h-3 shrink-0" strokeWidth={2} />
                                             {owner.company}
                                         </p>
@@ -423,13 +423,13 @@ export default function Page() {
                                         <div className="mt-auto pt-3 grid grid-cols-2 gap-1.5">
                                             <div className="px-2 py-2 bg-slate-50 dark:bg-white/5 rounded-md border border-slate-100 dark:border-white/10 text-center">
                                                 <span className="block text-sm font-black text-slate-900 dark:text-white leading-none font-mono">{owner.venues.length}</span>
-                                                <span className="block text-[8px] font-bold text-slate-400 uppercase mt-1">Recintos</span>
+                                                <span className="block text-[11px] md:text-[8px] font-bold text-slate-400 uppercase mt-1">Recintos</span>
                                             </div>
                                             <div className={`px-2 py-2 rounded-md border text-center ${hasDebt ? 'bg-red-500/5 border-red-500/20' : 'bg-emerald-500/5 border-emerald-500/20'}`}>
                                                 <span className={`block text-sm font-black leading-none font-mono truncate ${hasDebt ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-[#00df82]'}`}>
                                                     {formatCLP(owner.totalMrr)}
                                                 </span>
-                                                <span className={`block text-[8px] font-bold uppercase mt-1 ${hasDebt ? 'text-red-500' : 'text-emerald-600 dark:text-[#00df82]'}`}>
+                                                <span className={`block text-[11px] md:text-[8px] font-bold uppercase mt-1 ${hasDebt ? 'text-red-500' : 'text-emerald-600 dark:text-[#00df82]'}`}>
                                                     MRR
                                                 </span>
                                             </div>
@@ -439,11 +439,11 @@ export default function Page() {
 
                                 {/* Banda estado financiero */}
                                 <div className="px-4 py-2.5 flex items-center justify-between gap-2 border-t border-slate-100 dark:border-white/5">
-                                    <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate">
+                                    <span className="inline-flex items-center gap-1.5 text-xs md:text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate">
                                         <HugeiconsIcon icon={MoneyBag01Icon} className="w-3.5 h-3.5 text-slate-400 shrink-0" strokeWidth={1.8} />
                                         {hasDebt ? `Deuda ${formatCLP(owner.debt)}` : "Sin deudas"}
                                     </span>
-                                    <span className={`inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider shrink-0 ${hasDebt ? "text-red-500" : "text-emerald-600 dark:text-[#00df82]"}`}>
+                                    <span className={`inline-flex items-center gap-1.5 text-[11px] md:text-[9px] font-black uppercase tracking-wider shrink-0 ${hasDebt ? "text-red-500" : "text-emerald-600 dark:text-[#00df82]"}`}>
                                         <HugeiconsIcon icon={hasDebt ? Alert02Icon : CheckmarkCircle02Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                                         {hasDebt ? "Con deuda" : "Al día"}
                                     </span>
@@ -453,11 +453,11 @@ export default function Page() {
                                 <div className="grid grid-cols-2 bg-slate-50 dark:bg-white/2 border-t border-slate-100 dark:border-white/5 divide-x divide-slate-100 dark:divide-white/5">
                                     <button onClick={() => setProfileOwner(owner)} className="py-2.5 flex items-center justify-center gap-1.5 bg-[#00df82] text-slate-950 hover:bg-[#3affa0] transition-all cursor-pointer">
                                         <HugeiconsIcon icon={UserCircleIcon} className="w-3.5 h-3.5" strokeWidth={2} />
-                                        <span className="text-[9px] font-black uppercase tracking-wider">Perfil</span>
+                                        <span className="text-[11px] md:text-[9px] font-black uppercase tracking-wider">Perfil</span>
                                     </button>
                                     <button onClick={() => openEdit(owner)} className="py-2.5 flex items-center justify-center gap-1.5 text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] hover:bg-emerald-50 dark:hover:bg-[#00df82]/10 transition-all cursor-pointer">
                                         <HugeiconsIcon icon={PencilEdit02Icon} className="w-3.5 h-3.5" strokeWidth={2} />
-                                        <span className="text-[9px] font-black uppercase tracking-wider">Editar</span>
+                                        <span className="text-[11px] md:text-[9px] font-black uppercase tracking-wider">Editar</span>
                                     </button>
                                 </div>
                             </div>
@@ -470,12 +470,12 @@ export default function Page() {
                         <table className="w-full text-left border-collapse min-w-[860px]">
                             <thead>
                                 <tr className="border-b border-slate-100 dark:border-white/5 bg-slate-50/60 dark:bg-white/2">
-                                    <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Dueño</th>
-                                    <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tier</th>
-                                    <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center">Recintos</th>
-                                    <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">MRR</th>
-                                    <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Estado</th>
-                                    <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">Acciones</th>
+                                    <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Dueño</th>
+                                    <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tier</th>
+                                    <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center">Recintos</th>
+                                    <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">MRR</th>
+                                    <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Estado</th>
+                                    <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -498,25 +498,25 @@ export default function Page() {
                                                     )}
                                                     <div className="min-w-0">
                                                         <span className="font-black text-[13px] text-slate-900 dark:text-white uppercase truncate block font-heading">{owner.name}</span>
-                                                        <span className="text-[10px] text-slate-400 font-semibold truncate block mt-0.5">{owner.company}</span>
+                                                        <span className="text-xs md:text-[10px] text-slate-400 font-semibold truncate block mt-0.5">{owner.company}</span>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="py-4 px-6">
-                                                <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${tierStyle}`}>{owner.tier}</span>
+                                                <span className={`px-2.5 py-1 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider ${tierStyle}`}>{owner.tier}</span>
                                             </td>
                                             <td className="py-4 px-6 text-center font-mono text-[12px] font-black text-slate-900 dark:text-white">{owner.venues.length}</td>
                                             <td className="py-4 px-6 text-right font-mono text-[12px] font-black text-slate-900 dark:text-white">{formatCLP(owner.totalMrr)}</td>
                                             <td className="py-4 px-6">
-                                                <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border ${isActive ? 'bg-emerald-500/10 text-emerald-700 dark:text-[#00df82] border-emerald-500/25' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/25'}`}>
+                                                <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-wider border ${isActive ? 'bg-emerald-500/10 text-emerald-700 dark:text-[#00df82] border-emerald-500/25' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/25'}`}>
                                                     <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-red-500'}`} />
                                                     {owner.status}
                                                 </span>
-                                                {hasDebt && <span className="block text-[9px] font-bold text-red-500 uppercase tracking-wider mt-1">Deuda {formatCLP(owner.debt)}</span>}
+                                                {hasDebt && <span className="block text-[11px] md:text-[9px] font-bold text-red-500 uppercase tracking-wider mt-1">Deuda {formatCLP(owner.debt)}</span>}
                                             </td>
                                             <td className="py-4 px-6">
                                                 <div className="flex items-center justify-end">
-                                                    <button onClick={() => setProfileOwner(owner)} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:text-[#00df82] hover:border-emerald-300 dark:hover:border-[#00df82]/30 hover:bg-emerald-50 dark:hover:bg-[#00df82]/10 transition-all active:scale-95 cursor-pointer">
+                                                    <button onClick={() => setProfileOwner(owner)} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:text-[#00df82] hover:border-emerald-300 dark:hover:border-[#00df82]/30 hover:bg-emerald-50 dark:hover:bg-[#00df82]/10 transition-all active:scale-95 cursor-pointer">
                                                         <HugeiconsIcon icon={UserCircleIcon} className="w-3.5 h-3.5" strokeWidth={1.8} />
                                                         Perfil
                                                     </button>
@@ -592,7 +592,7 @@ export default function Page() {
                             </p>
                             <form onSubmit={handleManualPasswordUpdate} className="space-y-4 text-left">
                                 <div className="space-y-1.5">
-                                    <label htmlFor="manual-pass" className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Contraseña</label>
+                                    <label htmlFor="manual-pass" className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Contraseña</label>
                                     <input
                                         id="manual-pass"
                                         type="text"
@@ -625,11 +625,11 @@ export default function Page() {
 
                             <div className="rounded-md border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/2 p-4 text-left space-y-4 mb-5">
                                 <div>
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">Email de acceso</p>
+                                    <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">Email de acceso</p>
                                     <p className="font-mono text-sm font-bold text-slate-900 dark:text-white truncate">{createdCredentials.email}</p>
                                 </div>
                                 <div className="pt-3 border-t border-slate-200 dark:border-white/5">
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">Contraseña temporal</p>
+                                    <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1.5">Contraseña temporal</p>
                                     <div className="flex items-center justify-between gap-3">
                                         <p className="font-mono text-lg font-black text-emerald-600 dark:text-[#00df82] truncate">{createdCredentials.pass}</p>
                                         <button

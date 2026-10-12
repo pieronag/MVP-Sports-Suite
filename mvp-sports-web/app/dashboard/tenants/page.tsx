@@ -383,7 +383,7 @@ export default function Page() {
                     : 'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
                 }`}>
                     <HugeiconsIcon icon={notification.type === 'success' ? CheckmarkCircle02Icon : Alert02Icon} className="w-5 h-5" strokeWidth={1.8} />
-                    <span className="text-[10px] font-black uppercase tracking-wider">{notification.msg}</span>
+                    <span className="text-xs md:text-[10px] font-black uppercase tracking-wider">{notification.msg}</span>
                 </div>
             )}
 
@@ -411,7 +411,7 @@ export default function Page() {
             </div>
 
             {/* KPI */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                 <TarjetaKpi titulo="Recintos" valor={tenants.length.toString()} sub="Global" icono={<HugeiconsIcon icon={Building01Icon} className={ic} strokeWidth={1.6} />} brillo />
                 <TarjetaKpi titulo="Canchas" valor={tenants.reduce((a, t) => a + t.infra.courts, 0).toString()} sub="Operativas" icono={<HugeiconsIcon icon={CheckmarkBadge01Icon} className={ic} strokeWidth={1.6} />} />
                 <TarjetaKpi titulo="Staff" valor={tenants.reduce((a, t) => a + t.infra.staff, 0).toString()} sub="Colaboradores" icono={<HugeiconsIcon icon={UserGroupIcon} className={ic} strokeWidth={1.6} />} />
@@ -422,7 +422,7 @@ export default function Page() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 px-5 py-4 flex items-center justify-between">
                     <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">MRR total</p>
+                        <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-wider">MRR total</p>
                         <p className="text-lg font-black text-slate-900 dark:text-white font-mono leading-none mt-1">{new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(totalMrr)}</p>
                     </div>
                     <span className="w-10 h-10 rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-[#00df82]">
@@ -431,7 +431,7 @@ export default function Page() {
                 </div>
                 <div className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 px-5 py-4 flex items-center justify-between">
                     <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Por cobrar</p>
+                        <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-wider">Por cobrar</p>
                         <p className="text-lg font-black text-amber-600 dark:text-amber-400 font-mono leading-none mt-1">{new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(totalDebt)}</p>
                     </div>
                     <span className="w-10 h-10 rounded-md bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
@@ -440,7 +440,7 @@ export default function Page() {
                 </div>
                 <div className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 px-5 py-4 flex items-center justify-between">
                     <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Recintos con deuda</p>
+                        <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-wider">Recintos con deuda</p>
                         <p className="text-lg font-black text-slate-900 dark:text-white font-mono leading-none mt-1">{debtTenants}</p>
                     </div>
                     <span className="w-10 h-10 rounded-md bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500">
@@ -497,7 +497,7 @@ export default function Page() {
                     {/* Estado */}
                     <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-white/5 p-1 rounded-md border border-slate-100 dark:border-white/10">
                         {["Todos", "Suspendidos"].map((f) => (
-                            <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-[10px] font-black uppercase rounded-md transition-all whitespace-nowrap cursor-pointer ${filter === f ? "bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-xs" : "text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}>{f}</button>
+                            <button key={f} onClick={() => setFilter(f)} className={`px-4 py-1.5 text-xs md:text-[10px] font-black uppercase rounded-md transition-all whitespace-nowrap cursor-pointer ${filter === f ? "bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-xs" : "text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}>{f}</button>
                         ))}
                     </div>
 
@@ -542,7 +542,7 @@ export default function Page() {
                     </p>
                     <button
                         onClick={() => { setRegionFilter("Todas"); setCommuneFilter("Todas"); setFilter("Todos"); setSearchTerm(""); }}
-                        className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 text-xs md:text-[10px] font-black uppercase tracking-wider text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] transition-colors cursor-pointer"
                     >
                         <HugeiconsIcon icon={Cancel01Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                         Limpiar filtros
@@ -607,14 +607,14 @@ export default function Page() {
                                         <div className="absolute inset-0 bg-linear-to-r from-black/40 via-black/10 to-black/50" />
                                         <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent" />
 
-                                        <span className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border backdrop-blur-sm shadow-xs ${planStyle}`}>
+                                        <span className={`absolute top-2.5 left-2.5 px-2 py-0.5 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-wider border backdrop-blur-sm shadow-xs ${planStyle}`}>
                                             {t.plan}
                                         </span>
 
                                         {rating > 0 && (
                                             <span className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-black/55 backdrop-blur-sm border border-white/15">
                                                 <HugeiconsIcon icon={StarIcon} className="w-3 h-3 text-amber-400" strokeWidth={2} />
-                                                <span className="text-[10px] font-black text-white font-mono">{rating.toFixed(1)}</span>
+                                                <span className="text-xs md:text-[10px] font-black text-white font-mono">{rating.toFixed(1)}</span>
                                             </span>
                                         )}
                                     </div>
@@ -628,12 +628,12 @@ export default function Page() {
                                                     <h3 className="font-black text-slate-900 dark:text-white text-[15px] uppercase leading-tight truncate font-heading">
                                                         {t.name}
                                                     </h3>
-                                                    <p className="text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1 mt-1 truncate">
+                                                    <p className="text-xs md:text-[10px] text-slate-400 font-bold uppercase flex items-center gap-1 mt-1 truncate">
                                                         <HugeiconsIcon icon={MapPinIcon} className="w-3 h-3 text-emerald-500 shrink-0" strokeWidth={2} />
                                                         {t.commune || "—"}, {t.region || "—"}
                                                     </p>
                                                 </div>
-                                                <span className={`shrink-0 inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border ${
+                                                <span className={`shrink-0 inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-wider border ${
                                                     isActive ? 'bg-emerald-500/10 text-emerald-700 dark:text-[#00df82] border-emerald-500/25' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/25'
                                                 }`}>
                                                     <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-red-500'}`} />
@@ -645,7 +645,7 @@ export default function Page() {
                                             <div className="flex items-center gap-2 mt-3 min-w-0">
                                                 <div className="flex -space-x-1.5 shrink-0">
                                                     {t.owners.slice(0, 3).map((on, idx) => (
-                                                        <span key={idx} className="w-6 h-6 rounded-full bg-emerald-500/15 border-2 border-white dark:border-slate-900 text-emerald-700 dark:text-[#00df82] flex items-center justify-center text-[9px] font-black uppercase">
+                                                        <span key={idx} className="w-6 h-6 rounded-full bg-emerald-500/15 border-2 border-white dark:border-slate-900 text-emerald-700 dark:text-[#00df82] flex items-center justify-center text-[11px] md:text-[9px] font-black uppercase">
                                                             {on.charAt(0)}
                                                         </span>
                                                     ))}
@@ -655,7 +655,7 @@ export default function Page() {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+                                                <span className="text-xs md:text-[10px] font-semibold text-slate-500 dark:text-slate-400 truncate">
                                                     {t.owners.length > 0
                                                         ? (t.owners.length > 1 ? `${t.owners[0]} +${t.owners.length - 1}` : t.owners[0])
                                                         : "Sin dueños"}
@@ -667,27 +667,27 @@ export default function Page() {
                                         <div className="grid grid-cols-3 gap-1.5 px-4 pb-3">
                                             <div className="px-2 py-2 bg-slate-50 dark:bg-white/5 rounded-md border border-slate-100 dark:border-white/10 text-center">
                                                 <span className="block text-sm font-black text-slate-900 dark:text-white leading-none font-mono">{t.infra.courts}</span>
-                                                <span className="block text-[8px] font-bold text-slate-400 uppercase mt-1">Canchas</span>
+                                                <span className="block text-[11px] md:text-[8px] font-bold text-slate-400 uppercase mt-1">Canchas</span>
                                             </div>
                                             <div className="px-2 py-2 bg-slate-50 dark:bg-white/5 rounded-md border border-slate-100 dark:border-white/10 text-center">
                                                 <span className="block text-sm font-black text-slate-900 dark:text-white leading-none font-mono">{t.infra.staff}</span>
-                                                <span className="block text-[8px] font-bold text-slate-400 uppercase mt-1">Staff</span>
+                                                <span className="block text-[11px] md:text-[8px] font-bold text-slate-400 uppercase mt-1">Staff</span>
                                             </div>
                                             <div className={`px-2 py-2 rounded-md border text-center ${(t.debt || 0) > 0 ? 'bg-amber-500/10 border-amber-500/25' : 'bg-slate-50 dark:bg-white/5 border-slate-100 dark:border-white/10'}`}>
                                                 <span className={`block text-sm font-black leading-none font-mono ${(t.debt || 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-900 dark:text-white'}`}>
                                                     {new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(t.debt || 0)}
                                                 </span>
-                                                <span className={`block text-[8px] font-bold uppercase mt-1 ${(t.debt || 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`}>Deuda</span>
+                                                <span className={`block text-[11px] md:text-[8px] font-bold uppercase mt-1 ${(t.debt || 0) > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400'}`}>Deuda</span>
                                             </div>
                                         </div>
 
                                         {/* Meta */}
                                         <div className="flex items-center justify-between gap-2 px-4 pb-3">
-                                            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate">
+                                            <span className="inline-flex items-center gap-1.5 text-xs md:text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate">
                                                 <HugeiconsIcon icon={Clock01Icon} className="w-3.5 h-3.5 text-slate-400 shrink-0" strokeWidth={1.8} />
                                                 {t.infra.scheduleSummary}
                                             </span>
-                                            <span className={`inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider shrink-0 ${t.coordinates?.lat ? "text-emerald-600 dark:text-[#00df82]" : "text-amber-500"}`}>
+                                            <span className={`inline-flex items-center gap-1.5 text-[11px] md:text-[9px] font-black uppercase tracking-wider shrink-0 ${t.coordinates?.lat ? "text-emerald-600 dark:text-[#00df82]" : "text-amber-500"}`}>
                                                 <HugeiconsIcon icon={t.coordinates?.lat ? CheckmarkCircle02Icon : Alert02Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                                                 {t.coordinates?.lat ? "Geo" : "Sin geo"}
                                             </span>
@@ -697,11 +697,11 @@ export default function Page() {
                                         <div className="mt-auto p-2.5 bg-slate-50 dark:bg-white/2 border-t border-slate-100 dark:border-white/5 flex gap-1.5">
                                             <button onClick={() => openEdit(t)} aria-label="Editar recinto" className="flex-1 py-2 px-2 flex items-center justify-center gap-1.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-slate-500 hover:text-emerald-600 hover:border-emerald-300 dark:hover:text-[#00df82] dark:hover:border-[#00df82]/30 transition-all active:scale-95 cursor-pointer">
                                                 <HugeiconsIcon icon={PencilEdit02Icon} className="w-3.5 h-3.5" strokeWidth={2} />
-                                                <span className="text-[9px] font-black uppercase tracking-wider hidden sm:inline">Editar</span>
+                                                <span className="text-[11px] md:text-[9px] font-black uppercase tracking-wider hidden sm:inline">Editar</span>
                                             </button>
                                             <button onClick={() => setTenantToToggle(t)} aria-label={isActive ? 'Suspender recinto' : 'Activar recinto'} className={`flex-1 py-2 px-2 flex items-center justify-center gap-1.5 rounded-md border bg-white dark:bg-white/5 transition-all active:scale-95 cursor-pointer ${isActive ? 'border-amber-200 dark:border-amber-500/20 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10' : 'border-emerald-200 dark:border-emerald-500/20 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'}`}>
                                                 <HugeiconsIcon icon={isActive ? BlockedIcon : CheckmarkCircle02Icon} className="w-3.5 h-3.5" strokeWidth={2} />
-                                                <span className="text-[9px] font-black uppercase tracking-wider hidden sm:inline">{isActive ? 'Suspender' : 'Activar'}</span>
+                                                <span className="text-[11px] md:text-[9px] font-black uppercase tracking-wider hidden sm:inline">{isActive ? 'Suspender' : 'Activar'}</span>
                                             </button>
                                             <button onClick={() => setTenantToDelete(t)} aria-label="Eliminar recinto" className="py-2 px-3 flex items-center justify-center rounded-md border border-red-200 dark:border-red-500/20 bg-white dark:bg-white/5 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95 cursor-pointer">
                                                 <HugeiconsIcon icon={Delete02Icon} className="w-3.5 h-3.5" strokeWidth={2} />
@@ -718,15 +718,15 @@ export default function Page() {
                             <table className="w-full text-left border-collapse min-w-[820px]">
                                 <thead>
                                     <tr className="border-b border-slate-100 dark:border-white/5 bg-slate-50/60 dark:bg-white/2">
-                                        <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Recinto</th>
-                                        <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Plan</th>
-                                        <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center">Canchas</th>
-                                        <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center">Staff</th>
-                                        <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center">Rating</th>
-                                        <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">MRR</th>
-                                        <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">Por cobrar</th>
-                                        <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Estado</th>
-                                        <th className="py-4 px-6 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">Acciones</th>
+                                        <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Recinto</th>
+                                        <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Plan</th>
+                                        <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center">Canchas</th>
+                                        <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center">Staff</th>
+                                        <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center">Rating</th>
+                                        <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">MRR</th>
+                                        <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">Por cobrar</th>
+                                        <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Estado</th>
+                                        <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -743,7 +743,7 @@ export default function Page() {
                                                         </div>
                                                         <div className="min-w-0">
                                                             <span className="font-black text-[13px] text-slate-900 dark:text-white uppercase truncate block font-heading">{t.name}</span>
-                                                            <span className="text-[10px] text-slate-400 font-semibold flex items-center gap-1 mt-0.5">
+                                                            <span className="text-xs md:text-[10px] text-slate-400 font-semibold flex items-center gap-1 mt-0.5">
                                                                 <HugeiconsIcon icon={MapPinIcon} className="w-3 h-3 shrink-0" strokeWidth={2} />
                                                                 {t.commune || "—"}, {t.region || "—"}
                                                             </span>
@@ -751,7 +751,7 @@ export default function Page() {
                                                     </div>
                                                 </td>
                                                 <td className="py-4 px-6">
-                                                    <span className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${planStyle}`}>{t.plan}</span>
+                                                    <span className={`px-2.5 py-1 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider ${planStyle}`}>{t.plan}</span>
                                                 </td>
                                                 <td className="py-4 px-6 text-center font-mono text-[12px] font-black text-slate-900 dark:text-white">{t.infra.courts}</td>
                                                 <td className="py-4 px-6 text-center font-mono text-[12px] font-black text-slate-900 dark:text-white">{t.infra.staff}</td>
@@ -770,14 +770,14 @@ export default function Page() {
                                                     ) : <span className="text-[11px] text-slate-400">—</span>}
                                                 </td>
                                                 <td className="py-4 px-6">
-                                                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border ${isActive ? 'bg-emerald-500/10 text-emerald-700 dark:text-[#00df82] border-emerald-500/25' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/25'}`}>
+                                                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-wider border ${isActive ? 'bg-emerald-500/10 text-emerald-700 dark:text-[#00df82] border-emerald-500/25' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/25'}`}>
                                                         <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-red-500'}`} />
                                                         {t.status}
                                                     </span>
                                                 </td>
                                                 <td className="py-4 px-6">
                                                     <div className="flex items-center justify-end">
-                                                        <button onClick={() => setProfileTenant(t)} aria-label="Ver perfil" className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:text-[#00df82] hover:border-emerald-300 dark:hover:border-[#00df82]/30 hover:bg-emerald-50 dark:hover:bg-[#00df82]/10 transition-all active:scale-95 cursor-pointer">
+                                                        <button onClick={() => setProfileTenant(t)} aria-label="Ver perfil" className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:text-[#00df82] hover:border-emerald-300 dark:hover:border-[#00df82]/30 hover:bg-emerald-50 dark:hover:bg-[#00df82]/10 transition-all active:scale-95 cursor-pointer">
                                                             <HugeiconsIcon icon={UserCircleIcon} className="w-3.5 h-3.5" strokeWidth={1.8} />
                                                             Perfil
                                                         </button>

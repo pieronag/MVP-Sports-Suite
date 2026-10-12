@@ -67,7 +67,7 @@ export function SectionCard({
                             {title}
                         </h3>
                         {subtitle && (
-                            <p className="text-[10px] font-medium text-slate-400 truncate">{subtitle}</p>
+                            <p className="text-xs md:text-[10px] font-medium text-slate-400 truncate">{subtitle}</p>
                         )}
                     </div>
                 </div>
@@ -87,7 +87,7 @@ export function TarjetaKpi({
     tendenciaPositiva = true, isUp = true,
     brillo = false,
     className = "",
-    valueClassName = "text-2xl"
+    valueClassName = "text-xl sm:text-2xl"
 }: TarjetaKpiProps) {
     const displayTitulo = titulo || label;
     const displayValor = valor ?? value ?? '';
@@ -97,20 +97,20 @@ export function TarjetaKpi({
 
     return (
         <div className={`
-            relative p-5 rounded-md border transition-all duration-300 group overflow-hidden
+            relative p-3.5 sm:p-5 rounded-md border transition-all duration-300 group overflow-hidden min-w-0
             bg-white border-slate-200 hover:border-emerald-400/60 hover:shadow-md hover:shadow-slate-200/50
             dark:bg-slate-900/50 dark:border-white/5 dark:hover:border-[#00df82]/40 dark:hover:shadow-none
             ${brillo ? 'dark:shadow-[0_0_25px_-10px_rgba(0,223,130,0.4)]' : ''}
             ${className}
         `}>
-            <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="flex items-start justify-between gap-2 sm:gap-3 mb-2.5 sm:mb-3">
                 {displayIcono && (
-                    <span className="text-emerald-600 dark:text-[#00df82] [&>svg]:w-6 [&>svg]:h-6">
+                    <span className="text-emerald-600 dark:text-[#00df82] [&>svg]:w-5 [&>svg]:h-5 sm:[&>svg]:w-6 sm:[&>svg]:h-6">
                         {displayIcono}
                     </span>
                 )}
                 {displayTrend && (
-                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-md flex items-center gap-1
+                    <span className={`text-xs md:text-[10px] font-black px-2 py-0.5 rounded-md flex items-center gap-1
                         ${displayIsUp
                             ? 'text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-400/10'
                             : 'text-red-700 bg-red-50 dark:text-red-400 dark:bg-red-400/10'}`}>
@@ -119,14 +119,14 @@ export function TarjetaKpi({
                     </span>
                 )}
             </div>
-            <h3 className={`${valueClassName} font-black text-slate-900 dark:text-white tracking-tight leading-none font-mono`}>
+            <h3 className={`${valueClassName} font-black text-slate-900 dark:text-white tracking-tight leading-none font-mono tabular-nums truncate`}>
                 {displayValor}
             </h3>
-            <p className="text-[11px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider mt-2.5">
+            <p className="text-[11px] uppercase font-bold text-slate-500 dark:text-slate-400 tracking-wider mt-2 sm:mt-2.5 leading-snug">
                 {displayTitulo}
             </p>
             {sub && (
-                <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-1">{sub}</p>
+                <p className="text-xs md:text-[10px] text-slate-400 dark:text-slate-500 font-medium mt-1">{sub}</p>
             )}
         </div>
     )
@@ -139,7 +139,7 @@ export function SystemStatusRow({ name, status, ping }: { name: string; status: 
                 <div className={`w-1.5 h-1.5 rounded-full ${status === 'OPERATIVO' || status === 'Operativo' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`}></div>
                 <span className="text-slate-700 dark:text-slate-300 font-bold uppercase">{name}</span>
             </div>
-            <span className="font-mono text-slate-500 text-[10px]">{ping}</span>
+            <span className="font-mono text-slate-500 text-xs md:text-[10px]">{ping}</span>
         </div>
     )
 }
@@ -148,7 +148,7 @@ export function BotonAccion({ icon, etiqueta, onClick }: { icon?: React.ReactNod
     return (
         <button
             onClick={onClick}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-md border text-[10px] font-black uppercase tracking-wider transition-all
+            className="flex items-center gap-1.5 px-3 py-2 rounded-md border text-xs md:text-[10px] font-black uppercase tracking-wider transition-all
                        bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-emerald-600 hover:border-emerald-300
                        dark:bg-white/5 dark:border-white/10 dark:text-slate-300 dark:hover:border-[#00df82]/40 dark:hover:text-[#00df82]"
         >

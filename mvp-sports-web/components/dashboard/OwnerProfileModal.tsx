@@ -91,8 +91,8 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
                                 )}
                                 <div className="min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${tierStyle}`}>{owner.tier}</span>
-                                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border ${isActive ? "bg-emerald-500/10 text-emerald-700 dark:text-[#00df82] border-emerald-500/25" : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/25"}`}>
+                                        <span className={`px-2 py-0.5 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-wider ${tierStyle}`}>{owner.tier}</span>
+                                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-wider border ${isActive ? "bg-emerald-500/10 text-emerald-700 dark:text-[#00df82] border-emerald-500/25" : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/25"}`}>
                                             <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-red-500"}`} />
                                             {owner.status}
                                         </span>
@@ -115,15 +115,15 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
                         <div className="grid grid-cols-3 gap-2.5">
                             <div className="p-3 rounded-md border border-slate-100 dark:border-white/5 bg-white dark:bg-white/2 text-center">
                                 <span className="block text-xl font-black text-slate-900 dark:text-white font-mono leading-none">{owner.venues?.length ?? 0}</span>
-                                <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Recintos</span>
+                                <span className="block text-[11px] md:text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Recintos</span>
                             </div>
                             <div className="p-3 rounded-md border border-emerald-500/25 bg-emerald-500/5 text-center">
                                 <span className="block text-base font-black text-emerald-600 dark:text-[#00df82] font-mono leading-none truncate">{formatCLP(owner.totalMrr)}</span>
-                                <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">MRR</span>
+                                <span className="block text-[11px] md:text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">MRR</span>
                             </div>
                             <div className={`p-3 rounded-md border text-center ${hasDebt ? "border-red-500/25 bg-red-500/5" : "border-slate-100 dark:border-white/5 bg-white dark:bg-white/2"}`}>
                                 <span className={`block text-base font-black font-mono leading-none truncate ${hasDebt ? "text-red-600 dark:text-red-400" : "text-slate-900 dark:text-white"}`}>{hasDebt ? formatCLP(owner.debt) : "—"}</span>
-                                <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Deuda</span>
+                                <span className="block text-[11px] md:text-[9px] font-bold uppercase tracking-wider text-slate-400 mt-1">Deuda</span>
                             </div>
                         </div>
 
@@ -131,13 +131,13 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
                         <div className="rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
                             <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
                                 <HugeiconsIcon icon={UserGroupIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
-                                <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Información del dueño</span>
+                                <span className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Información del dueño</span>
                             </div>
                             <div className="divide-y divide-slate-100 dark:divide-white/5">
                                 {infoRows.map((row) => (
                                     <div key={row.label} className="flex items-center gap-3 px-4 py-3">
                                         <HugeiconsIcon icon={row.icon} className="w-4 h-4 shrink-0 text-slate-400" strokeWidth={1.8} />
-                                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 w-24 shrink-0">{row.label}</span>
+                                        <span className="text-xs md:text-[10px] font-black uppercase tracking-wider text-slate-400 w-24 shrink-0">{row.label}</span>
                                         <span className="text-[12px] font-semibold text-slate-900 dark:text-white truncate">{row.value}</span>
                                     </div>
                                 ))}
@@ -149,13 +149,13 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
                             <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
                                 <span className="flex items-center gap-2">
                                     <HugeiconsIcon icon={Store01Icon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
-                                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Recintos asignados</span>
+                                    <span className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Recintos asignados</span>
                                 </span>
-                                <span className="text-[10px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{owner.venues?.length ?? 0}</span>
+                                <span className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{owner.venues?.length ?? 0}</span>
                             </div>
                             <div className="p-4 flex flex-wrap gap-2">
                                 {owner.venues?.length > 0 ? owner.venues.map((v: any, i: number) => (
-                                    <span key={i} className="px-2.5 py-1 rounded-md bg-slate-50 dark:bg-white/5 text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 truncate max-w-[180px]">
+                                    <span key={i} className="px-2.5 py-1 rounded-md bg-slate-50 dark:bg-white/5 text-xs md:text-[10px] font-bold uppercase text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 truncate max-w-[180px]">
                                         {v.name}
                                     </span>
                                 )) : <p className="text-[11px] text-slate-400 py-1">Sin recintos asignados</p>}

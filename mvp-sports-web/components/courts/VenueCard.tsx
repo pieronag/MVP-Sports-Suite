@@ -62,11 +62,11 @@ export default function VenueCard({ venue, onClick }: VenueCardProps) {
                 {/* BADGE ESTADO */}
                 <div className="absolute top-3 right-3">
                     {isConfigured ? (
-                        <span className="px-2.5 py-1 bg-white/90 dark:bg-[#00df82]/90 backdrop-blur-md text-emerald-700 dark:text-black text-[9px] font-black uppercase rounded-md flex items-center gap-1.5 shadow-lg border border-emerald-100 dark:border-[#00df82]/40">
+                        <span className="px-2.5 py-1 bg-white/90 dark:bg-[#00df82]/90 backdrop-blur-md text-emerald-700 dark:text-black text-[11px] md:text-[9px] font-black uppercase rounded-md flex items-center gap-1.5 shadow-lg border border-emerald-100 dark:border-[#00df82]/40">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-black/50 animate-pulse" /> Activo
                         </span>
                     ) : (
-                        <span className="px-2.5 py-1 bg-white/90 dark:bg-amber-500/90 backdrop-blur-md text-amber-600 dark:text-black text-[9px] font-black uppercase rounded-md flex items-center gap-1.5 shadow-lg border border-amber-100 dark:border-amber-400/30">
+                        <span className="px-2.5 py-1 bg-white/90 dark:bg-amber-500/90 backdrop-blur-md text-amber-600 dark:text-black text-[11px] md:text-[9px] font-black uppercase rounded-md flex items-center gap-1.5 shadow-lg border border-amber-100 dark:border-amber-400/30">
                             <HugeiconsIcon icon={Alert02Icon} className="w-3 h-3" strokeWidth={2} /> Configurar
                         </span>
                     )}
@@ -86,18 +86,18 @@ export default function VenueCard({ venue, onClick }: VenueCardProps) {
                 {(venue.activeSports || []).length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-5">
                         {venue.activeSports.slice(0, 3).map(s => (
-                            <span key={s} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-slate-100 dark:bg-white/5 text-[9px] font-black text-slate-500 dark:text-slate-300 uppercase border border-slate-200 dark:border-white/10">
+                            <span key={s} className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-slate-100 dark:bg-white/5 text-[11px] md:text-[9px] font-black text-slate-500 dark:text-slate-300 uppercase border border-slate-200 dark:border-white/10">
                                 {sportIcon(s, 'w-3.5 h-3.5 text-emerald-600 dark:text-[#00df82]')} {s}
                             </span>
                         ))}
                         {venue.activeSports.length > 3 && (
-                            <span className="inline-flex items-center px-2.5 py-1.5 rounded-md bg-slate-100 dark:bg-white/5 text-[9px] font-black text-slate-400 uppercase border border-slate-200 dark:border-white/10">+{venue.activeSports.length - 3}</span>
+                            <span className="inline-flex items-center px-2.5 py-1.5 rounded-md bg-slate-100 dark:bg-white/5 text-[11px] md:text-[9px] font-black text-slate-400 uppercase border border-slate-200 dark:border-white/10">+{venue.activeSports.length - 3}</span>
                         )}
                     </div>
                 )}
 
                 {/* MÉTRICAS */}
-                <div className="flex items-center gap-8 text-[10px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-white/5 pt-5 mt-1">
+                <div className="flex items-center gap-8 text-xs md:text-[10px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-white/5 pt-5 mt-1">
                     <div className="flex items-center gap-2.5">
                         <HugeiconsIcon icon={FootballIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
                         <span className="font-black text-slate-900 dark:text-white font-mono text-[13px]">{venue.activeSports?.length || 0}</span>
@@ -112,7 +112,7 @@ export default function VenueCard({ venue, onClick }: VenueCardProps) {
 
                 {/* CTA */}
                 <div className="mt-4">
-                    <span className="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-emerald-600 dark:text-[#00df82] group-hover:gap-3 transition-all">
+                    <span className="inline-flex items-center gap-2 text-[11px] md:text-[9px] font-black uppercase tracking-wider text-emerald-600 dark:text-[#00df82] group-hover:gap-3 transition-all">
                         Gestionar infraestructura <HugeiconsIcon icon={ArrowRight01Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                     </span>
                 </div>

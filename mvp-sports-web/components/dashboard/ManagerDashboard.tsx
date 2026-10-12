@@ -139,7 +139,7 @@ export default function ManagerDashboard() {
         return (
             <div className="h-96 flex flex-col items-center justify-center text-slate-400 gap-2">
                 <ArrowPathIcon className="w-6 h-6 animate-spin text-emerald-500" />
-                <span className="text-[10px] font-black uppercase tracking-widest">Escaneando Datos del Recinto...</span>
+                <span className="text-xs md:text-[10px] font-black uppercase tracking-widest">Escaneando Datos del Recinto...</span>
             </div>
         );
     }
@@ -149,7 +149,7 @@ export default function ManagerDashboard() {
             <div className="h-96 flex flex-col items-center justify-center text-slate-400 gap-2 text-center p-6 bg-slate-50 dark:bg-white/5 rounded-md border border-dashed border-slate-200 dark:border-white/10">
                 <ExclamationCircleIcon className="w-8 h-8 text-amber-500 animate-pulse" />
                 <h3 className="text-sm font-black uppercase text-slate-900 dark:text-white mt-2">Acceso Limitado</h3>
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{errorMsg}</p>
+                <p className="text-xs md:text-[10px] font-bold text-slate-500 uppercase tracking-widest">{errorMsg}</p>
             </div>
         );
     }
@@ -178,7 +178,7 @@ export default function ManagerDashboard() {
                             const name = myVenues.find(v => v.id === e.target.value)?.name || '';
                             setSelectedTenantName(name);
                         }}
-                        className="pl-4 pr-2 py-1.5 bg-transparent text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer appearance-none"
+                        className="pl-4 pr-2 py-1.5 bg-transparent text-xs md:text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer appearance-none"
                     >
                         {myVenues.map(v => <option key={v.id} value={v.id} >{v.name}</option>)}
                     </select>
@@ -190,7 +190,7 @@ export default function ManagerDashboard() {
                                 type="date"
                                 value={selectedDate}
                                 onChange={(e) => setSelectedDate(e.target.value)}
-                                className="pl-5 bg-transparent text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white cursor-pointer appearance-none"
+                                className="pl-5 bg-transparent text-xs md:text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white cursor-pointer appearance-none"
                             />
                         </div>
                     </div>
@@ -202,7 +202,7 @@ export default function ManagerDashboard() {
             </div>
 
             {/* KPI GRID - COMPACT DNA */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                 <TarjetaKpi label="Reservas Hoy" value={stats.todayCount} sub="Reservas" icon={<TicketIcon />} />
                 <TarjetaKpi label="En Uso" value={stats.activeNow} sub="Ocupación" icon={<UserGroupIcon />} />
                 <TarjetaKpi label="Caja Hoy" value={formatMoney(stats.revenueToday)} sub="Venta" icon={<CurrencyDollarIcon />} brillo />
@@ -215,10 +215,10 @@ export default function ManagerDashboard() {
                     {/* ESTADO DE CANCHAS - COMPACT STYLE */}
                     <PanelGlass className="p-6 flex flex-col">
                         <div className="flex justify-between items-center mb-6">
-                            <h4 className="text-[10px] font-black uppercase text-slate-900 dark:text-white flex items-center gap-2">
+                            <h4 className="text-xs md:text-[10px] font-black uppercase text-slate-900 dark:text-white flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Estatus de Campo
                             </h4>
-                            <span className="text-[8px] font-black bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full uppercase tracking-widest">Live</span>
+                            <span className="text-[11px] md:text-[8px] font-black bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full uppercase tracking-widest">Live</span>
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -228,20 +228,20 @@ export default function ManagerDashboard() {
                                 }`}>
                                     <div className={`absolute top-0 left-0 right-0 h-1 ${court.isOccupied ? 'bg-amber-500' : 'bg-emerald-500'}`}></div>
                                     <div className="mb-1">
-                                        <div className="text-[10px] font-black uppercase text-slate-900 dark:text-white truncate">{court.name}</div>
-                                        {court.sport && <div className="text-[7px] font-bold text-slate-400 capitalize tracking-widest">{court.sport.toLowerCase()}</div>}
+                                        <div className="text-xs md:text-[10px] font-black uppercase text-slate-900 dark:text-white truncate">{court.name}</div>
+                                        {court.sport && <div className="text-[11px] md:text-[7px] font-bold text-slate-400 capitalize tracking-widest">{court.sport.toLowerCase()}</div>}
                                     </div>
                                     
                                     <div className="flex-1 flex flex-col justify-center">
                                         {court.isOccupied ? (
                                             <>
-                                                <p className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase truncate leading-none mb-1">{court.currentBooking}</p>
-                                                <span className="text-[7px] font-black text-slate-400 uppercase tracking-tighter">Fin: {court.endTime ? formatTime(court.endTime) : '--:--'}</span>
+                                                <p className="text-[11px] md:text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase truncate leading-none mb-1">{court.currentBooking}</p>
+                                                <span className="text-[11px] md:text-[7px] font-black text-slate-400 uppercase tracking-tighter">Fin: {court.endTime ? formatTime(court.endTime) : '--:--'}</span>
                                             </>
                                         ) : (
                                             <div className="flex items-center gap-1.5">
                                                 <div className="w-1 h-1 rounded-full bg-emerald-500"></div>
-                                                <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">Disponible</span>
+                                                <span className="text-[11px] md:text-[8px] font-black text-emerald-600 uppercase tracking-widest">Disponible</span>
                                             </div>
                                         )}
                                     </div>
@@ -257,13 +257,13 @@ export default function ManagerDashboard() {
                     {/* TABLA DE RESERVAS - COMPACT ADN */}
                     <PanelGlass className="overflow-hidden">
                         <div className="px-6 py-4 border-b border-slate-50 dark:border-white/5 flex justify-between items-center">
-                            <h3 className="text-[10px] font-black uppercase text-slate-900 dark:text-white tracking-widest">Próximas Reservas</h3>
-                            <Link href="/dashboard/calendar" className="text-[8px] font-black text-emerald-600 hover:text-emerald-500 uppercase tracking-widest transition-colors">Calendario →</Link>
+                            <h3 className="text-xs md:text-[10px] font-black uppercase text-slate-900 dark:text-white tracking-widest">Próximas Reservas</h3>
+                            <Link href="/dashboard/calendar" className="text-[11px] md:text-[8px] font-black text-emerald-600 hover:text-emerald-500 uppercase tracking-widest transition-colors">Calendario →</Link>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead>
-                                    <tr className="bg-slate-50/30 dark:bg-white/1 text-[8px] font-black text-slate-400 uppercase tracking-wider">
+                                    <tr className="bg-slate-50/30 dark:bg-white/1 text-[11px] md:text-[8px] font-black text-slate-400 uppercase tracking-wider">
                                         <th className="px-6 py-4">Fecha / Hora</th>
                                         <th className="px-6 py-4">Recinto / Deporte</th>
                                         <th className="px-6 py-4">Cliente / Campo</th>
@@ -277,19 +277,19 @@ export default function ManagerDashboard() {
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
                                                     <span className="font-black text-slate-900 dark:text-white font-mono text-xs">{formatTime(b.startTime)}</span>
-                                                    <span className="text-[7px] font-bold text-slate-400 uppercase">{b.start ? b.start.toLocaleDateString('es-CL') : 'HOY'}</span>
+                                                    <span className="text-[11px] md:text-[7px] font-bold text-slate-400 uppercase">{b.start ? b.start.toLocaleDateString('es-CL') : 'HOY'}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
-                                                    <span className="font-black text-slate-900 dark:text-white uppercase text-[9px] tracking-tighter truncate max-w-[120px]">{selectedTenantName}</span>
-                                                    <span className="text-[7px] font-black text-emerald-500 uppercase tracking-widest">{b.sport || 'MULTICANCHA'}</span>
+                                                    <span className="font-black text-slate-900 dark:text-white uppercase text-[11px] md:text-[9px] tracking-tighter truncate max-w-[120px]">{selectedTenantName}</span>
+                                                    <span className="text-[11px] md:text-[7px] font-black text-emerald-500 uppercase tracking-widest">{b.sport || 'MULTICANCHA'}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex flex-col">
-                                                    <span className="font-black text-slate-900 dark:text-white uppercase text-[9px]">{b.clientName}</span>
-                                                    <span className="text-[7px] font-bold text-slate-400 uppercase">{b.courtName}</span>
+                                                    <span className="font-black text-slate-900 dark:text-white uppercase text-[11px] md:text-[9px]">{b.clientName}</span>
+                                                    <span className="text-[11px] md:text-[7px] font-bold text-slate-400 uppercase">{b.courtName}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-right">
@@ -298,13 +298,13 @@ export default function ManagerDashboard() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <span className={`px-2.5 py-0.5 rounded-md text-[7px] font-black uppercase tracking-widest ${BADGE[bookingLabel(b)] || 'bg-slate-500 text-white'}`}>
+                                                <span className={`px-2.5 py-0.5 rounded-md text-[11px] md:text-[7px] font-black uppercase tracking-widest ${BADGE[bookingLabel(b)] || 'bg-slate-500 text-white'}`}>
                                                     {bookingLabel(b)}
                                                 </span>
                                             </td>
                                         </tr>
                                     )) : (
-                                        <tr><td colSpan={5} className="py-16 text-center text-slate-400 uppercase font-black text-[9px] tracking-widest italic opacity-50">Sin reservas</td></tr>
+                                        <tr><td colSpan={5} className="py-16 text-center text-slate-400 uppercase font-black text-[11px] md:text-[9px] tracking-widest italic opacity-50">Sin reservas</td></tr>
                                     )}
                                 </tbody>
                             </table>
@@ -315,14 +315,14 @@ export default function ManagerDashboard() {
                 <div className="space-y-5">
                     {/* RESUMEN FINANCIERO - COMPACT STYLE */}
                     <PanelGlass className="p-6">
-                        <h3 className="text-[10px] font-black uppercase text-slate-400 mb-6 flex items-center gap-2 tracking-widest">
+                        <h3 className="text-xs md:text-[10px] font-black uppercase text-slate-400 mb-6 flex items-center gap-2 tracking-widest">
                             <ChartBarIcon className="w-4 h-4 text-emerald-500" /> Caja Hoy
                         </h3>
                         <div className="space-y-6">
                             <div>
                                 <div className="flex justify-between items-center mb-3">
-                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">Liquidación</span>
-                                    <span className="text-[10px] font-black text-emerald-600">{nextBookings.filter(b => b.payment === 'paid').length}/{nextBookings.length}</span>
+                                    <span className="text-[11px] md:text-[9px] font-black text-slate-500 uppercase tracking-tighter">Liquidación</span>
+                                    <span className="text-xs md:text-[10px] font-black text-emerald-600">{nextBookings.filter(b => b.payment === 'paid').length}/{nextBookings.length}</span>
                                 </div>
                                 <div className="w-full h-1.5 bg-slate-50 dark:bg-white/5 rounded-full overflow-hidden">
                                     <div className="h-full bg-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${nextBookings.length > 0 ? (nextBookings.filter(b => b.payment === 'paid').length / nextBookings.length * 100) : 0}%` }}></div>
@@ -331,11 +331,11 @@ export default function ManagerDashboard() {
                             
                             <div className="pt-5 border-t border-slate-50 dark:border-white/5 space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-slate-400 uppercase font-black text-[9px] tracking-widest">Recaudado</span>
+                                    <span className="text-slate-400 uppercase font-black text-[11px] md:text-[9px] tracking-widest">Recaudado</span>
                                     <span className="text-sm font-black text-slate-900 dark:text-white font-mono">{formatMoney(stats.revenueToday)}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-slate-400 uppercase font-black text-[9px] tracking-widest">Promedio</span>
+                                    <span className="text-slate-400 uppercase font-black text-[11px] md:text-[9px] tracking-widest">Promedio</span>
                                     <span className="text-sm font-black text-emerald-500 font-mono">{formatMoney(stats.avgTicket)}</span>
                                 </div>
                             </div>
@@ -345,12 +345,12 @@ export default function ManagerDashboard() {
                     {/* MEDIDOR OCUPACION - COMPACT STYLE */}
                     <div className="p-6 rounded-md bg-slate-900 relative overflow-hidden group">
                         <div className="relative z-10">
-                            <p className="text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2">Ocupación</p>
+                            <p className="text-[11px] md:text-[9px] font-black text-emerald-500 uppercase tracking-[0.2em] mb-2">Ocupación</p>
                             <h4 className="text-4xl font-black text-white leading-none mb-6 tracking-tighter font-mono">{stats.occupancyRate}%</h4>
                             <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden backdrop-blur-md">
                                 <div className="h-full bg-emerald-500 rounded-full transition-all duration-1500" style={{ width: `${stats.occupancyRate}%` }}></div>
                             </div>
-                            <p className="text-[9px] text-slate-400 font-black uppercase mt-4 tracking-widest">Optimización</p>
+                            <p className="text-[11px] md:text-[9px] text-slate-400 font-black uppercase mt-4 tracking-widest">Optimización</p>
                         </div>
                         <SparklesIcon className="absolute -bottom-2 -right-2 w-24 h-24 text-emerald-500/10 group-hover:scale-110 transition-transform duration-700" />
                     </div>

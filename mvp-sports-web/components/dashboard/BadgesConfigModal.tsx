@@ -175,7 +175,7 @@ export default function BadgesConfigModal({ isOpen, onClose }: { isOpen: boolean
                                     <HugeiconsIcon icon={Medal01Icon} className="w-5 h-5" strokeWidth={1.8} />
                                 </span>
                                 <div>
-                                    <span className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-600 dark:text-[#00df82]">
+                                    <span className="text-xs md:text-[10px] font-black uppercase tracking-[0.25em] text-emerald-600 dark:text-[#00df82]">
                                         Mérito deportivo
                                     </span>
                                     <h2 id="badges-modal-title" className="text-lg font-black uppercase tracking-tight text-slate-900 dark:text-white font-heading leading-none mt-1">
@@ -234,14 +234,14 @@ export default function BadgesConfigModal({ isOpen, onClose }: { isOpen: boolean
                                                 </span>
                                                 <div className="min-w-0">
                                                     <h3 className="text-[13px] font-black uppercase tracking-tight text-slate-900 dark:text-white truncate font-heading">{badge.name}</h3>
-                                                    <p className="text-[10px] font-medium text-slate-400 truncate">{badge.description}</p>
+                                                    <p className="text-xs md:text-[10px] font-medium text-slate-400 truncate">{badge.description}</p>
                                                 </div>
                                             </div>
 
                                             <div className="grid grid-cols-3 gap-2">
                                                 {TIERS.map((t) => (
                                                     <div key={t.tier} className="space-y-1.5">
-                                                        <label className={`text-[9px] font-black uppercase tracking-wider block text-center ${t.accent}`}>{t.label}</label>
+                                                        <label className={`text-[11px] md:text-[9px] font-black uppercase tracking-wider block text-center ${t.accent}`}>{t.label}</label>
                                                         <input
                                                             type="number"
                                                             min={0}
@@ -255,9 +255,9 @@ export default function BadgesConfigModal({ isOpen, onClose }: { isOpen: boolean
                                             </div>
 
                                             <div className="mt-3 flex items-center justify-between">
-                                                <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">{badge.unit} requeridos</span>
+                                                <span className="text-[11px] md:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">{badge.unit} requeridos</span>
                                                 {invalid && (
-                                                    <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-red-500">
+                                                    <span className="inline-flex items-center gap-1 text-[11px] md:text-[9px] font-black uppercase tracking-wider text-red-500">
                                                         <HugeiconsIcon icon={AlertCircleIcon} className="w-3 h-3" strokeWidth={2.5} />
                                                         Bronce ≤ Plata ≤ Oro
                                                     </span>
@@ -279,7 +279,7 @@ export default function BadgesConfigModal({ isOpen, onClose }: { isOpen: boolean
                             </div>
                         )}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <p className="text-[10px] font-medium text-slate-400 flex items-center gap-2">
+                            <p className="text-xs md:text-[10px] font-medium text-slate-400 flex items-center gap-2">
                                 <HugeiconsIcon icon={InformationCircleIcon} className="w-4 h-4 text-emerald-500 shrink-0" strokeWidth={1.8} />
                                 Los cambios afectan el cálculo de insignias de todos los jugadores.
                             </p>

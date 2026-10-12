@@ -183,7 +183,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                 <HugeiconsIcon icon={mode === "edit" ? PencilEdit02Icon : Building01Icon} className="w-5 h-5" strokeWidth={1.8} />
                             </span>
                             <div>
-                                <span className="text-[9px] font-black uppercase tracking-[0.25em] text-emerald-600 dark:text-[#00df82]">
+                                <span className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.25em] text-emerald-600 dark:text-[#00df82]">
                                     {mode === "edit" ? "Editar" : "Nuevo"}
                                 </span>
                                 <h3 id="tenant-wizard-title" className="text-sm font-black uppercase tracking-tight text-slate-900 dark:text-white font-heading leading-none mt-1">
@@ -217,7 +217,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                             <span className={`block text-[12px] font-black uppercase tracking-wider ${active || done ? "text-slate-900 dark:text-white" : "text-slate-400"}`}>
                                                 {s.label}
                                             </span>
-                                            <span className="block text-[10px] text-slate-400 mt-0.5">{s.hint}</span>
+                                            <span className="block text-xs md:text-[10px] text-slate-400 mt-0.5">{s.hint}</span>
                                         </span>
                                     </button>
                                 );
@@ -226,8 +226,8 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
 
                         <div className="relative mt-auto pt-6">
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Progreso</span>
-                                <span className="text-[10px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{Math.round((step / 3) * 100)}%</span>
+                                <span className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Progreso</span>
+                                <span className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{Math.round((step / 3) * 100)}%</span>
                             </div>
                             <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
                                 <div className="h-full rounded-full bg-linear-to-r from-emerald-500 to-[#00df82] transition-all duration-500" style={{ width: `${(step / 3) * 100}%` }} />
@@ -244,7 +244,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                     <HugeiconsIcon icon={mode === "edit" ? PencilEdit02Icon : Building01Icon} className="w-4.5 h-4.5" strokeWidth={1.8} />
                                 </span>
                                 <div className="min-w-0">
-                                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-[#00df82] block">
+                                    <span className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-[#00df82] block">
                                         Paso {step} de 3 · {STEPS[step - 1].label}
                                     </span>
                                     <h3 className="text-sm font-black uppercase tracking-tight text-slate-900 dark:text-white font-heading truncate leading-none mt-0.5">
@@ -278,13 +278,13 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                             <>
                                                 <img src={form.imagePreview} alt="Portada" className="w-full h-full object-cover" />
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <span className="text-[10px] font-black uppercase tracking-wider text-white">Cambiar imagen</span>
+                                                    <span className="text-xs md:text-[10px] font-black uppercase tracking-wider text-white">Cambiar imagen</span>
                                                 </div>
                                             </>
                                         ) : (
                                             <div className="w-full h-full flex flex-col items-center justify-center gap-2">
                                                 <HugeiconsIcon icon={Image01Icon} className="w-7 h-7 text-slate-300 dark:text-white/20" strokeWidth={1.5} />
-                                                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Subir imagen de portada</span>
+                                                <span className="text-xs md:text-[10px] font-black uppercase tracking-wider text-slate-400">Subir imagen de portada</span>
                                             </div>
                                         )}
                                         <input type="file" accept="image/*" onChange={(e) => { if (e.target.files?.[0]) { const r = new FileReader(); r.onload = () => set({ imagePreview: r.result as string }); r.readAsDataURL(e.target.files[0]); } }} className="absolute inset-0 opacity-0 cursor-pointer" />
@@ -294,7 +294,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
 
                                     {/* Plan cards (sincronizadas con la BD) */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Plan</label>
+                                        <label className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Plan</label>
                                         <div className={`grid grid-cols-2 ${plans.length >= 4 ? 'sm:grid-cols-4' : 'sm:grid-cols-3'} gap-2`}>
                                             {plans.map((p) => {
                                                 const selected = form.plan === p.name || form.plan === p.id;
@@ -314,9 +314,9 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                                                 <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={2} />
                                                             </span>
                                                         )}
-                                                        <span className="block text-[9px] font-black uppercase tracking-wider text-slate-400">{tag}</span>
+                                                        <span className="block text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400">{tag}</span>
                                                         <span className={`block text-sm font-black font-heading mt-0.5 ${selected ? "text-emerald-700 dark:text-[#00df82]" : "text-slate-900 dark:text-white"}`}>{p.name}</span>
-                                                        <span className="block text-[10px] font-bold text-slate-400 font-mono mt-0.5">${p.price.toLocaleString("es-CL")}</span>
+                                                        <span className="block text-xs md:text-[10px] font-bold text-slate-400 font-mono mt-0.5">${p.price.toLocaleString("es-CL")}</span>
                                                     </button>
                                                 );
                                             })}
@@ -325,7 +325,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
 
                                     {/* Dueños */}
                                     <div className="space-y-2 relative">
-                                        <label className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Dueños asignados</label>
+                                        <label className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Dueños asignados</label>
                                         <div className="relative">
                                             <HugeiconsIcon icon={Search01Icon} className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" strokeWidth={1.8} />
                                             <input
@@ -343,7 +343,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                                     <button aria-label="Agregar" type="button" key={o.id} onClick={() => addOwner(o)} className="w-full px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer border-b border-slate-100 dark:border-white/5 last:border-0 flex justify-between items-center text-left">
                                                         <div className="min-w-0">
                                                             <p className="text-[12px] font-bold text-slate-900 dark:text-white truncate">{o.name}</p>
-                                                            <p className="text-[10px] text-slate-400 truncate">{o.email}</p>
+                                                            <p className="text-xs md:text-[10px] text-slate-400 truncate">{o.email}</p>
                                                         </div>
                                                         <HugeiconsIcon icon={Add01Icon} className="w-4 h-4 text-emerald-500 shrink-0" strokeWidth={2} />
                                                     </button>
@@ -356,7 +356,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                         <div className="flex flex-wrap gap-2 pt-1">
                                             {form.selectedOwners.map((o) => (
                                                 <span key={o.id} className="flex items-center gap-2 pl-2.5 pr-1.5 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
-                                                    <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-[#00df82] flex items-center justify-center text-[10px] font-black shrink-0">
+                                                    <span className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-[#00df82] flex items-center justify-center text-xs md:text-[10px] font-black shrink-0">
                                                         {o.name.charAt(0).toUpperCase()}
                                                     </span>
                                                     <span className="text-[11px] font-bold text-slate-900 dark:text-white max-w-[130px] truncate">{o.name}</span>
@@ -379,7 +379,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                 <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-200">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Región</label>
+                                            <label className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Región</label>
                                             <select value={form.region} onChange={(e) => set({ region: e.target.value })} className="w-full px-3.5 py-2.5 rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-sm font-semibold text-slate-900 dark:text-white focus:border-emerald-500 dark:focus:border-[#00df82] outline-hidden transition-all cursor-pointer">
                                                 {REGIONES_CHILE.map((r) => <option key={r} value={r} className="bg-white text-slate-900 dark:bg-[#0B0F19] dark:text-white">{r}</option>)}
                                             </select>
@@ -398,12 +398,12 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                                 </span>
                                                 <div className="min-w-0">
                                                     <p className="text-[11px] font-black uppercase tracking-wider text-slate-900 dark:text-white">Geolocalización</p>
-                                                    <p className="text-[10px] text-slate-400 truncate">
+                                                    <p className="text-xs md:text-[10px] text-slate-400 truncate">
                                                         {hasCoords ? `${form.lat.toFixed(5)}, ${form.lng.toFixed(5)}` : "Aún sin verificar"}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <button aria-label="Actualizar" type="button" onClick={geocode} disabled={geoLoading} className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-slate-900 dark:bg-[#00df82] text-white dark:text-slate-950 text-[10px] font-black uppercase tracking-wider active:scale-95 transition-all disabled:opacity-60 cursor-pointer shrink-0">
+                                            <button aria-label="Actualizar" type="button" onClick={geocode} disabled={geoLoading} className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-slate-900 dark:bg-[#00df82] text-white dark:text-slate-950 text-xs md:text-[10px] font-black uppercase tracking-wider active:scale-95 transition-all disabled:opacity-60 cursor-pointer shrink-0">
                                                 <HugeiconsIcon icon={geoLoading ? RefreshIcon : MapPinIcon} className={`w-4 h-4 ${geoLoading ? "animate-spin" : ""}`} strokeWidth={2} />
                                                 <span className="hidden sm:inline">{hasCoords ? "Verificar" : "Geolocalizar"}</span>
                                             </button>
@@ -432,17 +432,17 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                             </div>
                                         )}
                                         <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
-                                        <span className="absolute top-3 left-3 px-2.5 py-1 rounded-md text-[10px] font-black uppercase border shadow-lg bg-emerald-500 text-slate-950 border-emerald-400">
+                                        <span className="absolute top-3 left-3 px-2.5 py-1 rounded-md text-xs md:text-[10px] font-black uppercase border shadow-lg bg-emerald-500 text-slate-950 border-emerald-400">
                                             Plan {form.plan}
                                         </span>
-                                        <span className={`absolute top-3 right-3 px-2.5 py-1 rounded-md text-[10px] font-black uppercase border shadow-lg ${hasCoords ? "bg-white/90 text-slate-900 border-white/50" : "bg-amber-500 text-slate-950 border-amber-400"}`}>
+                                        <span className={`absolute top-3 right-3 px-2.5 py-1 rounded-md text-xs md:text-[10px] font-black uppercase border shadow-lg ${hasCoords ? "bg-white/90 text-slate-900 border-white/50" : "bg-amber-500 text-slate-950 border-amber-400"}`}>
                                             {hasCoords ? "Geo OK" : "Sin geo"}
                                         </span>
                                         <div className="absolute bottom-3 left-3 right-3">
                                             <h4 className="font-black text-white text-lg uppercase leading-tight truncate font-heading drop-shadow-md">
                                                 {form.name || "Sin nombre"}
                                             </h4>
-                                            <p className="text-[10px] text-slate-300 font-bold uppercase flex items-center gap-1 mt-0.5">
+                                            <p className="text-xs md:text-[10px] text-slate-300 font-bold uppercase flex items-center gap-1 mt-0.5">
                                                 <HugeiconsIcon icon={MapPinIcon} className="w-3 h-3 text-emerald-400" strokeWidth={2} />
                                                 {form.commune || "—"}, {form.region}
                                             </p>
@@ -453,7 +453,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                         <div className="rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
                                             <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
                                                 <HugeiconsIcon icon={IdentityCardIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
-                                                <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Datos del recinto</span>
+                                                <span className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Datos del recinto</span>
                                             </div>
                                             <div className="p-4 space-y-3">
                                                 <ReviewRow label="Nombre" value={form.name || "—"} />
@@ -469,9 +469,9 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                             <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
                                                 <span className="flex items-center gap-2">
                                                     <HugeiconsIcon icon={UserGroupIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
-                                                    <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Dueños</span>
+                                                    <span className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Dueños</span>
                                                 </span>
-                                                <span className="text-[10px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{form.selectedOwners.length}</span>
+                                                <span className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{form.selectedOwners.length}</span>
                                             </div>
                                             <div className="p-4 space-y-2.5 max-h-[220px] overflow-y-auto no-scrollbar">
                                                 {form.selectedOwners.length > 0 ? form.selectedOwners.map((o) => (
@@ -481,7 +481,7 @@ export default function TenantWizard({ open, mode, initial, ownersList, isSubmit
                                                         </span>
                                                         <div className="min-w-0">
                                                             <p className="text-[12px] font-bold text-slate-900 dark:text-white truncate">{o.name}</p>
-                                                            <p className="text-[10px] text-slate-400 truncate">{o.email}</p>
+                                                            <p className="text-xs md:text-[10px] text-slate-400 truncate">{o.email}</p>
                                                         </div>
                                                     </div>
                                                 )) : (
@@ -534,7 +534,7 @@ function Field({ label, icon: Icon, ...props }: any) {
     const id = props.id || props.name;
     return (
         <div className="space-y-1.5 text-left">
-            <label htmlFor={id} className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">{label}</label>
+            <label htmlFor={id} className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">{label}</label>
             <div className="relative">
                 {Icon && (
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
@@ -554,7 +554,7 @@ function Field({ label, icon: Icon, ...props }: any) {
 function ReviewRow({ label, value }: { label: string; value: string }) {
     return (
         <div className="flex items-start justify-between gap-4">
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 shrink-0">{label}</span>
+            <span className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 shrink-0">{label}</span>
             <span className="text-[12px] font-semibold text-slate-900 dark:text-white text-right truncate">{value}</span>
         </div>
     );

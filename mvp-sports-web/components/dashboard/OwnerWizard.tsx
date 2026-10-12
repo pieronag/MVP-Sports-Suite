@@ -121,7 +121,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                                     <HugeiconsIcon icon={mode === "edit" ? PencilEdit02Icon : UserIcon} className="w-5 h-5" strokeWidth={1.8} />
                                 </span>
                                 <div>
-                                    <span className="text-[9px] font-black uppercase tracking-[0.25em] text-emerald-600 dark:text-[#00df82]">
+                                    <span className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.25em] text-emerald-600 dark:text-[#00df82]">
                                         {mode === "edit" ? "Editar" : "Nuevo"}
                                     </span>
                                     <h3 id="owner-wizard-title" className="text-sm font-black uppercase tracking-tight text-slate-900 dark:text-white font-heading leading-none mt-1">
@@ -153,7 +153,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                                             </span>
                                             <span className="min-w-0">
                                                 <span className={`block text-[12px] font-black uppercase tracking-wider ${active || done ? "text-slate-900 dark:text-white" : "text-slate-400"}`}>{s.label}</span>
-                                                <span className="block text-[10px] text-slate-400 mt-0.5">{s.hint}</span>
+                                                <span className="block text-xs md:text-[10px] text-slate-400 mt-0.5">{s.hint}</span>
                                             </span>
                                         </button>
                                     );
@@ -162,8 +162,8 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
 
                             <div className="relative mt-auto pt-6">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Progreso</span>
-                                    <span className="text-[10px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{Math.round((step / 3) * 100)}%</span>
+                                    <span className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Progreso</span>
+                                    <span className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82] font-mono">{Math.round((step / 3) * 100)}%</span>
                                 </div>
                                 <div className="h-1.5 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden">
                                     <div className="h-full rounded-full bg-linear-to-r from-emerald-500 to-[#00df82] transition-all duration-500" style={{ width: `${(step / 3) * 100}%` }} />
@@ -180,7 +180,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                                         <HugeiconsIcon icon={mode === "edit" ? PencilEdit02Icon : UserIcon} className="w-4.5 h-4.5" strokeWidth={1.8} />
                                     </span>
                                     <div className="min-w-0">
-                                        <span className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-[#00df82] block">
+                                        <span className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-[#00df82] block">
                                             Paso {step} de 3 · {STEPS[step - 1].label}
                                         </span>
                                         <h3 className="text-sm font-black uppercase tracking-tight text-slate-900 dark:text-white font-heading truncate leading-none mt-0.5">
@@ -247,7 +247,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                                     <div className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-200">
                                         {mode === "create" && (
                                             <div className="space-y-1.5">
-                                                <label htmlFor="owner-password" className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Contraseña inicial</label>
+                                                <label htmlFor="owner-password" className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Contraseña inicial</label>
                                                 <div className="relative">
                                                     <HugeiconsIcon icon={SquareLock01Icon} className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" strokeWidth={1.8} />
                                                     <input
@@ -293,7 +293,7 @@ export default function OwnerWizard({ open, mode, initial, isSubmitting, onClose
                                         <div className="rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
                                             <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/3 border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
                                                 <HugeiconsIcon icon={SecurityCheckIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} />
-                                                <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Resumen del dueño</span>
+                                                <span className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">Resumen del dueño</span>
                                             </div>
                                             <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                                                 <ReviewRow label="Nombre" value={form.name || "—"} />
@@ -350,7 +350,7 @@ function Field({ label, icon: Icon, hint, ...props }: any) {
     const id = props.id || props.name;
     return (
         <div className="space-y-1.5 text-left">
-            <label htmlFor={id} className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">{label}</label>
+            <label htmlFor={id} className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">{label}</label>
             <div className="relative">
                 {Icon && (
                     <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
@@ -363,7 +363,7 @@ function Field({ label, icon: Icon, hint, ...props }: any) {
                     {...props}
                 />
             </div>
-            {hint && <p className="text-[10px] text-slate-400">{hint}</p>}
+            {hint && <p className="text-xs md:text-[10px] text-slate-400">{hint}</p>}
         </div>
     );
 }
@@ -371,7 +371,7 @@ function Field({ label, icon: Icon, hint, ...props }: any) {
 function ReviewRow({ label, value }: { label: string; value: string }) {
     return (
         <div className="flex items-start justify-between gap-4 min-w-0">
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 shrink-0">{label}</span>
+            <span className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 shrink-0">{label}</span>
             <span className="text-[12px] font-semibold text-slate-900 dark:text-white text-right truncate">{value}</span>
         </div>
     );

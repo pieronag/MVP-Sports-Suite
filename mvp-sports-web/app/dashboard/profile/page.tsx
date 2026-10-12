@@ -42,8 +42,8 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructi
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter leading-none font-heading">{title}</h3>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-8 uppercase leading-relaxed">{message}</p>
                 <div className="flex gap-3 justify-end">
-                    <button onClick={onCancel} className="px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:border-emerald-400/40 transition-all">Cancelar</button>
-                    <button onClick={onConfirm} className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-md text-white shadow-lg transition-all active:scale-95 ${isDestructive ? 'bg-red-600 shadow-red-500/20' : 'bg-emerald-500 dark:bg-[#00df82] dark:text-black shadow-emerald-500/20'}`}>Confirmar</button>
+                    <button onClick={onCancel} className="px-5 py-2.5 text-xs md:text-[10px] font-black uppercase tracking-widest rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:border-emerald-400/40 transition-all">Cancelar</button>
+                    <button onClick={onConfirm} className={`px-6 py-2.5 text-xs md:text-[10px] font-black uppercase tracking-widest rounded-md text-white shadow-lg transition-all active:scale-95 ${isDestructive ? 'bg-red-600 shadow-red-500/20' : 'bg-emerald-500 dark:bg-[#00df82] dark:text-black shadow-emerald-500/20'}`}>Confirmar</button>
                 </div>
             </div>
         </div>
@@ -270,7 +270,7 @@ export default function ProfilePage() {
                 {toasts.map(toast => (
                     <div key={toast.id} className={`pointer-events-auto flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${toast.type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:border-emerald-500/50 dark:text-emerald-400' : toast.type === 'error' ? 'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:border-red-500/50 dark:text-red-400' : 'bg-white/90 border-blue-500 text-blue-700 dark:bg-[#0B0F19]/90 dark:border-blue-500/50 dark:text-blue-400'}`}>
                         {toast.type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5" strokeWidth={2} /> : toast.type === 'error' ? <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5" strokeWidth={2} /> : <HugeiconsIcon icon={InformationCircleIcon} className="w-5 h-5" strokeWidth={2} />}
-                        <span className="text-[10px] font-black uppercase tracking-wider">{toast.message}</span>
+                        <span className="text-xs md:text-[10px] font-black uppercase tracking-wider">{toast.message}</span>
                     </div>
                 ))}
             </div>
@@ -288,14 +288,14 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex items-center gap-2">
                     {dirty && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[9px] font-black uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] md:text-[9px] font-black uppercase tracking-wider">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Sin guardar
                         </span>
                     )}
-                    <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-white/5 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 text-[10px] font-black uppercase rounded-md transition-all hover:bg-red-50 dark:hover:bg-red-500/10">
+                    <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-white/5 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 text-xs md:text-[10px] font-black uppercase rounded-md transition-all hover:bg-red-50 dark:hover:bg-red-500/10">
                         <HugeiconsIcon icon={Logout01Icon} className="w-4 h-4" strokeWidth={2} /> Salir
                     </button>
-                    <button onClick={handleSave} disabled={saving || !dirty} className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[10px] font-black uppercase rounded-md shadow-xl transition-all active:scale-95 disabled:opacity-40">
+                    <button onClick={handleSave} disabled={saving || !dirty} className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-xs md:text-[10px] font-black uppercase rounded-md shadow-xl transition-all active:scale-95 disabled:opacity-40">
                         {saving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> : <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={2} />}
                         {saving ? 'Guardando...' : 'Guardar cambios'}
                     </button>
@@ -325,10 +325,10 @@ export default function ProfilePage() {
                             <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageSelect} />
                         </div>
                         <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none capitalize">{profile.displayName.toLowerCase()}</h2>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{profile.jobTitle || 'Sin cargo'}</p>
+                        <p className="text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{profile.jobTitle || 'Sin cargo'}</p>
                         <div className="w-full pt-5 mt-4 border-t border-slate-100 dark:border-white/5 flex flex-col gap-2">
-                            <div className={`px-4 py-2 rounded-md text-[9px] font-black uppercase tracking-widest border ${getRoleBadge(profile.role)}`}>Rol: {getRoleLabel(profile.role)}</div>
-                            <div className="px-4 py-2 rounded-md text-[9px] font-black uppercase tracking-widest bg-slate-50 dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/5">
+                            <div className={`px-4 py-2 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest border ${getRoleBadge(profile.role)}`}>Rol: {getRoleLabel(profile.role)}</div>
+                            <div className="px-4 py-2 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest bg-slate-50 dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/5">
                                 Estado: <span className="text-emerald-600 dark:text-[#00df82]">{profile.status === 'active' ? 'Activo' : 'Inactivo'}</span>
                             </div>
                         </div>
@@ -337,10 +337,10 @@ export default function ProfilePage() {
                     <SectionCard title="Seguridad" subtitle="Gestión de tu acceso" icon={<HugeiconsIcon icon={Key01Icon} className="w-5 h-5" strokeWidth={1.8} />} bodyClassName="p-6">
                         <div className="flex items-center justify-between p-3 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
                             <div>
-                                <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase">Contraseña</p>
-                                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Cambia tu clave periódicamente</p>
+                                <p className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase">Contraseña</p>
+                                <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-tighter">Cambia tu clave periódicamente</p>
                             </div>
-                            <button onClick={() => setIsPassModalOpen(true)} className="px-3 py-1.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[8px] font-black uppercase rounded-md shadow-lg active:scale-95 transition-all">Actualizar</button>
+                            <button onClick={() => setIsPassModalOpen(true)} className="px-3 py-1.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[11px] md:text-[8px] font-black uppercase rounded-md shadow-lg active:scale-95 transition-all">Actualizar</button>
                         </div>
                     </SectionCard>
                 </div>
@@ -370,8 +370,8 @@ export default function ProfilePage() {
                                 <div className="flex items-center gap-3">
                                     <div className="p-2.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-500">{t.icon}</div>
                                     <div>
-                                        <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase">{t.label}</p>
-                                        <p className="text-[8px] font-bold text-slate-400 uppercase">{t.desc}</p>
+                                        <p className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase">{t.label}</p>
+                                        <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase">{t.desc}</p>
                                     </div>
                                 </div>
                                 <Toggle enabled={t.enabled} onChange={() => togglePref(t.key, !t.enabled)} />
@@ -411,8 +411,8 @@ export default function ProfilePage() {
                                 <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4 text-slate-400" strokeWidth={1.8} />
                             </div>
                             <div className="flex gap-4">
-                                <button onClick={() => { setShowCropper(false); setImageToCrop(null); }} className="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-slate-500 border border-slate-200 dark:border-white/10 rounded-md">Descartar</button>
-                                <button onClick={handleConfirmCrop} disabled={uploadingImg} className="flex-1 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md font-black text-[10px] uppercase tracking-widest shadow-xl disabled:opacity-50">{uploadingImg ? 'Subiendo...' : 'Finalizar'}</button>
+                                <button onClick={() => { setShowCropper(false); setImageToCrop(null); }} className="flex-1 py-3 text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-500 border border-slate-200 dark:border-white/10 rounded-md">Descartar</button>
+                                <button onClick={handleConfirmCrop} disabled={uploadingImg} className="flex-1 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md font-black text-xs md:text-[10px] uppercase tracking-widest shadow-xl disabled:opacity-50">{uploadingImg ? 'Subiendo...' : 'Finalizar'}</button>
                             </div>
                         </div>
                     </div>
@@ -424,7 +424,7 @@ export default function ProfilePage() {
                 <div className="fixed inset-0 z-250 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
                     <div className="w-full max-w-sm rounded-md border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0B0F19] shadow-2xl">
                         <div className="flex justify-between items-center p-6 border-b border-slate-100 dark:border-white/5">
-                            <h3 className="text-[10px] font-black uppercase tracking-widest font-heading">Actualizar seguridad</h3>
+                            <h3 className="text-xs md:text-[10px] font-black uppercase tracking-widest font-heading">Actualizar seguridad</h3>
                             <button aria-label="Cerrar" onClick={() => setIsPassModalOpen(false)} className="text-slate-400 hover:text-red-500 transition-colors"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" strokeWidth={2} /></button>
                         </div>
                         <form onSubmit={handlePasswordUpdate} className="p-6 space-y-5">
@@ -437,7 +437,7 @@ export default function ProfilePage() {
                             <Field label="Confirmar nueva" icon={<HugeiconsIcon icon={ShieldCheckIcon} className="w-4 h-4" strokeWidth={1.8} />}>
                                 <input type="password" value={passForm.confirm} onChange={(e) => setPassForm({ ...passForm, confirm: e.target.value })} className={inputCls} required />
                             </Field>
-                            <button type="submit" disabled={passLoading} className="w-full py-3.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md font-black text-[10px] uppercase tracking-widest shadow-xl disabled:opacity-50 flex items-center justify-center gap-2">
+                            <button type="submit" disabled={passLoading} className="w-full py-3.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md font-black text-xs md:text-[10px] uppercase tracking-widest shadow-xl disabled:opacity-50 flex items-center justify-center gap-2">
                                 {passLoading ? <><HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> Procesando...</> : <><HugeiconsIcon icon={ShieldCheckIcon} className="w-4 h-4" strokeWidth={2} /> Confirmar cambio</>}
                             </button>
                         </form>
@@ -451,7 +451,7 @@ export default function ProfilePage() {
 function Field({ label, icon, children }: { label: string, icon: React.ReactNode, children: React.ReactNode }) {
     return (
         <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">
+            <label className="flex items-center gap-2 text-[11px] md:text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">
                 <span className="text-emerald-600 dark:text-[#00df82]">{icon}</span>
                 {label}
             </label>

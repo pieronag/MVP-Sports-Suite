@@ -57,6 +57,12 @@ export default function Sidebar() {
     const finalPhoto = firestoreUser?.photoURL || user?.photoURL;
 
     useEffect(() => { setMobileOpen(false); }, [pathname]);
+    // La barra inferior del celular abre este mismo menú
+    useEffect(() => {
+        const open = () => setMobileOpen(true);
+        window.addEventListener("dashboard:open-menu", open);
+        return () => window.removeEventListener("dashboard:open-menu", open);
+    }, []);
 
     useEffect(() => {
         if (mobileOpen) document.body.classList.add('overflow-hidden');
@@ -179,7 +185,7 @@ export default function Sidebar() {
                             <p className="text-[13px] font-bold truncate transition-colors text-slate-700 group-hover:text-emerald-600 dark:text-white dark:group-hover:text-[#00df82] capitalize font-heading">
                                 {finalName.toLowerCase()}
                             </p>
-                            <p className="text-[10px] uppercase tracking-[0.15em] font-black text-slate-400 dark:text-slate-500">
+                            <p className="text-xs md:text-[10px] uppercase tracking-[0.15em] font-black text-slate-400 dark:text-slate-500">
                                 {roleLabel}
                             </p>
                         </div>
@@ -230,7 +236,7 @@ function MenuGroup({ title, children }: { title: string, children: React.ReactNo
     return (
         <div className="mb-0.5">
             <div className="px-2.5 mt-4 mb-1 flex items-center gap-2">
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 font-heading">{title}</span>
+                <span className="text-xs md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 font-heading">{title}</span>
                 <span className="flex-1 h-px bg-slate-100 dark:bg-white/5" />
             </div>
             <div className="flex flex-col gap-0.5">{children}</div>

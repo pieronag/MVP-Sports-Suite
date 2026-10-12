@@ -56,7 +56,7 @@ export default function Header() {
       {/* LEFT — página actual */}
       <div className="flex items-center gap-3 pl-12 xl:pl-0 min-w-0">
         <div className="min-w-0">
-          <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">
+          <p className="text-xs md:text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">
             MVP Sports Suite
           </p>
           <h1 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight truncate capitalize">
@@ -73,7 +73,7 @@ export default function Header() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 dark:bg-[#00df82]" />
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 dark:bg-[#00df82] dark:shadow-[0_0_8px_#00df82]" />
           </span>
-          <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-300">
+          <span className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-300">
             Sistema online
           </span>
         </div>
@@ -100,7 +100,7 @@ export default function Header() {
                      dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20 dark:border-red-500/20 cursor-pointer"
         >
           <HugeiconsIcon icon={Logout01Icon} className="w-4 h-4" strokeWidth={1.8} />
-          <span className="text-[10px] font-black uppercase tracking-[0.15em] hidden sm:inline">
+          <span className="text-xs md:text-[10px] font-black uppercase tracking-[0.15em] hidden sm:inline">
             Salir
           </span>
         </button>

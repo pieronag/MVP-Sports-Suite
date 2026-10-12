@@ -282,7 +282,7 @@ export default function Page() {
             </div>
 
             {/* KPIs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                 <TarjetaKpi titulo="Tickets pendientes" valor={kpis.open} sub="Abiertos y en proceso" icono={<HugeiconsIcon icon={Ticket01Icon} className={ic} strokeWidth={1.6} />} brillo />
                 <TarjetaKpi titulo="Alertas críticas" valor={kpis.critical} sub="Sin resolver" icono={<HugeiconsIcon icon={Alert02Icon} className={ic} strokeWidth={1.6} />} />
                 <TarjetaKpi titulo="Resueltos" valor={kpis.resolved} sub="Cerraron el ciclo" icono={<HugeiconsIcon icon={CheckmarkCircle02Icon} className={ic} strokeWidth={1.6} />} />
@@ -299,7 +299,7 @@ export default function Page() {
                             placeholder="Buscar ticket, recinto, email..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400 transition-all"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-xs md:text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400 transition-all"
                         />
                     </div>
                     <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10">
@@ -307,7 +307,7 @@ export default function Page() {
                         <select
                             value={categoryFilter}
                             onChange={(e) => setCategoryFilter(e.target.value)}
-                            className="bg-transparent text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white"
+                            className="bg-transparent text-xs md:text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white"
                         >
                             {categories.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
@@ -315,7 +315,7 @@ export default function Page() {
                     <select
                         value={priorityFilter}
                         onChange={(e) => setPriorityFilter(e.target.value)}
-                        className="px-2.5 py-2 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white"
+                        className="px-2.5 py-2 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs md:text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white"
                     >
                         {priorities.map(p => <option key={p} value={p}>{p}</option>)}
                     </select>
@@ -325,7 +325,7 @@ export default function Page() {
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={`px-4 py-1.5 text-[9px] font-black uppercase rounded-md transition-all ${filter === f ? "bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black" : "text-slate-400 hover:text-slate-700 dark:hover:text-white"}`}
+                            className={`px-4 py-1.5 text-[11px] md:text-[9px] font-black uppercase rounded-md transition-all ${filter === f ? "bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black" : "text-slate-400 hover:text-slate-700 dark:hover:text-white"}`}
                         >
                             {f}
                         </button>
@@ -340,21 +340,21 @@ export default function Page() {
                 icon={<HugeiconsIcon icon={Ticket01Icon} className="w-5 h-5" strokeWidth={1.8} />}
                 bodyClassName="p-0"
                 action={
-                    <span className="text-[9px] bg-emerald-500/15 text-emerald-600 dark:text-[#00df82] px-2.5 py-1 rounded-md font-black uppercase tracking-wider">Tickets</span>
+                    <span className="text-[11px] md:text-[9px] bg-emerald-500/15 text-emerald-600 dark:text-[#00df82] px-2.5 py-1 rounded-md font-black uppercase tracking-wider">Tickets</span>
                 }
             >
                 <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-left min-w-[1080px]">
                         <thead>
                             <tr className="bg-slate-50/60 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Ticket</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Asunto</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Cliente</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Prioridad</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Estado</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Asignado a</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Creado</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Acciones</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Ticket</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Asunto</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Cliente</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Prioridad</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Estado</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Asignado a</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Creado</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -366,30 +366,30 @@ export default function Page() {
                                                 {getCategoryIcon(t.category)}
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="font-mono font-black text-slate-900 dark:text-white text-[10px]">#{t.id.slice(0, 8)}</span>
-                                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">{t.category}</span>
+                                                <span className="font-mono font-black text-slate-900 dark:text-white text-xs md:text-[10px]">#{t.id.slice(0, 8)}</span>
+                                                <span className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-tighter">{t.category}</span>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col max-w-[300px]">
                                             <p className="text-[11px] font-black text-slate-900 dark:text-white uppercase leading-snug">{t.subject}</p>
-                                            <p className="text-[9px] text-slate-400 line-clamp-1 mt-0.5">{t.desc}</p>
+                                            <p className="text-[11px] md:text-[9px] text-slate-400 line-clamp-1 mt-0.5">{t.desc}</p>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
-                                            <p className="text-[10px] font-bold text-slate-900 dark:text-white uppercase">{t.tenant}</p>
-                                            <p className="text-[8px] text-slate-400 uppercase truncate max-w-[140px]">{t.userEmail || t.userName || t.user}</p>
+                                            <p className="text-xs md:text-[10px] font-bold text-slate-900 dark:text-white uppercase">{t.tenant}</p>
+                                            <p className="text-[11px] md:text-[8px] text-slate-400 uppercase truncate max-w-[140px]">{t.userEmail || t.userName || t.user}</p>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-center">
-                                        <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase border ${getPriorityStyle(t.priority)}`}>
+                                        <span className={`px-2 py-0.5 rounded-md text-[11px] md:text-[8px] font-black uppercase border ${getPriorityStyle(t.priority)}`}>
                                             {t.priority}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-center">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] font-black uppercase border ${getStatusBadge(t.status)}`}>
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] md:text-[9px] font-black uppercase border ${getStatusBadge(t.status)}`}>
                                             <span className={`w-1.5 h-1.5 rounded-full ${statusDot(t.status)}`} />
                                             {t.status}
                                         </span>
@@ -397,17 +397,17 @@ export default function Page() {
                                     <td className="px-6 py-4 text-center">
                                         <div className="flex flex-col items-center gap-1">
                                             <HugeiconsIcon icon={UserCircleIcon} className="w-5 h-5 text-slate-300 dark:text-slate-600" strokeWidth={1.6} />
-                                            <span className="text-[8px] text-slate-500 dark:text-slate-400 font-bold uppercase">{t.assignee}</span>
+                                            <span className="text-[11px] md:text-[8px] text-slate-500 dark:text-slate-400 font-bold uppercase">{t.assignee}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase font-mono">{t.created}</span>
+                                        <span className="text-[11px] md:text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase font-mono">{t.created}</span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         {t.status !== 'Resuelto' ? (
                                             <button
                                                 onClick={() => handleOpenManageModal(t)}
-                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[9px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/20 hover:brightness-110 active:scale-95 transition-all"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[11px] md:text-[9px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/20 hover:brightness-110 active:scale-95 transition-all"
                                             >
                                                 <HugeiconsIcon icon={Wrench01Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                                                 Gestionar
@@ -447,7 +447,7 @@ export default function Page() {
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase leading-none font-heading">Gestionar ticket</h3>
-                                    <p className="text-[10px] font-mono text-slate-400 mt-1 uppercase font-black tracking-widest">ID: #{selectedTicket.id.slice(0, 8).toUpperCase()}</p>
+                                    <p className="text-xs md:text-[10px] font-mono text-slate-400 mt-1 uppercase font-black tracking-widest">ID: #{selectedTicket.id.slice(0, 8).toUpperCase()}</p>
                                 </div>
                             </div>
                             <button onClick={() => setModalOpen(false)} aria-label="Cerrar" className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 rounded-md transition-all">
@@ -459,7 +459,7 @@ export default function Page() {
                             {/* info reportante / recinto */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2 p-4 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5">
-                                    <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400">Información del cliente</h4>
+                                    <h4 className="text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400">Información del cliente</h4>
                                     <div className="text-[11px] space-y-1.5">
                                         <p className="text-slate-800 dark:text-slate-200 font-bold"><span className="text-slate-400 uppercase font-semibold">Usuario:</span> {selectedTicket.userName || 'No especificado'}</p>
                                         <p className="text-slate-800 dark:text-slate-200 font-bold"><span className="text-slate-400 uppercase font-semibold">Email:</span> {selectedTicket.userEmail || 'No especificado'}</p>
@@ -467,7 +467,7 @@ export default function Page() {
                                     </div>
                                 </div>
                                 <div className="space-y-2 p-4 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5">
-                                    <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400">Recinto & SLA</h4>
+                                    <h4 className="text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400">Recinto & SLA</h4>
                                     <div className="text-[11px] space-y-1.5">
                                         <p className="text-slate-800 dark:text-slate-200 font-bold"><span className="text-slate-400 uppercase font-semibold">Complejo:</span> {selectedTicket.tenant}</p>
                                         <p className="text-slate-800 dark:text-slate-200 font-bold"><span className="text-slate-400 uppercase font-semibold">Enviado:</span> {selectedTicket.createdRaw.toLocaleString('es-CL', { timeZone: 'America/Santiago' })}</p>
@@ -484,18 +484,18 @@ export default function Page() {
                             {/* asunto y descripción */}
                             <div className="space-y-3">
                                 <div>
-                                    <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Asunto</h4>
+                                    <h4 className="text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Asunto</h4>
                                     <p className="text-sm font-black text-slate-900 dark:text-white uppercase">{selectedTicket.subject}</p>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Descripción del problema</h4>
+                                        <h4 className="text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Descripción del problema</h4>
                                         <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-md p-3.5 text-xs text-slate-700 dark:text-slate-300 font-medium whitespace-pre-line leading-relaxed max-h-32 overflow-y-auto">
                                             {selectedTicket.desc}
                                         </div>
                                     </div>
                                     <div>
-                                        <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Pasos para reproducir</h4>
+                                        <h4 className="text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400 mb-1">Pasos para reproducir</h4>
                                         <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-md p-3.5 text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-pre-line leading-relaxed max-h-32 overflow-y-auto">
                                             {selectedTicket.stepsToReproduce}
                                         </div>
@@ -505,27 +505,27 @@ export default function Page() {
 
                             {/* entorno técnico */}
                             <div className="space-y-2">
-                                <h4 className="text-[9px] font-black uppercase tracking-wider text-slate-400">Entorno técnico</h4>
+                                <h4 className="text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400">Entorno técnico</h4>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
                                     <div className="bg-white dark:bg-slate-900/50 p-2.5 rounded-md border border-slate-200 dark:border-white/5 text-center">
-                                        <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Sistema operativo</p>
-                                        <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase">{selectedTicket.os || 'Desconocido'}</p>
+                                        <p className="text-[11px] md:text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Sistema operativo</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase">{selectedTicket.os || 'Desconocido'}</p>
                                     </div>
                                     <div className="bg-white dark:bg-slate-900/50 p-2.5 rounded-md border border-slate-200 dark:border-white/5 text-center">
-                                        <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Navegador</p>
-                                        <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase truncate" title={selectedTicket.browser}>{selectedTicket.browser || 'Desconocido'}</p>
+                                        <p className="text-[11px] md:text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Navegador</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase truncate" title={selectedTicket.browser}>{selectedTicket.browser || 'Desconocido'}</p>
                                     </div>
                                     <div className="bg-white dark:bg-slate-900/50 p-2.5 rounded-md border border-slate-200 dark:border-white/5 text-center">
-                                        <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Módulo / pantalla</p>
-                                        <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase truncate" title={selectedTicket.screen}>{selectedTicket.screen || 'No especificada'}</p>
+                                        <p className="text-[11px] md:text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Módulo / pantalla</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase truncate" title={selectedTicket.screen}>{selectedTicket.screen || 'No especificada'}</p>
                                     </div>
                                     <div className="bg-white dark:bg-slate-900/50 p-2.5 rounded-md border border-slate-200 dark:border-white/5 text-center">
-                                        <p className="text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Categoría</p>
-                                        <p className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase">{selectedTicket.category}</p>
+                                        <p className="text-[11px] md:text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1">Categoría</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase">{selectedTicket.category}</p>
                                     </div>
                                 </div>
                                 {selectedTicket.userAgent && (
-                                    <div className="p-2 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-md text-[9px] font-mono text-slate-400 dark:text-slate-500 break-all select-all">
+                                    <div className="p-2 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-md text-[11px] md:text-[9px] font-mono text-slate-400 dark:text-slate-500 break-all select-all">
                                         UserAgent: {selectedTicket.userAgent}
                                     </div>
                                 )}
@@ -535,7 +535,7 @@ export default function Page() {
                             <div className="space-y-4 border-t border-slate-100 dark:border-white/5 pt-4">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
                                     <div className="md:col-span-1">
-                                        <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Estado del ticket</label>
+                                        <label className="block text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Estado del ticket</label>
                                         <select
                                             value={ticketStatus}
                                             onChange={(e) => setTicketStatus(e.target.value)}
@@ -548,10 +548,10 @@ export default function Page() {
                                     </div>
                                     {selectedTicket.repliedBy && (
                                         <div className="md:col-span-2 text-right">
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Última gestión</p>
+                                            <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Última gestión</p>
                                             <p className="text-[11px] font-bold text-emerald-600 dark:text-[#00df82] mt-1 uppercase">Por: {selectedTicket.repliedBy}</p>
                                             {selectedTicket.repliedAt && (
-                                                <p className="text-[8px] text-slate-400 dark:text-slate-500 font-mono mt-0.5">
+                                                <p className="text-[11px] md:text-[8px] text-slate-400 dark:text-slate-500 font-mono mt-0.5">
                                                     {new Date(selectedTicket.repliedAt.seconds * 1000).toLocaleString('es-CL', { timeZone: 'America/Santiago' })}
                                                 </p>
                                             )}
@@ -559,7 +559,7 @@ export default function Page() {
                                     )}
                                 </div>
                                 <div>
-                                    <label className="block text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Respuesta oficial / solución</label>
+                                    <label className="block text-[11px] md:text-[9px] font-black uppercase tracking-wider text-slate-400 mb-2">Respuesta oficial / solución</label>
                                     <textarea
                                         rows={4}
                                         value={adminResponse}
@@ -576,14 +576,14 @@ export default function Page() {
                             <button
                                 onClick={() => setModalOpen(false)}
                                 disabled={saving}
-                                className="px-5 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase tracking-wider rounded-md transition-all disabled:opacity-50"
+                                className="px-5 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-xs md:text-[10px] font-black uppercase tracking-wider rounded-md transition-all disabled:opacity-50"
                             >
                                 Cancelar
                             </button>
                             <button
                                 onClick={handleSaveManagement}
                                 disabled={saving || !adminResponse.trim()}
-                                className="px-6 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[10px] uppercase rounded-md tracking-wider transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-emerald-500/20 hover:brightness-110 active:scale-95"
+                                className="px-6 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-xs md:text-[10px] uppercase rounded-md tracking-wider transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-emerald-500/20 hover:brightness-110 active:scale-95"
                             >
                                 {saving ? (
                                     <>

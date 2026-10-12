@@ -71,7 +71,7 @@ const StatusModal = ({ isOpen, title, message, type, onClose }: any) => {
                 </div>
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter">{title}</h3>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-8 uppercase leading-relaxed">{message}</p>
-                <button onClick={onClose} className={`w-full py-3 text-[10px] font-black uppercase tracking-[0.2em] rounded-md text-white transition-all active:scale-95 ${isError ? 'bg-red-600 shadow-red-500/20' : isWarning ? 'bg-amber-600 shadow-amber-500/20' : 'bg-slate-900 dark:bg-emerald-600 shadow-emerald-500/20'}`}>
+                <button onClick={onClose} className={`w-full py-3 text-xs md:text-[10px] font-black uppercase tracking-[0.2em] rounded-md text-white transition-all active:scale-95 ${isError ? 'bg-red-600 shadow-red-500/20' : isWarning ? 'bg-amber-600 shadow-amber-500/20' : 'bg-slate-900 dark:bg-emerald-600 shadow-emerald-500/20'}`}>
                     Entendido
                 </button>
             </div>
@@ -538,7 +538,7 @@ export default function CheckInPage() {
                 <div className="fixed inset-0 z-200 bg-black flex flex-col animate-fadeIn">
                     {/* Header Cámara */}
                     <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-20 bg-linear-to-b from-black/80 to-transparent">
-                        <span className="text-white text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                        <span className="text-white text-xs md:text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_red]"></span> Escaneando QR
                         </span>
                         <button aria-label="Cerrar" onClick={stopCamera} className="p-2 bg-white/20 rounded-full text-white backdrop-blur-md active:scale-95 transition-transform">
@@ -583,7 +583,7 @@ export default function CheckInPage() {
                 <div>
                     <div className="flex items-center gap-2 mb-0.5">
                         <span className="w-6 h-[2px] bg-emerald-500 rounded-md"></span>
-                        <p className="text-[9px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">
+                        <p className="text-[11px] md:text-[9px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">
                             Terminal de Control Operativo
                         </p>
                     </div>
@@ -600,7 +600,7 @@ export default function CheckInPage() {
                         <select
                             value={selectedVenueId}
                             onChange={(e) => setSelectedVenueId(e.target.value)}
-                            className="appearance-none bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-md pl-9 pr-8 py-2 text-[9px] font-black outline-hidden text-slate-700 dark:text-white uppercase cursor-pointer shadow-xs transition-all focus:border-emerald-500"
+                            className="appearance-none bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-md pl-9 pr-8 py-2 text-[11px] md:text-[9px] font-black outline-hidden text-slate-700 dark:text-white uppercase cursor-pointer shadow-xs transition-all focus:border-emerald-500"
                         >
                             {venues.map(v => <option key={v.id} value={v.id} className="dark:bg-[#0B0F19]">{v.name}</option>)}
                         </select>
@@ -619,11 +619,11 @@ export default function CheckInPage() {
                         <div className="p-1.5 bg-slate-50 dark:bg-white/5 rounded-md text-slate-400 group-hover:text-emerald-500 transition-colors">
                             <UserGroupIcon className="w-3.5 h-3.5" />
                         </div>
-                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Afluencia Total</p>
+                        <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest">Afluencia Total</p>
                     </div>
                     <div className="flex items-baseline justify-between">
                         <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">{stats.total}</p>
-                        <p className="text-[10px] font-black text-slate-400 uppercase">{formatMoney(stats.potentialTotal)}</p>
+                        <p className="text-xs md:text-[10px] font-black text-slate-400 uppercase">{formatMoney(stats.potentialTotal)}</p>
                     </div>
                 </div>
 
@@ -633,11 +633,11 @@ export default function CheckInPage() {
                         <div className="p-1.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-md text-emerald-500">
                             <CheckCircleIcon className="w-3.5 h-3.5" />
                         </div>
-                        <p className="text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Ingresos OK</p>
+                        <p className="text-[11px] md:text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Ingresos OK</p>
                     </div>
                     <div className="flex items-baseline justify-between">
                         <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tighter">{stats.in}</p>
-                        <p className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase">{formatMoney(stats.totalCollected)}</p>
+                        <p className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase">{formatMoney(stats.totalCollected)}</p>
                     </div>
                 </div>
 
@@ -646,11 +646,11 @@ export default function CheckInPage() {
                         <div className="p-1.5 bg-red-50 dark:bg-red-500/10 rounded-md text-red-500">
                             <ExclamationTriangleIcon className="w-3.5 h-3.5" />
                         </div>
-                        <p className="text-[8px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Inasistencias</p>
+                        <p className="text-[11px] md:text-[8px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Inasistencias</p>
                     </div>
                     <div className="flex items-baseline justify-between">
                         <p className="text-2xl font-black text-red-600 dark:text-red-400 tracking-tighter">{stats.noShow}</p>
-                        <p className="text-[8px] font-black text-red-600 dark:text-red-400 uppercase">Por Inasistencia</p>
+                        <p className="text-[11px] md:text-[8px] font-black text-red-600 dark:text-red-400 uppercase">Por Inasistencia</p>
                     </div>
                 </div>
 
@@ -659,11 +659,11 @@ export default function CheckInPage() {
                         <div className="p-1.5 bg-slate-100 dark:bg-white/5 rounded-md text-slate-400">
                             <NoSymbolIcon className="w-3.5 h-3.5" />
                         </div>
-                        <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Anuladas</p>
+                        <p className="text-[11px] md:text-[8px] font-black text-slate-500 uppercase tracking-widest">Anuladas</p>
                     </div>
                     <div className="flex items-baseline justify-between">
                         <p className="text-2xl font-black text-slate-500 tracking-tighter">{stats.cancelled}</p>
-                        <p className="text-[8px] font-black text-slate-400 uppercase">Jugador o recinto</p>
+                        <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase">Jugador o recinto</p>
                     </div>
                 </div>
             </div>
@@ -676,7 +676,7 @@ export default function CheckInPage() {
                     title="Activar Escáner de Acceso"
                 >
                     <QrCodeIcon className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Escáner de Acceso</span>
+                    <span className="text-xs md:text-[10px] font-black uppercase tracking-widest">Escáner de Acceso</span>
                 </button>
                 <form onSubmit={processManualCode} className="flex-1 relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
@@ -691,7 +691,7 @@ export default function CheckInPage() {
                     />
                     <button
                         type="submit"
-                        className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-md text-[9px] font-black uppercase active:scale-95 transition-all shadow-md disabled:opacity-50"
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-md text-[11px] md:text-[9px] font-black uppercase active:scale-95 transition-all shadow-md disabled:opacity-50"
                         disabled={!manualCode}
                     >
                         Validar
@@ -712,7 +712,7 @@ export default function CheckInPage() {
 
             {/* Camera permission hint on mobile */}
             {cameraPermission === 'denied' && (
-                <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-md p-3 text-[10px] text-amber-700 dark:text-amber-400 font-bold flex items-center gap-2">
+                <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-md p-3 text-xs md:text-[10px] text-amber-700 dark:text-amber-400 font-bold flex items-center gap-2">
                     <CameraIcon className="w-4 h-4 shrink-0" />
                     <span>Permiso de cámara bloqueado. Habilítalo en la configuración del navegador para escanear códigos QR.</span>
                 </div>
@@ -727,7 +727,7 @@ export default function CheckInPage() {
                     <input
                         type="text"
                         placeholder="Filtrar por nombre o cancha..."
-                        className="w-full pl-9 pr-4 py-2 bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold text-slate-800 dark:text-white outline-hidden focus:border-emerald-500 transition-colors shadow-xs"
+                        className="w-full pl-9 pr-4 py-2 bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 rounded-md text-xs md:text-[10px] font-bold text-slate-800 dark:text-white outline-hidden focus:border-emerald-500 transition-colors shadow-xs"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -737,7 +737,7 @@ export default function CheckInPage() {
             {/* === LISTA DE RESERVAS FINANCE STYLE COMPACT === */}
             <div className="bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 overflow-hidden">
                 <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/2 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                    <h3 className="text-[9px] font-black text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-2 shrink-0">
+                    <h3 className="text-[11px] md:text-[9px] font-black text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-2 shrink-0">
                         <ClockIcon className="w-3.5 h-3.5 text-emerald-500" /> Registro de Hoy
                     </h3>
                     <div className="flex gap-1.5 overflow-x-auto max-w-full pb-1 md:pb-0 scrollbar-thin">
@@ -745,7 +745,7 @@ export default function CheckInPage() {
                             <button
                                 key={f}
                                 onClick={() => setFilter(f)}
-                                className={`px-2.5 py-1.5 rounded-md text-[8px] font-black uppercase whitespace-nowrap transition-all border ${filter === f
+                                className={`px-2.5 py-1.5 rounded-md text-[11px] md:text-[8px] font-black uppercase whitespace-nowrap transition-all border ${filter === f
                                     ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 shadow-md'
                                     : 'bg-white dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/10 hover:border-slate-300'}`}
                             >
@@ -759,14 +759,14 @@ export default function CheckInPage() {
                     {loading && bookings.length === 0 ? (
                         <div className="py-12 text-center flex flex-col items-center gap-2">
                             <ArrowPathIcon className="w-6 h-6 animate-spin text-emerald-500/40" />
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sincronizando datos...</p>
+                            <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Sincronizando datos...</p>
                         </div>
                     ) : filteredBookings.length === 0 ? (
                         <div className="py-16 flex flex-col items-center justify-center text-slate-400 gap-3">
                             <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-full">
                                 <IdentificationIcon className="w-8 h-8 opacity-20" />
                             </div>
-                            <p className="text-[9px] font-black uppercase tracking-widest">Sin registros encontrados</p>
+                            <p className="text-[11px] md:text-[9px] font-black uppercase tracking-widest">Sin registros encontrados</p>
                         </div>
                     ) : (
                         filteredBookings.map((booking) => {
@@ -781,7 +781,7 @@ export default function CheckInPage() {
                                     {/* INDICADOR DE HORA COMPACT */}
                                     <div className="flex flex-col items-center justify-center w-12 h-12 rounded-md bg-slate-900 dark:bg-white text-white dark:text-slate-900 shrink-0 group-hover:scale-105 transition-transform">
                                         <span className="text-[11px] font-black tracking-tighter">{booking.startTimeStr || formatTime(booking.startTime)}</span>
-                                        <span className="text-[6px] font-black uppercase opacity-60">HORA</span>
+                                        <span className="text-[11px] md:text-[6px] font-black uppercase opacity-60">HORA</span>
                                     </div>
 
                                     {/* INFO COMPACT */}
@@ -792,35 +792,35 @@ export default function CheckInPage() {
                                             </h3>
                                             {!isCheckedIn && booking.status !== 'cancelled' && !isLateNoShow ? (
                                                 isPaid ? (
-                                                    <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 text-[7px] font-black uppercase rounded border border-emerald-500/20">Pagado</span>
+                                                    <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 text-[11px] md:text-[7px] font-black uppercase rounded border border-emerald-500/20">Pagado</span>
                                                 ) : (
-                                                    <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 text-[7px] font-black uppercase rounded border border-amber-500/20">Pendiente</span>
+                                                    <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 text-[11px] md:text-[7px] font-black uppercase rounded border border-amber-500/20">Pendiente</span>
                                                 )
                                             ) : (booking.status === 'cancelled' || isLateNoShow) ? (
                                                 isNoShow ? (
                                                     booking.paymentStatus === 'paid' ? (
-                                                        <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[7px] font-black uppercase rounded border border-emerald-500/20">No-Show con Pago Aprobado</span>
+                                                        <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] md:text-[7px] font-black uppercase rounded border border-emerald-500/20">No-Show con Pago Aprobado</span>
                                                     ) : booking.paymentStatus === 'partial' ? (
-                                                        <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[7px] font-black uppercase rounded border border-amber-500/20">No-Show con Seña Retenida</span>
+                                                        <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[11px] md:text-[7px] font-black uppercase rounded border border-amber-500/20">No-Show con Seña Retenida</span>
                                                     ) : (
-                                                        <span className="px-1.5 py-0.5 bg-red-500/10 text-red-500 text-[7px] font-black uppercase rounded border border-red-500/20">Cancelado por No-Show</span>
+                                                        <span className="px-1.5 py-0.5 bg-red-500/10 text-red-500 text-[11px] md:text-[7px] font-black uppercase rounded border border-red-500/20">Cancelado por No-Show</span>
                                                     )
                                                 ) : (
-                                                    <span className="px-1.5 py-0.5 bg-slate-500/10 text-slate-500 text-[7px] font-black uppercase rounded border border-slate-500/20">{booking.cancelledBy === 'staff' ? 'Anulada por recinto' : 'Cancelado por jugador'}</span>
+                                                    <span className="px-1.5 py-0.5 bg-slate-500/10 text-slate-500 text-[11px] md:text-[7px] font-black uppercase rounded border border-slate-500/20">{booking.cancelledBy === 'staff' ? 'Anulada por recinto' : 'Cancelado por jugador'}</span>
                                                 )
                                             ) : null}
                                         </div>
                                         <div className="flex items-center gap-3 text-slate-400">
                                             <div className="flex items-center gap-1.5">
                                                 <MapPinIcon className="w-3 h-3 text-emerald-500" />
-                                                <span className="text-[9px] font-bold tracking-tight">
+                                                <span className="text-[11px] md:text-[9px] font-bold tracking-tight">
                                                     <span className="uppercase">{booking.courtName}</span>
                                                     {booking.sport && <span className="ml-1 text-slate-400 capitalize">· {booking.sport.toLowerCase()}</span>}
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-1">
                                                 <TicketIcon className="w-3 h-3" />
-                                                <span className="text-[9px] font-mono font-bold uppercase">#{booking.id.slice(-6)}</span>
+                                                <span className="text-[11px] md:text-[9px] font-mono font-bold uppercase">#{booking.id.slice(-6)}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -833,9 +833,9 @@ export default function CheckInPage() {
                                                 <div className="flex flex-col items-end gap-1">
                                                     <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
                                                         <ShieldCheckIcon className="w-3.5 h-3.5 text-emerald-500" />
-                                                        <span className="text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Acceso OK</span>
+                                                        <span className="text-[11px] md:text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Acceso OK</span>
                                                     </div>
-                                                    <span className="text-[7px] font-bold text-slate-400 uppercase mr-1">Listo</span>
+                                                    <span className="text-[11px] md:text-[7px] font-bold text-slate-400 uppercase mr-1">Listo</span>
                                                 </div>
                                             ) : (booking.status === 'cancelled' || isLateNoShow) ? (
                                                 <div className="flex flex-col items-end gap-1">
@@ -849,7 +849,7 @@ export default function CheckInPage() {
                                                         ) : (
                                                             <NoSymbolIcon className="w-3.5 h-3.5 text-red-500" />
                                                         )}
-                                                        <span className={`text-[8px] font-black uppercase tracking-widest ${
+                                                        <span className={`text-[11px] md:text-[8px] font-black uppercase tracking-widest ${
                                                             isNoShow && (booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial')
                                                                 ? 'text-emerald-600 dark:text-emerald-400'
                                                                 : 'text-red-600 dark:text-red-400'
@@ -860,7 +860,7 @@ export default function CheckInPage() {
                                                             }
                                                         </span>
                                                     </div>
-                                                    <span className="text-[7px] font-bold text-slate-400 uppercase mr-1">
+                                                    <span className="text-[11px] md:text-[7px] font-bold text-slate-400 uppercase mr-1">
                                                         {isNoShow 
                                                             ? (booking.paymentStatus === 'paid' ? 'No-Show Pagado' : booking.paymentStatus === 'partial' ? 'Seña Retenida' : 'No-Show')
                                                             : (booking.cancelledBy === 'staff' ? 'Por Recinto' : 'Por Jugador')
@@ -870,7 +870,7 @@ export default function CheckInPage() {
                                                         <button
                                                             onClick={() => handleNoShow(booking)}
                                                             disabled={processingId === booking.id}
-                                                            className="mt-1 h-8 px-3 rounded-md text-[9px] font-black uppercase tracking-widest bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
+                                                            className="mt-1 h-8 px-3 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
                                                         >
                                                             Registrar inasistencia
                                                         </button>
@@ -881,12 +881,12 @@ export default function CheckInPage() {
                                                     {isPaid ? (
                                                         <button
                                                             onClick={() => handleCheckInAction(booking, 'checkin')}
-                                                            className="h-9 px-4 rounded-md text-[9px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95 bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-105 shadow-slate-900/10"
+                                                            className="h-9 px-4 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95 bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-105 shadow-slate-900/10"
                                                         >
                                                             Ingresar
                                                         </button>
                                                     ) : (
-                                                        <span className="h-9 px-3 inline-flex items-center rounded-md text-[9px] font-black uppercase tracking-widest bg-slate-100 dark:bg-white/5 text-slate-400" title="Solo se puede ingresar con una reserva pagada online">
+                                                        <span className="h-9 px-3 inline-flex items-center rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest bg-slate-100 dark:bg-white/5 text-slate-400" title="Solo se puede ingresar con una reserva pagada online">
                                                             Sin pago online
                                                         </span>
                                                     )}
@@ -921,7 +921,7 @@ export default function CheckInPage() {
                             <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
                                 <>Autorización de <span className="text-emerald-500">Acceso</span></>
                             </h2>
-                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-2">
+                            <p className="text-xs md:text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-2">
                                 Reserva pagada online
                             </p>
                         </div>
@@ -930,18 +930,18 @@ export default function CheckInPage() {
                         <div className="px-6 py-4 space-y-3">
                             <div className="bg-slate-50 dark:bg-white/5 rounded-md p-4 space-y-3 border border-slate-100 dark:border-white/5 shadow-inner">
                                 <div className="flex justify-between items-center border-b border-slate-200/50 dark:border-white/5 pb-2">
-                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Cliente</span>
+                                    <span className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Cliente</span>
                                     <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase">{selectedBookingForConfirm?.clientName}</span>
                                 </div>
                                 <div className="flex justify-between items-center border-b border-slate-200/50 dark:border-white/5 pb-2">
-                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Cancha</span>
+                                    <span className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Cancha</span>
                                     <div className="text-right">
                                         <div className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase">{selectedBookingForConfirm?.courtName}</div>
-                                        {selectedBookingForConfirm?.sport && <div className="text-[8px] font-bold text-slate-400 capitalize">{selectedBookingForConfirm.sport.toLowerCase()}</div>}
+                                        {selectedBookingForConfirm?.sport && <div className="text-[11px] md:text-[8px] font-bold text-slate-400 capitalize">{selectedBookingForConfirm.sport.toLowerCase()}</div>}
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-center border-b border-slate-200/50 dark:border-white/5 pb-2">
-                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Horario</span>
+                                    <span className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Horario</span>
                                     <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase font-mono tracking-tighter">
                                         {(() => {
                                             if (!selectedBookingForConfirm) return '--:--';
@@ -958,8 +958,8 @@ export default function CheckInPage() {
 
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Estado Pago</span>
-                                    <span className={`text-[9px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider ${selectedBookingForConfirm?.paymentStatus === 'paid'
+                                    <span className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Estado Pago</span>
+                                    <span className={`text-[11px] md:text-[9px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider ${selectedBookingForConfirm?.paymentStatus === 'paid'
                                         ? 'bg-emerald-500 text-white'
                                         : 'bg-amber-500 text-white animate-pulse'
                                         }`}>
@@ -974,14 +974,14 @@ export default function CheckInPage() {
                         <div className="p-6 flex gap-2">
                             <button
                                 onClick={() => { setIsConfirmModalOpen(false); setSelectedBookingForConfirm(null); }}
-                                className="flex-1 py-3.5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/60 rounded-md text-[9px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all active:scale-95"
+                                className="flex-1 py-3.5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/60 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all active:scale-95"
                             >
                                 Cancelar
                             </button>
                             <button
                                 onClick={confirmCheckIn}
                                 disabled={!!processingId}
-                                className={`flex-2 py-3.5 rounded-md text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950`}
+                                className={`flex-2 py-3.5 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950`}
                             >
                                 {processingId ? (
                                     <ArrowPathIcon className="w-4 h-4 animate-spin" />

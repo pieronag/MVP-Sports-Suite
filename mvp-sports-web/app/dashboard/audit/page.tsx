@@ -187,7 +187,7 @@ export default function Page() {
                     <HugeiconsIcon icon={ShieldCheckIcon} className="w-10 h-10 text-red-500/70" strokeWidth={1.6} />
                 </span>
                 <h1 className="text-2xl font-black uppercase text-slate-900 dark:text-white mb-2 font-heading">Acceso restringido</h1>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                <p className="text-xs md:text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     Esta vista es exclusiva para administradores del sistema.
                 </p>
             </div>
@@ -227,7 +227,7 @@ export default function Page() {
             </div>
 
             {/* KPIs reales */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                 <TarjetaKpi titulo="Eventos totales" valor={kpis.total} sub="Registros en el núcleo" icono={<HugeiconsIcon icon={Database01Icon} className={ic} strokeWidth={1.6} />} brillo />
                 <TarjetaKpi titulo="Críticos" valor={kpis.critical} sub="Revisión requerida" icono={<HugeiconsIcon icon={Alert02Icon} className={ic} strokeWidth={1.6} />} />
                 <TarjetaKpi titulo="Fallidos" valor={kpis.failed} sub="Acciones rechazadas" icono={<HugeiconsIcon icon={Cancel01Icon} className={ic} strokeWidth={1.6} />} />
@@ -244,7 +244,7 @@ export default function Page() {
                             placeholder="Buscar por ID de trazabilidad, IP, actor o acción..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400 transition-all"
+                            className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 dark:focus:border-[#00df82]/40 rounded-md text-xs md:text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400 transition-all"
                         />
                     </div>
                     <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10">
@@ -252,7 +252,7 @@ export default function Page() {
                         <select
                             value={moduleFilter}
                             onChange={(e) => setModuleFilter(e.target.value)}
-                            className="bg-transparent text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white"
+                            className="bg-transparent text-xs md:text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white"
                         >
                             {modules.map(m => <option key={m} value={m}>{m}</option>)}
                         </select>
@@ -263,7 +263,7 @@ export default function Page() {
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={`px-5 py-1.5 text-[9px] font-black uppercase rounded-md transition-all ${filter === f ? "bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black" : "text-slate-400 hover:text-slate-700 dark:hover:text-white"}`}
+                            className={`px-5 py-1.5 text-[11px] md:text-[9px] font-black uppercase rounded-md transition-all ${filter === f ? "bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black" : "text-slate-400 hover:text-slate-700 dark:hover:text-white"}`}
                         >
                             {f}
                         </button>
@@ -278,19 +278,19 @@ export default function Page() {
                 icon={<HugeiconsIcon icon={FingerPrintIcon} className="w-5 h-5" strokeWidth={1.8} />}
                 bodyClassName="p-0"
                 action={
-                    <span className="text-[9px] bg-emerald-500/15 text-emerald-600 dark:text-[#00df82] px-2.5 py-1 rounded-md font-black uppercase tracking-wider">Trazabilidad</span>
+                    <span className="text-[11px] md:text-[9px] bg-emerald-500/15 text-emerald-600 dark:text-[#00df82] px-2.5 py-1 rounded-md font-black uppercase tracking-wider">Trazabilidad</span>
                 }
             >
                 <div className="overflow-x-auto custom-scrollbar">
                     <table className="w-full text-left min-w-[1080px]">
                         <thead>
                             <tr className="bg-slate-50/60 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Fecha / ID</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Severidad</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Actor / Rol</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Acción & módulo</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Detalle técnico</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Resultado</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Fecha / ID</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-center">Severidad</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Actor / Rol</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Acción & módulo</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Detalle técnico</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Resultado</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -298,35 +298,35 @@ export default function Page() {
                                 <tr key={log.id} className={`group hover:bg-slate-50/60 dark:hover:bg-white/2 transition-colors ${['critical', 'high'].includes(log.severity.toLowerCase()) ? 'bg-red-500/3' : ''}`}>
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase">{log.date}</span>
-                                            <span className="text-[9px] font-bold text-slate-400 mt-0.5">{log.time} · <span className="text-emerald-600 dark:text-[#00df82] font-mono">{log.traceId}</span></span>
+                                            <span className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase">{log.date}</span>
+                                            <span className="text-[11px] md:text-[9px] font-bold text-slate-400 mt-0.5">{log.time} · <span className="text-emerald-600 dark:text-[#00df82] font-mono">{log.traceId}</span></span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-center">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[8px] font-black uppercase border ${getSeverityStyle(log.severity)}`}>
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] md:text-[8px] font-black uppercase border ${getSeverityStyle(log.severity)}`}>
                                             <span className={`w-1.5 h-1.5 rounded-full ${getSeverityDot(log.severity)}`} />
                                             {sevLabel(log.severity)}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex flex-col">
-                                            <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase">{log.actor}</span>
-                                            <span className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">{log.role} · {log.email}</span>
+                                            <span className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase">{log.actor}</span>
+                                            <span className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">{log.role} · {log.email}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className="text-[10px] font-black text-indigo-600 dark:text-[#00df82] uppercase block">{log.action}</span>
-                                        <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{log.module}</span>
+                                        <span className="text-xs md:text-[10px] font-black text-indigo-600 dark:text-[#00df82] uppercase block">{log.action}</span>
+                                        <span className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{log.module}</span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <p className="text-[9px] font-bold text-slate-500 dark:text-slate-300 leading-relaxed max-w-xs wrap-break-word uppercase">{log.details}</p>
-                                        <div className="flex items-center gap-1.5 mt-2 text-[8px] font-black text-slate-400 uppercase">
+                                        <p className="text-[11px] md:text-[9px] font-bold text-slate-500 dark:text-slate-300 leading-relaxed max-w-xs wrap-break-word uppercase">{log.details}</p>
+                                        <div className="flex items-center gap-1.5 mt-2 text-[11px] md:text-[8px] font-black text-slate-400 uppercase">
                                             <HugeiconsIcon icon={GlobeIcon} className="w-3 h-3" strokeWidth={1.8} />
                                             {log.ip} <span className="opacity-30">·</span> {log.location} <span className="opacity-30">·</span> {log.device}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[8px] font-black uppercase border ${getStatusBadge(log.status)}`}>
+                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] md:text-[8px] font-black uppercase border ${getStatusBadge(log.status)}`}>
                                             <span className={`w-1.5 h-1.5 rounded-full ${getStatusDot(log.status)}`} />
                                             {statusLabel(log.status)}
                                         </span>

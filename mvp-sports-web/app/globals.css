@@ -525,3 +525,27 @@
    Títulos (font-heading) conservan su peso fuerte Fira Sans.
    El contenido se suaviza: black/extrabold -> 700 y bold -> 600. */
 }
+
+/* === PANELES EN CELULAR (dueño, mánager, superadmin) ===
+   Solo en pantallas táctiles: el escritorio con mouse queda igual. */
+@media (pointer: coarse) {
+  /* Objetivos táctiles de 44 px (botones, selectores y pestañas del panel) */
+  .dashboard-shell main :where(button, select, [role="tab"], a.btn) {
+    min-height: 44px;
+  }
+  /* 16 px evita el zoom automático de iOS al enfocar un campo */
+  .dashboard-shell :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+    font-size: 16px;
+  }
+}
+
+/* Foco visible con teclado, con el verde de la marca */
+.dashboard-shell :where(button, a, select, input, textarea, [tabindex]):focus-visible {
+  outline: 2px solid #00df82;
+  outline-offset: 2px;
+}
+
+/* Selección de texto con la paleta de la marca */
+.dashboard-shell ::selection {
+  background: rgb(0 223 130 / 0.28);
+}

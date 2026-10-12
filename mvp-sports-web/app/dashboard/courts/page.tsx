@@ -133,7 +133,7 @@ function PanelHeader({ titulo, desc, icon: Icon, action }: any) {
                 <span className="text-emerald-600 dark:text-[#00df82] shrink-0">{content}</span>
                 <div className="min-w-0">
                     <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white truncate font-heading">{titulo}</h3>
-                    <p className="text-[10px] font-bold text-slate-400 truncate">{desc}</p>
+                    <p className="text-xs md:text-[10px] font-bold text-slate-400 truncate">{desc}</p>
                 </div>
             </div>
             {action}
@@ -144,7 +144,7 @@ function PanelHeader({ titulo, desc, icon: Icon, action }: any) {
 function StatMini({ label, value }: { label: string; value: number }) {
     return (
         <div className="p-3 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
-            <p className="text-[8px] font-black text-slate-400 uppercase tracking-wider mb-1">{label}</p>
+            <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase tracking-wider mb-1">{label}</p>
             <p className="text-lg font-black text-slate-900 dark:text-white font-mono leading-none">{value}</p>
         </div>
     );
@@ -166,7 +166,7 @@ function HeaderSeccion({ titulo, desc, icon: Icon }: any) {
             </div>
             <div className="space-y-1">
                 <h3 className="text-xs font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white leading-tight">{titulo}</h3>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{desc}</p>
+                <p className="text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-widest">{desc}</p>
             </div>
         </div>
     );
@@ -181,8 +181,8 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructi
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter leading-none">{title}</h3>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-8 uppercase leading-relaxed">{message}</p>
                 <div className="flex gap-3 justify-end">
-                    <button onClick={onCancel} className="px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 transition-all">Cancelar</button>
-                    <button onClick={onConfirm} className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-md text-white shadow-lg transition-all active:scale-95 ${isDestructive ? 'bg-red-600 shadow-red-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}>Confirmar</button>
+                    <button onClick={onCancel} className="px-5 py-2.5 text-xs md:text-[10px] font-black uppercase tracking-widest rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 transition-all">Cancelar</button>
+                    <button onClick={onConfirm} className={`px-6 py-2.5 text-xs md:text-[10px] font-black uppercase tracking-widest rounded-md text-white shadow-lg transition-all active:scale-95 ${isDestructive ? 'bg-red-600 shadow-red-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}>Confirmar</button>
                 </div>
             </div>
         </div>
@@ -891,7 +891,7 @@ export default function CourtsPage() {
                     <div className="flex items-center gap-2 p-1.5 rounded-md">
                         <button
                             onClick={fetchVenues}
-                            className="px-6 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[9px] uppercase tracking-[0.2em] rounded-md transition-all hover:brightness-110 active:scale-95 shadow-xl shadow-emerald-500/20 flex items-center gap-2"
+                            className="px-6 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[11px] md:text-[9px] uppercase tracking-[0.2em] rounded-md transition-all hover:brightness-110 active:scale-95 shadow-xl shadow-emerald-500/20 flex items-center gap-2"
                         >
                             <HugeiconsIcon icon={RefreshIcon} className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> ACTUALIZAR RED
                         </button>
@@ -899,7 +899,7 @@ export default function CourtsPage() {
                 </div>
 
                 {/* KPIs REALES */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                     <TarjetaKpi titulo="Recintos" valor={venues.length} sub="Sedes activas" icono={<HugeiconsIcon icon={Store01Icon} className="w-6 h-6" strokeWidth={1.6} />} brillo />
                     <TarjetaKpi titulo="Canchas" valor={totalCourts} sub="Total de activos" icono={<HugeiconsIcon icon={FootballPitchIcon} className="w-6 h-6" strokeWidth={1.6} />} />
                     <TarjetaKpi titulo="Deportes" valor={sportsSet.size} sub="Disciplinas activas" icono={<HugeiconsIcon icon={FootballIcon} className="w-6 h-6" strokeWidth={1.6} />} />
@@ -909,7 +909,7 @@ export default function CourtsPage() {
                 {loading ? (
                     <div className="text-center py-40 animate-pulse">
                         <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4"></div>
-                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.3em]">Escaneando Infraestructura...</p>
+                        <p className="text-xs md:text-[10px] font-black uppercase text-slate-400 tracking-[0.3em]">Escaneando Infraestructura...</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -924,7 +924,7 @@ export default function CourtsPage() {
 
 return (
         <div className="w-full space-y-6 pb-28 text-left relative animate-fadeIn">
-            {toast && <div className={`fixed top-6 right-6 px-6 py-3.5 rounded-md shadow-2xl text-[10px] font-black uppercase tracking-widest z-1000 text-white flex items-center gap-3 animate-slideIn ${toast.type === 'success' ? 'bg-emerald-500 dark:bg-[#00df82] dark:text-black' : 'bg-red-600'}`}>{toast.type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" /> : <HugeiconsIcon icon={Alert02Icon} className="w-4 h-4" />} {toast.msg}</div>}
+            {toast && <div className={`fixed top-6 right-6 px-6 py-3.5 rounded-md shadow-2xl text-xs md:text-[10px] font-black uppercase tracking-widest z-1000 text-white flex items-center gap-3 animate-slideIn ${toast.type === 'success' ? 'bg-emerald-500 dark:bg-[#00df82] dark:text-black' : 'bg-red-600'}`}>{toast.type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" /> : <HugeiconsIcon icon={Alert02Icon} className="w-4 h-4" />} {toast.msg}</div>}
             <ConfirmModal
                 isOpen={confirmData.isOpen}
                 title={confirmData.title}
@@ -935,7 +935,7 @@ return (
             />
 
             {/* BREADCRUMB */}
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-wider">
+            <div className="flex items-center gap-2 text-xs md:text-[10px] font-black uppercase tracking-wider">
                 <button onClick={() => setSelectedVenue(null)} className="text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] transition-colors">Recintos</button>
                 <span className="text-slate-300 dark:text-white/20">/</span>
                 <span className="text-emerald-600 dark:text-[#00df82] truncate">{selectedVenue.name}</span>
@@ -958,9 +958,9 @@ return (
                             </button>
                             <div>
                                 <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                                    <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-[#00df82] text-[8px] font-black uppercase tracking-[0.2em] border border-emerald-500/20">Gestión de activos</span>
+                                    <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-[#00df82] text-[11px] md:text-[8px] font-black uppercase tracking-[0.2em] border border-emerald-500/20">Gestión de activos</span>
                                     <span className="text-slate-300 dark:text-white/10">•</span>
-                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1">
+                                    <p className="text-[11px] md:text-[9px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-1">
                                         <HugeiconsIcon icon={MapPinIcon} className="w-3 h-3" strokeWidth={1.8} /> {selectedVenue.address}
                                     </p>
                                 </div>
@@ -974,13 +974,13 @@ return (
                         <div className="flex items-center gap-3 p-1 bg-slate-100 dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 w-fit">
                             <button
                                 onClick={() => setActiveTab('config')}
-                                className={`flex items-center gap-2.5 px-6 py-3 text-[10px] font-black uppercase rounded-md transition-all ${activeTab === 'config' ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}
+                                className={`flex items-center gap-2.5 px-6 py-3 text-xs md:text-[10px] font-black uppercase rounded-md transition-all ${activeTab === 'config' ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}
                             >
                                 <HugeiconsIcon icon={Settings01Icon} className="w-4 h-4" /> Infraestructura
                             </button>
                             <button
                                 onClick={() => isConfigured ? setActiveTab('courts') : showToast("Define los deportes primero", 'error')}
-                                className={`flex items-center gap-2.5 px-6 py-3 text-[10px] font-black uppercase rounded-md transition-all ${activeTab === 'courts' ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}
+                                className={`flex items-center gap-2.5 px-6 py-3 text-xs md:text-[10px] font-black uppercase rounded-md transition-all ${activeTab === 'courts' ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}
                             >
                                 <HugeiconsIcon icon={Grid02Icon} className="w-4 h-4" /> Gestión de canchas
                             </button>
@@ -990,19 +990,19 @@ return (
                     {/* STATS RÁPIDOS */}
                     <div className="mt-6 pt-5 border-t border-slate-100 dark:border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-3">
                         <div className="p-3.5 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">Canchas</p>
+                            <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">Canchas</p>
                             <p className="text-lg font-black text-slate-900 dark:text-white font-mono leading-none">{courts.length}</p>
                         </div>
                         <div className="p-3.5 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">Deportes</p>
+                            <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">Deportes</p>
                             <p className="text-lg font-black text-slate-900 dark:text-white font-mono leading-none">{selectedVenue.activeSports?.length || 0}</p>
                         </div>
                         <div className="p-3.5 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">Horario</p>
+                            <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">Horario</p>
                             <p className="text-lg font-black text-slate-900 dark:text-white font-mono leading-none">{selectedVenue.openingHours || '08:00 - 23:00'}</p>
                         </div>
                         <div className="p-3.5 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">Tramos tarifarios</p>
+                            <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">Tramos tarifarios</p>
                             <p className="text-lg font-black text-slate-900 dark:text-white font-mono leading-none">{timeSlots.length}</p>
                         </div>
                     </div>
@@ -1019,7 +1019,7 @@ return (
                                 <PanelGlass className="p-6 rounded-md">
                                     <div className="flex items-center justify-between gap-3 mb-5">
                                         <div>
-                                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-[#00df82] mb-1.5">Estado de configuración</p>
+                                            <p className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-[#00df82] mb-1.5">Estado de configuración</p>
                                             <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none font-heading">{configDoneCount} de 5 pasos</p>
                                         </div>
                                         <span className={`px-3 py-1.5 rounded-md text-[11px] font-black font-mono ${configDoneCount === 5 ? 'bg-emerald-500/10 text-emerald-600 dark:text-[#00df82] border border-emerald-500/20' : 'bg-slate-100 dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/10'}`}>{Math.round((configDoneCount / 5) * 100)}%</span>
@@ -1031,17 +1031,17 @@ return (
                                         {configSteps.map((step, i) => (
                                             <div key={step.label} className={`flex items-center gap-3 p-2.5 rounded-md border transition-all ${step.done ? 'bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-100 dark:border-emerald-500/15' : 'bg-slate-50/50 dark:bg-white/2 border-slate-100 dark:border-white/5'}`}>
                                                 <span className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${step.done ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black' : 'bg-slate-100 dark:bg-white/10 text-slate-400'}`}>
-                                                    {step.done ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={2} /> : <span className="font-mono text-[10px] font-black">{String(i + 1).padStart(2, '0')}</span>}
+                                                    {step.done ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={2} /> : <span className="font-mono text-xs md:text-[10px] font-black">{String(i + 1).padStart(2, '0')}</span>}
                                                 </span>
-                                                <span className="flex-1 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300">{step.label}</span>
-                                                <span className={`text-[8px] font-black uppercase ${step.done ? 'text-emerald-600 dark:text-[#00df82]' : 'text-slate-300 dark:text-white/20'}`}>{step.done ? 'Listo' : 'Pendiente'}</span>
+                                                <span className="flex-1 text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-300">{step.label}</span>
+                                                <span className={`text-[11px] md:text-[8px] font-black uppercase ${step.done ? 'text-emerald-600 dark:text-[#00df82]' : 'text-slate-300 dark:text-white/20'}`}>{step.done ? 'Listo' : 'Pendiente'}</span>
                                             </div>
                                         ))}
                                     </div>
                                 </PanelGlass>
 
                                 <PanelGlass className="p-6 rounded-md">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">Datos rápidos</p>
+                                    <p className="text-xs md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4">Datos rápidos</p>
                                     <div className="grid grid-cols-2 gap-3">
                                         <StatMini label="Deportes" value={selectedSports.length} />
                                         <StatMini label="Canchas" value={courts.length} />
@@ -1064,7 +1064,7 @@ return (
                                         ) : (
                                             <div className="w-full h-full bg-slate-50 dark:bg-black/20 flex flex-col items-center justify-center text-slate-300 gap-3">
                                                 <HugeiconsIcon icon={Camera01Icon} className="w-10 h-10 opacity-20" strokeWidth={1.4} />
-                                                <span className="text-[9px] font-black uppercase tracking-[0.2em]">Sin imagen de portada</span>
+                                                <span className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em]">Sin imagen de portada</span>
                                             </div>
                                         )}
                                         <div className="absolute inset-0 bg-slate-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-xs">
@@ -1077,7 +1077,7 @@ return (
                                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleVenueImageUpload} />
 
                                     <div className="flex items-center justify-between mt-6 mb-3">
-                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Galería ({Math.min((selectedVenue.gallery || []).length, 6)}/6)</p>
+                                        <p className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Galería ({Math.min((selectedVenue.gallery || []).length, 6)}/6)</p>
                                     </div>
                                     <div className="flex gap-3 overflow-x-auto pb-1">
                                         {(selectedVenue.gallery || []).map((img, idx) => (
@@ -1093,7 +1093,7 @@ return (
                                         {(selectedVenue.gallery || []).length < 6 && (
                                             <div className="relative w-28 h-16 shrink-0 rounded-md border-2 border-dashed border-slate-200 dark:border-white/10 flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-emerald-500/50 hover:bg-slate-50 dark:hover:bg-white/5 transition-all group">
                                                 <HugeiconsIcon icon={Image01Icon} className="w-5 h-5 text-slate-300 dark:text-white/20 group-hover:text-emerald-500 transition-colors" strokeWidth={1.6} />
-                                                <span className="text-[8px] font-black uppercase text-slate-400">Añadir</span>
+                                                <span className="text-[11px] md:text-[8px] font-black uppercase text-slate-400">Añadir</span>
                                                 <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleGalleryUpload} />
                                             </div>
                                         )}
@@ -1104,7 +1104,7 @@ return (
                             {/* DEPORTES */}
                             <PanelGlass className="overflow-hidden">
                                 <PanelHeader titulo="Deportes disponibles" desc="Define las disciplinas del recinto" icon={TrophyIcon} action={
-                                    <span className="hidden sm:inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-slate-400">
+                                    <span className="hidden sm:inline-flex items-center gap-2 text-[11px] md:text-[9px] font-black uppercase tracking-widest text-slate-400">
                                         {selectedSports.length} seleccionados
                                     </span>
                                 } />
@@ -1126,7 +1126,7 @@ return (
                                                  <SoccerIcon className={`w-6 h-6 shrink-0 ${selected ? 'text-white' : 'text-slate-300'}`} />}
                                                 <span className="flex-1 text-left">
                                                     <span className="block text-[11px] font-black uppercase tracking-tight">{s}</span>
-                                                    <span className={`block text-[8px] font-black uppercase font-mono mt-0.5 ${selected ? 'text-white/80' : 'text-slate-300 dark:text-white/20'}`}>{courtsBySport(s)} canchas</span>
+                                                    <span className={`block text-[11px] md:text-[8px] font-black uppercase font-mono mt-0.5 ${selected ? 'text-white/80' : 'text-slate-300 dark:text-white/20'}`}>{courtsBySport(s)} canchas</span>
                                                 </span>
                                                 <span className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${selected ? 'bg-white/20' : 'bg-slate-100 dark:bg-white/10'}`}>
                                                     {selected ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-3.5 h-3.5" strokeWidth={2} /> : null}
@@ -1145,20 +1145,20 @@ return (
                                         <span className="text-emerald-600 dark:text-[#00df82] shrink-0"><HugeiconsIcon icon={Settings01Icon} className="w-4 h-4" strokeWidth={1.8} /></span>
                                         <div>
                                             <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white truncate font-heading">Operación y tarifas</h3>
-                                            <p className="text-[10px] font-bold text-slate-400 truncate">Horarios y precios por deporte</p>
+                                            <p className="text-xs md:text-[10px] font-bold text-slate-400 truncate">Horarios y precios por deporte</p>
                                         </div>
                                     </div>
                                     <div className="flex gap-2 p-1 bg-slate-100 dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 w-fit">
-                                        <button onClick={() => setOpTab('horario')} className={`px-5 py-2 rounded-md text-[10px] font-black uppercase transition-all ${opTab === 'horario' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>Horario</button>
-                                        <button onClick={() => setOpTab('tarifas')} className={`px-5 py-2 rounded-md text-[10px] font-black uppercase transition-all ${opTab === 'tarifas' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>Tarifas</button>
+                                        <button onClick={() => setOpTab('horario')} className={`px-5 py-2 rounded-md text-xs md:text-[10px] font-black uppercase transition-all ${opTab === 'horario' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>Horario</button>
+                                        <button onClick={() => setOpTab('tarifas')} className={`px-5 py-2 rounded-md text-xs md:text-[10px] font-black uppercase transition-all ${opTab === 'tarifas' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>Tarifas</button>
                                     </div>
                                 </div>
                                 <div className="p-6 lg:p-7">
                                     {opTab === 'horario' ? (
                                         <div className="animate-fadeIn">
                                             <div className="flex items-center justify-between gap-4 mb-5">
-                                                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Disponibilidad semanal</p>
-                                                <button onClick={handleCopyMondayToAll} className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[9px] font-black uppercase tracking-widest hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all">
+                                                <p className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Disponibilidad semanal</p>
+                                                <button onClick={handleCopyMondayToAll} className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all">
                                                     <HugeiconsIcon icon={Copy01Icon} className="w-3.5 h-3.5" strokeWidth={2} /> Copiar Lunes a todos
                                                 </button>
                                             </div>
@@ -1193,7 +1193,7 @@ return (
                                                 <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-6">
                                                     <div className="flex flex-wrap gap-2 p-1 bg-slate-100 dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10">
                                                         {selectedSports.map(s => (
-                                                            <button key={s} onClick={() => setActivePricingTab(s)} className={`px-5 py-2.5 rounded-md text-[10px] font-black uppercase transition-all ${activePricingTab === s ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>{s}</button>
+                                                            <button key={s} onClick={() => setActivePricingTab(s)} className={`px-5 py-2.5 rounded-md text-xs md:text-[10px] font-black uppercase transition-all ${activePricingTab === s ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>{s}</button>
                                                         ))}
                                                     </div>
                                                 </div>
@@ -1202,14 +1202,14 @@ return (
                                                     <div className="space-y-6">
                                                         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                                                             <div className="flex gap-2 p-1 bg-slate-100 dark:bg-white/5 rounded-md w-fit border border-slate-200 dark:border-white/10">
-                                                                <button onClick={() => setActiveDayTypeTab('weekday')} className={`px-6 py-2.5 rounded-md text-[10px] font-black uppercase transition-all ${activeDayTypeTab === 'weekday' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400'}`}>Lunes a viernes</button>
-                                                                <button onClick={() => setActiveDayTypeTab('weekend')} className={`px-6 py-2.5 rounded-md text-[10px] font-black uppercase transition-all ${activeDayTypeTab === 'weekend' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400'}`}>Fines de semana</button>
+                                                                <button onClick={() => setActiveDayTypeTab('weekday')} className={`px-6 py-2.5 rounded-md text-xs md:text-[10px] font-black uppercase transition-all ${activeDayTypeTab === 'weekday' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400'}`}>Lunes a viernes</button>
+                                                                <button onClick={() => setActiveDayTypeTab('weekend')} className={`px-6 py-2.5 rounded-md text-xs md:text-[10px] font-black uppercase transition-all ${activeDayTypeTab === 'weekend' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400'}`}>Fines de semana</button>
                                                             </div>
                                                             <div className="flex flex-wrap gap-2">
-                                                                <button onClick={() => handleFillMissingPrices(activePricingTab, activeDayTypeTab)} className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[9px] font-black uppercase tracking-widest hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all">
+                                                                <button onClick={() => handleFillMissingPrices(activePricingTab, activeDayTypeTab)} className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all">
                                                                     <HugeiconsIcon icon={MagicWand01Icon} className="w-3.5 h-3.5" strokeWidth={2} /> Completar faltantes
                                                                 </button>
-                                                                <button onClick={() => handleApplyAllPrices(activePricingTab, activeDayTypeTab)} className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[9px] font-black uppercase tracking-widest hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all">
+                                                                <button onClick={() => handleApplyAllPrices(activePricingTab, activeDayTypeTab)} className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all">
                                                                     <HugeiconsIcon icon={Layers01Icon} className="w-3.5 h-3.5" strokeWidth={2} /> Aplicar a todos los tramos
                                                                 </button>
                                                             </div>
@@ -1222,9 +1222,9 @@ return (
                                                                 return (
                                                                 <div key={time} className={`p-4 bg-slate-50/50 dark:bg-white/2 rounded-md border relative group hover:border-emerald-500/30 transition-all ${missing ? 'border-amber-300 dark:border-amber-500/40' : 'border-slate-200 dark:border-white/5'}`}>
                                                                     <div className="flex items-center justify-between gap-2 mb-3">
-                                                                        <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter">{time}</label>
+                                                                        <label className="text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter">{time}</label>
                                                                         {missing && (
-                                                                            <span className="inline-flex items-center gap-1 text-[8px] font-black uppercase text-amber-600 dark:text-amber-400">
+                                                                            <span className="inline-flex items-center gap-1 text-[11px] md:text-[8px] font-black uppercase text-amber-600 dark:text-amber-400">
                                                                                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Sin precio
                                                                             </span>
                                                                         )}
@@ -1272,7 +1272,7 @@ return (
                                 desc={`Canchas integradas en ${selectedVenue.name}`}
                                 icon={Grid02Icon}
                                 action={
-                                    <button onClick={handleOpenCreate} className="flex items-center justify-center gap-2.5 px-6 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[10px] uppercase rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all">
+                                    <button onClick={handleOpenCreate} className="flex items-center justify-center gap-2.5 px-6 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-xs md:text-[10px] uppercase rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all">
                                         <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" /> Integrar cancha
                                     </button>
                                 }
@@ -1282,16 +1282,16 @@ return (
                                 <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
                                     <div className="flex items-center gap-2.5">
                                         <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-[#00df82]"></span>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-300">Activas <span className="font-mono text-emerald-600 dark:text-[#00df82]">{activeCount}</span></p>
+                                        <p className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-300">Activas <span className="font-mono text-emerald-600 dark:text-[#00df82]">{activeCount}</span></p>
                                     </div>
                                     <div className="flex items-center gap-2.5">
                                         <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-300">En pausa <span className="font-mono text-red-500">{maintenanceCount}</span></p>
+                                        <p className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-300">En pausa <span className="font-mono text-red-500">{maintenanceCount}</span></p>
                                     </div>
                                     {noPriceSports > 0 && (
                                         <div className="flex items-center gap-2.5 text-amber-500">
                                             <HugeiconsIcon icon={Alert02Icon} className="w-3.5 h-3.5" strokeWidth={2} />
-                                            <p className="text-[10px] font-black uppercase tracking-widest">{noPriceSports} deporte{noPriceSports > 1 ? 's' : ''} sin tarifa</p>
+                                            <p className="text-xs md:text-[10px] font-black uppercase tracking-widest">{noPriceSports} deporte{noPriceSports > 1 ? 's' : ''} sin tarifa</p>
                                         </div>
                                     )}
                                     <div className="ml-auto flex items-center gap-4 min-w-[220px]">
@@ -1299,19 +1299,19 @@ return (
                                             <div className="h-full bg-emerald-500 dark:bg-[#00df82] transition-all" style={{ width: `${pctActive}%` }} />
                                             <div className="h-full bg-red-500 transition-all" style={{ width: `${pctMaint}%` }} />
                                         </div>
-                                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{sortedCourts.length} {sortedCourts.length === 1 ? 'cancha' : 'canchas'}</span>
+                                        <span className="text-xs md:text-[10px] font-black uppercase text-slate-400 tracking-widest">{sortedCourts.length} {sortedCourts.length === 1 ? 'cancha' : 'canchas'}</span>
                                     </div>
                                 </div>
 
                                 {/* FILTROS */}
                                 <div className="flex flex-wrap items-center gap-3 pt-5 border-t border-slate-100 dark:border-white/5">
-                                    <span className="px-4 text-[9px] font-black uppercase tracking-widest text-slate-400 shrink-0">Filtrar por deporte</span>
+                                    <span className="px-4 text-[11px] md:text-[9px] font-black uppercase tracking-widest text-slate-400 shrink-0">Filtrar por deporte</span>
                                     <div className="flex flex-wrap items-center gap-2 p-1 bg-slate-100 dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10">
-                                        <button onClick={() => setFilterSport('Todos')} className={`flex items-center gap-1.5 px-6 py-2.5 text-[10px] font-black uppercase rounded-md transition-all ${filterSport === 'Todos' ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
-                                            Todos <span className={`inline-flex items-center px-1.5 py-0.5 rounded-md text-[8px] font-mono ${filterSport === 'Todos' ? 'bg-white/20 text-white' : 'bg-white dark:bg-white/10 text-slate-400'}`}>{courts.length}</span>
+                                        <button onClick={() => setFilterSport('Todos')} className={`flex items-center gap-1.5 px-6 py-2.5 text-xs md:text-[10px] font-black uppercase rounded-md transition-all ${filterSport === 'Todos' ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
+                                            Todos <span className={`inline-flex items-center px-1.5 py-0.5 rounded-md text-[11px] md:text-[8px] font-mono ${filterSport === 'Todos' ? 'bg-white/20 text-white' : 'bg-white dark:bg-white/10 text-slate-400'}`}>{courts.length}</span>
                                         </button>
-                                        {selectedSports.map(s => <button key={s} onClick={() => setFilterSport(s)} className={`flex items-center gap-1.5 px-6 py-2.5 text-[10px] font-black uppercase rounded-md transition-all ${filterSport === s ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
-                                            {s} <span className={`inline-flex items-center px-1.5 py-0.5 rounded-md text-[8px] font-mono ${filterSport === s ? 'bg-white/20 text-white' : 'bg-white dark:bg-white/10 text-slate-400'}`}>{courtsBySport(s)}</span>
+                                        {selectedSports.map(s => <button key={s} onClick={() => setFilterSport(s)} className={`flex items-center gap-1.5 px-6 py-2.5 text-xs md:text-[10px] font-black uppercase rounded-md transition-all ${filterSport === s ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
+                                            {s} <span className={`inline-flex items-center px-1.5 py-0.5 rounded-md text-[11px] md:text-[8px] font-mono ${filterSport === s ? 'bg-white/20 text-white' : 'bg-white dark:bg-white/10 text-slate-400'}`}>{courtsBySport(s)}</span>
                                         </button>)}
                                     </div>
                                     <div className="ml-auto flex items-center gap-3">
@@ -1358,7 +1358,7 @@ return (
                                     <div className="p-4 flex flex-col flex-1">
                                         {/* ESTADO + ACCIONES */}
                                         <div className="flex justify-between items-start mb-4">
-                                            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border ${c.status === 'maintenance' ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20 text-red-500' : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-[#00df82]'}`}>
+                                            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest border ${c.status === 'maintenance' ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20 text-red-500' : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-[#00df82]'}`}>
                                                 <span className={`w-1.5 h-1.5 rounded-full ${c.status === 'maintenance' ? 'bg-red-500' : 'bg-emerald-500 dark:bg-[#00df82]'}`} />
                                                 {pausedNow(c) ? 'En pausa' : c.status === 'maintenance' ? 'Programada' : 'Activo'}
                                             </div>
@@ -1376,13 +1376,13 @@ return (
                                             <div className="min-w-0">
                                                 <h4 className="text-[14px] font-black text-slate-900 dark:text-white uppercase truncate tracking-tighter leading-none font-heading">{c.name}</h4>
                                                 <div className="flex items-center gap-2 mt-1.5">
-                                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{c.sport}</span>
+                                                    <span className="text-[11px] md:text-[9px] font-black uppercase tracking-widest text-slate-400">{c.sport}</span>
                                                     {courtBasePrice(c.sport) > 0 ? (
-                                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-[#00df82] text-[8px] font-black font-mono">
+                                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-[#00df82] text-[11px] md:text-[8px] font-black font-mono">
                                                             Desde ${formatPrice(courtBasePrice(c.sport))}
                                                         </span>
                                                     ) : (
-                                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 text-amber-600 dark:text-amber-400 text-[8px] font-black uppercase">
+                                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 text-amber-600 dark:text-amber-400 text-[11px] md:text-[8px] font-black uppercase">
                                                             <HugeiconsIcon icon={Alert02Icon} className="w-2.5 h-2.5" strokeWidth={2} /> Sin tarifa
                                                         </span>
                                                     )}
@@ -1392,7 +1392,7 @@ return (
 
                                         {c.status === 'maintenance' && c.maintenanceUntil && (
                                             <div className="mb-3 px-2.5 py-1.5 rounded-md bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20">
-                                                <p className="text-[9px] font-black uppercase tracking-widest text-red-500 flex items-center gap-1.5">
+                                                <p className="text-[11px] md:text-[9px] font-black uppercase tracking-widest text-red-500 flex items-center gap-1.5">
                                                     <HugeiconsIcon icon={Alert02Icon} className="w-3 h-3" strokeWidth={2} /> {maintenanceWindow(c)}
                                                 </p>
                                             </div>
@@ -1401,30 +1401,30 @@ return (
                                         {/* DATOS TÉCNICOS */}
                                         <div className="grid grid-cols-3 gap-2 py-3.5 border-t border-slate-100 dark:border-white/5">
                                             <div className="space-y-1">
-                                                <p className="text-[8px] font-bold text-slate-400 uppercase">Superficie</p>
-                                                <p className="text-[9px] font-black text-slate-600 dark:text-slate-300 truncate">{c.surface || '—'}</p>
+                                                <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase">Superficie</p>
+                                                <p className="text-[11px] md:text-[9px] font-black text-slate-600 dark:text-slate-300 truncate">{c.surface || '—'}</p>
                                             </div>
                                             <div className="space-y-1">
-                                                <p className="text-[8px] font-bold text-slate-400 uppercase">Tarifa</p>
-                                                <p className={`text-[9px] font-black font-mono truncate ${courtBasePrice(c.sport) > 0 ? 'text-emerald-600 dark:text-[#00df82]' : 'text-amber-500'}`}>
+                                                <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase">Tarifa</p>
+                                                <p className={`text-[11px] md:text-[9px] font-black font-mono truncate ${courtBasePrice(c.sport) > 0 ? 'text-emerald-600 dark:text-[#00df82]' : 'text-amber-500'}`}>
                                                     {courtBasePrice(c.sport) > 0 ? `$${formatPrice(courtBasePrice(c.sport))}` : 'Sin tarifa'}
                                                 </p>
                                             </div>
                                             <div className="space-y-1 text-right">
-                                                <p className="text-[8px] font-bold text-slate-400 uppercase">ID</p>
-                                                <p className="text-[9px] font-black text-slate-400 font-mono">#{c.id.slice(0, 4).toUpperCase()}</p>
+                                                <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase">ID</p>
+                                                <p className="text-[11px] md:text-[9px] font-black text-slate-400 font-mono">#{c.id.slice(0, 4).toUpperCase()}</p>
                                             </div>
                                         </div>
 
                                         {(c.features || []).length > 0 && (
                                             <div className="flex flex-wrap gap-2 pt-3">
                                                 {c.features.slice(0, 3).map(f => (
-                                                    <span key={f} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase">
+                                                    <span key={f} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs md:text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase">
                                                         {FEATURE_ICONS[f] && <HugeiconsIcon icon={FEATURE_ICONS[f]} className="w-3.5 h-3.5 text-emerald-600 dark:text-[#00df82]" strokeWidth={2} />} {f}
                                                     </span>
                                                 ))}
                                                 {c.features.length > 3 && (
-                                                    <span className="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-400 uppercase">+{c.features.length - 3}</span>
+                                                    <span className="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs md:text-[10px] font-bold text-slate-400 uppercase">+{c.features.length - 3}</span>
                                                 )}
                                             </div>
                                         )}
@@ -1432,11 +1432,11 @@ return (
                                         {/* ACCIÓN */}
                                         <div className="mt-auto pt-4">
                                             {c.status === 'maintenance' ? (
-                                                <button onClick={() => handleRestoreCourt(c.id)} className="w-full py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md text-[9px] font-black uppercase tracking-widest transition-all hover:brightness-110 flex items-center justify-center gap-2">
+                                                <button onClick={() => handleRestoreCourt(c.id)} className="w-full py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest transition-all hover:brightness-110 flex items-center justify-center gap-2">
                                                     <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-3.5 h-3.5" strokeWidth={2} /> Restaurar
                                                 </button>
                                             ) : (
-                                                <button onClick={() => handleOpenMaintenance(c)} className="w-full py-2.5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-300 rounded-md text-[9px] font-black uppercase tracking-widest transition-all hover:bg-red-500 hover:text-white flex items-center justify-center gap-2">
+                                                <button onClick={() => handleOpenMaintenance(c)} className="w-full py-2.5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-300 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest transition-all hover:bg-red-500 hover:text-white flex items-center justify-center gap-2">
                                                     <HugeiconsIcon icon={Wrench01Icon} className="w-3.5 h-3.5" strokeWidth={2} /> Mantenimiento
                                                 </button>
                                             )}
@@ -1452,9 +1452,9 @@ return (
                                     </div>
                                     <div className="space-y-2">
                                         <p className="text-[13px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-widest leading-none">Cero canchas registradas</p>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-2">Agrega nuevas unidades para expandir tu infraestructura</p>
+                                        <p className="text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-2">Agrega nuevas unidades para expandir tu infraestructura</p>
                                     </div>
-                                    <button onClick={handleOpenCreate} className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[10px] uppercase rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all">
+                                    <button onClick={handleOpenCreate} className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-xs md:text-[10px] uppercase rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all">
                                         <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" /> Integrar primera cancha
                                     </button>
                                 </div>
@@ -1470,14 +1470,14 @@ return (
                     <div className="max-w-6xl mx-auto pointer-events-auto rounded-md bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-md border border-slate-200 dark:border-white/10 shadow-2xl px-5 py-3.5 flex items-center justify-between gap-4">
                         <div className="flex items-center gap-2">
                             <span className={`w-2 h-2 rounded-full ${dirty ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
-                            <p className="text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                            <p className="text-xs md:text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
                                 {dirty ? 'Cambios sin guardar' : 'Infraestructura sincronizada'}
                             </p>
                         </div>
                         <button
                             onClick={handleSaveConfig}
                             disabled={!dirty}
-                            className="flex items-center gap-2 px-8 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[10px] uppercase tracking-[0.2em] rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-40"
+                            className="flex items-center gap-2 px-8 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-xs md:text-[10px] uppercase tracking-[0.2em] rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-40"
                         >
                             <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" /> Sincronizar cambios
                         </button>

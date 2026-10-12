@@ -43,8 +43,8 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructi
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter leading-none">{title}</h3>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-8 uppercase leading-relaxed">{message}</p>
                 <div className="flex gap-3 justify-end">
-                    {showCancel && <button onClick={onCancel} className="px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 transition-all">Cancelar</button>}
-                    <button onClick={onConfirm} className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-md text-white shadow-lg transition-all active:scale-95 ${isDestructive ? 'bg-red-600 shadow-red-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}>{showCancel ? 'Confirmar' : 'Entendido'}</button>
+                    {showCancel && <button onClick={onCancel} className="px-5 py-2.5 text-xs md:text-[10px] font-black uppercase tracking-widest rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 transition-all">Cancelar</button>}
+                    <button onClick={onConfirm} className={`px-6 py-2.5 text-xs md:text-[10px] font-black uppercase tracking-widest rounded-md text-white shadow-lg transition-all active:scale-95 ${isDestructive ? 'bg-red-600 shadow-red-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}>{showCancel ? 'Confirmar' : 'Entendido'}</button>
                 </div>
             </div>
         </div>
@@ -251,8 +251,8 @@ export default function MasterCalendar() {
         setSelectedDate(d.getFullYear() + '-' + (d.getMonth() + 1).toString().padStart(2, '0') + '-' + d.getDate().toString().padStart(2, '0'));
     };
 
-    if (loading && venues.length === 0) return <div className="text-center py-20 text-[10px] font-black uppercase text-slate-400 animate-pulse">Iniciando agenda...</div>;
-    if (!loading && venues.length === 0) return <div className="text-center py-20 text-[10px] font-black uppercase text-slate-400">No tienes recintos asignados. Pide al administrador que te asigne uno.</div>;
+    if (loading && venues.length === 0) return <div className="text-center py-20 text-xs md:text-[10px] font-black uppercase text-slate-400 animate-pulse">Iniciando agenda...</div>;
+    if (!loading && venues.length === 0) return <div className="text-center py-20 text-xs md:text-[10px] font-black uppercase text-slate-400">No tienes recintos asignados. Pide al administrador que te asigne uno.</div>;
 
     return (
         <div className="flex flex-col h-[calc(100vh-2rem)] w-full gap-4 text-left relative">
@@ -278,29 +278,29 @@ export default function MasterCalendar() {
                         <button onClick={() => shiftDay(-1)} aria-label="Día anterior" className="p-2.5 text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                             <HugeiconsIcon icon={ArrowLeft01Icon} className="w-4 h-4" strokeWidth={2.2} />
                         </button>
-                        <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="bg-transparent px-2 text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer" />
+                        <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="bg-transparent px-2 text-xs md:text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer" />
                         <button onClick={() => shiftDay(1)} aria-label="Día siguiente" className="p-2.5 text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
                             <HugeiconsIcon icon={ArrowRight01Icon} className="w-4 h-4" strokeWidth={2.2} />
                         </button>
                     </div>
-                    <select value={selectedVenueId} onChange={(e) => setSelectedVenueId(e.target.value)} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer appearance-none min-w-[180px]">
+                    <select value={selectedVenueId} onChange={(e) => setSelectedVenueId(e.target.value)} className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-xs md:text-[10px] font-black uppercase text-slate-700 dark:text-white outline-hidden cursor-pointer appearance-none min-w-[180px]">
                         {venues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                     </select>
                 </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Hoy</p><h3 className="text-lg font-black text-slate-900 dark:text-white leading-none font-mono">{bookings.filter(b => b.status !== 'cancelled').length}</h3></div>
-                <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20"><p className="text-[9px] font-black text-red-500 uppercase mb-0.5">Canceladas</p><h3 className="text-lg font-black text-red-600 dark:text-red-400 leading-none font-mono">{bookings.filter(b => b.status === 'cancelled').length}</h3></div>
-                <div className="p-3 rounded-md bg-emerald-500/10 border border-emerald-500/20"><p className="text-[9px] font-black text-emerald-600 dark:text-[#00df82] uppercase mb-0.5">Recaudado</p><h3 className="text-lg font-black text-emerald-600 dark:text-[#00df82] leading-none font-mono">{formatCLP(bookings.reduce((acc, b) => acc + collectedAmount(b), 0))}</h3></div>
-                <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Ocupación</p><h3 className="text-lg font-black text-slate-900 dark:text-white leading-none font-mono">{dashboardCourts.length > 0 ? Math.round((bookings.filter(b => b.status !== 'cancelled').reduce((a, b) => a + durationHours(b), 0) / (dashboardCourts.length * Math.max(1, calendarConfig.timeSlots.length))) * 100) : 0}%</h3></div>
-                <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Canchas</p><h3 className="text-lg font-black text-emerald-600 dark:text-[#00df82] leading-none font-mono">{dashboardCourts.length}</h3></div>
+                <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase mb-0.5">Hoy</p><h3 className="text-lg font-black text-slate-900 dark:text-white leading-none font-mono">{bookings.filter(b => b.status !== 'cancelled').length}</h3></div>
+                <div className="p-3 rounded-md bg-red-500/10 border border-red-500/20"><p className="text-[11px] md:text-[9px] font-black text-red-500 uppercase mb-0.5">Canceladas</p><h3 className="text-lg font-black text-red-600 dark:text-red-400 leading-none font-mono">{bookings.filter(b => b.status === 'cancelled').length}</h3></div>
+                <div className="p-3 rounded-md bg-emerald-500/10 border border-emerald-500/20"><p className="text-[11px] md:text-[9px] font-black text-emerald-600 dark:text-[#00df82] uppercase mb-0.5">Recaudado</p><h3 className="text-lg font-black text-emerald-600 dark:text-[#00df82] leading-none font-mono">{formatCLP(bookings.reduce((acc, b) => acc + collectedAmount(b), 0))}</h3></div>
+                <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase mb-0.5">Ocupación</p><h3 className="text-lg font-black text-slate-900 dark:text-white leading-none font-mono">{dashboardCourts.length > 0 ? Math.round((bookings.filter(b => b.status !== 'cancelled').reduce((a, b) => a + durationHours(b), 0) / (dashboardCourts.length * Math.max(1, calendarConfig.timeSlots.length))) * 100) : 0}%</h3></div>
+                <div className="p-3 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5"><p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase mb-0.5">Canchas</p><h3 className="text-lg font-black text-emerald-600 dark:text-[#00df82] leading-none font-mono">{dashboardCourts.length}</h3></div>
             </div>
 
             <div className="flex-1 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 shadow-xs overflow-hidden flex flex-col min-h-0 relative">
                 <div className="px-5 py-2 border-b border-slate-50 dark:border-white/5 flex flex-wrap gap-4 bg-slate-50/50 dark:bg-white/2">
                     {[['bg-emerald-500', 'Pagado'], ['bg-slate-400', 'Anulado']].map(([color, label]) => (
-                        <div key={label} className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full ${color}`}></div><span className="text-[9px] font-bold text-slate-400 uppercase">{label}</span></div>
+                        <div key={label} className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full ${color}`}></div><span className="text-[11px] md:text-[9px] font-bold text-slate-400 uppercase">{label}</span></div>
                     ))}
                 </div>
 
@@ -309,14 +309,14 @@ export default function MasterCalendar() {
                         <div className="sticky top-0 z-30 bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-md border-b border-slate-100 dark:border-white/10 flex ml-14">
                             {dashboardCourts.map(c => (
                                 <div key={c.id} style={{ width: COLUMN_WIDTH }} className="shrink-0 py-3 text-center border-r border-slate-50 dark:border-white/5">
-                                    <p className="text-[8px] font-black text-emerald-500 uppercase tracking-widest mb-0.5">{c.sport}</p>
-                                    <h4 className="text-[10px] font-black text-slate-800 dark:text-white uppercase">{c.name}</h4>
+                                    <p className="text-[11px] md:text-[8px] font-black text-emerald-500 uppercase tracking-widest mb-0.5">{c.sport}</p>
+                                    <h4 className="text-xs md:text-[10px] font-black text-slate-800 dark:text-white uppercase">{c.name}</h4>
                                 </div>
                             ))}
                         </div>
                         <div className="flex relative">
                             <div className="sticky left-0 z-20 w-14 bg-white dark:bg-[#0B0F19] border-r border-slate-100 dark:border-white/10">
-                                {calendarConfig.timeSlots.map(h => <div key={h} style={{ height: HOUR_HEIGHT }} className="border-b border-slate-50 dark:border-white/3 flex items-start justify-center pt-2.5"><span className="text-[10px] font-mono font-bold text-slate-400">{h}</span></div>)}
+                                {calendarConfig.timeSlots.map(h => <div key={h} style={{ height: HOUR_HEIGHT }} className="border-b border-slate-50 dark:border-white/3 flex items-start justify-center pt-2.5"><span className="text-xs md:text-[10px] font-mono font-bold text-slate-400">{h}</span></div>)}
                             </div>
                             <div className="relative flex">
                                 {dashboardCourts.map(c => <div key={c.id} style={{ width: COLUMN_WIDTH }} className="border-r border-slate-50 dark:border-white/4 h-full pointer-events-none"></div>)}
@@ -327,13 +327,13 @@ export default function MasterCalendar() {
                                         <div key={b.id} onClick={() => setSelectedBooking(b)} className={`absolute z-10 p-2 mx-1 rounded-md border shadow-xs cursor-pointer flex flex-col justify-between overflow-hidden transition-all hover:brightness-95 ${getCardStyle(b.paymentStatus, b.status)}`} style={{ top: (b.extractedHour - calendarConfig.startHour) * HOUR_HEIGHT + 2, height: HOUR_HEIGHT - 4, left: cIndex * COLUMN_WIDTH, width: COLUMN_WIDTH - 8 }}>
                                             <div className="flex justify-between items-start gap-1">
                                                 <div className="min-w-0">
-                                                    <p className="text-[7px] font-black uppercase opacity-40 mb-0.5">#{b.id.slice(-4).toUpperCase()}</p>
-                                                    <h5 className="text-[10px] font-black leading-tight uppercase truncate">{b.clientName || 'S/N'}</h5>
+                                                    <p className="text-[11px] md:text-[7px] font-black uppercase opacity-40 mb-0.5">#{b.id.slice(-4).toUpperCase()}</p>
+                                                    <h5 className="text-xs md:text-[10px] font-black leading-tight uppercase truncate">{b.clientName || 'S/N'}</h5>
                                                 </div>
                                             </div>
                                             <div className="flex justify-between items-end pt-1 border-t border-black/10 dark:border-white/10">
-                                                <span className="text-[8px] font-black opacity-70">{b.displayTime}</span>
-                                                <span className="text-[9px] font-black">{formatCLP(b.finalPrice)}</span>
+                                                <span className="text-[11px] md:text-[8px] font-black opacity-70">{b.displayTime}</span>
+                                                <span className="text-[11px] md:text-[9px] font-black">{formatCLP(b.finalPrice)}</span>
                                             </div>
                                         </div>
                                     )
@@ -354,7 +354,7 @@ export default function MasterCalendar() {
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-black uppercase font-heading">Reserva #{selectedBooking.id.slice(-6)}</h3>
-                                    <p className="text-[9px] font-bold uppercase opacity-80 tracking-wider">{selectedBooking.status === 'cancelled' ? 'Anulada' : 'Confirmada'}</p>
+                                    <p className="text-[11px] md:text-[9px] font-bold uppercase opacity-80 tracking-wider">{selectedBooking.status === 'cancelled' ? 'Anulada' : 'Confirmada'}</p>
                                 </div>
                             </div>
                             <button aria-label="Cerrar" onClick={() => setSelectedBooking(null)} className="p-1.5 text-white/80 hover:text-white dark:text-black/60 hover:bg-white/10 rounded-md transition-all"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" strokeWidth={2} /></button>
@@ -368,7 +368,7 @@ export default function MasterCalendar() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-black text-slate-900 dark:text-white uppercase truncate">{selectedBooking.clientName}</p>
-                                    <p className="text-[10px] text-emerald-600 dark:text-[#00df82] font-bold">{selectedBooking.clientPhone}</p>
+                                    <p className="text-xs md:text-[10px] text-emerald-600 dark:text-[#00df82] font-bold">{selectedBooking.clientPhone}</p>
                                 </div>
                                 <a href={`https://wa.me/${toWhatsAppNumber(selectedBooking.clientPhone)}`} target="_blank" rel="noreferrer" className="p-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md active:scale-90 transition-all hover:brightness-110" title="Contactar por WhatsApp">
                                     <HugeiconsIcon icon={Message02Icon} className="w-4 h-4" strokeWidth={2} />
@@ -377,40 +377,40 @@ export default function MasterCalendar() {
 
                             {/* DETALLE DE LA RESERVA */}
                             <div className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-4 space-y-3">
-                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                                     <HugeiconsIcon icon={Calendar03Icon} className="w-3.5 h-3.5 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} /> Detalle de la reserva
                                 </p>
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
-                                        <p className="text-[8px] font-black text-slate-400 uppercase mb-0.5">Cancha</p>
-                                        <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase truncate">{selectedBooking.courtName || '—'}</p>
+                                        <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase mb-0.5">Cancha</p>
+                                        <p className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase truncate">{selectedBooking.courtName || '—'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[8px] font-black text-slate-400 uppercase mb-0.5">Deporte</p>
-                                        <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase truncate">{selectedBooking.sport || '—'}</p>
+                                        <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase mb-0.5">Deporte</p>
+                                        <p className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase truncate">{selectedBooking.sport || '—'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[8px] font-black text-slate-400 uppercase mb-0.5">Fecha</p>
-                                        <p className="text-[10px] font-black text-slate-900 dark:text-white">{selectedBooking.date?.toDate ? selectedBooking.date.toDate().toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</p>
+                                        <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase mb-0.5">Fecha</p>
+                                        <p className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white">{selectedBooking.date?.toDate ? selectedBooking.date.toDate().toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[8px] font-black text-slate-400 uppercase mb-0.5">Horario</p>
-                                        <p className="text-[10px] font-black text-slate-900 dark:text-white">{selectedBooking.displayTime}{selectedBooking.endTime ? ` - ${selectedBooking.endTime}` : ''}</p>
+                                        <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase mb-0.5">Horario</p>
+                                        <p className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white">{selectedBooking.displayTime}{selectedBooking.endTime ? ` - ${selectedBooking.endTime}` : ''}</p>
                                     </div>
                                 </div>
                                 <div className="flex justify-between pt-2 border-t border-slate-100 dark:border-white/5">
-                                    <p className="text-[8px] font-black text-slate-400 uppercase">Código</p>
-                                    <p className="text-[10px] font-black text-emerald-600 dark:text-[#00df82] uppercase font-mono">#{selectedBooking.id.toUpperCase()}</p>
+                                    <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase">Código</p>
+                                    <p className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82] uppercase font-mono">#{selectedBooking.id.toUpperCase()}</p>
                                 </div>
                             </div>
 
                             {/* PAGO */}
                             <div className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-4 space-y-3">
-                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                                     <HugeiconsIcon icon={MoneyBag01Icon} className="w-3.5 h-3.5 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.8} /> Estado de pago
                                 </p>
                                 <div className="flex items-center justify-between">
-                                    <span className={`px-2.5 py-1 rounded-md text-[8px] font-black uppercase border ${
+                                    <span className={`px-2.5 py-1 rounded-md text-[11px] md:text-[8px] font-black uppercase border ${
                                         selectedBooking.paymentStatus === 'paid' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-[#00df82]' :
                                         selectedBooking.paymentStatus === 'refunded' ? 'bg-sky-500/10 border-sky-500 text-sky-600 dark:text-sky-400' :
                                         'bg-red-500/10 border-red-500 text-red-600 dark:text-red-400'
@@ -418,15 +418,15 @@ export default function MasterCalendar() {
                                         {selectedBooking.paymentStatus === 'paid' ? 'Pagado online' :
                                          selectedBooking.paymentStatus === 'refunded' ? 'Reembolsado' : 'Inasistencia'}
                                     </span>
-                                    <span className="text-[9px] font-black text-slate-400 uppercase">Mercado Pago</span>
+                                    <span className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase">Mercado Pago</span>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3 pt-1">
                                     <div>
-                                        <p className="text-[8px] font-black text-slate-400 uppercase mb-0.5">Monto del turno</p>
+                                        <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase mb-0.5">Monto del turno</p>
                                         <p className="text-base font-black text-slate-900 dark:text-white font-mono">{formatCLP(selectedBooking.finalPrice)}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[8px] font-black text-slate-400 uppercase mb-0.5">Cobrado</p>
+                                        <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase mb-0.5">Cobrado</p>
                                         <p className="text-base font-black text-slate-900 dark:text-white font-mono">{formatCLP(selectedBooking.paymentStatus === 'refunded' ? 0 : selectedBooking.finalPrice)}</p>
                                     </div>
                                 </div>
@@ -435,20 +435,20 @@ export default function MasterCalendar() {
                             {/* NOTAS */}
                             {selectedBooking.notes && (
                                 <div className="rounded-md bg-amber-500/5 border border-amber-500/15 p-4">
-                                    <p className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-1">Notas</p>
-                                    <p className="text-[10px] text-slate-700 dark:text-slate-300">{selectedBooking.notes}</p>
+                                    <p className="text-[11px] md:text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-1">Notas</p>
+                                    <p className="text-xs md:text-[10px] text-slate-700 dark:text-slate-300">{selectedBooking.notes}</p>
                                 </div>
                             )}
 
                             {/* RESPONSABLE */}
                             <div className="flex justify-between items-center pt-3 border-t border-slate-100 dark:border-white/5">
-                                <p className="text-[8px] font-black text-slate-400 uppercase">Registrado por</p>
-                                <p className="text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase">{selectedBooking.createdBy || 'Sistema'}</p>
+                                <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase">Registrado por</p>
+                                <p className="text-xs md:text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase">{selectedBooking.createdBy || 'Sistema'}</p>
                             </div>
 
                             {selectedBooking.status !== 'cancelled' && (
                                 <button onClick={() => requestCancelBooking(selectedBooking)}
-                                    className="w-full py-3 rounded-md border border-red-500/30 text-red-600 dark:text-red-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-500/5 transition-all">
+                                    className="w-full py-3 rounded-md border border-red-500/30 text-red-600 dark:text-red-400 text-xs md:text-[10px] font-black uppercase tracking-widest hover:bg-red-500/5 transition-all">
                                     Anular reserva
                                 </button>
                             )}

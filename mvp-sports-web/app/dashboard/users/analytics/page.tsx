@@ -204,10 +204,10 @@ export default function PlayerAnalyticsPage() {
         if (!active || !payload?.length) return null;
         return (
             <div className="bg-white dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-md px-3.5 py-3 shadow-2xl backdrop-blur-md">
-                {label && <p className="text-[10px] font-black text-emerald-600 dark:text-[#00df82] uppercase mb-1.5 tracking-tighter border-b border-slate-100 dark:border-white/10 pb-1">{label}</p>}
+                {label && <p className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82] uppercase mb-1.5 tracking-tighter border-b border-slate-100 dark:border-white/10 pb-1">{label}</p>}
                 <div className="space-y-1">
                     {payload.map((entry: any, index: number) => (
-                        <p key={index} className="text-[10px] font-bold text-slate-600 dark:text-slate-200 uppercase flex items-center gap-2">
+                        <p key={index} className="text-xs md:text-[10px] font-bold text-slate-600 dark:text-slate-200 uppercase flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: entry.color || entry.fill }} />
                             {entry.name}: <span className="font-black text-slate-900 dark:text-white font-mono">{entry.value}</span>
                         </p>
@@ -252,8 +252,8 @@ export default function PlayerAnalyticsPage() {
                                         <HugeiconsIcon icon={Download01Icon} className="w-4 h-4" strokeWidth={1.8} />
                                     </span>
                                     <span className="flex flex-col min-w-0">
-                                        <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-wider">CSV (Excel)</span>
-                                        <span className="text-[9px] text-slate-400">Formato es-CL con ';'</span>
+                                        <span className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-wider">CSV (Excel)</span>
+                                        <span className="text-[11px] md:text-[9px] text-slate-400">Formato es-CL con ';'</span>
                                     </span>
                                 </button>
                                 <button
@@ -264,8 +264,8 @@ export default function PlayerAnalyticsPage() {
                                         <HugeiconsIcon icon={DocumentCodeIcon} className="w-4 h-4" strokeWidth={1.8} />
                                     </span>
                                     <span className="flex flex-col min-w-0">
-                                        <span className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-wider">JSON</span>
-                                        <span className="text-[9px] text-slate-400">Datos estructurados</span>
+                                        <span className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-wider">JSON</span>
+                                        <span className="text-[11px] md:text-[9px] text-slate-400">Datos estructurados</span>
                                     </span>
                                 </button>
                             </div>
@@ -285,19 +285,19 @@ export default function PlayerAnalyticsPage() {
             {/* RESUMEN */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-5">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Atletas</p>
+                    <p className="text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Atletas</p>
                     <p className="text-3xl font-black text-slate-900 dark:text-white font-mono leading-none">{summary.total}</p>
                 </div>
                 <div className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-5">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Nivel promedio</p>
+                    <p className="text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Nivel promedio</p>
                     <p className="text-3xl font-black text-slate-900 dark:text-white font-mono leading-none">{summary.avgOvr}</p>
                 </div>
                 <div className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-5">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Goles totales</p>
+                    <p className="text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Goles totales</p>
                     <p className="text-3xl font-black text-emerald-600 dark:text-[#00df82] font-mono leading-none">{summary.totalGoals}</p>
                 </div>
                 <div className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-5">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Máximo goleador</p>
+                    <p className="text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Máximo goleador</p>
                     <p className="text-lg font-black text-slate-900 dark:text-white uppercase leading-none truncate">{summary.topScorer}</p>
                 </div>
             </div>
@@ -324,7 +324,7 @@ export default function PlayerAnalyticsPage() {
                                 </ResponsiveContainer>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                                     <span className="text-3xl font-black text-slate-900 dark:text-white font-mono leading-none">{summary.total}</span>
-                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1">Atletas</span>
+                                    <span className="text-[11px] md:text-[9px] font-bold text-slate-400 uppercase tracking-wider mt-1">Atletas</span>
                                 </div>
                             </div>
                             <div className="flex flex-col gap-2 shrink-0">
@@ -333,7 +333,7 @@ export default function PlayerAnalyticsPage() {
                                     return (
                                         <div key={i} className="flex items-center gap-2">
                                             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: tierHex(t.name) }} />
-                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">
+                                            <span className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-tighter">
                                                 {t.name}: <span className="text-slate-900 dark:text-white font-mono">{t.value}</span>
                                                 <span className="opacity-60 ml-1">· {pct}%</span>
                                             </span>
@@ -358,8 +358,8 @@ export default function PlayerAnalyticsPage() {
                     bodyClassName="p-5"
                     action={
                         <div className="flex gap-4">
-                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-[#00df82]" /><span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-300">Goles</span></div>
-                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-indigo-600" /><span className="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-300">Asist.</span></div>
+                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-[#00df82]" /><span className="text-xs md:text-[10px] font-bold uppercase text-slate-500 dark:text-slate-300">Goles</span></div>
+                            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-indigo-600" /><span className="text-xs md:text-[10px] font-bold uppercase text-slate-500 dark:text-slate-300">Asist.</span></div>
                         </div>
                     }
                 >
@@ -409,13 +409,13 @@ export default function PlayerAnalyticsPage() {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Buscar..."
-                                className="w-28 bg-transparent text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400"
+                                className="w-28 bg-transparent text-xs md:text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400"
                             />
                         </div>
                         <select
                             value={tierFilter}
                             onChange={(e) => setTierFilter(e.target.value)}
-                            className="px-3 py-1.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white focus:border-emerald-400 dark:focus:border-[#00df82]/40 transition-colors"
+                            className="px-3 py-1.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs md:text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white focus:border-emerald-400 dark:focus:border-[#00df82]/40 transition-colors"
                         >
                             {tiers.map(t => <option key={t} value={t}>{t}</option>)}
                         </select>
@@ -426,12 +426,12 @@ export default function PlayerAnalyticsPage() {
                     <table className="w-full text-left min-w-[680px]">
                         <thead>
                             <tr className="bg-slate-50/60 dark:bg-white/2 border-b border-slate-100 dark:border-white/5">
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">#</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Atleta</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider">Categoría</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">OVR</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Goles</th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Victorias</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">#</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Atleta</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider">Categoría</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">OVR</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Goles</th>
+                                <th className="px-6 py-4 text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-wider text-right">Victorias</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -449,12 +449,12 @@ export default function PlayerAnalyticsPage() {
                                             </div>
                                             <div className="flex flex-col min-w-0">
                                                 <span className="text-[11px] font-bold text-slate-900 dark:text-white uppercase truncate max-w-[180px]">{p.name}</span>
-                                                <span className="text-[10px] text-slate-400 truncate max-w-[180px]">{p.email}</span>
+                                                <span className="text-xs md:text-[10px] text-slate-400 truncate max-w-[180px]">{p.email}</span>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider ${tierStyle(p.level)}`}>
+                                        <span className={`text-xs md:text-[10px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider ${tierStyle(p.level)}`}>
                                             {p.level}
                                         </span>
                                     </td>
@@ -472,7 +472,7 @@ export default function PlayerAnalyticsPage() {
                         </div>
                     )}
                     {filteredRanking.length > 10 && (
-                        <div className="px-6 py-3 border-t border-slate-100 dark:border-white/5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                        <div className="px-6 py-3 border-t border-slate-100 dark:border-white/5 text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                             Mostrando 10 de {filteredRanking.length} atletas
                         </div>
                     )}

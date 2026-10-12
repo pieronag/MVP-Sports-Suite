@@ -42,7 +42,7 @@ const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 
     return (
         <div className={`fixed top-5 right-5 z-160 flex items-center gap-3 px-4 py-3 rounded-md shadow-xl border animate-slideIn ${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-[#00df82] dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
             {type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5" /> : <HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" />}
-            <span className="text-[10px] font-bold uppercase tracking-wider">{message}</span>
+            <span className="text-xs md:text-[10px] font-bold uppercase tracking-wider">{message}</span>
         </div>
     );
 };
@@ -55,8 +55,8 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructi
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase">{title}</h3>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-6 uppercase">{message}</p>
                 <div className="flex gap-3 justify-end">
-                    <button onClick={onCancel} className="px-4 py-2 text-[10px] font-bold uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">CANCELAR</button>
-                    <button onClick={onConfirm} className={`px-4 py-2 text-[10px] font-bold uppercase rounded-md text-white ${isDestructive ? 'bg-red-600' : 'bg-emerald-600'}`}>CONFIRMAR</button>
+                    <button onClick={onCancel} className="px-4 py-2 text-xs md:text-[10px] font-bold uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">CANCELAR</button>
+                    <button onClick={onConfirm} className={`px-4 py-2 text-xs md:text-[10px] font-bold uppercase rounded-md text-white ${isDestructive ? 'bg-red-600' : 'bg-emerald-600'}`}>CONFIRMAR</button>
                 </div>
             </div>
         </div>
@@ -85,13 +85,13 @@ const PasswordModal = ({ isOpen, onClose, onConfirm, memberName }: any) => {
                 <div className="flex justify-between items-start mb-4">
                     <div>
                         <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase">Cambiar Clave</h3>
-                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Usuario: {memberName}</p>
+                        <p className="text-[11px] md:text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Usuario: {memberName}</p>
                     </div>
                     <button aria-label="Cerrar" onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-white"><HugeiconsIcon icon={Cancel01Icon} className="w-5 h-5" /></button>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="bg-emerald-50 dark:bg-emerald-500/10 p-4 rounded-md border border-emerald-100 dark:border-emerald-500/20">
-                        <label className="text-[10px] font-bold text-emerald-700 dark:text-[#00df82] uppercase tracking-wide block mb-1.5">Nueva Contraseña</label>
+                        <label className="text-xs md:text-[10px] font-bold text-emerald-700 dark:text-[#00df82] uppercase tracking-wide block mb-1.5">Nueva Contraseña</label>
                         <div className="relative">
                             <HugeiconsIcon icon={SquareLock01Icon} className="w-4 h-4 text-emerald-600 absolute left-3 top-1/2 -translate-y-1/2" />
                             <input type={showPassword ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-9 pr-10 py-3 bg-white dark:bg-[#0B0F19] border border-emerald-200 dark:border-emerald-500/30 rounded-md text-xs font-bold outline-hidden" placeholder={`Mínimo ${PASSWORD_MIN} caracteres`} />
@@ -99,8 +99,8 @@ const PasswordModal = ({ isOpen, onClose, onConfirm, memberName }: any) => {
                         </div>
                     </div>
                     <div className="flex gap-3">
-                        <button type="button" onClick={onClose} className="flex-1 px-4 py-3 text-[10px] font-bold uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">CANCELAR</button>
-                        <button type="submit" disabled={isSaving || !!passwordIssue(password)} className="flex-2 px-6 py-3 text-[10px] font-bold uppercase rounded-md text-white bg-emerald-600 disabled:opacity-50 flex items-center justify-center gap-2">
+                        <button type="button" onClick={onClose} className="flex-1 px-4 py-3 text-xs md:text-[10px] font-bold uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">CANCELAR</button>
+                        <button type="submit" disabled={isSaving || !!passwordIssue(password)} className="flex-2 px-6 py-3 text-xs md:text-[10px] font-bold uppercase rounded-md text-white bg-emerald-600 disabled:opacity-50 flex items-center justify-center gap-2">
                             {isSaving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" /> : <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" />}
                             ACTUALIZAR
                         </button>
@@ -374,7 +374,7 @@ export default function StaffPage() {
                 <div>
                     <div className="flex items-center gap-2 mb-0.5">
                         <span className="w-6 h-[2px] bg-emerald-500 rounded-md"></span>
-                        <p className="text-[9px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">
+                        <p className="text-[11px] md:text-[9px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">
                             Gestión de Talento Humano
                         </p>
                     </div>
@@ -384,12 +384,12 @@ export default function StaffPage() {
                 </div>
 
                 <div className="flex items-center gap-2 p-1.5 rounded-md">
-                    <span className="px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-400 hidden md:inline-flex items-center gap-2">
+                    <span className="px-3 py-2 text-[11px] md:text-[9px] font-black uppercase tracking-widest text-slate-400 hidden md:inline-flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-[#00df82]" /> {activeCount} activos · {inactiveCount} suspendidos
                     </span>
                     <button 
                         onClick={() => handleOpenModal()} 
-                        className="px-6 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[9px] uppercase tracking-[0.2em] rounded-md transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-emerald-500/20 flex items-center gap-2 border border-emerald-400/20 dark:border-white/10"
+                        className="px-6 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[11px] md:text-[9px] uppercase tracking-[0.2em] rounded-md transition-all hover:scale-[1.02] active:scale-95 shadow-xl shadow-emerald-500/20 flex items-center gap-2 border border-emerald-400/20 dark:border-white/10"
                     >
                         <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" /> NUEVO PERSONAL
                     </button>
@@ -402,7 +402,7 @@ export default function StaffPage() {
                     <select 
                         value={filterVenueId} 
                         onChange={(e) => setFilterVenueId(e.target.value)} 
-                        className="w-full bg-slate-50 dark:bg-white/5 border-0 rounded-md pl-3 pr-8 py-3 text-[10px] font-bold uppercase outline-hidden text-slate-600 dark:text-white cursor-pointer appearance-none"
+                        className="w-full bg-slate-50 dark:bg-white/5 border-0 rounded-md pl-3 pr-8 py-3 text-xs md:text-[10px] font-bold uppercase outline-hidden text-slate-600 dark:text-white cursor-pointer appearance-none"
                     >
                         <option value="ALL">TODOS LOS RECINTOS</option>
                         {venues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
@@ -416,13 +416,13 @@ export default function StaffPage() {
                         placeholder="Buscar por nombre..." 
                         value={searchTerm} 
                         onChange={(e) => setSearchTerm(e.target.value)} 
-                        className="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-md text-[10px] font-bold outline-hidden placeholder:text-slate-400" 
+                        className="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 rounded-md text-xs md:text-[10px] font-bold outline-hidden placeholder:text-slate-400" 
                     />
                 </div>
             </div>
 
             {/* KPIs */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                 <TarjetaKpi label="Total Personal" value={staffList.length} sub="Miembros registrados" icon={<HugeiconsIcon icon={UserGroupIcon} />} brillo />
                 <TarjetaKpi label="Activos" value={activeCount} sub="Con acceso habilitado" icon={<HugeiconsIcon icon={CheckmarkCircle02Icon} />} />
                 <TarjetaKpi label="Suspendidos" value={inactiveCount} sub="Acceso restringido" icon={<HugeiconsIcon icon={PowerIcon} />} />
@@ -430,7 +430,7 @@ export default function StaffPage() {
             </div>
 
             {loading ? (
-                <div className="text-center py-20 text-[10px] font-bold text-slate-400 uppercase tracking-widest animate-pulse">
+                <div className="text-center py-20 text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-widest animate-pulse">
                     Cargando personal...
                 </div>
             ) : (
@@ -443,29 +443,29 @@ export default function StaffPage() {
                                     <div className={`w-11 h-11 rounded-md flex items-center justify-center font-black text-sm ${avatarTone(member.fullName)}`}>
                                         {initials(member.fullName)}
                                     </div>
-                                    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[8px] font-black uppercase border ${member.status === 'active' ? 'bg-emerald-50 text-emerald-600 dark:text-[#00df82] border-emerald-100 dark:border-emerald-500/20' : 'bg-red-50 text-red-500 border-red-100 dark:border-red-500/20'}`}>
+                                    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] md:text-[8px] font-black uppercase border ${member.status === 'active' ? 'bg-emerald-50 text-emerald-600 dark:text-[#00df82] border-emerald-100 dark:border-emerald-500/20' : 'bg-red-50 text-red-500 border-red-100 dark:border-red-500/20'}`}>
                                         <span className={`w-1.5 h-1.5 rounded-full ${member.status === 'active' ? 'bg-emerald-500 dark:bg-[#00df82] animate-pulse' : 'bg-red-500'}`} />
                                         {member.status === 'active' ? 'Activo' : 'Suspendido'}
                                     </span>
                                 </div>
                                 <h3 className="font-black text-slate-900 dark:text-white text-base uppercase truncate mb-1">{member.fullName}</h3>
-                                <p className="text-[10px] text-slate-400 font-bold uppercase mb-3 flex items-center gap-1.5">
+                                <p className="text-xs md:text-[10px] text-slate-400 font-bold uppercase mb-3 flex items-center gap-1.5">
                                     <HugeiconsIcon icon={Briefcase01Icon} className="w-3.5 h-3.5" /> {member.jobTitle || 'PERSONAL'}
                                 </p>
-                                {member.rut && <p className="text-[9px] text-slate-400 font-mono mb-3">RUT: {member.rut}</p>}
-                                <div className="space-y-2 text-[10px] font-bold uppercase text-slate-500 mb-4">
+                                {member.rut && <p className="text-[11px] md:text-[9px] text-slate-400 font-mono mb-3">RUT: {member.rut}</p>}
+                                <div className="space-y-2 text-xs md:text-[10px] font-bold uppercase text-slate-500 mb-4">
                                     <p className="flex items-center gap-2 truncate"><HugeiconsIcon icon={Mail01Icon} className="w-3.5 h-3.5 shrink-0" /> {member.email}</p>
                                     <p className="flex items-center gap-2"><HugeiconsIcon icon={CallIcon} className="w-3.5 h-3.5 shrink-0" /> {member.phone || '---'}</p>
                                 </div>
                                 {(member.tenantIds || []).length > 0 && (
                                     <div className="flex flex-wrap gap-1.5">
                                         {member.tenantIds.slice(0, 3).map(id => (
-                                            <span key={id} className="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300 truncate max-w-[120px]">
+                                            <span key={id} className="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[11px] md:text-[8px] font-bold uppercase text-slate-500 dark:text-slate-300 truncate max-w-[120px]">
                                                 <HugeiconsIcon icon={Building01Icon} className="w-2.5 h-2.5 mr-1 text-emerald-600 dark:text-[#00df82]" strokeWidth={2} /> {venueName(id)}
                                             </span>
                                         ))}
                                         {member.tenantIds.length > 3 && (
-                                            <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 text-[8px] font-bold uppercase text-slate-400">+{member.tenantIds.length - 3}</span>
+                                            <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 text-[11px] md:text-[8px] font-bold uppercase text-slate-400">+{member.tenantIds.length - 3}</span>
                                         )}
                                     </div>
                                 )}
@@ -492,7 +492,7 @@ export default function StaffPage() {
                                 <HugeiconsIcon icon={UserGroupIcon} className="w-8 h-8" strokeWidth={1.4} />
                             </div>
                             <p className="text-[12px] font-black uppercase text-slate-400 tracking-widest">Sin personal encontrado</p>
-                            <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Agrega miembros o cambia los filtros</p>
+                            <p className="text-xs md:text-[10px] font-bold text-slate-300 uppercase tracking-wider">Agrega miembros o cambia los filtros</p>
                         </div>
                     )}
                 </div>
@@ -507,7 +507,7 @@ export default function StaffPage() {
                                     <HugeiconsIcon icon={UserGroupIcon} className="w-5 h-5" strokeWidth={1.8} />
                                 </div>
                                 <div>
-                                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-[#00df82] mb-0.5">{editingId ? 'Editar miembro' : 'Nuevo miembro'}</p>
+                                    <p className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-[#00df82] mb-0.5">{editingId ? 'Editar miembro' : 'Nuevo miembro'}</p>
                                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none font-heading">{editingId ? 'Editar Staff' : 'Crear y Dar Acceso'}</h3>
                                 </div>
                             </div>
@@ -517,32 +517,32 @@ export default function StaffPage() {
                         </div>
                         <form onSubmit={handleSave} className="p-6 space-y-4">
                             <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Nombre Completo</label>
+                                <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Nombre Completo</label>
                                 <input type="text" required value={formData.fullName} onChange={e => setFormData({ ...formData, fullName: e.target.value })} placeholder="Ej: Carlos Soto" className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Cargo</label>
+                                    <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Cargo</label>
                                     <input type="text" value={formData.jobTitle} onChange={e => setFormData({ ...formData, jobTitle: e.target.value })} placeholder="Ej: Recepcionista" className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">RUT</label>
+                                    <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">RUT</label>
                                     <input type="text" value={formData.rut} onChange={e => setFormData({ ...formData, rut: e.target.value })} placeholder="12.345.678-9" className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-hidden font-mono focus:border-emerald-500 transition-all" />
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Correo Electrónico</label>
+                                    <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Correo Electrónico</label>
                                     <input type="email" required value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Teléfono</label>
+                                    <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Teléfono</label>
                                     <input type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
                                 </div>
                             </div>
                             {!editingId && (
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Contraseña Inicial</label>
+                                    <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Contraseña Inicial</label>
                                     <div className="relative">
                                         <HugeiconsIcon icon={SquareLock01Icon} className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" strokeWidth={1.8} />
                                         <input type={showPassword ? "text" : "password"} required minLength={PASSWORD_MIN} value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} placeholder={`Mínimo ${PASSWORD_MIN} caracteres`} className="w-full pl-9 pr-10 py-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 transition-all" />
@@ -560,11 +560,11 @@ export default function StaffPage() {
                             )}
                             <div className="pt-2">
                                 <div className="flex items-center justify-between mb-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Asignar Recintos</label>
+                                    <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400">Asignar Recintos</label>
                                     <button type="button" onClick={() => {
                                         if (formData.tenantIds.length === venues.length) setFormData({ ...formData, tenantIds: [] });
                                         else setFormData({ ...formData, tenantIds: venues.map(v => v.id) });
-                                    }} className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-[#00df82] hover:underline">
+                                    }} className="text-[11px] md:text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-[#00df82] hover:underline">
                                         {formData.tenantIds.length === venues.length && venues.length > 0 ? 'Quitar todos' : 'Seleccionar todos'}
                                     </button>
                                 </div>
@@ -574,12 +574,12 @@ export default function StaffPage() {
                                             <div className={`w-4 h-4 rounded border flex items-center justify-center ${formData.tenantIds.includes(v.id) ? 'bg-emerald-500 dark:bg-[#00df82] border-emerald-500 dark:border-[#00df82]' : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/20'}`}>
                                                 {formData.tenantIds.includes(v.id) && <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-3 h-3 text-white dark:text-black" />}
                                             </div>
-                                            <span className="text-[9px] font-black uppercase truncate">{v.name}</span>
+                                            <span className="text-[11px] md:text-[9px] font-black uppercase truncate">{v.name}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                            <button type="submit" disabled={isSaving} className="w-full py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-[10px] uppercase tracking-widest rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                            <button type="submit" disabled={isSaving} className="w-full py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-xs md:text-[10px] uppercase tracking-widest rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                                 {isSaving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" /> : <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" />}
                                 {editingId ? 'Guardar Cambios' : 'Crear y Dar Acceso'}
                             </button>

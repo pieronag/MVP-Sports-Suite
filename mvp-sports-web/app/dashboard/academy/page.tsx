@@ -55,7 +55,7 @@ const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 
             'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
         }`}>
             {type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5" /> : <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5" />}
-            <span className="text-[10px] font-black uppercase tracking-wider">{message}</span>
+            <span className="text-xs md:text-[10px] font-black uppercase tracking-wider">{message}</span>
         </div>
     );
 };
@@ -242,7 +242,7 @@ export default function AcademyPage() {
                     <div className="w-full max-w-lg rounded-md border bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
                         <div className="px-5 py-4 border-b border-slate-100 dark:border-white/5 flex items-center justify-between">
                             <div>
-                                <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Alumnos inscritos</p>
+                                <p className="text-xs md:text-[10px] font-black text-indigo-500 uppercase tracking-widest">Alumnos inscritos</p>
                                 <h3 className="text-sm font-black text-slate-900 dark:text-white font-heading">{studentsModal.cls.name}</h3>
                             </div>
                             <button aria-label="Cerrar" onClick={() => setStudentsModal(null)} className="p-2 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white">✕</button>
@@ -257,8 +257,8 @@ export default function AcademyPage() {
                                             <p className="text-[11px] text-slate-400 truncate">{e.userEmail || ''}</p>
                                         </div>
                                         {e.paymentStatus === 'paid'
-                                            ? <span className="px-2 py-1 rounded-md text-[10px] font-black uppercase bg-emerald-500/10 text-emerald-600 dark:text-[#00df82]">Pagado</span>
-                                            : <button onClick={() => markPaid(e)} className="px-2.5 py-1.5 rounded-md text-[10px] font-black uppercase bg-amber-500 text-white">Marcar pagado</button>}
+                                            ? <span className="px-2 py-1 rounded-md text-xs md:text-[10px] font-black uppercase bg-emerald-500/10 text-emerald-600 dark:text-[#00df82]">Pagado</span>
+                                            : <button onClick={() => markPaid(e)} className="px-2.5 py-1.5 rounded-md text-xs md:text-[10px] font-black uppercase bg-amber-500 text-white">Marcar pagado</button>}
                                     </div>
                                 ))}
                         </div>
@@ -272,19 +272,19 @@ export default function AcademyPage() {
                 <div>
                     <div className="flex items-center gap-2 mb-0.5">
                         <span className="w-6 h-[2px] bg-indigo-500 rounded-md"></span>
-                        <p className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 tracking-[0.2em] uppercase">Módulo Educativo</p>
+                        <p className="text-xs md:text-[10px] font-bold text-indigo-600 dark:text-indigo-400 tracking-[0.2em] uppercase">Módulo Educativo</p>
                     </div>
                     <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">Gestión de <span className="text-emerald-500 dark:text-[#00df82]">Academias</span></h1>
                 </div>
                 <div className="flex items-center gap-2.5">
-                    <button onClick={() => setIsModalOpen(true)} className="px-6 py-3 bg-indigo-500 text-white font-black text-[10px] uppercase rounded-md shadow-xl shadow-indigo-500/25 flex items-center gap-2.5 hover:brightness-110 active:scale-95 transition-all">
+                    <button onClick={() => setIsModalOpen(true)} className="px-6 py-3 bg-indigo-500 text-white font-black text-xs md:text-[10px] uppercase rounded-md shadow-xl shadow-indigo-500/25 flex items-center gap-2.5 hover:brightness-110 active:scale-95 transition-all">
                         <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" /> Nueva Clase
                     </button>
                 </div>
             </div>
 
             {/* KPIs */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                 <TarjetaKpi label="Clases" value={classes.length.toString()} sub="Total de planes" icon={<HugeiconsIcon icon={Mortarboard01Icon} />} />
                 <TarjetaKpi label="Activas" value={classes.filter(c => c.status === 'active').length.toString()} sub="En curso" icon={<HugeiconsIcon icon={PlayCircleIcon} />} />
                 <TarjetaKpi label="Alumnos" value={classes.reduce((acc, c) => acc + (c.enrolledStudents || 0), 0).toString()} sub="Inscritos" icon={<HugeiconsIcon icon={UserGroupIcon} />} />
@@ -295,7 +295,7 @@ export default function AcademyPage() {
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-24 space-y-4 animate-pulse">
                     <HugeiconsIcon icon={RefreshIcon} className="w-8 h-8 text-indigo-500 animate-spin" />
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sincronizando academia...</p>
+                    <p className="text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Sincronizando academia...</p>
                 </div>
             ) : classes.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-200 dark:border-white/5 shadow-xs">
@@ -304,9 +304,9 @@ export default function AcademyPage() {
                     </div>
                     <div className="space-y-1">
                         <p className="text-[12px] font-black uppercase text-slate-400 tracking-widest">Sin clases publicadas</p>
-                        <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Crea tu primer plan académico</p>
+                        <p className="text-xs md:text-[10px] font-bold text-slate-300 uppercase tracking-wider">Crea tu primer plan académico</p>
                     </div>
-                    <button onClick={() => setIsModalOpen(true)} className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-500 text-white rounded-md text-[10px] font-black uppercase tracking-widest shadow-xl shadow-indigo-500/25 hover:brightness-110 active:scale-95 transition-all">
+                    <button onClick={() => setIsModalOpen(true)} className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-500 text-white rounded-md text-xs md:text-[10px] font-black uppercase tracking-widest shadow-xl shadow-indigo-500/25 hover:brightness-110 active:scale-95 transition-all">
                         <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" /> Nueva Clase
                     </button>
                 </div>
@@ -324,7 +324,7 @@ export default function AcademyPage() {
                                     </div>
                                     <div className="absolute inset-0 bg-linear-to-t from-black/45 via-transparent to-black/10" />
                                     <div className="absolute top-3 left-3">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md backdrop-blur-md text-white text-[8px] font-black uppercase tracking-widest border border-white/20 ${c.status === 'active' ? 'bg-white/15' : 'bg-amber-500/40'}`}>
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md backdrop-blur-md text-white text-[11px] md:text-[8px] font-black uppercase tracking-widest border border-white/20 ${c.status === 'active' ? 'bg-white/15' : 'bg-amber-500/40'}`}>
                                             <span className={`w-1.5 h-1.5 rounded-full ${c.status === 'active' ? 'bg-white animate-pulse' : 'bg-amber-200'}`} />
                                             {c.status === 'active' ? 'En Curso' : 'Suspendida'}
                                         </span>
@@ -334,7 +334,7 @@ export default function AcademyPage() {
                                     </div>
                                     <div className="absolute bottom-3 left-3 right-3">
                                         <h3 className="text-base font-black text-white uppercase truncate drop-shadow-lg font-heading">{c.name}</h3>
-                                        <p className="text-[9px] font-bold text-white/90 uppercase mt-0.5 flex items-center gap-1.5">
+                                        <p className="text-[11px] md:text-[9px] font-bold text-white/90 uppercase mt-0.5 flex items-center gap-1.5">
                                             <HugeiconsIcon icon={UserIcon} className="w-3 h-3" strokeWidth={2} /> {/^prof/i.test(c.instructor || "") ? c.instructor : `Prof. ${c.instructor || ""}`}
                                         </p>
                                     </div>
@@ -343,10 +343,10 @@ export default function AcademyPage() {
                                 <div className="p-4 flex-1 flex flex-col">
                                     {/* CHIPS */}
                                     <div className="flex flex-wrap items-center gap-1.5 mb-3">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[8px] font-black uppercase border w-fit ${st.chip}`}>
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] md:text-[8px] font-black uppercase border w-fit ${st.chip}`}>
                                             {sportIcon(c.sport, 'w-3 h-3')} {c.sport || 'Pádel'}
                                         </span>
-                                        <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[8px] font-black uppercase text-slate-500 dark:text-slate-300">
+                                        <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[11px] md:text-[8px] font-black uppercase text-slate-500 dark:text-slate-300">
                                             {ageGroupLabel(c.ageGroup)}
                                         </span>
                                     </div>
@@ -354,9 +354,9 @@ export default function AcademyPage() {
                                     {/* SCHEDULE */}
                                     <div className="flex flex-wrap gap-1.5 mb-4">
                                         {(c.daysOfWeek || []).map((d: string) => (
-                                            <span key={d} className="px-2 py-0.5 bg-slate-50 dark:bg-white/5 text-[8px] font-black uppercase text-slate-500 rounded-md border border-slate-100 dark:border-white/5">{d.slice(0, 3)}</span>
+                                            <span key={d} className="px-2 py-0.5 bg-slate-50 dark:bg-white/5 text-[11px] md:text-[8px] font-black uppercase text-slate-500 rounded-md border border-slate-100 dark:border-white/5">{d.slice(0, 3)}</span>
                                         ))}
-                                        <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase border ml-auto flex items-center gap-1 ${st.chip}`}>
+                                        <span className={`px-2 py-0.5 rounded-md text-[11px] md:text-[8px] font-black uppercase border ml-auto flex items-center gap-1 ${st.chip}`}>
                                             <HugeiconsIcon icon={Clock01Icon} className="w-3 h-3" /> {c.startTime}{c.endTime ? `-${c.endTime}` : ''}
                                         </span>
                                     </div>
@@ -364,37 +364,37 @@ export default function AcademyPage() {
                                     {/* STATS */}
                                     <div className="space-y-2 bg-slate-50 dark:bg-white/3 p-3.5 rounded-md border border-slate-100 dark:border-white/5 mb-4">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Mensualidad</span>
+                                            <span className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest">Mensualidad</span>
                                             <span className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] font-mono">${formatCLP(Number(c.price) || 0)}</span>
                                         </div>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Alumnos</span>
-                                            <button onClick={() => openStudents(c)} className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 font-mono hover:underline">{c.enrolledStudents || 0} / {c.maxStudents} · {occupancy}% · Ver alumnos</button>
+                                            <span className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest">Alumnos</span>
+                                            <button onClick={() => openStudents(c)} className="text-xs md:text-[10px] font-black text-indigo-600 dark:text-indigo-400 font-mono hover:underline">{c.enrolledStudents || 0} / {c.maxStudents} · {occupancy}% · Ver alumnos</button>
                                         </div>
                                         <div className="w-full h-1.5 bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
                                             <div className="h-full bg-emerald-500 dark:bg-[#00df82] transition-all duration-1000" style={{ width: `${occupancy}%` }} />
                                         </div>
                                         <div className="flex items-center justify-between pt-0.5">
-                                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Temporada</span>
-                                            <span className="text-[9px] font-black text-slate-500 dark:text-slate-300 font-mono">{fmtDate(c.startDate)} → {fmtDate(c.endDate)}</span>
+                                            <span className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest">Temporada</span>
+                                            <span className="text-[11px] md:text-[9px] font-black text-slate-500 dark:text-slate-300 font-mono">{fmtDate(c.startDate)} → {fmtDate(c.endDate)}</span>
                                         </div>
                                     </div>
 
                                     {/* FOOTER ACCIONES */}
                                     <div className="mt-auto p-2 bg-slate-50 dark:bg-white/2 border-t border-slate-100 dark:border-white/5 grid grid-cols-3 gap-2 -mx-4 -mb-4">
-                                        <button onClick={() => handleOpenEdit(c)} className="py-2 flex items-center justify-center gap-1.5 bg-white dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 text-[8px] font-black uppercase tracking-widest hover:text-slate-900 dark:hover:text-white hover:border-indigo-400/40 transition-all active:scale-95" title="Editar">
+                                        <button onClick={() => handleOpenEdit(c)} className="py-2 flex items-center justify-center gap-1.5 bg-white dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 text-[11px] md:text-[8px] font-black uppercase tracking-widest hover:text-slate-900 dark:hover:text-white hover:border-indigo-400/40 transition-all active:scale-95" title="Editar">
                                             <HugeiconsIcon icon={PencilEdit02Icon} className="w-3 h-3" /> Editar
                                         </button>
                                         {c.status === 'active' ? (
-                                            <button onClick={() => requestToggleStatus(c)} className="py-2 flex items-center justify-center gap-1.5 bg-white dark:bg-white/5 rounded-md border border-amber-200 dark:border-amber-500/30 text-amber-600 dark:text-amber-400 text-[8px] font-black uppercase tracking-widest hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-all active:scale-95" title="Suspender">
+                                            <button onClick={() => requestToggleStatus(c)} className="py-2 flex items-center justify-center gap-1.5 bg-white dark:bg-white/5 rounded-md border border-amber-200 dark:border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] md:text-[8px] font-black uppercase tracking-widest hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-all active:scale-95" title="Suspender">
                                                 <HugeiconsIcon icon={BlockedIcon} className="w-3 h-3" /> Suspender
                                             </button>
                                         ) : (
-                                            <button onClick={() => requestToggleStatus(c)} className="py-2 flex items-center justify-center gap-1.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md text-[8px] font-black uppercase tracking-widest hover:brightness-110 transition-all active:scale-95" title="Reactivar">
+                                            <button onClick={() => requestToggleStatus(c)} className="py-2 flex items-center justify-center gap-1.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-widest hover:brightness-110 transition-all active:scale-95" title="Reactivar">
                                                 <HugeiconsIcon icon={PlayCircleIcon} className="w-3 h-3" /> Reactivar
                                             </button>
                                         )}
-                                        <button onClick={() => Number(c.enrolledStudents || 0) > 0 ? addToast("Tiene alumnos con pago: suspéndela en vez de eliminarla", 'error') : setClassToDelete(c.id)} className="py-2 flex items-center justify-center gap-1.5 bg-white dark:bg-white/5 rounded-md border border-red-100 dark:border-red-500/20 text-red-400 text-[8px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95" title="Eliminar">
+                                        <button onClick={() => Number(c.enrolledStudents || 0) > 0 ? addToast("Tiene alumnos con pago: suspéndela en vez de eliminarla", 'error') : setClassToDelete(c.id)} className="py-2 flex items-center justify-center gap-1.5 bg-white dark:bg-white/5 rounded-md border border-red-100 dark:border-red-500/20 text-red-400 text-[11px] md:text-[8px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95" title="Eliminar">
                                             <HugeiconsIcon icon={Delete02Icon} className="w-3 h-3" /> Eliminar
                                         </button>
                                     </div>
@@ -415,7 +415,7 @@ export default function AcademyPage() {
                                     <HugeiconsIcon icon={Mortarboard01Icon} className="w-5 h-5" strokeWidth={1.8} />
                                 </div>
                                 <div>
-                                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-0.5">{isEditing ? 'Editar plan' : 'Nuevo plan'}</p>
+                                    <p className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-indigo-500 mb-0.5">{isEditing ? 'Editar plan' : 'Nuevo plan'}</p>
                                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none font-heading">{isEditing ? 'Sincronizar Clase' : 'Publicar Academia'}</h3>
                                 </div>
                             </div>
@@ -430,9 +430,9 @@ export default function AcademyPage() {
                                 <div className="flex items-center justify-between gap-2 mb-2">
                                     <div className="flex items-center gap-2">
                                         <span className="w-1.5 h-4 bg-indigo-500 rounded-md"></span>
-                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Deporte</p>
+                                        <p className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Deporte</p>
                                     </div>
-                                    <span className="text-[9px] font-black uppercase text-indigo-500">{formData.sport}</span>
+                                    <span className="text-[11px] md:text-[9px] font-black uppercase text-indigo-500">{formData.sport}</span>
                                 </div>
                                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                                     {SPORTS.map(s => {
@@ -440,7 +440,7 @@ export default function AcademyPage() {
                                         return (
                                             <button key={s} type="button" onClick={() => setFormData({ ...formData, sport: s })} className={`flex flex-col items-center gap-1.5 p-3 rounded-md border transition-all active:scale-95 ${on ? 'bg-indigo-500 border-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 hover:border-indigo-400/40 hover:text-indigo-500'}`}>
                                                 {sportIcon(s, `w-5 h-5 ${on ? 'text-white' : 'text-indigo-400'}`)}
-                                                <span className="text-[9px] font-black uppercase">{s}</span>
+                                                <span className="text-[11px] md:text-[9px] font-black uppercase">{s}</span>
                                             </button>
                                         );
                                     })}
@@ -452,7 +452,7 @@ export default function AcademyPage() {
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2 mb-1">
                                         <span className="w-1.5 h-4 bg-indigo-500 rounded-md"></span>
-                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Identidad del plan</p>
+                                        <p className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Identidad del plan</p>
                                     </div>
                                     <InputGroupPremium label="Nombre de la Clase" value={formData.name} onChange={(e: any) => setFormData({ ...formData, name: e.target.value })} icon={<HugeiconsIcon icon={IdentityCardIcon} className="w-4 h-4" />} placeholder="Ej: Escuela de Pádel" />
                                     <InputGroupPremium label="Instructor Principal" value={formData.instructor} onChange={(e: any) => setFormData({ ...formData, instructor: e.target.value })} icon={<HugeiconsIcon icon={UserIcon} className="w-4 h-4" />} placeholder="Prof. Nombre" />
@@ -467,8 +467,8 @@ export default function AcademyPage() {
                                         <option value="adultos">ADULTOS</option>
                                     </InputGroupPremium>
                                     <div className="flex flex-col gap-1">
-                                        <label className="text-[8px] font-black uppercase tracking-widest text-slate-400">Descripción Ejecutiva</label>
-                                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold outline-hidden h-24 resize-none focus:border-indigo-500 text-slate-700 dark:text-white" placeholder="Objetivos y metodología..." />
+                                        <label className="text-[11px] md:text-[8px] font-black uppercase tracking-widest text-slate-400">Descripción Ejecutiva</label>
+                                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs md:text-[10px] font-bold outline-hidden h-24 resize-none focus:border-indigo-500 text-slate-700 dark:text-white" placeholder="Objetivos y metodología..." />
                                     </div>
                                 </div>
 
@@ -476,15 +476,15 @@ export default function AcademyPage() {
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2 mb-1">
                                         <span className="w-1.5 h-4 bg-indigo-500 rounded-md"></span>
-                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Programación</p>
+                                        <p className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Programación</p>
                                     </div>
                                     <div>
-                                        <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Días de Operación</label>
+                                        <label className="text-[11px] md:text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Días de Operación</label>
                                         <div className="flex flex-wrap gap-1.5">
                                             {WEEK_DAYS.map(day => {
                                                 const on = formData.daysOfWeek.includes(day);
                                                 return (
-                                                    <button key={day} type="button" onClick={() => handleDayToggle(day)} className={`px-2.5 py-1.5 rounded-md text-[8px] font-black uppercase transition-all border ${on ? 'bg-indigo-500 text-white border-indigo-500 shadow-md shadow-indigo-500/20' : 'bg-slate-50 dark:bg-white/5 text-slate-400 border-slate-200 dark:border-white/5 hover:border-indigo-400/40'}`}>{day.slice(0, 3)}</button>
+                                                    <button key={day} type="button" onClick={() => handleDayToggle(day)} className={`px-2.5 py-1.5 rounded-md text-[11px] md:text-[8px] font-black uppercase transition-all border ${on ? 'bg-indigo-500 text-white border-indigo-500 shadow-md shadow-indigo-500/20' : 'bg-slate-50 dark:bg-white/5 text-slate-400 border-slate-200 dark:border-white/5 hover:border-indigo-400/40'}`}>{day.slice(0, 3)}</button>
                                                 );
                                             })}
                                         </div>
@@ -502,10 +502,10 @@ export default function AcademyPage() {
                                         <InputGroupPremium label="Fin Temporada" type="date" value={formData.endDate} onChange={(e: any) => setFormData({ ...formData, endDate: e.target.value })} icon={<HugeiconsIcon icon={Calendar03Icon} className="w-4 h-4" />} />
                                     </div>
                                     <div>
-                                        <label className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2 block flex items-center gap-1.5"><HugeiconsIcon icon={Notification01Icon} className="w-3.5 h-3.5 text-indigo-500" strokeWidth={2} /> Alerta a alumnos (días antes)</label>
+                                        <label className="text-[11px] md:text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2 block flex items-center gap-1.5"><HugeiconsIcon icon={Notification01Icon} className="w-3.5 h-3.5 text-indigo-500" strokeWidth={2} /> Alerta a alumnos (días antes)</label>
                                         <div className="flex gap-2">
                                             {[1, 2, 3, 7].map(d => (
-                                                <button key={d} type="button" onClick={() => setFormData({ ...formData, alertDays: d })} className={`flex-1 py-2 rounded-md text-[10px] font-black uppercase transition-all ${formData.alertDays === d ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-indigo-500'}`}>{d} día{d > 1 ? 's' : ''}</button>
+                                                <button key={d} type="button" onClick={() => setFormData({ ...formData, alertDays: d })} className={`flex-1 py-2 rounded-md text-xs md:text-[10px] font-black uppercase transition-all ${formData.alertDays === d ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-indigo-500'}`}>{d} día{d > 1 ? 's' : ''}</button>
                                             ))}
                                         </div>
                                     </div>
@@ -514,14 +514,14 @@ export default function AcademyPage() {
 
                             <div className="p-4 bg-indigo-50/40 dark:bg-indigo-500/5 rounded-md border border-indigo-100 dark:border-indigo-500/15 flex items-center gap-3">
                                 <HugeiconsIcon icon={ShieldCheckIcon} className="w-5 h-5 text-indigo-500 shrink-0" />
-                                <p className="text-[9px] font-bold uppercase text-slate-500 dark:text-slate-400 leading-relaxed">Esta configuración será visible inmediatamente en la App móvil para el registro de nuevos alumnos.</p>
+                                <p className="text-[11px] md:text-[9px] font-bold uppercase text-slate-500 dark:text-slate-400 leading-relaxed">Esta configuración será visible inmediatamente en la App móvil para el registro de nuevos alumnos.</p>
                             </div>
 
                             {/* VISTA PREVIA EN VIVO */}
                             <div className="rounded-md border border-slate-200 dark:border-white/10 overflow-hidden">
                                 <div className="px-4 py-3 bg-slate-50/50 dark:bg-white/2 border-b border-slate-100 dark:border-white/5 flex items-center gap-2">
                                     <span className="w-1.5 h-4 bg-indigo-500 rounded-md"></span>
-                                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Vista previa del plan</p>
+                                    <p className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Vista previa del plan</p>
                                 </div>
                                 <div className="p-4 flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-md bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center text-indigo-500 shrink-0">
@@ -529,18 +529,18 @@ export default function AcademyPage() {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-black uppercase text-slate-900 dark:text-white truncate font-heading">{formData.name || 'Nombre de la clase'}</p>
-                                        <p className="text-[9px] font-bold text-indigo-500 uppercase mt-0.5">{/^prof/i.test(formData.instructor) ? formData.instructor : `Prof. ${formData.instructor || 'Instructor'}`} · {formData.sport} · {ageGroupLabel(formData.ageGroup)}</p>
+                                        <p className="text-[11px] md:text-[9px] font-bold text-indigo-500 uppercase mt-0.5">{/^prof/i.test(formData.instructor) ? formData.instructor : `Prof. ${formData.instructor || 'Instructor'}`} · {formData.sport} · {ageGroupLabel(formData.ageGroup)}</p>
                                     </div>
                                     <div className="text-right shrink-0">
                                         <p className="text-sm font-black text-emerald-600 dark:text-[#00df82] font-mono">${formatCLP(Number(formData.price) || 0)}</p>
-                                        <p className="text-[8px] font-black uppercase text-slate-400">/ mes</p>
+                                        <p className="text-[11px] md:text-[8px] font-black uppercase text-slate-400">/ mes</p>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="flex gap-3 pt-1">
-                                <button type="button" onClick={handleCloseModal} className="flex-1 py-3.5 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 rounded-md text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-white/10 transition-all">Cancelar</button>
-                                <button type="submit" disabled={saving} className="flex-2 py-3.5 bg-indigo-500 text-white rounded-md text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                                <button type="button" onClick={handleCloseModal} className="flex-1 py-3.5 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 rounded-md text-xs md:text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-white/10 transition-all">Cancelar</button>
+                                <button type="submit" disabled={saving} className="flex-2 py-3.5 bg-indigo-500 text-white rounded-md text-xs md:text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                                     {saving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" /> : <HugeiconsIcon icon={ShieldCheckIcon} className="w-4 h-4" />}
                                     {isEditing ? 'Actualizar Plan Académico' : 'Lanzar Clase en App'}
                                 </button>
@@ -558,14 +558,14 @@ export default function AcademyPage() {
                             <HugeiconsIcon icon={statusConfirm.nextStatus === 'suspended' ? BlockedIcon : PlayCircleIcon} className={`w-8 h-8 ${statusConfirm.nextStatus === 'suspended' ? 'text-amber-500' : 'text-emerald-600 dark:text-[#00df82]'}`} />
                         </div>
                         <h3 className="text-lg font-black uppercase text-slate-900 dark:text-white mb-2 tracking-tighter font-heading">{statusConfirm.nextStatus === 'suspended' ? 'Suspender Clase' : 'Reactivar Clase'}</h3>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8 leading-relaxed">
+                        <p className="text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8 leading-relaxed">
                             {statusConfirm.nextStatus === 'suspended'
                                 ? `¿Confirmas suspender "${statusConfirm.name}"? Los alumnos ya no podrán inscribirse hasta que la reactives.`
                                 : `¿Confirmas reactivar "${statusConfirm.name}"? Volverá a ser visible en la App para inscripciones.`}
                         </p>
                         <div className="flex gap-3">
-                            <button onClick={() => setStatusConfirm({ ...statusConfirm, isOpen: false })} className="flex-1 py-3 text-[10px] font-black uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">CANCELAR</button>
-                            <button onClick={confirmToggleStatus} className={`flex-1 py-3 text-[10px] font-black uppercase rounded-md text-white shadow-xl ${statusConfirm.nextStatus === 'suspended' ? 'bg-amber-500 shadow-amber-500/20 hover:bg-amber-600' : 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-emerald-500/25 hover:brightness-110'}`}>
+                            <button onClick={() => setStatusConfirm({ ...statusConfirm, isOpen: false })} className="flex-1 py-3 text-xs md:text-[10px] font-black uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">CANCELAR</button>
+                            <button onClick={confirmToggleStatus} className={`flex-1 py-3 text-xs md:text-[10px] font-black uppercase rounded-md text-white shadow-xl ${statusConfirm.nextStatus === 'suspended' ? 'bg-amber-500 shadow-amber-500/20 hover:bg-amber-600' : 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-emerald-500/25 hover:brightness-110'}`}>
                                 {statusConfirm.nextStatus === 'suspended' ? 'SUSPENDER' : 'REACTIVAR'}
                             </button>
                         </div>
@@ -581,10 +581,10 @@ export default function AcademyPage() {
                             <HugeiconsIcon icon={Alert02Icon} className="w-8 h-8 text-red-600" />
                         </div>
                         <h3 className="text-lg font-black uppercase text-slate-900 dark:text-white mb-2 tracking-tighter font-heading">¿Eliminar Clase?</h3>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Los alumnos ya no verán esta clase en la App. Esta acción es irreversible.</p>
+                        <p className="text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Los alumnos ya no verán esta clase en la App. Esta acción es irreversible.</p>
                         <div className="flex gap-3">
-                            <button onClick={() => setClassToDelete(null)} className="flex-1 py-3 text-[10px] font-black uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">CANCELAR</button>
-                            <button onClick={handleDelete} className="flex-1 py-3 text-[10px] font-black uppercase rounded-md text-white bg-red-600 shadow-xl shadow-red-600/20">CONFIRMAR</button>
+                            <button onClick={() => setClassToDelete(null)} className="flex-1 py-3 text-xs md:text-[10px] font-black uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">CANCELAR</button>
+                            <button onClick={handleDelete} className="flex-1 py-3 text-xs md:text-[10px] font-black uppercase rounded-md text-white bg-red-600 shadow-xl shadow-red-600/20">CONFIRMAR</button>
                         </div>
                     </div>
                 </div>
@@ -597,13 +597,13 @@ export default function AcademyPage() {
 function InputGroupPremium({ label, value, onChange, placeholder, icon, readOnly, type = "text", children }: any) {
     return (
         <div className="flex flex-col gap-1 group w-full">
-            <label className="text-[8px] font-black uppercase tracking-widest text-slate-400">{label}</label>
+            <label className="text-[11px] md:text-[8px] font-black uppercase tracking-widest text-slate-400">{label}</label>
             <div className="relative">
                 {icon && <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 dark:text-white/20 group-focus-within:text-indigo-500 transition-colors">{icon}</div>}
                 {type === 'select' ? (
-                    <select value={value || ''} onChange={onChange} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-bold text-slate-700 dark:text-white focus:border-indigo-500 outline-hidden transition-all appearance-none uppercase cursor-pointer`}>{children}</select>
+                    <select value={value || ''} onChange={onChange} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs md:text-[10px] font-bold text-slate-700 dark:text-white focus:border-indigo-500 outline-hidden transition-all appearance-none uppercase cursor-pointer`}>{children}</select>
                 ) : (
-                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2.5 rounded-md border text-[10px] font-bold transition-all outline-hidden ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white focus:border-indigo-500'}`} />
+                    <input type={type} value={value || ''} onChange={onChange} readOnly={readOnly} placeholder={placeholder} className={`w-full ${icon ? 'pl-9' : 'px-3'} pr-3 py-2.5 rounded-md border text-xs md:text-[10px] font-bold transition-all outline-hidden ${readOnly ? 'bg-slate-50 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white focus:border-indigo-500'}`} />
                 )}
                 {type === 'select' && <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300"><HugeiconsIcon icon={ArrowDown01Icon} className="w-3 h-3" /></div>}
             </div>

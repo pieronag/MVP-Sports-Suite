@@ -40,7 +40,7 @@ const sportIcon = (sport: string, cls: string) => {
 };
 
 const inputCls = "w-full mt-1.5 px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black text-slate-900 dark:text-white outline-hidden focus:border-emerald-500 focus:ring-1 ring-emerald-500 transition-all";
-const labelCls = "block text-[10px] font-black uppercase tracking-widest text-slate-400";
+const labelCls = "block text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400";
 
 export default function CourtModal({
     isOpen,
@@ -66,7 +66,7 @@ export default function CourtModal({
                             <HugeiconsIcon icon={FootballPitchIcon} className="w-5 h-5" strokeWidth={1.8} />
                         </div>
                         <div>
-                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-[#00df82] mb-0.5">{editingId ? 'Editar activo' : 'Nuevo activo'}</p>
+                            <p className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-[#00df82] mb-0.5">{editingId ? 'Editar activo' : 'Nuevo activo'}</p>
                             <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none font-heading">{editingId ? 'Editar Cancha' : 'Integrar Cancha'}</h3>
                         </div>
                     </div>
@@ -121,7 +121,7 @@ export default function CourtModal({
                     <div>
                         <div className="flex items-center justify-between mb-2.5">
                             <label className={labelCls}>Características</label>
-                            <span className="text-[9px] font-black uppercase tracking-widest text-slate-300 dark:text-white/20">{form.features.length} seleccionadas</span>
+                            <span className="text-[11px] md:text-[9px] font-black uppercase tracking-widest text-slate-300 dark:text-white/20">{form.features.length} seleccionadas</span>
                         </div>
                         <div className="grid grid-cols-2 gap-2.5">
                             {COURT_FEATURES_LIST.map(feature => {
@@ -132,7 +132,7 @@ export default function CourtModal({
                                             {active && <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-3 h-3 text-white dark:text-black" strokeWidth={2.5} />}
                                         </span>
                                         <input type="checkbox" className="hidden" checked={active} onChange={() => onToggleFeature(feature)} />
-                                        <span className={`text-[9px] font-black uppercase tracking-tight ${active ? 'text-emerald-700 dark:text-[#00df82]' : 'text-slate-500 dark:text-slate-300'}`}>{feature}</span>
+                                        <span className={`text-[11px] md:text-[9px] font-black uppercase tracking-tight ${active ? 'text-emerald-700 dark:text-[#00df82]' : 'text-slate-500 dark:text-slate-300'}`}>{feature}</span>
                                     </label>
                                 );
                             })}
@@ -142,13 +142,13 @@ export default function CourtModal({
 
                 {/* FOOTER */}
                 <div className="px-6 pb-6 pt-1 flex gap-3">
-                    <button onClick={onClose} className="flex-1 py-3 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest rounded-md hover:bg-slate-200 dark:hover:bg-white/10 transition-all">
+                    <button onClick={onClose} className="flex-1 py-3 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 text-xs md:text-[10px] font-black uppercase tracking-widest rounded-md hover:bg-slate-200 dark:hover:bg-white/10 transition-all">
                         Cancelar
                     </button>
                     <button
                         onClick={onSave}
                         disabled={!valid}
-                        className="flex-1 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[10px] font-black uppercase tracking-widest rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2"
+                        className="flex-1 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-xs md:text-[10px] font-black uppercase tracking-widest rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center gap-2"
                     >
                         <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" strokeWidth={2} />
                         {editingId ? 'Guardar Cambios' : 'Crear Cancha'}

@@ -1,6 +1,7 @@
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 import DashboardGuard from "@/components/dashboard/DashboardGuard";
+import MobileTabBar from "@/components/dashboard/MobileTabBar";
 
 export default function DashboardLayout({
   children,
@@ -9,7 +10,7 @@ export default function DashboardLayout({
 }) {
   return (
     <DashboardGuard>
-      <div className="min-h-screen bg-slate-50 dark:bg-[#020611] transition-colors duration-0">
+      <div className="dashboard-shell min-h-screen bg-slate-50 dark:bg-[#020611] transition-colors duration-0">
 
         {/* 1. SIDEBAR (Desktop: fijo izquierda / Mobile: hamburger overlay) */}
         <Sidebar />
@@ -21,11 +22,12 @@ export default function DashboardLayout({
           <Header />
 
           {/* Contenido — ESPACIADO REDUCIDO (Layout Global) */}
-          <main className="flex-1 px-3 py-4 md:px-5 md:py-6 xl:p-6">
+          <main className="flex-1 px-4 pt-4 pb-28 md:px-5 md:pt-6 xl:p-6">
             {children}
           </main>
 
         </div>
+        <MobileTabBar />
       </div>
     </DashboardGuard>
   );

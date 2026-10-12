@@ -71,7 +71,7 @@ const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 
     return (
         <div className={`fixed top-5 right-5 z-150 flex items-center gap-3 px-4 py-3 rounded-md shadow-2xl border animate-slideIn ${type === 'success' ? 'bg-white border-emerald-500 text-emerald-700 dark:bg-[#0B0F19] dark:text-emerald-400 dark:border-emerald-500/50' : 'bg-white border-red-500 text-red-700 dark:bg-[#0B0F19] dark:text-red-400 dark:border-red-500/50'}`}>
             {type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5 text-emerald-500" strokeWidth={2} /> : <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5 text-red-500" strokeWidth={2} />}
-            <span className="text-[10px] font-black uppercase tracking-widest">{message}</span>
+            <span className="text-xs md:text-[10px] font-black uppercase tracking-widest">{message}</span>
         </div>
     );
 };
@@ -164,7 +164,7 @@ export default function GamificationSettingsPage() {
     ];
 
     if (loading) return (
-        <div className="flex h-full w-full items-center justify-center text-slate-400 text-[10px] font-bold uppercase gap-2 py-20">
+        <div className="flex h-full w-full items-center justify-center text-slate-400 text-xs md:text-[10px] font-bold uppercase gap-2 py-20">
             <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" strokeWidth={2} /> Localizando motor de mérito...
         </div>
     );
@@ -186,7 +186,7 @@ export default function GamificationSettingsPage() {
                 </div>
                 <div className="flex items-center gap-3">
                     {dirty && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[9px] font-black uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] md:text-[9px] font-black uppercase tracking-wider">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                             Cambios sin guardar
                         </span>
@@ -203,7 +203,7 @@ export default function GamificationSettingsPage() {
             </div>
 
             {/* KPIs */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                 <TarjetaKpi titulo="Check-in base" valor={`+${params.xpPerCheckin}`} icono={<HugeiconsIcon icon={CheckmarkCircle02Icon} className={ic} strokeWidth={1.6} />} sub="XP por asistencia" brillo />
                 <TarjetaKpi titulo="Bono MVP" valor={`+${params.xpPerMvp}`} icono={<HugeiconsIcon icon={SparklesIcon} className={ic} strokeWidth={1.6} />} sub="Reconocimiento" />
                 <TarjetaKpi titulo="Inasistencia" valor={`-${params.xpPerNoShow}`} icono={<HugeiconsIcon icon={Alert02Icon} className={ic} strokeWidth={1.6} />} sub="Penalidad" />
@@ -215,7 +215,7 @@ export default function GamificationSettingsPage() {
                     <button
                         key={t.id}
                         onClick={() => setTab(t.id)}
-                        className={`flex items-center gap-2 px-5 py-2.5 rounded-md border text-[10px] font-black uppercase transition-all shrink-0 ${
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-md border text-xs md:text-[10px] font-black uppercase transition-all shrink-0 ${
                             tab === t.id ? 'bg-emerald-500 dark:bg-[#00df82] border-emerald-500 dark:border-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-700 dark:hover:text-white'
                         }`}
                     >
@@ -240,7 +240,7 @@ export default function GamificationSettingsPage() {
                             <StepperCard label="Inasistencia" desc="Penalidad" value={params.xpPerNoShow} onChange={(v) => setXP('xpPerNoShow', v)} negative icon={<HugeiconsIcon icon={Alert02Icon} className="w-5 h-5 text-red-500" strokeWidth={1.8} />} />
                         </div>
                         <div className="pt-5 mt-5 border-t border-slate-100 dark:border-white/5">
-                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-3">Reglas de partido</p>
+                            <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest mb-3">Reglas de partido</p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <StepperCard label="Victoria" desc="Por partido ganado" value={params.xpPerWin} onChange={(v) => setXP('xpPerWin', v)} icon={<HugeiconsIcon icon={TrophyIcon} className="w-5 h-5 text-amber-500" strokeWidth={1.8} />} />
                                 <StepperCard label="Derrota" desc="Por partido perdido" value={params.xpPerLoss} onChange={(v) => setXP('xpPerLoss', v)} icon={<HugeiconsIcon icon={ArrowRight01Icon} className="w-5 h-5 text-rose-500" strokeWidth={1.8} />} />
@@ -283,7 +283,7 @@ export default function GamificationSettingsPage() {
                                     <h3 className="text-[11px] font-black uppercase text-slate-800 dark:text-white tracking-widest">{sport}</h3>
                                 </div>
                                 <div className="flex items-center gap-4">
-                                    <label className="flex items-center gap-2 cursor-pointer text-[8px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">
+                                    <label className="flex items-center gap-2 cursor-pointer text-[11px] md:text-[8px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">
                                         <button
                                             onClick={() => setSport(sport, 'countGoals', !config.countGoals)}
                                             className={`w-9 h-5 rounded-full relative transition-all ${config.countGoals ? 'bg-emerald-500 dark:bg-[#00df82]' : 'bg-slate-200 dark:bg-white/10'}`}
@@ -292,7 +292,7 @@ export default function GamificationSettingsPage() {
                                         </button>
                                         Cuenta goles
                                     </label>
-                                    <label className="flex items-center gap-2 cursor-pointer text-[8px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">
+                                    <label className="flex items-center gap-2 cursor-pointer text-[11px] md:text-[8px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">
                                         <button
                                             onClick={() => setSport(sport, 'countAssists', !config.countAssists)}
                                             className={`w-9 h-5 rounded-full relative transition-all ${config.countAssists ? 'bg-emerald-500 dark:bg-[#00df82]' : 'bg-slate-200 dark:bg-white/10'}`}
@@ -324,7 +324,7 @@ export default function GamificationSettingsPage() {
                 >
                     <div className="flex items-center gap-1.5 mb-6 px-1">
                         <HugeiconsIcon icon={InformationCircleIcon} className="w-3.5 h-3.5 text-slate-400 shrink-0" strokeWidth={2} />
-                        <p className="text-[8px] font-bold text-slate-400 uppercase tracking-wide">El jugador alcanza cada rango al superar su umbral mínimo de XP.</p>
+                        <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-wide">El jugador alcanza cada rango al superar su umbral mínimo de XP.</p>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
                         {TIER_META.map(tm => (
@@ -333,17 +333,17 @@ export default function GamificationSettingsPage() {
                                 <div className={`p-2 rounded-md border bg-white/60 dark:bg-white/10 ${tm.color}`}>
                                     <HugeiconsIcon icon={tm.icon} className="w-4 h-4" strokeWidth={1.8} />
                                 </div>
-                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-white">{tm.label}</h3>
+                                <h3 className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-white">{tm.label}</h3>
                                 <div className="w-full flex items-center justify-between bg-white/70 dark:bg-slate-900/60 px-2 py-1.5 rounded-md border border-white/40 dark:border-white/10">
-                                    <span className="text-[7px] font-black uppercase tracking-widest text-slate-400">Min XP</span>
+                                    <span className="text-[11px] md:text-[7px] font-black uppercase tracking-widest text-slate-400">Min XP</span>
                                     <input
                                         type="number"
                                         value={params.tiers[tm.key]}
                                         onChange={(e) => setTier(tm.key, Number(e.target.value))}
-                                        className="w-16 text-right bg-transparent text-[10px] font-black text-slate-700 dark:text-white outline-hidden font-mono"
+                                        className="w-16 text-right bg-transparent text-xs md:text-[10px] font-black text-slate-700 dark:text-white outline-hidden font-mono"
                                     />
                                 </div>
-                                <p className="text-[8px] font-bold text-slate-500 dark:text-slate-400 font-mono">{fmt(Number(params.tiers[tm.key]) || 0)}</p>
+                                <p className="text-[11px] md:text-[8px] font-bold text-slate-500 dark:text-slate-400 font-mono">{fmt(Number(params.tiers[tm.key]) || 0)}</p>
                             </div>
                         ))}
                     </div>
@@ -376,7 +376,7 @@ function Simulator({ tiers }: { tiers: any }) {
                 <div className="relative shrink-0">
                     <div className="w-36 h-36 rounded-full border-10 border-slate-100 dark:border-white/5 flex items-center justify-center relative shadow-2xl bg-white dark:bg-slate-900">
                         <div className="text-center">
-                            <p className="text-[8px] font-black uppercase text-slate-400 tracking-tighter">Nivel general</p>
+                            <p className="text-[11px] md:text-[8px] font-black uppercase text-slate-400 tracking-tighter">Nivel general</p>
                             <p className="text-5xl font-black text-slate-900 dark:text-white leading-none tracking-tighter font-mono">{overall}</p>
                             <div className="flex items-center justify-center gap-0.5 mt-1">
                                 {[...Array(5)].map((_, i) => (
@@ -386,7 +386,7 @@ function Simulator({ tiers }: { tiers: any }) {
                         </div>
                     </div>
                     <div className="mt-3 text-center">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[8px] font-black uppercase border ${currentTier?.color || 'bg-slate-100 border-slate-200 text-slate-500'}`}>
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] md:text-[8px] font-black uppercase border ${currentTier?.color || 'bg-slate-100 border-slate-200 text-slate-500'}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${currentTier?.dot || 'bg-slate-400'}`} />
                             {currentTier?.label || 'Sin rango'}
                         </span>
@@ -396,8 +396,8 @@ function Simulator({ tiers }: { tiers: any }) {
                 <div className="flex-1 space-y-6 w-full">
                     <div className="space-y-4 bg-slate-50 dark:bg-white/5 p-6 rounded-md border border-slate-200 dark:border-white/5">
                         <div className="flex justify-between items-center px-1">
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Experiencia acumulada</span>
-                            <span className="text-lg font-black text-slate-900 dark:text-emerald-500 font-mono tracking-tighter">{fmt(testXP)} <span className="text-[10px] text-slate-400">XP</span></span>
+                            <span className="text-xs md:text-[10px] font-black text-slate-500 uppercase tracking-widest">Experiencia acumulada</span>
+                            <span className="text-lg font-black text-slate-900 dark:text-emerald-500 font-mono tracking-tighter">{fmt(testXP)} <span className="text-xs md:text-[10px] text-slate-400">XP</span></span>
                         </div>
                         <input
                             type="range"
@@ -407,7 +407,7 @@ function Simulator({ tiers }: { tiers: any }) {
                             onChange={(e) => setTestXP(Number(e.target.value))}
                             className="w-full h-1.5 bg-slate-200 dark:bg-white/10 rounded-md appearance-none cursor-pointer accent-emerald-500"
                         />
-                        <div className="flex justify-between text-[8px] font-black text-slate-400 uppercase tracking-widest px-1">
+                        <div className="flex justify-between text-[11px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest px-1">
                             <span>0 XP</span>
                             <span>{fmt(maxXP)} XP</span>
                         </div>
@@ -417,16 +417,16 @@ function Simulator({ tiers }: { tiers: any }) {
                         <div className="p-4 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5">
                             <div className="flex items-center gap-2 mb-1">
                                 <HugeiconsIcon icon={BoltIcon} className="w-3 h-3 text-emerald-600 dark:text-[#00df82]" strokeWidth={2} />
-                                <p className="text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Motor lógico</p>
+                                <p className="text-[11px] md:text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Motor lógico</p>
                             </div>
-                            <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Escalado de raíz cuadrada</p>
+                            <p className="text-xs md:text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tighter">Escalado de raíz cuadrada</p>
                         </div>
                         <div className="p-4 rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5">
                             <div className="flex items-center gap-2 mb-1">
                                 <HugeiconsIcon icon={SparklesIcon} className="w-3 h-3 text-amber-500" strokeWidth={2} />
-                                <p className="text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Curva de esfuerzo</p>
+                                <p className="text-[11px] md:text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Curva de esfuerzo</p>
                             </div>
-                            <p className="text-[10px] font-bold text-amber-500/80 uppercase tracking-tighter">Objetivo de eficiencia</p>
+                            <p className="text-xs md:text-[10px] font-bold text-amber-500/80 uppercase tracking-tighter">Objetivo de eficiencia</p>
                         </div>
                     </div>
                 </div>
@@ -443,12 +443,12 @@ function StepperCard({ label, desc, value, onChange, icon, negative = false, ste
                     {icon}
                 </div>
                 <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white leading-none block mb-1">{label}</label>
-                    <p className="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">{desc}</p>
+                    <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white leading-none block mb-1">{label}</label>
+                    <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-tighter">{desc}</p>
                 </div>
             </div>
             <div className="flex items-center justify-between bg-slate-50 dark:bg-white/5 px-2 py-1.5 rounded-md border border-slate-200 dark:border-white/10">
-                <span className="text-[7px] text-slate-400 uppercase font-black tracking-widest ml-1">XP</span>
+                <span className="text-[11px] md:text-[7px] text-slate-400 uppercase font-black tracking-widest ml-1">XP</span>
                 <div className="flex items-center gap-1.5">
                     <button onClick={() => onChange(Math.max(0, value - step))} aria-label="Disminuir" className="w-8 h-8 rounded-md bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-500 hover:border-emerald-400 dark:hover:border-[#00df82]/40 hover:text-emerald-600 dark:hover:text-[#00df82] font-black text-base transition-all active:scale-90">−</button>
                     <input
@@ -467,7 +467,7 @@ function StepperCard({ label, desc, value, onChange, icon, negative = false, ste
 function InlineStepper({ label, value, onChange, color, disabled = false, step = 50 }: { label: string, value: number, onChange: (v: number) => void, color: string, disabled?: boolean, step?: number }) {
     return (
         <div className={`flex items-center justify-between gap-2 bg-white dark:bg-slate-900/50 px-3 py-2 rounded-md border border-slate-200 dark:border-white/10 ${disabled ? 'opacity-40' : ''}`}>
-            <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest">{label}</span>
+            <span className="text-[11px] md:text-[8px] font-black uppercase text-slate-400 tracking-widest">{label}</span>
             <div className="flex items-center gap-1.5">
                 <button onClick={() => !disabled && onChange(Math.max(0, value - step))} aria-label={`Disminuir ${label}`} disabled={disabled} className="w-7 h-7 rounded-md bg-slate-100 dark:bg-white/10 text-slate-500 hover:text-emerald-600 dark:hover:text-[#00df82] font-black text-base transition-all active:scale-90 disabled:opacity-40">−</button>
                 <input

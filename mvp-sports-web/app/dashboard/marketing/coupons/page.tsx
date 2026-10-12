@@ -32,7 +32,7 @@ function PanelHeader({ titulo, desc, icon: Icon, action }: any) {
                 <span className="w-10 h-10 rounded-md bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-500 shrink-0">{content}</span>
                 <div className="min-w-0">
                     <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white truncate font-heading">{titulo}</h3>
-                    <p className="text-[10px] font-bold text-slate-400 truncate">{desc}</p>
+                    <p className="text-xs md:text-[10px] font-bold text-slate-400 truncate">{desc}</p>
                 </div>
             </div>
             {action}
@@ -43,7 +43,7 @@ function PanelHeader({ titulo, desc, icon: Icon, action }: any) {
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
     useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
     return (
-        <div className={`fixed top-4 right-4 z-150 flex items-center gap-3 px-4 py-2.5 rounded-md shadow-2xl text-[9px] font-black uppercase tracking-widest text-white ${type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`}>
+        <div className={`fixed top-4 right-4 z-150 flex items-center gap-3 px-4 py-2.5 rounded-md shadow-2xl text-[11px] md:text-[9px] font-black uppercase tracking-widest text-white ${type === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`}>
             {type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" /> : <HugeiconsIcon icon={Alert02Icon} className="w-4 h-4" />}
             <span>{message}</span>
         </div>
@@ -59,8 +59,8 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructi
                 <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter">{title}</h3>
                 <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-8 uppercase leading-relaxed">{message}</p>
                 <div className="flex gap-3 justify-end">
-                    <button onClick={onCancel} className="px-5 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 transition-all">Cancelar</button>
-                    <button onClick={onConfirm} className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded-md text-white shadow-lg transition-all active:scale-95 ${isDestructive ? 'bg-red-600 shadow-red-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}>Confirmar</button>
+                    <button onClick={onCancel} className="px-5 py-2.5 text-xs md:text-[10px] font-black uppercase tracking-widest rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 transition-all">Cancelar</button>
+                    <button onClick={onConfirm} className={`px-6 py-2.5 text-xs md:text-[10px] font-black uppercase tracking-widest rounded-md text-white shadow-lg transition-all active:scale-95 ${isDestructive ? 'bg-red-600 shadow-red-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}>Confirmar</button>
                 </div>
             </div>
         </div>
@@ -308,11 +308,11 @@ export default function CouponsPage() {
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <div className="flex flex-col gap-1">
-                        <label className="text-[7px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Filtrar Recinto</label>
+                        <label className="text-[11px] md:text-[7px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest pl-1">Filtrar Recinto</label>
                         <select 
                             value={selectedTenantId || ''} 
                             onChange={(e) => setSelectedTenantId(e.target.value)}
-                            className="px-5 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[9px] font-black uppercase tracking-wider rounded-md focus:ring-1 focus:ring-pink-500 outline-hidden text-slate-700 dark:text-slate-200"
+                            className="px-5 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[11px] md:text-[9px] font-black uppercase tracking-wider rounded-md focus:ring-1 focus:ring-pink-500 outline-hidden text-slate-700 dark:text-slate-200"
                         >
                             {tenants.map(t => {
                                 const isLocked = !(t as any).features?.marketing;
@@ -329,7 +329,7 @@ export default function CouponsPage() {
                         <button 
                             onClick={() => handleOpenModal()} 
                             disabled={isMarketingLocked || tenants.length === 0}
-                            className={`w-full sm:w-auto px-6 py-3 bg-pink-500 text-white font-black text-[9px] uppercase tracking-widest rounded-md transition-all shadow-xl flex items-center justify-center gap-2 ${isMarketingLocked || tenants.length === 0 ? 'opacity-40 cursor-not-allowed shadow-none' : 'hover:brightness-110 active:scale-95 shadow-pink-500/25'}`}
+                            className={`w-full sm:w-auto px-6 py-3 bg-pink-500 text-white font-black text-[11px] md:text-[9px] uppercase tracking-widest rounded-md transition-all shadow-xl flex items-center justify-center gap-2 ${isMarketingLocked || tenants.length === 0 ? 'opacity-40 cursor-not-allowed shadow-none' : 'hover:brightness-110 active:scale-95 shadow-pink-500/25'}`}
                         >
                             <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" /> NUEVO BENEFICIO
                         </button>
@@ -347,20 +347,20 @@ export default function CouponsPage() {
                         <div className="space-y-3 mb-6 z-10 max-w-md">
                             <div className="flex items-center justify-center gap-2">
                                 <span className="w-6 h-[2px] bg-pink-500 rounded-full"></span>
-                                <p className="text-[9px] font-black text-pink-600 dark:text-pink-400 tracking-[0.25em] uppercase">Plan de Pago Requerido</p>
+                                <p className="text-[11px] md:text-[9px] font-black text-pink-600 dark:text-pink-400 tracking-[0.25em] uppercase">Plan de Pago Requerido</p>
                                 <span className="w-6 h-[2px] bg-pink-500 rounded-full"></span>
                             </div>
                             <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">
                                 HERRAMIENTAS DE <span className="text-emerald-500 dark:text-[#00df82]">MARKETING & CUPONES</span>
                             </h2>
-                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase max-w-sm mx-auto leading-relaxed">
+                            <p className="text-xs md:text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase max-w-sm mx-auto leading-relaxed">
                                 Fideliza a tus jugadores, crea códigos de descuento personalizados y aumenta las reservas de tus canchas. Módulo habilitado a partir del plan Básico.
                             </p>
                         </div>
 
                         <a 
                             href="/dashboard/billing-subscription" 
-                            className="relative group px-8 py-3.5 overflow-hidden rounded-md bg-linear-to-r from-pink-500 via-rose-500 to-amber-500 font-black text-[9px] uppercase tracking-[0.2em] text-slate-950 transition-all hover:scale-[1.03] active:scale-95 shadow-xl shadow-pink-500/10 flex items-center justify-center gap-2 border border-white/20 z-10"
+                            className="relative group px-8 py-3.5 overflow-hidden rounded-md bg-linear-to-r from-pink-500 via-rose-500 to-amber-500 font-black text-[11px] md:text-[9px] uppercase tracking-[0.2em] text-slate-950 transition-all hover:scale-[1.03] active:scale-95 shadow-xl shadow-pink-500/10 flex items-center justify-center gap-2 border border-white/20 z-10"
                         >
                             <div className="absolute inset-0 w-full h-full bg-linear-to-r from-amber-400 via-rose-400 to-pink-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                             <HugeiconsIcon icon={SparklesIcon} className="w-4 h-4 text-slate-950" />
@@ -374,14 +374,14 @@ export default function CouponsPage() {
                             desc="Monitorea el rendimiento de tus códigos promocionales"
                             icon={DiscountTag01Icon}
                             action={
-                                <span className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-md bg-pink-50 dark:bg-pink-500/10 border border-pink-100 dark:border-pink-500/20 text-pink-600 dark:text-pink-400 text-[9px] font-black uppercase tracking-widest">
+                                <span className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-md bg-pink-50 dark:bg-pink-500/10 border border-pink-100 dark:border-pink-500/20 text-pink-600 dark:text-pink-400 text-[11px] md:text-[9px] font-black uppercase tracking-widest">
                                     <HugeiconsIcon icon={DiscountTag01Icon} className="w-3.5 h-3.5" strokeWidth={2} /> {filteredCoupons.length} cupones
                                 </span>
                             }
                         />
 
                         {/* TARJETAS DE ESTADÍSTICAS */}
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                             <TarjetaKpi
                                 titulo="Total Emitidos"
                                 valor={filteredCoupons.length.toString()}
@@ -415,7 +415,7 @@ export default function CouponsPage() {
 
                         {/* LISTADO DE CUPONES */}
                         {loading ? (
-                            <div className="text-center py-20 text-[9px] font-bold text-slate-400 uppercase tracking-widest animate-pulse">Cargando beneficios...</div>
+                            <div className="text-center py-20 text-[11px] md:text-[9px] font-bold text-slate-400 uppercase tracking-widest animate-pulse">Cargando beneficios...</div>
                         ) : filteredCoupons.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 bg-white dark:bg-[#0B0F19] rounded-md border border-slate-200 dark:border-white/5 shadow-xs">
                                 <div className="w-16 h-16 bg-pink-50 dark:bg-pink-500/10 rounded-md flex items-center justify-center text-pink-500 border border-pink-100 dark:border-pink-500/20">
@@ -423,9 +423,9 @@ export default function CouponsPage() {
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-[12px] font-black uppercase text-slate-400 tracking-widest">Sin cupones en este recinto</p>
-                                    <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Crea tu primer código de descuento</p>
+                                    <p className="text-xs md:text-[10px] font-bold text-slate-300 uppercase tracking-wider">Crea tu primer código de descuento</p>
                                 </div>
-                                <button onClick={() => handleOpenModal()} className="inline-flex items-center gap-2 px-6 py-3 bg-pink-500 text-white rounded-md text-[10px] font-black uppercase tracking-widest shadow-xl shadow-pink-500/25 hover:brightness-110 active:scale-95 transition-all">
+                                <button onClick={() => handleOpenModal()} className="inline-flex items-center gap-2 px-6 py-3 bg-pink-500 text-white rounded-md text-xs md:text-[10px] font-black uppercase tracking-widest shadow-xl shadow-pink-500/25 hover:brightness-110 active:scale-95 transition-all">
                                     <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" /> Emitir Cupón
                                 </button>
                             </div>
@@ -441,23 +441,23 @@ export default function CouponsPage() {
                                                     <div className="w-11 h-11 rounded-md bg-pink-50 dark:bg-pink-500/10 text-pink-500 border border-pink-100 dark:border-pink-500/20 flex items-center justify-center">
                                                         <HugeiconsIcon icon={DiscountTag01Icon} className="w-5 h-5" strokeWidth={1.8} />
                                                     </div>
-                                                    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[8px] font-black uppercase border ${state.tone}`}>
+                                                    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] md:text-[8px] font-black uppercase border ${state.tone}`}>
                                                         <span className={`w-1.5 h-1.5 rounded-full ${state.dot} ${state.label === 'Vigente' ? 'animate-pulse' : ''}`} /> {state.label}
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter font-mono leading-none">{c.discount}%</span>
-                                                    <span className="text-[9px] font-black text-pink-500 uppercase">descuento</span>
+                                                    <span className="text-[11px] md:text-[9px] font-black text-pink-500 uppercase">descuento</span>
                                                 </div>
                                                 <h3 className="font-black text-slate-900 dark:text-white text-lg tracking-widest uppercase mb-2">{c.code}</h3>
-                                                <p className="text-[10px] text-slate-400 font-bold uppercase line-clamp-2">{c.description || 'Sin descripción.'}</p>
+                                                <p className="text-xs md:text-[10px] text-slate-400 font-bold uppercase line-clamp-2">{c.description || 'Sin descripción.'}</p>
                                             </div>
 
                                             <div className="relative px-6">
                                                 <div className="border-t-2 border-dashed border-slate-200 dark:border-white/10"></div>
                                             </div>
 
-                                            <div className="px-6 py-4 space-y-2 text-[9px] font-bold uppercase text-slate-500 flex-1">
+                                            <div className="px-6 py-4 space-y-2 text-[11px] md:text-[9px] font-bold uppercase text-slate-500 flex-1">
                                                 <div className="flex justify-between items-center gap-2">
                                                     <span className="flex items-center gap-1.5 shrink-0"><HugeiconsIcon icon={Calendar03Icon} className="w-3 h-3 text-pink-400" strokeWidth={2} /> Validez</span>
                                                     <span className="text-slate-900 dark:text-white font-mono text-right">{fmtRange(c.validFrom, c.validUntil)}</span>
@@ -473,7 +473,7 @@ export default function CouponsPage() {
                                                 <div className="w-full bg-slate-100 dark:bg-white/5 h-1.5 rounded-full overflow-hidden">
                                                     <div className="bg-pink-500 dark:bg-pink-400 h-full transition-all" style={{ width: `${usagePct}%` }}></div>
                                                 </div>
-                                                <p className="text-right text-[8px] text-slate-400 font-mono">{usagePct}% utilizado</p>
+                                                <p className="text-right text-[11px] md:text-[8px] text-slate-400 font-mono">{usagePct}% utilizado</p>
                                             </div>
 
                                             <div className="p-3 bg-slate-50 dark:bg-white/2 border-t border-slate-100 dark:border-white/5 flex gap-2">
@@ -502,7 +502,7 @@ export default function CouponsPage() {
                                     <HugeiconsIcon icon={DiscountTag01Icon} className="w-5 h-5" strokeWidth={1.8} />
                                 </div>
                                 <div>
-                                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-pink-500 mb-0.5">{editingId ? 'Editar beneficio' : 'Nuevo beneficio'}</p>
+                                    <p className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-pink-500 mb-0.5">{editingId ? 'Editar beneficio' : 'Nuevo beneficio'}</p>
                                     <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none font-heading">{editingId ? 'Editar Cupón' : 'Emitir Cupón'}</h3>
                                 </div>
                             </div>
@@ -512,49 +512,49 @@ export default function CouponsPage() {
                         </div>
                         <form onSubmit={handleSave} className="p-6 space-y-4">
                             <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Código Promocional</label>
+                                <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Código Promocional</label>
                                 <input required type="text" value={formData.code} onChange={e => setFormData({ ...formData, code: e.target.value.toUpperCase() })} className="w-full px-3.5 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-lg font-black tracking-[0.2em] outline-hidden uppercase focus:border-pink-500 transition-all" placeholder="EJ: PADEL2026" />
                             </div>
                             <div>
                                 <div className="flex items-center justify-between mb-1.5">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Descuento (%)</label>
-                                    <span className="text-[10px] font-black font-mono text-pink-500">{formData.discount}%</span>
+                                    <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400">Descuento (%)</label>
+                                    <span className="text-xs md:text-[10px] font-black font-mono text-pink-500">{formData.discount}%</span>
                                 </div>
                                 <div className="grid grid-cols-4 gap-2 mb-2">
                                     {[10, 15, 25, 50].map(p => (
-                                        <button key={p} type="button" onClick={() => setFormData({ ...formData, discount: p })} className={`py-2 rounded-md text-[10px] font-black uppercase transition-all ${formData.discount === p ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/25' : 'bg-slate-100 dark:bg-white/5 text-slate-400 hover:bg-pink-50 dark:hover:bg-pink-500/10 hover:text-pink-500'}`}>{p}%</button>
+                                        <button key={p} type="button" onClick={() => setFormData({ ...formData, discount: p })} className={`py-2 rounded-md text-xs md:text-[10px] font-black uppercase transition-all ${formData.discount === p ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/25' : 'bg-slate-100 dark:bg-white/5 text-slate-400 hover:bg-pink-50 dark:hover:bg-pink-500/10 hover:text-pink-500'}`}>{p}%</button>
                                     ))}
                                 </div>
                                 <input required type="number" min="1" max="100" value={formData.discount} onChange={e => setFormData({ ...formData, discount: Number(e.target.value) })} className="w-full px-3.5 py-2.5 bg-pink-50 dark:bg-pink-500/5 border border-pink-200 dark:border-pink-500/20 rounded-md text-xs font-black outline-hidden" />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Límite Usos</label>
+                                    <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Límite Usos</label>
                                     <input required type="number" min="1" value={formData.limit} onChange={e => setFormData({ ...formData, limit: Number(e.target.value) })} className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-black outline-hidden" />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Mínimo Compra ($)</label>
+                                    <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Mínimo Compra ($)</label>
                                     <input required type="number" min="0" value={formData.minimumPurchase} onChange={e => setFormData({ ...formData, minimumPurchase: Number(e.target.value) })} className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-black outline-hidden" />
                                 </div>
                             </div>
                             <div>
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Descripción</label>
+                                <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Descripción</label>
                                 <textarea required rows={2} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-3.5 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-hidden resize-none" placeholder="Restricciones..." />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Fecha Inicio</label>
-                                    <input required type="date" value={formData.validFrom} onChange={e => setFormData({ ...formData, validFrom: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-black outline-hidden uppercase" />
+                                    <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Fecha Inicio</label>
+                                    <input required type="date" value={formData.validFrom} onChange={e => setFormData({ ...formData, validFrom: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs md:text-[10px] font-black outline-hidden uppercase" />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Fecha Fin</label>
-                                    <input required type="date" value={formData.validUntil} onChange={e => setFormData({ ...formData, validUntil: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[10px] font-black outline-hidden uppercase" />
+                                    <label className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1.5">Fecha Fin</label>
+                                    <input required type="date" value={formData.validUntil} onChange={e => setFormData({ ...formData, validUntil: e.target.value })} className="w-full px-3 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs md:text-[10px] font-black outline-hidden uppercase" />
                                 </div>
                             </div>
                             <button
                                 type="submit"
                                 disabled={saving}
-                                className="w-full py-3.5 bg-pink-500 text-white rounded-md text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-pink-500/25 hover:brightness-110 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                                className="w-full py-3.5 bg-pink-500 text-white rounded-md text-xs md:text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-pink-500/25 hover:brightness-110 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                             >
                                 {saving ? <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4 animate-spin" /> : <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" />} {editingId ? "Actualizar Beneficio" : "Crear Beneficio Activo"}
                             </button>

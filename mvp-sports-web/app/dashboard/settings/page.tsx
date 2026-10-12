@@ -82,7 +82,7 @@ function HeaderSeccion({ titulo, desc }: any) {
                 <span className="w-6 h-[2px] bg-emerald-500 rounded-md" />
                 <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 dark:text-white leading-none font-heading">{titulo}</h3>
             </div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed pl-9">{desc}</p>
+            <p className="text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed pl-9">{desc}</p>
         </div>
     );
 }
@@ -440,7 +440,7 @@ export default function SettingsPage() {
         return (
             <div className="flex flex-col items-center justify-center py-24 gap-5">
                 <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
-                <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.3em]">Cargando configuración...</p>
+                <p className="text-xs md:text-[10px] font-black uppercase text-slate-400 tracking-[0.3em]">Cargando configuración...</p>
             </div>
         );
     }
@@ -460,7 +460,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="flex items-center gap-3">
                     {dirty && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[9px] font-black uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] md:text-[9px] font-black uppercase tracking-wider">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                             Cambios sin guardar
                         </span>
@@ -477,7 +477,7 @@ export default function SettingsPage() {
             </div>
 
             {/* RESUMEN */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                 <TarjetaKpi titulo="Ingreso recurrente" valor={formatCLP(realStats.totalRevenue)} sub="Suma de planes activos" icono={<HugeiconsIcon icon={MoneyBag01Icon} className="w-6 h-6" strokeWidth={1.6} />} brillo />
                 <TarjetaKpi titulo="Plan Elite" valor={realStats.eliteCount} sub="Recintos en nivel superior" icono={<HugeiconsIcon icon={TrophyIcon} className="w-6 h-6" strokeWidth={1.6} />} />
                 <TarjetaKpi titulo="Planes pagos" valor={realStats.proCount} sub="Niveles intermedios" icono={<HugeiconsIcon icon={StarIcon} className="w-6 h-6" strokeWidth={1.6} />} />
@@ -490,7 +490,7 @@ export default function SettingsPage() {
                     <button
                         key={t.id}
                         onClick={() => setActiveTab(t.id)}
-                        className={`flex items-center gap-2.5 px-5 py-2.5 rounded-md border text-[10px] font-black uppercase transition-all shrink-0 ${
+                        className={`flex items-center gap-2.5 px-5 py-2.5 rounded-md border text-xs md:text-[10px] font-black uppercase transition-all shrink-0 ${
                             activeTab === t.id
                                 ? 'bg-emerald-500 dark:bg-[#00df82] border-emerald-500 dark:border-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20'
                                 : 'bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-700 dark:hover:text-white'
@@ -508,11 +508,11 @@ export default function SettingsPage() {
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <HeaderSeccion titulo="Modelos de monetización" desc="Gestión de planes SaaS, precios y comisiones transaccionales." />
                             <div className="flex items-center gap-2 shrink-0">
-                                <button onClick={handleSyncPriorities} disabled={saving || isExecuting} title="Actualiza en Firebase el peso de prioridad y beneficios de todos los recintos según su plan" className="flex items-center gap-2 px-4 py-2.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase tracking-wider hover:border-emerald-400 dark:hover:border-[#00df82]/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all disabled:opacity-40">
+                                <button onClick={handleSyncPriorities} disabled={saving || isExecuting} title="Actualiza en Firebase el peso de prioridad y beneficios de todos los recintos según su plan" className="flex items-center gap-2 px-4 py-2.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-xs md:text-[10px] font-black uppercase tracking-wider hover:border-emerald-400 dark:hover:border-[#00df82]/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all disabled:opacity-40">
                                     <HugeiconsIcon icon={RefreshIcon} className={`w-4 h-4 ${saving ? 'animate-spin' : ''}`} strokeWidth={2} />
                                     Sincronizar prioridad
                                 </button>
-                                <button onClick={addPlan} className="flex items-center gap-2 px-4 py-2.5 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all shrink-0">
+                                <button onClick={addPlan} className="flex items-center gap-2 px-4 py-2.5 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-xs md:text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all shrink-0">
                                     <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" strokeWidth={2} />
                                     Añadir plan
                                 </button>
@@ -527,17 +527,17 @@ export default function SettingsPage() {
                                             <div>
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <span className="w-3 h-[2px] bg-emerald-500 rounded-md"></span>
-                                                    <p className="text-[8px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-[0.2em]">Suscripción</p>
+                                                    <p className="text-[11px] md:text-[8px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-[0.2em]">Suscripción</p>
                                                 </div>
                                                 <h4 className="text-lg font-black uppercase text-slate-900 dark:text-white leading-none font-heading">{p.name}</h4>
-                                                <span className={`inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-md text-[8px] font-black uppercase ${used > 0 ? 'bg-emerald-500/15 text-emerald-600 dark:text-[#00df82]' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                <span className={`inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-md text-[11px] md:text-[8px] font-black uppercase ${used > 0 ? 'bg-emerald-500/15 text-emerald-600 dark:text-[#00df82]' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
                                                     <HugeiconsIcon icon={ServerIcon} className="w-3 h-3" strokeWidth={2} />
                                                     {used} recinto(s)
                                                 </span>
                                             </div>
                                             <div className="flex flex-col items-end gap-1">
                                                 <div className="flex items-center gap-1 bg-slate-50 dark:bg-white/5 px-3 py-1.5 rounded-md border border-slate-200 dark:border-white/10">
-                                                    <span className="text-[10px] font-black text-emerald-600 dark:text-[#00df82]">$</span>
+                                                    <span className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82]">$</span>
                                                     <input
                                                         type="number" min={0}
                                                         value={p.price}
@@ -545,7 +545,7 @@ export default function SettingsPage() {
                                                         className="w-16 bg-transparent text-sm font-black outline-hidden text-slate-900 dark:text-white text-right font-mono"
                                                     />
                                                 </div>
-                                                <p className="text-[7px] font-black text-slate-400 uppercase mt-0.5">
+                                                <p className="text-[11px] md:text-[7px] font-black text-slate-400 uppercase mt-0.5">
                                                     {formatCLP(Number(p.price || 0))} <span className="opacity-70">· Neto {formatCLP(Math.round(Number(p.price || 0) / 1.19))}</span>
                                                 </p>
                                             </div>
@@ -553,14 +553,14 @@ export default function SettingsPage() {
 
                                         <div className="grid grid-cols-2 gap-3 mb-6">
                                             <div className="p-3.5 bg-slate-50 dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10">
-                                                <p className="text-[7px] font-black text-slate-400 uppercase mb-1.5 tracking-widest leading-none">Comisión %</p>
+                                                <p className="text-[11px] md:text-[7px] font-black text-slate-400 uppercase mb-1.5 tracking-widest leading-none">Comisión %</p>
                                                 <div className="flex items-center gap-1">
-                                                    <span className="text-emerald-600 dark:text-[#00df82] font-black text-[10px]">%</span>
+                                                    <span className="text-emerald-600 dark:text-[#00df82] font-black text-xs md:text-[10px]">%</span>
                                                     <input type="number" step="0.1" min={0} max={100} value={p.commission} onChange={e => updatePlan(idx, 'commission', Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)))} className="w-full bg-transparent text-xs font-black outline-hidden text-slate-900 dark:text-white font-mono" />
                                                 </div>
                                             </div>
                                             <div className="p-3.5 bg-slate-50 dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10">
-                                                <p className="text-[7px] font-black text-slate-400 uppercase mb-1.5 tracking-widest leading-none">Peso prioridad</p>
+                                                <p className="text-[11px] md:text-[7px] font-black text-slate-400 uppercase mb-1.5 tracking-widest leading-none">Peso prioridad</p>
                                                 <div className="flex items-center gap-1">
                                                     <HugeiconsIcon icon={BoltIcon} className="w-3 h-3 text-indigo-500" strokeWidth={1.8} />
                                                     <input type="number" min={0} value={p.priorityScore} onChange={e => updatePlan(idx, 'priorityScore', Math.max(0, parseInt(e.target.value) || 0))} className="w-full bg-transparent text-xs font-black outline-hidden text-slate-900 dark:text-white font-mono" />
@@ -569,19 +569,19 @@ export default function SettingsPage() {
                                         </div>
 
                                         <div className="space-y-3.5 pt-6 border-t border-slate-100 dark:border-white/5">
-                                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3 pl-1">Beneficios del plan</p>
+                                            <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3 pl-1">Beneficios del plan</p>
                                             {benefitCatalog.map(b => (
                                                 <div key={b.key} className="flex items-center justify-between">
                                                     <div className={`flex items-center gap-3 transition-all ${p.features?.[b.key] ? 'text-slate-900 dark:text-white' : 'text-slate-300 dark:text-white/10'}`}>
                                                         <div className={`w-6 h-6 rounded-md flex items-center justify-center transition-all ${p.features?.[b.key] ? 'bg-emerald-500/10 text-emerald-600 dark:text-[#00df82]' : 'bg-slate-100 dark:bg-white/5'}`}>{b.icon}</div>
-                                                        <span className="text-[9px] font-black uppercase tracking-tight">{b.label}</span>
+                                                        <span className="text-[11px] md:text-[9px] font-black uppercase tracking-tight">{b.label}</span>
                                                     </div>
                                                     <Toggle on={!!p.features?.[b.key]} onChange={() => updatePlanFeature(idx, b.key, !p.features?.[b.key])} />
                                                 </div>
                                             ))}
                                         </div>
 
-                                        <button onClick={() => removePlan(idx)} className="mt-5 flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[8px] font-black uppercase text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all">
+                                        <button onClick={() => removePlan(idx)} className="mt-5 flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] md:text-[8px] font-black uppercase text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all">
                                             <HugeiconsIcon icon={Delete02Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                                             Eliminar plan
                                         </button>
@@ -589,7 +589,7 @@ export default function SettingsPage() {
                                 );
                             })}
                         </div>
-                        <p className="flex items-center gap-2 text-[8px] font-bold text-slate-400 uppercase leading-relaxed">
+                        <p className="flex items-center gap-2 text-[11px] md:text-[8px] font-bold text-slate-400 uppercase leading-relaxed">
                             <HugeiconsIcon icon={InformationCircleIcon} className="w-3.5 h-3.5 shrink-0" strokeWidth={1.8} />
                             El "peso de prioridad" ordena los recintos en el directorio del player: los planes con "Prioridad Top" aparecen primero y, dentro de estos, se ordenan por este valor (mayor = primero).
                         </p>
@@ -614,23 +614,23 @@ export default function SettingsPage() {
                                     ].map(row => (
                                         <div key={row.key} className="flex items-center justify-between bg-white dark:bg-white/5 p-4 rounded-md border border-slate-200 dark:border-white/10">
                                             <div>
-                                                <p className="text-[10px] font-black uppercase tracking-tight text-slate-900 dark:text-white">{row.label}</p>
-                                                <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">{row.desc}</p>
+                                                <p className="text-xs md:text-[10px] font-black uppercase tracking-tight text-slate-900 dark:text-white">{row.label}</p>
+                                                <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase mt-1">{row.desc}</p>
                                             </div>
                                             <Toggle on={settings.sii[row.key as keyof typeof settings.sii] as boolean} onChange={() => updateNested('sii', row.key, !settings.sii[row.key as keyof typeof settings.sii])} color={row.color} />
                                         </div>
                                     ))}
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="space-y-1.5">
-                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">RUT de la empresa</label>
+                                            <label className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">RUT de la empresa</label>
                                             <input type="text" value={settings.sii.rutEmpresa} onChange={e => updateNested('sii', 'rutEmpresa', e.target.value)} className={inputCls} />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">IVA (%)</label>
+                                            <label className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">IVA (%)</label>
                                             <input type="number" min={0} max={100} value={settings.sii.taxRate} onChange={e => updateNested('sii', 'taxRate', Math.min(100, Math.max(0, parseInt(e.target.value) || 0)))} className={inputCls} />
                                         </div>
                                     </div>
-                                    <p className="text-[8px] font-bold text-slate-400 uppercase leading-relaxed">
+                                    <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase leading-relaxed">
                                         <HugeiconsIcon icon={InformationCircleIcon} className="w-3 h-3 inline mr-1" strokeWidth={1.8} />
                                         El IVA se aplica automáticamente a las liquidaciones del módulo de facturación.
                                     </p>
@@ -648,8 +648,8 @@ export default function SettingsPage() {
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-md bg-slate-100 dark:bg-white/5 flex items-center justify-center text-indigo-500"><HugeiconsIcon icon={MoneyBag01Icon} className="w-5 h-5" strokeWidth={1.6} /></div>
                                                 <div>
-                                                    <p className="text-[10px] font-black uppercase text-slate-900 dark:text-white">{label}</p>
-                                                    <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">{settings.paymentGateways[id as keyof typeof settings.paymentGateways] ? 'Activa' : 'Inactiva'}</p>
+                                                    <p className="text-xs md:text-[10px] font-black uppercase text-slate-900 dark:text-white">{label}</p>
+                                                    <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase mt-0.5">{settings.paymentGateways[id as keyof typeof settings.paymentGateways] ? 'Activa' : 'Inactiva'}</p>
                                                 </div>
                                             </div>
                                             <Toggle on={settings.paymentGateways[id as keyof typeof settings.paymentGateways]} onChange={() => updateNested('paymentGateways', id, !settings.paymentGateways[id as keyof typeof settings.paymentGateways])} color="bg-indigo-600" />
@@ -669,24 +669,24 @@ export default function SettingsPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-5">
                                 <div className={panelCls}>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block pl-1">Nombre de la plataforma</label>
+                                    <label className="text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block pl-1">Nombre de la plataforma</label>
                                     <input type="text" value={settings.platformName} onChange={e => { setSettings({ ...settings, platformName: e.target.value }); markDirty(); }} className={inputCls} />
                                 </div>
                                 <div className={panelCls}>
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block pl-1">Correo de soporte</label>
+                                    <label className="text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block pl-1">Correo de soporte</label>
                                     <input type="email" value={settings.supportEmail} onChange={e => { setSettings({ ...settings, supportEmail: e.target.value }); markDirty(); }} className={inputCls} />
                                 </div>
                                 <div className={panelCls}>
                                     <div className="flex items-center justify-between mb-2">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Términos y condiciones</label>
-                                        <span className="text-[8px] font-black text-slate-300 uppercase">Legal</span>
+                                        <label className="text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Términos y condiciones</label>
+                                        <span className="text-[11px] md:text-[8px] font-black text-slate-300 uppercase">Legal</span>
                                     </div>
                                     <textarea rows={4} value={settings.legal.terms} onChange={e => updateNested('legal', 'terms', e.target.value)} className={`${inputCls} resize-y`} />
                                 </div>
                                 <div className={panelCls}>
                                     <div className="flex items-center justify-between mb-2">
-                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Política de privacidad</label>
-                                        <span className="text-[8px] font-black text-slate-300 uppercase">Legal</span>
+                                        <label className="text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Política de privacidad</label>
+                                        <span className="text-[11px] md:text-[8px] font-black text-slate-300 uppercase">Legal</span>
                                     </div>
                                     <textarea rows={4} value={settings.legal.privacy} onChange={e => updateNested('legal', 'privacy', e.target.value)} className={`${inputCls} resize-y`} />
                                 </div>
@@ -698,13 +698,13 @@ export default function SettingsPage() {
                                 </div>
                                 {[['razonSocial', 'Razón social'], ['rut', 'RUT'], ['direccion', 'Dirección'], ['giro', 'Giro'], ['representante', 'Representante'], ['emailFacturacion', 'Correo de facturación']].map(([key, label]) => (
                                     <div key={key}>
-                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1.5 block pl-1">{label}</label>
+                                        <label className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1.5 block pl-1">{label}</label>
                                         <input type="text" value={settings.corporateData[key as keyof typeof settings.corporateData]} onChange={e => updateNested('corporateData', key, e.target.value)} className={inputCls} />
                                     </div>
                                 ))}
                                 <div className="pt-2 flex items-start gap-2 rounded-md bg-emerald-500/10 border border-emerald-500/20 p-3">
                                     <HugeiconsIcon icon={InformationCircleIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82] shrink-0 mt-0.5" strokeWidth={1.8} />
-                                    <p className="text-[8px] font-bold text-slate-500 dark:text-slate-400 uppercase leading-relaxed">
+                                    <p className="text-[11px] md:text-[8px] font-bold text-slate-500 dark:text-slate-400 uppercase leading-relaxed">
                                         Estos datos se usan como emisor en las liquidaciones PDF y en los documentos legales de la plataforma.
                                     </p>
                                 </div>
@@ -718,7 +718,7 @@ export default function SettingsPage() {
                     <div className="space-y-8 animate-fadeIn">
                         <HeaderSeccion titulo="Staff directivo" desc="Jerarquía y privilegios de acceso al núcleo administrativo." />
                         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10">
-                            <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-wider">
+                            <div className="flex items-center gap-4 text-xs md:text-[10px] font-black uppercase tracking-wider">
                                 <span className="text-slate-500 dark:text-slate-300">Total: <span className="text-slate-900 dark:text-white">{adminTeam.length}</span></span>
                                 <span className="text-slate-500 dark:text-slate-300">Superadmins: <span className="text-indigo-500">{adminTeam.filter(a => a.role === 'superadmin').length}</span></span>
                                 <span className="text-slate-500 dark:text-slate-300">Admins: <span className="text-emerald-600 dark:text-[#00df82]">{adminTeam.filter(a => a.role !== 'superadmin').length}</span></span>
@@ -730,7 +730,7 @@ export default function SettingsPage() {
                                     value={staffSearch}
                                     onChange={e => setStaffSearch(e.target.value)}
                                     placeholder="Buscar por nombre o correo..."
-                                    className="w-full pl-9 pr-3 py-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 rounded-md text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400"
+                                    className="w-full pl-9 pr-3 py-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500/40 rounded-md text-xs md:text-[10px] font-black outline-hidden text-slate-700 dark:text-white placeholder:text-slate-400"
                                 />
                             </div>
                         </div>
@@ -742,7 +742,7 @@ export default function SettingsPage() {
                                 </div>
                                 <div className="space-y-3">
                                     <input type="email" value={promoEmail} onChange={e => setPromoEmail(e.target.value)} className="w-full bg-white/10 border-none rounded-md px-4 py-3 text-[11px] font-black placeholder-indigo-300 text-white outline-hidden focus:ring-2 ring-white/20" placeholder="email@mvp.cl" />
-                                    <button onClick={promoteUser} disabled={saving} className="w-full py-3 bg-white text-indigo-600 rounded-md text-[10px] font-black uppercase active:scale-95 shadow-lg hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2">
+                                    <button onClick={promoteUser} disabled={saving} className="w-full py-3 bg-white text-indigo-600 rounded-md text-xs md:text-[10px] font-black uppercase active:scale-95 shadow-lg hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2">
                                         Asignar rango <HugeiconsIcon icon={ArrowUpRight01Icon} className="w-3.5 h-3.5" strokeWidth={2} />
                                     </button>
                                 </div>
@@ -754,11 +754,11 @@ export default function SettingsPage() {
                                             <div className="w-10 h-10 rounded-md bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400"><HugeiconsIcon icon={UserCircleIcon} className="w-6 h-6" strokeWidth={1.6} /></div>
                                             <div>
                                                 <p className="text-[11px] font-black text-slate-900 dark:text-white uppercase leading-none mb-1">{a.fullName || 'Administrador'}{isSelf(a.uid) ? ' (tú)' : ''}</p>
-                                                <p className="text-[9px] font-bold text-slate-400 font-mono">{a.email}</p>
+                                                <p className="text-[11px] md:text-[9px] font-bold text-slate-400 font-mono">{a.email}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${a.role === 'superadmin' ? 'bg-indigo-600 text-white' : 'bg-emerald-500 text-white'}`}>{a.role === 'superadmin' ? 'Superadmin' : 'Admin'}</span>
+                                            <span className={`px-3 py-1 rounded-full text-[11px] md:text-[8px] font-black uppercase tracking-widest ${a.role === 'superadmin' ? 'bg-indigo-600 text-white' : 'bg-emerald-500 text-white'}`}>{a.role === 'superadmin' ? 'Superadmin' : 'Admin'}</span>
                                             {a.role === 'superadmin' && (
                                                 <button
                                                     onClick={() => demoteStaff(a)}
@@ -808,7 +808,7 @@ export default function SettingsPage() {
                                 <div key={s.label} className="rounded-md bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-5">
                                     <div className="text-emerald-600 dark:text-[#00df82] mb-3">{s.icon}</div>
                                     <p className="text-2xl font-black text-slate-900 dark:text-white font-mono leading-none">{s.value}</p>
-                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-wider mt-2">{s.label}</p>
+                                    <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase tracking-wider mt-2">{s.label}</p>
                                 </div>
                             ))}
                         </div>
@@ -821,7 +821,7 @@ export default function SettingsPage() {
                                 </div>
                                 <div>
                                     <p className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-wider font-heading">Modo mantenimiento</p>
-                                    <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">
+                                    <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase mt-1">
                                         {settings.maintenanceMode ? 'Activo: la plataforma está en mantenimiento.' : 'Inactivo: acceso normal para todos los usuarios.'}
                                     </p>
                                 </div>
@@ -834,7 +834,7 @@ export default function SettingsPage() {
                                         showModal({ title: next ? 'Mantenimiento activado' : 'Mantenimiento finalizado', message: next ? 'La plataforma queda en modo mantenimiento.' : 'El acceso quedó restaurado.', type: 'success' });
                                     }).catch(() => showModal({ title: 'Error', message: 'No se pudo actualizar el mantenimiento.', type: 'danger' }));
                                 }}
-                                className={`px-6 py-3 rounded-md text-[10px] font-black uppercase shadow-lg active:scale-95 transition-all ${settings.maintenanceMode ? 'bg-slate-900 text-white hover:bg-slate-800' : 'bg-amber-500 text-white hover:bg-amber-600'}`}
+                                className={`px-6 py-3 rounded-md text-xs md:text-[10px] font-black uppercase shadow-lg active:scale-95 transition-all ${settings.maintenanceMode ? 'bg-slate-900 text-white hover:bg-slate-800' : 'bg-amber-500 text-white hover:bg-amber-600'}`}
                             >
                                 {settings.maintenanceMode ? 'Finalizar mantenimiento' : 'Iniciar mantenimiento'}
                             </button>
@@ -847,7 +847,7 @@ export default function SettingsPage() {
                                     <div className="w-9 h-9 rounded-md bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500"><HugeiconsIcon icon={Database01Icon} className="w-5 h-5" strokeWidth={1.6} /></div>
                                     <h4 className="text-[11px] font-black uppercase text-slate-900 dark:text-white tracking-widest leading-none font-heading">Auditoría reciente</h4>
                                 </div>
-                                <span className="text-[8px] font-black text-slate-400 uppercase">Últimos {recentAudit.length} eventos</span>
+                                <span className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase">Últimos {recentAudit.length} eventos</span>
                             </div>
                             <div className="space-y-2.5">
                                 {recentAudit.length > 0 ? recentAudit.map((log) => {
@@ -858,15 +858,15 @@ export default function SettingsPage() {
                                     return (
                                         <div key={log.id || `${log.action}-${log.timestamp?.seconds}`} className="flex items-center justify-between gap-4 p-4 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10">
                                             <div className="flex items-center gap-3 min-w-0">
-                                                <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase border shrink-0 ${sevStyle}`}>{sev === 'CRITICAL' ? 'Crítica' : sev === 'HIGH' ? 'Alta' : sev === 'MEDIUM' ? 'Media' : 'Baja'}</span>
+                                                <span className={`px-2 py-0.5 rounded-md text-[11px] md:text-[8px] font-black uppercase border shrink-0 ${sevStyle}`}>{sev === 'CRITICAL' ? 'Crítica' : sev === 'HIGH' ? 'Alta' : sev === 'MEDIUM' ? 'Media' : 'Baja'}</span>
                                                 <div className="min-w-0">
-                                                    <p className="text-[10px] font-black text-slate-900 dark:text-white uppercase truncate">{log.action || 'EVENTO'}</p>
-                                                    <p className="text-[8px] font-bold text-slate-400 uppercase truncate">{log.module} · {log.actor || 'Sistema'}</p>
+                                                    <p className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase truncate">{log.action || 'EVENTO'}</p>
+                                                    <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase truncate">{log.module} · {log.actor || 'Sistema'}</p>
                                                 </div>
                                             </div>
                                             <div className="text-right shrink-0">
-                                                <p className="text-[9px] font-black text-slate-500 dark:text-slate-300 font-mono">{time}</p>
-                                                <p className="text-[8px] font-bold text-slate-400 uppercase">{date}</p>
+                                                <p className="text-[11px] md:text-[9px] font-black text-slate-500 dark:text-slate-300 font-mono">{time}</p>
+                                                <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase">{date}</p>
                                             </div>
                                         </div>
                                     );
@@ -904,14 +904,14 @@ export default function SettingsPage() {
                                 <button
                                     onClick={() => { modal.onConfirm?.(); setModal(prev => ({ ...prev, show: false })); }}
                                     disabled={!!modal.confirmText && confirmValue.trim().toUpperCase() !== modal.confirmText.toUpperCase()}
-                                    className={`w-full py-3.5 text-white rounded-md text-[10px] font-black uppercase shadow-2xl active:scale-95 transition-all disabled:opacity-40 ${modal.type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-500 dark:bg-[#00df82] dark:text-black hover:brightness-110'}`}
+                                    className={`w-full py-3.5 text-white rounded-md text-xs md:text-[10px] font-black uppercase shadow-2xl active:scale-95 transition-all disabled:opacity-40 ${modal.type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-500 dark:bg-[#00df82] dark:text-black hover:brightness-110'}`}
                                 >
                                     Ejecutar protocolo
                                 </button>
-                                <button onClick={() => setModal(prev => ({ ...prev, show: false }))} className="w-full py-3.5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 rounded-md text-[10px] font-black uppercase transition-all hover:bg-slate-200 dark:hover:bg-white/10">Abortar operación</button>
+                                <button onClick={() => setModal(prev => ({ ...prev, show: false }))} className="w-full py-3.5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 rounded-md text-xs md:text-[10px] font-black uppercase transition-all hover:bg-slate-200 dark:hover:bg-white/10">Abortar operación</button>
                             </div>
                         ) : (
-                            <button onClick={() => setModal(prev => ({ ...prev, show: false }))} className="w-full py-3.5 bg-emerald-500 dark:bg-[#00df82] dark:text-black text-white rounded-md text-[10px] font-black uppercase shadow-2xl active:scale-95 transition-all hover:brightness-110">Entendido</button>
+                            <button onClick={() => setModal(prev => ({ ...prev, show: false }))} className="w-full py-3.5 bg-emerald-500 dark:bg-[#00df82] dark:text-black text-white rounded-md text-xs md:text-[10px] font-black uppercase shadow-2xl active:scale-95 transition-all hover:brightness-110">Entendido</button>
                         )}
                     </div>
                 </div>

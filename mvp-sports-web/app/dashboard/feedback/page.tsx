@@ -32,7 +32,7 @@ const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 
             'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
         }`}>
             {type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5" strokeWidth={2} /> : <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5" strokeWidth={2} />}
-            <span className="text-[10px] font-black uppercase tracking-wider">{message}</span>
+            <span className="text-xs md:text-[10px] font-black uppercase tracking-wider">{message}</span>
         </div>
     );
 };
@@ -197,7 +197,7 @@ export default function FeedbackPage() {
                     <button onClick={() => fetchData()} title="Actualizar datos" className="p-2.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all">
                         <HugeiconsIcon icon={RefreshIcon} className="w-4 h-4" strokeWidth={2} />
                     </button>
-                    <button onClick={exportCSV} disabled={filteredReviews.length === 0} className="flex items-center gap-2 px-3.5 py-2.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-[10px] font-black uppercase tracking-wider hover:border-emerald-400 dark:hover:border-[#00df82]/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all disabled:opacity-40">
+                    <button onClick={exportCSV} disabled={filteredReviews.length === 0} className="flex items-center gap-2 px-3.5 py-2.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-xs md:text-[10px] font-black uppercase tracking-wider hover:border-emerald-400 dark:hover:border-[#00df82]/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all disabled:opacity-40">
                         <HugeiconsIcon icon={Download01Icon} className="w-4 h-4" strokeWidth={2} /> Exportar
                     </button>
                 </div>
@@ -208,23 +208,23 @@ export default function FeedbackPage() {
                 <div className="flex flex-wrap items-center gap-2">
                     <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10">
                         <HugeiconsIcon icon={Building01Icon} className="w-3.5 h-3.5 text-emerald-600 dark:text-[#00df82] shrink-0" strokeWidth={2} />
-                        <select value={selectedVenueId} onChange={(e) => setSelectedVenueId(e.target.value)} className="bg-transparent text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white">
+                        <select value={selectedVenueId} onChange={(e) => setSelectedVenueId(e.target.value)} className="bg-transparent text-xs md:text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white">
                             <option value="all">Todos los recintos</option>
                             {venues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
                         </select>
                     </div>
-                    <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value === 'all' ? 'all' : parseInt(e.target.value))} className="px-2.5 py-2 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white">
+                    <select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value === 'all' ? 'all' : parseInt(e.target.value))} className="px-2.5 py-2 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs md:text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white">
                         <option value="all">Todos los meses</option>
                         {MESES.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                     </select>
-                    <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="px-2.5 py-2 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white">
+                    <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))} className="px-2.5 py-2 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs md:text-[10px] font-black uppercase outline-hidden text-slate-700 dark:text-white">
                         {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
                     </select>
                 </div>
                 <div className="flex bg-white dark:bg-white/5 p-1 rounded-md border border-slate-200 dark:border-white/10">
-                    <button onClick={() => setFilterRating('all')} className={`px-3 py-1.5 text-[9px] font-black uppercase rounded-md transition-all ${filterRating === 'all' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>Todas</button>
+                    <button onClick={() => setFilterRating('all')} className={`px-3 py-1.5 text-[11px] md:text-[9px] font-black uppercase rounded-md transition-all ${filterRating === 'all' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>Todas</button>
                     {[5, 4, 3, 2, 1].map(star => (
-                        <button aria-label={`Filtrar ${star} estrellas`} key={star} onClick={() => setFilterRating(star)} className={`flex items-center gap-1 px-2.5 py-1.5 text-[9px] font-black rounded-md transition-all ${filterRating === star ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
+                        <button aria-label={`Filtrar ${star} estrellas`} key={star} onClick={() => setFilterRating(star)} className={`flex items-center gap-1 px-2.5 py-1.5 text-[11px] md:text-[9px] font-black rounded-md transition-all ${filterRating === star ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
                             {star} <HugeiconsIcon icon={StarIcon} className="w-3 h-3 text-amber-500" strokeWidth={2} />
                         </button>
                     ))}
@@ -235,7 +235,7 @@ export default function FeedbackPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="rounded-md bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/5 p-5 flex items-center justify-between">
                     <div>
-                        <p className="text-[9px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-widest mb-1.5">Rating promedio</p>
+                        <p className="text-[11px] md:text-[9px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-widest mb-1.5">Rating promedio</p>
                         <div className="flex items-end gap-2">
                             <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter leading-none font-mono">{avgRating}</h3>
                             <div className="flex text-amber-500 mb-1">
@@ -258,7 +258,7 @@ export default function FeedbackPage() {
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-24 space-y-4">
                     <HugeiconsIcon icon={RefreshIcon} className="w-8 h-8 text-emerald-500 animate-spin" strokeWidth={1.6} />
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sincronizando reputación global...</p>
+                    <p className="text-xs md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sincronizando reputación global...</p>
                 </div>
             ) : (
                 <SectionCard
@@ -270,7 +270,7 @@ export default function FeedbackPage() {
                     {filteredReviews.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-16 text-slate-400">
                             <HugeiconsIcon icon={Message02Icon} className="w-12 h-12 mb-4" strokeWidth={1.4} />
-                            <p className="text-[10px] font-black uppercase tracking-widest">Sin opiniones bajo estos criterios</p>
+                            <p className="text-xs md:text-[10px] font-black uppercase tracking-widest">Sin opiniones bajo estos criterios</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -288,9 +288,9 @@ export default function FeedbackPage() {
                                                         <HugeiconsIcon icon={UserCircleIcon} className="w-5 h-5" strokeWidth={1.6} />
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-tight truncate">{displayName}</h4>
-                                                        <span className="text-[7px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-widest truncate block">{review.venueName}</span>
-                                                        <span className="text-[7px] font-bold text-slate-400 uppercase">{review.date?.toDate ? review.date.toDate().toLocaleDateString('es-CL', { day: '2-digit', month: 'short' }) : 'Reciente'}</span>
+                                                        <h4 className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-tight truncate">{displayName}</h4>
+                                                        <span className="text-[11px] md:text-[7px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-widest truncate block">{review.venueName}</span>
+                                                        <span className="text-[11px] md:text-[7px] font-bold text-slate-400 uppercase">{review.date?.toDate ? review.date.toDate().toLocaleDateString('es-CL', { day: '2-digit', month: 'short' }) : 'Reciente'}</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/15">
@@ -305,27 +305,27 @@ export default function FeedbackPage() {
                                             {(review.bookingId || sport) && (
                                                 <div className="mt-3 flex flex-wrap gap-1.5">
                                                     {review.bookingId && (
-                                                        <span className="bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-md border border-slate-200 dark:border-white/10 text-[8px] font-black text-emerald-600 dark:text-[#00df82] uppercase">#{review.bookingId.slice(0, 8).toUpperCase()}</span>
+                                                        <span className="bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-md border border-slate-200 dark:border-white/10 text-[11px] md:text-[8px] font-black text-emerald-600 dark:text-[#00df82] uppercase">#{review.bookingId.slice(0, 8).toUpperCase()}</span>
                                                     )}
                                                     {sport && (
-                                                        <span className="bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-md border border-slate-200 dark:border-white/10 text-[8px] font-black text-slate-600 dark:text-slate-300 uppercase">{sport}</span>
+                                                        <span className="bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-md border border-slate-200 dark:border-white/10 text-[11px] md:text-[8px] font-black text-slate-600 dark:text-slate-300 uppercase">{sport}</span>
                                                     )}
                                                 </div>
                                             )}
 
                                             {review.reply ? (
                                                 <div className="mt-3 p-3 rounded-md bg-emerald-500/5 border border-emerald-500/15">
-                                                    <p className="text-[7px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-widest mb-1">Respuesta del recinto</p>
-                                                    <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed">{typeof review.reply === 'string' ? review.reply : ''}</p>
+                                                    <p className="text-[11px] md:text-[7px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-widest mb-1">Respuesta del recinto</p>
+                                                    <p className="text-xs md:text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed">{typeof review.reply === 'string' ? review.reply : ''}</p>
                                                 </div>
                                             ) : isReplying ? (
                                                 <div className="mt-3 space-y-2">
                                                     <textarea rows={2} value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Escribe tu respuesta..." className={inputCls} autoFocus />
                                                     <div className="flex gap-2">
-                                                        <button aria-label="Enviar" onClick={() => handleReply(review.id)} disabled={isSubmittingReply || !replyText.trim()} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[8px] font-black uppercase tracking-wider disabled:opacity-40 active:scale-95 transition-all">
+                                                        <button aria-label="Enviar" onClick={() => handleReply(review.id)} disabled={isSubmittingReply || !replyText.trim()} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[11px] md:text-[8px] font-black uppercase tracking-wider disabled:opacity-40 active:scale-95 transition-all">
                                                             <HugeiconsIcon icon={SentIcon} className="w-3 h-3" strokeWidth={2} /> {isSubmittingReply ? 'Enviando...' : 'Publicar'}
                                                         </button>
-                                                        <button onClick={() => { setReplyingId(null); setReplyText(''); }} className="px-3 py-1.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 text-[8px] font-black uppercase tracking-wider transition-all">Cancelar</button>
+                                                        <button onClick={() => { setReplyingId(null); setReplyText(''); }} className="px-3 py-1.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 text-[11px] md:text-[8px] font-black uppercase tracking-wider transition-all">Cancelar</button>
                                                     </div>
                                                 </div>
                                             ) : null}
@@ -334,10 +334,10 @@ export default function FeedbackPage() {
                                         <div className="mt-auto pt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
                                             <div className="flex items-center gap-1.5">
                                                 <span className={`w-1.5 h-1.5 rounded-full ${review.rating >= 4 ? 'bg-emerald-500' : review.rating >= 3 ? 'bg-amber-500' : 'bg-red-500'}`} />
-                                                <p className="text-[7px] font-black text-slate-400 uppercase tracking-tighter">Verificado</p>
+                                                <p className="text-[11px] md:text-[7px] font-black text-slate-400 uppercase tracking-tighter">Verificado</p>
                                             </div>
                                             {!review.reply && (
-                                                <button onClick={() => setReplyingId(isReplying ? null : review.id)} className="text-[8px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-wider hover:underline">
+                                                <button onClick={() => setReplyingId(isReplying ? null : review.id)} className="text-[11px] md:text-[8px] font-black text-emerald-600 dark:text-[#00df82] uppercase tracking-wider hover:underline">
                                                     Responder
                                                 </button>
                                             )}

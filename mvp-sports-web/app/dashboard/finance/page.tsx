@@ -67,7 +67,7 @@ const LABEL_TONE: Record<string, string> = {
     'Error en reembolso': 'text-amber-500 bg-amber-500/10 border-amber-500/10',
 };
 const StatusBadge = ({ label }: { label: string }) => (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] font-bold uppercase border ${LABEL_TONE[label] || 'text-slate-500 bg-slate-500/10 border-slate-500/10'}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] md:text-[9px] font-bold uppercase border ${LABEL_TONE[label] || 'text-slate-500 bg-slate-500/10 border-slate-500/10'}`}>
         <span className="w-1.5 h-1.5 rounded-full bg-current" />{label}
     </span>
 );
@@ -258,7 +258,7 @@ export default function FinancePage() {
                     <div>
                         <div className="flex items-center gap-2 mb-0.5">
                             <span className="w-6 h-[2px] bg-emerald-500 rounded-md"></span>
-                            <p className="text-[9px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Analítica de negocio</p>
+                            <p className="text-[11px] md:text-[9px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Analítica de negocio</p>
                         </div>
                         <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">
                             Control <span className="text-emerald-500 dark:text-[#00df82]">Financiero</span>
@@ -277,7 +277,7 @@ export default function FinancePage() {
                             </p>
                         </div>
                         <Link href="/dashboard/billing-subscription">
-                            <span className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-emerald-500 text-white text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all">
+                            <span className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-emerald-500 text-white text-xs md:text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all">
                                 Mejorar plan
                             </span>
                         </Link>
@@ -294,7 +294,7 @@ export default function FinancePage() {
                 <div>
                     <div className="flex items-center gap-2 mb-0.5">
                         <span className="w-6 h-[2px] bg-emerald-500 rounded-md"></span>
-                        <p className="text-[10px] font-bold text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">
+                        <p className="text-xs md:text-[10px] font-bold text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">
                             Resumen de ingresos y pagos
                         </p>
                     </div>
@@ -331,14 +331,14 @@ export default function FinancePage() {
             {loadError && (
                 <div role="alert" className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-md border border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-400">
                     <p className="text-[11px] font-bold">{loadError}</p>
-                    <button onClick={() => setReloadTick(t => t + 1)} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-red-500 text-white text-[10px] font-bold uppercase tracking-wider">
+                    <button onClick={() => setReloadTick(t => t + 1)} className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-red-500 text-white text-xs md:text-[10px] font-bold uppercase tracking-wider">
                         <HugeiconsIcon icon={RefreshIcon} className="w-3.5 h-3.5" strokeWidth={2} /> Reintentar
                     </button>
                 </div>
             )}
 
             {/* KPI GRID */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
                 <TarjetaKpi
                     label={`INGRESOS ${MONTHS[selectedMonth].toUpperCase()}`}
                     value={formatCLP(stats.total)}
@@ -361,17 +361,17 @@ export default function FinancePage() {
                                 <HugeiconsIcon icon={trendUp ? ChartBarIncreasingIcon : ChartBarDecreasingIcon} className="w-5 h-5" strokeWidth={1.8} />
                             </div>
                             <div>
-                                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1">Vs mes anterior</p>
+                                <p className="text-[11px] md:text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-1">Vs mes anterior</p>
                                 <p className={`text-lg font-black font-mono leading-none ${trendUp ? 'text-emerald-600 dark:text-[#00df82]' : 'text-red-500'}`}>
                                     {showTrend ? `${trendPct >= 0 ? '+' : ''}${trendPct}%` : '—'}
                                 </p>
                             </div>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2">
-                            <button onClick={exportCSV} className="flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[9px] font-bold uppercase tracking-widest hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all">
+                            <button onClick={exportCSV} className="flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[11px] md:text-[9px] font-bold uppercase tracking-widest hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all">
                                 <HugeiconsIcon icon={FileExportIcon} className="w-3.5 h-3.5" strokeWidth={2} /> CSV
                             </button>
-                            <button onClick={generatePDF} className="flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-emerald-500/25 hover:brightness-110 transition-all">
+                            <button onClick={generatePDF} className="flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md text-[11px] md:text-[9px] font-bold uppercase tracking-widest shadow-lg shadow-emerald-500/25 hover:brightness-110 transition-all">
                                 <HugeiconsIcon icon={DocumentCodeIcon} className="w-3.5 h-3.5" strokeWidth={2} /> PDF
                             </button>
                         </div>
@@ -388,7 +388,7 @@ export default function FinancePage() {
                                 <button
                                     key={type}
                                     onClick={() => setFilterType(type)}
-                                    className={`flex-1 lg:flex-none whitespace-nowrap px-4 py-2 text-[10px] font-bold uppercase rounded-md transition-all ${
+                                    className={`flex-1 lg:flex-none whitespace-nowrap px-4 py-2 text-xs md:text-[10px] font-bold uppercase rounded-md transition-all ${
                                         filterType === type
                                             ? 'bg-slate-900 text-white dark:bg-[#00df82] dark:text-black'
                                             : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'
@@ -398,7 +398,7 @@ export default function FinancePage() {
                                 </button>
                             ))}
                         </div>
-                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">
+                        <span className="text-xs md:text-[10px] font-black uppercase text-slate-400 tracking-widest">
                             {filteredTransactions.length} {filteredTransactions.length === 1 ? 'movimiento' : 'movimientos'}
                         </span>
                     </div>
@@ -418,18 +418,18 @@ export default function FinancePage() {
                 {/* Móvil: tarjetas */}
                 <div className="md:hidden divide-y divide-slate-100 dark:divide-white/5">
                     {loading ? (
-                        <p className="py-16 text-center text-[10px] font-bold text-slate-400 uppercase animate-pulse">Cargando movimientos...</p>
+                        <p className="py-16 text-center text-xs md:text-[10px] font-bold text-slate-400 uppercase animate-pulse">Cargando movimientos...</p>
                     ) : visibleTransactions.length === 0 ? (
                         <EmptyState />
                     ) : visibleTransactions.map((t) => (
                         <div key={`${t.kind}-${t.id}`} className="p-4 flex items-start justify-between gap-3">
                             <div className="min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border ${KIND_TONE[t.kind]}`}>{KIND_LABEL[t.kind]}</span>
-                                    <span className="text-[10px] font-mono text-slate-400">{t.date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })}{t.timeRange ? ` · ${t.timeRange}` : ''}</span>
+                                    <span className={`px-2 py-0.5 rounded-md text-[11px] md:text-[9px] font-bold uppercase border ${KIND_TONE[t.kind]}`}>{KIND_LABEL[t.kind]}</span>
+                                    <span className="text-xs md:text-[10px] font-mono text-slate-400">{t.date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })}{t.timeRange ? ` · ${t.timeRange}` : ''}</span>
                                 </div>
                                 <p className="text-[12px] font-bold text-slate-900 dark:text-white uppercase truncate">{t.clientName}</p>
-                                <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{t.kind === 'reserva' ? `${t.sport} · ${t.courtName}` : t.detail} · {venueName(t.tenantId)}</p>
+                                <p className="text-xs md:text-[10px] text-slate-500 dark:text-slate-400 truncate">{t.kind === 'reserva' ? `${t.sport} · ${t.courtName}` : t.detail} · {venueName(t.tenantId)}</p>
                             </div>
                             <div className="text-right shrink-0 space-y-1.5">
                                 <p className={`text-[12px] font-black font-mono ${t.counts ? 'text-slate-900 dark:text-white' : 'text-slate-400 line-through'}`}>{formatCLP(t.amount)}</p>
@@ -444,20 +444,20 @@ export default function FinancePage() {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-50/30 dark:bg-white/1">
-                                <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fecha</th>
-                                <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cliente</th>
-                                <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Recinto</th>
-                                <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tipo</th>
-                                <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Detalle</th>
-                                <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pago</th>
-                                <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Monto</th>
-                                <th className="px-5 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">Estado</th>
+                                <th className="px-5 py-4 text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fecha</th>
+                                <th className="px-5 py-4 text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cliente</th>
+                                <th className="px-5 py-4 text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Recinto</th>
+                                <th className="px-5 py-4 text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tipo</th>
+                                <th className="px-5 py-4 text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Detalle</th>
+                                <th className="px-5 py-4 text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pago</th>
+                                <th className="px-5 py-4 text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Monto</th>
+                                <th className="px-5 py-4 text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider text-center">Estado</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={8} className="px-6 py-20 text-center text-[10px] font-bold text-slate-400 uppercase animate-pulse">Cargando movimientos...</td>
+                                    <td colSpan={8} className="px-6 py-20 text-center text-xs md:text-[10px] font-bold text-slate-400 uppercase animate-pulse">Cargando movimientos...</td>
                                 </tr>
                             ) : visibleTransactions.length > 0 ? (
                                 visibleTransactions.map((t) => (
@@ -465,18 +465,18 @@ export default function FinancePage() {
                                         <td className="px-5 py-4">
                                             <div className="flex flex-col">
                                                 <span className="font-bold text-slate-800 dark:text-white">{t.date.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' })}</span>
-                                                <span className="text-[9px] text-slate-400 font-mono">{t.date.toLocaleDateString('es-CL', { year: 'numeric' })}</span>
-                                                {t.timeRange && <span className="text-[9px] text-slate-400 font-mono mt-0.5">{t.timeRange}</span>}
+                                                <span className="text-[11px] md:text-[9px] text-slate-400 font-mono">{t.date.toLocaleDateString('es-CL', { year: 'numeric' })}</span>
+                                                {t.timeRange && <span className="text-[11px] md:text-[9px] text-slate-400 font-mono mt-0.5">{t.timeRange}</span>}
                                             </div>
                                         </td>
                                         <td className="px-5 py-4">
                                             <span className="font-bold text-slate-900 dark:text-white uppercase truncate block max-w-[160px]">{t.clientName}</span>
-                                            {t.clientPhone && <p className="text-[9px] text-slate-400 font-mono">{t.clientPhone}</p>}
+                                            {t.clientPhone && <p className="text-[11px] md:text-[9px] text-slate-400 font-mono">{t.clientPhone}</p>}
                                         </td>
                                         <td className="px-5 py-4"><span className="text-slate-500 dark:text-slate-300 uppercase truncate block max-w-[120px]">{venueName(t.tenantId)}</span></td>
-                                        <td className="px-5 py-4"><span className={`inline-flex px-2 py-0.5 rounded-md text-[9px] font-bold uppercase border ${KIND_TONE[t.kind]}`}>{KIND_LABEL[t.kind]}</span></td>
+                                        <td className="px-5 py-4"><span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] md:text-[9px] font-bold uppercase border ${KIND_TONE[t.kind]}`}>{KIND_LABEL[t.kind]}</span></td>
                                         <td className="px-5 py-4"><span className="text-slate-600 dark:text-slate-300 uppercase truncate block max-w-[200px]">{t.kind === 'reserva' ? `${t.sport} · ${t.courtName}` : t.detail}</span></td>
-                                        <td className="px-5 py-4"><span className="text-[10px] font-bold uppercase text-sky-500">{paymentLabel(t)}</span></td>
+                                        <td className="px-5 py-4"><span className="text-xs md:text-[10px] font-bold uppercase text-sky-500">{paymentLabel(t)}</span></td>
                                         <td className="px-5 py-4 text-right">
                                             <span className={`font-bold font-mono block whitespace-nowrap ${t.counts ? 'text-slate-900 dark:text-white' : 'text-slate-400 line-through'}`}>{formatCLP(t.amount)}</span>
                                         </td>
@@ -492,15 +492,15 @@ export default function FinancePage() {
 
                 {filteredTransactions.length > 0 && (
                     <div className="px-6 py-4 border-t border-slate-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-white/2">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total cobrado del listado ({filteredTransactions.length})</p>
-                        <p className="text-[10px] font-black font-mono text-emerald-600 dark:text-[#00df82]">{formatCLP(sumVisible)}</p>
+                        <p className="text-xs md:text-[10px] font-bold uppercase tracking-widest text-slate-400">Total cobrado del listado ({filteredTransactions.length})</p>
+                        <p className="text-xs md:text-[10px] font-black font-mono text-emerald-600 dark:text-[#00df82]">{formatCLP(sumVisible)}</p>
                     </div>
                 )}
 
                 {filteredTransactions.length > rowLimit && (
                     <button
                         onClick={() => setRowLimit(r => r + 20)}
-                        className="w-full py-4 text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-[#00df82] hover:bg-slate-50/50 dark:hover:bg-white/2 transition-colors border-t border-slate-100 dark:border-white/5"
+                        className="w-full py-4 text-xs md:text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-[#00df82] hover:bg-slate-50/50 dark:hover:bg-white/2 transition-colors border-t border-slate-100 dark:border-white/5"
                     >
                         Mostrar más ({filteredTransactions.length - rowLimit} restantes)
                     </button>
@@ -517,7 +517,7 @@ function EmptyState() {
                 <HugeiconsIcon icon={Cash01Icon} className="w-7 h-7" strokeWidth={1.4} />
             </div>
             <p className="text-[12px] font-black uppercase text-slate-400 tracking-widest">Sin movimientos en este periodo</p>
-            <p className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Prueba con otro mes o recinto</p>
+            <p className="text-xs md:text-[10px] font-bold text-slate-300 uppercase tracking-wider">Prueba con otro mes o recinto</p>
         </div>
     );
 }
