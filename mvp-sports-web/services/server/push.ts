@@ -1,6 +1,6 @@
 import "server-only";
 import crypto from "crypto";
-import webpush from "web-push";
+import * as webpush from "web-push";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "./firebase-admin";
 import { pushFor, type PushEvent } from "@/utils/pushMessages";
