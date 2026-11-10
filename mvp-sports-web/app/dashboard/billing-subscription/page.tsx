@@ -1,4 +1,5 @@
 "use client";
+import { useFeedback } from "@/components/ui/Feedback";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import { postApi } from "@/services/client/apiClient";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -6,7 +7,7 @@ import { LifebuoyIcon } from '@hugeicons/core-free-icons';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/client/firebase';
-import { collection, getDocs, getDoc, query, where, orderBy, doc, updateDoc, onSnapshot, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, getDoc, query, where, orderBy, doc, Timestamp } from 'firebase/firestore';
 import {
     BarChartIcon,
     Building01Icon,
@@ -74,13 +75,12 @@ export default function BillingPage() {
     const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
     const [processingPlan, setProcessingPlan] = useState<string | null>(null);
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
-    const [toast, setToast] = useState<{ msg: string, type: 'success' | 'error' | 'info' } | null>(null);
     const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean, planId: string, planName: string } | null>(null);
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
     const [invoices, setInvoices] = useState<any[]>([]);
     const [loadingInvoices, setLoadingInvoices] = useState(false);
 
-    const showToast = (msg: string, type: 'success' | 'error' | 'info') => { setToast({ msg, type }); setTimeout(() => setToast(null), 4000); };
+    const { toast: showToast } = useFeedback();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -156,7 +156,7 @@ export default function BillingPage() {
         try {
             const snap = await getDocs(query(collection(db, "invoices"), where("tenantId", "==", selectedTenantId), orderBy("date", "desc")));
             setInvoices(snap.docs.map(d => ({ id: d.id, ...d.data(), date: d.data().date?.toDate() || new Date() })));
-        } catch (e) { setInvoices([]); } finally { setLoadingInvoices(false); }
+        } catch { setInvoices([]); } finally { setLoadingInvoices(false); }
     };
 
     useEffect(() => { if (isHistoryModalOpen) fetchInvoices(); }, [isHistoryModalOpen, selectedTenantId]);
@@ -186,7 +186,6 @@ export default function BillingPage() {
 
     return (
         <div className="w-full space-y-5 pb-10 text-left relative">
-            {toast && <div className={`fixed top-4 right-4 px-5 py-3 rounded-md shadow-2xl text-xs md:text-[10px] font-black uppercase tracking-widest z-300 text-white flex items-center gap-2.5 animate-slideIn ${toast.type === 'success' ? 'bg-emerald-500 dark:bg-[#00df82] dark:text-black' : 'bg-red-600'}`}>{toast.type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" /> : <HugeiconsIcon icon={Cancel01Icon} className="w-4 h-4" />} {toast.msg}</div>}
 
             {/* CABECERA */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">

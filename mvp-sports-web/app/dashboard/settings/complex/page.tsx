@@ -1,40 +1,29 @@
 "use client";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { PanelGlass, TarjetaKpi, BotonAccion } from '@/components/ui/DashboardWidgets';
+import { PanelGlass} from '@/components/ui/DashboardWidgets';
 import { Key01Icon } from '@hugeicons/core-free-icons';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { auditService } from '@/services/client/auditService';
-import { db, auth, storage } from '@/services/client/firebase';
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
-import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc, increment, or } from 'firebase/firestore';
+import { db, auth} from '@/services/client/firebase';
+import { collection, getDocs, getDoc, query, where, doc, updateDoc, or } from 'firebase/firestore';
 import {
     Alert02Icon,
     Briefcase01Icon,
     Building01Icon,
-    Calendar03Icon,
-    Cancel01Icon,
     CheckmarkCircle02Icon,
     Clock01Icon,
-    CloudUploadIcon,
     CodeIcon,
     CreditCardIcon,
     FireIcon,
     GlobeIcon,
     IdentityCardIcon,
-    Image01Icon,
     Mail01Icon,
     MapPinIcon,
     Message02Icon,
-    MoneyBag01Icon,
     CallIcon,
     RefreshIcon,
-    ScaleIcon,
-    Settings01Icon,
     ShieldCheckIcon,
-    SparklesIcon,
-    StarIcon,
-    Delete02Icon,
     UserGroupIcon,
     FloppyDiskIcon,
 } from '@hugeicons/core-free-icons';

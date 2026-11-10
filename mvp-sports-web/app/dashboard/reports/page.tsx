@@ -4,7 +4,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
     Search01Icon,
     Ticket01Icon,
-    Clock01Icon,
     Alert02Icon,
     Message02Icon,
     MoneyBag01Icon,
@@ -18,8 +17,7 @@ import {
     Cancel01Icon,
     FilterIcon,
     CheckmarkCircle02Icon,
-    ArrowUpRight01Icon,
-ViewIcon, } from '@hugeicons/core-free-icons';
+    ViewIcon, } from '@hugeicons/core-free-icons';
 import { collection, getDocs, query, orderBy, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
 import { useAuth } from '@/context/AuthContext';

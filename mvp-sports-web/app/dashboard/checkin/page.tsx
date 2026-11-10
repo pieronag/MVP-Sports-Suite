@@ -1,5 +1,5 @@
 "use client";
-import { postApi, syncBookingSlots } from "@/services/client/apiClient";
+import { postApi} from "@/services/client/apiClient";
 import { listBookings } from "@/services/client/data/bookings";
 import { isReal } from "@/utils/bookingModel";
 import { operatingDay } from "@/utils/chileTime";
@@ -9,7 +9,7 @@ import { Html5Qrcode } from 'html5-qrcode';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/client/firebase';
 import { auditService } from '@/services/client/auditService';
-import { collection, query, where, getDocs, getDoc, orderBy, doc, updateDoc, Timestamp, or } from 'firebase/firestore';
+import { collection, query, where, getDocs, Timestamp} from 'firebase/firestore';
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     Alert02Icon,
@@ -34,7 +34,6 @@ import {
     VideoOffIcon,
 } from "@hugeicons/core-free-icons";
 
-
 // Adaptadores: mantienen los nombres usados en el JSX sobre Hugeicons
 const MagnifyingGlassIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Search01Icon} className={className} strokeWidth={1.6} />;
 const QrCodeIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={QrCodeIconHi} className={className} strokeWidth={1.6} />;
@@ -48,7 +47,6 @@ const MapPinIcon = ({ className }: { className?: string }) => <HugeiconsIcon ico
 const BuildingStorefrontIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Store01Icon} className={className} strokeWidth={1.6} />;
 const ChevronDownIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={ArrowDown01Icon} className={className} strokeWidth={1.6} />;
 const CameraIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Camera01Icon} className={className} strokeWidth={1.6} />;
-const BanknotesIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Money03Icon} className={className} strokeWidth={1.6} />;
 const ExclamationCircleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={AlertCircleIcon} className={className} strokeWidth={1.6} />;
 const InformationCircleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={InformationCircleIconHi} className={className} strokeWidth={1.6} />;
 const UserGroupIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={UserGroupIconHi} className={className} strokeWidth={1.6} />;
@@ -235,7 +233,7 @@ export default function CheckInPage() {
                     },
                     () => { }
                 );
-            } catch (err) {
+            } catch {
                 // Si falla el streaming (ej. no hay HTTPS), activamos automáticamente el fallback nativo
                 console.warn("Streaming not supported, triggering native camera fallback.");
                 stopCamera();
@@ -260,7 +258,7 @@ export default function CheckInPage() {
             } else {
                 setStatusModal({ isOpen: true, title: "QR Inválido", message: "No se reconoció ninguna reserva vigente en la imagen capturada.", type: 'error' });
             }
-        } catch (err) {
+        } catch {
             setStatusModal({ isOpen: true, title: "Error de Escaneo", message: "No se detectó un código QR. Intenta tomar la foto más cerca, enfocada y con buena iluminación.", type: 'error' });
         }
     };

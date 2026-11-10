@@ -1,4 +1,5 @@
 "use client";
+import { useFeedback } from "@/components/ui/Feedback";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import { canonicalSport } from "@/utils/sports";
 import { postApi } from "@/services/client/apiClient";
@@ -11,34 +12,24 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/client/firebase';
-import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc, or, deleteField } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, updateDoc, addDoc, deleteDoc, deleteField } from 'firebase/firestore';
 import { auditService } from '@/services/client/auditService';
 import {
     Add01Icon,
     Alert02Icon,
     ArrowDown01Icon,
     ArrowLeft01Icon,
-    BarChartIcon,
-    BoltIcon,
-    Building01Icon,
-    Calendar03Icon,
     Camera01Icon,
-    Cancel01Icon,
     CheckmarkCircle02Icon,
-    Clock01Icon,
-    FilterIcon,
     Grid02Icon,
     Image01Icon,
     MapPinIcon,
-    MoneyBag01Icon,
     PencilEdit02Icon,
     PuzzleIcon,
     RefreshIcon,
     Settings01Icon,
-    SignalIcon,
     Delete02Icon,
     TrophyIcon,
-    UserGroupIcon,
     Wrench01Icon,
     FootballIcon,
     FootballPitchIcon,
@@ -150,28 +141,6 @@ function StatMini({ label, value }: { label: string; value: number }) {
     );
 }
 
-function HeaderSeccion({ titulo, desc, icon: Icon }: any) {
-    let content: React.ReactNode;
-    if (React.isValidElement(Icon)) {
-        content = Icon;
-    } else if (Array.isArray(Icon)) {
-        content = <HugeiconsIcon icon={Icon} className="w-5 h-5" strokeWidth={1.8} />;
-    } else {
-        content = <Icon className="w-5 h-5" />;
-    }
-    return (
-        <div className="flex items-center gap-3.5 mb-6">
-            <div className="w-10 h-10 rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-[#00df82] shrink-0">
-                {content}
-            </div>
-            <div className="space-y-1">
-                <h3 className="text-xs font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white leading-tight">{titulo}</h3>
-                <p className="text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-widest">{desc}</p>
-            </div>
-        </div>
-    );
-}
-
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructive = false }: any) => {
     if (!isOpen) return null;
     return (
@@ -275,12 +244,8 @@ export default function CourtsPage() {
     const [maintenanceConflicts, setMaintenanceConflicts] = useState<any[]>([]);
 
     // TOASTS
-    const [toast, setToast] = useState<{ msg: string, type: 'success' | 'error' | 'info' } | null>(null);
 
-    const showToast = (msg: string, type: 'success' | 'error' | 'info') => {
-        setToast({ msg, type });
-        setTimeout(() => setToast(null), 3000);
-    };
+    const { toast: showToast } = useFeedback();
 
     // Comprime y sube a Storage; devuelve la URL (antes: base64 dentro de Firestore)
     const compressImage = (file: File): Promise<string> => uploadImage(file, { folder: "courts", maxSize: 1200, quality: 0.75 });
@@ -925,7 +890,6 @@ export default function CourtsPage() {
 
 return (
         <div className="w-full space-y-6 pb-28 text-left relative animate-fadeIn">
-            {toast && <div className={`fixed top-6 right-6 px-6 py-3.5 rounded-md shadow-2xl text-xs md:text-[10px] font-black uppercase tracking-widest z-1000 text-white flex items-center gap-3 animate-slideIn ${toast.type === 'success' ? 'bg-emerald-500 dark:bg-[#00df82] dark:text-black' : 'bg-red-600'}`}>{toast.type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-4 h-4" /> : <HugeiconsIcon icon={Alert02Icon} className="w-4 h-4" />} {toast.msg}</div>}
             <ConfirmModal
                 isOpen={confirmData.isOpen}
                 title={confirmData.title}

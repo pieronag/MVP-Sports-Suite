@@ -7,24 +7,14 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/client/firebase';
-import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy} from 'firebase/firestore';
 import { collectedAmount, durationHours } from '@/utils/bookingMath';
 import { auditService } from '@/services/client/auditService';
 import {
-    Add01Icon,
-    Alert02Icon,
-    Building01Icon,
     Calendar03Icon,
     Cancel01Icon,
-    CheckmarkCircle02Icon,
-    ArrowDown01Icon,
-    Clock01Icon,
-    ComputerIcon,
     Message02Icon,
     MoneyBag01Icon,
-    RefreshIcon,
-    SmartPhone01Icon,
-    UserCircleIcon,
     UserIcon,
     ArrowLeft01Icon,
     ArrowRight01Icon,
@@ -32,7 +22,6 @@ import {
 
 const HOUR_HEIGHT = 80;
 const COLUMN_WIDTH = 180;
-
 
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructive = false, showCancel = true }: any) => {
     if (!isOpen) return null;
@@ -50,7 +39,6 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructi
         </div>
     );
 };
-
 
 const formatCLP = (amount: any) => {
     const value = Number(amount) || 0;
@@ -73,7 +61,6 @@ const toWhatsAppNumber = (phone: string = ''): string => {
     return digits.startsWith('56') ? digits : `56${digits}`;
 };
 
-
 export default function MasterCalendar() {
     const { user, firestoreUser, role } = useAuth();
     const [loading, setLoading] = useState(true);
@@ -86,7 +73,6 @@ export default function MasterCalendar() {
     const [confirmData, setConfirmData] = useState<{ isOpen: boolean, title: string, message: string, action: () => void, isDestructive: boolean, showCancel?: boolean }>({ 
         isOpen: false, title: '', message: '', action: () => { }, isDestructive: false, showCancel: true 
     });
-
 
     const calendarConfig = React.useMemo(() => {
         let openHour = 8;
@@ -234,7 +220,6 @@ export default function MasterCalendar() {
             },
         });
     };
-
 
     const getCardStyle = (paymentStatus: string, status: string) => {
         if (status === 'cancelled') return 'bg-slate-50 dark:bg-slate-800/60 border-slate-300 dark:border-white/10 text-slate-500 dark:text-slate-400 opacity-60';

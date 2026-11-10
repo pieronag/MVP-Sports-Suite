@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo} from "react";
 import TierBadge from "@/components/player/TierBadge";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

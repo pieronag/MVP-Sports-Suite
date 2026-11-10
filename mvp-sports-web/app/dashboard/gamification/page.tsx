@@ -16,7 +16,6 @@ import {
     Database01Icon,
     BoltIcon,
     BarChartIcon,
-    CheckmarkBadge01Icon,
     InformationCircleIcon,
     ArrowRight01Icon,
     FloppyDiskIcon,

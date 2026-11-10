@@ -1,7 +1,6 @@
-import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs, Timestamp, increment } from 'firebase/firestore';
+import { doc, getDoc, updateDoc} from 'firebase/firestore';
 import { db, auth } from '@/services/client/firebase';
 import { canonicalSport } from '@/utils/sports';
-import { deleteUser } from 'firebase/auth';
 
 export interface PlayerProfile {
     uid: string;

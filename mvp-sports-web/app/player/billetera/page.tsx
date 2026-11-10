@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { ChevronLeft, Clock, CreditCard, CheckCircle2, Receipt } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { bookingService, Booking } from "@/services/client/player/bookingService";
@@ -73,7 +72,6 @@ export default function BilleteraPage() {
               <p className={`text-[12px] ${muted}`}>pagado en {new Date().getFullYear()}</p>
             </div>
           </div>
-
 
           <section aria-label="Movimientos">
             <h2 className={`text-[12px] font-semibold mb-2 ${muted}`}>Movimientos</h2>

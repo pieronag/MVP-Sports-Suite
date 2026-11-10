@@ -2,9 +2,9 @@
 import { REGIONS } from "@/utils/chileRegions";
 import { teamPostIssue, playerPostIssue } from "@/utils/matchmaking";
 import { GlowCard, SectionPill, SegmentedTabs } from "@/components/player/ui";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Swords, Users, MessageCircle, CheckCircle2, X, Send, User, MapPin } from "@/components/player/icons";
+import { ChevronLeft, Swords, Users, MessageCircle, CheckCircle2, X, User, MapPin } from "@/components/player/icons";
 import { ChevronDown } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
@@ -20,8 +20,6 @@ const POSITIONS_BY_SPORT: Record<string, string[]> = {
   "Básquetbol": ["Base", "Escolta", "Alero", "Ala-Pívot", "Pívot"],
   "Vóleibol": ["Armador", "Atacante", "Central", "Líbero"],
 };
-
-
 
 export default function PartidosPage() {
   const router = useRouter();

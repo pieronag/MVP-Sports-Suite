@@ -221,7 +221,7 @@ export default function Page() {
             try {
                 await updateDoc(doc(db, "invoices", inv.id), { status: newStatus });
                 fetchData();
-            } catch (error) { showAlert("Error", "No se pudo actualizar el estado."); }
+            } catch { showAlert("Error", "No se pudo actualizar el estado."); }
         });
     };
 
@@ -230,7 +230,7 @@ export default function Page() {
             try {
                 await deleteDoc(doc(db, "invoices", id));
                 fetchData();
-            } catch (error) { showAlert("Error", "No se pudo eliminar la liquidación."); }
+            } catch { showAlert("Error", "No se pudo eliminar la liquidación."); }
         });
     };
 
@@ -331,7 +331,7 @@ const TH = { fillColor: [255, 255, 255] as [number, number, number], textColor: 
 
         try {
             docPDF.addImage('/Logo.png', 'PNG', 15, 8, 30, 30);
-        } catch (e) {
+        } catch {
             f(true);
             docPDF.setFontSize(12);
             docPDF.setTextColor(GREEN_D[0], GREEN_D[1], GREEN_D[2]);
@@ -588,7 +588,7 @@ f(true);
         try {
             const doc = await buildPdf(inv);
             setPreview({ url: doc.output('datauristring'), inv });
-        } catch (e) {
+        } catch {
             showAlert('Error', 'No se pudo generar la vista previa.');
         }
     };

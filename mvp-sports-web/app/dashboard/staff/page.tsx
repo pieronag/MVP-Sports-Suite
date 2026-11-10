@@ -5,23 +5,18 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db, auth } from '@/services/client/firebase';
-import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc, or } from 'firebase/firestore';
-import { getApps, initializeApp, getApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { collection, getDocs, query, where} from 'firebase/firestore';
 import { updateStaffPassword } from './actions';
 import { auditService } from '@/services/client/auditService';
 import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
 import {
     Add01Icon,
-    Alert02Icon,
     Briefcase01Icon,
     Building01Icon,
     Cancel01Icon,
     CheckmarkCircle02Icon,
     ViewIcon,
     ViewOffIcon,
-    Grid02Icon,
-    IdentityCardIcon,
     SquareLock01Icon,
     Mail01Icon,
     PencilEdit02Icon,
@@ -29,12 +24,9 @@ import {
     PowerIcon,
     RefreshIcon,
     Search01Icon,
-    ShieldCheckIcon,
     Delete02Icon,
-    UserCircleIcon,
     UserGroupIcon,
-    UserIcon,
-} from '@hugeicons/core-free-icons';
+    } from '@hugeicons/core-free-icons';
 import { PASSWORD_MIN, passwordIssue } from "@/utils/password";
 
 const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
@@ -154,7 +146,7 @@ export default function StaffPage() {
                 staffArrays.flat().forEach(s => uniqueStaffMap.set(s.id, s));
                 allStaff = Array.from(uniqueStaffMap.values());
                 setStaffList(allStaff);
-            } catch (error) { notify("Error al cargar datos", "error"); } finally { setLoading(false); }
+            } catch { notify("Error al cargar datos", "error"); } finally { setLoading(false); }
         };
         initData();
     }, [user]);
@@ -175,7 +167,7 @@ export default function StaffPage() {
             const uniqueStaffMap = new Map();
             staffArrays.flat().forEach(s => uniqueStaffMap.set(s.id, s));
             setStaffList(Array.from(uniqueStaffMap.values()));
-        } catch (e) { }
+        } catch { }
     };
 
     const handleOpenModal = (member?: StaffMember) => {

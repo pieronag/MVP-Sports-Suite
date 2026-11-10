@@ -2,20 +2,16 @@
 import { GlowCard, SectionPill } from "@/components/player/ui";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, CreditCard, ShieldCheck, Zap, Calendar, Clock, Trophy, MapPin, Users, CheckCircle2, XCircle, X } from "@/components/player/icons";
+import { ChevronLeft, CreditCard, ShieldCheck, Calendar, Clock, Trophy, MapPin, Users, CheckCircle2, XCircle, X } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
-import { Timestamp } from "firebase/firestore";
 import { walletService } from "@/services/client/player/walletService";
 import { couponService } from "@/services/client/player/couponService";
 import { tournamentService } from "@/services/client/player/tournamentService";
 import { teamService } from "@/services/client/player/teamService";
-import { bookingService } from "@/services/client/player/bookingService";
-import { doc, getDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { doc, getDoc} from "firebase/firestore";
 import { db } from "@/services/client/firebase";
 import { priceFromTenantConfig } from "@/utils/pricing";
 import CardPayment from "@/components/player/CardPayment";
-
-
 
 const formatMoney = (n: number) => new Intl.NumberFormat("es-CL").format(n);
 

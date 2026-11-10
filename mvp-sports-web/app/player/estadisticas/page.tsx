@@ -3,17 +3,12 @@ import { GlowCard, SectionPill, SegmentedTabs } from "@/components/player/ui";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ChevronLeft, Trophy, Target, Activity, Zap, Shield, Crown, Medal, Clock,
-  Ruler, Weight, Footprints, Sparkles, TrendingUp, Calendar, Drill, CircleDot,
-  Sword, Star, Info, AlertCircle, Users, Crosshair, ShieldCheck, Sun, Moon,
-  Heart, Share2, Timer, Plus, Minus, MapPin, ChevronDown
-} from "@/components/player/icons";
+  ChevronLeft, Trophy, Activity, Zap, Ruler, Weight, Footprints, TrendingUp, Star, Info, AlertCircle, Plus, Minus, MapPin} from "@/components/player/icons";
 import { BADGE_ICONS } from "@/components/player/badgeIcons";
-import { doc, getDoc, onSnapshot, updateDoc, addDoc, collection, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, addDoc, collection} from 'firebase/firestore';
 import { db } from "@/services/client/firebase";
 import { cached } from "@/services/client/player/cache";
 import { usePlayer } from "@/context/PlayerContext";
-import { gamificationService } from "@/services/client/player/gamificationService";
 import { bookingService, Booking } from "@/services/client/player/bookingService";
 import { userService } from "@/services/client/player/userService";
 import { teamService } from "@/services/client/player/teamService";
@@ -48,8 +43,6 @@ const BADGE_DESCRIPTIONS: Record<string, string> = {
   night_player: 'Nocturno', loyal: 'Meses fidelidad', weekend_warrior: 'Finde',
   stamina: 'Minutos', social: 'Invitados'
 };
-
-
 
 export default function EstadisticasPage() {
   const router = useRouter();

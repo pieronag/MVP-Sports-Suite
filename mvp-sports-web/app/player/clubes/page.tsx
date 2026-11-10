@@ -3,7 +3,7 @@ import VenueCard from "@/components/player/VenueCard";
 import { SectionPill } from "@/components/player/ui";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Search, Star, MapPin, Navigation, Compass } from "@/components/player/icons";
+import { ChevronLeft, Search, Compass } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { venueService, Tenant } from "@/services/client/player/venueService";
 import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
@@ -15,7 +15,6 @@ const SPORT_ICON_MAP: Record<string, any> = {
   basquet: BasquetbolIcon, basket: BasquetbolIcon, básquetbol: BasquetbolIcon,
   voley: VoleibolIcon, "vóley": VoleibolIcon, voleibol: VoleibolIcon,
 };
-
 
 const formatDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 6371;
@@ -36,15 +35,6 @@ const getVenueImage = (venue: any) => {
   if (s.includes("padel")) return "https://images.unsplash.com/photo-1626248801379-51a0748a5f96";
   if (s.includes("tenis")) return "https://images.unsplash.com/photo-1595435064215-68d148332009";
   return "https://images.unsplash.com/photo-1574629810360-7efbbe195018";
-};
-
-
-const getSportEmoji = (sportName: string) => {
-  const s = (sportName || "").toLowerCase();
-  if (s === "todos" || s === "todo") return null;
-  const icons: Record<string, string> = { futbol: "⚽", fútbol: "⚽", padel: "🎾", pádel: "🎾", tenis: "🎾", basquet: "🏀", basket: "🏀", voley: "🏐", vóley: "🏐", entrenamiento: "💪", training: "💪" };
-  for (const [k, v] of Object.entries(icons)) { if (s.includes(k)) return v; }
-  return null;
 };
 
 export default function ExploreClubesPage() {

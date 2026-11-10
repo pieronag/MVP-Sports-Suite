@@ -5,14 +5,13 @@ import { DiscountTag01Icon, PercentIcon } from '@hugeicons/core-free-icons';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/client/firebase';
-import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc, increment } from 'firebase/firestore';
+import { collection, getDocs, query, where, addDoc, Timestamp} from 'firebase/firestore';
 import {
     Add01Icon,
     Alert02Icon,
     Calendar03Icon,
     Cancel01Icon,
     CheckmarkCircle02Icon,
-    SquareLock01Icon,
     PencilEdit02Icon,
     RefreshIcon,
     SparklesIcon,

@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { postApi } from "@/services/client/apiClient";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-    Settings01Icon,
     MoneyBag01Icon,
     ServerIcon,
     UserGroupIcon,
@@ -14,7 +13,6 @@ import {
     MarketingIcon,
     BarChartIcon,
     LifebuoyIcon,
-    Key01Icon,
     RefreshIcon,
     CheckmarkCircle02Icon,
     Add01Icon,
@@ -26,7 +24,6 @@ import {
     InformationCircleIcon,
     Search01Icon,
     Shield01Icon,
-    CheckmarkBadge01Icon,
     CpuIcon,
     ChartIncreaseIcon,
     IdentityCardIcon,
@@ -34,7 +31,7 @@ import {
     CreditCardIcon,
     FloppyDiskIcon,
 } from '@hugeicons/core-free-icons';
-import { doc, getDoc, updateDoc, collection, query, where, getDocs, getCountFromServer, serverTimestamp, writeBatch, setDoc, orderBy, limit } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, query, where, getDocs, getCountFromServer, serverTimestamp, writeBatch, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
 import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
 import { useAuth } from '@/context/AuthContext';
@@ -215,7 +212,7 @@ export default function SettingsPage() {
             });
             showModal({ title: "Prioridad sincronizada", message: `Peso de prioridad y beneficios actualizados en ${updated} recinto(s).`, type: 'success' });
             setTimeout(() => setModal(prev => ({ ...prev, show: false })), 2000);
-        } catch (e) {
+        } catch {
             await auditService.logAuditEvent({
                 action: 'PLAN_SYNC_PRIORITY',
                 module: 'CONFIGURACIONES',
@@ -248,7 +245,7 @@ export default function SettingsPage() {
             setDirty(false);
             showModal({ title: "Núcleo sincronizado", message: "Configuración propagada exitosamente.", type: 'success' });
             setTimeout(() => setModal(prev => ({ ...prev, show: false })), 2000);
-        } catch (e) {
+        } catch {
             await auditService.logAuditEvent({
                 action: 'NÚCLEO_UPDATE',
                 module: 'CONFIGURACIONES',
@@ -283,7 +280,7 @@ export default function SettingsPage() {
             showModal({ title: "Rango elevado", message: "Privilegios asignados correctamente.", type: 'success' });
             setPromoEmail('');
             await loadTeam();
-        } catch (e) {
+        } catch {
             await auditService.logAuditEvent({
                 action: 'ELEVACIÓN_RANGO',
                 module: 'STAFF',
@@ -321,7 +318,7 @@ export default function SettingsPage() {
                     });
                     await loadTeam();
                     showModal({ title: "Rol actualizado", message: `${member.email} ahora es administrador.`, type: 'success' });
-                } catch (e) {
+                } catch {
                     await auditService.logAuditEvent({
                         action: 'STAFF_DOWNGRADE',
                         module: 'STAFF',
@@ -362,7 +359,7 @@ export default function SettingsPage() {
                     });
                     await loadTeam();
                     showModal({ title: "Acceso removido", message: "El usuario ya no tiene acceso administrativo.", type: 'success' });
-                } catch (e) {
+                } catch {
                     await auditService.logAuditEvent({
                         action: 'STAFF_ACCESS_REMOVED',
                         module: 'STAFF',

@@ -1,30 +1,21 @@
 "use client";
+import { useFeedback } from "@/components/ui/Feedback";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect } from 'react';
 import {
-    Add01Icon,
     Alert02Icon,
-    ArrowUpRight01Icon,
     BoltIcon,
     Building01Icon,
-    Calendar03Icon,
-    Cancel01Icon,
-    ChartDecreaseIcon,
     ChartIncreaseIcon,
-    CheckmarkCircle02Icon,
     Clock01Icon,
     FilterIcon,
-    InformationCircleIcon,
     MapPinIcon,
     MoneyBag01Icon,
     PieChartIcon,
-    RefreshIcon,
-    SparklesIcon,
-    UserGroupIcon,
     Wrench01Icon,
 } from '@hugeicons/core-free-icons';
 import { useAuth } from '@/context/AuthContext';
-import { PanelGlass, TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';
+import { TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';
 import { ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
 import { watchBookings } from '@/services/client/data/bookings';
 import { watchOwnedVenues, watchCourtsInMaintenance, type VenueSummary, type CourtMaintenance } from '@/services/client/data/venues';
@@ -42,7 +33,6 @@ const formatCLP = (amount: number) => {
 };
 
 const VOLT = '#00df82';
-const VOLT_DARK = '#00c16f';
 
 const BADGE_STYLE: Record<string, string> = {
     'Pagado': 'bg-emerald-500 text-white', 'Anulada': 'bg-slate-500 text-white', 'Reembolsado': 'bg-sky-500 text-white',
@@ -61,12 +51,8 @@ export default function OwnerDashboard() {
     const [selectedVenueId, setSelectedVenueId] = useState<string>('all');
     const [timeRange, setTimeRange] = useState<TimeRange>('month');
     const [paymentFilter, setPaymentFilter] = useState<'all' | 'paid' | 'noshow'>('all');
-    const [toast, setToast] = useState<{ msg: string, type: 'success' | 'error' | 'info' } | null>(null);
 
-    const showToast = (msg: string, type: 'success' | 'error' | 'info') => {
-        setToast({ msg, type });
-        setTimeout(() => setToast(null), 4000);
-    };
+    const { toast: showToast } = useFeedback();
     const onLoadError = (e: Error & { code?: string }) => {
         console.error(e);
         showToast(e.code === 'permission-denied' ? 'No tienes permiso para ver estos datos' : 'No se pudieron cargar los datos. Revisa tu conexión.', 'error');
@@ -112,14 +98,6 @@ export default function OwnerDashboard() {
 
     return (
         <div className="w-full space-y-6 pb-12 text-left relative animate-fadeIn">
-            {toast && (
-                <div className={`fixed top-6 right-6 z-100 p-4 rounded-md shadow-2xl backdrop-blur-xl border animate-slideIn ${toast.type === 'success' ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black' : toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-slate-900 text-white'}`}>
-                    <div className="flex items-center gap-3">
-                        <HugeiconsIcon icon={toast.type === 'success' ? CheckmarkCircle02Icon : InformationCircleIcon} className="w-5 h-5" strokeWidth={2} />
-                        <p className="text-xs md:text-[10px] font-black uppercase tracking-widest">{toast.msg}</p>
-                    </div>
-                </div>
-            )}
 
             {/* CABECERA */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">

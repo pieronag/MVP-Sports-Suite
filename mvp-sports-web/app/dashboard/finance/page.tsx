@@ -15,9 +15,6 @@ import {
     Cash01Icon,
     ChartBarDecreasingIcon,
     ChartBarIncreasingIcon,
-    CheckmarkCircle02Icon,
-    Clock01Icon,
-    Coins01Icon,
     DocumentCodeIcon,
     FileExportIcon,
     MoneyBag01Icon,
@@ -174,7 +171,7 @@ export default function FinancePage() {
 
         try {
             doc.addImage('/Logo.png', 'PNG', -15, -5, 60, 60);
-        } catch (e) {
+        } catch {
             doc.setTextColor(0, 0, 0);
             doc.setFontSize(40);
             doc.setFont('helvetica', 'bold');

@@ -3,9 +3,7 @@ import { GlowCard, SectionPill, SegmentedTabs } from "@/components/player/ui";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ChevronLeft, Calendar, Clock, MapPin, CheckCircle2, AlertCircle,
-  XCircle, ArrowRight, Navigation, Ticket, X, Share2, Stars, Timer,
-  ShieldCheck, CalendarDays, Trophy, Medal, Star, Trash2, Loader, Receipt
+  Calendar, Clock, CheckCircle2, XCircle, Navigation, Ticket, X, Share2, ShieldCheck, CalendarDays, Trophy, Star, Trash2, Receipt
 , Repeat } from "@/components/player/icons";
 import { QRCodeSVG } from "qrcode.react";
 import { usePlayer } from "@/context/PlayerContext";
@@ -97,8 +95,6 @@ const getStatusInfo = (booking: any, C: any) => {
   return { label: "Pendiente", color: "#f59e0b" };
 };
 
-
-
 export default function ReservasPage() {
   const { profile, theme } = usePlayer();
   const router = useRouter();
@@ -124,7 +120,6 @@ export default function ReservasPage() {
 
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [bookingToCancel, setBookingToCancel] = useState<string | null>(null);
-
 
   useEffect(() => {
     setHistoryLimit(10);

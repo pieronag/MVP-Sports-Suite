@@ -17,7 +17,7 @@ import {
   SquareLock01Icon,
   Tick02Icon,
 } from "@hugeicons/core-free-icons";
-import { auth, functions, db } from "@/services/client/firebase";
+import { auth, db } from "@/services/client/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { emailService } from "@/services/client/emailService";
 import { doc, getDoc } from "firebase/firestore";

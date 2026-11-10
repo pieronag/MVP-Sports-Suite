@@ -2,7 +2,6 @@
 import { SegmentedTabs } from "@/components/player/ui";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
     ChevronLeft, Mail, AlertCircle, CheckCircle2,
     Shield, Activity, ArrowRight, Smartphone, User

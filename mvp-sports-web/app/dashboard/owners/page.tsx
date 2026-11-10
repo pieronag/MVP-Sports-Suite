@@ -1,4 +1,5 @@
 "use client";
+import { useFeedback } from "@/components/ui/Feedback";
 import React, { useState, useEffect } from 'react';
 import { postApi } from "@/services/client/apiClient";
 import { HugeiconsIcon } from '@hugeicons/react';
@@ -10,7 +11,6 @@ import {
     Alert02Icon,
     Add01Icon,
     PencilEdit02Icon,
-    Cancel01Icon,
     IdentityCardIcon,
     InformationCircleIcon,
     Key01Icon,
@@ -18,7 +18,6 @@ import {
     Copy01Icon,
     MoneyBag01Icon,
     UserGroupIcon,
-    CheckmarkBadge01Icon,
     Building01Icon,
     Grid02Icon,
     ListViewIcon,
@@ -75,12 +74,8 @@ export default function Page() {
     const [isToggling, setIsToggling] = useState(false);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
     const [profileOwner, setProfileOwner] = useState<Owner | null>(null);
-    const [notification, setNotification] = useState<{ msg: string, type: 'success' | 'error' } | null>(null);
 
-    const addToast = (msg: string, type: 'success' | 'error' = 'success') => {
-        setNotification({ msg, type });
-        setTimeout(() => setNotification(null), 4000);
-    };
+    const { toast: addToast } = useFeedback();
 
     const fetchOwners = async () => {
         setLoading(true);
@@ -137,7 +132,7 @@ export default function Page() {
                 };
             });
             setOwners(loadedOwners);
-        } catch (error) { addToast("Error al cargar dueños", 'error'); } finally { setLoading(false); }
+        } catch { addToast("Error al cargar dueños", 'error'); } finally { setLoading(false); }
     };
 
     useEffect(() => { fetchOwners(); }, []);
@@ -151,7 +146,7 @@ export default function Page() {
             setOwners(prev => prev.filter(o => o.id !== ownerToDelete.id));
             setOwnerToDelete(null);
             addToast("Dueño eliminado correctamente", 'success');
-        } catch (error) { addToast("Error al eliminar dueño", 'error'); } finally { setIsDeleting(false); }
+        } catch { addToast("Error al eliminar dueño", 'error'); } finally { setIsDeleting(false); }
     };
 
     const openCreate = () => {
@@ -263,12 +258,6 @@ export default function Page() {
 
     return (
         <div className="w-full space-y-6 pb-12 animate-fadeIn relative">
-            {notification && (
-                <div className={`fixed top-6 right-6 z-420 flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${notification.type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-emerald-400 dark:border-emerald-500/50' : 'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'}`}>
-                    <HugeiconsIcon icon={notification.type === 'success' ? CheckmarkCircle02Icon : Alert02Icon} className="w-5 h-5" strokeWidth={1.8} />
-                    <span className="text-xs md:text-[10px] font-black uppercase tracking-wider">{notification.msg}</span>
-                </div>
-            )}
 
             {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">

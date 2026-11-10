@@ -4,7 +4,6 @@ import TierBadge from "@/components/player/TierBadge";
 import { uploadImage } from "@/services/client/imageUpload";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
@@ -12,10 +11,8 @@ import { gamificationService } from "@/services/client/player/gamificationServic
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "@/services/client/firebase";
 import {
-  ChevronLeft, Sun, Moon, Camera, Trophy, Target, Handshake, Star,
-  Medal, Sparkles, Download, Share2, Activity, User as UserIcon, MapPin, Zap,
-  Shield, ShieldAlert, Award, Swords, Flame, Heart, Crosshair, CircleDot,
-  Sunrise, GraduationCap, TrendingUp, Users, Sword, CalendarDays, X, Crown, Timer, CalendarCheck
+  Sun, Moon, Camera, Trophy, Target, Handshake, Star,
+  Medal, Download, Share2, User as MapPin, X, CalendarCheck
 } from "@/components/player/icons";
 import { BADGE_ICONS } from "@/components/player/badgeIcons";
 
@@ -66,8 +63,6 @@ const BADGE_GLOSSARY_DATA = [
 ];
 
 const TIERS = ["bronce", "plata", "oro", "platino", "diamante", "elite", "leyenda"];
-
-
 
 export default function PerfilPage() {
   const router = useRouter();
@@ -218,8 +213,6 @@ export default function PerfilPage() {
           {isDark ? <Moon size={18} className="text-amber-400" /> : <Sun size={18} className="text-slate-600" />}
         </button>
       </div>
-
-
 
       {/* Avatar Section */}
       <div className="flex flex-col items-center py-2 mb-4">

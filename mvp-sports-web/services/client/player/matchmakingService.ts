@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs, addDoc, getDoc, doc, updateDoc, deleteDoc, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, doc, updateDoc, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
 import { canonicalSport } from '@/utils/sports';
 

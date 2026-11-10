@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs, doc, getDoc, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc} from 'firebase/firestore';
 import { db, auth } from '@/services/client/firebase';
 
 export const tournamentService = {

@@ -22,7 +22,6 @@ import {
     UserGroupIcon as UserGroupIconHi,
 } from "@hugeicons/core-free-icons";
 
-
 // Adaptadores: mantienen los nombres usados en el JSX sobre Hugeicons
 const CalendarDaysIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Calendar03Icon} className={className} strokeWidth={1.6} />;
 const UserGroupIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={UserGroupIconHi} className={className} strokeWidth={1.6} />;
@@ -36,7 +35,6 @@ const SparklesIcon = ({ className }: { className?: string }) => <HugeiconsIcon i
 const TicketIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Ticket01Icon} className={className} strokeWidth={1.6} />;
 import { dayOpenHours } from '@/utils/bookingMath';
 import Link from 'next/link';
-import MetricCard from './MetricCard';
 import { PanelGlass, TarjetaKpi } from '@/components/ui/DashboardWidgets';
 
 // --- INTERFACES ---
@@ -58,8 +56,6 @@ export default function ManagerDashboard() {
     const [selectedDate, setSelectedDate] = useState<string>(operatingDay().day);
     const [now, setNow] = useState(() => new Date());
     useEffect(() => { const t = setInterval(() => setNow(new Date()), 60_000); return () => clearInterval(t); }, []);
-
-
 
     useEffect(() => {
         const fetchVenues = async () => {

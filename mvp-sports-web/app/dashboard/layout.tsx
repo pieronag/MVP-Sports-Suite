@@ -2,6 +2,7 @@ import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
 import DashboardGuard from "@/components/dashboard/DashboardGuard";
 import MobileTabBar from "@/components/dashboard/MobileTabBar";
+import { FeedbackProvider } from "@/components/ui/Feedback";
 
 export default function DashboardLayout({
   children,
@@ -10,6 +11,7 @@ export default function DashboardLayout({
 }) {
   return (
     <DashboardGuard>
+      <FeedbackProvider>
       <div className="dashboard-shell min-h-screen bg-slate-50 dark:bg-[#020611] transition-colors duration-0">
 
         {/* 1. SIDEBAR (Desktop: fijo izquierda / Mobile: hamburger overlay) */}
@@ -29,6 +31,7 @@ export default function DashboardLayout({
         </div>
         <MobileTabBar />
       </div>
+      </FeedbackProvider>
     </DashboardGuard>
   );
 }

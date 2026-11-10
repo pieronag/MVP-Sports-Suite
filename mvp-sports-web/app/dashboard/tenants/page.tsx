@@ -1,4 +1,5 @@
 "use client";
+import { useFeedback } from "@/components/ui/Feedback";
 import { normalizeVenue } from "@/utils/venueModel";
 import React, { useState, useEffect } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -34,7 +35,7 @@ import {
     query, orderBy, where, serverTimestamp
 } from "firebase/firestore";
 import { db } from "@/services/client/firebase";
-import { TarjetaKpi, SectionCard } from "@/components/ui/DashboardWidgets";
+import { TarjetaKpi} from "@/components/ui/DashboardWidgets";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import TenantWizard, { EMPTY_TENANT_FORM, TenantFormState, OwnerOption } from "@/components/dashboard/TenantWizard";
 import TenantProfileModal from "@/components/dashboard/TenantProfileModal";
@@ -100,12 +101,7 @@ export default function Page() {
     const [sortBy, setSortBy] = useState<'name' | 'mrr' | 'rating'>('name');
     const [visibleCount, setVisibleCount] = useState(12);
 
-    const [notification, setNotification] = useState<{ msg: string, type: 'success' | 'error' } | null>(null);
-
-    const addToast = (msg: string, type: "success" | "error" = "success") => {
-        setNotification({ msg, type });
-        setTimeout(() => setNotification(null), 4000);
-    };
+    const { toast: addToast } = useFeedback();
 
     const fetchInitialData = async () => {
         setLoading(true);
@@ -217,7 +213,7 @@ export default function Page() {
                 } as Tenant;
             });
             setTenants(tenantsList);
-        } catch (error) { addToast("Error al cargar recintos", "error"); } finally { setLoading(false); }
+        } catch { addToast("Error al cargar recintos", "error"); } finally { setLoading(false); }
     };
 
     useEffect(() => {
@@ -242,7 +238,7 @@ export default function Page() {
             setTenantToDelete(null);
             addToast("Recinto eliminado", "success");
             fetchInitialData();
-        } catch (error) { addToast("Error al eliminar", "error"); } finally { setIsDeleting(false); }
+        } catch { addToast("Error al eliminar", "error"); } finally { setIsDeleting(false); }
     };
 
     const handleToggleStatus = async () => {
@@ -254,7 +250,7 @@ export default function Page() {
             setTenantToToggle(null);
             addToast(`Recinto ${next.toLowerCase()}`, "success");
             fetchInitialData();
-        } catch (e) { addToast("Error al cambiar el estado", "error"); } finally { setIsToggling(false); }
+        } catch { addToast("Error al cambiar el estado", "error"); } finally { setIsToggling(false); }
     };
 
     const openCreate = () => {
@@ -377,15 +373,6 @@ export default function Page() {
 
     return (
         <div className="w-full space-y-6 pb-12 animate-fadeIn relative">
-            {notification && (
-                <div className={`fixed top-6 right-6 z-420 flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${
-                    notification.type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-emerald-400 dark:border-emerald-500/50'
-                    : 'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
-                }`}>
-                    <HugeiconsIcon icon={notification.type === 'success' ? CheckmarkCircle02Icon : Alert02Icon} className="w-5 h-5" strokeWidth={1.8} />
-                    <span className="text-xs md:text-[10px] font-black uppercase tracking-wider">{notification.msg}</span>
-                </div>
-            )}
 
             {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">

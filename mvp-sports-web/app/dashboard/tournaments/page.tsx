@@ -1,4 +1,5 @@
 "use client";
+import { useFeedback } from "@/components/ui/Feedback";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import { tournamentIssue } from "@/utils/tournament";
 import { uploadImage } from "@/services/client/imageUpload";
@@ -6,15 +7,12 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/client/firebase';
-import { collection, getDocs, getDoc, query, where, orderBy, limit, doc, updateDoc, addDoc, deleteDoc, serverTimestamp, onSnapshot, Timestamp, writeBatch, setDoc } from 'firebase/firestore';
-import { auditService } from '@/services/client/auditService';
+import { collection, getDocs, doc, updateDoc, addDoc, deleteDoc, serverTimestamp} from 'firebase/firestore';
 import {
     Add01Icon,
     Alert02Icon,
     BarChartIcon,
-    BlockedIcon,
     Building01Icon,
-    Calendar03Icon,
     Cancel01Icon,
     CheckmarkCircle02Icon,
     ArrowDown01Icon,
@@ -22,19 +20,14 @@ import {
     ArrowRight01Icon,
     Clock01Icon,
     CloudUploadIcon,
-    DocumentCodeIcon,
     Flag01Icon,
     Grid02Icon,
     IdentityCardIcon,
     Image01Icon,
-    InformationCircleIcon,
-    SquareLock01Icon,
-    MapPinIcon,
     MoneyBag01Icon,
     PencilEdit02Icon,
     CallIcon,
     PlayCircleIcon,
-    PowerIcon,
     RefreshIcon,
     ShieldCheckIcon,
     SparklesIcon,
@@ -44,7 +37,7 @@ import {
     UserGroupIcon,
     UserIcon,
 } from '@hugeicons/core-free-icons';
-import { PanelGlass, TarjetaKpi } from '@/components/ui/DashboardWidgets';
+import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
 import ModalPortal from '@/components/ui/ModalPortal';
 import { SoccerIcon, PadelIcon, TennisIcon, BasketballIcon, VolleyballIcon } from '@/components/icons/SportsIcons';
 
@@ -239,19 +232,6 @@ const buildStandings = (matches: any[]) => {
     return Object.values(table).sort((a: any, b: any) => (b.pts - a.pts) || ((b.gf - b.gc) - (a.gf - a.gc)));
 };
 
-// --- COMPONENTE TOAST ---
-const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
-    useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
-    return (
-        <div className={`fixed top-6 right-6 z-200 flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-[#00df82] dark:border-emerald-500/50' :
-                'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
-            }`}>
-            {type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5" /> : <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5" />}
-            <span className="text-xs md:text-[10px] font-black uppercase tracking-wider">{message}</span>
-        </div>
-    );
-};
-
 export default function ChampionshipsPage() {
     const { user } = useAuth();
 
@@ -260,7 +240,6 @@ export default function ChampionshipsPage() {
     const [tenants, setTenants] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [notification, setNotification] = useState<{ msg: string, type: 'success' | 'error' } | null>(null);
 
     // MODALES
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -295,7 +274,7 @@ export default function ChampionshipsPage() {
     };
     const [formData, setFormData] = useState(INITIAL_FORM_STATE);
 
-    const addToast = (msg: string, type: 'success' | 'error') => setNotification({ msg, type });
+    const { toast: addToast } = useFeedback();
 
     // CARGA
     const fetchData = async () => {
@@ -350,7 +329,7 @@ export default function ChampionshipsPage() {
 
             addToast("Torneo guardado exitosamente", 'success');
             handleCloseModal(); fetchData();
-        } catch (e) { addToast("Error al guardar el torneo", 'error'); } finally { setSaving(false); }
+        } catch { addToast("Error al guardar el torneo", 'error'); } finally { setSaving(false); }
     };
 
     const handleDelete = async () => {
@@ -359,7 +338,7 @@ export default function ChampionshipsPage() {
             await deleteDoc(doc(db, "tournaments", tournamentToDelete));
             addToast("Torneo eliminado", 'success');
             setTournamentToDelete(null); fetchData();
-        } catch (e) { addToast("Error al eliminar", 'error'); }
+        } catch { addToast("Error al eliminar", 'error'); }
     };
 
     const handleOpenEdit = (t: any) => {
@@ -464,7 +443,6 @@ export default function ChampionshipsPage() {
 
     return (
         <div className="w-full space-y-6 pb-12 animate-fadeIn relative">
-            {notification && <Toast message={notification.msg} type={notification.type} onClose={() => setNotification(null)} />}
 
             {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">

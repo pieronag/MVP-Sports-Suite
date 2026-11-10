@@ -2,13 +2,11 @@
 import { GlowCard, SectionPill } from "@/components/player/ui";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle, MapPin, Share2, Clock, Trophy, AlertCircle, ChevronLeft, Receipt, X, FileText, Calendar } from "@/components/player/icons";
+import { CheckCircle, Share2, AlertCircle, ChevronLeft, Receipt, X, FileText, Calendar } from "@/components/player/icons";
 import { QRCodeSVG } from "qrcode.react";
 import { usePlayer } from "@/context/PlayerContext";
 import FindPlayers from "@/components/player/FindPlayers";
 import { bookingService } from "@/services/client/player/bookingService";
-
-
 
 const SPORT_CONFIG: Record<string, { color: string }> = {
   futbol: { color: "#10b981" }, padel: { color: "#3b82f6" }, tenis: { color: "#f59e0b" },

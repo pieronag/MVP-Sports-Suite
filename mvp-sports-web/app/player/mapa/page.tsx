@@ -4,13 +4,12 @@ import { SectionPill } from "@/components/player/ui";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import { ChevronLeft, Locate, Navigation, Star, Compass } from "@/components/player/icons";
+import { Locate, Compass } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { venueService } from "@/services/client/player/venueService";
 import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
 
 const MapView = dynamic(() => import("./MapComponent"), { ssr: false });
-
 
 const formatDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 6371;

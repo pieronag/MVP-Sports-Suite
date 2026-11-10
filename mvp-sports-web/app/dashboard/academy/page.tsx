@@ -1,4 +1,5 @@
 "use client";
+import { useFeedback } from "@/components/ui/Feedback";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { academyIssue } from "@/utils/academy";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
@@ -31,7 +32,7 @@ import {
     Coins01Icon,
     Building01Icon,
 } from '@hugeicons/core-free-icons';
-import { PanelGlass, TarjetaKpi } from '@/components/ui/DashboardWidgets';
+import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
 import { SoccerIcon, PadelIcon, TennisIcon, BasketballIcon, VolleyballIcon } from '@/components/icons/SportsIcons';
 
 const SPORTS = ['Fútbol', 'Pádel', 'Tenis', 'Básquetbol', 'Vóleibol'];
@@ -44,20 +45,6 @@ const sportIcon = (sport: string, cls: string) => {
     if (n === 'basquetbol') return <BasketballIcon className={cls} />;
     if (n === 'voleibol') return <VolleyballIcon className={cls} />;
     return <PadelIcon className={cls} />;
-};
-
-// --- COMPONENTE TOAST ---
-const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) => {
-    useEffect(() => { const t = setTimeout(onClose, 4000); return () => clearTimeout(t); }, [onClose]);
-    return (
-        <div className={`fixed top-6 right-6 z-200 flex items-center gap-3 px-5 py-3 rounded-md shadow-2xl border animate-slideInRight backdrop-blur-md ${
-            type === 'success' ? 'bg-white/90 border-emerald-500 text-emerald-700 dark:bg-[#0B0F19]/90 dark:text-[#00df82] dark:border-emerald-500/50' : 
-            'bg-white/90 border-red-500 text-red-700 dark:bg-[#0B0F19]/90 dark:text-red-400 dark:border-red-500/50'
-        }`}>
-            {type === 'success' ? <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-5 h-5" /> : <HugeiconsIcon icon={Alert02Icon} className="w-5 h-5" />}
-            <span className="text-xs md:text-[10px] font-black uppercase tracking-wider">{message}</span>
-        </div>
-    );
 };
 
 export default function AcademyPage() {
@@ -83,11 +70,10 @@ export default function AcademyPage() {
             await updateDoc(doc(db, "academy_enrollments", enrollment.id), { paymentStatus: 'paid', paymentMethod: enrollment.paymentMethod === 'mercadopago' ? 'mercadopago' : 'venue', paidAt: serverTimestamp() });
             setStudentsModal(m => m && ({ ...m, list: m.list.map(x => x.id === enrollment.id ? { ...x, paymentStatus: 'paid' } : x) }));
             addToast("Pago registrado", 'success');
-        } catch (e) { addToast("No se pudo registrar el pago", 'error'); }
+        } catch { addToast("No se pudo registrar el pago", 'error'); }
     };
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [notification, setNotification] = useState<{ msg: string, type: 'success' | 'error' } | null>(null);
 
     // MODALES
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -106,7 +92,7 @@ export default function AcademyPage() {
 
     const WEEK_DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-    const addToast = (msg: string, type: 'success' | 'error') => setNotification({ msg, type });
+    const { toast: addToast } = useFeedback();
 
     // CARGA
     const fetchData = async () => {
@@ -168,7 +154,7 @@ export default function AcademyPage() {
             }
 
             handleCloseModal(); fetchData();
-        } catch (e) { addToast("Error al procesar la clase", 'error'); } finally { setSaving(false); }
+        } catch { addToast("Error al procesar la clase", 'error'); } finally { setSaving(false); }
     };
 
     const handleDelete = async () => {
@@ -177,7 +163,7 @@ export default function AcademyPage() {
             await deleteDoc(doc(db, "academy_classes", classToDelete));
             addToast("Clase eliminada", 'success');
             setClassToDelete(null); fetchData();
-        } catch (e) { addToast("Error al eliminar", 'error'); }
+        } catch { addToast("Error al eliminar", 'error'); }
     };
 
     const requestToggleStatus = (c: any) => {
@@ -191,7 +177,7 @@ export default function AcademyPage() {
             await updateDoc(doc(db, "academy_classes", statusConfirm.classId), { status: statusConfirm.nextStatus });
             addToast(`Clase ${statusConfirm.nextStatus === 'suspended' ? 'suspendida' : 'reactivada'}`, 'success');
             fetchData();
-        } catch (e) { addToast("Error al cambiar estado", 'error'); }
+        } catch { addToast("Error al cambiar estado", 'error'); }
         setStatusConfirm({ isOpen: false, classId: null, name: '', nextStatus: 'active' });
     };
 
@@ -265,7 +251,6 @@ export default function AcademyPage() {
                     </div>
                 </div>
             )}
-            {notification && <Toast message={notification.msg} type={notification.type} onClose={() => setNotification(null)} />}
 
             {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">

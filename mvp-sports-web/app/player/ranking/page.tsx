@@ -3,8 +3,6 @@ import { getApi } from "@/services/client/apiClient";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { collection, getDocs, limit, orderBy, query, where } from "firebase/firestore";
-import { db } from "@/services/client/firebase";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
 import { cached } from "@/services/client/player/cache";

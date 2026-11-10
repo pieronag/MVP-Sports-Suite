@@ -18,8 +18,6 @@ import {
     Building01Icon,
     Clock01Icon,
     Message02Icon,
-    Cancel01Icon,
-    ArrowRight01Icon,
     SentIcon,
 } from '@hugeicons/core-free-icons';
 

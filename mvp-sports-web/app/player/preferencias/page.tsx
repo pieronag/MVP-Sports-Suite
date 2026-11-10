@@ -1,15 +1,13 @@
 "use client";
 import { GlowCard, SectionPill } from "@/components/player/ui";
 import PushSettings from "@/components/player/PushSettings";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
 import { userService } from "@/services/client/player/userService";
-import { auth, db } from "@/services/client/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { auth} from "@/services/client/firebase";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
 import { ChevronLeft, ChevronRight, Trash2, Save, User, Phone, ShieldCheck, Calendar, Ruler, Weight, Lock, LogOut, Eye, EyeOff, AlertCircle, CheckCircle2, X, Shield, Award, Target, Sun, Moon, Activity, MapPin, Heart } from "@/components/player/icons";
 import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon } from "@/components/icons/SportsIcons";
@@ -85,8 +83,6 @@ type FormData = {
   dominantFoot: string; favTime: string; frequency: string; intensity: string;
   bio: string; city: string; gender: string;
 };
-
-
 
 function InputRow({ icon: Icon, color, label, value, onChange, error, maxLength, type = "text" }: {
   icon: any; color: string; label: string; value: string;

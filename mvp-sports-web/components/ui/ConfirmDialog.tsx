@@ -18,6 +18,8 @@ interface ConfirmDialogProps {
   cancelLabel?: string;
   tone?: ConfirmTone;
   loading?: boolean;
+  /** Un solo botón: aviso informativo en vez de confirmación */
+  hideCancel?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -51,6 +53,7 @@ export default function ConfirmDialog({
   cancelLabel = "Cancelar",
   tone = "default",
   loading = false,
+  hideCancel = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -90,14 +93,14 @@ export default function ConfirmDialog({
           {message}
         </div>
         <div className="flex gap-3">
-          <button
+          {!hideCancel && <button
             type="button"
             onClick={onCancel}
             disabled={loading}
             className="flex-1 py-3 text-[11px] font-black uppercase tracking-[0.15em] rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 transition-all disabled:opacity-50 cursor-pointer"
           >
             {cancelLabel}
-          </button>
+          </button>}
           <button
             type="button"
             onClick={onConfirm}

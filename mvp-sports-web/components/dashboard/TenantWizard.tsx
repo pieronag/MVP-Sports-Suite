@@ -11,7 +11,6 @@ import {
     Cancel01Icon,
     Search01Icon,
     Image01Icon,
-    DashboardSquare01Icon,
     MapPinIcon,
     IdentityCardIcon,
     ArrowLeft01Icon,
@@ -20,7 +19,6 @@ import {
     Tick02Icon,
     RefreshIcon,
     PencilEdit02Icon,
-    MoneyBag01Icon,
     GlobeIcon,
     CheckmarkCircle02Icon,
 } from "@hugeicons/core-free-icons";

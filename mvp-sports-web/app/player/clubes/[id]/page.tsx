@@ -5,15 +5,13 @@ import { slotInstant } from "@/utils/chileTime";
 import { GlowCard, SectionPill } from "@/components/player/ui";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Clock, MapPin, Star, Info, ShieldCheck, CheckCircle2, X, Phone, MessageCircle, Navigation, Wifi, Tv, Car, Umbrella, Wind, CircleDot, Zap, Globe, Ban, CreditCard, Images } from "@/components/player/icons";
+import { ChevronLeft, ChevronRight, Clock, Star, ShieldCheck, CheckCircle2, X, Phone, Navigation, Zap, Globe, Ban, CreditCard, Images } from "@/components/player/icons";
 import { usePlayer } from "@/context/PlayerContext";
 import { venueService, Tenant, Court } from "@/services/client/player/venueService";
 import { bookingService } from "@/services/client/player/bookingService";
 import { collection, query, where, onSnapshot, doc } from "firebase/firestore";
 import { db } from "@/services/client/firebase";
 import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon, CanchaFutbolIcon, CanchaPadelIcon, CanchaTenisIcon, CanchaBasquetbolIcon, CanchaVoleibolIcon } from "@/components/icons/SportsIcons";
-
-
 
 const SPORT_ICONS: Record<string, any> = {
   futbol: FutbolIcon, fútbol: FutbolIcon, futbolito: FutbolIcon,

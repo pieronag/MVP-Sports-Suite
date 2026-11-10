@@ -9,7 +9,6 @@ import {
     PieChart, Pie, Cell
 } from 'recharts';
 import {
-    MoneyBag01Icon,
     ChartIncreaseIcon,
     CreditCardIcon,
     GlobeIcon,
@@ -27,7 +26,7 @@ import {
     ArrowLeft01Icon,
     ArrowRight01Icon,
 } from '@hugeicons/core-free-icons';
-import { collection, query, orderBy, limit, onSnapshot, doc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, doc } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
 import { TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';
 

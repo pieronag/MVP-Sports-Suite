@@ -1,6 +1,6 @@
 "use server";
 import { adminAuth as getAdminAuth, adminDb } from "@/services/server/firebase-admin";
-import { PASSWORD_MIN, passwordIssue } from "@/utils/password";
+import { passwordIssue } from "@/utils/password";
 
 /**
  * Verifica la identidad y el rol del llamador de la server action.

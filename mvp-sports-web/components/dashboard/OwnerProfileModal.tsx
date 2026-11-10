@@ -10,7 +10,6 @@ import {
     MapPinIcon,
     Building01Icon,
     Store01Icon,
-    MoneyBag01Icon,
     Alert02Icon,
     CheckmarkCircle02Icon,
     Cancel01Icon,

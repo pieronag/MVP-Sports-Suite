@@ -5,12 +5,9 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
     Alert02Icon,
     Building01Icon,
-    Cancel01Icon,
     CheckmarkCircle02Icon,
-    FilterIcon,
     Message02Icon,
     RefreshIcon,
-    Search01Icon,
     SentIcon,
     StarIcon,
     UserCircleIcon,
@@ -19,7 +16,7 @@ import {
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/client/firebase';
-import { collection, getDocs, query, where, orderBy, doc, updateDoc, Timestamp, or, limit } from 'firebase/firestore';
+import { collection, getDocs, query, where, orderBy, doc, updateDoc, Timestamp, limit } from 'firebase/firestore';
 import { TarjetaKpi, SectionCard } from '@/components/ui/DashboardWidgets';
 
 const inputCls = "w-full px-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-xs font-bold outline-hidden text-slate-800 dark:text-white focus:border-emerald-500/40 transition-all";

@@ -1,7 +1,7 @@
 import { cached, invalidate } from '@/services/client/player/cache';
 import { syncBookingSlots } from '@/services/client/apiClient';
 import { openHours } from "@/utils/venueSchedule";
-import { collection, query, where, getDocs, addDoc, Timestamp, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, Timestamp, doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { db, auth } from '@/services/client/firebase';
 
 export interface Booking {

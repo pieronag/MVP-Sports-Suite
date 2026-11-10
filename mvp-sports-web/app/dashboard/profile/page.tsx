@@ -11,7 +11,6 @@ import {
     UserCircleIcon,
     Mail01Icon,
     CallIcon,
-    Building01Icon,
     IdentityCardIcon,
     RefreshIcon,
     Camera01Icon,
@@ -26,12 +25,11 @@ import {
     Alert02Icon,
     InformationCircleIcon,
     ShieldCheckIcon,
-    ArrowRight01Icon,
-} from '@hugeicons/core-free-icons';
+    } from '@hugeicons/core-free-icons';
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '@/utils/cropImage';
 import { SectionCard } from '@/components/ui/DashboardWidgets';
-import { PASSWORD_MIN, passwordIssue } from "@/utils/password";
+import { passwordIssue } from "@/utils/password";
 
 const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructive = false }: any) => {
     if (!isOpen) return null;
@@ -162,7 +160,7 @@ export default function ProfilePage() {
         try {
             await updateDoc(doc(db, "users", user.uid), { [field]: value });
             addToast(field === 'language' || field === 'timezone' ? 'Preferencia actualizada' : 'Preferencia actualizada', 'success');
-        } catch (error) {
+        } catch {
             setProfile(p => ({ ...(p as UserProfile), [field]: prev }));
             addToast("Error al guardar preferencia", 'error');
         }
@@ -214,7 +212,7 @@ export default function ProfilePage() {
             });
             setDirty(false);
             addToast("Perfil actualizado correctamente", 'success');
-        } catch (error) {
+        } catch {
             addToast("Error al guardar cambios", 'error');
         } finally {
             setSaving(false);
@@ -234,7 +232,7 @@ export default function ProfilePage() {
             addToast("Contraseña actualizada exitosamente", 'success');
             setIsPassModalOpen(false);
             setPassForm({ current: '', new: '', confirm: '' });
-        } catch (error: any) {
+        } catch {
             addToast("Error al actualizar contraseña", 'error');
         } finally {
             setPassLoading(false);

@@ -6,7 +6,6 @@ import {
     FireIcon,
     TrophyIcon,
     CrownIcon,
-    BarChartIcon,
     Download01Icon,
     UserGroupIcon,
     Search01Icon,

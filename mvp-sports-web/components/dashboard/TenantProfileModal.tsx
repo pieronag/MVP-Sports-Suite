@@ -9,16 +9,11 @@ import {
     UserGroupIcon,
     StarIcon,
     Clock01Icon,
-    MoneyBag01Icon,
     Cancel01Icon,
-    CrownIcon,
     Shield01Icon,
     CheckmarkCircle02Icon,
-    Alert02Icon,
     GlobeIcon,
     PencilEdit02Icon,
-    CallIcon,
-    Mail01Icon,
     Delete02Icon,
 } from "@hugeicons/core-free-icons";
 
