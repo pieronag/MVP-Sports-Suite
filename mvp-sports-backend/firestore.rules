@@ -261,14 +261,15 @@ service cloud.firestore {
     }
 
     match /bookings/{bookingId} {
-      // Datos personales: el titular, quien la creó y el personal de recintos.
+      // Datos personales: el titular, quien la creó y el personal del recinto de la reserva.
+      // Antes bastaba con ser personal de cualquier recinto (isStaff) para leer reservas de todos.
       // La disponibilidad pública se lee desde court_slots.
       allow read: if isAuthenticated() && (
         resource.data.get('userId', '') == request.auth.uid ||
         resource.data.get('createdBy', '') == request.auth.uid ||
         resource.data.get('createdBy', '') == request.auth.token.get('email', '') ||
         request.auth.uid in resource.data.get('participantIds', []) ||
-        isStaff()
+        worksAtTenant(resource.data.get('tenantId', ''))
       );
       // 100% online: las reservas de cancha solo las crea el servidor tras verificar el pago en
       // Mercado Pago. El jugador solo puede registrar un partido interno (sin recinto, cancha ni pago).

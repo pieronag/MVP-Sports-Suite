@@ -3,7 +3,7 @@ import { env, admin, hasServiceAccount } from "./helpers";
 
 // Flujos reales de cuenta contra Firebase con cuentas de prueba (@example.test).
 // Requiere .env.local con E2E_* y firebase-service-account.json; si faltan, se omiten.
-const ready = !!env.E2E_MANAGER_EMAIL && !!env.E2E_PLAYER_EMAIL && hasServiceAccount;
+const ready = !!env.E2E_MANAGER_EMAIL && hasServiceAccount;
 const adminAuth = admin;
 
 async function login(page: Page, email: string, password: string) {
@@ -46,7 +46,8 @@ test.describe("Cuenta y acceso", () => {
   test("registro → sin verificar no entra → verificado entra → elimina su cuenta", async ({ page, isMobile }) => {
     test.skip(isMobile, "Crea y borra una cuenta real: basta una vez");
     test.setTimeout(150_000);
-    const email = env.E2E_PLAYER_EMAIL, password = env.E2E_PLAYER_PASSWORD;
+    // Cuenta propia de esta prueba (se crea y se borra aquí): no toca al jugador de prueba que usan las demás
+    const email = "e2e.registro@example.test", password = `Reg-${Date.now().toString(36)}-Ok9`;
     const admin = adminAuth();
     const prev = await admin.auth().getUserByEmail(email).catch(() => null);
     if (prev) await admin.auth().deleteUser(prev.uid);

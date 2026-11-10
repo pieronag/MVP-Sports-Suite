@@ -146,8 +146,14 @@ test.describe("Liquidaciones", () => {
     const errors = watchErrors(page);
     await login(page, env.E2E_ADMIN_EMAIL, env.E2E_ADMIN_PASSWORD);
     await page.goto("/dashboard/invoices");
+    // La vista abre en el último mes cerrado: retrocede hasta encontrar una liquidación (máx. 12 meses)
     const ver = page.getByTitle("Ver liquidación").first();
-    await expect(ver).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole("button", { name: "Mes anterior" })).toBeVisible({ timeout: 30_000 });
+    for (let i = 0; i < 12 && !(await ver.isVisible().catch(() => false)); i++) {
+      await page.getByRole("button", { name: "Mes anterior" }).click();
+      await page.waitForTimeout(1500);
+    }
+    test.skip(!(await ver.isVisible()), "No hay liquidaciones en los últimos 12 meses");
     await ver.click();
     const download = page.waitForEvent("download");
     await page.getByRole("button", { name: /descargar/i }).last().click();

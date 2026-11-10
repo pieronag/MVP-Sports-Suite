@@ -661,8 +661,9 @@ export default function CourtsPage() {
         // No dejar reservas huérfanas: bloquear si hay reservas vigentes desde hoy
         try {
             const now = new Date();
-            // Solo filtro por cancha (no requiere índice compuesto); la fecha se filtra aquí
-            const snap = await getDocs(query(collection(db, "bookings"), where("courtId", "==", courtId)));
+            // Filtro por recinto y cancha (dos igualdades: sin índice compuesto); la fecha se filtra aquí.
+            // El recinto es obligatorio: las reglas solo dejan leer reservas de los recintos donde se trabaja.
+            const snap = await getDocs(query(collection(db, "bookings"), where("tenantId", "==", courtToDelete?.tenantId || ""), where("courtId", "==", courtId)));
             const active = snap.docs.map(d => normalizeBooking(d.id, d.data()))
                 .filter(b => isReal(b) && b.state !== 'cancelled' && !b.isNoShow && b.start && b.start >= now).length;
             if (active > 0) {
