@@ -50,7 +50,7 @@ test.describe("Cuenta y acceso", () => {
     const email = "e2e.registro@example.test", password = `Reg-${Date.now().toString(36)}-Ok9`;
     const admin = adminAuth();
     const prev = await admin.auth().getUserByEmail(email).catch(() => null);
-    if (prev) await admin.auth().deleteUser(prev.uid);
+    if (prev) { await admin.auth().deleteUser(prev.uid); await admin.firestore().collection("users").doc(prev.uid).delete(); }
 
     // 1) Registro por la pantalla
     await page.goto("/");

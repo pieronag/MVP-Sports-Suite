@@ -116,11 +116,10 @@ export async function buildBookingCheckout(uid: string, input: BookingCheckoutIn
     date: bookingDate,
     startTime,
     endTime: `${String(endH).padStart(2, "0")}:${String(sm || 0).padStart(2, "0")}`,
+    // Modelo v3: un solo monto (totalPrice); el cupón solo se guarda si se usó
     totalPrice: amount,
-    price: amount,
     originalPrice: basePrice,
-    couponCode: coupon?.code || null,
-    couponId: coupon?.id || null,
+    ...(coupon ? { couponCode: coupon.code, couponId: coupon.id } : {}),
     discountApplied: coupon?.discount || 0,
     source: "web_app",
     createdBy: user.email || uid,

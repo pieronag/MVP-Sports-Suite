@@ -1,6 +1,20 @@
-# Modelo de datos v2
+# Modelo de datos v3
 
-Versión registrada en `settings/schema.version = 2` (migración `mvp-sports-backend/scripts/migrate-v2.cjs`, 12-oct-2026).
+Versión registrada en `settings/schema.version = 3` (migración `mvp-sports-backend/scripts/migrate-v3.cjs`, 10-nov-2026; la v2 es `migrate-v2.cjs`, 12-oct-2026).
+
+Herramientas (desde la raíz del repositorio):
+
+- `node mvp-sports-backend/scripts/backup.cjs` — respaldo completo de Firestore (con tipos) y de Firebase Auth en `docs/backups/<fecha>/` (ignorado por git: tiene datos personales). Hacerlo siempre antes de migrar.
+- `node mvp-sports-backend/scripts/inventory.cjs docs/backups/<fecha>` — campos reales por colección, con su tipo y frecuencia. Sirve para detectar desorden.
+- `node mvp-sports-backend/scripts/migrate-v3.cjs [--apply]` — sin `--apply` solo simula. Es idempotente: una segunda pasada debe dar 0 cambios.
+
+Qué ordenó la v3:
+
+- Toda cuenta de acceso tiene su perfil en `users` y todo perfil tiene su cuenta (1 a 1).
+- Fuera lo que ya nadie usaba: billetera antigua (`walletBalance`, `users/*/transactions`), tarjetas de Transbank (`users/*/cards`), `public_profiles`, ELO y sincronizaciones viejas, copia de `emailVerified` (vive en Auth).
+- Reservas con un solo monto, `totalPrice` (el servidor ya no escribe `price`); el cupón solo se guarda si se usó.
+- Sin campos en `null`: ausente significa lo mismo.
+- `rate_limits` es estado temporal: la migración borra contadores de más de 24 h.
 
 Reglas generales:
 
@@ -42,7 +56,8 @@ Solo existen si se pagaron (o terminaron reembolsadas o en inasistencia). Las cr
 | sport | string | nombre oficial |
 | date | Timestamp | inicio real del bloque |
 | startTime, endTime | "HH:MM" | |
-| totalPrice | número | monto cobrado |
+| totalPrice | número | monto cobrado (único campo de monto) |
+| originalPrice, discountApplied, couponCode, couponId | | cupón: solo si se usó |
 | paymentStatus | "paid" \| "refunded" \| "refund_failed" \| "no-show" \| "pending" | servidor |
 | status | "confirmed" \| "active" \| "completed" \| "cancelled" \| "no-show" | servidor (salida: el jugador, si hubo ingreso) |
 | checkIn, checkInTime, checkInBy | | servidor (`/api/bookings/checkin`) |
@@ -58,7 +73,7 @@ Solo existen si se pagaron (o terminaron reembolsadas o en inasistencia). Las cr
 | status | "active" \| "inactive" \| "suspended" \| "disabled" | además deshabilita la cuenta de acceso |
 | tenantIds, tenantId | string[], string | personal de recintos; servidor |
 | createdAt, updatedAt, lastLogin | Timestamp | |
-| height, weight, level | número | |
+| height, weight, level | número | nunca texto |
 | mainSport, favSports | nombre oficial | |
 | xp, ovr, tier, badges, stats | | los calcula el servidor |
 
@@ -67,4 +82,4 @@ Solo existen si se pagaron (o terminaron reembolsadas o en inasistencia). Las cr
 - `courts`: tenantId, name, sport (oficial), surface, status ("active" \| "maintenance"), maintenanceStart, maintenanceUntil.
 - `staff`: ficha del personal (uid, tenantIds, RUT, teléfono). Solo la escribe el servidor.
 - `reviews`: id = id de la reserva (una por partido). Solo la escribe el servidor.
-- `tournaments`, `tournament_registrations`, `academy_classes` (con tenantId), `academy_enrollments`, `coupons`, `payments`, `invoices`, `teams`, `matchmaking`, `challenges`, `public_profiles`, `court_slots`, `audit` (solo se agrega).
+- `tournaments`, `tournament_registrations`, `academy_classes` (con tenantId), `academy_enrollments`, `coupons`, `payments`, `invoices`, `teams`, `matchmaking`, `challenges`, `court_slots` (siempre con tenantId), `audit` (solo se agrega), `rate_limits` (temporal).
