@@ -123,7 +123,7 @@ test.describe("Check-in con el código del ticket", () => {
   test("recepción escribe el código como sale en el ticket y registra el ingreso", async ({ page, isMobile }) => {
     test.skip(isMobile, "Escribe en la base: basta una vez");
     const booking = fs.existsSync(saPath) ? await admin().firestore().collection("bookings").doc("E2ECHECKINAB12CD").get() : null;
-    test.skip(!booking?.exists || !(await exists(env.E2E_MANAGER_EMAIL)), "Sin reserva de prueba para check-in");
+    test.skip(!booking?.exists || !!booking.data()?.checkIn || !(await exists(env.E2E_MANAGER_EMAIL)), "Sin reserva de prueba sin ingresar (se crea con el script de datos de prueba)");
     test.setTimeout(120_000);
     const errors = watchErrors(page);
     await login(page, env.E2E_MANAGER_EMAIL, env.E2E_MANAGER_PASSWORD);
@@ -136,6 +136,22 @@ test.describe("Check-in con el código del ticket", () => {
     const b = (await admin().firestore().collection("bookings").doc("E2ECHECKINAB12CD").get()).data();
     expect(b.checkIn).toBeTruthy();
     expect(errors, errors.join("\n")).toEqual([]);
+
+    // El partido jugado suma experiencia al jugador y la ve en Estadísticas
+    const user = (await admin().firestore().collection("users").doc(b.userId).get()).data();
+    expect(user.xp).toBeGreaterThan(0);
+    if (!env.E2E_PLAYER_PASSWORD) return;
+    const player = await page.context().browser()!.newPage();
+    await player.goto("/login");
+    await player.waitForLoadState("networkidle");
+    await player.locator("#email").fill(env.E2E_PLAYER_EMAIL);
+    await player.locator("#password").fill(env.E2E_PLAYER_PASSWORD);
+    await player.locator('button[type="submit"]').click();
+    await expect(player).toHaveURL(/\/player/, { timeout: 30_000 });
+    await player.goto("/player/estadisticas");
+    await expect(player.getByText("XP total")).toBeVisible({ timeout: 30_000 });
+    await expect(player.getByText(user.xp.toLocaleString("es-CL"), { exact: true }).first()).toBeVisible({ timeout: 20_000 });
+    await player.close();
   });
 });
 
