@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { readBody } from "@/services/server/http";
 import { adminAuth as getAdminAuth } from '@/services/server/firebase-admin';
 
 export async function POST(request: Request) {
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Token inválido.' }, { status: 401 });
     }
 
-    const raw = await request.json();
+    const raw = await readBody(request);
     // Escapa todo lo que viene del cliente antes de insertarlo en el HTML del correo
     const esc = (v: unknown) => String(v ?? '').slice(0, 120).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
     const email = String(raw?.email || '').trim().toLowerCase();

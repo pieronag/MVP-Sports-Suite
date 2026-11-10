@@ -6,6 +6,7 @@ import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { syncBooking } from "@/services/server/bookingProjections";
 import { canCheckIn, canMarkNoShow } from "@/utils/bookingPolicy";
 import { worksAtTenant } from "@/services/server/tenantAccess";
+import { readBody, docId } from "@/services/server/http";
 import { recomputePlayer } from "@/services/server/gamification";
 
 // Ingreso e inasistencia los registra el servidor: valida recinto, pago y horario, y recalcula la experiencia.
@@ -14,7 +15,8 @@ import { recomputePlayer } from "@/services/server/gamification";
 export async function POST(request: Request) {
   const caller = await verifyAuthedCaller(request);
   if (!caller) return NextResponse.json({ error: "Inicia sesión." }, { status: 401 });
-  const { bookingId, action } = await request.json().catch(() => ({}));
+  const { bookingId: rawBookingId, action } = await readBody(request);
+  const bookingId = docId(rawBookingId);
   if (!bookingId || !["checkin", "noshow"].includes(action)) return NextResponse.json({ error: "Solicitud no válida." }, { status: 400 });
 
   const db = adminDb();

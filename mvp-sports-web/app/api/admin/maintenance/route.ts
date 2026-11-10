@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/services/server/firebase-admin";
 import { isSuperAdminCaller } from "@/services/server/server-auth";
+import { readBody } from "@/services/server/http";
 import { slotOf, blocksSlot, rebuildCourtDay, syncBooking } from "@/services/server/bookingProjections";
 
 // Tareas de mantenimiento de una sola vez (solo superadmin), ejecutadas en el servidor
@@ -12,7 +13,7 @@ import { slotOf, blocksSlot, rebuildCourtDay, syncBooking } from "@/services/ser
 export async function POST(request: Request) {
   const caller = await isSuperAdminCaller(request);
   if (!caller) return NextResponse.json({ error: "Solo superadmin" }, { status: 403 });
-  const { task, apply } = await request.json().catch(() => ({}));
+  const { task, apply } = await readBody(request);
   const db = adminDb();
 
   if (task === "rebuild-slots") {

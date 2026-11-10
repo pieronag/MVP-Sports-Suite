@@ -3,6 +3,7 @@ import { adminDb } from "@/services/server/firebase-admin";
 import { notifyUser } from "@/services/server/push";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { chargeCard, rejectionMessage, PaymentError } from "@/services/server/mercadopago";
+import { readBody, docId } from "@/services/server/http";
 import { buildEnrollment, commitEnrollment } from "@/services/server/academies";
 
 // Inscribe al jugador en una clase de academia.
@@ -12,8 +13,8 @@ export async function POST(request: Request) {
   const caller = await verifyAuthedCaller(request);
   if (!caller) return NextResponse.json({ error: "Inicia sesión para inscribirte" }, { status: 401 });
   try {
-    const body = await request.json();
-    const draft = await buildEnrollment(caller.uid, String(body?.classId || ""));
+    const body = await readBody(request);
+    const draft = await buildEnrollment(caller.uid, docId(body.classId));
 
     if (draft.price > 0 && !body?.payOnline) throw new PaymentError("Esta clase se paga online al inscribirte.");
     if (body?.payOnline && draft.price > 0) {

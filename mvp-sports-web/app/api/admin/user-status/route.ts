@@ -3,6 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { adminAuth, adminDb } from "@/services/server/firebase-admin";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { allowRequest } from "@/services/server/rateLimit";
+import { readBody } from "@/services/server/http";
 import { normalizeRole, isPlatformAdmin } from "@/utils/roles";
 
 const STATUSES = ["active", "suspended", "disabled"] as const;
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
   if (!caller) return NextResponse.json({ error: "Inicia sesión." }, { status: 401 });
   if (!(await allowRequest(`user_status_${caller.uid}`, 60, 60_000))) return NextResponse.json({ error: "Demasiadas solicitudes. Intenta en un minuto." }, { status: 429 });
 
-  const body = await request.json().catch(() => ({}));
+  const body = await readBody(request);
   const uids: string[] = (Array.isArray(body?.uids) ? body.uids : [body?.uid]).filter((u: unknown) => typeof u === "string" && /^[A-Za-z0-9_-]{6,128}$/.test(u)).slice(0, 100);
   const status = body?.status as (typeof STATUSES)[number];
   if (!uids.length) return NextResponse.json({ error: "Indica la cuenta." }, { status: 400 });

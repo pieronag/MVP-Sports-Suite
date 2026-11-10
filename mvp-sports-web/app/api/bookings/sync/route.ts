@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
+import { readBody, docId } from "@/services/server/http";
 import { syncBooking } from "@/services/server/bookingProjections";
 
 // Recalcula horarios ocupados y reseña de una reserva tras crearla, editarla o cancelarla.
@@ -8,8 +9,8 @@ export async function POST(request: Request) {
   const caller = await verifyAuthedCaller(request);
   if (!caller) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   try {
-    const body = await request.json();
-    const bookingId = String(body?.bookingId || "");
+    const body = await readBody(request);
+    const bookingId = docId(body.bookingId);
     if (!bookingId) return NextResponse.json({ error: "Falta la reserva" }, { status: 400 });
     const prev = body?.prev && typeof body.prev === "object"
       ? { courtId: String(body.prev.courtId || ""), date: body.prev.date, startTime: String(body.prev.startTime || "") }

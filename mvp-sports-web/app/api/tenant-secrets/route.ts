@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/services/server/firebase-admin";
 import { verifyAuthedCaller, getUserRole, SUPER_ADMIN_ROLES } from "@/services/server/server-auth";
+import { readBody, docId } from "@/services/server/http";
 import { getTenantSecrets, setTenantSecrets, TENANT_SECRET_KEYS, type TenantSecrets } from "@/services/server/tenant-secrets";
 
 // Owner del recinto (ownerId/ownerIds) o superadmin. Los managers no gestionan credenciales.
@@ -26,7 +27,7 @@ async function authorize(request: Request, tenantId: string | null) {
 
 // Devuelve solo qué credenciales están configuradas, nunca su valor
 export async function GET(request: Request) {
-  const tenantId = new URL(request.url).searchParams.get("tenantId");
+  const tenantId = docId(new URL(request.url).searchParams.get("tenantId")) || null;
   const auth = await authorize(request, tenantId);
   if (auth.error) return auth.error;
   const secrets = await getTenantSecrets(tenantId!);
@@ -36,8 +37,8 @@ export async function GET(request: Request) {
 
 // Guarda credenciales. Un string vacío borra la credencial; omitir la clave la conserva.
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => ({}));
-  const tenantId: string | null = body?.tenantId || null;
+  const body = await readBody(request);
+  const tenantId: string | null = docId(body.tenantId) || null;
   const auth = await authorize(request, tenantId);
   if (auth.error) return auth.error;
 

@@ -3,6 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/services/server/firebase-admin";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { allowRequest } from "@/services/server/rateLimit";
+import { readBody, docId } from "@/services/server/http";
 import { worksAtTenant } from "@/services/server/tenantAccess";
 
 // Respuesta del recinto a una reseña (dueño, co-dueño o personal del recinto)
@@ -12,8 +13,8 @@ export async function POST(request: Request) {
   if (!(await allowRequest(`review_reply_${caller.uid}`, 20, 60_000))) {
     return NextResponse.json({ error: "Demasiadas solicitudes. Intenta en un minuto." }, { status: 429 });
   }
-  const body = await request.json().catch(() => ({}));
-  const reviewId = typeof body?.reviewId === "string" ? body.reviewId : "";
+  const body = await readBody(request);
+  const reviewId = docId(body.reviewId);
   const reply = typeof body?.reply === "string" ? body.reply.trim().slice(0, 500) : "";
   if (!reviewId) return NextResponse.json({ error: "Falta la reseña." }, { status: 400 });
   if (reply.length < 2) return NextResponse.json({ error: "Escribe una respuesta." }, { status: 400 });

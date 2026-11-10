@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
+import { docId } from "@/services/server/http";
 import { getCardSetup, PaymentError } from "@/services/server/mercadopago";
 
 // Datos para inicializar el Card Payment Brick: Public Key del recinto y tarjetas guardadas del jugador
 export async function GET(request: Request) {
   const caller = await verifyAuthedCaller(request);
   if (!caller) return NextResponse.json({ error: "Inicia sesión para pagar" }, { status: 401 });
-  const tenantId = new URL(request.url).searchParams.get("tenantId") || "";
+  const tenantId = docId(new URL(request.url).searchParams.get("tenantId"));
   if (!tenantId) return NextResponse.json({ error: "Falta el recinto" }, { status: 400 });
   try {
     return NextResponse.json(await getCardSetup(caller.uid, caller.email, tenantId));

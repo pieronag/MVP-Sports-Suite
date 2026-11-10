@@ -4,6 +4,7 @@ import { notifyUser } from "@/services/server/push";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { allowRequest } from "@/services/server/rateLimit";
 import { cancelAndRefund, RefundBusyError } from "@/services/server/refunds";
+import { readBody, docId } from "@/services/server/http";
 import { canPlayerCancel, refundFor } from "@/utils/bookingPolicy";
 
 // Única vía para que un jugador cancele: solo hasta 24 h antes, reembolsando lo pagado menos 3% de comisión.
@@ -13,7 +14,8 @@ export async function POST(request: Request) {
   if (!(await allowRequest(`refund_${caller.uid}`, 3, 60_000))) {
     return NextResponse.json({ error: "Demasiadas solicitudes. Intenta en un minuto." }, { status: 429 });
   }
-  const { bookingId } = await request.json().catch(() => ({}));
+  const { bookingId: rawBookingId } = await readBody(request);
+  const bookingId = docId(rawBookingId);
   if (!bookingId) return NextResponse.json({ error: "Debe indicar la reserva." }, { status: 400 });
 
   try {

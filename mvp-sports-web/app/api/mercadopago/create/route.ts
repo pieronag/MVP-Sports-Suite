@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
+import { readBody, docId } from "@/services/server/http";
 import { buildBookingCheckout, chargeCard, rejectionMessage, PaymentError } from "@/services/server/mercadopago";
 
 // Cobra una reserva con tarjeta (Checkout API / Card Payment Brick). El cliente envía qué quiere
@@ -9,20 +10,20 @@ export async function POST(request: Request) {
   if (!caller) return NextResponse.json({ error: "Inicia sesión para pagar" }, { status: 401 });
 
   try {
-    const body = await request.json();
+    const body = await readBody(request);
     if (body?.type === "tournament") {
       return NextResponse.json({ error: "El pago online de torneos aún no está disponible" }, { status: 400 });
     }
     const checkout = await buildBookingCheckout(caller.uid, {
-      tenantId: String(body?.tenantId || ""),
-      courtId: String(body?.courtId || ""),
+      tenantId: docId(body.tenantId),
+      courtId: docId(body.courtId),
       sport: String(body?.sport || ""),
       date: String(body?.date || ""),
       startTime: String(body?.startTime || ""),
       couponCode: body?.couponCode ? String(body.couponCode) : undefined,
-      teamId: body?.teamId ? String(body.teamId) : undefined,
+      teamId: docId(body.teamId) || undefined,
     });
-    const pay = await chargeCard({ uid: caller.uid, tenantId: body.tenantId, ...checkout, card: body.card, payerEmail: caller.email, saveCard: !!body.saveCard });
+    const pay = await chargeCard({ uid: caller.uid, tenantId: docId(body.tenantId), ...checkout, card: body.card, payerEmail: caller.email, saveCard: !!body.saveCard });
       if (pay.result !== "approved" && !pay.challenge) {
         return NextResponse.json({ ok: false, status: pay.status, error: rejectionMessage(pay.statusDetail) }, { status: 402 });
       }

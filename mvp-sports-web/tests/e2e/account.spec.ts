@@ -1,27 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
-import fs from "fs";
-import path from "path";
+import { env, admin, hasServiceAccount } from "./helpers";
 
 // Flujos reales de cuenta contra Firebase con cuentas de prueba (@example.test).
 // Requiere .env.local con E2E_* y firebase-service-account.json; si faltan, se omiten.
-const root = path.resolve(__dirname, "../..");
-const env: Record<string, string> = {};
-try {
-  for (const line of fs.readFileSync(path.join(root, ".env.local"), "utf8").split(/\r?\n/)) {
-    const m = line.match(/^([A-Z0-9_]+)="?(.*?)"?$/);
-    if (m) env[m[1]] = m[2];
-  }
-} catch { /* sin .env.local */ }
-const saPath = path.join(root, "firebase-service-account.json");
-const ready = !!env.E2E_MANAGER_EMAIL && !!env.E2E_PLAYER_EMAIL && fs.existsSync(saPath);
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const adminAuth = () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const admin = require("firebase-admin");
-  if (!admin.apps.length) admin.initializeApp({ credential: admin.credential.cert(JSON.parse(fs.readFileSync(saPath, "utf8"))) });
-  return admin;
-};
+const ready = !!env.E2E_MANAGER_EMAIL && !!env.E2E_PLAYER_EMAIL && hasServiceAccount;
+const adminAuth = admin;
 
 async function login(page: Page, email: string, password: string) {
   await page.goto("/login");

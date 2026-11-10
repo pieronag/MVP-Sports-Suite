@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/services/server/firebase-admin";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
+import { readBody } from "@/services/server/http";
 import { allowRequest } from "@/services/server/rateLimit";
 
 // Correos de verificación y de restablecimiento de contraseña (Resend).
 // Funciona sin sesión: el enlace solo viaja al buzón indicado, nunca en la respuesta.
 export async function POST(request: Request) {
   const caller = await verifyAuthedCaller(request);
-  const body = await request.json().catch(() => ({}));
+  const body = await readBody(request);
   const cleanEmail = String(body?.email || "").trim().toLowerCase();
   const type = body?.type;
   if (!cleanEmail || (type !== "verify" && type !== "reset")) {

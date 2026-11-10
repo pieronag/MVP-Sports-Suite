@@ -3,6 +3,7 @@ import { adminDb } from "@/services/server/firebase-admin";
 import { notifyUser } from "@/services/server/push";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { chargeCard, rejectionMessage, PaymentError } from "@/services/server/mercadopago";
+import { readBody, docId } from "@/services/server/http";
 import { buildRegistration, commitRegistration } from "@/services/server/tournaments";
 
 // Inscribe un equipo a un torneo.
@@ -12,8 +13,8 @@ export async function POST(request: Request) {
   const caller = await verifyAuthedCaller(request);
   if (!caller) return NextResponse.json({ error: "Inicia sesión para inscribirte" }, { status: 401 });
   try {
-    const body = await request.json();
-    const draft = await buildRegistration(caller.uid, String(body?.tournamentId || ""), String(body?.teamId || ""));
+    const body = await readBody(request);
+    const draft = await buildRegistration(caller.uid, docId(body.tournamentId), docId(body.teamId));
 
     if (draft.price > 0 && !body?.payOnline) throw new PaymentError("La inscripción a este torneo se paga online.");
     if (body?.payOnline && draft.price > 0) {

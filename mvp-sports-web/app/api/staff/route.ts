@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { allowRequest } from "@/services/server/rateLimit";
+import { readBody } from "@/services/server/http";
 import { createStaff, StaffError } from "@/services/server/staff";
 
 // Alta de personal: crea la cuenta de acceso y el perfil en el servidor (el dueño solo asigna sus recintos)
@@ -9,7 +10,7 @@ export async function POST(request: Request) {
   if (!caller) return NextResponse.json({ error: "Inicia sesión." }, { status: 401 });
   if (!(await allowRequest(`staff_create_${caller.uid}`, 10, 60_000))) return NextResponse.json({ error: "Demasiadas solicitudes. Intenta en un minuto." }, { status: 429 });
   try {
-    const r = await createStaff(caller.uid, await request.json().catch(() => ({})));
+    const r = await createStaff(caller.uid, await readBody(request));
     return NextResponse.json({ ok: true, ...r });
   } catch (e) {
     if (e instanceof StaffError) return NextResponse.json({ error: e.message }, { status: e.status });

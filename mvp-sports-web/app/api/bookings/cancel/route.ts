@@ -6,6 +6,7 @@ import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { allowRequest } from "@/services/server/rateLimit";
 import { worksAtTenant } from "@/services/server/tenantAccess";
 import { cancelAndRefund, RefundBusyError } from "@/services/server/refunds";
+import { readBody, docId } from "@/services/server/http";
 import { canVenueCancel, fullRefund } from "@/utils/bookingPolicy";
 
 // Anulación hecha por el recinto (dueño o personal): libera el horario y devuelve el 100% del pago.
@@ -15,7 +16,8 @@ export async function POST(request: Request) {
   if (!(await allowRequest(`venue_cancel_${caller.uid}`, 10, 60_000))) {
     return NextResponse.json({ error: "Demasiadas solicitudes. Intenta en un minuto." }, { status: 429 });
   }
-  const { bookingId, reason } = await request.json().catch(() => ({}));
+  const { bookingId: rawBookingId, reason } = await readBody(request);
+  const bookingId = docId(rawBookingId);
   if (typeof bookingId !== "string" || !bookingId) return NextResponse.json({ error: "Debe indicar la reserva." }, { status: 400 });
 
   try {

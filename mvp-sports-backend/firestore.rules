@@ -137,7 +137,10 @@ service cloud.firestore {
       allow delete: if isSuperAdmin();
       allow update: if isAuthenticated() && (isSuperAdmin() || (request.auth.uid == userId && !touchesPrivileged()));
       // Subcolecciones (tarjetas, estadísticas, transacciones): solo el titular y la administración
-      match /{subcollection=**} {
+      // Solo subcolecciones: "/{x}/{resto=**}" exige al menos un segmento. Un "/{x=**}" a secas también
+      // coincide con el propio documento (cero segmentos) y le daba al titular escritura total sobre
+      // rol, recintos, estado y experiencia, saltándose touchesPrivileged().
+      match /{subcollection}/{rest=**} {
         allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
       }
     }
@@ -154,7 +157,10 @@ service cloud.firestore {
       // El propio usuario elimina su cuenta por /api/account/delete
       allow delete: if isSuperAdmin();
       allow update: if isAuthenticated() && (isSuperAdmin() || (request.auth.uid == userId && !touchesPrivileged()));
-      match /{subcollection=**} {
+      // Solo subcolecciones: "/{x}/{resto=**}" exige al menos un segmento. Un "/{x=**}" a secas también
+      // coincide con el propio documento (cero segmentos) y le daba al titular escritura total sobre
+      // rol, recintos, estado y experiencia, saltándose touchesPrivileged().
+      match /{subcollection}/{rest=**} {
         allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
       }
     }

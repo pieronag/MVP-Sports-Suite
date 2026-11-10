@@ -3,6 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { adminDb } from "@/services/server/firebase-admin";
 import { verifyAuthedCaller } from "@/services/server/server-auth";
 import { allowRequest } from "@/services/server/rateLimit";
+import { readBody, docId } from "@/services/server/http";
 import { recomputeVenueRating } from "@/services/server/reviews";
 
 // Reseña de un recinto: solo quien jugó la reserva (con ingreso registrado), una por reserva.
@@ -12,8 +13,8 @@ export async function POST(request: Request) {
   if (!(await allowRequest(`review_${caller.uid}`, 5, 60_000))) {
     return NextResponse.json({ error: "Demasiadas solicitudes. Intenta en un minuto." }, { status: 429 });
   }
-  const body = await request.json().catch(() => ({}));
-  const bookingId = typeof body?.bookingId === "string" ? body.bookingId : "";
+  const body = await readBody(request);
+  const bookingId = docId(body.bookingId);
   const rating = Math.round(Number(body?.rating));
   const comment = typeof body?.comment === "string" ? body.comment.trim().slice(0, 500) : "";
   if (!bookingId) return NextResponse.json({ error: "Falta la reserva." }, { status: 400 });

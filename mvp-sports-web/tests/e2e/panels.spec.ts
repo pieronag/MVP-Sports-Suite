@@ -1,27 +1,10 @@
 import { test, expect, type Page } from "@playwright/test";
 import fs from "fs";
-import path from "path";
+import { env, admin, exists, saPath } from "./helpers";
 
 // Panel del mánager y Configuración del complejo con cuentas de prueba (@example.test).
 // El dueño de prueba administra un recinto propio e inactivo (no lo ven los jugadores).
-const root = path.resolve(__dirname, "../..");
-const env: Record<string, string> = {};
-try {
-  for (const line of fs.readFileSync(path.join(root, ".env.local"), "utf8").split(/\r?\n/)) {
-    const m = line.match(/^([A-Z0-9_]+)="?(.*?)"?$/);
-    if (m) env[m[1]] = m[2];
-  }
-} catch { /* sin .env.local */ }
-const saPath = path.join(root, "firebase-service-account.json");
 const TENANT = "e2e-recinto-prueba";
-
-const admin = () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const a = require("firebase-admin");
-  if (!a.apps.length) a.initializeApp({ credential: a.credential.cert(JSON.parse(fs.readFileSync(saPath, "utf8"))) });
-  return a;
-};
-const exists = async (email?: string) => !!email && fs.existsSync(saPath) && admin().auth().getUserByEmail(email).then(() => true, () => false);
 
 async function login(page: Page, email: string, password: string) {
   await page.goto("/login");
@@ -87,7 +70,7 @@ test.describe("Configuración del complejo", () => {
     await expect(page.getByText("Configuración actualizada con éxito")).toBeVisible({ timeout: 20_000 });
 
     // Se guardó en la base sin tocar propiedad ni estado
-    const t = (await admin().firestore().collection("tenants").doc(TENANT).get()).data();
+    const t = (await admin().firestore().collection("tenants").doc(TENANT).get()).data() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(t.name).toBe(nuevo);
     expect(t.whatsapp).toBe("+56911112222");
     expect(t.status).toBe("inactive");
@@ -133,12 +116,12 @@ test.describe("Check-in con el código del ticket", () => {
     await page.getByRole("button", { name: /^validar$/i }).click();
     await page.getByRole("button", { name: /confirmar entrada/i }).click();
     await expect(page.getByText(/ingreso exitoso/i)).toBeVisible({ timeout: 20_000 });
-    const b = (await admin().firestore().collection("bookings").doc("E2ECHECKINAB12CD").get()).data();
+    const b = (await admin().firestore().collection("bookings").doc("E2ECHECKINAB12CD").get()).data() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(b.checkIn).toBeTruthy();
     expect(errors, errors.join("\n")).toEqual([]);
 
     // El partido jugado suma experiencia al jugador y la ve en Estadísticas
-    const user = (await admin().firestore().collection("users").doc(b.userId).get()).data();
+    const user = (await admin().firestore().collection("users").doc(b.userId).get()).data() as any; // eslint-disable-line @typescript-eslint/no-explicit-any
     expect(user.xp).toBeGreaterThan(0);
     if (!env.E2E_PLAYER_PASSWORD) return;
     const player = await page.context().browser()!.newPage();
