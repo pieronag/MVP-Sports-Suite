@@ -1,4 +1,5 @@
 "use client";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PanelGlass} from '@/components/ui/DashboardWidgets';
 import { Key01Icon } from '@hugeicons/core-free-icons';
@@ -349,15 +350,7 @@ export default function TenantSettingsPage() {
 
             {/* CABECERA */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="w-6 h-[2px] bg-emerald-500 rounded-md"></span>
-                        <p className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Infraestructura & Control Operativo</p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">
-                        Configuración <span className="text-emerald-500 dark:text-[#00df82]">Complejo</span>
-                    </h1>
-                </div>
+                <PageTitle eyebrow="Infraestructura & Control Operativo">Configuración <Accent>Complejo</Accent></PageTitle>
 
                 <div className="flex items-center gap-3">
                     {dirty && (

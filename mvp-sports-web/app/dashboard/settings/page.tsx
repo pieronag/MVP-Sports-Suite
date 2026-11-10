@@ -1,4 +1,5 @@
 "use client";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import React, { useState, useEffect } from 'react';
 import { postApi } from "@/services/client/apiClient";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -446,15 +447,7 @@ export default function SettingsPage() {
         <div className="w-full space-y-6 pb-10 text-left relative animate-fadeIn">
             {/* CABECERA */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="w-6 h-[2px] bg-emerald-500 rounded-md" />
-                        <p className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Configuración central</p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">
-                        Núcleo <span className="text-emerald-500 dark:text-[#00df82]">Operativo</span>
-                    </h1>
-                </div>
+                <PageTitle eyebrow="Configuración central">Núcleo <Accent>Operativo</Accent></PageTitle>
                 <div className="flex items-center gap-3">
                     {dirty && (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] md:text-[9px] font-black uppercase tracking-wider">
@@ -588,7 +581,7 @@ export default function SettingsPage() {
                         </div>
                         <p className="flex items-center gap-2 text-[11px] md:text-[8px] font-bold text-slate-400 uppercase leading-relaxed">
                             <HugeiconsIcon icon={InformationCircleIcon} className="w-3.5 h-3.5 shrink-0" strokeWidth={1.8} />
-                            El "peso de prioridad" ordena los recintos en el directorio del player: los planes con "Prioridad Top" aparecen primero y, dentro de estos, se ordenan por este valor (mayor = primero).
+                            El «peso de prioridad» ordena los recintos en el directorio del jugador: los planes con «Prioridad Top» aparecen primero y, dentro de estos, se ordenan por este valor (mayor = primero).
                         </p>
                     </div>
                 )}

@@ -1,4 +1,5 @@
 "use client";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import { postApi } from "@/services/client/apiClient";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -363,17 +364,7 @@ export default function StaffPage() {
 
             {/* CABECERA ADN FINANCE STYLE */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6 relative z-10">
-                <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                        <span className="w-6 h-[2px] bg-emerald-500 rounded-md"></span>
-                        <p className="text-[11px] md:text-[9px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">
-                            Gestión de Talento Humano
-                        </p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">
-                        Administración de <span className="text-emerald-500 dark:text-[#00df82]">Staff</span>
-                    </h1>
-                </div>
+                <PageTitle eyebrow="Gestión de Talento Humano">Administración de <Accent>Staff</Accent></PageTitle>
 
                 <div className="flex items-center gap-2 p-1.5 rounded-md">
                     <span className="px-3 py-2 text-[11px] md:text-[9px] font-black uppercase tracking-widest text-slate-400 hidden md:inline-flex items-center gap-2">

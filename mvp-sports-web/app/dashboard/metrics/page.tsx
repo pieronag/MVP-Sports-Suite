@@ -1,4 +1,5 @@
 "use client";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import React, { useState, useEffect } from 'react';
 import { listAllBookings } from "@/services/client/data/bookings";
 import { countsAsIncome } from "@/utils/bookingModel";
@@ -372,15 +373,7 @@ export default function MetricsPage() {
             )}
             {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="w-6 h-[2px] bg-emerald-500 rounded-md" />
-                        <p className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Auditoría ejecutiva</p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">
-                        Métricas de <span className="text-emerald-500 dark:text-[#00df82]">Desempeño</span>
-                    </h1>
-                </div>
+                <PageTitle eyebrow="Auditoría ejecutiva">Métricas de <Accent>Desempeño</Accent></PageTitle>
                 <div className="flex items-center gap-2">
                     <div className="flex items-center rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 overflow-hidden">
                         <button

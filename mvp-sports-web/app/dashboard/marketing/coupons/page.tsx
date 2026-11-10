@@ -1,4 +1,5 @@
 "use client";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { DiscountTag01Icon, PercentIcon } from '@hugeicons/core-free-icons';
@@ -297,13 +298,7 @@ export default function CouponsPage() {
 
             {/* HEADER CON FILTRO DE RECINTOS */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/5">
-                <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                        <span className="w-6 h-[2px] bg-pink-500 rounded-md"></span>
-                        <p className="text-[11px] font-black text-pink-600 dark:text-pink-400 tracking-[0.2em] uppercase">Estrategia de Fidelización</p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">Mis <span className="text-pink-500">Beneficios</span></h1>
-                </div>
+                <PageTitle eyebrow="Estrategia de Fidelización" tone="pink">Mis <Accent tone="pink">Beneficios</Accent></PageTitle>
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <div className="flex flex-col gap-1">

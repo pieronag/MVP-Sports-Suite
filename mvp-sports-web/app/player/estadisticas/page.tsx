@@ -1,4 +1,5 @@
 "use client";
+import { useNow } from "@/hooks/useNow";
 import { GlowCard, SectionPill, SegmentedTabs } from "@/components/player/ui";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -45,6 +46,7 @@ const BADGE_DESCRIPTIONS: Record<string, string> = {
 };
 
 export default function EstadisticasPage() {
+  const now = useNow();
   const router = useRouter();
   const { profile, theme } = usePlayer();
   const isDark = theme === 'dark';
@@ -91,13 +93,6 @@ export default function EstadisticasPage() {
   }, []);
 
   const [autoOpened, setAutoOpened] = useState(false);
-  useEffect(() => {
-    if (autoOpened || loading || typeof window === 'undefined') return;
-    const id = new URLSearchParams(window.location.search).get('registrar');
-    if (!id) return;
-    const b: any = bookings.find((x: any) => x.id === id);
-    if (b) { setAutoOpened(true); handleOpenStatsModal({ ...b, id: b.id }); }
-  }, [bookings, loading, autoOpened]);
 
   const handleLoadTeamMembers = async (teamId: string, teamsList?: any[], existingStats?: any, existingAssignments?: any, existingAssists?: any) => {
     setLoadingMembers(true);
@@ -146,6 +141,13 @@ export default function EstadisticasPage() {
       } catch (error) { console.error(error); }
     }
   };
+  useEffect(() => {
+    if (autoOpened || loading || typeof window === 'undefined') return;
+    const id = new URLSearchParams(window.location.search).get('registrar');
+    if (!id) return;
+    const b: any = bookings.find((x: any) => x.id === id);
+    if (b) { setAutoOpened(true); handleOpenStatsModal({ ...b, id: b.id }); }
+  }, [bookings, loading, autoOpened]);
 
   const executeSaveMatchStats = async () => {
     setShowConfirmModal(false); setSavingStats(true);
@@ -260,7 +262,7 @@ export default function EstadisticasPage() {
       if (!d || isNaN(d.getTime())) return false;
       const [h, m] = String(b.startTime || '00:00').split(':').map(Number);
       const st = new Date(d); st.setHours(h || 0, m || 0, 0, 0); if ((h || 0) < 6) st.setDate(st.getDate() + 1);
-      return st.getTime() + 60 * 60_000 < Date.now();
+      return st.getTime() + 60 * 60_000 < now;
     };
     const matchesList = bookings.filter(b => {
       const isCompleted = b.status === 'completed' || (b as any).checkOut === true || (b.status !== 'cancelled' && hasEnded(b));
@@ -300,7 +302,7 @@ export default function EstadisticasPage() {
       noshowsCount: matchesList.filter((m: any) => m.displayStatus === 'no-show').length,
       partidosTotales: matchesList.filter((m: any) => m.displayStatus === 'completed').length
     };
-  }, [bookings, profile, gamification]);
+  }, [bookings, profile, gamification, now]);
 
   const rc: Record<string, { bg: string; txt: string }> = {
     win: { bg: 'rgba(16,185,129,0.1)', txt: '#10b981' },

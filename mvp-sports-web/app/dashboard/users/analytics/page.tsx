@@ -1,4 +1,5 @@
 "use client";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -26,6 +27,24 @@ import {
 const GRID_STROKE = '#94a3b8';
 const GRID_OPACITY = 0.18;
 const AXIS_FILL = '#64748b';
+
+// Tooltip de los gráficos: fuera del componente para no recrearse en cada render
+function TooltipBox({ active, payload, label }: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    if (!active || !payload?.length) return null;
+    return (
+        <div className="bg-white dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-md px-3.5 py-3 shadow-2xl backdrop-blur-md">
+            {label && <p className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82] uppercase mb-1.5 tracking-tighter border-b border-slate-100 dark:border-white/10 pb-1">{label}</p>}
+            <div className="space-y-1">
+                {payload.map((entry: any, index: number) => (
+                    <p key={index} className="text-xs md:text-[10px] font-bold text-slate-600 dark:text-slate-200 uppercase flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: entry.color || entry.fill }} />
+                        {entry.name}: <span className="font-black text-slate-900 dark:text-white font-mono">{entry.value}</span>
+                    </p>
+                ))}
+            </div>
+        </div>
+    );
+}
 
 export default function PlayerAnalyticsPage() {
     const [players, setPlayers] = useState<any[]>([]);
@@ -199,36 +218,12 @@ export default function PlayerAnalyticsPage() {
     };
 
     // Tooltip adaptativo: blanco en light, oscuro en dark
-    const TooltipBox = ({ active, payload, label }: any) => {
-        if (!active || !payload?.length) return null;
-        return (
-            <div className="bg-white dark:bg-[#020617] border border-slate-200 dark:border-white/10 rounded-md px-3.5 py-3 shadow-2xl backdrop-blur-md">
-                {label && <p className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82] uppercase mb-1.5 tracking-tighter border-b border-slate-100 dark:border-white/10 pb-1">{label}</p>}
-                <div className="space-y-1">
-                    {payload.map((entry: any, index: number) => (
-                        <p key={index} className="text-xs md:text-[10px] font-bold text-slate-600 dark:text-slate-200 uppercase flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: entry.color || entry.fill }} />
-                            {entry.name}: <span className="font-black text-slate-900 dark:text-white font-mono">{entry.value}</span>
-                        </p>
-                    ))}
-                </div>
-            </div>
-        );
-    };
 
     return (
         <div className="w-full space-y-6 pb-12 animate-fadeIn relative">
             {/* CABECERA */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="w-6 h-[2px] bg-emerald-500 rounded-md" />
-                        <p className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Inteligencia de datos</p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">
-                        Analítica de <span className="text-emerald-500 dark:text-[#00df82]">Atletas</span>
-                    </h1>
-                </div>
+                <PageTitle eyebrow="Inteligencia de datos">Analítica de <Accent>Atletas</Accent></PageTitle>
                 <div className="flex items-center gap-2.5">
                     <div className="relative" ref={exportRef}>
                         <button
@@ -252,7 +247,7 @@ export default function PlayerAnalyticsPage() {
                                     </span>
                                     <span className="flex flex-col min-w-0">
                                         <span className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-wider">CSV (Excel)</span>
-                                        <span className="text-[11px] md:text-[9px] text-slate-400">Formato es-CL con ';'</span>
+                                        <span className="text-[11px] md:text-[9px] text-slate-400">Formato es-CL con «;»</span>
                                     </span>
                                 </button>
                                 <button

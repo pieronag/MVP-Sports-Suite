@@ -46,7 +46,7 @@ const cleanRut = (rut: string) => rut.replace(/[^0-9kK]/g, "").toUpperCase();
 
 const validateChileanRut = (rut: string) => {
   if (!rut) return true;
-  let value = cleanRut(rut);
+  const value = cleanRut(rut);
   if (value.length < 2) return false;
   const cuerpo = value.slice(0, -1);
   if (cuerpo.length < 1) return false;
@@ -58,7 +58,7 @@ const validateChileanRut = (rut: string) => {
 };
 
 const maskRut = (value: string) => {
-  let c = cleanRut(value);
+  const c = cleanRut(value);
   if (c.length <= 1) return c;
   return c.slice(0, -1).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.") + "-" + c.slice(-1);
 };
@@ -71,7 +71,7 @@ const maskPhone = (value: string) => {
 };
 
 const maskBirthDate = (value: string) => {
-  let c = value.replace(/\D/g, "").slice(0, 8);
+  const c = value.replace(/\D/g, "").slice(0, 8);
   if (c.length <= 2) return c;
   if (c.length <= 4) return c.slice(0, 2) + "/" + c.slice(2);
   return c.slice(0, 2) + "/" + c.slice(2, 4) + "/" + c.slice(4);
@@ -205,8 +205,6 @@ export default function PreferenciasPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
 
-  useEffect(() => { loadPrefs(); }, []);
-
   const loadPrefs = async () => {
     if (!user?.uid) { setLoading(false); return; }
     try {
@@ -225,6 +223,8 @@ export default function PreferenciasPage() {
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
+  // Se carga cuando la sesión está lista (antes solo al montar: si la sesión llegaba después, no cargaba)
+  useEffect(() => { loadPrefs(); }, [user?.uid]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const hasChanges = useCallback(() => {
     if (!initialData) return false;

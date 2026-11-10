@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { GlowCard, SectionPill } from "@/components/player/ui";
 import { registrationState } from "@/utils/tournament";
 import { useEffect, useMemo, useState } from "react";
@@ -158,7 +159,7 @@ export default function TorneosPage() {
             <Trophy size={32} className={isDark ? "text-slate-600" : "text-slate-300"} />
             <p className={`text-[13px] font-medium mt-3 ${sub}`}>No hay torneos con inscripciones abiertas</p>
             <p className={`text-[12px] mt-1 ${sub}`}>Mientras tanto, arma un partido con otro equipo.</p>
-            <a href="/player/equipos/partidos" className="mt-4 px-5 h-10 inline-flex items-center rounded-md text-[12px] font-semibold bg-emerald-500 text-white">Buscar rival</a>
+            <Link href="/player/equipos/partidos" className="mt-4 px-5 h-10 inline-flex items-center rounded-md text-[12px] font-semibold bg-emerald-500 text-white">Buscar rival</Link>
           </div>
         ) : active.map(t => <Card key={t.id} t={t} />)}
 

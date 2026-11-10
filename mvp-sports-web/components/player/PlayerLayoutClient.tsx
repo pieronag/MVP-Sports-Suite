@@ -131,6 +131,9 @@ function PlayerShell({ children }: { children: React.ReactNode }) {
     );
 }
 
+// Partículas de la pantalla de carga: posiciones fijas (antes Math.random() en cada render las hacía saltar)
+const PARTICLES = Array.from({ length: 10 }, (_, i) => ({ left: (i * 37 + 11) % 100, delay: (i * 7) % 10, opacity: 0.15 + ((i * 13) % 35) / 100 }));
+
 export default function PlayerLayoutClient({ children }: { children: React.ReactNode }) {
     const { user, loading, role } = useAuth();
     const router = useRouter();
@@ -151,9 +154,9 @@ export default function PlayerLayoutClient({ children }: { children: React.React
                 <div className="absolute inset-0 glow-mesh opacity-30" />
                 {/* Floating Particles */}
                 <div className="absolute inset-0 pointer-events-none">
-                    {mounted && [...Array(10)].map((_, i) => (
+                    {mounted && PARTICLES.map((p, i) => (
                         <div key={i} className={`particle animate-particle-${(i % 5) + 1}`}
-                            style={{ left: `${Math.random() * 100}%`, animationDelay: `${Math.random() * 10}s`, opacity: Math.random() * 0.5 }}
+                            style={{ left: `${p.left}%`, animationDelay: `${p.delay}s`, opacity: p.opacity }}
                         />
                     ))}
                 </div>

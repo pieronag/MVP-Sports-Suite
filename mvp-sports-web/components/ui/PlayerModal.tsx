@@ -1,4 +1,5 @@
 "use client";
+import { useNow } from "@/hooks/useNow";
 import React, { useEffect, useState } from 'react';
 import { normalizeBooking, isReal } from "@/utils/bookingModel";
 import type { Booking } from "@/types/booking";
@@ -86,6 +87,7 @@ function resolveDate(candidates: any[]): Date | null {
 }
 
 export default function PlayerModal({ user, isOpen, onClose, gamification, initialTab = 'perfil', onToggleStatus }: PlayerModalProps) {
+  const now = useNow();
     const [tab, setTab] = useState<'perfil' | 'historial' | 'logros'>(initialTab);
     const [gamificationLocal, setGamificationLocal] = useState<any>(gamification || null);
     const [history, setHistory] = useState<any[]>([]);
@@ -125,12 +127,6 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
         }
     }, [isOpen, gamificationLocal]);
 
-    useEffect(() => {
-        if (!isOpen || !user?.id) return;
-        // Se carga el historial al abrir: Historial y Logros lo necesitan.
-        if (history.length === 0) fetchHistory();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isOpen, user?.id]);
 
     const fetchHistory = async () => {
         setLoadingHistory(true);
@@ -158,6 +154,12 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
             setLoadingHistory(false);
         }
     };
+    useEffect(() => {
+        if (!isOpen || !user?.id) return;
+        // Se carga el historial al abrir: Historial y Logros lo necesitan.
+        if (history.length === 0) fetchHistory();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, user?.id]);
 
     if (!isOpen || !user) return null;
 
@@ -175,7 +177,7 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
     let joinedStr = '—';
     if (rawJoined) joinedStr = rawJoined.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
     else if (typeof user.joined === 'string' && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(user.joined.trim())) joinedStr = user.joined;
-    const daysActive = rawJoined ? Math.max(1, (Date.now() - rawJoined.getTime()) / 86400000) : 1;
+    const daysActive = rawJoined ? Math.max(1, (now - rawJoined.getTime()) / 86400000) : 1;
 
     const tiers = gamificationLocal?.tiers || { bronze: 0, silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 };
     const RANGOS = [

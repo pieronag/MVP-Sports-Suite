@@ -85,6 +85,26 @@ const formatDistance = (lat1: number, lon1: number, lat2: number, lon2: number) 
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) < 1 ? `${Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*1000)}m` : `${(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(1)}km`;
 };
 
+// Pasos del asistente de reserva (fuera del componente: definido adentro se recreaba en cada render)
+const STEP_LABELS = ["Deporte", "Día y hora", "Confirmar"];
+function StepIndicator({ step, isDark }: { step: number; isDark: boolean }) {
+  return (
+    <ol className="grid grid-cols-3 gap-1 mb-4" aria-label="Pasos de la reserva">
+      {STEP_LABELS.map((label, i) => {
+        const s = i + 1, done = step > s, current = step === s;
+        return (
+          <li key={s} aria-current={current ? "step" : undefined} className="flex flex-col items-center gap-1.5">
+            <div className={`h-1 w-full rounded-full ${done || current ? "bg-emerald-500" : isDark ? "bg-white/8" : "bg-slate-200"}`} />
+            <span className={`text-[11px] font-semibold flex items-center gap-1 ${current ? (isDark ? "text-slate-100" : "text-slate-900") : done ? "text-emerald-500" : isDark ? "text-slate-500" : "text-slate-400"}`}>
+              {done && <CheckCircle2 size={12} />}{label}
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 export default function VenueDetailPage() {
   const { id } = useParams();
   const router = useRouter();
@@ -294,22 +314,6 @@ export default function VenueDetailPage() {
   }, [availableSports, profile, autoSport]);
 
   const DAY_KEYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-  const STEP_LABELS = ["Deporte", "Día y hora", "Confirmar"];
-  const StepIndicator = () => (
-    <ol className="grid grid-cols-3 gap-1 mb-4" aria-label="Pasos de la reserva">
-      {STEP_LABELS.map((label, i) => {
-        const s = i + 1, done = bookingStep > s, current = bookingStep === s;
-        return (
-          <li key={s} aria-current={current ? "step" : undefined} className="flex flex-col items-center gap-1.5">
-            <div className={`h-1 w-full rounded-full ${done || current ? "bg-emerald-500" : isDark ? "bg-white/8" : "bg-slate-200"}`} />
-            <span className={`text-[11px] font-semibold flex items-center gap-1 ${current ? (isDark ? "text-slate-100" : "text-slate-900") : done ? "text-emerald-500" : isDark ? "text-slate-500" : "text-slate-400"}`}>
-              {done && <CheckCircle2 size={12} />}{label}
-            </span>
-          </li>
-        );
-      })}
-    </ol>
-  );
 
   const renderSportSelection = () => (
     <GlowCard isDark={isDark}>
@@ -587,7 +591,7 @@ export default function VenueDetailPage() {
       <div className="px-5 pt-5 pb-8 space-y-4">
         {/* Reserva: primero en la pantalla */}
         <h2 className={`text-[18px] font-heading font-black tracking-tight ${isDark ? "text-slate-100" : "text-slate-900"}`}>Reserva tu cancha</h2>
-        <StepIndicator />
+        <StepIndicator step={bookingStep} isDark={isDark} />
         {bookingStep === 1 && renderSportSelection()}
         {bookingStep === 2 && renderCourtSelection()}
         {bookingStep === 3 && renderSummary()}

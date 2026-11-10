@@ -1,4 +1,6 @@
 "use client";
+import { useFeedback } from "@/components/ui/Feedback";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { listAllBookings, listBookings } from "@/services/client/data/bookings";
 import { countsAsIncome } from "@/utils/bookingModel";
@@ -27,7 +29,6 @@ import {
     FilterIcon,
     PrinterIcon,
     Delete02Icon,
-    Mail01Icon,
     RefreshIcon,
     Alert02Icon,
     ArrowDown01Icon,
@@ -87,22 +88,9 @@ export default function Page() {
     const [selectedMonth, setSelectedMonth] = useState(getPreviousMonth());
     const [monthAll, setMonthAll] = useState(false);
     const [isGenerating, setIsGenerating] = useState(false);
-    const [showConfirmModal, setShowConfirmModal] = useState(false);
-
-    const [modalConfig, setModalConfig] = useState<{
-        isOpen: boolean;
-        title: string;
-        message: string;
-        type: 'alert' | 'confirm';
-        onConfirm?: () => void;
-    }>({ isOpen: false, title: '', message: '', type: 'alert' });
-
-    const showAlert = (title: string, message: string) => {
-        setModalConfig({ isOpen: true, title, message, type: 'alert' });
-    };
-
-    const showConfirm = (title: string, message: string, onConfirm: () => void) => {
-        setModalConfig({ isOpen: true, title, message, type: 'confirm', onConfirm });
+    const { alert: showAlert, confirm } = useFeedback();
+    const showConfirm = async (title: string, message: string, onConfirm: () => void | Promise<void>) => {
+        if (await confirm({ title, message })) await onConfirm();
     };
 
     const fetchData = async () => {
@@ -172,7 +160,6 @@ export default function Page() {
 
     const handleGenerateBulk = async () => {
         setIsGenerating(true);
-        setShowConfirmModal(false);
         try {
             const settingsSnap = await getDoc(doc(db, "settings", "global"));
             const settingsData = settingsSnap.exists() ? settingsSnap.data() : null;
@@ -679,15 +666,7 @@ f(true);
         <div className="w-full space-y-6 pb-12 animate-fadeIn relative">
             {/* CABECERA */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="w-6 h-[2px] bg-emerald-500 rounded-md" />
-                        <p className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Control financiero</p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">
-                        Gestión de <span className="text-emerald-500 dark:text-[#00df82]">Facturación</span>
-                    </h1>
-                </div>
+                <PageTitle eyebrow="Control financiero">Gestión de <Accent>Facturación</Accent></PageTitle>
                 <div className="flex items-center gap-2.5">
                     <div className="relative" ref={exportRef}>
                         <button
@@ -729,14 +708,7 @@ f(true);
                         )}
                     </div>
                     <button
-                        onClick={() => showAlert("Envío Masivo", "Enviando recordatorios a recintos con saldos pendientes...")}
-                        className="flex items-center gap-2 px-3.5 py-2.5 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 text-[11px] font-black uppercase tracking-wider hover:border-emerald-400 dark:hover:border-[#00df82]/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all"
-                    >
-                        <HugeiconsIcon icon={Mail01Icon} className="w-4 h-4" strokeWidth={1.8} />
-                        Envío masivo
-                    </button>
-                    <button
-                        onClick={() => setShowConfirmModal(true)}
+                        onClick={() => showConfirm("Liquidación masiva", `Se generarán las liquidaciones considerando únicamente pagos aceptados para ${monthAll ? "el periodo seleccionado" : selectedMonth}.`, handleGenerateBulk)}
                         disabled={isGenerating}
                         className="flex items-center gap-2 px-4 py-2.5 rounded-md bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black text-[11px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                     >
@@ -923,48 +895,6 @@ f(true);
                     )}
                 </div>
             </SectionCard>
-
-            {/* MODAL GENERACION MASIVA */}
-            {showConfirmModal && (
-                <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setShowConfirmModal(false)}>
-                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-md p-8 border border-slate-200 dark:border-white/10 shadow-2xl text-center relative overflow-hidden" onClick={e => e.stopPropagation()}>
-                        <div className="absolute top-0 left-0 right-0 h-24 bg-linear-to-b from-slate-50 dark:from-white/3 to-transparent pointer-events-none"></div>
-                        <div className="relative z-10 w-16 h-16 bg-emerald-500/10 dark:bg-[#00df82]/10 rounded-md flex items-center justify-center mx-auto mb-6 border border-emerald-500/20">
-                            <HugeiconsIcon icon={ReceiptIcon} className="w-8 h-8 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.6} />
-                        </div>
-                        <h3 className="relative z-10 text-xl font-black uppercase text-slate-900 dark:text-white mb-2 tracking-tighter font-heading">Liquidación masiva</h3>
-                        <p className="relative z-10 text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8 leading-relaxed px-4">
-                            Se generarán las facturas considerando <strong>únicamente pagos aceptados</strong> para el periodo {monthAll ? 'seleccionado' : selectedMonth}.
-                        </p>
-                        <div className="relative z-10 flex gap-4">
-                            <button onClick={() => setShowConfirmModal(false)} className="flex-1 py-3 text-[11px] md:text-[9px] font-black uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10 transition-all">Cancelar</button>
-                            <button onClick={handleGenerateBulk} disabled={isGenerating} className="flex-1 py-3 text-[11px] md:text-[9px] font-black uppercase rounded-md text-white bg-emerald-500 dark:bg-[#00df82] dark:text-black shadow-lg shadow-emerald-500/25 active:scale-95 transition-all disabled:opacity-60">
-                                {isGenerating ? 'Generando...' : 'Proceder'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {modalConfig.isOpen && (
-                <div className="fixed inset-0 z-300 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setModalConfig({ ...modalConfig, isOpen: false })}>
-                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-md p-8 border border-slate-200 dark:border-white/10 shadow-2xl text-center" onClick={e => e.stopPropagation()}>
-                        <div className="w-14 h-14 bg-emerald-500/10 dark:bg-[#00df82]/10 rounded-md flex items-center justify-center mx-auto mb-4 border border-emerald-500/20">
-                            <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-7 h-7 text-emerald-600 dark:text-[#00df82]" strokeWidth={1.6} />
-                        </div>
-                        <h3 className="text-lg font-black uppercase text-slate-900 dark:text-white mb-2 tracking-tighter font-heading">{modalConfig.title}</h3>
-                        <p className="text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 leading-relaxed">{modalConfig.message}</p>
-                        <div className="flex gap-4">
-                            {modalConfig.type === 'confirm' && (
-                                <button onClick={() => setModalConfig({ ...modalConfig, isOpen: false })} className="flex-1 py-3 text-[11px] md:text-[9px] font-black uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 hover:bg-slate-200 dark:hover:bg-white/10 transition-all">Cancelar</button>
-                            )}
-                            <button onClick={() => { modalConfig.onConfirm?.(); setModalConfig({ ...modalConfig, isOpen: false }); }} className={`flex-1 py-3 text-[11px] md:text-[9px] font-black uppercase rounded-md transition-all ${modalConfig.type === 'confirm' ? 'bg-emerald-500 dark:bg-[#00df82] dark:text-black text-white shadow-lg shadow-emerald-500/25 active:scale-95' : 'bg-emerald-500 dark:bg-[#00df82] dark:text-black text-white shadow-lg shadow-emerald-500/25 active:scale-95'}`}>
-                                {modalConfig.type === 'confirm' ? 'Confirmar' : 'Entendido'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* MODAL VISTA PREVIA PDF */}
             {preview.url && (

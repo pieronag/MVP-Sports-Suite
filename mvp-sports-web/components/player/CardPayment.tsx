@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { auth } from "@/services/client/firebase";
 import { usePlayer } from "@/context/PlayerContext";
@@ -42,7 +42,7 @@ function CardPaymentForm({ tenantId, amount, isDark, onPay, onApproved }: {
   onPay: (card: any, saveCard: boolean) => Promise<PayResult>;
   onApproved: (returnUrl?: string) => void;
 }) {
-  const containerId = useRef(`mp-card-${Math.random().toString(36).slice(2)}`).current;
+  const containerId = `mp-card-${useId().replace(/:/g, "")}`;
   const controller = useRef<any>(null);
   const saveRef = useRef(true);
   const [state, setState] = useState<"loading" | "ready" | "paying" | "challenge" | "approved" | "error">("loading");
@@ -50,7 +50,7 @@ function CardPaymentForm({ tenantId, amount, isDark, onPay, onApproved }: {
   const [hasSaved, setHasSaved] = useState(false);
   const [saveCard, setSaveCard] = useState(true);
   const [challenge, setChallenge] = useState<{ url: string; creq: string } | null>(null);
-  saveRef.current = saveCard;
+  useEffect(() => { saveRef.current = saveCard; }, [saveCard]);
 
   // Tras el desafío 3D Secure: revisar el estado hasta que Mercado Pago responda
   const pollStatus = async (pid: string) => {

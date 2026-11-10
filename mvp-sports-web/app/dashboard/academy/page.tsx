@@ -1,4 +1,5 @@
 "use client";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { useFeedback } from "@/components/ui/Feedback";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { academyIssue } from "@/utils/academy";
@@ -254,13 +255,7 @@ export default function AcademyPage() {
 
             {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
-                <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                        <span className="w-6 h-[2px] bg-indigo-500 rounded-md"></span>
-                        <p className="text-xs md:text-[10px] font-bold text-indigo-600 dark:text-indigo-400 tracking-[0.2em] uppercase">Módulo Educativo</p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">Gestión de <span className="text-emerald-500 dark:text-[#00df82]">Academias</span></h1>
-                </div>
+                <PageTitle eyebrow="Módulo Educativo" tone="indigo">Gestión de <Accent>Academias</Accent></PageTitle>
                 <div className="flex items-center gap-2.5">
                     <button onClick={() => setIsModalOpen(true)} className="px-6 py-3 bg-indigo-500 text-white font-black text-xs md:text-[10px] uppercase rounded-md shadow-xl shadow-indigo-500/25 flex items-center gap-2.5 hover:brightness-110 active:scale-95 transition-all">
                         <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" /> Nueva Clase

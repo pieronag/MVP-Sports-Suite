@@ -1,4 +1,5 @@
 "use client";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { useFeedback } from "@/components/ui/Feedback";
 import React, { useState, useEffect, useMemo } from 'react';
 import { HugeiconsIcon } from '@hugeicons/react';
@@ -160,7 +161,7 @@ export default function Page() {
 
           const realOvr = Number(data.ovr || data.elo || 0);
           const xp = Number(data.xp || 0);
-          let realTier = String(data.tier || data.level || 'Bronce').toUpperCase();
+          const realTier = String(data.tier || data.level || 'Bronce').toUpperCase();
 
           const stats = data.stats || { played: 0, won: 0, lost: 0, goals: 0 };
           const played = Number(stats.played || 0);
@@ -492,15 +493,7 @@ export default function Page() {
 
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
-          <div>
-              <div className="flex items-center gap-2 mb-1">
-                  <span className="w-6 h-[2px] bg-emerald-500 rounded-md"></span>
-                  <p className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Auditoría de jugadores</p>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">
-                Directorio de <span className="text-emerald-500 dark:text-[#00df82]">Atletas</span>
-              </h1>
-          </div>
+          <PageTitle eyebrow="Auditoría de jugadores">Directorio de <Accent>Atletas</Accent></PageTitle>
           <div className="flex items-center gap-2">
               <button onClick={() => setIsBadgesModalOpen(true)} className="inline-flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md hover:bg-slate-50 dark:hover:bg-white/10 transition-all active:scale-95 text-amber-600 dark:text-amber-400 text-[11px] font-black uppercase tracking-wider shadow-xs cursor-pointer">
                   <HugeiconsIcon icon={Medal01Icon} className="w-4 h-4" strokeWidth={2} />

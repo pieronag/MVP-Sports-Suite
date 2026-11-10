@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         document.cookie = "auth_session=true; path=/; max-age=31536000; SameSite=Lax";
 
         try {
-          let userDoc = await getDoc(doc(db, "users", currentUser.uid));
+          const userDoc = await getDoc(doc(db, "users", currentUser.uid));
           let foundRole: UserRole = null;
           let foundUser: any = null;
           if (userDoc.exists()) {

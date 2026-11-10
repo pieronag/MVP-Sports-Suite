@@ -1,4 +1,5 @@
 "use client";
+import { useNow } from "@/hooks/useNow";
 import { GlowCard, SectionPill, SegmentedTabs } from "@/components/player/ui";
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
@@ -96,6 +97,7 @@ const getStatusInfo = (booking: any, C: any) => {
 };
 
 export default function ReservasPage() {
+  const now = useNow();
   const { profile, theme } = usePlayer();
   const router = useRouter();
   const isDark = theme === "dark";
@@ -319,7 +321,7 @@ export default function ReservasPage() {
           const isConfirmed = b.status === "confirmed" && !b.checkOut;
           // Ventana de ingreso: desde 30 min antes hasta el fin del bloque de 1 h
           const st = (() => { const d = getFormattedDate(b.date).raw as Date | undefined; if (!d) return null; const [h, m] = String(b.startTime || "00:00").split(":").map(Number); const o = new Date(d); o.setHours(h || 0, m || 0, 0, 0); if ((h || 0) < 6) o.setDate(o.getDate() + 1); return o; })();
-          const inWindow = !!st && Date.now() >= st.getTime() - 30 * 60_000 && Date.now() <= st.getTime() + 60 * 60_000;
+          const inWindow = !!st && now >= st.getTime() - 30 * 60_000 && now <= st.getTime() + 60 * 60_000;
           const isActive = (b.status === "active" || b.checkIn) && !b.checkOut;
           const isCompleted = b.status === "completed" || b.status === "past" || b.checkOut === true;
           const isCancelled = b.status === "cancelled";

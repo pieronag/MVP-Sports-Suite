@@ -1,4 +1,5 @@
 "use client";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { useFeedback } from "@/components/ui/Feedback";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import { postApi } from "@/services/client/apiClient";
@@ -189,13 +190,7 @@ export default function BillingPage() {
 
             {/* CABECERA */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
-                <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                        <span className="w-6 h-[2px] bg-emerald-500 rounded-md"></span>
-                        <p className="text-xs md:text-[10px] font-bold text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Estado de cuenta</p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">Pagos & <span className="text-emerald-500 dark:text-[#00df82]">Planes</span></h1>
-                </div>
+                <PageTitle eyebrow="Estado de cuenta">Pagos & <Accent>Planes</Accent></PageTitle>
                 <button onClick={() => setIsHistoryModalOpen(true)} className="flex items-center gap-2.5 px-6 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-white rounded-md text-xs md:text-[10px] font-black uppercase tracking-widest transition-all hover:border-emerald-500/40 active:scale-95">
                     <HugeiconsIcon icon={DocumentCodeIcon} className="w-4 h-4 text-emerald-600 dark:text-[#00df82]" /> Historial de Pagos
                 </button>

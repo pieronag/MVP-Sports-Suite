@@ -1,4 +1,6 @@
 "use client";
+import { useNow } from "@/hooks/useNow";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { useFeedback } from "@/components/ui/Feedback";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import { tournamentIssue } from "@/utils/tournament";
@@ -233,6 +235,7 @@ const buildStandings = (matches: any[]) => {
 };
 
 export default function ChampionshipsPage() {
+  const now = useNow();
     const { user } = useAuth();
 
     // ESTADOS
@@ -446,13 +449,7 @@ export default function ChampionshipsPage() {
 
             {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
-                <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                        <span className="w-6 h-[2px] bg-amber-500 rounded-md"></span>
-                        <p className="text-xs md:text-[10px] font-bold text-amber-600 dark:text-amber-400 tracking-[0.2em] uppercase">Módulo de Competiciones</p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">Gestión de <span className="text-amber-500 dark:text-amber-400">Campeonatos</span></h1>
-                </div>
+                <PageTitle eyebrow="Módulo de Competiciones" tone="amber">Gestión de <Accent tone="amber">Campeonatos</Accent></PageTitle>
                 <div className="flex items-center gap-2.5">
                     <button onClick={() => setIsModalOpen(true)} className="px-6 py-3 bg-amber-500 text-white font-black text-xs md:text-[10px] uppercase rounded-md shadow-xl shadow-amber-500/25 flex items-center gap-2.5 hover:brightness-110 active:scale-95 transition-all"><HugeiconsIcon icon={Add01Icon} className="w-4 h-4" /> Nuevo Torneo</button>
                 </div>
@@ -1331,7 +1328,7 @@ export default function ChampionshipsPage() {
                                             </div>
                                             <div className="text-right">
                                                 <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase">Inscrito</p>
-                                                <p className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82]">{new Date(team.registeredAt || Date.now()).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
+                                                <p className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-[#00df82]">{new Date(team.registeredAt || now).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' })}</p>
                                             </div>
                                         </div>
                                     ))}

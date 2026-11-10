@@ -1,4 +1,5 @@
 "use client";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { postApi } from "@/services/client/apiClient";
 import { listBookings } from "@/services/client/data/bookings";
 import { isReal } from "@/utils/bookingModel";
@@ -251,13 +252,7 @@ export default function MasterCalendar() {
                 showCancel={confirmData.showCancel}
             />
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/5">
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="w-6 h-[2px] bg-emerald-500 rounded-md"></span>
-                        <p className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Operación diaria</p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">Agenda <span className="text-emerald-500 dark:text-[#00df82]">de Canchas</span></h1>
-                </div>
+                <PageTitle eyebrow="Operación diaria">Agenda <Accent>de Canchas</Accent></PageTitle>
                 <div className="flex flex-wrap items-center gap-2">
                     <div className="flex items-center bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md overflow-hidden">
                         <button onClick={() => shiftDay(-1)} aria-label="Día anterior" className="p-2.5 text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">

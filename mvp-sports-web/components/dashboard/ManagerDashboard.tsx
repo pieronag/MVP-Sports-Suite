@@ -1,4 +1,5 @@
 "use client";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import React, { useState, useEffect } from 'react';
 import { watchBookings } from "@/services/client/data/bookings";
 import { isReal, bookingLabel } from "@/utils/bookingModel";
@@ -154,17 +155,7 @@ export default function ManagerDashboard() {
         <div className="w-full space-y-5 pb-10 text-left relative animate-fadeIn">
             {/* CABECERA ADN FINANCE STYLE */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6 relative z-10">
-                <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                        <span className="w-6 h-[2px] bg-emerald-500 rounded-md"></span>
-                        <p className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">
-                            Centro de Control Operativo
-                        </p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">
-                        Gestión <span className="text-emerald-500 dark:text-[#00df82]">En Vivo</span>
-                    </h1>
-                </div>
+                <PageTitle eyebrow="Centro de Control Operativo">Gestión <Accent>En Vivo</Accent></PageTitle>
 
                 <div className="flex flex-wrap items-center gap-2 bg-white dark:bg-slate-900/50 p-1.5 rounded-md border border-slate-200 dark:border-white/5">
                     <select

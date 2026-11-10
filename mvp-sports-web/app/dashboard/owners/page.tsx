@@ -1,4 +1,5 @@
 "use client";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { useFeedback } from "@/components/ui/Feedback";
 import React, { useState, useEffect } from 'react';
 import { postApi } from "@/services/client/apiClient";
@@ -81,7 +82,7 @@ export default function Page() {
         setLoading(true);
         try {
             const settingsSnap = await getDoc(doc(db, "settings", "global"));
-            let priceMap: Record<string, number> = {};
+            const priceMap: Record<string, number> = {};
             let maxPlanPrice = 0;
             if (settingsSnap.exists()) {
                 const plans = settingsSnap.data().plans || [];
@@ -261,15 +262,7 @@ export default function Page() {
 
             {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="w-6 h-[2px] bg-emerald-500 rounded-md" />
-                        <p className="text-[11px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Cartera de partners</p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">
-                        Gestión de <span className="text-emerald-500 dark:text-[#00df82]">Dueños</span>
-                    </h1>
-                </div>
+                <PageTitle eyebrow="Cartera de partners">Gestión de <Accent>Dueños</Accent></PageTitle>
                 <button onClick={openCreate} className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00df82] text-slate-950 text-[11px] font-black uppercase tracking-wider rounded-md shadow-[0_0_25px_-8px_rgba(0,223,130,0.7)] hover:bg-[#3affa0] active:scale-95 transition-all cursor-pointer">
                     <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" strokeWidth={2} />
                     Nuevo dueño

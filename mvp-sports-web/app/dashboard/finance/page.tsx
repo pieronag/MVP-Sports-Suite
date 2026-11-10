@@ -1,4 +1,5 @@
 "use client";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect } from 'react';
@@ -252,15 +253,7 @@ export default function FinancePage() {
         return (
             <div className="w-full space-y-5 pb-10 text-left relative">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
-                    <div>
-                        <div className="flex items-center gap-2 mb-0.5">
-                            <span className="w-6 h-[2px] bg-emerald-500 rounded-md"></span>
-                            <p className="text-[11px] md:text-[9px] font-black text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">Analítica de negocio</p>
-                        </div>
-                        <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">
-                            Control <span className="text-emerald-500 dark:text-[#00df82]">Financiero</span>
-                        </h1>
-                    </div>
+                    <PageTitle eyebrow="Analítica de negocio">Control <Accent>Financiero</Accent></PageTitle>
                 </div>
                 <div className="flex flex-col items-center justify-center py-24 text-center gap-6">
                     <div className="flex flex-col items-center gap-5">
@@ -288,17 +281,7 @@ export default function FinancePage() {
         <div className="w-full space-y-5 pb-10 text-left relative">
             {/* CABECERA ADN */}
             <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-5">
-                <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                        <span className="w-6 h-[2px] bg-emerald-500 rounded-md"></span>
-                        <p className="text-xs md:text-[10px] font-bold text-emerald-600 dark:text-[#00df82] tracking-[0.2em] uppercase">
-                            Resumen de ingresos y pagos
-                        </p>
-                    </div>
-                    <h1 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase leading-none font-heading">
-                        Control <span className="text-emerald-500 dark:text-[#00df82]">Financiero</span>
-                    </h1>
-                </div>
+                <PageTitle eyebrow="Resumen de ingresos y pagos">Control <Accent>Financiero</Accent></PageTitle>
 
                 {/* CONTROLES */}
                 <div className="flex flex-wrap items-center gap-2">
