@@ -80,6 +80,22 @@ test.describe("Configuración del complejo", () => {
     // Al recargar, los datos siguen ahí
     await page.reload();
     await expect(page.getByLabel("Nombre Comercial")).toHaveValue(nuevo, { timeout: 30_000 });
+
+    // Un email inválido no se guarda
+    await page.getByLabel("Email de Contacto").fill("no-es-un-email");
+    await page.getByRole("button", { name: /^guardar$/i }).click();
+    await expect(page.getByText("El email de contacto no es válido.")).toBeVisible();
+    await page.keyboard.press("Escape");
+    expect((await admin().firestore().collection("tenants").doc(TENANT).get()).data()?.contactEmail).not.toBe("no-es-un-email");
+
+    // Revisar credenciales dice qué falta, sin inventar conexiones
+    const mp = page.getByRole("switch", { name: "Cobro online con Mercado Pago" });
+    if ((await mp.isEnabled()) && (await mp.getAttribute("aria-checked")) === "false") await mp.click();
+    if (await mp.isEnabled()) {
+      await page.getByLabel("Public Key").fill("");
+      await page.getByRole("button", { name: "Revisar credenciales" }).click();
+      await expect(page.getByRole("status").filter({ hasText: /Falta: Public Key/ })).toBeVisible();
+    }
     expect(errors, errors.join("\n")).toEqual([]);
   });
 });
