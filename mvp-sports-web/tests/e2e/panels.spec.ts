@@ -335,3 +335,44 @@ test.describe("Usuarios (superadmin)", () => {
     for (const staff of ["Admin E2E", "Mánager E2E", "Dueño E2E"]) await expect(main.getByText(staff, { exact: true })).toHaveCount(0);
   });
 });
+
+test.describe("Configuración central (superadmin)", () => {
+  // Sin guardar: es la configuración real de la plataforma
+  test("recorre las pestañas, marca cambios pendientes y valida al elevar staff", async ({ page, isMobile }) => {
+    test.skip(!(await exists(env.E2E_ADMIN_EMAIL)), "Sin superadmin de prueba");
+    test.setTimeout(120_000);
+    const errors = watchErrors(page);
+    await login(page, env.E2E_ADMIN_EMAIL, env.E2E_ADMIN_PASSWORD);
+    await page.goto("/dashboard/settings");
+    await expect(page.getByText("Modelos de monetización")).toBeVisible({ timeout: 30_000 });
+    const save = page.getByRole("button", { name: "Guardar cambios" });
+    await expect(save).toBeDisabled();
+
+    // Editar un beneficio deja el aviso de cambios pendientes y habilita Guardar
+    await page.getByRole("switch").first().click();
+    await expect(page.getByText("Cambios sin guardar")).toBeVisible();
+    await expect(save).toBeEnabled();
+
+    await page.getByRole("tab", { name: /Fiscal/ }).click();
+    await expect(page.getByRole("heading", { name: "Factura electrónica (SII)" })).toBeVisible();
+    await expect(page.getByLabel("IVA (%)")).toHaveValue(/\d+/);
+
+    await page.getByRole("tab", { name: /Identidad/ }).click();
+    await expect(page.getByLabel("Nombre de la plataforma")).not.toHaveValue("");
+
+    await page.getByRole("tab", { name: /Staff/ }).click();
+    await expect(page.getByText(/\(tú\)/)).toBeVisible();
+    await page.getByLabel("Buscar en el staff").fill("zzzz-nadie");
+    await expect(page.getByText("Nadie coincide con la búsqueda")).toBeVisible();
+    await page.getByLabel("Correo del usuario a elevar").fill("nadie.existe@example.test");
+    await page.getByRole("button", { name: /Asignar rango/ }).click();
+    await expect(page.getByText("Usuario no encontrado")).toBeVisible();
+    await page.getByRole("button", { name: "Entendido" }).click();
+
+    await page.getByRole("tab", { name: /Núcleo/ }).click();
+    await expect(page.getByRole("heading", { name: "Auditoría reciente" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /mantenimiento/i })).toBeVisible();
+    if (!isMobile) await page.screenshot({ path: "test-results/settings-nucleo.png", fullPage: true });
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+});
