@@ -95,6 +95,7 @@ export default function Header() {
         {/* Logout */}
         <button
           onClick={handleLogout}
+          aria-label="Salir"
           className="flex items-center gap-2 px-3 py-2 rounded-md transition-all active:scale-95
                      bg-red-50 text-red-600 hover:bg-red-100 border border-red-100
                      dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20 dark:border-red-500/20 cursor-pointer"

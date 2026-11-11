@@ -293,7 +293,8 @@ service cloud.firestore {
     match /maintenance/{mId} {
       allow read: if isManager() || isSuperAdmin();
       allow create: if canManageTenant(request.resource.data.get('tenantId', ''));
-      allow update, delete: if canManageTenant(resource.data.get('tenantId', ''));
+      allow update: if canManageTenant(resource.data.get('tenantId', '')) && canManageTenant(request.resource.data.get('tenantId', ''));
+      allow delete: if canManageTenant(resource.data.get('tenantId', ''));
     }
 
     // ==========================================
@@ -318,8 +319,16 @@ service cloud.firestore {
 
     match /coupons/{couponId} {
       allow read: if true;
-      allow create: if canManageScoped(request.resource.data);
-      allow update, delete: if canManageScoped(resource.data);
+      // Siempre de un recinto (salvo plataforma) y con descuento coherente; al editar, también vale para el resultado
+      allow create: if canManageScoped(request.resource.data) && validCoupon(request.resource.data);
+      allow update: if canManageScoped(resource.data) && canManageScoped(request.resource.data) && validCoupon(request.resource.data);
+      allow delete: if canManageScoped(resource.data);
+    }
+
+    function validCoupon(d) {
+      return (isSuperAdmin() || d.get('tenantId', '') != '')
+        && d.get('discount', 0) is number && d.get('discount', 0) > 0
+        && (d.get('type', 'percentage') == 'fixed' || d.get('discount', 0) <= 100);
     }
 
     // ==========================================
@@ -407,7 +416,9 @@ service cloud.firestore {
     match /tournaments/{id} {
       allow read: if true;
       allow create: if canManageScoped(request.resource.data);
-      allow update, delete: if canManageScoped(resource.data);
+      // Al editar se valida también el resultado: antes se podía mover a un recinto ajeno
+      allow update: if canManageScoped(resource.data) && canManageScoped(request.resource.data);
+      allow delete: if canManageScoped(resource.data);
     }
 
     // Inscripciones: las crea el servidor (/api/tournaments/register) tras validar
@@ -431,7 +442,9 @@ service cloud.firestore {
     match /academy_classes/{id} {
       allow read: if true;
       allow create: if canManageScoped(request.resource.data);
-      allow update, delete: if canManageScoped(resource.data);
+      // Al editar se valida también el resultado: antes se podía mover a un recinto ajeno
+      allow update: if canManageScoped(resource.data) && canManageScoped(request.resource.data);
+      allow delete: if canManageScoped(resource.data);
     }
 
     // ==========================================

@@ -1,6 +1,6 @@
-import { collection, query, where, getDocs, doc, getDoc, updateDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, Timestamp } from 'firebase/firestore';
 import { db } from '@/services/client/firebase';
-import { couponIssue } from '@/utils/coupon';
+import { couponIssue, pickCoupon } from '@/utils/coupon';
 
 export interface Coupon {
     id: string;
@@ -16,19 +16,16 @@ export interface Coupon {
 export const couponService = {
     async validateCoupon(code: string, tenantId: string, price: number): Promise<Coupon> {
         const couponsRef = collection(db, 'coupons');
-        const q = query(couponsRef, where('code', '==', code.toUpperCase()));
+        const q = query(couponsRef, where('code', '==', code.trim().toUpperCase()));
         const snap = await getDocs(q);
         if (snap.empty) throw new Error('Cupón no encontrado');
-        const doc = snap.docs[0];
-        const coupon = { id: doc.id, ...doc.data() } as Coupon;
-        const issue = couponIssue(coupon, { tenantId, price });
+        // Misma regla que el servidor (que es el que cobra): el cupón del recinto de la reserva
+        const tenant = (await getDoc(doc(db, 'tenants', tenantId))).data() || {};
+        const ownerIds = [tenant.ownerId, ...(tenant.ownerIds || [])].filter(Boolean) as string[];
+        const coupon = pickCoupon(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Coupon & { ownerId?: string }), tenantId, ownerIds);
+        if (!coupon) throw new Error('Este cupón no es válido para este recinto');
+        const issue = couponIssue(coupon, { tenantId, price, tenantOwnerIds: ownerIds });
         if (issue) throw new Error(issue);
         return coupon;
     },
-
-    async incrementCouponUsage(couponId: string) {
-        const ref = doc(db, 'coupons', couponId);
-        const snap = await getDoc(ref);
-        await updateDoc(ref, { usedCount: (snap.data()?.usedCount || 0) + 1 });
-    }
 };

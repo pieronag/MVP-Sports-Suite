@@ -575,7 +575,7 @@ export default function TenantSettingsPage() {
                                                     {isMpGloballyDisabled && <p className="text-[11px] md:text-[7px] font-black text-red-500 uppercase tracking-widest mt-1">Desactivado por Plataforma</p>}
                                                 </div>
                                             </div>
-                                            <ToggleMini enabled={isMpActive} onChange={() => setFormData({ ...formData, isMercadopagoActive: !formData.isMercadopagoActive })} disabled={isMpGloballyDisabled} color="bg-emerald-500 shadow-emerald-500/20" />
+                                            <ToggleMini label="Cobro online con Mercado Pago" enabled={isMpActive} onChange={() => setFormData({ ...formData, isMercadopagoActive: !formData.isMercadopagoActive })} disabled={isMpGloballyDisabled} color="bg-emerald-500 shadow-emerald-500/20" />
                                         </div>
                                         {isMpActive && (
                                             <div className="space-y-4 animate-fadeIn">
@@ -675,10 +675,13 @@ function InputMini({ label, value, icon, onChange, type = "text", placeholder = 
     );
 }
 
-function ToggleMini({ enabled, onChange, color = 'bg-emerald-500 shadow-emerald-500/20', disabled = false }: any) {
+function ToggleMini({ enabled, onChange, color = 'bg-emerald-500 shadow-emerald-500/20', disabled = false, label }: any) {
     return (
         <button
             type="button"
+            role="switch"
+            aria-checked={!!enabled}
+            aria-label={label}
             onClick={disabled ? undefined : onChange}
             disabled={disabled}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 shadow-inner ${disabled ? 'bg-slate-100 dark:bg-white/5 opacity-40 cursor-not-allowed' : enabled ? color + ' shadow-lg' : 'bg-slate-200 dark:bg-white/10'}`}

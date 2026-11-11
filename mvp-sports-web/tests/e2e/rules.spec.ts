@@ -95,6 +95,7 @@ test("mánager: solo ve y opera su recinto", async () => {
 
 test("dueño: dueño de lo suyo y nada más", async () => {
   const { db, uid } = await as(env.E2E_OWNER_EMAIL, env.E2E_OWNER_PASSWORD);
+  const created: string[] = []; // documentos legítimos que crea la prueba (se borran al final)
   const passed = await attempts([
     ["agregarse como dueño de otro recinto", () => updateDoc(doc(db, "tenants", TENANT_B), { ownerIds: [uid] })],
     ["leer una reserva de otro recinto", () => getDoc(doc(db, "bookings", BOOKING_B))],
@@ -104,8 +105,21 @@ test("dueño: dueño de lo suyo y nada más", async () => {
     ["escribir sus credenciales en el documento público", () => updateDoc(doc(db, "tenants", TENANT), { mercadopagoAccessToken: "APP_USR-x" })],
     ["leer sus credenciales directo", () => getDoc(doc(db, "tenant_secrets", TENANT))],
     ["borrar su recinto", () => deleteDoc(doc(db, "tenants", TENANT))],
+    ["crear un cupón sin recinto (valdría en todos)", () => addDoc(collection(db, "coupons"), { ownerId: uid, code: "E2EGLOBAL", discount: 100, status: "active" })],
+    ["crear un cupón con descuento de 500%", () => addDoc(collection(db, "coupons"), { ownerId: uid, tenantId: TENANT, code: "E2EMEGA", discount: 500 })],
+    ["mover su cupón al recinto ajeno", async () => {
+      const ref = await addDoc(collection(db, "coupons"), { ownerId: uid, tenantId: TENANT, code: "E2EMOVER", discount: 10, status: "active" });
+      created.push(ref.path);
+      await updateDoc(ref, { tenantId: TENANT_B });
+    }],
+    ["mover su torneo al recinto ajeno", async () => {
+      const ref = await addDoc(collection(db, "tournaments"), { ownerId: uid, tenantId: TENANT, name: "Torneo E2E", price: 0 });
+      created.push(ref.path);
+      await updateDoc(ref, { tenantId: TENANT_B });
+    }],
     ["subirse a superadmin", () => updateDoc(doc(db, "users", uid), { role: "superadmin" })],
   ]);
   expect(passed, passed.join("\n")).toEqual([]);
   await updateDoc(doc(db, "tenants", TENANT), { address: "Calle de Prueba 456" }); // lo suyo sí
+  for (const p of created) await admin().firestore().doc(p).delete();
 });

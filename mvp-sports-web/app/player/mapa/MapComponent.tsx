@@ -93,7 +93,7 @@ export default function MapView({ venues, center, isDark }: { venues: any[]; cen
     >
       {userPos && (
         <>
-          <Marker position={userPos} icon={{
+          <Marker position={userPos} title="Tu ubicación" icon={{
             path: google.maps.SymbolPath.CIRCLE,
             scale: 8,
             fillColor: "#3b82f6",
@@ -111,6 +111,7 @@ export default function MapView({ venues, center, isDark }: { venues: any[]; cen
           <Marker
             key={v.id}
             position={{ lat: v.lat, lng: v.lng }}
+            title={v.name}
             onClick={() => router.push(`/player/clubes/${v.id}`)}
             icon={{
               path: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z",

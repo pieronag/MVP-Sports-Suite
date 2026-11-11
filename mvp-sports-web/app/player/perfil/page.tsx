@@ -209,7 +209,7 @@ export default function PerfilPage() {
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <div className="w-10" aria-hidden />
         <h1 className="font-heading font-black text-[18px] tracking-tight flex-1 text-center">Perfil</h1>
-        <button onClick={toggleTheme} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
+        <button onClick={toggleTheme} aria-label="Cambiar tema" className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           {isDark ? <Moon size={18} className="text-amber-400" /> : <Sun size={18} className="text-slate-600" />}
         </button>
       </div>
@@ -226,7 +226,7 @@ export default function PerfilPage() {
               </div>
             )}
           </div>
-          <button onClick={handlePickImage} className="absolute -bottom-0.5 -right-0.5 w-10 h-10 rounded-md bg-emerald-500 flex items-center justify-center border-4 border-[#020611] hover:bg-emerald-600 transition-colors">
+          <button onClick={handlePickImage} aria-label="Cambiar foto de perfil" className="absolute -bottom-0.5 -right-0.5 w-10 h-10 rounded-md bg-emerald-500 flex items-center justify-center border-4 border-[#020611] hover:bg-emerald-600 transition-colors">
             {uploading ? (
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (

@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { notifyUser } from "@/services/server/push";
 import { chileDayLabel } from "@/utils/chileTime";
 import { canonicalSport } from "@/utils/sports";
-import { couponIssue, couponUses } from "@/utils/coupon";
+import { couponIssue, couponUses, pickCoupon } from "@/utils/coupon";
 import { chileDateTime } from "@/utils/chileTime";
 import { isWithinOpenHours } from "@/utils/venueSchedule";
 import { courtBlockedAt } from "@/utils/courtAvailability";
@@ -31,13 +31,14 @@ export class PaymentError extends Error {
 export { priceFromTenantConfig } from "@/utils/pricing";
 import { priceFromTenantConfig } from "@/utils/pricing";
 
-async function resolveCoupon(code: string | undefined, tenantId: string, price: number) {
+async function resolveCoupon(code: string | undefined, tenantId: string, price: number, tenantOwnerIds: string[]) {
   if (!code) return null;
-  const snap = await adminDb().collection("coupons").where("code", "==", code.trim().toUpperCase()).limit(1).get();
-  if (snap.empty) throw new PaymentError("Cupón no encontrado");
-  const doc = snap.docs[0];
+  // Varios recintos pueden usar el mismo código: se elige el del recinto de la reserva
+  const snap = await adminDb().collection("coupons").where("code", "==", code.trim().toUpperCase()).limit(20).get();
+  const doc = pickCoupon(snap.docs.map((d) => Object.assign(d, { tenantId: d.data().tenantId, ownerId: d.data().ownerId })), tenantId, tenantOwnerIds);
+  if (!doc) throw new PaymentError(snap.empty ? "Cupón no encontrado" : "Este cupón no es válido para este recinto");
   const c = doc.data();
-  const issue = couponIssue(c, { tenantId, price });
+  const issue = couponIssue(c, { tenantId, price, tenantOwnerIds });
   if (issue) throw new PaymentError(issue);
   return { id: doc.id, code: c.code as string, discount: Number(c.discount) || 0, type: (c.type || "percentage") as string };
 }
@@ -78,7 +79,7 @@ export async function buildBookingCheckout(uid: string, input: BookingCheckoutIn
   const basePrice = priceFromTenantConfig(tenant, sport, date, startTime);
   if (basePrice <= 0) throw new PaymentError("El recinto no tiene tarifa para ese horario");
 
-  const coupon = await resolveCoupon(input.couponCode, tenantId, basePrice);
+  const coupon = await resolveCoupon(input.couponCode, tenantId, basePrice, [tenant.ownerId, ...(tenant.ownerIds || [])].filter(Boolean));
   const discount = coupon ? (coupon.type === "fixed" ? coupon.discount : (basePrice * coupon.discount) / 100) : 0;
   const amount = Math.max(0, Math.round(basePrice - discount));
   if (amount <= 0) throw new PaymentError("El monto a pagar debe ser mayor a cero");
