@@ -376,3 +376,34 @@ test.describe("Configuración central (superadmin)", () => {
     expect(errors, errors.join("\n")).toEqual([]);
   });
 });
+
+test.describe("Red de recintos (superadmin)", () => {
+  test("busca, cambia de vista y no deja borrar un recinto con canchas", async ({ page, isMobile }) => {
+    test.skip(!(await exists(env.E2E_ADMIN_EMAIL)), "Sin superadmin de prueba");
+    test.setTimeout(120_000);
+    const errors = watchErrors(page);
+    await login(page, env.E2E_ADMIN_EMAIL, env.E2E_ADMIN_PASSWORD);
+    await page.goto("/dashboard/tenants");
+    await page.getByLabel("Buscar recinto o dueño").fill("Recinto E2E");
+    const row = page.locator(`[data-tenant="${TENANT}"]`);
+    await expect(row).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator("[data-tenant]")).toHaveCount(1);
+
+    // Filtro de inactivos: el recinto de prueba está inactivo
+    await page.getByRole("button", { name: "Inactivos" }).click();
+    await expect(row).toBeVisible();
+
+    // Vista de tarjetas → eliminar queda bloqueado porque tiene canchas
+    await page.getByRole("button", { name: "Vista cuadrícula" }).click();
+    await page.getByRole("button", { name: "Eliminar Recinto E2E" }).click();
+    await expect(page.getByText("No se puede eliminar")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/Suspéndelo para que deje de recibir reservas/)).toBeVisible();
+    await page.getByRole("button", { name: "Entendido" }).click();
+
+    // El perfil abre desde la tarjeta
+    await page.getByRole("button", { name: "Ver perfil de Recinto E2E" }).click();
+    await expect(page.locator("#tenant-profile-title")).toHaveText(/Recinto E2E/);
+    if (!isMobile) await page.screenshot({ path: "test-results/tenants-grid.png" });
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+});

@@ -166,7 +166,7 @@ export default function MapaPage() {
 
   const getVenueImage = (v: any) => {
     const url = v.imageURL || v.imageUrl;
-    if (url && (url.startsWith("http") || url.startsWith("data:image"))) return url;
+    if (url && /^(https?:|data:image|\/api\/images\/)/.test(url)) return url;
     return "https://images.unsplash.com/photo-1599566150163-29194dcaad36";
   };
 

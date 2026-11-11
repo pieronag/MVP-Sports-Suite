@@ -1,4 +1,5 @@
 "use client";
+import { isTenantActive } from "@/services/client/data/tenantDirectory";
 import { hideBrokenImg } from "@/utils/img";
 import React, { useEffect } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -42,7 +43,7 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
 
     if (!isOpen || !tenant) return null;
 
-    const isActive = tenant.status === "Activo";
+    const isActive = isTenantActive(tenant.status);
     const rating = Number(tenant.rating) || 0;
     const planKey = (tenant.plan || "").toLowerCase();
     const matchedPlan = plans.find(p => p.id.toLowerCase() === planKey || p.name.toLowerCase() === planKey);
@@ -97,7 +98,7 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
                         </span>
                         <span className={`absolute top-3 left-3 mt-9 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider border backdrop-blur-sm shadow-lg ${isActive ? "bg-emerald-500/20 text-emerald-300 border-emerald-400/30" : "bg-red-500/20 text-red-300 border-red-400/30"}`}>
                             <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-400" : "bg-red-400"}`} />
-                            {tenant.status}
+                            {isActive ? "Activo" : tenant.status === "Suspendido" ? "Suspendido" : "Inactivo"}
                         </span>
 
                         <button onClick={onClose} aria-label="Cerrar" className="absolute top-3 right-3 p-2 rounded-md bg-black/40 backdrop-blur-sm text-white/80 hover:text-white hover:bg-black/60 transition-colors cursor-pointer">

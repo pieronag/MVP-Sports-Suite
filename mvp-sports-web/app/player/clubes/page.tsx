@@ -29,7 +29,7 @@ const formatDistance = (lat1: number, lon1: number, lat2: number, lon2: number) 
 const getVenueImage = (venue: any) => {
   const data = venue as any;
   const url = data.imageURL || data.imageUrl;
-  if (url && (url.startsWith("data:image") || url.startsWith("http"))) return url;
+  if (url && /^(https?:|data:image|\/api\/images\/)/.test(url)) return url;
   const allSports = (data.activeSports || data.sports || ["Multicancha"]) as string[];
   const s = (allSports[0] || "").toLowerCase();
   if (s.includes("padel")) return "https://images.unsplash.com/photo-1626248801379-51a0748a5f96";
