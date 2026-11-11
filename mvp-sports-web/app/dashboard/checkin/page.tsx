@@ -1,12 +1,16 @@
 "use client";
+import { useQrScanner } from "@/hooks/useQrScanner";
+import { useFeedback } from "@/components/ui/Feedback";
+import { useNow } from "@/hooks/useNow";
+import { hoursUntilStart } from "@/utils/chileTime";
+import { CHECKIN_OPENS_HOURS, CHECKIN_GRACE_HOURS } from "@/utils/bookingPolicy";
 import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { postApi} from "@/services/client/apiClient";
 import { listBookings } from "@/services/client/data/bookings";
 import { isReal } from "@/utils/bookingModel";
 import { operatingDay } from "@/utils/chileTime";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
-import React, { useState, useEffect, useRef } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
+import React, { useState, useEffect} from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/services/client/firebase';
 import { auditService } from '@/services/client/auditService';
@@ -14,7 +18,6 @@ import { collection, query, where, getDocs, Timestamp} from 'firebase/firestore'
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
     Alert02Icon,
-    AlertCircleIcon,
     ArrowDown01Icon,
     Camera01Icon,
     Cancel01Icon,
@@ -23,7 +26,6 @@ import {
     IdentityCardIcon as IdentificationIconHi,
     InformationCircleIcon as InformationCircleIconHi,
     Location01Icon,
-    Money03Icon,
     QrCode01Icon as QrCodeIconHi,
     RefreshIcon,
     Search01Icon,
@@ -48,35 +50,12 @@ const MapPinIcon = ({ className }: { className?: string }) => <HugeiconsIcon ico
 const BuildingStorefrontIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Store01Icon} className={className} strokeWidth={1.6} />;
 const ChevronDownIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={ArrowDown01Icon} className={className} strokeWidth={1.6} />;
 const CameraIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Camera01Icon} className={className} strokeWidth={1.6} />;
-const ExclamationCircleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={AlertCircleIcon} className={className} strokeWidth={1.6} />;
 const InformationCircleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={InformationCircleIconHi} className={className} strokeWidth={1.6} />;
 const UserGroupIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={UserGroupIconHi} className={className} strokeWidth={1.6} />;
 const ShieldCheckIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={SecurityCheckIcon} className={className} strokeWidth={1.6} />;
 const ExclamationTriangleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Alert02Icon} className={className} strokeWidth={1.6} />;
 const ClockIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Clock01Icon} className={className} strokeWidth={1.6} />;
 const NoSymbolIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={UnavailableIcon} className={className} strokeWidth={1.6} />;
-
-const StatusModal = ({ isOpen, title, message, type, onClose }: any) => {
-    if (!isOpen) return null;
-    const isError = type === 'error';
-    const isWarning = type === 'warning';
-
-    return (
-        <div className="fixed inset-0 z-500 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn" onClick={onClose}>
-            <div className="bg-white dark:bg-[#0B0F19] rounded-md shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative text-center" onClick={(e) => e.stopPropagation()}>
-                <div className={`absolute top-0 left-0 w-full h-1 ${isError ? 'bg-red-500' : isWarning ? 'bg-amber-500' : 'bg-emerald-500'}`}></div>
-                <div className={`w-14 h-14 rounded-md mx-auto mb-4 flex items-center justify-center ${isError ? 'bg-red-50 dark:bg-red-500/10 text-red-500' : isWarning ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-500' : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500'}`}>
-                    {isError ? <XMarkIcon className="w-8 h-8" /> : isWarning ? <ExclamationCircleIcon className="w-8 h-8" /> : <InformationCircleIcon className="w-8 h-8" />}
-                </div>
-                <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter">{title}</h3>
-                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-8 uppercase leading-relaxed">{message}</p>
-                <button onClick={onClose} className={`w-full py-3 text-xs md:text-[10px] font-black uppercase tracking-[0.2em] rounded-md text-white transition-all active:scale-95 ${isError ? 'bg-red-600 shadow-red-500/20' : isWarning ? 'bg-amber-600 shadow-amber-500/20' : 'bg-slate-900 dark:bg-emerald-600 shadow-emerald-500/20'}`}>
-                    Entendido
-                </button>
-            </div>
-        </div>
-    );
-};
 
 // --- INTERFACES ---
 interface Booking {
@@ -105,12 +84,9 @@ interface Booking {
     notes?: string;
 }
 
-// --- HELPER: CHILE TIME ---
-const getChileNow = () => {
-    return new Date(new Date().toLocaleString("en-US", { timeZone: "America/Santiago" }));
-};
-
 export default function CheckInPage() {
+    const now = useNow(15_000);
+    const { alert } = useFeedback();
     const { user, role, firestoreUser } = useAuth();
 
     // ESTADOS DE DATOS
@@ -125,13 +101,6 @@ export default function CheckInPage() {
     const [selectedBookingForConfirm, setSelectedBookingForConfirm] = useState<Booking | null>(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     // ESTADOS DE CÁMARA
-    const [isCameraOpen, setIsCameraOpen] = useState(false);
-    const [cameraError, setCameraError] = useState<string | null>(null);
-    const [cameraPermission, setCameraPermission] = useState<'prompt' | 'granted' | 'denied' | 'unknown'>('unknown');
-    const qrScannerRef = useRef<Html5Qrcode | null>(null);
-    const [statusModal, setStatusModal] = useState<{ isOpen: boolean, title: string, message: string, type: 'info' | 'error' | 'warning' }>({
-        isOpen: false, title: '', message: '', type: 'info'
-    });
 
     // --- 1. CARGAR RECINTOS ---
     useEffect(() => {
@@ -192,7 +161,7 @@ export default function CheckInPage() {
             setBookings(updatedList);
         } catch (error: any) {
             console.error("Error fetching bookings:", error);
-            setStatusModal({ isOpen: true, title: "No se pudieron cargar las reservas", message: error?.code === 'permission-denied' ? 'Tu cuenta no tiene permisos sobre este recinto.' : 'Revisa tu conexión e inténtalo nuevamente.', type: 'error' });
+            alert("No se pudieron cargar las reservas", error?.code === 'permission-denied' ? 'Tu cuenta no tiene permisos sobre este recinto.' : 'Revisa tu conexión e inténtalo nuevamente.');
         } finally {
             setLoading(false);
         }
@@ -202,132 +171,23 @@ export default function CheckInPage() {
         if (selectedVenueId) fetchTodayBookings();
     }, [selectedVenueId]);
 
-    // --- 2. CÁMARA (Usando html5-qrcode para máxima compatibilidad) ---
-    const startCamera = async () => {
-        // Intentamos primero el modo streaming (solo funcionará en HTTPS)
-        setIsCameraOpen(true);
-        setCameraError(null);
-
-        setTimeout(async () => {
-            try {
-                const scanner = new Html5Qrcode("qr-reader");
-                qrScannerRef.current = scanner;
-                await scanner.start(
-                    { facingMode: "environment" },
-                    { 
-                        fps: 30, 
-                        qrbox: (w, h) => {
-                            const size = Math.floor(Math.min(w, h) * 0.8);
-                            return { width: size, height: size };
-                        },
-                    },
-                    (decodedText) => {
-                        const found = bookings.find(b => b.id === decodedText || b.id.slice(-6).toUpperCase() === decodedText.toUpperCase());
-                        if (found) {
-                            if (found.checkIn) {
-                                setStatusModal({ isOpen: true, title: "Ya Ingresó", message: `${found.clientName} ya registró su entrada para esta reserva.`, type: 'warning' });
-                            } else {
-                                handleCheckInAction(found);
-                            }
-                            stopCamera();
-                        }
-                    },
-                    () => { }
-                );
-            } catch {
-                // Si falla el streaming (ej. no hay HTTPS), activamos automáticamente el fallback nativo
-                console.warn("Streaming not supported, triggering native camera fallback.");
-                stopCamera();
-                const nativeInput = document.getElementById('native-camera-input') as HTMLInputElement;
-                if (nativeInput) nativeInput.click();
-            }
-        }, 300);
+    const formatTime = (ts: Timestamp) => {
+        const d = ts.toDate();
+        return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
     };
 
-    const handleNativeCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        // Mostrar un pequeño loader si fuera necesario
-        const scanner = new Html5Qrcode("qr-reader-hidden");
-        try {
-            const decodedText = await scanner.scanFile(file, true);
-            const found = bookings.find(b => b.id === decodedText || b.id.slice(-6).toUpperCase() === decodedText.toUpperCase());
-            if (found) {
-                if (found.checkIn) setStatusModal({ isOpen: true, title: "Ya Ingresó", message: `${found.clientName} ya registró su entrada.`, type: 'warning' });
-                else handleCheckInAction(found);
-            } else {
-                setStatusModal({ isOpen: true, title: "QR Inválido", message: "No se reconoció ninguna reserva vigente en la imagen capturada.", type: 'error' });
-            }
-        } catch {
-            setStatusModal({ isOpen: true, title: "Error de Escaneo", message: "No se detectó un código QR. Intenta tomar la foto más cerca, enfocada y con buena iluminación.", type: 'error' });
-        }
-    };
-
-    const stopCamera = async () => {
-        if (qrScannerRef.current) {
-            try {
-                if (qrScannerRef.current.isScanning) {
-                    await qrScannerRef.current.stop();
-                }
-            } catch (e) {
-                console.warn("Error stopping scanner:", e);
-            }
-            qrScannerRef.current = null;
-        }
-        setIsCameraOpen(false);
-    };
-
-    useEffect(() => {
-        return () => {
-            if (qrScannerRef.current && qrScannerRef.current.isScanning) {
-                qrScannerRef.current.stop().catch(() => { });
-            }
-        };
-    }, []);
-
-    // Auto-check camera permission on mount (prompt on mobile)
-    useEffect(() => {
-        const checkCameraPermission = async () => {
-            try {
-                if (navigator.permissions && navigator.permissions.query) {
-                    const result = await navigator.permissions.query({ name: 'camera' as PermissionName });
-                    setCameraPermission(result.state as any);
-                    result.onchange = () => setCameraPermission(result.state as any);
-                } else {
-                    setCameraPermission('unknown');
-                }
-            } catch {
-                setCameraPermission('unknown');
-            }
-        };
-        checkCameraPermission();
-    }, []);
-
+    // Misma ventana que el servidor (utils/bookingPolicy): desde 2 h antes hasta 15 min después del inicio, en hora de Chile
     const validateCheckInTime = (booking: Booking): { valid: boolean, message: string, isLate: boolean } => {
-        const now = getChileNow();
-        const start = booking.startTime.toDate();
-        const startChile = new Date(start.toLocaleString("en-US", { timeZone: "America/Santiago" }));
-
-        if (booking.startTimeStr) {
-            const [hours, minutes] = booking.startTimeStr.split(':').map(Number);
-            startChile.setHours(hours, minutes, 0, 0);
+        const h = hoursUntilStart({ date: booking.startTime, startTime: booking.startTimeStr }, new Date(now));
+        if (h === null) return { valid: false, message: "La reserva no tiene horario.", isLate: false };
+        if (h > CHECKIN_OPENS_HOURS) {
+            const [sh, sm] = String(booking.startTimeStr || formatTime(booking.startTime)).split(':').map(Number);
+            const opens = ((sh * 60 + (sm || 0) - CHECKIN_OPENS_HOURS * 60) + 1440) % 1440;
+            const hh = String(Math.floor(opens / 60)).padStart(2, '0'), mm = String(opens % 60).padStart(2, '0');
+            return { valid: false, message: `Demasiado temprano. El ingreso se habilita a las ${hh}:${mm} hrs.`, isLate: false };
         }
-
-        const twoHoursBefore = new Date(startChile.getTime() - 2 * 60 * 60 * 1000);
-        const fifteenMinsAfter = new Date(startChile.getTime() + 15 * 60 * 1000);
-
-        if (now < twoHoursBefore) {
-            const h = twoHoursBefore.getHours().toString().padStart(2, '0');
-            const m = twoHoursBefore.getMinutes().toString().padStart(2, '0');
-            return { valid: false, message: `Demasiado temprano. El ingreso se habilita a las ${h}:${m} hrs.`, isLate: false };
-        }
-
-        if (now > fifteenMinsAfter) {
-            return { valid: false, message: "Límite de espera excedido (15 min). La reserva se considera cancelada.", isLate: true };
-        }
-
-        return { valid: true, message: "", isLate: now > startChile };
+        if (h < -CHECKIN_GRACE_HOURS) return { valid: false, message: "Límite de espera excedido (15 min). La reserva se considera inasistencia.", isLate: true };
+        return { valid: true, message: "", isLate: h < 0 };
     };
 
     // El cobro se registra en cualquier momento (prepago en mesón, durante o al
@@ -335,12 +195,12 @@ export default function CheckInPage() {
     const handleCheckInAction = (booking: Booking, _action: 'checkin' = 'checkin') => {
         // 100% online: sin pago aprobado no hay ingreso (vale para botón, QR y código manual)
         if (booking.paymentStatus !== 'paid') {
-            setStatusModal({ isOpen: true, title: "Reserva sin pago", message: "Esta reserva no tiene un pago online aprobado. El jugador debe pagar desde la app para poder ingresar.", type: 'error' });
+            alert("Reserva sin pago", "Esta reserva no tiene un pago online aprobado. El jugador debe pagar desde la app para poder ingresar.");
             return;
         }
         const validation = validateCheckInTime(booking);
         if (!validation.valid) {
-            setStatusModal({ isOpen: true, title: "Acceso Denegado", message: validation.message, type: 'error' });
+            alert("Acceso Denegado", validation.message);
             return;
         }
 
@@ -369,6 +229,16 @@ export default function CheckInPage() {
         setIsConfirmModalOpen(true);
     };
 
+    // --- 2. CÁMARA: el QR del ticket es el id de la reserva (también se acepta el código de 6 caracteres)
+    const handleScannedCode = (text: string) => {
+        const code = text.trim();
+        const found = bookings.find(b => b.id === code || b.id.slice(-6).toUpperCase() === code.toUpperCase());
+        if (!found) return alert("QR inválido", "No se reconoció ninguna reserva de hoy con ese código.");
+        if (found.checkIn) return alert("Ya ingresó", `${found.clientName} ya registró su entrada para esta reserva.`);
+        handleCheckInAction(found);
+    };
+    const { isCameraOpen, cameraError, cameraPermission, startCamera, stopCamera, onNativeCapture } = useQrScanner(handleScannedCode, alert);
+
     const confirmCheckIn = async () => {
         if (!selectedBookingForConfirm) return;
 
@@ -388,7 +258,7 @@ export default function CheckInPage() {
                     status: 'SUCCESS'
                 });
 
-                setStatusModal({ isOpen: true, title: "Ingreso Exitoso", message: `El ingreso de ${booking.clientName} ha sido registrado correctamente y la reserva está en juego.`, type: 'info' });
+                alert("Ingreso Exitoso", `El ingreso de ${booking.clientName} ha sido registrado correctamente y la reserva está en juego.`);
 
             setIsConfirmModalOpen(false);
             setSelectedBookingForConfirm(null);
@@ -402,7 +272,7 @@ export default function CheckInPage() {
                 status: 'FAILED'
             });
 
-            setStatusModal({ isOpen: true, title: "No se pudo registrar el ingreso", message: error?.message || "Hubo un error al procesar el ingreso. Reintenta.", type: 'error' });
+            alert("No se pudo registrar el ingreso", error?.message || "Hubo un error al procesar el ingreso. Reintenta.");
         } finally {
             setProcessingId(null);
         }
@@ -427,12 +297,7 @@ export default function CheckInPage() {
                 b.id === booking.id ? { ...b, status: 'cancelled', noShow: true } : b
             ));
 
-            setStatusModal({
-                isOpen: true,
-                title: "No-Show Registrado",
-                message: `Se ha cancelado la reserva y aplicado un strike a ${booking.clientName}.`,
-                type: 'info'
-            });
+            alert("No-Show Registrado", `Se ha cancelado la reserva y aplicado un strike a ${booking.clientName}.`);
         } catch (error: any) {
             console.error("Error in handleNoShow:", error);
             await auditService.logAuditEvent({
@@ -443,7 +308,7 @@ export default function CheckInPage() {
                 status: 'FAILED'
             });
 
-            setStatusModal({ isOpen: true, title: "No se pudo registrar", message: error?.message || "No se pudo registrar el No-Show.", type: 'error' });
+            alert("No se pudo registrar", error?.message || "No se pudo registrar el No-Show.");
         } finally {
             setProcessingId(null);
         }
@@ -459,20 +324,16 @@ export default function CheckInPage() {
             b.clientName.toLowerCase().includes(manualCode.trim().toLowerCase())
         );
         if (found) {
-            if (found.checkIn) setStatusModal({ isOpen: true, title: "Ya Ingresó", message: `${found.clientName} ya registró su entrada anteriormente.`, type: 'warning' });
+            if (found.checkIn) alert("Ya Ingresó", `${found.clientName} ya registró su entrada anteriormente.`);
             else handleCheckInAction(found);
             setManualCode('');
         } else {
-            setStatusModal({ isOpen: true, title: "Sin Resultados", message: "No se encontró ninguna reserva para hoy con los datos ingresados.", type: 'warning' });
+            alert("Sin Resultados", "No se encontró ninguna reserva para hoy con los datos ingresados.");
         }
     };
 
     // FORMATTERS
     const formatMoney = (amount: number) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }).format(amount);
-    const formatTime = (ts: Timestamp) => {
-        const d = ts.toDate();
-        return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
-    };
 
     // HELPERS DE MOTIVOS DE CANCELACIÓN
     const isBookingNoShow = (b: Booking) => {
@@ -526,14 +387,6 @@ export default function CheckInPage() {
 
     return (
         <div className="space-y-6 animate-fadeIn font-sans pb-10 text-slate-600 dark:text-slate-300">
-            <StatusModal
-                isOpen={statusModal.isOpen}
-                title={statusModal.title}
-                message={statusModal.message}
-                type={statusModal.type}
-                onClose={() => setStatusModal(prev => ({ ...prev, isOpen: false }))}
-            />
-
             {/* === MODAL DE CÁMARA (Overlay Completo — funciona en móvil y web) === */}
             {isCameraOpen && (
                 <div className="fixed inset-0 z-200 bg-black flex flex-col animate-fadeIn">
@@ -697,7 +550,7 @@ export default function CheckInPage() {
                 accept="image/*"
                 capture="environment"
                 className="hidden"
-                onChange={handleNativeCapture}
+                onChange={onNativeCapture}
             />
             <div id="qr-reader-hidden" className="hidden"></div>
 

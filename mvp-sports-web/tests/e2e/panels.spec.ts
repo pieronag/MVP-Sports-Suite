@@ -286,3 +286,38 @@ test.describe("Partidos (jugador)", () => {
     }
   });
 });
+
+test.describe("Check-in escaneando el QR del ticket", () => {
+  test("el QR del ticket del jugador, leído por recepción, registra el ingreso", async ({ page, browser, isMobile }) => {
+    test.skip(isMobile, "Escribe en la base: basta una vez");
+    const booking = await admin().firestore().collection("bookings").doc("E2ECHECKINAB12CD").get();
+    test.skip(!booking.exists || !!booking.data()?.checkIn || !(await exists(env.E2E_MANAGER_EMAIL)), "Sin reserva de prueba sin ingresar");
+    test.setTimeout(150_000);
+    // 1) El jugador abre su ticket y se toma la imagen del QR
+    const ctx = await browser.newContext();
+    const player = await ctx.newPage();
+    await player.goto("/login");
+    await player.waitForLoadState("networkidle");
+    await player.locator("#email").fill(env.E2E_PLAYER_EMAIL);
+    await player.locator("#password").fill(env.E2E_PLAYER_PASSWORD);
+    await player.locator('button[type="submit"]').click();
+    await expect(player).toHaveURL(/\/player/, { timeout: 30_000 });
+    await player.goto("/player/ticket?bookingId=E2ECHECKINAB12CD");
+    // El QR (qrcode.react) con su recuadro blanco: el margen blanco es necesario para leerlo
+    const qr = player.locator('div.bg-white.p-4 > svg').first();
+    await expect(qr).toBeVisible({ timeout: 30_000 });
+    await qr.evaluate((el) => el.scrollIntoView({ block: "center" })); // que la barra inferior no lo tape
+    const png = await qr.locator("xpath=..").screenshot({ scale: "device" });
+    await ctx.close();
+    // 2) Recepción lo "fotografía" con la cámara nativa
+    const errors = watchErrors(page);
+    await login(page, env.E2E_MANAGER_EMAIL, env.E2E_MANAGER_PASSWORD);
+    await page.goto("/dashboard/checkin");
+    await expect(page.getByText("Jugador E2E").first()).toBeVisible({ timeout: 30_000 });
+    await page.locator("#native-camera-input").setInputFiles({ name: "qr.png", mimeType: "image/png", buffer: png });
+    await page.getByRole("button", { name: /confirmar entrada/i }).click({ timeout: 20_000 });
+    await expect(page.getByText(/ingreso exitoso/i)).toBeVisible({ timeout: 20_000 });
+    expect((await admin().firestore().collection("bookings").doc("E2ECHECKINAB12CD").get()).data()?.checkIn).toBeTruthy();
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+});
