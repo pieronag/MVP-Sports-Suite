@@ -1,28 +1,36 @@
 "use client";
-import { hideBrokenImg } from "@/utils/img";
+// Partidos: buscar rival (equipos), jugadores disponibles y partidos que buscan gente, y "Mis partidos"
+// (mis publicaciones y mis retos). Las piezas viven en components/player/matchmaking y la lógica en utils/matchmaking.
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ChevronLeft, CheckCircle2, MessageCircle, Swords, User, Users, X } from "@/components/player/icons";
+import { SectionPill, SegmentedTabs } from "@/components/player/ui";
 import TeamDetailModal from "@/components/player/matchmaking/TeamDetailModal";
 import PlayerDetailModal from "@/components/player/matchmaking/PlayerDetailModal";
-import { REGIONS } from "@/utils/chileRegions";
-import { teamPostIssue, playerPostIssue } from "@/utils/matchmaking";
-import { GlowCard, SectionPill, SegmentedTabs } from "@/components/player/ui";
-import { useState, useEffect} from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Swords, Users, MessageCircle, CheckCircle2, X, User, MapPin } from "@/components/player/icons";
-import { ChevronDown } from "@/components/player/icons";
+import { ConfirmSheet, ResultSheet } from "@/components/player/matchmaking/Sheet";
+import { EditEntrySheet, PublishPlayerSheet, PublishTeamSheet } from "@/components/player/matchmaking/PublishSheets";
+import {
+  ChallengeCard, ChallengeDetailSheet, Empty, FilterBar, MyEntryCard, NeedCard, PlayerCard, RivalCard, TeamPickerSheet, type Filters,
+} from "@/components/player/matchmaking/Cards";
 import { usePlayer } from "@/context/PlayerContext";
 import { useAuth } from "@/context/AuthContext";
-import { matchmakingService, MatchEntry, Challenge } from "@/services/client/player/matchmakingService";
+import { matchmakingService, type Challenge, type MatchEntry } from "@/services/client/player/matchmakingService";
 import { teamService } from "@/services/client/player/teamService";
+import { REGIONS } from "@/utils/chileRegions";
+import { inZone, matchSport, widenSearch } from "@/utils/matchmaking";
 
-const SPORTS = ["Fútbol", "Pádel", "Tenis", "Básquetbol", "Vóleibol", "Futbolito"];
-const POSITIONS_BY_SPORT: Record<string, string[]> = {
-  "Fútbol": ["Arquero", "Defensa", "Lateral", "Volante", "Delantero"],
-  "Futbolito": ["Arquero", "Defensa", "Lateral", "Volante", "Delantero"],
-  "Pádel": ["Lado Derecho", "Lado Izquierdo"],
-  "Tenis": ["Individual", "Dobles"],
-  "Básquetbol": ["Base", "Escolta", "Alero", "Ala-Pívot", "Pívot"],
-  "Vóleibol": ["Armador", "Atacante", "Central", "Líbero"],
-};
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type Tab = "rival" | "jugadores" | "mis";
+type Team = { id: string; name: string; sport?: string; members?: string[]; ownerId?: string; imageUrl?: string };
+type TeamData = { team: any; profiles: Record<string, any> } | null;
+type Modal =
+  | { kind: "publishTeam" } | { kind: "publishPlayer" } | { kind: "edit"; entry: MatchEntry } | { kind: "close"; entry: MatchEntry }
+  | { kind: "team"; entry: MatchEntry } | { kind: "player"; entry: MatchEntry } | { kind: "pickTeam"; entry: MatchEntry }
+  | { kind: "challenge"; entry: MatchEntry; team: Team } | { kind: "challengeDetail"; c: Challenge }
+  | { kind: "answer"; c: Challenge; accept: boolean } | null;
+
+const fold = (v: unknown) => String(v ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+const TABS: Tab[] = ["rival", "jugadores", "mis"];
 
 export default function PartidosPage() {
   const router = useRouter();
@@ -30,263 +38,166 @@ export default function PartidosPage() {
   const { profile, theme } = usePlayer();
   const { user } = useAuth();
   const isDark = theme === "dark";
-
-  const [activeTab, setActiveTab] = useState<"rival" | "jugadores" | "mis">(
-    (searchParams.get("tab") as any) || "rival"
-  );
-  const [sportFilter, setSportFilter] = useState("");
-  const [positionFilter, setPositionFilter] = useState("");
-  const [regionFilter, setRegionFilter] = useState("");
-  const [communeFilters, setCommuneFilters] = useState<string[]>([]);
-  const [showZone, setShowZone] = useState(false);
-
-  // Publish modals
-  const [showPublishTeam, setShowPublishTeam] = useState(false);
-  const [showPublishPlayer, setShowPublishPlayer] = useState(false);
-  const [publishSport, setPublishSport] = useState("Fútbol");
-  const [publishSports, setPublishSports] = useState<string[]>(["Fútbol"]);
-  const [publishDesc, setPublishDesc] = useState("");
-  const [publishRegion, setPublishRegion] = useState("");
-  const [publishCommunes, setPublishCommunes] = useState<string[]>([]);
-  const [selectedTeam, setSelectedTeam] = useState("");
-  const [teams, setTeams] = useState<MatchEntry[]>([]);
-  const [players, setPlayers] = useState<MatchEntry[]>([]);
-  const [needs, setNeeds] = useState<MatchEntry[]>([]);
-  useEffect(() => { if (activeTab === "jugadores") matchmakingService.getNeeds().then(setNeeds).catch(() => setNeeds([])); }, [activeTab]);
-  const [myEntries, setMyEntries] = useState<MatchEntry[]>([]);
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [userTeams, setUserTeams] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const [actionLoading, setActionLoading] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
-  const [editEntry, setEditEntry] = useState<MatchEntry | null>(null);
-  const [editDesc, setEditDesc] = useState("");
-  const [editSport, setEditSport] = useState("");
-  const [editSports, setEditSports] = useState<string[]>([]);
-  const [showTeamDetail, setShowTeamDetail] = useState<MatchEntry | null>(null);
-  const [teamDetailData, setTeamDetailData] = useState<{ team: any; profiles: Record<string, any> } | null>(null);
-  const [showPlayerDetail, setShowPlayerDetail] = useState<MatchEntry | null>(null);
-  const [showTeamSelector, setShowTeamSelector] = useState<MatchEntry | null>(null);
-  const [showChallengeDetail, setShowChallengeDetail] = useState<Challenge | null>(null);
-  const [challengeTeamData, setChallengeTeamData] = useState<{ team: any; profiles: Record<string, any> } | null>(null);
-  const [showCloseConfirm, setShowCloseConfirm] = useState<MatchEntry | null>(null);
-  const [confirmChallenge, setConfirmChallenge] = useState<{ entry: MatchEntry; team: any } | null>(null);
-  const [confirmAction, setConfirmAction] = useState<{ challengeId: string; action: "accept" | "decline" } | null>(null);
-
   const uid = user?.uid || "";
-  const playerName = (profile as any)?.displayName || "Jugador";
-  const playerPhoto = (profile as any)?.photoURL || "";
-  const playerPosition = (profile as any)?.position || "";
-  const playerOvr = (profile as any)?.ovr || 40;
-  const playerTier = (profile as any)?.tier || "Bronce";
+  const p = (profile || {}) as any;
+  const me = { name: p.displayName || "Jugador", photo: p.photoURL || "", position: p.position || "", ovr: p.ovr || 40, tier: p.tier || "Bronce" };
 
-  // Filtros iniciales desde las preferencias del jugador (deporte principal y su comuna/región)
+  const initialTab = searchParams.get("tab") as Tab;
+  const [tab, setTab] = useState<Tab>(TABS.includes(initialTab) ? initialTab : "rival");
+  const [filters, setFilters] = useState<Filters>({ sport: "", position: "", region: "", communes: [] });
+  const [zoneOpen, setZoneOpen] = useState(false);
+
+  // Cada listado recuerda para qué deporte llegó: si el filtro cambió, aún está cargando
+  const [teamsFor, setTeamsFor] = useState<{ sport: string; list: MatchEntry[] } | null>(null);
+  const [playersFor, setPlayersFor] = useState<{ sport: string; list: MatchEntry[] } | null>(null);
+  const [needs, setNeeds] = useState<MatchEntry[]>([]);
+  const [myEntries, setMyEntries] = useState<MatchEntry[] | null>(null);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [userTeams, setUserTeams] = useState<Team[]>([]);
+
+  const [modal, setModal] = useState<Modal>(null);
+  const [teamData, setTeamData] = useState<TeamData>(null);
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const close = () => { setModal(null); setTeamData(null); };
+  const fail = (msg: string) => setResult({ type: "error", msg });
+
+  // Filtros iniciales desde el perfil: deporte principal y la comuna donde vive
   const [prefsApplied, setPrefsApplied] = useState(false);
   useEffect(() => {
     if (prefsApplied || !profile) return;
-    const norm = (v: string) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
-    const sport = SPORTS.find(x => norm(x) === norm((profile as any).mainSport));
-    if (sport) { setSportFilter(sport); setPublishSport(sport); setPublishSports([sport]); }
-    const city = norm((profile as any).city);
-    if (city) {
-      for (const [region, communes] of Object.entries(REGIONS)) {
-        const c = communes.find(x => norm(x) === city);
-        if (c) { setRegionFilter(region); setCommuneFilters([c]); setPublishRegion(region); setPublishCommunes([c]); break; }
-      }
+    const sport = matchSport(p.mainSport) || "";
+    let region = "", communes: string[] = [];
+    const city = fold(p.city);
+    if (city) for (const [r, list] of Object.entries(REGIONS)) {
+      const c = list.find((x) => fold(x) === city);
+      if (c) { region = r; communes = [c]; break; }
     }
+    // Una sola vez, cuando llega el perfil (asíncrono): no hay forma de derivarlo en el render sin pisar lo que el jugador elija
+    setFilters((f) => ({ ...f, sport, region, communes })); // eslint-disable-line react-hooks/set-state-in-effect
     setPrefsApplied(true);
-  }, [profile, prefsApplied]);
+  }, [profile, prefsApplied]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Real-time subscriptions
+  // Escuchas: los listados dependen del deporte (filtra el servidor); la zona y la posición se filtran aquí
   useEffect(() => {
     if (!uid) return;
-    const unsubs: (() => void)[] = [];
+    const sport = filters.sport;
+    return matchmakingService.subscribeToTeamsLooking(sport || undefined, (e) => setTeamsFor({ sport, list: e.filter((x) => x.userId !== uid) }));
+  }, [uid, filters.sport]);
+  useEffect(() => {
+    if (!uid || tab !== "jugadores") return;
+    const sport = filters.sport;
+    matchmakingService.getNeeds().then(setNeeds).catch(() => setNeeds([]));
+    return matchmakingService.subscribeToPlayersAvailable(sport || undefined, (e) => setPlayersFor({ sport, list: e.filter((x) => x.userId !== uid) }));
+  }, [uid, tab, filters.sport]);
+  useEffect(() => {
+    if (!uid) return;
+    const offs = [
+      matchmakingService.subscribeToMyEntries(uid, setMyEntries),
+      matchmakingService.subscribeToMyChallenges(uid, setChallenges),
+    ];
+    teamService.getUserTeams(uid).then((t) => setUserTeams(t as Team[])).catch(() => {});
+    return () => offs.forEach((off) => off());
+  }, [uid]);
 
-    unsubs.push(matchmakingService.subscribeToTeamsLooking(sportFilter || undefined, (entries) => {
-      setTeams(entries.filter(e => e.userId !== uid)
-        .filter(e => !regionFilter || (e.region || "").includes(regionFilter))
-        .filter(e => communeFilters.length === 0 || (e.communes || []).some(c => communeFilters.includes(c))));
-    }));
+  const zoneOk = useCallback((e: MatchEntry) => inZone(e, filters.region, filters.communes), [filters.region, filters.communes]);
+  const teams = teamsFor?.sport === filters.sport ? teamsFor.list : null;
+  const players = playersFor?.sport === filters.sport ? playersFor.list : null;
+  const visibleTeams = useMemo(() => teams?.filter(zoneOk) ?? null, [teams, zoneOk]);
+  const visiblePlayers = useMemo(() => players?.filter((e) => zoneOk(e) && (!filters.position || e.position === filters.position)) ?? null, [players, zoneOk, filters.position]);
+  const visibleNeeds = useMemo(() => needs.filter((e) => e.userId !== uid && (!filters.sport || fold(e.sport) === fold(filters.sport)) && zoneOk(e)), [needs, uid, filters.sport, zoneOk]);
 
-    const sportForPlayers = activeTab === "jugadores" ? sportFilter || undefined : undefined;
-    unsubs.push(matchmakingService.subscribeToPlayersAvailable(sportForPlayers, (entries) => {
-      let filtered = entries.filter(e => e.userId !== uid);
-      if (positionFilter) filtered = filtered.filter(e => e.position === positionFilter);
-      filtered = filtered.filter(e => !regionFilter || (e.region || "").includes(regionFilter));
-      filtered = filtered.filter(e => communeFilters.length === 0 || (e.communes || []).some(c => communeFilters.includes(c)));
-      setPlayers(filtered);
-    }));
+  const activeMine = (myEntries || []).filter((e) => e.status === "active");
+  const myPlayerEntry = activeMine.find((e) => e.type === "player");
+  const captainTeams = userTeams.filter((t) => t.ownerId === uid);
+  const publishedTeamIds = new Set(activeMine.filter((e) => e.type === "team").map((e) => e.teamId));
+  const publishableTeams = captainTeams.filter((t) => !publishedTeamIds.has(t.id));
+  const widen = widenSearch(filters);
+  const widenAction = widen ? { label: widen.label, onClick: () => setFilters((f) => ({ ...f, ...widen.next })) } : null;
 
-    unsubs.push(matchmakingService.subscribeToMyEntries(uid, (entries) => {
-      setMyEntries(entries);
-    }));
-
-    unsubs.push(matchmakingService.subscribeToMyChallenges(uid, (challenges) => {
-      setChallenges(challenges);
-    }));
-
-    // Fetch user teams once (they rarely change)
-    teamService.getUserTeams(uid).then(setUserTeams).catch(() => {});
-    setLoading(false);
-
-    return () => unsubs.forEach(u => u());
-  }, [uid, sportFilter, positionFilter, regionFilter, communeFilters, activeTab]);
-
-  // El deporte publicado es el del equipo (no se puede elegir otro)
-  const teamSport = (t?: { sport?: string }) => SPORTS.find(s => s.toLowerCase() === String(t?.sport || "").toLowerCase());
-
-  // Abre "Publicar equipo" con lo obvio ya elegido: el único equipo disponible y la zona del filtro
-  const openPublishTeam = () => {
-    if (availableTeams.length === 1) {
-      setSelectedTeam(availableTeams[0].id);
-      const sp = teamSport(availableTeams[0]); if (sp) setPublishSport(sp);
-    }
-    if (regionFilter && !publishRegion) { setPublishRegion(regionFilter); setPublishCommunes(communeFilters); }
-    setShowPublishTeam(true);
-  };
-
-  const handlePublishTeam = async () => {
-    const team = userTeams.find(t => t.id === selectedTeam);
-    const issue = teamPostIssue({ teamId: team?.id, sport: (team && teamSport(team)) || publishSport, region: publishRegion, communes: publishCommunes });
-    if (issue || !team) { setFeedback({ type: "error", msg: issue || "Elige el equipo que quieres publicar." }); return; }
-    setActionLoading(true);
+  const loadTeam = async (teamId?: string) => {
+    setTeamData(null);
+    if (!teamId) return;
     try {
-      await matchmakingService.publishTeam({
-        teamId: team.id, teamName: team.name, teamImageUrl: (team as any).imageUrl,
-        sport: teamSport(team) || publishSport, memberCount: team.members?.length || 1,
-        description: publishDesc, region: publishRegion, communes: publishCommunes,
-      }, uid);
-      setFeedback({ type: "success", msg: "¡Equipo publicado! Ahora otros capitanes pueden retarte." });
-      setShowPublishTeam(false);
-      setSelectedTeam(""); setPublishDesc(""); setPublishRegion(""); setPublishCommunes([]);
-      if (uid) matchmakingService.getMyEntries(uid).then(setMyEntries).catch(() => {});
-    } catch (e: any) { setFeedback({ type: "error", msg: e?.message || "Error al publicar el equipo." }); }
-    finally { setActionLoading(false); }
+      const team = await teamService.getTeamById(teamId);
+      if (team) setTeamData({ team, profiles: await teamService.getMemberProfiles(team.members) });
+    } catch { /* la ficha se queda cargando; el resto sigue usable */ }
   };
 
-  const handlePublishPlayer = async () => {
-    const issue = playerPostIssue({ sports: publishSports, region: publishRegion, communes: publishCommunes });
-    if (issue) { setFeedback({ type: "error", msg: issue }); return; }
-    setActionLoading(true);
-    try {
-      const data: any = {
-        userId: uid, displayName: playerName,
-        position: playerPosition || "Jugador", ovr: playerOvr || 40, tier: playerTier || "Bronce",
-        sports: publishSports,
-        description: publishDesc, region: publishRegion, communes: publishCommunes,
-      };
-      if (playerPhoto) data.photoURL = playerPhoto;
-      await matchmakingService.publishPlayer(data);
-      setFeedback({ type: "success", msg: "¡Disponibilidad publicada! Los capitanes podrán contactarte." });
-      setShowPublishPlayer(false);
-    } catch (e: any) {
-      setFeedback({ type: "error", msg: e?.message || "Error al publicar disponibilidad." });
-    }
-    finally { setActionLoading(false); }
+  const run = async (fn: () => Promise<void>, errorMsg: string) => {
+    setBusy(true);
+    try { await fn(); } catch (e: any) { fail(e?.message && !/firebase|permission/i.test(e.message) ? e.message : errorMsg); }
+    finally { setBusy(false); }
   };
 
-  const handleChallenge = async (entry: MatchEntry) => {
+  const publishTeam = (d: { team: Team; sport: string; description: string; region: string; communes: string[] }) => run(async () => {
+    await matchmakingService.publishTeam({
+      teamId: d.team.id, teamName: d.team.name, teamImageUrl: d.team.imageUrl, sport: d.sport,
+      memberCount: d.team.members?.length || 1, description: d.description, region: d.region, communes: d.communes,
+    }, uid);
+    close();
+    setResult({ type: "success", msg: "¡Equipo publicado! Ahora otros capitanes pueden retarte." });
+  }, "No se pudo publicar el equipo.");
+
+  const publishPlayer = (d: { sports: string[]; description: string; region: string; communes: string[] }) => run(async () => {
+    await matchmakingService.publishPlayer({
+      userId: uid, displayName: me.name, position: me.position || "Jugador", ovr: me.ovr, tier: me.tier,
+      ...(me.photo ? { photoURL: me.photo } : {}), ...d,
+    });
+    close();
+    setResult({ type: "success", msg: "¡Disponibilidad publicada! Los capitanes podrán contactarte." });
+  }, "No se pudo publicar tu disponibilidad.");
+
+  const saveEdit = (entry: MatchEntry, data: { description: string; sports?: string[] }) => run(async () => {
+    await matchmakingService.updateEntry(entry.id, data);
+    close();
+    setResult({ type: "success", msg: "Publicación actualizada." });
+  }, "No se pudo actualizar la publicación.");
+
+  const closeEntry = (entry: MatchEntry) => run(async () => {
+    await matchmakingService.closeEntry(entry.id);
+    close();
+  }, "No se pudo retirar la publicación.");
+
+  const askChallenge = (entry: MatchEntry) => {
     if (!entry.teamId) return;
-    if (userCaptainTeams.length > 1) {
-      setShowTeamSelector(entry);
-      return;
-    }
-    if (userCaptainTeams.length === 1) {
-      setConfirmChallenge({ entry, team: userCaptainTeams[0] });
-      return;
-    }
-    setFeedback({ type: "error", msg: "Debes ser capitán de un equipo para retar." });
+    if (captainTeams.length === 0) { fail("Debes ser capitán de un equipo para retar."); return; }
+    setModal(captainTeams.length === 1 ? { kind: "challenge", entry, team: captainTeams[0] } : { kind: "pickTeam", entry });
   };
 
-  const executeChallenge = async (entry: MatchEntry, myTeam: any) => {
-    if (!entry.teamId || !myTeam) return;
-    setActionLoading(true);
-    try {
-      await matchmakingService.createChallenge({
-        type: "team_vs_team",
-        challengerTeamId: myTeam.id, challengerTeamName: myTeam.name,
-        challengedTeamId: entry.teamId, challengedTeamName: entry.teamName || "",
-        sport: entry.sport,
-        senderId: uid, receiverId: entry.userId || "",
-      });
-      setConfirmChallenge(null);
-      setFeedback({ type: "success", msg: `¡Has retado a ${entry.teamName}!` });
-    } catch { setFeedback({ type: "error", msg: "Error al retar." }); }
-    finally { setActionLoading(false); }
-  };
+  const challenge = (entry: MatchEntry, team: Team) => run(async () => {
+    await matchmakingService.createChallenge({
+      type: "team_vs_team", challengerTeamId: team.id, challengerTeamName: team.name,
+      challengedTeamId: entry.teamId, challengedTeamName: entry.teamName || "", sport: entry.sport,
+      senderId: uid, receiverId: entry.userId || "",
+    });
+    close();
+    setResult({ type: "success", msg: `¡Has retado a ${entry.teamName}! Te avisaremos cuando responda.` });
+  }, "No se pudo enviar el reto.");
 
-  const handleContact = async (entry: MatchEntry) => {
-    if (!entry.userId) return;
-    setActionLoading(true);
-    try {
-      const challengeId = await matchmakingService.createChallenge({
-        type: "captain_to_player",
-        captainId: uid, captainName: playerName,
-        playerId: entry.userId, playerName: entry.displayName || "",
-        sport: sportFilter || entry.sports?.[0] || "Fútbol",
-        senderId: uid, receiverId: entry.userId,
-      });
-      setFeedback({ type: "success", msg: "Chat abierto con el jugador." });
-      router.push(`/player/equipos/partidos/chat?id=${challengeId}`);
-    } catch { setFeedback({ type: "error", msg: "Error al contactar." }); }
-    finally { setActionLoading(false); }
-  };
+  const openChat = (data: Parameters<typeof matchmakingService.createChallenge>[0]) => run(async () => {
+    const id = await matchmakingService.createChallenge(data);
+    close();
+    router.push(`/player/equipos/partidos/chat?id=${id}`);
+  }, "No pudimos abrir el chat. Intenta de nuevo.");
 
-  const handleJoinNeed = async (entry: MatchEntry) => {
-    if (!uid || !entry.userId) return;
-    setActionLoading(true);
-    try {
-      const challengeId = await matchmakingService.createChallenge({
-        type: "captain_to_player",
-        captainId: entry.userId, captainName: entry.displayName || "Organizador",
-        playerId: uid, playerName,
-        sport: entry.sport || "Fútbol",
-        senderId: uid, receiverId: entry.userId,
-      });
-      router.push(`/player/equipos/partidos/chat?id=${challengeId}`);
-    } catch { setFeedback({ type: "error", msg: "No pudimos abrir el chat. Intenta de nuevo." }); }
-    finally { setActionLoading(false); }
-  };
+  const answer = (c: Challenge, accept: boolean) => run(async () => {
+    if (accept) await matchmakingService.acceptChallenge(c.id);
+    else await matchmakingService.declineChallenge(c.id);
+    close();
+    if (accept) router.push(`/player/equipos/partidos/chat?id=${c.id}`);
+    else setResult({ type: "success", msg: "Reto rechazado. El otro equipo verá tu respuesta." });
+  }, accept ? "No se pudo aceptar el reto." : "No se pudo rechazar el reto.");
 
-  const handleAcceptChallenge = async (challengeId: string) => {
-    try {
-      await matchmakingService.acceptChallenge(challengeId);
-    } catch {}
-  };
-
-  const handleEditSave = async () => {
-    if (!editEntry) return;
-    setActionLoading(true);
-    try {
-      const data: any = { description: editDesc };
-      if (editEntry.type === "team" && editSport) data.sport = editSport;
-      if (editEntry.type === "player") data.sports = editSports;
-      await matchmakingService.updateEntry(editEntry.id, data);
-      setFeedback({ type: "success", msg: "Publicación actualizada." });
-      setEditEntry(null);
-    } catch { setFeedback({ type: "error", msg: "Error al actualizar." }); }
-    finally { setActionLoading(false); }
-  };
-
-  const handleDeclineChallenge = async (challengeId: string) => {
-    try {
-      await matchmakingService.declineChallenge(challengeId);
-    } catch {}
-  };
-
-  const isSportToggled = (s: string) => publishSports.includes(s);
-  const toggleSport = (s: string) => {
-    setPublishSports(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
-  };
-
-  const userCaptainTeams = userTeams.filter(t => t.ownerId === uid);
-  const publishedTeamIds = new Set(myEntries.filter(e => e.type === "team" && e.status === "active").map(e => e.teamId));
-  const availableTeams = userCaptainTeams.filter(t => !publishedTeamIds.has(t.id));
+  const spinner = <div className="flex justify-center py-10"><div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>;
+  const wasChallenged = (e: MatchEntry) => challenges.some((c) => c.status !== "declined"
+    && ((c.challengedTeamId === e.teamId && c.senderId === uid) || (c.challengerTeamId === e.teamId && c.receiverId === uid)));
+  const wasContacted = (e: MatchEntry) => challenges.some((c) => c.status !== "closed" && c.playerId === e.userId && c.senderId === uid);
+  const pendingAnswers = challenges.filter((c) => c.receiverId === uid && c.status === "pending").length;
+  const bigBtn = "w-full h-[52px] rounded-md bg-emerald-500 text-white font-semibold text-[13px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]";
 
   return (
     <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-      {/* Header */}
       <div className={`sticky top-0 z-20 px-5 pt-12 pb-4 flex items-center justify-between gap-3 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
         <button aria-label="Volver" onClick={() => router.push("/player/equipos")} className={`w-10 h-10 rounded-md flex items-center justify-center transition-all active:scale-90 ${isDark ? "bg-white/6 hover:bg-white/10" : "bg-slate-100 hover:bg-slate-200"}`}>
           <ChevronLeft size={20} className="text-emerald-500" />
@@ -295,697 +206,140 @@ export default function PartidosPage() {
         <div className="w-10" />
       </div>
 
-      {/* Tabs */}
       <div className="px-5 pt-3">
-        <SegmentedTabs isDark={isDark} value={activeTab} onChange={setActiveTab} options={[
+        <SegmentedTabs isDark={isDark} value={tab} onChange={setTab} options={[
           { id: "rival", label: "Buscar rival", icon: Swords },
           { id: "jugadores", label: "Jugadores", icon: Users },
-          { id: "mis", label: "Mis partidos", icon: MessageCircle },
+          { id: "mis", label: pendingAnswers ? `Mis partidos (${pendingAnswers})` : "Mis partidos", icon: MessageCircle },
         ]} />
       </div>
 
       <div className="px-5 pt-4 pb-8 space-y-4">
-        {/* Filtros: deporte en chips de un toque; zona plegada */}
-        {(activeTab === "rival" || activeTab === "jugadores") && (
-          <div className="space-y-2">
-            <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5">
-              {["", ...SPORTS].map(s => {
-                const on = sportFilter === s;
-                return (
-                  <button key={s || "all"} aria-pressed={on} onClick={() => { setSportFilter(s); setPositionFilter(""); }}
-                    className={`px-4 h-10 rounded-md text-[12px] font-semibold whitespace-nowrap shrink-0 transition-all active:scale-[0.97] ${on ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-white text-slate-700 border border-slate-200"}`}>
-                    {s || "Todos"}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="flex gap-2">
-              <button onClick={() => setShowZone(v => !v)} aria-expanded={showZone}
-                className={`flex-1 h-11 rounded-md px-4 text-[12px] font-semibold flex items-center justify-between gap-2 border ${regionFilter ? "border-emerald-500/40 text-emerald-500" : isDark ? "bg-[#0A101D] text-slate-300 border-white/6" : "bg-white text-slate-700 border-slate-200"}`}>
-                <span className="flex items-center gap-2 min-w-0"><MapPin size={15} /><span className="truncate">{regionFilter ? `${regionFilter}${communeFilters.length ? ` · ${communeFilters.length} comuna${communeFilters.length > 1 ? "s" : ""}` : ""}` : "Todo Chile"}</span></span>
-                <ChevronDown size={15} className={`shrink-0 transition-transform ${showZone ? "rotate-180" : ""}`} />
-              </button>
-              {activeTab === "jugadores" && sportFilter && (POSITIONS_BY_SPORT[sportFilter] || []).length > 0 && (
-                <select value={positionFilter} onChange={e => setPositionFilter(e.target.value)} aria-label="Posición"
-                  className={`flex-1 h-11 rounded-md px-3 text-[12px] font-semibold outline-hidden border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-700 border-slate-200"}`}>
-                  <option value="">Cualquier posición</option>
-                  {(POSITIONS_BY_SPORT[sportFilter] || []).map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
-              )}
-            </div>
-            {showZone && (
-              <div className={`rounded-md p-3 space-y-3 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`}>
-                <select value={regionFilter} onChange={e => { setRegionFilter(e.target.value); setCommuneFilters([]); }} aria-label="Región"
-                  className={`w-full h-11 rounded-md px-3 text-[12px] font-semibold outline-hidden border ${isDark ? "bg-[#020611] text-slate-200 border-white/6" : "bg-slate-50 text-slate-700 border-slate-200"}`}>
-                  <option value="">Todo Chile</option>
-                  {Object.keys(REGIONS).map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-                {regionFilter && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {(REGIONS[regionFilter] || []).map(c => {
-                      const selected = communeFilters.includes(c);
-                      return (
-                        <button key={c} aria-pressed={selected} onClick={() => setCommuneFilters(prev => selected ? prev.filter(x => x !== c) : [...prev, c])}
-                          className={`px-3 h-9 rounded-md text-[11px] font-medium transition-all ${selected ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{c}</button>
-                      );
-                    })}
-                  </div>
-                )}
-                <div className="flex gap-2">
-                  {(regionFilter || communeFilters.length > 0) && (
-                    <button onClick={() => { setRegionFilter(""); setCommuneFilters([]); }} className={`flex-1 h-10 rounded-md text-[11px] font-semibold ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>Quitar zona</button>
-                  )}
-                  <button onClick={() => setShowZone(false)} className="flex-1 h-10 rounded-md text-[11px] font-semibold bg-emerald-500 text-white">Listo</button>
-                </div>
-              </div>
-            )}
-          </div>
+        {tab !== "mis" && (
+          <FilterBar isDark={isDark} filters={filters} onChange={setFilters} showPosition={tab === "jugadores" && !!filters.sport}
+            zoneOpen={zoneOpen} onToggleZone={() => setZoneOpen((v) => !v)} />
         )}
 
-        {/* Tab: Buscar Rival */}
-        {activeTab === "rival" && (
+        {tab === "rival" && (
           <>
-            <button onClick={openPublishTeam}
-                className="w-full h-[52px] rounded-md font-semibold text-[12px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-                style={{ backgroundColor: "#10b981", color: "white" }}>
-                <Swords size={16} /> Publicar mi equipo
-            </button>
-
-            {loading ? (
-              <div className="flex justify-center py-10"><div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
-            ) : teams.filter(e => e.userId !== uid).length === 0 ? (
-              <div className="py-16 flex flex-col items-center">
-                <Swords size={40} className={isDark ? "text-slate-600" : "text-slate-300"} strokeWidth={1} />
-                <p className={`text-[13px] font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay equipos buscando rival</p>
-                {(sportFilter || regionFilter) && (
-                  <button onClick={() => { setCommuneFilters([]); if (communeFilters.length === 0) { setRegionFilter(""); if (!regionFilter) setSportFilter(""); } }}
-                    className="mt-4 px-5 h-10 rounded-md text-[12px] font-semibold bg-emerald-500 text-white">
-                    {communeFilters.length > 0 ? "Buscar en toda la región" : regionFilter ? "Buscar en todo Chile" : "Ver todos los deportes"}
-                  </button>
-                )}
-              </div>
+            <button onClick={() => setModal({ kind: "publishTeam" })} className={bigBtn}><Swords size={16} /> Publicar mi equipo</button>
+            {visibleTeams === null ? spinner : visibleTeams.length === 0 ? (
+              <Empty isDark={isDark} icon={<Swords size={40} strokeWidth={1} />} text="No hay equipos buscando rival con estos filtros" action={widenAction} />
             ) : (
               <div className="space-y-3">
-                {teams.filter(e => e.userId !== uid).map(entry => {
-                  const alreadyChallenged = challenges.some(c => c.status !== "declined" && ((c.challengedTeamId === entry.teamId && c.senderId === uid) || (c.challengerTeamId === entry.teamId && c.receiverId === uid)));
-                  return (
-                    <GlowCard key={entry.id} isDark={isDark}>
-                      <div className="overflow-hidden">
-                        {/* Hero image */}
-                        <div className="h-[90px] relative" style={{ background: entry.teamImageUrl ? `url(${entry.teamImageUrl}) center/cover` : `linear-gradient(135deg, #059669, #047857)` }}>
-                          <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
-                          <div className="absolute bottom-3 left-4 right-4">
-                            <div className="flex items-center gap-2">
-                              <span className="bg-emerald-500 px-2 py-0.5 rounded-md text-white font-semibold text-[12px]">{entry.sport}</span>
-                              <span className="bg-black/40 px-2 py-0.5 rounded-md text-white/80 text-[11px] font-medium">{entry.memberCount} jugadores</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1 min-w-0">
-                              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.teamName}</p>
-                              <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                {entry.communes && entry.communes.length > 0 ? (
-                                  <span className={`text-[11px] font-medium flex items-center gap-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}><MapPin size={9} />{entry.communes.slice(0, 2).join(", ")}{entry.communes.length > 2 ? ` +${entry.communes.length - 2}` : ""} · {entry.region}</span>
-                                ) : entry.commune ? (
-                                  <span className={`text-[11px] font-medium flex items-center gap-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}><MapPin size={9} />{entry.commune}</span>
-                                ) : null}
-                              </div>
-                            </div>
-                            <button onClick={async () => { setShowTeamDetail(entry); setTeamDetailData(null); try { const team = await teamService.getTeamById(entry.teamId!); if (team) { const p = await teamService.getMemberProfiles(team.members); setTeamDetailData({ team, profiles: p }); } } catch {} }}
-                              className={`px-4 h-9 rounded-md text-[12px] font-semibold transition-all active:scale-[0.98] shrink-0 ml-2 ${alreadyChallenged ? (isDark ? "bg-white/6 text-slate-500" : "bg-slate-100 text-slate-400") : "bg-emerald-500 text-white"}`}>
-                              {alreadyChallenged ? "Retado" : "Ver"}
-                            </button>
-                          </div>
-                          {entry.description && <p className={`text-[11px] font-medium mt-2 leading-snug ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.description}</p>}
-                        </div>
-                      </div>
-                    </GlowCard>
-                  );
-                })}
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Tab: Jugadores */}
-        {activeTab === "jugadores" && (
-          <>
-            {(() => {
-              const n = (v: string) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-              const list = needs.filter((e) => e.userId !== uid
-                && (!sportFilter || n(e.sport) === n(sportFilter))
-                && (communeFilters.length === 0 || (e.communes || []).some((c) => communeFilters.includes(c))));
-              if (!list.length) return null;
-              return (
-                <section aria-label="Partidos que buscan jugadores" className="space-y-2">
-                  <p className={`text-[12px] font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>Partidos que buscan jugadores</p>
-                  {list.map((e) => (
-                    <div key={e.id} className={`rounded-md p-4 border flex items-center gap-3 ${isDark ? "bg-[#0A101D] border-emerald-500/20" : "bg-white border-emerald-500/30"}`}>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-[14px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>Faltan {e.needed} · {e.sport}</p>
-                        <p className={`text-[12px] truncate ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                          {e.day ? new Date(`${e.day}T12:00:00`).toLocaleDateString("es-CL", { weekday: "short", day: "numeric", month: "short" }) : ""} · {e.startTime} hrs · {e.tenantName}
-                        </p>
-                        <p className={`text-[11px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>Organiza {e.displayName}</p>
-                      </div>
-                      <button disabled={actionLoading} onClick={() => handleJoinNeed(e)} className="px-4 h-10 rounded-md bg-emerald-500 text-white text-[12px] font-semibold shrink-0 disabled:opacity-60">Me sumo</button>
-                    </div>
-                  ))}
-                </section>
-              );
-            })()}
-            <button onClick={() => setShowPublishPlayer(true)}
-              className="w-full h-[52px] rounded-md bg-emerald-500 text-white font-semibold text-[12px] flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
-              <User size={16} /> Estoy Disponible
-            </button>
-
-            {loading ? (
-              <div className="flex justify-center py-10"><div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
-            ) : players.filter(e => e.userId !== uid).length === 0 ? (
-              <div className="py-16 flex flex-col items-center">
-                <Users size={40} className={isDark ? "text-slate-600" : "text-slate-300"} strokeWidth={1} />
-                <p className={`text-[13px] font-medium mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay jugadores disponibles</p>
-                {(sportFilter || regionFilter) && (
-                  <button onClick={() => { setCommuneFilters([]); if (communeFilters.length === 0) { setRegionFilter(""); if (!regionFilter) setSportFilter(""); } }}
-                    className="mt-4 px-5 h-10 rounded-md text-[12px] font-semibold bg-emerald-500 text-white">
-                    {communeFilters.length > 0 ? "Buscar en toda la región" : regionFilter ? "Buscar en todo Chile" : "Ver todos los deportes"}
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {players.filter(e => e.userId !== uid).map(entry => {
-                  const alreadyContacted = challenges.some(c => c.status !== "closed" && c.playerId === entry.userId && c.senderId === uid);
-                  return (
-                    <GlowCard key={entry.id} isDark={isDark}>
-                      <div className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-14 h-14 rounded-md overflow-hidden shrink-0 border-2" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0" }}>
-                            {entry.photoURL ? <img src={entry.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><User size={24} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
-                              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.displayName}</p>
-                              <span className="text-emerald-500 text-[12px] font-bold shrink-0 ml-2">OVR {entry.ovr}</span>
-                            </div>
-                            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>{entry.position || "Jugador"}</span>
-                              <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-md ${isDark ? "bg-white/6 text-slate-400" : "bg-slate-100 text-slate-500"}`}>{entry.tier}</span>
-                              {entry.communes && entry.communes.length > 0 ? (
-                                <span className={`text-[11px] font-medium flex items-center gap-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}><MapPin size={9} />{entry.communes[0]}</span>
-                              ) : entry.commune ? (
-                                <span className={`text-[11px] font-medium flex items-center gap-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}><MapPin size={9} />{entry.commune}</span>
-                              ) : null}
-                            </div>
-                            {entry.sports && entry.sports.length > 0 && (
-                              <div className="flex gap-1 mt-2 flex-wrap">
-                                {entry.sports.map(s => <span key={s} className={`text-[11px] font-medium px-2 py-0.5 rounded-md ${isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600"}`}>{s}</span>)}
-                              </div>
-                            )}
-                            {entry.description && <p className={`text-[11px] font-medium mt-1.5 leading-snug ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.description}</p>}
-                          </div>
-                        </div>
-                        <button onClick={() => setShowPlayerDetail(entry)} disabled={alreadyContacted}
-                          className={`w-full mt-3 h-10 rounded-md text-[12px] font-semibold transition-all active:scale-[0.98] ${alreadyContacted ? (isDark ? "bg-white/6 text-slate-500 border border-white/6" : "bg-slate-100 text-slate-400 border border-slate-200") : "bg-emerald-500 text-white shadow-xs shadow-emerald-500/25"}`}>
-                          {alreadyContacted ? "Contactado" : "Ver"}
-                        </button>
-                      </div>
-                    </GlowCard>
-                  );
-                })}
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Tab: Mis Actividades */}
-        {activeTab === "mis" && (
-          <>
-            {loading ? (
-              <div className="flex justify-center py-10"><div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
-            ) : (
-              <div className="space-y-4">
-                {/* My published entries */}
-                {myEntries.filter(e => e.status === "active").length > 0 && (
-                  <>
-                    <SectionPill label="Mis publicaciones" />
-                    {myEntries.filter(e => e.status === "active").map(entry => (
-                      <GlowCard key={entry.id} isDark={isDark}>
-                        <div className="p-4 flex items-center gap-3">
-                          <div className={`w-11 h-11 rounded-md flex items-center justify-center shrink-0 ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
-                            {entry.type === "team" ? <Swords size={20} className="text-emerald-500" /> : <User size={20} className="text-emerald-500" />}
-                          </div>
-                          <div className="flex-1">
-                            <p className={`font-semibold text-[12px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{entry.type === "team" ? entry.teamName : entry.type === "need" ? `Buscas ${entry.needed} jugador${entry.needed === 1 ? "" : "es"} · ${entry.tenantName} ${entry.startTime}` : "Disponible como jugador"}</p>
-                            <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{entry.sport || entry.sports?.join(", ")}</p>
-                          </div>
-                          {entry.type !== "need" && (
-                          <button onClick={() => { setEditEntry(entry); setEditDesc(entry.description || ""); setEditSport(entry.sport || ""); setEditSports(entry.sports || []); }}
-                            className={`px-2.5 h-7 rounded-md text-[12px] font-semibold ${isDark ? "bg-blue-500/10 text-blue-400" : "bg-blue-50 text-blue-500"}`}>Editar</button>
-                          )}
-                          <button onClick={() => setShowCloseConfirm(entry)}
-                            className={`px-2.5 h-7 rounded-md text-[12px] font-semibold ml-1.5 ${isDark ? "bg-red-500/10 text-red-400" : "bg-red-50 text-red-500"}`}>Cancelar</button>
-                        </div>
-                      </GlowCard>
-                    ))}
-                  </>
-                )}
-
-                {/* Challenges */}
-                {challenges.length > 0 && (
-                  <>
-                    <SectionPill label="Mis challenges" />
-                    {challenges.map(c => {
-                      const isReceiver = c.receiverId === uid;
-                      const otherName = c.type === "team_vs_team"
-                        ? (isReceiver ? c.challengerTeamName : c.challengedTeamName)
-                        : (isReceiver ? c.captainName : c.playerName);
-                      const otherId = c.type === "team_vs_team"
-                        ? (c.senderId === uid ? c.receiverId : c.senderId)
-                        : (c.senderId === uid ? c.receiverId || "" : c.senderId);
-                      return (
-                        <GlowCard key={c.id} isDark={isDark}>
-                          <div className="p-4">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-11 h-11 rounded-md flex items-center justify-center shrink-0 ${isDark ? "bg-white/6" : "bg-slate-100"}`}>
-                                <MessageCircle size={20} className={c.status === "active" ? "text-emerald-500" : c.status === "pending" ? "text-amber-500" : "text-slate-400"} />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className={`font-semibold text-[12px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-                                  {c.type === "team_vs_team" ? `vs ${otherName}` : `Chat con ${otherName}`}
-                                </p>
-                                <div className="flex items-center gap-2 mt-0.5">
-                                  <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-md ${
-                                    c.status === "active" ? (isDark ? "bg-emerald-500/10 text-emerald-400" : "bg-emerald-50 text-emerald-600") :
-                                    c.status === "pending" ? (isDark ? "bg-amber-500/10 text-amber-400" : "bg-amber-50 text-amber-600") :
-                                    (isDark ? "bg-slate-500/10 text-slate-400" : "bg-slate-100 text-slate-500")
-                                  }`}>
-                                    {c.status === "active" ? "Activo" : c.status === "pending" ? "Pendiente" : c.status === "declined" ? "Rechazado" : "Cerrado"}
-                                  </span>
-                                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{c.sport}</span>
-                                </div>
-                              </div>
-                              {(c.status === "pending" || c.status === "active") && c.type === "team_vs_team" && (
-                                <button onClick={async () => { setShowChallengeDetail(c); setChallengeTeamData(null); try { const teamId = c.senderId === uid ? c.challengedTeamId : c.challengerTeamId; const team = teamId ? await teamService.getTeamById(teamId) : null; if (team) { const p = await teamService.getMemberProfiles(team.members); setChallengeTeamData({ team, profiles: p }); } } catch {} }}
-                                  className={`px-3 h-9 rounded-md text-[12px] font-semibold transition-all active:scale-[0.98] ${isDark ? "bg-white/6 text-slate-400" : "bg-slate-100 text-slate-500"}`}>
-                                  Ver equipo
-                                </button>
-                              )}
-                              {c.status === "active" && (
-                                <button onClick={() => router.push(`/player/equipos/partidos/chat?id=${c.id}`)}
-                                  className="px-4 h-9 rounded-md bg-emerald-500 text-white text-[12px] font-semibold transition-all active:scale-[0.98]">
-                                  Chat
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        </GlowCard>
-                      );
-                    })}
-                  </>
-                )}
-
-                {myEntries.filter(e => e.status === "active").length === 0 && challenges.length === 0 && (
-                  <div className="py-16 flex flex-col items-center">
-                    <MessageCircle size={40} className={isDark ? "text-slate-600" : "text-slate-300"} strokeWidth={1} />
-                    <p className={`text-[13px] font-medium mt-3 text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>No tienes actividades aún.<br />Publica tu equipo o disponibilidad.</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Publish Team Modal */}
-      {showPublishTeam && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowPublishTeam(false)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
-              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Publicar mi equipo</p>
-              <button aria-label="Cerrar" onClick={() => setShowPublishTeam(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
-            </div>
-            <div className="mb-4">
-              <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Equipo</label>
-              {availableTeams.length === 0 ? (
-                <div className={`w-full h-11 rounded-md flex items-center px-4 text-[13px] font-medium border ${isDark ? "bg-white/4 text-slate-500 border-white/6" : "bg-slate-50 text-slate-400 border-slate-200"}`}>
-                  {userTeams.length === 0 ? "No tienes equipos. Crea uno primero." : "Todos tus equipos ya están publicados"}
-                </div>
-              ) : (
-                <div className="relative">
-                  <select value={selectedTeam} onChange={e => { setSelectedTeam(e.target.value); const s = teamSport(userTeams.find(t => t.id === e.target.value)); if (s) setPublishSport(s); }}
-                    className={`w-full h-11 rounded-md px-4 text-[13px] font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
-                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
-                    <option value="">Seleccionar equipo</option>
-                    {availableTeams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                  </select>
-                </div>
-              )}
-            </div>
-            <div className="mb-4">
-              <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
-              <div className="relative">
-                <select value={publishSport} onChange={e => setPublishSport(e.target.value)}
-                  disabled={!!teamSport(userTeams.find(t => t.id === selectedTeam))}
-                  className={`w-full h-11 disabled:opacity-60 disabled:cursor-not-allowed rounded-md px-4 text-[13px] font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
-                  {SPORTS.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-            </div>
-            <div className="mb-4">
-              <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción (opcional)</label>
-              <input value={publishDesc} maxLength={200} onChange={e => setPublishDesc(e.target.value)} placeholder="Ej: Buscamos rival para este sábado"
-                className={`w-full h-11 rounded-md px-3 text-[13px] font-medium outline-hidden border ${isDark ? "bg-white/6 text-slate-200 border-white/6 placeholder-slate-500" : "bg-slate-50 text-slate-900 border-slate-200 placeholder-slate-400"}`} />
-            </div>
-            <div className="mb-4">
-              <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Región</label>
-              <div className="relative">
-                <select value={publishRegion} onChange={e => { setPublishRegion(e.target.value); setPublishCommunes([]); }}
-                  className={`w-full h-11 rounded-md px-4 text-[13px] font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
-                  <option value="">Seleccionar región</option>
-                  {Object.keys(REGIONS).map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
-            </div>
-            {publishRegion && (
-              <div className="mb-4">
-                <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Comunas donde juegan</label>
-                <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto">
-                  {(REGIONS[publishRegion] || []).map(c => {
-                    const selected = publishCommunes.includes(c);
-                    return (
-                      <button key={c} type="button" onClick={() => setPublishCommunes(prev => selected ? prev.filter(x => x !== c) : [...prev, c])}
-                        className={`px-2.5 py-1 hover:scale-[1.02] active:scale-95 rounded-md text-[11px] font-medium transition-all ${selected ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{c}</button>
-                    );
-                  })}
-                </div>
-                {publishCommunes.length > 0 && <p className={`text-[11px] font-medium mt-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{publishCommunes.length} seleccionadas</p>}
-              </div>
-            )}
-            <button onClick={handlePublishTeam} disabled={actionLoading || !selectedTeam}
-              className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
-              {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Publicar equipo"}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Publish Player Modal */}
-      {showPublishPlayer && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowPublishPlayer(false)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
-              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Estoy disponible</p>
-              <button aria-label="Cerrar" onClick={() => setShowPublishPlayer(false)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
-            </div>
-            <div className={`p-4 rounded-md mb-4 ${isDark ? "bg-white/4" : "bg-slate-50"}`}>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-md overflow-hidden" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
-                  {playerPhoto ? <img src={playerPhoto} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User size={18} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
-                </div>
-                <div>
-                  <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{playerName}</p>
-                  <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{playerPosition} · OVR {playerOvr} · {playerTier}</p>
-                </div>
-              </div>
-            </div>
-            <div className="mb-4">
-              <label className={`text-[12px] font-semibold mb-2 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deportes</label>
-              <div className="flex flex-wrap gap-2">
-                {SPORTS.map(s => (
-                  <button key={s} onClick={() => toggleSport(s)}
-                    className={`px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all ${isSportToggled(s) ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{s}</button>
+                {visibleTeams.map((e) => (
+                  <RivalCard key={e.id} isDark={isDark} entry={e} challenged={wasChallenged(e)} onOpen={() => { setModal({ kind: "team", entry: e }); loadTeam(e.teamId); }} />
                 ))}
               </div>
-            </div>
-            <div className="mb-4">
-              <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Región</label>
-              <div className="relative">
-                <select value={publishRegion} onChange={e => { setPublishRegion(e.target.value); setPublishCommunes([]); }}
-                  className={`w-full h-11 rounded-md px-4 text-[13px] font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
-                  <option value="">Seleccionar región</option>
-                  {Object.keys(REGIONS).map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
-            </div>
-            {publishRegion && (
-              <div className="mb-4">
-                <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Comunas donde juegan</label>
-                <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto">
-                  {(REGIONS[publishRegion] || []).map(c => {
-                    const selected = publishCommunes.includes(c);
-                    return (
-                      <button key={c} type="button" onClick={() => setPublishCommunes(prev => selected ? prev.filter(x => x !== c) : [...prev, c])}
-                        className={`px-2.5 py-1 hover:scale-[1.02] active:scale-95 rounded-md text-[11px] font-medium transition-all ${selected ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300 hover:bg-white/10" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>{c}</button>
-                    );
-                  })}
-                </div>
-                {publishCommunes.length > 0 && <p className={`text-[11px] font-medium mt-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{publishCommunes.length} seleccionadas</p>}
-              </div>
             )}
-            <div className="mb-4">
-              <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Comentario (opcional)</label>
-              <input value={publishDesc} maxLength={200} onChange={e => setPublishDesc(e.target.value)} placeholder="Ej: Busco partidos los fines de semana"
-                className={`w-full h-11 rounded-md px-3 text-[13px] font-medium outline-hidden border ${isDark ? "bg-white/6 text-slate-200 border-white/6 placeholder-slate-500" : "bg-slate-50 text-slate-900 border-slate-200 placeholder-slate-400"}`} />
-            </div>
-            <button onClick={handlePublishPlayer} disabled={actionLoading || publishSports.length === 0}
-              className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
-              {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Publicar disponibilidad"}
-            </button>
-          </div>
-        </div>
-      )}
+          </>
+        )}
 
-      {/* Team Selector Modal */}
-      {showTeamSelector && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowTeamSelector(null)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Retar a {showTeamSelector.teamName}</p>
-              <button aria-label="Cerrar" onClick={() => setShowTeamSelector(null)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
-            </div>
-            <p className={`text-[11px] font-medium mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Selecciona con qué equipo quieres retar:</p>
-            <div className="space-y-2 mb-5">
-              {userCaptainTeams.map(t => (
-                <button key={t.id} onClick={async () => { setShowTeamSelector(null); setConfirmChallenge({ entry: showTeamSelector, team: t }); }}
-                  className={`w-full p-4 rounded-md border text-left transition-all active:scale-[0.98] ${isDark ? "bg-[#0A101D] border-white/6 hover:bg-white/4" : "bg-white border-slate-200 hover:bg-slate-50"}`}>
-                  <p className={`font-semibold text-[12px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{t.name}</p>
-                  <p className={`text-[11px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{(t.sport || "").charAt(0).toUpperCase() + (t.sport || "").slice(1)} · {t.members?.length || 1} jugadores</p>
-                </button>
-              ))}
-            </div>
-            <button onClick={() => setShowTeamSelector(null)} className={`w-full py-3 rounded-md font-semibold text-[11px] ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
-          </div>
-        </div>
-      )}
-
-      {/* Confirm Challenge Modal */}
-      {confirmChallenge && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setConfirmChallenge(null)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-            <div className="w-16 h-16 rounded-md bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
-              <Swords size={28} className="text-emerald-500" />
-            </div>
-            <p className={`font-semibold text-[14px] mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Retar a {confirmChallenge.entry.teamName}?</p>
-            <p className={`text-[11px] font-medium mb-1 ${isDark ? "text-slate-400" : "text-slate-500"}`}>Con tu equipo:</p>
-            <p className={`font-semibold text-[12px] mb-5 ${isDark ? "text-slate-200" : "text-slate-700"}`}>{confirmChallenge.team.name} · {confirmChallenge.entry.sport.toUpperCase()}</p>
-            <div className="flex gap-3">
-              <button onClick={() => setConfirmChallenge(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
-              <button onClick={() => executeChallenge(confirmChallenge.entry, confirmChallenge.team)} disabled={actionLoading}
-                className="flex-1 py-3.5 rounded-md bg-emerald-500 text-white font-semibold text-[13px] disabled:opacity-50 flex items-center justify-center">
-                {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Confirmar reto"}
+        {tab === "jugadores" && (
+          <>
+            {visibleNeeds.length > 0 && (
+              <section aria-label="Partidos que buscan jugadores" className="space-y-2">
+                <p className={`text-[12px] font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>Partidos que buscan jugadores</p>
+                {visibleNeeds.map((e) => (
+                  <NeedCard key={e.id} isDark={isDark} entry={e} busy={busy} onJoin={() => openChat({
+                    type: "captain_to_player", captainId: e.userId, captainName: e.displayName || "Organizador",
+                    playerId: uid, playerName: me.name, sport: e.sport || "Fútbol", senderId: uid, receiverId: e.userId || "",
+                  })} />
+                ))}
+              </section>
+            )}
+            {myPlayerEntry ? (
+              <button onClick={() => setModal({ kind: "edit", entry: myPlayerEntry })} className={`${bigBtn} bg-transparent! text-emerald-600 dark:text-emerald-400 border border-emerald-500/40`}>
+                <CheckCircle2 size={16} /> Ya estás disponible · Editar
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Challenge Detail Modal */}
-      {showChallengeDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => { setShowChallengeDetail(null); setChallengeTeamData(null); }}>
-          <div className={`w-full max-w-sm rounded-md overflow-hidden border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-            <div className="h-[100px] relative bg-linear-to-br from-emerald-800 to-slate-900">
-              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
-              <button aria-label="Cerrar" onClick={() => { setShowChallengeDetail(null); setChallengeTeamData(null); }} className="absolute top-4 right-4 w-8 h-8 rounded-md bg-black/40 border border-white/10 flex items-center justify-center"><X size={14} className="text-white" /></button>
-              <div className="absolute bottom-4 left-5 right-5">
-                <p className="text-white text-[15px] font-semibold">{showChallengeDetail.type === "team_vs_team" ? (showChallengeDetail.senderId === uid ? showChallengeDetail.challengedTeamName : showChallengeDetail.challengerTeamName) : ""}</p>
-                <p className="text-white/70 text-[11px] font-medium mt-0.5">{showChallengeDetail.sport} · {showChallengeDetail.status === "pending" ? "Challenge pendiente" : showChallengeDetail.status === "active" ? "Challenge activo" : "Challenge cerrado"}</p>
-              </div>
-            </div>
-            <div className="p-5 space-y-4 max-h-[55vh] overflow-y-auto">
-              {challengeTeamData ? (
-                <>
-                  <div className="flex items-center justify-between p-3 rounded-md" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
-                    <p className={`text-[11px] font-semibold ${isDark ? "text-slate-400" : "text-slate-500"}`}>Miembros</p>
-                    <span className={`text-[12px] font-semibold ${isDark ? "text-slate-200" : "text-slate-800"}`}>{challengeTeamData.team.members.length}</span>
-                  </div>
-                  <div className="space-y-1.5">
-                    <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Jugadores</p>
-                    <div className="space-y-1.5 max-h-[200px] overflow-y-auto">
-                      {challengeTeamData.team.members.map((mid: string) => {
-                        const p = challengeTeamData.profiles[mid] || {};
-                        return (
-                          <div key={mid} className="flex items-center gap-2.5 p-2 rounded-md" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.03)" : "transparent" }}>
-                            <div className="w-8 h-8 rounded-md overflow-hidden shrink-0" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
-                              {p.photoURL ? <img src={p.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="" className="w-full h-full object-cover" /> : <User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className={`text-[11px] font-medium truncate ${isDark ? "text-slate-200" : "text-slate-700"}`}>{p.displayName || "Jugador MVP"}{mid === challengeTeamData.team.ownerId ? " (C)" : ""}</p>
-                            </div>
-                            <span className="text-emerald-500 text-[11px] font-semibold shrink-0">OVR {p.ovr || 40}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="flex justify-center py-4"><div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
-              )}
-              {showChallengeDetail.status === "pending" && showChallengeDetail.receiverId === uid && (
-                <div className="flex gap-3 pt-2">
-                  <button onClick={() => setConfirmAction({ challengeId: showChallengeDetail.id, action: "accept" })}
-                    className="flex-1 h-11 rounded-md bg-emerald-500 text-white font-semibold text-[12px] transition-all active:scale-[0.98] shadow-xs shadow-emerald-500/25">Aceptar</button>
-                  <button onClick={() => setConfirmAction({ challengeId: showChallengeDetail.id, action: "decline" })}
-                    className="flex-1 h-11 rounded-md bg-red-500 text-white font-semibold text-[12px] transition-all active:scale-[0.98]">Rechazar</button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Confirm Action Modal (accept/decline challenge) */}
-      {confirmAction && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setConfirmAction(null)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-            <div className={`w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 ${confirmAction.action === "accept" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
-              {confirmAction.action === "accept" ? <CheckCircle2 size={28} className="text-emerald-500" /> : <X size={28} className="text-red-500" />}
-            </div>
-            <p className={`font-semibold text-[14px] mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>
-              {confirmAction.action === "accept" ? "¿Aceptar challenge?" : "¿Rechazar challenge?"}
-            </p>
-            <p className={`text-[11px] font-medium mb-6 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-              {confirmAction.action === "accept" ? "Se abrirá un chat con el capitán del equipo rival." : "El equipo rival será notificado de tu decisión."}
-            </p>
-            <div className="flex gap-3">
-              <button onClick={() => setConfirmAction(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Cancelar</button>
-              <button onClick={async () => {
-                const c = confirmAction; setConfirmAction(null); setShowChallengeDetail(null); setChallengeTeamData(null);
-                if (c.action === "accept") await handleAcceptChallenge(c.challengeId);
-                else await handleDeclineChallenge(c.challengeId);
-              }} disabled={actionLoading}
-                className="flex-1 py-3.5 rounded-md font-semibold text-[13px] text-white disabled:opacity-50 flex items-center justify-center"
-                style={{ backgroundColor: confirmAction.action === "accept" ? "#10b981" : "#ef4444" }}>
-                {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : (confirmAction.action === "accept" ? "Aceptar" : "Rechazar")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showTeamDetail && (
-        <TeamDetailModal entry={showTeamDetail} data={teamDetailData} isDark={isDark} actionLoading={actionLoading}
-          onChallenge={handleChallenge} onClose={() => { setShowTeamDetail(null); setTeamDetailData(null); }} />
-      )}
-
-      {showPlayerDetail && (
-        <PlayerDetailModal entry={showPlayerDetail} isDark={isDark} actionLoading={actionLoading}
-          onContact={handleContact} onClose={() => setShowPlayerDetail(null)} />
-      )}
-
-      {/* Confirmar retiro de publicación */}
-      {showCloseConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowCloseConfirm(null)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-            <div className="w-16 h-16 rounded-md flex items-center justify-center mx-auto mb-4 bg-red-500/10"><X size={28} className="text-red-500" /></div>
-            <p className={`font-semibold text-[14px] mb-2 ${isDark ? "text-slate-100" : "text-slate-900"}`}>¿Retirar publicación?</p>
-            <p className={`text-[11px] font-medium mb-6 wrap-break-word ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-              {showCloseConfirm.type === "team" ? showCloseConfirm.teamName : "Tu disponibilidad como jugador"} dejará de aparecer en Partidos.
-            </p>
-            <div className="flex gap-3">
-              <button onClick={() => setShowCloseConfirm(null)} className={`flex-1 py-3.5 rounded-md font-semibold text-[13px] ${isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-700"}`}>Volver</button>
-              <button disabled={actionLoading} onClick={async () => {
-                const e = showCloseConfirm; setActionLoading(true);
-                try {
-                  await matchmakingService.closeEntry(e.id!);
-                  setMyEntries(prev => prev.filter(x => x.id !== e.id));
-                  setShowCloseConfirm(null);
-                } catch { setShowCloseConfirm(null); setFeedback({ type: "error", msg: "No se pudo retirar la publicación." }); }
-                finally { setActionLoading(false); }
-              }} className="flex-1 py-3.5 rounded-md font-semibold text-[13px] text-white bg-red-500 disabled:opacity-50">Retirar</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Entry Modal */}
-      {editEntry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setEditEntry(null)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
-              <p className={`font-semibold text-[14px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Editar publicación</p>
-              <button aria-label="Cerrar" onClick={() => setEditEntry(null)} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><X size={14} /></button>
-            </div>
-            <div className={`p-4 rounded-md mb-4 ${isDark ? "bg-white/4" : "bg-slate-50"}`}>
-              <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>{editEntry.type === "team" ? editEntry.teamName : "Disponible como jugador"}</p>
-              <p className={`text-[11px] font-medium mt-0.5 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{editEntry.sport || editEntry.sports?.join(", ")}</p>
-            </div>
-            {/* Edit Sport for team */}
-            {editEntry.type === "team" && (
-              <div className="mb-4">
-                <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</label>
-                <div className="relative">
-                  <select value={editSport} onChange={e => setEditSport(e.target.value)}
-                    className={`w-full h-11 rounded-md px-4 text-[13px] font-semibold outline-hidden appearance-none cursor-pointer border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6" : "bg-white text-slate-900 border-slate-200"}`}
-                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center', paddingRight: '36px' }}>
-                    {SPORTS.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
+            ) : (
+              <button onClick={() => setModal({ kind: "publishPlayer" })} className={bigBtn}><User size={16} /> Estoy disponible</button>
+            )}
+            {visiblePlayers === null ? spinner : visiblePlayers.length === 0 ? (
+              <Empty isDark={isDark} icon={<Users size={40} strokeWidth={1} />} text="No hay jugadores disponibles con estos filtros" action={widenAction} />
+            ) : (
+              <div className="space-y-3">
+                {visiblePlayers.map((e) => <PlayerCard key={e.id} isDark={isDark} entry={e} contacted={wasContacted(e)} onOpen={() => setModal({ kind: "player", entry: e })} />)}
               </div>
             )}
-            {/* Edit Sports for player */}
-            {editEntry.type === "player" && (
-              <div className="mb-4">
-                <label className={`text-[12px] font-semibold mb-2 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deportes</label>
-                <div className="flex flex-wrap gap-2">
-                  {SPORTS.map(s => (
-                    <button key={s} onClick={() => setEditSports(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])}
-                      className={`px-3 py-1.5 rounded-md text-[11px] font-semibold transition-all ${editSports.includes(s) ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-300" : "bg-slate-100 text-slate-600"}`}>{s}</button>
-                  ))}
-                </div>
-              </div>
-            )}
-            <div className="mb-5">
-              <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción</label>
-              <input value={editDesc} maxLength={200} onChange={e => setEditDesc(e.target.value)} placeholder="Descripción de tu publicación"
-                className={`w-full h-11 rounded-md px-4 text-[13px] font-semibold outline-hidden border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6 placeholder-slate-500" : "bg-white text-slate-900 border-slate-200 placeholder-slate-400"}`} />
-            </div>
-            <button onClick={handleEditSave} disabled={actionLoading}
-              className="w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center">
-              {actionLoading ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : "Guardar cambios"}
-            </button>
-          </div>
-        </div>
-      )}
+          </>
+        )}
 
-      {/* Feedback */}
-      {feedback && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setFeedback(null)}>
-          <div className={`w-full max-w-sm rounded-md p-6 border text-center ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-            <div className={`w-14 h-14 rounded-md flex items-center justify-center mx-auto mb-4 ${feedback.type === "success" ? "bg-emerald-500/10" : "bg-red-500/10"}`}>
-              {feedback.type === "success" ? <CheckCircle2 size={28} className="text-emerald-500" /> : <X size={28} className="text-red-500" />}
-            </div>
-            <p className={`text-[13px] font-semibold mb-4 ${isDark ? "text-slate-100" : "text-slate-900"}`}>{feedback.msg}</p>
-            <button onClick={() => setFeedback(null)} className={`w-full py-3 rounded-md font-semibold text-[13px] ${feedback.type === "success" ? "bg-emerald-500 text-white" : "bg-red-500 text-white"}`}>Entendido</button>
+        {tab === "mis" && (myEntries === null ? spinner : (
+          <div className="space-y-4">
+            {activeMine.length > 0 && (
+              <>
+                <SectionPill label="Mis publicaciones" />
+                {activeMine.map((e) => (
+                  <MyEntryCard key={e.id} isDark={isDark} entry={e}
+                    onEdit={e.type !== "need" ? () => setModal({ kind: "edit", entry: e }) : undefined}
+                    onClose={() => setModal({ kind: "close", entry: e })} />
+                ))}
+              </>
+            )}
+            {challenges.length > 0 && (
+              <>
+                <SectionPill label="Mis retos y chats" />
+                {challenges.map((c) => (
+                  <ChallengeCard key={c.id} isDark={isDark} c={c} uid={uid}
+                    onOpen={() => { setModal({ kind: "challengeDetail", c }); loadTeam(c.senderId === uid ? c.challengedTeamId : c.challengerTeamId); }}
+                    onChat={() => router.push(`/player/equipos/partidos/chat?id=${c.id}`)} />
+                ))}
+              </>
+            )}
+            {activeMine.length === 0 && challenges.length === 0 && (
+              <Empty isDark={isDark} icon={<MessageCircle size={40} strokeWidth={1} />} text={<>Aún no tienes partidos.<br />Publica tu equipo o tu disponibilidad.</>}
+                action={{ label: "Buscar rival", onClick: () => setTab("rival") }} />
+            )}
           </div>
-        </div>
+        ))}
+      </div>
+
+      {modal?.kind === "publishTeam" && (
+        <PublishTeamSheet isDark={isDark} teams={publishableTeams} hasAnyTeam={captainTeams.length > 0} busy={busy}
+          zone={{ region: filters.region, communes: filters.communes }} onSubmit={publishTeam} onClose={close} />
       )}
+      {modal?.kind === "publishPlayer" && (
+        <PublishPlayerSheet isDark={isDark} me={me} busy={busy} initialSports={filters.sport ? [filters.sport] : matchSport(p.mainSport) ? [matchSport(p.mainSport)!] : []}
+          zone={{ region: filters.region, communes: filters.communes }} onSubmit={publishPlayer} onClose={close} />
+      )}
+      {modal?.kind === "edit" && <EditEntrySheet isDark={isDark} entry={modal.entry} busy={busy} onSubmit={(d) => saveEdit(modal.entry, d)} onClose={close} />}
+      {modal?.kind === "close" && (
+        <ConfirmSheet isDark={isDark} tone="danger" icon={<X size={28} className="text-red-500" />} title="¿Retirar publicación?"
+          message={<>{modal.entry.type === "team" ? modal.entry.teamName : modal.entry.type === "need" ? "La búsqueda de jugadores" : "Tu disponibilidad como jugador"} dejará de aparecer en Partidos.</>}
+          confirmLabel="Retirar" cancelLabel="Volver" busy={busy} onConfirm={() => closeEntry(modal.entry)} onClose={close} />
+      )}
+      {modal?.kind === "team" && (
+        <TeamDetailModal entry={modal.entry} data={teamData} isDark={isDark} actionLoading={busy} onChallenge={askChallenge} onClose={close} />
+      )}
+      {modal?.kind === "player" && (
+        <PlayerDetailModal entry={modal.entry} isDark={isDark} actionLoading={busy} onClose={close}
+          onContact={(e: MatchEntry) => openChat({
+            type: "captain_to_player", captainId: uid, captainName: me.name, playerId: e.userId, playerName: e.displayName || "",
+            sport: filters.sport || e.sports?.[0] || "Fútbol", senderId: uid, receiverId: e.userId || "",
+          })} />
+      )}
+      {modal?.kind === "pickTeam" && (
+        <TeamPickerSheet isDark={isDark} rivalName={modal.entry.teamName || "equipo"} teams={captainTeams} onClose={close}
+          onPick={(t) => setModal({ kind: "challenge", entry: modal.entry, team: t as Team })} />
+      )}
+      {modal?.kind === "challenge" && (
+        <ConfirmSheet isDark={isDark} tone="ok" icon={<Swords size={28} className="text-emerald-500" />} title={`¿Retar a ${modal.entry.teamName}?`}
+          message={<>Con tu equipo <strong>{modal.team.name}</strong> · {modal.entry.sport}</>}
+          confirmLabel="Confirmar reto" busy={busy} onConfirm={() => challenge(modal.entry, modal.team)} onClose={close} />
+      )}
+      {modal?.kind === "challengeDetail" && (
+        <ChallengeDetailSheet isDark={isDark} c={modal.c} uid={uid} data={teamData} busy={busy}
+          onAnswer={(accept) => setModal({ kind: "answer", c: modal.c, accept })} onClose={close} />
+      )}
+      {modal?.kind === "answer" && (
+        <ConfirmSheet isDark={isDark} tone={modal.accept ? "ok" : "danger"}
+          icon={modal.accept ? <CheckCircle2 size={28} className="text-emerald-500" /> : <X size={28} className="text-red-500" />}
+          title={modal.accept ? "¿Aceptar el reto?" : "¿Rechazar el reto?"}
+          message={modal.accept ? "Se abrirá un chat con el capitán rival para coordinar el partido." : "El equipo rival verá que rechazaste el reto."}
+          confirmLabel={modal.accept ? "Aceptar" : "Rechazar"} busy={busy} onConfirm={() => answer(modal.c, modal.accept)} onClose={close} />
+      )}
+      {result && <ResultSheet isDark={isDark} type={result.type} msg={result.msg} onClose={() => setResult(null)} />}
     </div>
   );
 }

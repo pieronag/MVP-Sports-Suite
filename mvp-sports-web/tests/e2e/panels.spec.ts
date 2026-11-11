@@ -296,9 +296,91 @@ test.describe("Partidos (jugador)", () => {
       const playerCard = page.locator("div", { hasText: "Lucía E2E" }).filter({ has: page.getByRole("button", { name: "Ver" }) }).last();
       await playerCard.getByRole("button", { name: "Ver" }).click({ timeout: 30_000 });
       await expect(page.getByText("Juego los sábados").last()).toBeVisible();
+      await page.keyboard.press("Escape");
       expect(errors, errors.join("\n")).toEqual([]);
     } finally {
       await Promise.all([team.delete(), tEntry.delete(), pEntry.delete()]);
+    }
+  });
+
+  test("publica su disponibilidad, valida la edición, la retira y reta a un equipo", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Escribe en la base: basta una vez");
+    test.skip(!(await exists(env.E2E_PLAYER_B_EMAIL)), "Sin datos de prueba");
+    test.setTimeout(150_000);
+    const db = admin().firestore();
+    const A = await admin().auth().getUserByEmail(env.E2E_PLAYER_EMAIL);
+    const B = await admin().auth().getUserByEmail(env.E2E_PLAYER_B_EMAIL);
+    const rival = db.collection("teams").doc("e2e-equipo-rival"), mine = db.collection("teams").doc("e2e-equipo-mio");
+    const rEntry = db.collection("matchmaking").doc("e2e-mm-rival");
+    const cleanup = async () => {
+      const [mm, ch] = await Promise.all([
+        db.collection("matchmaking").where("userId", "==", A.uid).get(),
+        db.collection("challenges").where("senderId", "==", A.uid).get(),
+      ]);
+      await Promise.all([rival.delete(), mine.delete(), rEntry.delete(), ...mm.docs.map((d) => d.ref.delete()), ...ch.docs.map((d) => d.ref.delete())]);
+    };
+    await cleanup();
+    await Promise.all([
+      rival.set({ name: "Rivales E2E", ownerId: B.uid, members: [B.uid], sport: "Pádel" }),
+      mine.set({ name: "Míos E2E", ownerId: A.uid, members: [A.uid], sport: "Pádel" }),
+      rEntry.set({ type: "team", status: "active", userId: B.uid, teamId: rival.id, teamName: "Rivales E2E", sport: "Pádel", region: "O'Higgins", communes: ["Rancagua"], memberCount: 1, createdAt: new Date() }),
+    ]);
+    try {
+      const errors = watchErrors(page);
+      await page.goto("/login");
+      await page.waitForLoadState("networkidle");
+      await page.locator("#email").fill(env.E2E_PLAYER_EMAIL);
+      await page.locator("#password").fill(env.E2E_PLAYER_PASSWORD);
+      await page.locator('button[type="submit"]').click();
+      await expect(page).toHaveURL(/\/player/, { timeout: 30_000 });
+      await page.goto("/player/equipos/partidos?tab=jugadores");
+
+      // Publicar disponibilidad: sin comuna no se puede
+      await page.getByRole("button", { name: "Estoy disponible" }).click({ timeout: 30_000 });
+      const sheet = page.getByRole("dialog", { name: "Estoy disponible" });
+      const padel = sheet.getByRole("button", { name: "Pádel" });
+      if ((await padel.getAttribute("aria-pressed")) !== "true") await padel.click();
+      await sheet.getByRole("combobox").selectOption("O'Higgins");
+      await sheet.getByRole("button", { name: "Publicar disponibilidad" }).click();
+      await expect(sheet.getByRole("alert")).toHaveText(/comuna/);
+      await sheet.getByRole("button", { name: "Rancagua" }).click();
+      await sheet.getByRole("button", { name: "Publicar disponibilidad" }).click();
+      await expect(page.getByText(/Disponibilidad publicada/)).toBeVisible({ timeout: 20_000 });
+      await page.getByRole("button", { name: "Entendido" }).click();
+
+      // Ya publicado: el botón pasa a editar, y no deja quedarse sin deportes
+      await page.getByRole("button", { name: /Ya estás disponible/ }).click({ timeout: 20_000 });
+      const edit = page.getByRole("dialog", { name: "Editar publicación" });
+      for (const b of await edit.getByRole("button", { pressed: true }).all()) await b.click();
+      await edit.getByRole("button", { name: "Guardar cambios" }).click();
+      await expect(edit.getByRole("alert")).toHaveText(/al menos un deporte/);
+      await page.keyboard.press("Escape");
+
+      // Retirarla desde Mis partidos
+      await page.getByRole("tab", { name: /Mis partidos/ }).click();
+      await page.getByRole("button", { name: "Retirar" }).first().click();
+      await page.getByRole("dialog", { name: "¿Retirar publicación?" }).getByRole("button", { name: "Retirar" }).click();
+      await expect(page.getByRole("button", { name: "Retirar" })).toHaveCount(0, { timeout: 20_000 });
+      const left = await db.collection("matchmaking").where("userId", "==", A.uid).where("status", "==", "active").get();
+      expect(left.size).toBe(0);
+
+      // Retar con mi único equipo de capitán: va directo a confirmar
+      await page.getByRole("tab", { name: /Buscar rival/ }).click();
+      await page.getByRole("group", { name: "Deporte" }).getByRole("button", { name: "Pádel" }).click();
+      while ((await page.getByRole("button", { name: "Ver Rivales E2E" }).count()) === 0) {
+        const widen = page.getByRole("button", { name: /^Buscar en/ });
+        if (!(await widen.count())) break;
+        await widen.click();
+      }
+      await page.getByRole("button", { name: "Ver Rivales E2E" }).click({ timeout: 30_000 });
+      await page.getByRole("button", { name: /Retar a este equipo/ }).click({ timeout: 20_000 });
+      await page.getByRole("button", { name: "Confirmar reto" }).click();
+      await expect(page.getByText(/Has retado a Rivales E2E/)).toBeVisible({ timeout: 20_000 });
+      const sent = await db.collection("challenges").where("senderId", "==", A.uid).get();
+      expect(sent.docs.map((d) => d.data())).toEqual([expect.objectContaining({ challengerTeamId: mine.id, challengedTeamId: rival.id, status: "pending", receiverId: B.uid })]);
+      expect(errors, errors.join("\n")).toEqual([]);
+    } finally {
+      await cleanup();
     }
   });
 });
