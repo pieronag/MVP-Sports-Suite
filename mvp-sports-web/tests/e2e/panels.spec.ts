@@ -164,3 +164,22 @@ test.describe("Liquidaciones", () => {
     expect(errors, errors.join("\n")).toEqual([]);
   });
 });
+
+test.describe("Canchas", () => {
+  test("el dueño ve la flota de su recinto y la filtra por nombre", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Basta una vez");
+    test.skip(!(await exists(env.E2E_OWNER_EMAIL)), "Sin dueño de prueba");
+    test.setTimeout(120_000);
+    const errors = watchErrors(page);
+    await login(page, env.E2E_OWNER_EMAIL, env.E2E_OWNER_PASSWORD);
+    await page.goto("/dashboard/courts");
+    // Primero se elige el recinto en la lista
+    await page.getByText("Recinto E2E").first().click({ timeout: 30_000 });
+    await expect(page.getByText("Cancha E2E").first()).toBeVisible({ timeout: 30_000 });
+    await page.getByPlaceholder(/buscar/i).first().fill("no existe");
+    await expect(page.getByText("Cancha E2E")).toHaveCount(0);
+    await page.getByPlaceholder(/buscar/i).first().fill("E2E");
+    await expect(page.getByText("Cancha E2E").first()).toBeVisible();
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+});

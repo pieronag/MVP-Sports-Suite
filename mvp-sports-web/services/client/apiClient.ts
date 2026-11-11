@@ -1,6 +1,11 @@
 import { auth } from "@/services/client/firebase";
 
 // POST a una ruta de API propia con el token de sesión (si hay). Lanza Error con el mensaje del servidor.
+// Error de la API con su código HTTP: 4xx es una respuesta del servidor (no reintentar por otra vía), 5xx una falla
+export class ApiError extends Error {
+  constructor(message: string, public status: number) { super(message); this.name = "ApiError"; }
+}
+
 export async function postApi<T = any>(path: string, body: unknown): Promise<T> {
   const token = await auth.currentUser?.getIdToken().catch(() => undefined);
   const res = await fetch(path, {
@@ -9,7 +14,7 @@ export async function postApi<T = any>(path: string, body: unknown): Promise<T> 
     body: JSON.stringify(body),
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data?.error || `Error ${res.status}`);
+  if (!res.ok) throw new ApiError(data?.error || `Error ${res.status}`, res.status);
   return data as T;
 }
 

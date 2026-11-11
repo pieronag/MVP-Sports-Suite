@@ -1,0 +1,38 @@
+// Canchas: estado de mantenimiento y tarifas por deporte (lógica pura, compartida por la pantalla y la flota)
+import { courtBlockedAt } from "@/utils/courtAvailability";
+import { chileDateTime } from "@/utils/chileTime";
+import { canonicalSport } from "@/utils/sports";
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// Mantenimiento: "En pausa" solo dentro de la ventana; antes de ella queda "Programada"
+export const pausedNow = (c: any) => c.status === 'maintenance' && courtBlockedAt(c, Date.now(), Date.now() + 1);
+const toDateAny = (v: any) => (v?.seconds ? new Date(v.seconds * 1000) : v ? new Date(v) : null);
+export const maintenanceWindow = (c: any) => {
+    const a = toDateAny(c.maintenanceStart), b = toDateAny(c.maintenanceUntil);
+    const day = (d: Date) => d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' });
+    const hour = (d: Date) => d.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
+    if (!b) return 'Sin fecha de término';
+    if (a && day(a) === day(b)) return `${day(a)} · ${hour(a)} – ${hour(b)}`;
+    return `${a ? day(a) + ' – ' : 'Hasta '}${day(b)}`;
+};
+
+// Ventana del formulario de mantenimiento en hora de Chile
+export const maintenanceRange = (f: { type: string; date: string; startTime: string; endTime: string; endDate: string }) => {
+    const hm = (t: string) => t.split(':').map(Number) as [number, number];
+    if (f.type === 'hours') {
+        const [sh, sm] = hm(f.startTime); const [eh, em] = hm(f.endTime);
+        return { start: chileDateTime(f.date, sh, sm || 0), end: chileDateTime(f.date, eh, em || 0) };
+    }
+    return { start: chileDateTime(f.date, 0, 0), end: new Date(chileDateTime(f.endDate, 0, 0, 1).getTime() - 1) };
+};
+
+// Une las tarifas por nombre oficial del deporte; si hay "Pádel" y "Padel", gana la que ya tenía el nombre oficial
+export const mergePricing = (matrix: Record<string, any>, sports: string[]) => {
+    const out: Record<string, any> = {};
+    for (const [k, v] of Object.entries(matrix)) {
+        const c = canonicalSport(k);
+        if (!sports.some(x => canonicalSport(x) === c)) continue;
+        if (!(c in out) || k === c) out[c] = v;
+    }
+    return out;
+};

@@ -35,23 +35,37 @@ export async function POST(request: Request) {
     const fromEmail = emailSettings.fromEmail || process.env.RESEND_FROM_EMAIL || "MVP Sports <noreply@mvpsports.cl>";
     const actionCodeSettings = { url: "https://mvpsports.cl", handleCodeInApp: false };
 
+    // Si el dominio de retorno no está autorizado en Firebase Auth, el enlace se genera sin él (sigue funcionando)
+    const makeLink = async (fn: "generateEmailVerificationLink" | "generatePasswordResetLink") => {
+      try { return await adminAuth()[fn](cleanEmail, actionCodeSettings); }
+      catch (e: any) {
+        if (e?.code !== "auth/unauthorized-continue-uri") throw e;
+        console.warn("auth email: mvpsports.cl no está en los dominios autorizados de Firebase Auth; enlace sin URL de retorno");
+        return adminAuth()[fn](cleanEmail);
+      }
+    };
+
     let actionLink = "";
     let subject = "", title = "", description = "", buttonText = "";
     try {
       if (type === "verify") {
-        actionLink = await adminAuth().generateEmailVerificationLink(cleanEmail, actionCodeSettings);
+        actionLink = await makeLink("generateEmailVerificationLink");
         subject = "Verifica tu correo electrónico - MVP Sports";
         title = "Activa tu Cuenta";
         description = `Hola, ${name}. Gracias por unirte a MVP Sports. Para activar tu cuenta y poder iniciar sesión en la aplicación móvil y el panel de control, haz clic en el botón de abajo:`;
         buttonText = "Verificar Cuenta";
       } else {
-        actionLink = await adminAuth().generatePasswordResetLink(cleanEmail, actionCodeSettings);
+        actionLink = await makeLink("generatePasswordResetLink");
         subject = "Restablece tu contraseña - MVP Sports";
         title = "Restablece tu Contraseña";
         description = `Hola, ${name}. Hemos recibido una solicitud para restablecer tu contraseña. Si no realizaste esta solicitud, puedes ignorar este correo. De lo contrario, haz clic en el siguiente botón para continuar:`;
         buttonText = "Restablecer Contraseña";
       }
     } catch (e: any) {
+      // Límite propio de Firebase para un mismo correo: avisar que espere (no es una falla del servidor)
+      if (/EXCEED_LIMIT|TOO_MANY_ATTEMPTS/.test(String(e?.message) + JSON.stringify(e?.httpResponse?.data || ""))) {
+        return NextResponse.json({ error: "Demasiadas solicitudes para este correo. Intenta de nuevo más tarde." }, { status: 429 });
+      }
       // Respuesta idéntica exista o no la cuenta (evita enumerar correos)
       if (e?.code === "auth/user-not-found" || e?.code === "auth/email-not-found") return NextResponse.json({ success: true });
       // Firebase a veces responde "internal-error" para correos inexistentes: se confirma antes de fallar

@@ -1,4 +1,7 @@
 "use client";
+import CourtFleet from "@/components/courts/CourtFleet";
+import { PanelHeader, StatMini } from "@/components/courts/ui";
+import { maintenanceRange, mergePricing } from "@/utils/courtConfig";
 import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { useFeedback } from "@/components/ui/Feedback";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
@@ -6,8 +9,6 @@ import { canonicalSport } from "@/utils/sports";
 import { postApi } from "@/services/client/apiClient";
 import { listBookings } from "@/services/client/data/bookings";
 import { normalizeBooking, isReal } from "@/utils/bookingModel";
-import { chileDateTime } from "@/utils/chileTime";
-import { courtBlockedAt } from "@/utils/courtAvailability";
 import { uploadImage } from "@/services/client/imageUpload";
 import { HugeiconsIcon } from "@hugeicons/react";
 import React, { useState, useEffect, useRef } from 'react';
@@ -16,8 +17,6 @@ import { db } from '@/services/client/firebase';
 import { collection, getDocs, query, where, doc, updateDoc, addDoc, deleteDoc, deleteField } from 'firebase/firestore';
 import { auditService } from '@/services/client/auditService';
 import {
-    Add01Icon,
-    Alert02Icon,
     ArrowDown01Icon,
     ArrowLeft01Icon,
     Camera01Icon,
@@ -26,29 +25,18 @@ import {
     Image01Icon,
     MapPinIcon,
     PencilEdit02Icon,
-    PuzzleIcon,
     RefreshIcon,
     Settings01Icon,
     Delete02Icon,
     TrophyIcon,
-    Wrench01Icon,
     FootballIcon,
     FootballPitchIcon,
     Store01Icon,
     ChartIncreaseIcon,
-    Search01Icon,
     Copy01Icon,
     MagicWand01Icon,
     Layers01Icon,
-    UmbrellaIcon,
-    LightbulbIcon,
-    BrickWallIcon,
-    CircleDotIcon,
-    Leaf01Icon,
-    Sun01Icon,
-    Video01Icon,
-    Diamond01Icon,
-} from '@hugeicons/core-free-icons';
+    } from '@hugeicons/core-free-icons';
 import VenueCard from '@/components/courts/VenueCard';
 import CourtModal from '@/components/courts/CourtModal';
 import MaintenanceModal from '@/components/courts/MaintenanceModal';
@@ -110,103 +98,17 @@ interface Court {
     maintenanceStart?: any;
 }
 
-function PanelHeader({ titulo, desc, icon: Icon, action }: any) {
-    let content: React.ReactNode;
-    if (React.isValidElement(Icon)) {
-        content = Icon;
-    } else if (Array.isArray(Icon)) {
-        content = <HugeiconsIcon icon={Icon} className="w-4 h-4" strokeWidth={1.8} />;
-    } else {
-        content = <Icon className="w-4 h-4" />;
-    }
-    return (
-        <div className="flex items-center justify-between gap-4 px-6 lg:px-7 py-4 border-b border-slate-100 dark:border-white/5">
-            <div className="flex items-center gap-3 min-w-0">
-                <span className="text-emerald-600 dark:text-[#00df82] shrink-0">{content}</span>
-                <div className="min-w-0">
-                    <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white truncate font-heading">{titulo}</h3>
-                    <p className="text-xs md:text-[10px] font-bold text-slate-400 truncate">{desc}</p>
-                </div>
-            </div>
-            {action}
-        </div>
-    );
-}
-
-function StatMini({ label, value }: { label: string; value: number }) {
-    return (
-        <div className="p-3 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
-            <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase tracking-wider mb-1">{label}</p>
-            <p className="text-lg font-black text-slate-900 dark:text-white font-mono leading-none">{value}</p>
-        </div>
-    );
-}
-
-const ConfirmModal = ({ isOpen, title, message, onConfirm, onCancel, isDestructive = false }: any) => {
-    if (!isOpen) return null;
-    return (
-        <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn" onClick={onCancel}>
-            <div className="bg-white dark:bg-[#0B0F19] rounded-md shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-sm p-6 overflow-hidden relative" onClick={(e) => e.stopPropagation()}>
-                <div className={`absolute top-0 left-0 w-full h-1 ${isDestructive ? 'bg-red-500' : 'bg-emerald-500'}`}></div>
-                <h3 className="text-lg font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tighter leading-none">{title}</h3>
-                <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-8 uppercase leading-relaxed">{message}</p>
-                <div className="flex gap-3 justify-end">
-                    <button onClick={onCancel} className="px-5 py-2.5 text-xs md:text-[10px] font-black uppercase tracking-widest rounded-md bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:bg-slate-200 transition-all">Cancelar</button>
-                    <button onClick={onConfirm} className={`px-6 py-2.5 text-xs md:text-[10px] font-black uppercase tracking-widest rounded-md text-white shadow-lg transition-all active:scale-95 ${isDestructive ? 'bg-red-600 shadow-red-500/20' : 'bg-emerald-600 shadow-emerald-500/20'}`}>Confirmar</button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// Mantenimiento: "En pausa" solo dentro de la ventana; antes de ella queda "Programada"
-const pausedNow = (c: any) => c.status === 'maintenance' && courtBlockedAt(c, Date.now(), Date.now() + 1);
-const toDateAny = (v: any) => (v?.seconds ? new Date(v.seconds * 1000) : v ? new Date(v) : null);
-const maintenanceWindow = (c: any) => {
-    const a = toDateAny(c.maintenanceStart), b = toDateAny(c.maintenanceUntil);
-    const day = (d: Date) => d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short' });
-    const hour = (d: Date) => d.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false });
-    if (!b) return 'Sin fecha de término';
-    if (a && day(a) === day(b)) return `${day(a)} · ${hour(a)} – ${hour(b)}`;
-    return `${a ? day(a) + ' – ' : 'Hasta '}${day(b)}`;
-};
-
-// Ventana del formulario de mantenimiento en hora de Chile
-const maintenanceRange = (f: { type: string; date: string; startTime: string; endTime: string; endDate: string }) => {
-    const hm = (t: string) => t.split(':').map(Number) as [number, number];
-    if (f.type === 'hours') {
-        const [sh, sm] = hm(f.startTime); const [eh, em] = hm(f.endTime);
-        return { start: chileDateTime(f.date, sh, sm || 0), end: chileDateTime(f.date, eh, em || 0) };
-    }
-    return { start: chileDateTime(f.date, 0, 0), end: new Date(chileDateTime(f.endDate, 0, 0, 1).getTime() - 1) };
-};
-
-// Une las tarifas por nombre oficial del deporte; si hay "Pádel" y "Padel", gana la que ya tenía el nombre oficial
-const mergePricing = (matrix: Record<string, any>, sports: string[]) => {
-    const out: Record<string, any> = {};
-    for (const [k, v] of Object.entries(matrix)) {
-        const c = canonicalSport(k);
-        if (!sports.some(x => canonicalSport(x) === c)) continue;
-        if (!(c in out) || k === c) out[c] = v;
-    }
-    return out;
-};
-
 export default function CourtsPage() {
     const { user, role, firestoreUser } = useAuth();
 
     // ESTADOS
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
     const [venues, setVenues] = useState<Venue[]>([]);
     const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
     const [courts, setCourts] = useState<Court[]>([]);
     const [activeTab, setActiveTab] = useState<'config' | 'courts'>('config');
     const [dirty, setDirty] = useState(false);
     const markDirty = () => setDirty(true);
-    const [confirmData, setConfirmData] = useState<{ isOpen: boolean, title: string, message: string, action: () => void, isDestructive: boolean }>({
-        isOpen: false, title: '', message: '', action: () => { }, isDestructive: false
-    });
 
     // CONFIGURACIÓN
     const [weeklySchedule, setWeeklySchedule] = useState<WeeklySchedule>(DEFAULT_WEEKLY_SCHEDULE);
@@ -223,8 +125,6 @@ export default function CourtsPage() {
     const isSportSelected = (sport: string) => selectedSports.some(s => normalizeSport(s) === normalizeSport(sport));
 
     // FILTRO Y MODAL
-    const [filterSport, setFilterSport] = useState<string>('Todos');
-    const [searchCourt, setSearchCourt] = useState<string>('');
     const [isCourtModalOpen, setIsCourtModalOpen] = useState(false);
     const [editingCourtId, setEditingCourtId] = useState<string | null>(null);
     const [courtForm, setCourtForm] = useState({ name: '', sport: '', surface: '', features: [] as string[] });
@@ -246,7 +146,7 @@ export default function CourtsPage() {
 
     // TOASTS
 
-    const { toast: showToast } = useFeedback();
+    const { toast: showToast, confirm } = useFeedback();
 
     // Comprime y sube a Storage; devuelve la URL (antes: base64 dentro de Firestore)
     const compressImage = (file: File): Promise<string> => uploadImage(file, { folder: "courts", maxSize: 1200, quality: 0.75 });
@@ -291,7 +191,7 @@ export default function CourtsPage() {
                     setSelectedVenue(firstVenue);
                 }
             }
-        } catch (error) {
+        } catch {
             showToast("Error al cargar recintos", "error");
         } finally {
             setLoading(false);
@@ -386,7 +286,7 @@ export default function CourtsPage() {
                 setSelectedVenue({ ...selectedVenue, gallery: newGallery });
                 setVenues(prev => prev.map(v => v.id === selectedVenue.id ? { ...v, gallery: newGallery } : v));
                 showToast("Foto añadida a galería", 'success');
-            } catch (error) {
+            } catch {
                 showToast("Error al subir foto", 'error');
             }
         }
@@ -401,7 +301,7 @@ export default function CourtsPage() {
             setSelectedVenue({ ...selectedVenue, gallery: newGallery });
             setVenues(prev => prev.map(v => v.id === selectedVenue.id ? { ...v, gallery: newGallery } : v));
             showToast("Foto eliminada", 'success');
-        } catch (error) {
+        } catch {
             showToast("Error al eliminar foto", 'error');
         }
     };
@@ -641,38 +541,31 @@ export default function CourtsPage() {
             showToast("No se pudo verificar si la cancha tiene reservas. Intenta nuevamente.", 'error');
             return;
         }
-        setConfirmData({
-            isOpen: true,
-            title: "Eliminar Activo",
-            message: "¿Seguro que deseas eliminar esta cancha permanentemente? Esta acción es irreversible.",
-            isDestructive: true,
-            action: async () => {
-                try {
-                    await deleteDoc(doc(db, "courts", courtId));
-                    setCourts(courts.filter(c => c.id !== courtId));
-                    setVenues(prev => prev.map(v => v.id === selectedVenue?.id ? { ...v, realCourtCount: Math.max(0, (v.realCourtCount || 0) - 1) } : v));
-                    showToast("Cancha eliminada", 'success');
+        if (!(await confirm({ title: "Eliminar Activo", message: "¿Seguro que deseas eliminar esta cancha permanentemente? Esta acción es irreversible.", tone: "danger" }))) return;
+            try {
+                await deleteDoc(doc(db, "courts", courtId));
+                setCourts(courts.filter(c => c.id !== courtId));
+                setVenues(prev => prev.map(v => v.id === selectedVenue?.id ? { ...v, realCourtCount: Math.max(0, (v.realCourtCount || 0) - 1) } : v));
+                showToast("Cancha eliminada", 'success');
 
-                    await auditService.logAuditEvent({
-                        action: 'CANCHA_ELIMINAR',
-                        module: 'Infraestructura/Canchas',
-                        details: `Cancha ${courtToDelete?.name || ''} (${courtId}) eliminada del recinto ${selectedVenue?.name}.`,
-                        severity: 'MEDIUM',
-                        status: 'SUCCESS'
-                    });
-                } catch (e: any) {
-                    showToast("Error al eliminar", 'error');
-                    await auditService.logAuditEvent({
-                        action: 'CANCHA_ELIMINAR',
-                        module: 'Infraestructura/Canchas',
-                        details: `Falla al eliminar cancha ${courtToDelete?.name || ''} (${courtId}). Error: ${e.message || e}`,
-                        severity: 'MEDIUM',
-                        status: 'FAILED'
-                    });
-                }
-                setConfirmData(prev => ({ ...prev, isOpen: false }));
+                await auditService.logAuditEvent({
+                    action: 'CANCHA_ELIMINAR',
+                    module: 'Infraestructura/Canchas',
+                    details: `Cancha ${courtToDelete?.name || ''} (${courtId}) eliminada del recinto ${selectedVenue?.name}.`,
+                    severity: 'MEDIUM',
+                    status: 'SUCCESS'
+                });
+            } catch (e: any) {
+                showToast("Error al eliminar", 'error');
+                await auditService.logAuditEvent({
+                    action: 'CANCHA_ELIMINAR',
+                    module: 'Infraestructura/Canchas',
+                    details: `Falla al eliminar cancha ${courtToDelete?.name || ''} (${courtId}). Error: ${e.message || e}`,
+                    severity: 'MEDIUM',
+                    status: 'FAILED'
+                });
             }
-        });
+            
     };
 
     const handleOpenMaintenance = (court: Court) => { setMaintenanceCourt(court); setMaintenanceConflicts([]); setIsMaintenanceModalOpen(true); };
@@ -702,24 +595,17 @@ export default function CourtsPage() {
         if (conflicts === null || conflicts === undefined) return;
         if (conflicts.length > 0) {
             const total = conflicts.reduce((acc: number, c: any) => acc + Number(c.price || 0), 0);
-            setConfirmData({
-                isOpen: true,
-                title: "Hay reservas pagadas",
-                message: `${conflicts.length === 1 ? 'Hay 1 reserva pagada' : `Hay ${conflicts.length} reservas pagadas`} en ese periodo (${conflicts.map((c: any) => `${c.clientName} ${c.startTime}`).join(', ')}). Si continúas, se anularán y se devolverá el 100% ($${formatPrice(total)}) a cada cliente por Mercado Pago.`,
-                isDestructive: true,
-                action: async () => {
-                    setConfirmData(prev => ({ ...prev, isOpen: false }));
-                    const failed: string[] = [];
-                    for (const c of conflicts) {
-                        try {
-                            const r = await postApi<{ success: boolean }>('/api/bookings/cancel', { bookingId: c.id, reason: 'Mantenimiento de cancha' });
-                            if (!r.success) failed.push(`${c.clientName} ${c.startTime} (reembolso pendiente)`);
-                        } catch (e: any) { failed.push(`${c.clientName} ${c.startTime}: ${e?.message || 'error'}`); }
-                    }
-                    await executeMaintenanceUpdate();
-                    if (failed.length) showToast(`Mantenimiento activado. Revisa: ${failed.join('; ')}`, 'error');
+            if (!(await confirm({ title: "Hay reservas pagadas", message: `${conflicts.length === 1 ? 'Hay 1 reserva pagada' : `Hay ${conflicts.length} reservas pagadas`} en ese periodo (${conflicts.map((c: any) => `${c.clientName} ${c.startTime}`).join(', ')}). Si continúas, se anularán y se devolverá el 100% ($${formatPrice(total)}) a cada cliente por Mercado Pago.`, tone: "danger" }))) return;
+                const failed: string[] = [];
+                for (const c of conflicts) {
+                    try {
+                        const r = await postApi<{ success: boolean }>('/api/bookings/cancel', { bookingId: c.id, reason: 'Mantenimiento de cancha' });
+                        if (!r.success) failed.push(`${c.clientName} ${c.startTime} (reembolso pendiente)`);
+                    } catch (e: any) { failed.push(`${c.clientName} ${c.startTime}: ${e?.message || 'error'}`); }
                 }
-            });
+                await executeMaintenanceUpdate();
+                if (failed.length) showToast(`Mantenimiento activado. Revisa: ${failed.join('; ')}`, 'error');
+                
             return;
         }
         await executeMaintenanceUpdate();
@@ -779,33 +665,8 @@ export default function CourtsPage() {
         }
     };
 
-    // FUNCIONES SECUNDARIAS
-    const filteredCourts = courts.filter(c => (filterSport === 'Todos' ? true : normalizeSport(c.sport) === normalizeSport(filterSport)))
-        .filter(c => searchCourt.trim() === '' ? true : c.name.toLowerCase().includes(searchCourt.trim().toLowerCase()));
-    const sportOrder: any = {};
-    selectedSports.forEach((s, i) => { sportOrder[normalizeSport(s)] = i; });
-    const sortedCourts = [...filteredCourts].sort((a, b) => {
-        const oa = sportOrder[normalizeSport(a.sport)] ?? 999;
-        const ob = sportOrder[normalizeSport(b.sport)] ?? 999;
-        if (oa !== ob) return oa - ob;
-        const ma = a.status === 'maintenance' ? 1 : 0;
-        const mb = b.status === 'maintenance' ? 1 : 0;
-        if (ma !== mb) return ma - mb;
-        return a.name.localeCompare(b.name, 'es', { sensitivity: 'base' });
-    });
-
-    const FEATURE_ICONS: any = {
-        'Techada': UmbrellaIcon,
-        'Iluminación LED': LightbulbIcon,
-        'Muro Panorámico': BrickWallIcon,
-        'Pista Central': CircleDotIcon,
-        'Césped FIFA': Leaf01Icon,
-        'Outdoor (Aire Libre)': Sun01Icon,
-        'Grabación de Partidos': Video01Icon,
-        'Cristal Templado': Diamond01Icon,
-    };
-
     const courtsBySport = (sport: string) => courts.filter(c => normalizeSport(c.sport) === normalizeSport(sport)).length;
+    const formatPrice = (n: number) => n.toLocaleString('es-CL');
 
     // PROGRESO DE CONFIGURACIÓN
     const configSteps = [
@@ -816,22 +677,6 @@ export default function CourtsPage() {
         { label: 'Tarifas', done: selectedSports.some(s => timeSlots.some(t => ((pricingMatrix[s]?.weekday?.[t] ?? 0) > 0) || ((pricingMatrix[s]?.weekend?.[t] ?? 0) > 0))) },
     ];
     const configDoneCount = configSteps.filter(s => s.done).length;
-
-    const courtBasePrice = (sport: string) => {
-        const anyPricing = pricingMatrix[sport] || {};
-        // Ambas tablas por separado: al mezclarlas como objeto, el fin de semana
-        // pisaba los precios de semana del mismo horario y el "Desde" salía mal.
-        const prices = [...Object.values(anyPricing.weekday || {}), ...Object.values(anyPricing.weekend || {})].map(Number).filter(p => p > 0);
-        return prices.length > 0 ? Math.min(...prices) : 0;
-    };
-
-    const formatPrice = (n: number) => n.toLocaleString('es-CL');
-
-    const activeCount = courts.filter(c => !pausedNow(c)).length;
-    const maintenanceCount = courts.length - activeCount;
-    const noPriceSports = selectedSports.filter(s => courtBasePrice(s) === 0).length;
-    const pctActive = courts.length > 0 ? Math.round((activeCount / courts.length) * 100) : 0;
-    const pctMaint = courts.length > 0 ? Math.round((maintenanceCount / courts.length) * 100) : 0;
 
     const totalCourts = venues.reduce((acc, v) => acc + (v.realCourtCount || 0), 0);
     const sportsSet = new Set<string>();
@@ -881,15 +726,6 @@ export default function CourtsPage() {
 
 return (
         <div className="w-full space-y-6 pb-28 text-left relative animate-fadeIn">
-            <ConfirmModal
-                isOpen={confirmData.isOpen}
-                title={confirmData.title}
-                message={confirmData.message}
-                onConfirm={confirmData.action}
-                onCancel={() => setConfirmData(prev => ({ ...prev, isOpen: false }))}
-                isDestructive={confirmData.isDestructive}
-            />
-
             {/* BREADCRUMB */}
             <div className="flex items-center gap-2 text-xs md:text-[10px] font-black uppercase tracking-wider">
                 <button onClick={() => setSelectedVenue(null)} className="text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] transition-colors">Recintos</button>
@@ -1220,203 +1056,9 @@ return (
                         </div>
                     </>
                 ) : (
-                    <div className="lg:col-span-12 space-y-6 animate-fadeIn">
-                        {/* HEADER + FLOTA + FILTROS */}
-                        <div className="bg-white dark:bg-slate-900/50 rounded-md border border-slate-200 dark:border-white/5 overflow-hidden">
-                            <PanelHeader
-                                titulo="Unidades del recinto"
-                                desc={`Canchas integradas en ${selectedVenue.name}`}
-                                icon={Grid02Icon}
-                                action={
-                                    <button onClick={handleOpenCreate} className="flex items-center justify-center gap-2.5 px-6 py-3 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-xs md:text-[10px] uppercase rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all">
-                                        <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" /> Integrar cancha
-                                    </button>
-                                }
-                            />
-                            <div className="p-6 lg:p-7 space-y-5">
-                                {/* ESTADO DE LA FLOTA */}
-                                <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
-                                    <div className="flex items-center gap-2.5">
-                                        <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-[#00df82]"></span>
-                                        <p className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-300">Activas <span className="font-mono text-emerald-600 dark:text-[#00df82]">{activeCount}</span></p>
-                                    </div>
-                                    <div className="flex items-center gap-2.5">
-                                        <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                                        <p className="text-xs md:text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-300">En pausa <span className="font-mono text-red-500">{maintenanceCount}</span></p>
-                                    </div>
-                                    {noPriceSports > 0 && (
-                                        <div className="flex items-center gap-2.5 text-amber-500">
-                                            <HugeiconsIcon icon={Alert02Icon} className="w-3.5 h-3.5" strokeWidth={2} />
-                                            <p className="text-xs md:text-[10px] font-black uppercase tracking-widest">{noPriceSports} deporte{noPriceSports > 1 ? 's' : ''} sin tarifa</p>
-                                        </div>
-                                    )}
-                                    <div className="ml-auto flex items-center gap-4 min-w-[220px]">
-                                        <div className="flex-1 h-2 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden flex">
-                                            <div className="h-full bg-emerald-500 dark:bg-[#00df82] transition-all" style={{ width: `${pctActive}%` }} />
-                                            <div className="h-full bg-red-500 transition-all" style={{ width: `${pctMaint}%` }} />
-                                        </div>
-                                        <span className="text-xs md:text-[10px] font-black uppercase text-slate-400 tracking-widest">{sortedCourts.length} {sortedCourts.length === 1 ? 'cancha' : 'canchas'}</span>
-                                    </div>
-                                </div>
-
-                                {/* FILTROS */}
-                                <div className="flex flex-wrap items-center gap-3 pt-5 border-t border-slate-100 dark:border-white/5">
-                                    <span className="px-4 text-[11px] md:text-[9px] font-black uppercase tracking-widest text-slate-400 shrink-0">Filtrar por deporte</span>
-                                    <div className="flex flex-wrap items-center gap-2 p-1 bg-slate-100 dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10">
-                                        <button onClick={() => setFilterSport('Todos')} className={`flex items-center gap-1.5 px-6 py-2.5 text-xs md:text-[10px] font-black uppercase rounded-md transition-all ${filterSport === 'Todos' ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
-                                            Todos <span className={`inline-flex items-center px-1.5 py-0.5 rounded-md text-[11px] md:text-[8px] font-mono ${filterSport === 'Todos' ? 'bg-white/20 text-white' : 'bg-white dark:bg-white/10 text-slate-400'}`}>{courts.length}</span>
-                                        </button>
-                                        {selectedSports.map(s => <button key={s} onClick={() => setFilterSport(s)} className={`flex items-center gap-1.5 px-6 py-2.5 text-xs md:text-[10px] font-black uppercase rounded-md transition-all ${filterSport === s ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
-                                            {s} <span className={`inline-flex items-center px-1.5 py-0.5 rounded-md text-[11px] md:text-[8px] font-mono ${filterSport === s ? 'bg-white/20 text-white' : 'bg-white dark:bg-white/10 text-slate-400'}`}>{courtsBySport(s)}</span>
-                                        </button>)}
-                                    </div>
-                                    <div className="ml-auto flex items-center gap-3">
-                                        <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 dark:text-white/20"><HugeiconsIcon icon={Search01Icon} className="w-4 h-4" strokeWidth={2} /></span>
-                                            <input
-                                                type="text"
-                                                value={searchCourt}
-                                                onChange={e => setSearchCourt(e.target.value)}
-                                                placeholder="Buscar cancha..."
-                                                className="w-56 pl-9 pr-3 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-black outline-hidden focus:border-emerald-500 placeholder:text-slate-300 dark:placeholder:text-white/20"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-                            {sortedCourts.map(c => {
-                                const sportAccent: any = {
-                                    'Fútbol': 'bg-emerald-500', 'Futbolito': 'bg-emerald-400', 'Pádel': 'bg-orange-500',
-                                    'Tenis': 'bg-sky-500', 'Básquetbol': 'bg-indigo-500', 'Vóleibol': 'bg-purple-500',
-                                };
-                                const sportTile: any = {
-                                    'Fútbol': 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-[#00df82]', 'Futbolito': 'bg-emerald-50 dark:bg-emerald-400/10 text-emerald-500',
-                                    'Pádel': 'bg-orange-50 dark:bg-orange-500/10 text-orange-500', 'Tenis': 'bg-sky-50 dark:bg-sky-500/10 text-sky-500',
-                                    'Básquetbol': 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500', 'Vóleibol': 'bg-purple-50 dark:bg-purple-500/10 text-purple-500',
-                                };
-                                const accent = sportAccent[c.sport] || 'bg-slate-400';
-                                const tile = sportTile[c.sport] || 'bg-slate-50 dark:bg-white/5 text-slate-400';
-                                const courtSportIcon = (() => {
-                                    const n = normalizeSport(c.sport);
-                                    if (n === 'futbol' || n === 'futbolito') return <SoccerIcon className="w-5 h-5" />;
-                                    if (n === 'padel') return <PadelIcon className="w-5 h-5" />;
-                                    if (n === 'tenis') return <TennisIcon className="w-5 h-5" />;
-                                    if (n === 'basquetbol') return <BasketballIcon className="w-5 h-5" />;
-                                    if (n === 'voleibol') return <VolleyballIcon className="w-5 h-5" />;
-                                    return <HugeiconsIcon icon={FootballIcon} className="w-5 h-5" strokeWidth={1.8} />;
-                                })();
-                                return (
-                                <div key={c.id} className="bg-white dark:bg-slate-900/50 rounded-md border border-slate-200 dark:border-white/5 shadow-xs relative group hover:border-emerald-500/30 hover:shadow-lg hover:shadow-slate-200/50 dark:hover:shadow-none transition-all overflow-hidden flex flex-col">
-                                    <div className={`h-1 w-full ${accent}`} />
-                                    <div className="p-4 flex flex-col flex-1">
-                                        {/* ESTADO + ACCIONES */}
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest border ${c.status === 'maintenance' ? 'bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20 text-red-500' : 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-[#00df82]'}`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full ${c.status === 'maintenance' ? 'bg-red-500' : 'bg-emerald-500 dark:bg-[#00df82]'}`} />
-                                                {pausedNow(c) ? 'En pausa' : c.status === 'maintenance' ? 'Programada' : 'Activo'}
-                                            </div>
-                                            <div className="flex gap-1.5">
-                                                <button onClick={() => handleOpenEdit(c)} className="p-2 bg-slate-50 dark:bg-white/5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-emerald-400/40 border border-transparent transition-all" title="Editar"><HugeiconsIcon icon={PencilEdit02Icon} className="w-3.5 h-3.5" /></button>
-                                                <button onClick={() => handleDeleteCourt(c.id)} className="p-2 bg-slate-50 dark:bg-white/5 rounded-md text-slate-400 hover:text-red-500 border border-transparent transition-all" title="Eliminar"><HugeiconsIcon icon={Delete02Icon} className="w-3.5 h-3.5" /></button>
-                                            </div>
-                                        </div>
-
-                                        {/* IDENTIDAD */}
-                                        <div className="flex items-center gap-3 mb-4">
-                                            <span className={`w-11 h-11 rounded-md flex items-center justify-center shrink-0 ${tile}`}>
-                                                {courtSportIcon}
-                                            </span>
-                                            <div className="min-w-0">
-                                                <h4 className="text-[14px] font-black text-slate-900 dark:text-white uppercase truncate tracking-tighter leading-none font-heading">{c.name}</h4>
-                                                <div className="flex items-center gap-2 mt-1.5">
-                                                    <span className="text-[11px] md:text-[9px] font-black uppercase tracking-widest text-slate-400">{c.sport}</span>
-                                                    {courtBasePrice(c.sport) > 0 ? (
-                                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-[#00df82] text-[11px] md:text-[8px] font-black font-mono">
-                                                            Desde ${formatPrice(courtBasePrice(c.sport))}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 text-amber-600 dark:text-amber-400 text-[11px] md:text-[8px] font-black uppercase">
-                                                            <HugeiconsIcon icon={Alert02Icon} className="w-2.5 h-2.5" strokeWidth={2} /> Sin tarifa
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {c.status === 'maintenance' && c.maintenanceUntil && (
-                                            <div className="mb-3 px-2.5 py-1.5 rounded-md bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20">
-                                                <p className="text-[11px] md:text-[9px] font-black uppercase tracking-widest text-red-500 flex items-center gap-1.5">
-                                                    <HugeiconsIcon icon={Alert02Icon} className="w-3 h-3" strokeWidth={2} /> {maintenanceWindow(c)}
-                                                </p>
-                                            </div>
-                                        )}
-
-                                        {/* DATOS TÉCNICOS */}
-                                        <div className="grid grid-cols-3 gap-2 py-3.5 border-t border-slate-100 dark:border-white/5">
-                                            <div className="space-y-1">
-                                                <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase">Superficie</p>
-                                                <p className="text-[11px] md:text-[9px] font-black text-slate-600 dark:text-slate-300 truncate">{c.surface || '—'}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase">Tarifa</p>
-                                                <p className={`text-[11px] md:text-[9px] font-black font-mono truncate ${courtBasePrice(c.sport) > 0 ? 'text-emerald-600 dark:text-[#00df82]' : 'text-amber-500'}`}>
-                                                    {courtBasePrice(c.sport) > 0 ? `$${formatPrice(courtBasePrice(c.sport))}` : 'Sin tarifa'}
-                                                </p>
-                                            </div>
-                                            <div className="space-y-1 text-right">
-                                                <p className="text-[11px] md:text-[8px] font-bold text-slate-400 uppercase">ID</p>
-                                                <p className="text-[11px] md:text-[9px] font-black text-slate-400 font-mono">#{c.id.slice(0, 4).toUpperCase()}</p>
-                                            </div>
-                                        </div>
-
-                                        {(c.features || []).length > 0 && (
-                                            <div className="flex flex-wrap gap-2 pt-3">
-                                                {c.features.slice(0, 3).map(f => (
-                                                    <span key={f} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs md:text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase">
-                                                        {FEATURE_ICONS[f] && <HugeiconsIcon icon={FEATURE_ICONS[f]} className="w-3.5 h-3.5 text-emerald-600 dark:text-[#00df82]" strokeWidth={2} />} {f}
-                                                    </span>
-                                                ))}
-                                                {c.features.length > 3 && (
-                                                    <span className="inline-flex items-center px-3 py-1 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs md:text-[10px] font-bold text-slate-400 uppercase">+{c.features.length - 3}</span>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        {/* ACCIÓN */}
-                                        <div className="mt-auto pt-4">
-                                            {c.status === 'maintenance' ? (
-                                                <button onClick={() => handleRestoreCourt(c.id)} className="w-full py-2.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest transition-all hover:brightness-110 flex items-center justify-center gap-2">
-                                                    <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-3.5 h-3.5" strokeWidth={2} /> Restaurar
-                                                </button>
-                                            ) : (
-                                                <button onClick={() => handleOpenMaintenance(c)} className="w-full py-2.5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-300 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest transition-all hover:bg-red-500 hover:text-white flex items-center justify-center gap-2">
-                                                    <HugeiconsIcon icon={Wrench01Icon} className="w-3.5 h-3.5" strokeWidth={2} /> Mantenimiento
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                );
-                            })}
-                            {sortedCourts.length === 0 && (
-                                <div className="col-span-full py-32 text-center space-y-5">
-                                    <div className="w-24 h-24 bg-slate-50 dark:bg-white/5 rounded-md flex items-center justify-center mx-auto text-slate-300 border border-slate-200 dark:border-white/10">
-                                        <HugeiconsIcon icon={PuzzleIcon} className="w-12 h-12" strokeWidth={1.4} />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <p className="text-[13px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-widest leading-none">Cero canchas registradas</p>
-                                        <p className="text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-2">Agrega nuevas unidades para expandir tu infraestructura</p>
-                                    </div>
-                                    <button onClick={handleOpenCreate} className="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black font-black text-xs md:text-[10px] uppercase rounded-md shadow-xl shadow-emerald-500/25 hover:brightness-110 active:scale-95 transition-all">
-                                        <HugeiconsIcon icon={Add01Icon} className="w-4 h-4" /> Integrar primera cancha
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                    <CourtFleet courts={courts} selectedSports={selectedSports} pricingMatrix={pricingMatrix} venueName={selectedVenue.name}
+                        onCreate={handleOpenCreate} onEdit={handleOpenEdit} onMaintenance={handleOpenMaintenance}
+                        onRestore={handleRestoreCourt} onDelete={handleDeleteCourt} />
                 )}
             </div>
 

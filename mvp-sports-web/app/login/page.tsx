@@ -137,8 +137,10 @@ export default function LoginPage() {
       await emailService.sendAuthEmail(email.trim(), "reset");
       setError("");
       setResendStatus("Si el correo está registrado, te enviamos un enlace para restablecer tu contraseña.");
-    } catch {
-      setResendStatus("No se pudo enviar el correo. Inténtalo más tarde.");
+    } catch (e) {
+      // Límite de intentos: decirlo tal cual; cualquier otra falla, mensaje genérico
+      const status = (e as { status?: number }).status;
+      setResendStatus(status === 429 ? (e as Error).message : "No se pudo enviar el correo. Inténtalo más tarde.");
     } finally {
       setResending(false);
     }

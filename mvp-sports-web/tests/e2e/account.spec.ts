@@ -35,10 +35,12 @@ test.describe("Cuenta y acceso", () => {
     await expect(page).toHaveURL(/\/dashboard\/?$/, { timeout: 20_000 });
   });
 
-  test("recuperar contraseña muestra el aviso neutro", async ({ page }) => {
+  test("recuperar contraseña muestra el aviso neutro (también si el correo no existe)", async ({ page }, testInfo) => {
     await page.goto("/login");
     await page.waitForLoadState("networkidle");
-    await page.locator("#email").fill(env.E2E_MANAGER_EMAIL);
+    // Correo inexistente (uno por proyecto, por el límite de intentos): no se envía nada real y la respuesta
+    // debe ser la misma que para una cuenta registrada (no revela qué correos existen)
+    await page.locator("#email").fill(`e2e.no-existe-${testInfo.project.name}@example.test`);
     await page.getByRole("button", { name: /olvidaste tu contraseña/i }).click();
     await expect(page.getByText(/si el correo está registrado, te enviamos un enlace/i)).toBeVisible({ timeout: 20_000 });
   });

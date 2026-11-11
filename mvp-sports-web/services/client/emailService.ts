@@ -1,5 +1,5 @@
 import { auth } from '@/services/client/firebase';
-import { postApi } from '@/services/client/apiClient';
+import { postApi, ApiError } from '@/services/client/apiClient';
 import { sendEmailVerification, sendPasswordResetEmail } from 'firebase/auth';
 
 export const emailService = {
@@ -19,6 +19,9 @@ export const emailService = {
         throw new Error((data && data.error) || 'No se pudo enviar el correo.');
       }
     } catch (error: any) {
+      // Respuestas del servidor (límite de intentos, sin permiso, datos inválidos): se respetan, sin reintentar por Firebase.
+      // El correo nativo de Firebase es solo respaldo cuando nuestro envío falla (5xx o sin conexión).
+      if (error instanceof ApiError && error.status < 500) throw error;
       console.warn('[EmailService] Envío propio no disponible; uso el correo nativo de Firebase Auth:', error.message || error);
 
       if (type === 'verify') {
