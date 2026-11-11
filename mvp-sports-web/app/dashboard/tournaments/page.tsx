@@ -1,4 +1,5 @@
 "use client";
+import { shuffle, generateFixture, stageName, standings } from "@/utils/fixture";
 import { useNow } from "@/hooks/useNow";
 import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { useFeedback } from "@/components/ui/Feedback";
@@ -138,101 +139,7 @@ interface Match {
     court?: string;
 }
 
-// --- UTILS DE TORNEO ---
-const shuffleArray = (array: any[]) => {
-    const newArr = [...array];
-    for (let i = newArr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
-    }
-    return newArr;
-};
-
-const generateFixture = (tournament: any, teams: any[]) => {
-    const { type } = tournament;
-    if (type === 'liga') return generateRoundRobin(teams);
-    if (type === 'eliminacion') return generateKnockout(teams);
-    return generateGroups(teams);
-};
-
-const generateRoundRobin = (teams: any[]) => {
-    const matches: any[] = [];
-    const n = teams.length;
-    const tempTeams = [...teams];
-    if (n % 2 !== 0) tempTeams.push({ id: 'bye', name: 'DESCANSO' });
-    const numTeams = tempTeams.length;
-    const rounds = numTeams - 1;
-
-    for (let r = 0; r < rounds; r++) {
-        for (let i = 0; i < numTeams / 2; i++) {
-            const team1 = tempTeams[i];
-            const team2 = tempTeams[numTeams - 1 - i];
-            if (team1.id !== 'bye' && team2.id !== 'bye') {
-                matches.push({
-                    id: Math.random().toString(36).substr(2, 9),
-                    team1_id: team1.id, team1_name: team1.name,
-                    team2_id: team2.id, team2_name: team2.name,
-                    score1: null, score2: null, status: 'pending', round: r + 1
-                });
-            }
-        }
-        tempTeams.splice(1, 0, tempTeams.pop());
-    }
-    return { matches, totalRounds: rounds };
-};
-
-const generateKnockout = (teams: any[]) => {
-    const matches: any[] = [];
-    const n = teams.length;
-    const rounds = Math.ceil(Math.log2(n));
-    const bracketSize = Math.pow(2, rounds);
-
-    for (let i = 0; i < bracketSize / 2; i++) {
-        const t1 = teams[i * 2] || { id: 'bye', name: '---' };
-        const t2 = teams[i * 2 + 1] || { id: 'bye', name: '---' };
-        matches.push({
-            id: Math.random().toString(36).substr(2, 9),
-            team1_id: t1.id, team1_name: t1.name,
-            team2_id: t2.id, team2_name: t2.name,
-            score1: t2.id === 'bye' ? 1 : null,
-            score2: t2.id === 'bye' ? 0 : null,
-            status: t2.id === 'bye' ? 'finished' : 'pending',
-            round: 1, stage: getStageName(rounds, 1)
-        });
-    }
-    return { matches, totalRounds: rounds };
-};
-
-const getStageName = (totalRounds: number, currentRound: number) => {
-    const diff = totalRounds - currentRound;
-    if (diff === 0) return 'Final';
-    if (diff === 1) return 'Semifinal';
-    if (diff === 2) return 'Cuartos de Final';
-    if (diff === 3) return 'Octavos de Final';
-    return `Ronda ${currentRound}`;
-};
-
-const generateGroups = (teams: any[]) => {
-    return generateRoundRobin(teams.slice(0, 4));
-};
-
 const formatCLP = (n: number) => n.toLocaleString('es-CL');
-
-const buildStandings = (matches: any[]) => {
-    const table: any = {};
-    (matches || []).filter(m => m.status === 'finished' && m.score1 != null && m.score2 != null).forEach(m => {
-        const t1 = m.team1_name, t2 = m.team2_name;
-        if (!table[t1]) table[t1] = { name: t1, pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, pts: 0 };
-        if (!table[t2]) table[t2] = { name: t2, pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, pts: 0 };
-        table[t1].pj++; table[t2].pj++;
-        table[t1].gf += m.score1; table[t1].gc += m.score2;
-        table[t2].gf += m.score2; table[t2].gc += m.score1;
-        if (m.score1 > m.score2) { table[t1].pg++; table[t1].pts += 3; table[t2].pp++; }
-        else if (m.score2 > m.score1) { table[t2].pg++; table[t2].pts += 3; table[t1].pp++; }
-        else { table[t1].pe++; table[t2].pe++; table[t1].pts++; table[t2].pts++; }
-    });
-    return Object.values(table).sort((a: any, b: any) => (b.pts - a.pts) || ((b.gf - b.gc) - (a.gf - a.gc)));
-};
 
 export default function ChampionshipsPage() {
   const now = useNow();
@@ -248,7 +155,6 @@ export default function ChampionshipsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
-    const [tournamentToDelete, setTournamentToDelete] = useState<string | null>(null);
 
     // FIXTURE / DRAW
     const [fixtureModal, setFixtureModal] = useState<any>({
@@ -277,7 +183,7 @@ export default function ChampionshipsPage() {
     };
     const [formData, setFormData] = useState(INITIAL_FORM_STATE);
 
-    const { toast: addToast } = useFeedback();
+    const { toast: addToast, confirm } = useFeedback();
 
     // CARGA
     const fetchData = async () => {
@@ -335,12 +241,12 @@ export default function ChampionshipsPage() {
         } catch { addToast("Error al guardar el torneo", 'error'); } finally { setSaving(false); }
     };
 
-    const handleDelete = async () => {
-        if (!tournamentToDelete) return;
+    const handleDelete = async (id: string) => {
+        if (!(await confirm({ title: "¿Eliminar torneo?", message: "Esta acción no se puede deshacer y borrará toda la información asociada.", tone: "danger" }))) return;
         try {
-            await deleteDoc(doc(db, "tournaments", tournamentToDelete));
+            await deleteDoc(doc(db, "tournaments", id));
             addToast("Torneo eliminado", 'success');
-            setTournamentToDelete(null); fetchData();
+            fetchData();
         } catch { addToast("Error al eliminar", 'error'); }
     };
 
@@ -375,7 +281,7 @@ export default function ChampionshipsPage() {
     };
 
     const handleGenerateFixture = () => {
-        const teams = shuffleArray(fixtureModal.tournament.teams || []);
+        const teams = shuffle(fixtureModal.tournament.teams || []);
         setDrawAnimation({ isDrawing: true, remainingTeams: teams, drawnTeams: [], currentPair: [null, null], completedMatches: [], revealed: false });
         setFixtureModal((prev: any) => ({ ...prev, step: 'draw' }));
     };
@@ -428,7 +334,7 @@ export default function ChampionshipsPage() {
     }, []);
 
     const handleFinalizeDraw = async () => {
-        const res = generateFixture(fixtureModal.tournament, drawAnimation.drawnTeams);
+        const res = generateFixture(fixtureModal.tournament.type, drawAnimation.drawnTeams);
         setFixtureModal((prev: any) => ({ ...prev, step: 'review', fixtureData: res }));
         await updateDoc(doc(db, "tournaments", fixtureModal.tournament.id), { fixture: res, status: 'active' });
         fetchData();
@@ -582,7 +488,7 @@ export default function ChampionshipsPage() {
                                     <button onClick={() => handleOpenEdit(t)} className="py-2 flex items-center justify-center gap-1 bg-white dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 text-[11px] md:text-[8px] font-black uppercase tracking-widest hover:text-slate-900 dark:hover:text-white hover:border-amber-400/40 transition-all active:scale-95" title="Editar">
                                         <HugeiconsIcon icon={PencilEdit02Icon} className="w-3 h-3" /> Editar
                                     </button>
-                                    <button onClick={() => ((t.teams?.length || t.enrolledTeams || 0) > 0) ? addToast("Tiene equipos inscritos: no se puede eliminar. Puedes editarlo o esperar a que termine.", 'error') : setTournamentToDelete(t.id)} className="py-2 flex items-center justify-center gap-1 bg-white dark:bg-white/5 rounded-md border border-red-100 dark:border-red-500/20 text-red-400 text-[11px] md:text-[8px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95" title="Eliminar">
+                                    <button onClick={() => ((t.teams?.length || t.enrolledTeams || 0) > 0) ? addToast("Tiene equipos inscritos: no se puede eliminar. Puedes editarlo o esperar a que termine.", 'error') : handleDelete(t.id)} className="py-2 flex items-center justify-center gap-1 bg-white dark:bg-white/5 rounded-md border border-red-100 dark:border-red-500/20 text-red-400 text-[11px] md:text-[8px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-500/10 transition-all active:scale-95" title="Eliminar">
                                         <HugeiconsIcon icon={Delete02Icon} className="w-3 h-3" /> Borrar
                                     </button>
                                 </div>
@@ -1091,7 +997,7 @@ export default function ChampionshipsPage() {
                                                 { key: 'bracket', label: isKnockout ? 'Cuadro' : 'Rondas' },
                                                 { key: 'standings', label: 'Posiciones' },
                                             ].map(t => {
-                                                const count = t.key === 'calendar' ? roundMatches(fixtureModal.selectedRound).length : t.key === 'bracket' ? (fixtureModal.fixtureData?.matches?.length || 0) : (buildStandings(fixtureModal.fixtureData?.matches || []).length);
+                                                const count = t.key === 'calendar' ? roundMatches(fixtureModal.selectedRound).length : t.key === 'bracket' ? (fixtureModal.fixtureData?.matches?.length || 0) : (standings(fixtureModal.fixtureData?.matches || []).length);
                                                 return (
                                                     <button key={t.key} onClick={() => setFixtureModal((p: any) => ({ ...p, view: t.key }))} className={`pb-2.5 px-5 text-xs md:text-[10px] font-black uppercase tracking-widest border-b-2 transition-colors flex items-center gap-2 ${fixtureModal.view === t.key ? 'border-amber-500 text-amber-500' : 'border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
                                                         {t.label}
@@ -1110,7 +1016,7 @@ export default function ChampionshipsPage() {
                                                     return (
                                                         <div key={round} className={`min-w-[240px] shrink-0 flex flex-col ${ri > 0 ? 'border-l-2 border-dashed border-amber-200/50 dark:border-amber-500/20 pl-5' : ''}`}>
                                                             <div className="text-center mb-4 shrink-0">
-                                                                <p className="text-xs md:text-[10px] font-black uppercase tracking-widest text-amber-600 font-heading">{isKnockout ? getStageName(totalRounds, round) : `Jornada ${round}`}</p>
+                                                                <p className="text-xs md:text-[10px] font-black uppercase tracking-widest text-amber-600 font-heading">{isKnockout ? stageName(totalRounds, round) : `Jornada ${round}`}</p>
                                                                 <p className="text-[11px] md:text-[8px] font-black uppercase text-slate-400 font-mono">{matches.length} partidos</p>
                                                             </div>
                                                             <div className="flex-1 flex flex-col justify-center gap-3">
@@ -1191,11 +1097,11 @@ export default function ChampionshipsPage() {
                                                     </thead>
                                                     <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-[11px] font-bold uppercase">
                                                         {(() => {
-                                                            const standings = buildStandings(fixtureModal.fixtureData?.matches || []);
-                                                            if (standings.length === 0) return <tr><td colSpan={8} className="px-4 py-14 text-center text-xs md:text-[10px] text-slate-400 tracking-widest">Sin resultados registrados aún</td></tr>;
+                                                            const table = standings(fixtureModal.fixtureData?.matches || []);
+                                                            if (table.length === 0) return <tr><td colSpan={8} className="px-4 py-14 text-center text-xs md:text-[10px] text-slate-400 tracking-widest">Sin resultados registrados aún</td></tr>;
                                                             const medals = ['🥇', '🥈', '🥉'];
-                                                            return standings.map((s: any, i: number) => (
-                                                                <tr key={s.name} className={i < 3 ? 'bg-amber-500/5' : 'hover:bg-slate-50/50 dark:hover:bg-white/2'}>
+                                                            return table.map((s, i) => (
+                                                                <tr key={s.id} className={i < 3 ? 'bg-amber-500/5' : 'hover:bg-slate-50/50 dark:hover:bg-white/2'}>
                                                                     <td className="px-4 py-3.5 text-slate-400 font-mono font-black">{i < 3 ? medals[i] : i + 1}</td>
                                                                     <td className="px-4 py-3.5 text-slate-900 dark:text-white truncate max-w-[180px]">{s.name}</td>
                                                                     <td className="px-3 py-3.5 text-center text-slate-500 font-mono">{s.pj}</td>
@@ -1278,22 +1184,6 @@ export default function ChampionshipsPage() {
             )}
 
             {/* MODAL ELIMINAR ESTANDARIZADO */}
-            {tournamentToDelete && (
-                <div className="fixed inset-0 z-250 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setTournamentToDelete(null)}>
-                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-md p-6 border border-slate-200 dark:border-white/10 shadow-2xl text-center" onClick={e => e.stopPropagation()}>
-                        <div className="w-16 h-16 bg-red-50 dark:bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100 dark:border-red-500/20">
-                            <HugeiconsIcon icon={Alert02Icon} className="w-8 h-8 text-red-600" />
-                        </div>
-                        <h3 className="text-lg font-black uppercase text-black dark:text-white mb-2 tracking-tighter">¿Eliminar Registro?</h3>
-                        <p className="text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Esta acción no se puede deshacer y borrará toda la información asociada.</p>
-                        <div className="flex gap-3">
-                            <button onClick={() => setTournamentToDelete(null)} className="flex-1 py-3 text-xs md:text-[10px] font-black uppercase rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">CANCELAR</button>
-                            <button onClick={handleDelete} className="flex-1 py-3 text-xs md:text-[10px] font-black uppercase rounded-md text-white bg-red-600 shadow-xl shadow-red-600/20">CONFIRMAR</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {/* MODAL PARTICIPANTES (EQUIPOS INSCRITOS) */}
             {participantsModal.isOpen && (
                 <div className="fixed inset-0 z-180 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn" onClick={() => setParticipantsModal({ isOpen: false, tournament: null })}>
