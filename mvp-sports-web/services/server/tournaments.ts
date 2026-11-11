@@ -65,6 +65,8 @@ export async function commitRegistration(
   tx: Transaction,
   draft: Omit<RegistrationDraft, "title" | "returnUrl">,
   payment: { paymentStatus: "paid" | "pending"; method: "mercadopago" | "free"; paymentRecordId?: string },
+  // Con un pago ya aprobado se inscribe aunque el cupo se haya llenado entretanto (mejor un equipo extra que un cobro sin inscripción)
+  enforceCapacity = true,
 ) {
   const db = adminDb();
   const regRef = db.collection("tournament_registrations").doc(draft.regId);
@@ -72,6 +74,9 @@ export async function commitRegistration(
   const [reg, tSnap] = await Promise.all([tx.get(regRef), tx.get(tRef)]);
   const teams: any[] = tSnap.data()?.teams || [];
   const alreadyIn = teams.some((x) => x.id === draft.teamId);
+  // El cupo se revisa dentro de la transacción: dos equipos a la vez por el último cupo ya no lo sobrepasan
+  const maxTeams = Number(tSnap.data()?.maxTeams) || 0;
+  if (!alreadyIn && enforceCapacity && maxTeams > 0 && teams.length >= maxTeams) throw new PaymentError("No quedan cupos", 409);
 
   if (!reg.exists) {
     tx.set(regRef, {

@@ -351,7 +351,7 @@ export async function settlePayment(paymentRecordId: string, mpPaymentId: string
 
     // Inscripción a torneo: lee y escribe (sus lecturas siguen antes de las escrituras de abajo)
     if (data.pendingRegistration) {
-      await commitRegistration(tx, data.pendingRegistration, { paymentStatus: "paid", method: "mercadopago", paymentRecordId });
+      await commitRegistration(tx, data.pendingRegistration, { paymentStatus: "paid", method: "mercadopago", paymentRecordId }, false);
     }
     if (data.pendingEnrollment) {
       await commitEnrollment(tx, data.pendingEnrollment, { paymentStatus: "paid", method: "mercadopago", paymentRecordId }, false);
