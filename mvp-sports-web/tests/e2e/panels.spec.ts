@@ -213,3 +213,36 @@ test.describe("Torneo por grupos", () => {
     }
   });
 });
+
+test.describe("Sorteo del fixture", () => {
+  test("validar, sacar bolillas y lanzar el torneo guarda el fixture", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Basta una vez");
+    test.skip(!(await exists(env.E2E_OWNER_EMAIL)), "Sin dueño de prueba");
+    test.setTimeout(180_000);
+    const owner = await admin().auth().getUserByEmail(env.E2E_OWNER_EMAIL);
+    const ref = admin().firestore().collection("tournaments").doc("e2e-torneo-sorteo");
+    await ref.set({ tenantId: "e2e-recinto-prueba", ownerId: owner.uid, name: "Copa E2E Sorteo", sport: "Pádel", type: "eliminacion", price: 0, maxTeams: 2, prize1: "Trofeo",
+      teams: [{ id: "e2e-s1", name: "Rojos E2E", userId: owner.uid }, { id: "e2e-s2", name: "Azules E2E", userId: owner.uid }], enrolledTeams: 2, status: "open", isVisibleInApp: false });
+    try {
+      const errors = watchErrors(page);
+      await login(page, env.E2E_OWNER_EMAIL, env.E2E_OWNER_PASSWORD);
+      await page.goto("/dashboard/tournaments");
+      const card = page.locator("div", { hasText: "Copa E2E Sorteo" }).filter({ has: page.getByTitle("Fixture") }).last();
+      await card.getByTitle("Fixture").click({ timeout: 30_000 });
+      await page.getByRole("button", { name: /iniciar sorteo de bolillas/i }).click();
+      for (let i = 0; i < 2; i++) {
+        const ball = page.getByRole("button", { name: /sacar bolilla/i });
+        await expect(ball).toBeEnabled({ timeout: 20_000 });
+        await ball.click();
+      }
+      await page.getByRole("button", { name: /confirmar fixture y lanzar torneo/i }).first().click({ timeout: 30_000 });
+      await expect.poll(async () => (await ref.get()).data()?.status, { timeout: 15_000 }).toBe("active");
+      const t = (await ref.get()).data()!;
+      expect(t.fixture.matches.length).toBe(1);
+      expect([t.fixture.matches[0].team1_id, t.fixture.matches[0].team2_id].sort()).toEqual(["e2e-s1", "e2e-s2"]);
+      expect(errors, errors.join("\n")).toEqual([]);
+    } finally {
+      await ref.delete();
+    }
+  });
+});
