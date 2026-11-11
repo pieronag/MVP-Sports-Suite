@@ -246,3 +246,43 @@ test.describe("Sorteo del fixture", () => {
     }
   });
 });
+
+test.describe("Partidos (jugador)", () => {
+  test("abre la ficha de un equipo y la de un jugador publicados", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Basta una vez");
+    test.skip(!(await exists(env.E2E_PLAYER_B_EMAIL)), "Sin datos de prueba");
+    test.setTimeout(120_000);
+    const db = admin().firestore();
+    const B = await admin().auth().getUserByEmail(env.E2E_PLAYER_B_EMAIL);
+    const team = db.collection("teams").doc("e2e-equipo-partidos");
+    const tEntry = db.collection("matchmaking").doc("e2e-mm-equipo"), pEntry = db.collection("matchmaking").doc("e2e-mm-jugador");
+    await Promise.all([
+      team.set({ name: "Halcones E2E", ownerId: B.uid, members: [B.uid], sport: "Pádel" }),
+      tEntry.set({ type: "team", status: "active", userId: B.uid, teamId: team.id, teamName: "Halcones E2E", sport: "Pádel", region: "O'Higgins", communes: ["Rancagua"], memberCount: 1, description: "Buscamos rival E2E", createdAt: new Date() }),
+      pEntry.set({ type: "player", status: "active", userId: B.uid, displayName: "Lucía E2E", sports: ["Pádel"], position: "Drive", ovr: 55, tier: "Bronce", region: "O'Higgins", communes: ["Rancagua"], description: "Juego los sábados", createdAt: new Date() }),
+    ]);
+    try {
+      const errors = watchErrors(page);
+      await page.goto("/login");
+      await page.waitForLoadState("networkidle");
+      await page.locator("#email").fill(env.E2E_PLAYER_EMAIL);
+      await page.locator("#password").fill(env.E2E_PLAYER_PASSWORD);
+      await page.locator('button[type="submit"]').click();
+      await expect(page).toHaveURL(/\/player/, { timeout: 30_000 });
+      await page.goto("/player/equipos/partidos");
+      // Ficha del equipo
+      const teamCard = page.locator("div", { hasText: "Halcones E2E" }).filter({ has: page.getByRole("button", { name: "Ver" }) }).last();
+      await teamCard.getByRole("button", { name: "Ver" }).click({ timeout: 30_000 });
+      await expect(page.getByText("Buscamos rival E2E").last()).toBeVisible();
+      await page.getByRole("button", { name: "Cerrar" }).last().click();
+      // Ficha del jugador
+      await page.getByRole("tab", { name: /jugadores/i }).or(page.getByRole("button", { name: /^jugadores$/i })).first().click();
+      const playerCard = page.locator("div", { hasText: "Lucía E2E" }).filter({ has: page.getByRole("button", { name: "Ver" }) }).last();
+      await playerCard.getByRole("button", { name: "Ver" }).click({ timeout: 30_000 });
+      await expect(page.getByText("Juego los sábados").last()).toBeVisible();
+      expect(errors, errors.join("\n")).toEqual([]);
+    } finally {
+      await Promise.all([team.delete(), tEntry.delete(), pEntry.delete()]);
+    }
+  });
+});
