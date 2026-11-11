@@ -7,6 +7,7 @@ Herramientas (desde la raíz del repositorio):
 - `node mvp-sports-backend/scripts/backup.cjs` — respaldo completo de Firestore (con tipos) y de Firebase Auth en `docs/backups/<fecha>/` (ignorado por git: tiene datos personales). Hacerlo siempre antes de migrar.
 - `node mvp-sports-backend/scripts/inventory.cjs docs/backups/<fecha>` — campos reales por colección, con su tipo y frecuencia. Sirve para detectar desorden.
 - `node mvp-sports-backend/scripts/migrate-v3.cjs [--apply]` — sin `--apply` solo simula. Es idempotente: una segunda pasada debe dar 0 cambios.
+- `node mvp-sports-backend/scripts/migrate-images.cjs [--apply]` — mueve a `images` las fotos que quedaron en base64 dentro de los documentos. Idempotente.
 
 Qué ordenó la v3:
 
@@ -82,4 +83,5 @@ Solo existen si se pagaron (o terminaron reembolsadas o en inasistencia). Las cr
 - `courts`: tenantId, name, sport (oficial), surface, status ("active" \| "maintenance"), maintenanceStart, maintenanceUntil.
 - `staff`: ficha del personal (uid, tenantIds, RUT, teléfono). Solo la escribe el servidor.
 - `reviews`: id = id de la reserva (una por partido). Solo la escribe el servidor.
+- `images`: una imagen por documento (owner, folder, type, size, data en bytes, máx. 700 KB). Solo Admin SDK: se sube con `POST /api/images` y se lee en `/api/images/<id>` (caché de un año). Los demás documentos guardan solo esa URL, nunca la foto en base64. El proyecto no tiene bucket de Storage (plan Spark).
 - `tournaments`, `tournament_registrations`, `academy_classes` (con tenantId), `academy_enrollments`, `coupons`, `payments`, `invoices`, `teams`, `matchmaking`, `challenges`, `court_slots` (siempre con tenantId), `audit` (solo se agrega), `rate_limits` (temporal).

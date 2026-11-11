@@ -2,7 +2,8 @@
 import { hideBrokenImg } from "@/utils/img";
 import CourtFleet from "@/components/courts/CourtFleet";
 import { PanelHeader, StatMini } from "@/components/courts/ui";
-import { maintenanceRange, mergePricing } from "@/utils/courtConfig";
+import { maintenanceRange, mergePricing, timeSlotsFor, type SportPricing, type WeeklySchedule } from "@/utils/courtConfig";
+import OperationPanel, { DEFAULT_DAY_SCHEDULE } from "@/components/courts/OperationPanel";
 import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { useFeedback } from "@/components/ui/Feedback";
 import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
@@ -18,7 +19,6 @@ import { db } from '@/services/client/firebase';
 import { collection, getDocs, query, where, doc, updateDoc, addDoc, deleteDoc, deleteField } from 'firebase/firestore';
 import { auditService } from '@/services/client/auditService';
 import {
-    ArrowDown01Icon,
     ArrowLeft01Icon,
     Camera01Icon,
     CheckmarkCircle02Icon,
@@ -34,9 +34,6 @@ import {
     FootballPitchIcon,
     Store01Icon,
     ChartIncreaseIcon,
-    Copy01Icon,
-    MagicWand01Icon,
-    Layers01Icon,
     } from '@hugeicons/core-free-icons';
 import VenueCard from '@/components/courts/VenueCard';
 import CourtModal from '@/components/courts/CourtModal';
@@ -46,13 +43,6 @@ import { SoccerIcon, PadelIcon, TennisIcon, BasketballIcon, VolleyballIcon } fro
 
 // --- CONSTANTES ---
 const AVAILABLE_SPORTS = ['Fútbol', 'Futbolito', 'Pádel', 'Tenis', 'Básquetbol', 'Vóleibol'];
-
-const DAYS_MAP: { [key: string]: string } = {
-    monday: 'Lunes', tuesday: 'Martes', wednesday: 'Miércoles', thursday: 'Jueves',
-    friday: 'Viernes', saturday: 'Sábado', sunday: 'Domingo'
-};
-
-const DEFAULT_DAY_SCHEDULE = { isOpen: true, open: '09:00', close: '23:00' };
 
 const DEFAULT_WEEKLY_SCHEDULE: WeeklySchedule = {
     monday: { ...DEFAULT_DAY_SCHEDULE },
@@ -65,12 +55,6 @@ const DEFAULT_WEEKLY_SCHEDULE: WeeklySchedule = {
 };
 
 // --- INTERFACES ---
-interface PricingMap { [hour: string]: number; }
-interface DayTypePricing { weekday: PricingMap; weekend: PricingMap; }
-interface SportPricing { [sport: string]: DayTypePricing; }
-interface DaySchedule { isOpen: boolean; open: string; close: string; }
-interface WeeklySchedule { [key: string]: DaySchedule; }
-
 interface Venue {
     id: string;
     name: string;
@@ -116,9 +100,6 @@ export default function CourtsPage() {
     const [selectedSports, setSelectedSports] = useState<string[]>([]);
     const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
     const [pricingMatrix, setPricingMatrix] = useState<SportPricing>({});
-    const [activePricingTab, setActivePricingTab] = useState<string>('');
-    const [activeDayTypeTab, setActiveDayTypeTab] = useState<'weekday' | 'weekend'>('weekday');
-    const [opTab, setOpTab] = useState<'horario' | 'tarifas'>('horario');
     const [venueImageLoading, setVenueImageLoading] = useState(false);
 
     // HELPER PARA NORMALIZAR DEPORTES (TILDES Y MAYUSCULAS)
@@ -237,7 +218,6 @@ export default function CourtsPage() {
             });
             setPricingMatrix(normalizedPricing);
 
-            if (selectedVenue.activeSports?.length > 0) setActivePricingTab(selectedVenue.activeSports[0]);
             if (selectedVenue.schedule && selectedVenue.activeSports?.length > 0) setActiveTab('courts');
             else setActiveTab('config');
         }
@@ -307,116 +287,15 @@ export default function CourtsPage() {
         }
     };
 
-    const getGlobalTimeSlots = () => {
-        let minOpen = 24; let maxClose = 0;
-        Object.values(weeklySchedule).forEach(day => {
-            if (!day.isOpen) return;
-            const openH = parseInt(day.open.split(':')[0]);
-            let closeH = parseInt(day.close.split(':')[0]);
-            if (closeH < openH) closeH += 24;
-            if (closeH === 0 && day.close !== '00:00') closeH = 24;
-            if (openH < minOpen) minOpen = openH;
-            if (closeH > maxClose) maxClose = closeH;
-        });
-        if (minOpen === 24) return [];
-        const uniqueSlots = new Set<string>();
-        for (let i = minOpen; i < maxClose; i++) {
-            const hour = i % 24;
-            uniqueSlots.add(`${hour.toString().padStart(2, '0')}:00`);
-        }
-        return Array.from(uniqueSlots);
-    };
-    const timeSlots = getGlobalTimeSlots();
+    const timeSlots = timeSlotsFor(weeklySchedule);
 
-    const updateDaySchedule = (day: string, field: keyof DaySchedule, value: any) => {
-        setWeeklySchedule(prev => ({ ...prev, [day]: { ...prev[day], [field]: value } }));
-        markDirty();
-    };
     const toggleSport = (sport: string) => {
         if (isSportSelected(sport)) {
             setSelectedSports(prev => prev.filter(s => normalizeSport(s) !== normalizeSport(sport)));
-            if (normalizeSport(activePricingTab) === normalizeSport(sport)) setActivePricingTab('');
         } else {
             setSelectedSports(prev => [...prev, sport]);
-            if (!activePricingTab) setActivePricingTab(sport);
         }
         markDirty();
-    };
-    const updatePrice = (sport: string, dayType: 'weekday' | 'weekend', time: string, price: number) => {
-        setPricingMatrix(prev => {
-            const currentSportData = prev[sport] || { weekday: {}, weekend: {} };
-            return {
-                ...prev,
-                [sport]: {
-                    ...currentSportData,
-                    [dayType]: {
-                        ...currentSportData[dayType],
-                        [time]: price
-                    }
-                }
-            };
-        });
-        markDirty();
-    };
-    const handleCopyPriceDown = (sport: string, dayType: 'weekday' | 'weekend', startIndex: number) => {
-        const slotsToFill = timeSlots.slice(startIndex);
-        const basePrice = pricingMatrix[sport]?.[dayType]?.[timeSlots[startIndex]] || 0;
-        setPricingMatrix(prev => {
-            const currentSportData = prev[sport] || { weekday: {}, weekend: {} };
-            const newDayPricing = { ...currentSportData[dayType] };
-            slotsToFill.forEach(time => { newDayPricing[time] = basePrice; });
-            return {
-                ...prev,
-                [sport]: {
-                    ...currentSportData,
-                    [dayType]: newDayPricing
-                }
-            };
-        });
-        showToast("Tarifa replicada", 'success');
-    };
-    const getReferencePrice = (sport: string, dayType: 'weekday' | 'weekend') => {
-        const dayPricing = pricingMatrix[sport]?.[dayType] || {};
-        const first = timeSlots.find(t => (dayPricing[t] ?? 0) > 0);
-        if (first !== undefined) return dayPricing[first];
-        const anyPricing = pricingMatrix[sport] || {};
-        const all = { ...(anyPricing.weekday || {}), ...(anyPricing.weekend || {}) };
-        const any = timeSlots.find(t => (all[t] ?? 0) > 0);
-        return any !== undefined ? all[any] : 0;
-    };
-    const handleFillMissingPrices = (sport: string, dayType: 'weekday' | 'weekend') => {
-        const ref = getReferencePrice(sport, dayType);
-        if (!ref) { showToast("Define al menos un precio primero", 'error'); return; }
-        setPricingMatrix(prev => {
-            const currentSportData = prev[sport] || { weekday: {}, weekend: {} };
-            const newDayPricing = { ...currentSportData[dayType] };
-            timeSlots.forEach(time => { if (!(newDayPricing[time] > 0)) newDayPricing[time] = ref; });
-            return { ...prev, [sport]: { ...currentSportData, [dayType]: newDayPricing } };
-        });
-        markDirty();
-        showToast("Tramos faltantes completados", 'success');
-    };
-    const handleApplyAllPrices = (sport: string, dayType: 'weekday' | 'weekend') => {
-        const ref = getReferencePrice(sport, dayType);
-        if (!ref) { showToast("Define al menos un precio primero", 'error'); return; }
-        setPricingMatrix(prev => {
-            const currentSportData = prev[sport] || { weekday: {}, weekend: {} };
-            const newDayPricing = { ...currentSportData[dayType] };
-            timeSlots.forEach(time => { newDayPricing[time] = ref; });
-            return { ...prev, [sport]: { ...currentSportData, [dayType]: newDayPricing } };
-        });
-        markDirty();
-        showToast("Precio aplicado a todos los tramos", 'success');
-    };
-    const handleCopyMondayToAll = () => {
-        setWeeklySchedule(prev => {
-            const monday = prev.monday || DEFAULT_DAY_SCHEDULE;
-            const next: WeeklySchedule = {};
-            Object.keys(prev).forEach(day => { next[day] = { ...monday }; });
-            return next;
-        });
-        markDirty();
-        showToast("Horario del Lunes copiado a todos los días", 'success');
     };
     const handleSaveConfig = async () => {
         if (!selectedVenue) return;
@@ -853,7 +732,7 @@ return (
                                 <div className="p-6 lg:p-7">
                                     <div className="relative aspect-16/7 rounded-md overflow-hidden border border-slate-200 dark:border-white/5 shadow-lg transition-all group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                                         {selectedVenue.imageURL ? (
-                                            <img src={selectedVenue.imageURL} referrerPolicy="no-referrer" onError={hideBrokenImg} className="w-full h-full object-cover" />
+                                            <img src={selectedVenue.imageURL} alt="Portada del recinto" referrerPolicy="no-referrer" onError={hideBrokenImg} className="w-full h-full object-cover" />
                                         ) : (
                                             <div className="w-full h-full bg-slate-50 dark:bg-black/20 flex flex-col items-center justify-center text-slate-300 gap-3">
                                                 <HugeiconsIcon icon={Camera01Icon} className="w-10 h-10 opacity-20" strokeWidth={1.4} />
@@ -932,128 +811,10 @@ return (
                             </PanelGlass>
 
                             {/* OPERACIÓN Y TARIFAS */}
-                            <PanelGlass className="overflow-hidden">
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 lg:px-7 py-4 border-b border-slate-100 dark:border-white/5">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-emerald-600 dark:text-[#00df82] shrink-0"><HugeiconsIcon icon={Settings01Icon} className="w-4 h-4" strokeWidth={1.8} /></span>
-                                        <div>
-                                            <h3 className="text-[11px] font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white truncate font-heading">Operación y tarifas</h3>
-                                            <p className="text-xs md:text-[10px] font-bold text-slate-400 truncate">Horarios y precios por deporte</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-2 p-1 bg-slate-100 dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10 w-fit">
-                                        <button onClick={() => setOpTab('horario')} className={`px-5 py-2 rounded-md text-xs md:text-[10px] font-black uppercase transition-all ${opTab === 'horario' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>Horario</button>
-                                        <button onClick={() => setOpTab('tarifas')} className={`px-5 py-2 rounded-md text-xs md:text-[10px] font-black uppercase transition-all ${opTab === 'tarifas' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>Tarifas</button>
-                                    </div>
-                                </div>
-                                <div className="p-6 lg:p-7">
-                                    {opTab === 'horario' ? (
-                                        <div className="animate-fadeIn">
-                                            <div className="flex items-center justify-between gap-4 mb-5">
-                                                <p className="text-[11px] md:text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Disponibilidad semanal</p>
-                                                <button onClick={handleCopyMondayToAll} className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all">
-                                                    <HugeiconsIcon icon={Copy01Icon} className="w-3.5 h-3.5" strokeWidth={2} /> Copiar Lunes a todos
-                                                </button>
-                                            </div>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                                                {Object.keys(DAYS_MAP).map(dayKey => {
-                                                    const day = weeklySchedule[dayKey] || DEFAULT_DAY_SCHEDULE;
-                                                    return (
-                                                        <div key={dayKey} className={`p-4 rounded-md border transition-all ${day.isOpen ? 'border-emerald-500/30 bg-emerald-500/2 shadow-xs' : 'border-slate-200 dark:border-white/5 opacity-30 grayscale'}`}>
-                                                            <div className="flex justify-between items-center mb-4">
-                                                                <span className="text-[11px] font-black uppercase tracking-tighter text-slate-900 dark:text-white">{DAYS_MAP[dayKey]}</span>
-                                                                <button
-                                                                    onClick={() => updateDaySchedule(dayKey, 'isOpen', !day.isOpen)}
-                                                                    className={`w-8 h-4 rounded-full relative transition-all ${day.isOpen ? 'bg-emerald-500 dark:bg-[#00df82] shadow-lg shadow-emerald-500/20' : 'bg-slate-200 dark:bg-white/10'}`}
-                                                                >
-                                                                    <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${day.isOpen ? 'right-0.5' : 'left-0.5'}`}></div>
-                                                                </button>
-                                                            </div>
-                                                            {day.isOpen && (
-                                                                <div className="grid grid-cols-2 gap-2.5">
-                                                                    <input type="time" value={day.open} onChange={e => updateDaySchedule(dayKey, 'open', e.target.value)} className="bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[11px] font-black outline-hidden focus:border-emerald-500 text-center" />
-                                                                    <input type="time" value={day.close} onChange={e => updateDaySchedule(dayKey, 'close', e.target.value)} className="bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-md px-3 py-2.5 text-[11px] font-black outline-hidden focus:border-emerald-500 text-center" />
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    )
-                                                })}
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        selectedSports.length > 0 ? (
-                                            <div className="animate-fadeIn">
-                                                <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-6">
-                                                    <div className="flex flex-wrap gap-2 p-1 bg-slate-100 dark:bg-white/5 rounded-md border border-slate-200 dark:border-white/10">
-                                                        {selectedSports.map(s => (
-                                                            <button key={s} onClick={() => setActivePricingTab(s)} className={`px-5 py-2.5 rounded-md text-xs md:text-[10px] font-black uppercase transition-all ${activePricingTab === s ? 'bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>{s}</button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-
-                                                {activePricingTab && (
-                                                    <div className="space-y-6">
-                                                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                                                            <div className="flex gap-2 p-1 bg-slate-100 dark:bg-white/5 rounded-md w-fit border border-slate-200 dark:border-white/10">
-                                                                <button onClick={() => setActiveDayTypeTab('weekday')} className={`px-6 py-2.5 rounded-md text-xs md:text-[10px] font-black uppercase transition-all ${activeDayTypeTab === 'weekday' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400'}`}>Lunes a viernes</button>
-                                                                <button onClick={() => setActiveDayTypeTab('weekend')} className={`px-6 py-2.5 rounded-md text-xs md:text-[10px] font-black uppercase transition-all ${activeDayTypeTab === 'weekend' ? 'bg-slate-900 dark:bg-[#00df82] text-white dark:text-black shadow-md' : 'text-slate-400'}`}>Fines de semana</button>
-                                                            </div>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                <button onClick={() => handleFillMissingPrices(activePricingTab, activeDayTypeTab)} className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all">
-                                                                    <HugeiconsIcon icon={MagicWand01Icon} className="w-3.5 h-3.5" strokeWidth={2} /> Completar faltantes
-                                                                </button>
-                                                                <button onClick={() => handleApplyAllPrices(activePricingTab, activeDayTypeTab)} className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-[#00df82] transition-all">
-                                                                    <HugeiconsIcon icon={Layers01Icon} className="w-3.5 h-3.5" strokeWidth={2} /> Aplicar a todos los tramos
-                                                                </button>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                                                            {timeSlots.map((time, idx) => {
-                                                                const currentVal = pricingMatrix[activePricingTab]?.[activeDayTypeTab]?.[time] || '';
-                                                                const missing = currentVal === '' || currentVal === 0;
-                                                                return (
-                                                                <div key={time} className={`p-4 bg-slate-50/50 dark:bg-white/2 rounded-md border relative group hover:border-emerald-500/30 transition-all ${missing ? 'border-amber-300 dark:border-amber-500/40' : 'border-slate-200 dark:border-white/5'}`}>
-                                                                    <div className="flex items-center justify-between gap-2 mb-3">
-                                                                        <label className="text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-tighter">{time}</label>
-                                                                        {missing && (
-                                                                            <span className="inline-flex items-center gap-1 text-[11px] md:text-[8px] font-black uppercase text-amber-600 dark:text-amber-400">
-                                                                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Sin precio
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
-                                                                    <div className="relative">
-                                                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[11px] font-black text-slate-300">$</span>
-                                                                        <input
-                                                                            type="number"
-                                                                            value={pricingMatrix[activePricingTab]?.[activeDayTypeTab]?.[time] || ''}
-                                                                            onChange={e => updatePrice(activePricingTab, activeDayTypeTab, time, parseInt(e.target.value) || 0)}
-                                                                            className={`w-full pl-6 pr-2 py-3 bg-white dark:bg-black/40 border rounded-md text-[11px] font-black outline-hidden focus:ring-1 ring-emerald-500 text-emerald-600 dark:text-[#00df82] ${missing ? 'border-amber-300 dark:border-amber-500/40' : 'border-slate-200 dark:border-white/10'}`}
-                                                                            placeholder="0"
-                                                                        />
-                                                                    </div>
-                                                                    <button
-                                                                        onClick={() => handleCopyPriceDown(activePricingTab, activeDayTypeTab, idx)}
-                                                                        className="absolute -right-2 -bottom-2 w-7 h-7 bg-emerald-500 dark:bg-[#00df82] text-white dark:text-black rounded-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-xl z-10"
-                                                                        title="Replicar hacia abajo"
-                                                                    >
-                                                                        <HugeiconsIcon icon={ArrowDown01Icon} className="w-3.5 h-3.5" strokeWidth={2} />
-                                                                    </button>
-                                                                </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <div className="py-12 text-center">
-                                                <p className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Activa deportes para configurar tarifas</p>
-                                            </div>
-                                        )
-                                    )}
-                                </div>
-                            </PanelGlass>
+                            <OperationPanel
+                                schedule={weeklySchedule} onScheduleChange={(next) => { setWeeklySchedule(next); markDirty(); }}
+                                sports={selectedSports} pricing={pricingMatrix} onPricingChange={(next) => { setPricingMatrix(next); markDirty(); }}
+                                timeSlots={timeSlots} notify={showToast} />
                         </div>
                     </>
                 ) : (

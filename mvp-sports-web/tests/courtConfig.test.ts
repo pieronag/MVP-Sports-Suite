@@ -33,3 +33,30 @@ describe("pausedNow", () => {
     expect(pausedNow({ status: "maintenance", maintenanceStart: new Date(now + 3_600_000), maintenanceUntil: new Date(now + 7_200_000) })).toBe(false);
   });
 });
+
+import { timeSlotsFor, referencePrice, setSlotPrices } from "../utils/courtConfig";
+
+describe("horario y tarifas", () => {
+  const day = (open: string, close: string, isOpen = true) => ({ isOpen, open, close });
+  it("tramos de una hora de la apertura más temprana al cierre más tardío", () => {
+    expect(timeSlotsFor({ monday: day("09:00", "12:00"), sunday: day("10:00", "14:00") })).toEqual(["09:00", "10:00", "11:00", "12:00", "13:00"]);
+  });
+  it("cierre después de medianoche y días cerrados", () => {
+    expect(timeSlotsFor({ friday: day("22:00", "01:00"), monday: day("06:00", "23:00", false) })).toEqual(["22:00", "23:00", "00:00"]);
+    expect(timeSlotsFor({ monday: day("09:00", "10:00", false) })).toEqual([]);
+  });
+  const slots = ["09:00", "10:00", "11:00"];
+  it("precio de referencia: primero el mismo tipo de día, luego cualquiera", () => {
+    expect(referencePrice({ "Pádel": { weekday: { "10:00": 8000 } } }, "Pádel", "weekday", slots)).toBe(8000);
+    expect(referencePrice({ "Pádel": { weekday: { "11:00": 9000 } } }, "Pádel", "weekend", slots)).toBe(9000);
+    expect(referencePrice({}, "Pádel", "weekday", slots)).toBe(0);
+  });
+  it("completar faltantes no pisa precios y aplicar a todos sí; nada muta el original", () => {
+    const base = { "Pádel": { weekday: { "10:00": 12000 }, weekend: { "09:00": 1 } } };
+    const filled = setSlotPrices(base, "Pádel", "weekday", slots, 8000, true);
+    expect(filled["Pádel"].weekday).toEqual({ "09:00": 8000, "10:00": 12000, "11:00": 8000 });
+    expect(filled["Pádel"].weekend).toEqual({ "09:00": 1 });
+    expect(setSlotPrices(base, "Pádel", "weekday", slots, 8000)["Pádel"].weekday).toEqual({ "09:00": 8000, "10:00": 8000, "11:00": 8000 });
+    expect(base["Pádel"].weekday).toEqual({ "10:00": 12000 });
+  });
+});

@@ -407,3 +407,37 @@ test.describe("Red de recintos (superadmin)", () => {
     expect(errors, errors.join("\n")).toEqual([]);
   });
 });
+
+test.describe("Canchas › tarifas", () => {
+  test("replicar un precio hacia abajo deja cambios pendientes y se guarda", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Escribe en la base: basta una vez");
+    test.skip(!(await exists(env.E2E_OWNER_EMAIL)), "Sin dueño de prueba");
+    test.setTimeout(120_000);
+    const errors = watchErrors(page);
+    await login(page, env.E2E_OWNER_EMAIL, env.E2E_OWNER_PASSWORD);
+    await page.goto("/dashboard/courts");
+    await page.getByText("Recinto E2E").first().click({ timeout: 30_000 });
+    await page.getByRole("button", { name: "Infraestructura" }).click();
+    await expect(page.getByText("Infraestructura sincronizada")).toBeVisible({ timeout: 30_000 });
+
+    await page.getByRole("tab", { name: "Tarifas" }).click();
+    await page.getByRole("tab", { name: "Lunes a viernes" }).click();
+    const first = page.locator("[data-slot]").first();
+    const slot = await first.getAttribute("data-slot");
+    const price = 7000 + Math.floor(Math.random() * 90) * 100; // valor nuevo en cada corrida
+    await first.locator("input").fill(String(price));
+    await first.getByRole("button", { name: /Replicar el precio/ }).click();
+    await expect(page.getByText("Cambios sin guardar")).toBeVisible();
+    const last = page.locator("[data-slot]").last();
+    await expect(last.locator("input")).toHaveValue(String(price));
+    const lastSlot = await last.getAttribute("data-slot");
+
+    await page.getByRole("button", { name: /Sincronizar cambios/ }).click();
+    await expect(page.getByText("Infraestructura sincronizada")).toBeVisible({ timeout: 20_000 });
+    const pricing = (await admin().firestore().collection("tenants").doc(TENANT).get()).data()?.pricing || {};
+    const padel = pricing["Pádel"]?.weekday || {};
+    expect(padel[slot!]).toBe(price);
+    expect(padel[lastSlot!]).toBe(price);
+    expect(errors, errors.join("\n")).toEqual([]);
+  });
+});
