@@ -654,7 +654,7 @@ export default function PartidosPage() {
             </div>
             <div className="mb-4">
               <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción (opcional)</label>
-              <input value={publishDesc} onChange={e => setPublishDesc(e.target.value)} placeholder="Ej: Buscamos rival para este sábado"
+              <input value={publishDesc} maxLength={200} onChange={e => setPublishDesc(e.target.value)} placeholder="Ej: Buscamos rival para este sábado"
                 className={`w-full h-11 rounded-md px-3 text-[13px] font-medium outline-hidden border ${isDark ? "bg-white/6 text-slate-200 border-white/6 placeholder-slate-500" : "bg-slate-50 text-slate-900 border-slate-200 placeholder-slate-400"}`} />
             </div>
             <div className="mb-4">
@@ -747,7 +747,7 @@ export default function PartidosPage() {
             )}
             <div className="mb-4">
               <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Comentario (opcional)</label>
-              <input value={publishDesc} onChange={e => setPublishDesc(e.target.value)} placeholder="Ej: Busco partidos los fines de semana"
+              <input value={publishDesc} maxLength={200} onChange={e => setPublishDesc(e.target.value)} placeholder="Ej: Busco partidos los fines de semana"
                 className={`w-full h-11 rounded-md px-3 text-[13px] font-medium outline-hidden border ${isDark ? "bg-white/6 text-slate-200 border-white/6 placeholder-slate-500" : "bg-slate-50 text-slate-900 border-slate-200 placeholder-slate-400"}`} />
             </div>
             <button onClick={handlePublishPlayer} disabled={actionLoading || publishSports.length === 0}
@@ -1096,7 +1096,7 @@ export default function PartidosPage() {
             )}
             <div className="mb-5">
               <label className={`text-[12px] font-semibold mb-1.5 block ${isDark ? "text-slate-500" : "text-slate-400"}`}>Descripción</label>
-              <input value={editDesc} onChange={e => setEditDesc(e.target.value)} placeholder="Descripción de tu publicación"
+              <input value={editDesc} maxLength={200} onChange={e => setEditDesc(e.target.value)} placeholder="Descripción de tu publicación"
                 className={`w-full h-11 rounded-md px-4 text-[13px] font-semibold outline-hidden border ${isDark ? "bg-[#0A101D] text-slate-200 border-white/6 placeholder-slate-500" : "bg-white text-slate-900 border-slate-200 placeholder-slate-400"}`} />
             </div>
             <button onClick={handleEditSave} disabled={actionLoading}

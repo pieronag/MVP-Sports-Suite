@@ -69,11 +69,15 @@ test("jugador: no puede escalar privilegios ni tocar datos ajenos", async () => 
     ["escribir en la auditoría", () => addDoc(collection(db, "audit"), { action: "falso", userId: uid })],
     ["leer pagos ajenos", () => getDocs(query(collection(db, "payments"), limit(5)))],
     ["inscribirse en un torneo sin pagar", () => addDoc(collection(db, "tournament_registrations"), { userId: uid, tournamentId: "x", paymentStatus: "paid" })],
+    ["ponerse un nombre gigante (rompe ranking y equipos)", () => updateDoc(doc(db, "users", uid), { displayName: "x".repeat(100_000) })],
+    ["publicarse en partidos con una descripción gigante", () => addDoc(collection(db, "matchmaking"), { userId: uid, type: "player", status: "active", description: "x".repeat(100_000) })],
+    ["crear un equipo con nombre gigante", () => addDoc(collection(db, "teams"), { ownerId: uid, members: [uid], name: "x".repeat(5000) })],
+    ["reporte de soporte gigante", () => addDoc(collection(db, "reports"), { userId: uid, subject: "x", description: "x".repeat(900_000) })],
   ]);
   expect(passed, passed.join("\n")).toEqual([]);
   // Control positivo: sí puede leer y editar lo propio permitido
   expect((await getDoc(doc(db, "users", uid))).exists()).toBe(true);
-  await updateDoc(doc(db, "users", uid), { city: "Rancagua" });
+  await updateDoc(doc(db, "users", uid), { city: "Rancagua", displayName: "Jugador E2E" });
 });
 
 test("mánager: solo ve y opera su recinto", async () => {
