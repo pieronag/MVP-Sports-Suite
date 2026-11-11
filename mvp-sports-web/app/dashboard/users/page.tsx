@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { useFeedback } from "@/components/ui/Feedback";
 import React, { useState, useEffect, useMemo } from 'react';
@@ -650,7 +651,7 @@ export default function Page() {
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center font-black text-slate-500 text-sm overflow-hidden border border-slate-100 dark:border-white/10 shrink-0">
-                                {user.photoURL ? <img src={user.photoURL} className="w-full h-full object-cover" alt={user.name} /> : user.name.charAt(0)}
+                                {user.photoURL ? <img src={user.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} className="w-full h-full object-cover" alt={user.name} /> : user.name.charAt(0)}
                               </div>
                               <div className="min-w-0">
                                 <div className="flex items-center gap-1.5 flex-wrap">
@@ -757,7 +758,7 @@ export default function Page() {
                     <div className="flex items-start justify-between gap-3 pl-1.5">
                       <div className="relative shrink-0">
                         <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center font-black text-slate-500 dark:text-slate-400 text-lg overflow-hidden">
-                          {user.photoURL ? <img src={user.photoURL} className="w-full h-full object-cover" alt={user.name} /> : user.name.charAt(0).toUpperCase()}
+                          {user.photoURL ? <img src={user.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} className="w-full h-full object-cover" alt={user.name} /> : user.name.charAt(0).toUpperCase()}
                         </div>
                         <div className={`absolute -bottom-1 -right-1 min-w-[26px] h-[26px] px-1 rounded-md border-2 border-white dark:border-slate-900 flex items-center justify-center font-black text-xs md:text-[10px] shadow-xs ${getOvrColor(user.tier)}`}>
                           {user.ovr}

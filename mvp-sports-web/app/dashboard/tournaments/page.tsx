@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import FixtureFlow from "@/components/tournaments/FixtureFlow";
 import { sportIcon, sportStyle, getSportConfig, formatCLP, TOURNAMENT_SPORTS } from "@/components/tournaments/sport";
 import { useNow } from "@/hooks/useNow";
@@ -208,7 +209,7 @@ export default function ChampionshipsPage() {
                         <div key={t.id} className="group flex flex-col h-full bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 shadow-xs overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-slate-200/40 dark:hover:shadow-black/40 hover:-translate-y-0.5">
                             {/* HERO */}
                             <div className={`relative h-36 bg-linear-to-br ${st.gradient} overflow-hidden shrink-0`}>
-                                {t.imageUrl ? <img src={t.imageUrl} className="absolute inset-0 w-full h-full object-cover" alt="" /> : null}
+                                {t.imageUrl ? <img src={t.imageUrl} referrerPolicy="no-referrer" onError={hideBrokenImg} className="absolute inset-0 w-full h-full object-cover" alt="" /> : null}
                                 <div className="absolute -right-5 -bottom-9 opacity-10 group-hover:opacity-20 transition-opacity">
                                     {sportIcon(t.sport, 'w-28 h-28 text-white')}
                                 </div>
@@ -514,7 +515,7 @@ export default function ChampionshipsPage() {
                                         <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-white/3 rounded-md border border-slate-100 dark:border-white/5">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center overflow-hidden">
-                                                    {team.logo ? <img src={team.logo} className="w-full h-full object-cover" alt="" /> : <HugeiconsIcon icon={Flag01Icon} className="w-5 h-5 text-slate-300" />}
+                                                    {team.logo ? <img src={team.logo} referrerPolicy="no-referrer" onError={hideBrokenImg} className="w-full h-full object-cover" alt="" /> : <HugeiconsIcon icon={Flag01Icon} className="w-5 h-5 text-slate-300" />}
                                                 </div>
                                                 <div>
                                                     <p className="text-[11px] font-black text-black dark:text-white uppercase">{team.name}</p>

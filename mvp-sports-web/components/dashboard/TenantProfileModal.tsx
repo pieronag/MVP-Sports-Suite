@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import React, { useEffect } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import ModalPortal from "@/components/ui/ModalPortal";
@@ -85,7 +86,7 @@ export default function TenantProfileModal({ tenant, isOpen, onClose, onEdit, on
                     {/* PORTADA */}
                     <div className="relative h-36 sm:h-44 shrink-0 overflow-hidden">
                         {tenant.imageUrl ? (
-                            <img src={tenant.imageUrl} alt={tenant.name} className="w-full h-full object-cover" />
+                            <img src={tenant.imageUrl} referrerPolicy="no-referrer" onError={hideBrokenImg} alt={tenant.name} className="w-full h-full object-cover" />
                         ) : (
                             <div className="w-full h-full bg-linear-to-br from-slate-900 to-slate-800 dark:from-[#0B0F19] dark:to-[#04231a]" />
                         )}

@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import { useNow } from "@/hooks/useNow";
 import React, { useEffect, useState } from 'react';
 import { normalizeBooking, isReal } from "@/utils/bookingModel";
@@ -333,7 +334,7 @@ export default function PlayerModal({ user, isOpen, onClose, gamification, initi
                             <div className="flex items-center gap-4 min-w-0">
                                 <div className="relative shrink-0">
                                     <div className="w-16 h-16 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-100 dark:border-white/10 overflow-hidden flex items-center justify-center">
-                                        {photoURL ? <img src={photoURL} className="w-full h-full object-cover" alt={name} /> : <span className="text-2xl font-black text-slate-300 dark:text-slate-600">{name.charAt(0).toUpperCase()}</span>}
+                                        {photoURL ? <img src={photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} className="w-full h-full object-cover" alt={name} /> : <span className="text-2xl font-black text-slate-300 dark:text-slate-600">{name.charAt(0).toUpperCase()}</span>}
                                     </div>
                                     <div className={`absolute -bottom-1.5 -right-1.5 min-w-[30px] h-[30px] px-1 rounded-md flex items-center justify-center font-black border-[3px] border-white dark:border-[#0B0F19] shadow-lg text-[11px] ${rangoActual.color}`}>
                                         {user.ovr || 40}

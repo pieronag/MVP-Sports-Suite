@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import CourtFleet from "@/components/courts/CourtFleet";
 import { PanelHeader, StatMini } from "@/components/courts/ui";
 import { maintenanceRange, mergePricing } from "@/utils/courtConfig";
@@ -852,7 +853,7 @@ return (
                                 <div className="p-6 lg:p-7">
                                     <div className="relative aspect-16/7 rounded-md overflow-hidden border border-slate-200 dark:border-white/5 shadow-lg transition-all group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                                         {selectedVenue.imageURL ? (
-                                            <img src={selectedVenue.imageURL} className="w-full h-full object-cover" />
+                                            <img src={selectedVenue.imageURL} referrerPolicy="no-referrer" onError={hideBrokenImg} className="w-full h-full object-cover" />
                                         ) : (
                                             <div className="w-full h-full bg-slate-50 dark:bg-black/20 flex flex-col items-center justify-center text-slate-300 gap-3">
                                                 <HugeiconsIcon icon={Camera01Icon} className="w-10 h-10 opacity-20" strokeWidth={1.4} />

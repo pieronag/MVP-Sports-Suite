@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { useFeedback } from "@/components/ui/Feedback";
 import { normalizeVenue } from "@/utils/venueModel";
@@ -580,7 +581,7 @@ export default function Page() {
                                     {/* Imagen (izquierda) */}
                                     <div className="relative w-32 sm:w-36 shrink-0 overflow-hidden">
                                         <img
-                                            src={t.imageUrl || "https://placehold.co/600x800/0B0F19/ffffff?text=Recinto"}
+                                            src={t.imageUrl || "https://placehold.co/600x800/0B0F19/ffffff?text=Recinto"} referrerPolicy="no-referrer" onError={hideBrokenImg}
                                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             alt={t.name}
                                         />
@@ -719,7 +720,7 @@ export default function Page() {
                                                 <td className="py-4 px-6">
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-10 h-10 rounded-md overflow-hidden bg-slate-100 dark:bg-white/5 border border-slate-100 dark:border-white/10 shrink-0">
-                                                            {t.imageUrl ? <img src={t.imageUrl} alt={t.name} className="w-full h-full object-cover" /> : <HugeiconsIcon icon={Building01Icon} className="w-5 h-5 text-slate-300 dark:text-white/15 m-auto mt-2.5" strokeWidth={1.6} />}
+                                                            {t.imageUrl ? <img src={t.imageUrl} referrerPolicy="no-referrer" onError={hideBrokenImg} alt={t.name} className="w-full h-full object-cover" /> : <HugeiconsIcon icon={Building01Icon} className="w-5 h-5 text-slate-300 dark:text-white/15 m-auto mt-2.5" strokeWidth={1.6} />}
                                                         </div>
                                                         <div className="min-w-0">
                                                             <span className="font-black text-[13px] text-slate-900 dark:text-white uppercase truncate block font-heading">{t.name}</span>

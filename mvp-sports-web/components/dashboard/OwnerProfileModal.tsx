@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import React, { useEffect } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import ModalPortal from "@/components/ui/ModalPortal";
@@ -82,7 +83,7 @@ export default function OwnerProfileModal({ owner, isOpen, onClose, onEdit, onCh
                         <div className="relative flex items-start justify-between gap-3">
                             <div className="flex items-center gap-4 min-w-0">
                                 {owner.photoURL ? (
-                                    <img src={owner.photoURL} alt={owner.name} className="w-16 h-16 rounded-md object-cover border border-slate-200 dark:border-white/10 shrink-0" />
+                                    <img src={owner.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} alt={owner.name} className="w-16 h-16 rounded-md object-cover border border-slate-200 dark:border-white/10 shrink-0" />
                                 ) : (
                                     <span className="w-16 h-16 rounded-md bg-linear-to-br from-emerald-500 to-emerald-800 text-white flex items-center justify-center font-black text-2xl shrink-0">
                                         {owner.name.charAt(0).toUpperCase()}

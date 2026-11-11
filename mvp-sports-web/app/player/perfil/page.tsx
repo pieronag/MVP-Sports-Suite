@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import { GlowCard, SectionPill } from "@/components/player/ui";
 import TierBadge from "@/components/player/TierBadge";
 import { uploadImage } from "@/services/client/imageUpload";
@@ -392,7 +393,7 @@ export default function PerfilPage() {
           {/* Mini carta: foto con degradado, isotipo, valoración y rango */}
           <div className="relative h-[260px]">
             {photoURL ? (
-              <img src={photoURL} alt="" className="absolute inset-0 w-full h-full object-cover" />
+              <img src={photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="" className="absolute inset-0 w-full h-full object-cover" />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center" style={{ background: "radial-gradient(80% 70% at 50% 40%, rgba(0,223,130,0.18), #0A101D 70%)" }}>
                 <span className="text-white/15 text-[96px] font-heading font-black">{initials}</span>
@@ -445,7 +446,7 @@ export default function PerfilPage() {
           {/* Foto en un marco redondeado, como las cards de la app */}
           <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: "#0A101D" }}>
             {photoURL ? (
-              <img src={photoURL} alt="" crossOrigin="anonymous" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <img src={photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="" crossOrigin="anonymous" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             ) : (
               <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(80% 70% at 50% 40%, rgba(0,223,130,0.18), #0A101D 70%)" }}>
                 <span style={{ color: "rgba(255,255,255,0.14)", fontSize: 280, fontWeight: 900, letterSpacing: -10 }}>{initials}</span>

@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import { GlowCard, SectionPill } from "@/components/player/ui";
 import { uploadImage } from "@/services/client/imageUpload";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -267,7 +268,7 @@ export default function EquipoDetailPage() {
                   return (
                     <div key={reqUid} className="flex items-center gap-3 px-5 py-4">
                       <div className="w-10 h-10 rounded-md overflow-hidden flex items-center justify-center shrink-0" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
-                        {reqProfile.photoURL ? <img src={reqProfile.photoURL} alt="" className="w-full h-full object-cover" /> : <User size={18} className={isDark ? "text-slate-400" : "text-slate-500"} />}
+                        {reqProfile.photoURL ? <img src={reqProfile.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="" className="w-full h-full object-cover" /> : <User size={18} className={isDark ? "text-slate-400" : "text-slate-500"} />}
                       </div>
                       <span className={`text-[13px] font-medium flex-1 ${isDark ? "text-slate-200" : "text-slate-800"}`}>{reqProfile.displayName}</span>
                       <button aria-label="Aceptar solicitud" onClick={() => handleAcceptRequest(reqUid)} disabled={actionLoading} className="w-9 h-9 rounded-md bg-emerald-500/10 flex items-center justify-center">
@@ -294,7 +295,7 @@ export default function EquipoDetailPage() {
               return (
                 <div key={memberId} className="flex items-center gap-3 px-5 py-4">
                   <div className="w-11 h-11 rounded-md overflow-hidden shrink-0 relative" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
-                    {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User size={20} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
+                    {p.photoURL ? <img src={p.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User size={20} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
                     {isMemberOwner && <div className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center border-2" style={{ borderColor: isDark ? "#0A101D" : "white" }}><Crown color="white" size={8} /></div>}
                   </div>
                   <div className="flex-1 min-w-0">

@@ -1,3 +1,4 @@
+import { hideBrokenImg } from "@/utils/img";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -54,7 +55,7 @@ export default async function PublicPlayer({ params }: { params: Promise<{ uid: 
         <div className="flex items-center gap-4">
           <div className="w-20 h-20 rounded-md overflow-hidden bg-emerald-500/10 flex items-center justify-center shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            {p.photo ? <img src={p.photo} alt="" className="w-full h-full object-cover" /> : <span className="text-2xl font-bold text-emerald-500">{p.name.charAt(0)}</span>}
+            {p.photo ? <img src={p.photo} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="" className="w-full h-full object-cover" /> : <span className="text-2xl font-bold text-emerald-500">{p.name.charAt(0)}</span>}
           </div>
           <div className="min-w-0">
             <h1 className="text-[22px] font-heading font-black tracking-tight truncate">{p.name}</h1>

@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { uploadImage } from "@/services/client/imageUpload";
 import React, { useState, useEffect, useRef } from 'react';
@@ -300,7 +301,7 @@ export default function ProfilePage() {
                         <div className="relative group mb-5 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                             <div className="w-32 h-32 rounded-full bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center overflow-hidden border-4 border-white dark:border-white/5 shadow-2xl group-hover:border-emerald-500 transition-all duration-500">
                                 {profile.photoURL ? (
-                                    <img src={profile.photoURL} alt="Avatar" className="w-full h-full object-cover" />
+                                    <img src={profile.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="Avatar" className="w-full h-full object-cover" />
                                 ) : (
                                     <span className="text-4xl font-black text-slate-300 dark:text-white/20 uppercase tracking-tighter">{profile.displayName?.charAt(0) || 'U'}</span>
                                 )}

@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import React from 'react';
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -47,7 +48,7 @@ export default function VenueCard({ venue, onClick }: VenueCardProps) {
             <div className="h-40 bg-slate-100 dark:bg-white/5 relative overflow-hidden">
                 {venue.imageURL ? (
                     <img
-                        src={venue.imageURL}
+                        src={venue.imageURL} onError={hideBrokenImg}
                         alt={venue.name}
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"

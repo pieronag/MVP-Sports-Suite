@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import TeamDetailModal from "@/components/player/matchmaking/TeamDetailModal";
 import PlayerDetailModal from "@/components/player/matchmaking/PlayerDetailModal";
 import { REGIONS } from "@/utils/chileRegions";
@@ -482,7 +483,7 @@ export default function PartidosPage() {
                       <div className="p-4">
                         <div className="flex items-center gap-3">
                           <div className="w-14 h-14 rounded-md overflow-hidden shrink-0 border-2" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0" }}>
-                            {entry.photoURL ? <img src={entry.photoURL} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><User size={24} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
+                            {entry.photoURL ? <img src={entry.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}><User size={24} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
@@ -831,7 +832,7 @@ export default function PartidosPage() {
                         return (
                           <div key={mid} className="flex items-center gap-2.5 p-2 rounded-md" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.03)" : "transparent" }}>
                             <div className="w-8 h-8 rounded-md overflow-hidden shrink-0" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
-                              {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : <User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />}
+                              {p.photoURL ? <img src={p.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="" className="w-full h-full object-cover" /> : <User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />}
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className={`text-[11px] font-medium truncate ${isDark ? "text-slate-200" : "text-slate-700"}`}>{p.displayName || "Jugador MVP"}{mid === challengeTeamData.team.ownerId ? " (C)" : ""}</p>

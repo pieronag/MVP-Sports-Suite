@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import WhatsappLogo from "@/components/icons/WhatsappLogo";
 import { courtBlockedAt } from "@/utils/courtAvailability";
 import { slotInstant } from "@/utils/chileTime";
@@ -559,7 +560,7 @@ export default function VenueDetailPage() {
     <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
       {/* Cabecera compacta: lo justo para saber dónde estás; la reserva es lo principal */}
       <div className="h-[168px] relative overflow-hidden">
-        <img src={venueData?.imageURL || venueData?.imageUrl || "https://images.unsplash.com/photo-1574629810360-7efbbe195018"} alt="" className="w-full h-full object-cover" />
+        <img src={venueData?.imageURL || venueData?.imageUrl || "https://images.unsplash.com/photo-1574629810360-7efbbe195018"} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/45 to-black/20" />
         <div className="absolute top-12 left-5 right-5 flex items-center justify-between z-10">
           <button aria-label="Volver" onClick={() => router.back()} className="w-10 h-10 rounded-md bg-black/45 backdrop-blur-sm border border-white/10 flex items-center justify-center">

@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 // Ficha de un equipo publicado en Partidos: zona, descripción, capitán, OVR promedio y plantel; desde aquí se desafía
 import { Swords, X, User, MapPin } from "@/components/player/icons";
 
@@ -44,7 +45,7 @@ export default function TeamDetailModal({ entry, data, isDark, actionLoading, on
                         <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Capitán</p>
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-md overflow-hidden shrink-0" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
-                            {ownerProfile?.photoURL ? <img src={ownerProfile.photoURL} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
+                            {ownerProfile?.photoURL ? <img src={ownerProfile.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} /></div>}
                           </div>
                           <span className={`text-[12px] font-medium ${isDark ? "text-slate-200" : "text-slate-800"}`}>{ownerName}</span>
                         </div>
@@ -72,7 +73,7 @@ export default function TeamDetailModal({ entry, data, isDark, actionLoading, on
                         return (
                           <div key={mid} className="flex items-center gap-2.5 p-2 rounded-md" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.03)" : "transparent" }}>
                             <div className="w-8 h-8 rounded-md overflow-hidden shrink-0" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
-                              {p.photoURL ? <img src={p.photoURL} alt="" className="w-full h-full object-cover" /> : <User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />}
+                              {p.photoURL ? <img src={p.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="" className="w-full h-full object-cover" /> : <User size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />}
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className={`text-[11px] font-medium truncate ${isDark ? "text-slate-200" : "text-slate-700"}`}>{p.displayName || "Jugador MVP"}{isOwner ? " (C)" : ""}</p>

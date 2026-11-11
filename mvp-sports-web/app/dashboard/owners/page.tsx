@@ -1,4 +1,5 @@
 "use client";
+import { hideBrokenImg } from "@/utils/img";
 import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { useFeedback } from "@/components/ui/Feedback";
 import React, { useState, useEffect } from 'react';
@@ -356,7 +357,7 @@ export default function Page() {
                                     <div className="relative w-32 sm:w-36 aspect-square shrink-0 overflow-hidden">
                                         {owner.photoURL ? (
                                             <img
-                                                src={owner.photoURL}
+                                                src={owner.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg}
                                                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                                 alt={owner.name}
                                             />
@@ -474,7 +475,7 @@ export default function Page() {
                                             <td className="py-4 px-6">
                                                 <div className="flex items-center gap-3">
                                                     {owner.photoURL ? (
-                                                        <img src={owner.photoURL} alt={owner.name} className="w-10 h-10 rounded-md object-cover border border-slate-200 dark:border-white/10 shrink-0" />
+                                                        <img src={owner.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} alt={owner.name} className="w-10 h-10 rounded-md object-cover border border-slate-200 dark:border-white/10 shrink-0" />
                                                     ) : (
                                                         <span className="w-10 h-10 rounded-md bg-linear-to-br from-emerald-500 to-emerald-800 text-white flex items-center justify-center font-black text-sm shrink-0">{owner.name.charAt(0).toUpperCase()}</span>
                                                     )}
