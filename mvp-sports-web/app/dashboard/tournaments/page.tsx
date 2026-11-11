@@ -1050,7 +1050,7 @@ export default function ChampionshipsPage() {
                                                     {roundMatches(fixtureModal.selectedRound).map((match: any, idx: number) => (
                                                         <div key={idx} className="bg-white dark:bg-[#0B0F19] p-5 rounded-md border border-slate-200 dark:border-white/10 shadow-xs space-y-4 transition-transform hover:scale-[1.02]">
                                                             <div className="flex justify-between items-center">
-                                                                <span className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest font-mono">#{idx + 1}{match.stage ? ` · ${match.stage}` : ''}</span>
+                                                                <span className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest font-mono">#{idx + 1}{match.stage ? ` · ${match.stage}` : ''}{match.group ? ` · ${match.group}` : ''}</span>
                                                                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] md:text-[8px] font-black uppercase ${match.status === 'finished' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-[#00df82]' : 'bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'}`}>
                                                                     <span className={`w-1.5 h-1.5 rounded-full ${match.status === 'finished' ? 'bg-emerald-500' : 'bg-amber-500'}`} /> {match.status === 'finished' ? 'Finalizado' : 'Próximamente'}
                                                                 </span>
@@ -1089,34 +1089,47 @@ export default function ChampionshipsPage() {
                                         )}
 
                                         {/* POSICIONES */}
-                                        {fixtureModal.view === 'standings' && (
-                                            <div className="max-w-2xl mx-auto w-full overflow-hidden rounded-md border border-slate-200 dark:border-white/10 shadow-xs">
-                                                <table className="w-full text-left">
-                                                    <thead className="bg-slate-50/50 dark:bg-white/2 text-[11px] md:text-[9px] font-black uppercase text-slate-400 tracking-widest">
-                                                        <tr><th className="px-4 py-3.5">#</th><th className="px-4 py-3.5">Equipo</th><th className="px-3 py-3.5 text-center">PJ</th><th className="px-3 py-3.5 text-center">G</th><th className="px-3 py-3.5 text-center">E</th><th className="px-3 py-3.5 text-center">P</th><th className="px-3 py-3.5 text-center">DG</th><th className="px-4 py-3.5 text-center">Pts</th></tr>
-                                                    </thead>
-                                                    <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-[11px] font-bold uppercase">
-                                                        {(() => {
-                                                            const table = standings(fixtureModal.fixtureData?.matches || []);
-                                                            if (table.length === 0) return <tr><td colSpan={8} className="px-4 py-14 text-center text-xs md:text-[10px] text-slate-400 tracking-widest">Sin resultados registrados aún</td></tr>;
-                                                            const medals = ['🥇', '🥈', '🥉'];
-                                                            return table.map((s, i) => (
-                                                                <tr key={s.id} className={i < 3 ? 'bg-amber-500/5' : 'hover:bg-slate-50/50 dark:hover:bg-white/2'}>
-                                                                    <td className="px-4 py-3.5 text-slate-400 font-mono font-black">{i < 3 ? medals[i] : i + 1}</td>
-                                                                    <td className="px-4 py-3.5 text-slate-900 dark:text-white truncate max-w-[180px]">{s.name}</td>
-                                                                    <td className="px-3 py-3.5 text-center text-slate-500 font-mono">{s.pj}</td>
-                                                                    <td className="px-3 py-3.5 text-center text-slate-500 font-mono">{s.pg}</td>
-                                                                    <td className="px-3 py-3.5 text-center text-slate-500 font-mono">{s.pe}</td>
-                                                                    <td className="px-3 py-3.5 text-center text-slate-500 font-mono">{s.pp}</td>
-                                                                    <td className="px-3 py-3.5 text-center text-slate-500 font-mono">{s.gf - s.gc}</td>
-                                                                    <td className="px-4 py-3.5 text-center text-amber-600 dark:text-amber-400 font-mono font-black text-[13px]">{s.pts}</td>
-                                                                </tr>
-                                                            ));
-                                                        })()}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        )}
+                                        {fixtureModal.view === 'standings' && (() => {
+                                            // Torneo por grupos: una tabla por grupo (antes una sola tabla mezclaba a todos los grupos)
+                                            const all: any[] = fixtureModal.fixtureData?.matches || [];
+                                            const names = [...new Set(all.map((m) => m.group).filter(Boolean))] as string[];
+                                            const sections = names.length ? names.map((g) => ({ title: g, matches: all.filter((m) => m.group === g) })) : [{ title: '', matches: all }];
+                                            return (
+                                                <div className="space-y-6">
+                                                    {sections.map((section) => (
+                                                        <div key={section.title || 'tabla'} className="space-y-2">
+                                                            {section.title && <p className="max-w-2xl mx-auto text-[11px] font-black uppercase tracking-widest text-amber-600">{section.title}</p>}
+                                                            <div className="max-w-2xl mx-auto w-full overflow-hidden rounded-md border border-slate-200 dark:border-white/10 shadow-xs">
+                                                                        <table className="w-full text-left">
+                                                                            <thead className="bg-slate-50/50 dark:bg-white/2 text-[11px] md:text-[9px] font-black uppercase text-slate-400 tracking-widest">
+                                                                                <tr><th className="px-4 py-3.5">#</th><th className="px-4 py-3.5">Equipo</th><th className="px-3 py-3.5 text-center">PJ</th><th className="px-3 py-3.5 text-center">G</th><th className="px-3 py-3.5 text-center">E</th><th className="px-3 py-3.5 text-center">P</th><th className="px-3 py-3.5 text-center">DG</th><th className="px-4 py-3.5 text-center">Pts</th></tr>
+                                                                            </thead>
+                                                                            <tbody className="divide-y divide-slate-100 dark:divide-white/5 text-[11px] font-bold uppercase">
+                                                                                {(() => {
+                                                                                    const table = standings(section.matches);
+                                                                                    if (table.length === 0) return <tr><td colSpan={8} className="px-4 py-14 text-center text-xs md:text-[10px] text-slate-400 tracking-widest">Sin resultados registrados aún</td></tr>;
+                                                                                    const medals = ['🥇', '🥈', '🥉'];
+                                                                                    return table.map((s, i) => (
+                                                                                        <tr key={s.id} className={i < 3 ? 'bg-amber-500/5' : 'hover:bg-slate-50/50 dark:hover:bg-white/2'}>
+                                                                                            <td className="px-4 py-3.5 text-slate-400 font-mono font-black">{i < 3 ? medals[i] : i + 1}</td>
+                                                                                            <td className="px-4 py-3.5 text-slate-900 dark:text-white truncate max-w-[180px]">{s.name}</td>
+                                                                                            <td className="px-3 py-3.5 text-center text-slate-500 font-mono">{s.pj}</td>
+                                                                                            <td className="px-3 py-3.5 text-center text-slate-500 font-mono">{s.pg}</td>
+                                                                                            <td className="px-3 py-3.5 text-center text-slate-500 font-mono">{s.pe}</td>
+                                                                                            <td className="px-3 py-3.5 text-center text-slate-500 font-mono">{s.pp}</td>
+                                                                                            <td className="px-3 py-3.5 text-center text-slate-500 font-mono">{s.gf - s.gc}</td>
+                                                                                            <td className="px-4 py-3.5 text-center text-amber-600 dark:text-amber-400 font-mono font-black text-[13px]">{s.pts}</td>
+                                                                                        </tr>
+                                                                                    ));
+                                                                                })()}
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            );
+                                        })()}
                                     </div>
                                 );
                             })()}

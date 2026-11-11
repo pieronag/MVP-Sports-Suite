@@ -183,3 +183,33 @@ test.describe("Canchas", () => {
     expect(errors, errors.join("\n")).toEqual([]);
   });
 });
+
+test.describe("Torneo por grupos", () => {
+  test("el fixture muestra a qué grupo pertenece cada partido y una tabla por grupo", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Basta una vez");
+    test.skip(!(await exists(env.E2E_OWNER_EMAIL)), "Sin dueño de prueba");
+    test.setTimeout(120_000);
+    const { groups } = await import("../../utils/fixture");
+    const owner = await admin().auth().getUserByEmail(env.E2E_OWNER_EMAIL);
+    const teams = Array.from({ length: 8 }, (_, i) => ({ id: `e2e-t${i + 1}`, name: `Equipo E2E ${i + 1}` }));
+    const fixture = groups(teams);
+    fixture.matches[0] = { ...fixture.matches[0], score1: 2, score2: 1, status: "finished" }; // un resultado para que haya tabla
+    const ref = admin().firestore().collection("tournaments").doc("e2e-torneo-grupos");
+    await ref.set({ tenantId: "e2e-recinto-prueba", ownerId: owner.uid, name: "Copa E2E Grupos", sport: "Pádel", type: "grupos", price: 0, maxTeams: 8,
+      teams: teams.map((t) => ({ ...t, userId: owner.uid })), enrolledTeams: 8, status: "active", fixture, isVisibleInApp: false });
+    try {
+      const errors = watchErrors(page);
+      await login(page, env.E2E_OWNER_EMAIL, env.E2E_OWNER_PASSWORD);
+      await page.goto("/dashboard/tournaments");
+      const card = page.locator("div", { hasText: "Copa E2E Grupos" }).filter({ has: page.getByTitle("Fixture") }).last();
+      await card.getByTitle("Fixture").click({ timeout: 30_000 });
+      await expect(page.getByText(/Grupo A/).first()).toBeVisible({ timeout: 20_000 }); // en la tarjeta del partido
+      await page.getByRole("button", { name: /posiciones/i }).first().click();
+      await expect(page.getByText("Grupo A", { exact: true })).toBeVisible();
+      await expect(page.getByText("Grupo B", { exact: true })).toBeVisible();
+      expect(errors, errors.join("\n")).toEqual([]);
+    } finally {
+      await ref.delete();
+    }
+  });
+});
