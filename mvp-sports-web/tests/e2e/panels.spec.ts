@@ -321,3 +321,17 @@ test.describe("Check-in escaneando el QR del ticket", () => {
     expect(errors, errors.join("\n")).toEqual([]);
   });
 });
+
+test.describe("Usuarios (superadmin)", () => {
+  test("lista solo jugadores: el superadmin y el personal no aparecen", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Basta una vez");
+    test.skip(!(await exists(env.E2E_ADMIN_EMAIL)), "Sin superadmin de prueba");
+    test.setTimeout(120_000);
+    await login(page, env.E2E_ADMIN_EMAIL, env.E2E_ADMIN_PASSWORD);
+    await page.goto("/dashboard/users");
+    await page.getByPlaceholder(/buscar/i).first().fill("E2E", { timeout: 30_000 });
+    const main = page.locator("main");
+    await expect(main.getByText("Jugador E2E", { exact: true }).first()).toBeVisible({ timeout: 30_000 });
+    for (const staff of ["Admin E2E", "Mánager E2E", "Dueño E2E"]) await expect(main.getByText(staff, { exact: true })).toHaveCount(0);
+  });
+});

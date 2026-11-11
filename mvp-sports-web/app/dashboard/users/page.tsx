@@ -1,4 +1,5 @@
 "use client";
+import { normalizeRole } from "@/utils/roles";
 import { hideBrokenImg } from "@/utils/img";
 import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { useFeedback } from "@/components/ui/Feedback";
@@ -73,25 +74,6 @@ interface User {
   raw?: any;
 }
 
-interface Toast {
-  id: number;
-  type: "success" | "error" | "info";
-  message: string;
-}
-
-const normalizeBadgeId = (id: string): string => {
-  const normMap: Record<string, string> = {
-    goals: 'scorer',
-    assists: 'playmaker',
-    clean_sheets: 'defender',
-    won: 'wins',
-    played: 'experience',
-    sports_played: 'multi_sport',
-    loyalty: 'loyal'
-  };
-  return normMap[id] || id;
-};
-
 export default function Page() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -137,7 +119,6 @@ export default function Page() {
         }
       }
       setGamificationConfig(gamification);
-      const maxXP = gamification?.tiers?.legend || 25000;
 
       const teamsSnap = await getDocs(collection(db, "teams"));
       const allTeams = teamsSnap.docs.map(d => ({
@@ -151,10 +132,8 @@ export default function Page() {
         try {
           const data = doc.data();
           const userId = doc.id;
-          const rawRole = (data.role || '').toLowerCase();
-          
-          // Excluir roles administrativos
-          if (['admin', 'owner', 'manager', 'gestor', 'dueño'].includes(rawRole)) return acc;
+          // Solo jugadores (antes el superadmin y el personal 'staff' aparecían como jugadores)
+          if (normalizeRole(data.role) !== 'player') return acc;
 
           const userTeamsRaw = allTeams.filter(t => t.ownerId === userId || (Array.isArray(t.members) && t.members.includes(userId)));
           const userTeams = userTeamsRaw.map(t => t.name);
@@ -167,7 +146,6 @@ export default function Page() {
           const stats = data.stats || { played: 0, won: 0, lost: 0, goals: 0 };
           const played = Number(stats.played || 0);
           const won = Number(stats.won || 0);
-          const lost = Number(stats.lost || (played - won > 0 ? played - won : 0));
           const winRate = played > 0 ? Math.round((won / played) * 100) : 0;
           const goalsPerMatch = played > 0 ? Number((Number(stats.goals || 0) / played).toFixed(2)) : 0;
 
@@ -184,97 +162,8 @@ export default function Page() {
             if (!isNaN(d.getTime())) { rawJoined = d; break; }
           }
 
-          const daysActive = rawJoined
-            ? Math.max(1, (new Date().getTime() - rawJoined.getTime()) / (1000 * 60 * 60 * 24))
-            : 1;
-
-          const earnedBadges: any[] = [];
-          const settingsData = settingsSnap.exists() ? settingsSnap.data() || {} : {};
-          const gamificationData = settingsData.gamification || {};
-          const badgeConfigs = gamificationData.badges || settingsData.badges || {};
-          const statsMap: Record<string, number> = {
-            scorer: data.stats?.goals || 0,
-            goals: data.stats?.goals || 0,
-            
-            playmaker: data.stats?.assists || 0,
-            assists: data.stats?.assists || 0,
-            
-            defender: data.stats?.clean_sheets || data.stats?.interceptions || 0,
-            clean_sheets: data.stats?.clean_sheets || data.stats?.interceptions || 0,
-            
-            wins: data.stats?.won || 0,
-            won: data.stats?.won || 0,
-            
-            mvp: data.stats?.mvp || data.stats?.mvps || 0,
-            mvps: data.stats?.mvp || data.stats?.mvps || 0,
-            
-            experience: data.stats?.played || 0,
-            played: data.stats?.played || 0,
-            
-            multi_sport: data.stats?.sports_played || 1,
-            sports_played: data.stats?.sports_played || 1,
-            
-            captaincy: data.stats?.captain_matches || 0,
-            captain_matches: data.stats?.captain_matches || 0,
-            
-            comeback: data.stats?.comebacks || 0,
-            comebacks: data.stats?.comebacks || 0,
-            
-            precision: data.stats?.precision_matches || 0,
-            precision_matches: data.stats?.precision_matches || 0,
-            
-            clutch: data.stats?.clutch_goals || 0,
-            clutch_goals: data.stats?.clutch_goals || 0,
-            
-            tournaments: data.stats?.tournaments_played || 0,
-            tournaments_played: data.stats?.tournaments_played || 0,
-            
-            invictus: data.stats?.longest_win_streak || 0,
-            longest_win_streak: data.stats?.longest_win_streak || 0,
-            
-            rivalry: data.stats?.rivalries_won || 0,
-            rivalries_won: data.stats?.rivalries_won || 0,
-            
-            morning_player: data.stats?.morning_matches || 0,
-            morning_matches: data.stats?.morning_matches || 0,
-            
-            night_player: data.stats?.night_matches || 0,
-            night_matches: data.stats?.night_matches || 0,
-            
-            loyal: Math.floor(daysActive / 30),
-            loyalty: Math.floor(daysActive / 30),
-            
-            weekend_warrior: data.stats?.weekend_matches || 0,
-            weekend_matches: data.stats?.weekend_matches || 0,
-            
-            stamina: data.stats?.minutes_played || (data.stats?.played || 0) * 60,
-            minutes_played: data.stats?.minutes_played || (data.stats?.played || 0) * 60,
-            
-            social: data.stats?.invited_players || 0,
-            invited_players: data.stats?.invited_players || 0
-          };
-
-          Object.keys(badgeConfigs).forEach(badgeId => {
-            const config = badgeConfigs[badgeId] || { bronze: 5, silver: 15, gold: 30 };
-            const userVal = statsMap[badgeId] || 0;
-            let tier = null;
-
-            const goldVal = Number(config.gold || 0);
-            const silverVal = Number(config.silver || 0);
-            const bronzeVal = Number(config.bronze || 0);
-
-            if (userVal > 0) {
-              if (goldVal > 0 && userVal >= goldVal) tier = 'gold';
-              else if (silverVal > 0 && userVal >= silverVal) tier = 'silver';
-              else if (bronzeVal > 0 && userVal >= bronzeVal) tier = 'bronze';
-            }
-            if (tier) {
-              const normId = normalizeBadgeId(badgeId);
-              if (!earnedBadges.some(b => b.id === normId)) {
-                earnedBadges.push({ id: normId, tier });
-              }
-            }
-          });
+          // Insignias: las que calcula el servidor (utils/gamificationCalc); antes esta pantalla las recalculaba con otras reglas
+          const earnedBadges: any[] = Array.isArray(data.badges) ? data.badges : [];
 
           acc.push({
             id: userId, name: data.displayName || data.name || "Usuario Sin Nombre",
@@ -910,7 +799,6 @@ export default function Page() {
 }
 
 function SortableTh({ label, active, onClick, align = 'left' }: { label: string; active: boolean; onClick: () => void; align?: 'left' | 'center' | 'right' }) {
-  const alignCls = align === 'center' ? 'justify-center text-center' : align === 'right' ? 'justify-end text-right' : 'text-left';
   return (
     <th className={`py-4 px-6 ${align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'}`}>
       <button
