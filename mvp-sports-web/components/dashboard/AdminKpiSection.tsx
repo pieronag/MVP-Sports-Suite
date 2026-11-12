@@ -20,6 +20,7 @@ interface KpiData {
     churn: number;
     ltv: number;
     conversionRate: number;
+    revenueIsEstimate?: boolean;
 }
 
 interface AdminKpiSectionProps {
@@ -35,7 +36,7 @@ export default function AdminKpiSection({ kpis, formatCLP }: AdminKpiSectionProp
             <TarjetaKpi
                 titulo="MRR mensual"
                 valor={formatCLP(kpis.mrr)}
-                sub={`ARR proyectado: ${formatCLP(kpis.mrr * 12)} · Facturado: ${formatCLP(kpis.revenue)}`}
+                sub={`ARR proyectado: ${formatCLP(kpis.mrr * 12)} · ${kpis.revenueIsEstimate ? "Comisión estimada" : "Facturado"}: ${formatCLP(kpis.revenue)}`}
                 icono={<HugeiconsIcon icon={MoneyBag01Icon} className={ic} strokeWidth={1.6} />}
                 brillo
             />
