@@ -518,6 +518,50 @@ test.describe("Usuarios (superadmin)", () => {
   });
 });
 
+test.describe("Usuarios: suspender y activar (superadmin)", () => {
+  test("busca sin tildes, suspende con confirmación desde la selección y vuelve a activar", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Escribe en la base: basta una vez");
+    test.skip(!(await exists(env.E2E_ADMIN_EMAIL)) || !(await exists(env.E2E_PLAYER_B_EMAIL)), "Sin datos de prueba");
+    test.setTimeout(150_000);
+    const B = await admin().auth().getUserByEmail(env.E2E_PLAYER_B_EMAIL);
+    const ref = admin().firestore().collection("users").doc(B.uid);
+    try {
+      const errors = watchErrors(page);
+      await login(page, env.E2E_ADMIN_EMAIL, env.E2E_ADMIN_PASSWORD);
+      await page.goto("/dashboard/users");
+      await page.getByLabel("Buscar jugador").fill("jugador b e2e", { timeout: 30_000 });
+      const row = page.locator(`[data-player="${B.uid}"]:visible`);
+      await expect(row).toHaveCount(1, { timeout: 30_000 });
+
+      // Suspender: pide confirmación y se puede cancelar
+      await row.getByRole("button", { name: "Seleccionar Jugador B E2E" }).click();
+      const actions = page.getByRole("region", { name: "Acciones con la selección" });
+      await actions.getByRole("button", { name: /Suspender/ }).click();
+      await page.getByRole("button", { name: "Cancelar" }).click();
+      expect((await ref.get()).data()?.status).not.toBe("suspended");
+      await actions.getByRole("button", { name: /Suspender/ }).click();
+      await page.getByRole("dialog").getByRole("button", { name: "Suspender" }).click();
+      await expect(page.getByText("1 jugador suspendido")).toBeVisible({ timeout: 20_000 });
+      expect((await ref.get()).data()?.status).toBe("suspended");
+      await expect(row.getByText("Suspendido", { exact: true })).toBeVisible();
+
+      // Activar desde el filtro de suspendidos
+      await page.getByRole("button", { name: "Suspendidos", exact: true }).click();
+      await row.getByRole("button", { name: "Seleccionar Jugador B E2E" }).click();
+      await actions.getByRole("button", { name: /Activar/ }).click();
+      await page.getByRole("dialog").getByRole("button", { name: "Activar" }).click();
+      await expect(page.getByText("1 jugador activado")).toBeVisible({ timeout: 20_000 });
+      expect((await ref.get()).data()?.status).toBe("active");
+      expect(errors, errors.join("\n")).toEqual([]);
+    } finally {
+      if ((await ref.get()).data()?.status === "suspended") {
+        await ref.update({ status: "active" });
+        await admin().auth().updateUser(B.uid, { disabled: false });
+      }
+    }
+  });
+});
+
 test.describe("Configuración central (superadmin)", () => {
   // Sin guardar: es la configuración real de la plataforma
   test("recorre las pestañas, marca cambios pendientes y valida al elevar staff", async ({ page, isMobile }) => {

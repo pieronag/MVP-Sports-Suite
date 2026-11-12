@@ -1,813 +1,259 @@
 "use client";
-import { normalizeRole } from "@/utils/roles";
-import { hideBrokenImg } from "@/utils/img";
+// Directorio de jugadores (superadmin): buscar, filtrar, ver perfil, suspender o activar (uno o varios), exportar y recalcular niveles.
+// Filas, filtros, orden y CSV en utils/playerDirectory; tabla y tarjetas en components/users.
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  ArrowDown01Icon, BarChartIcon, BlockedIcon, Cancel01Icon, CheckmarkCircle02Icon, Download01Icon, Grid02Icon, ListViewIcon,
+  Medal01Icon, Mortarboard01Icon, RefreshIcon, Search01Icon, SparklesIcon, UserGroupIcon, Activity01Icon,
+} from "@hugeicons/core-free-icons";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
 import { useFeedback } from "@/components/ui/Feedback";
-import React, { useState, useEffect, useMemo } from 'react';
-import { HugeiconsIcon } from '@hugeicons/react';
-import {
-    Search01Icon,
-    BlockedIcon,
-    CheckmarkCircle02Icon,
-    TrophyIcon,
-    UserGroupIcon,
-    RefreshIcon,
-    UserCircleIcon,
-    SparklesIcon,
-    BarChartIcon,
-    FireIcon,
-    Mortarboard01Icon,
-    Grid02Icon,
-    ListViewIcon,
-    Certificate01Icon,
-    ArrowDown01Icon,
-    Medal01Icon,
-    Activity01Icon,
-    CrownIcon,
-    Download01Icon,
-    SquareIcon,
-    CheckmarkSquare02Icon,
-    ArrowUpDownIcon,
-    Cancel01Icon,
-} from '@hugeicons/core-free-icons';
-import { collection, getDocs, doc, query, getDoc } from 'firebase/firestore';
-import { db } from '@/services/client/firebase';
-import PlayerModal from '@/components/ui/PlayerModal';
-import { TarjetaKpi } from '@/components/ui/DashboardWidgets';
-import ConfirmDialog from '@/components/ui/ConfirmDialog';
-import BadgesConfigModal from '@/components/dashboard/BadgesConfigModal';
+import PlayerModal from "@/components/ui/PlayerModal";
+import BadgesConfigModal from "@/components/dashboard/BadgesConfigModal";
+import { TarjetaKpi } from "@/components/ui/DashboardWidgets";
+import { Pagination, PlayerCards, PlayerTable } from "@/components/users/PlayerViews";
 import { postApi } from "@/services/client/apiClient";
+import { db } from "@/services/client/firebase";
+import {
+  filterPlayers, playersCsv, sortPlayers, sportsOf, toPlayerRow, type PlayerFilter, type PlayerRow, type SortKey, type TeamRef,
+} from "@/utils/playerDirectory";
 
-// --- INTERFACES ---
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-  ovr: number;
-  xp: number;
-  tier: string;
-  form: string[];
-  stats: { 
-    played: number; won: number; lost: number; goals: number;
-    assists?: number; clean_sheets?: number; mvp?: number;
-    captain_matches?: number; precision_matches?: number;
-    clutch_goals?: number; interceptions?: number;
-    minutes_played?: number; sports_played?: number;
-    comebacks?: number; tournaments_played?: number;
-    longest_win_streak?: number; rivalries_won?: number;
-    morning_matches?: number; night_matches?: number;
-    weekend_matches?: number; invited_players?: number;
-  };
-  photoURL?: string;
-  team: string;
-  teamList: string[];
-  joined: string;
-  rawJoined: Date | null;
-  winRate: number;
-  goalsPerMatch: number;
-  badges: any[];
-  strikes?: number;
-  mainSport?: string;
-  position?: string;
-  raw?: any;
-}
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type IconType = typeof Search01Icon;
+const Icon = ({ icon, className, w = 1.8 }: { icon: IconType; className?: string; w?: number }) => <HugeiconsIcon icon={icon} className={className} strokeWidth={w} />;
+const PAGE_SIZE = 25;
+const FILTERS: PlayerFilter[] = ["Todos", "Capitanes", "Sin equipo", "Con strikes", "Suspendidos"];
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 
-export default function Page() {
-  const [users, setUsers] = useState<User[]>([]);
+// PlayerModal espera la forma antigua de la fila
+const forModal = (u: PlayerRow) => ({
+  ...u, status: u.suspended ? "Suspendido" : "Activo", role: u.captain ? "Capitán" : "Jugador", teamList: u.teams,
+  team: u.teams.join(", ") || "Sin equipo", rawJoined: u.joinedAt,
+  joined: u.joinedAt ? u.joinedAt.toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" }) : "—",
+});
+
+export default function UsersPage() {
+  const { toast, confirm } = useFeedback();
+  const [players, setPlayers] = useState<PlayerRow[]>([]);
+  const [gamification, setGamification] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [isBulkLoading, setIsBulkLoading] = useState(false);
-  const [gamificationConfig, setGamificationConfig] = useState<any>(null);
+  const [busy, setBusy] = useState<"bulk" | "recompute" | null>(null);
 
-  const [filter, setFilter] = useState('Todos');
-  const [sportFilter, setSportFilter] = useState('Todos');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<PlayerFilter>("Todos");
+  const [sport, setSport] = useState("Todos");
+  const [sort, setSort] = useState<{ key: SortKey; dir: "asc" | "desc" }>({ key: "ovr", dir: "desc" });
+  const [view, setView] = useState<"grid" | "list">("list");
+  const [page, setPage] = useState(1);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [profile, setProfile] = useState<PlayerRow | null>(null);
+  const [badgesOpen, setBadgesOpen] = useState(false);
 
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
-  const [playerTab, setPlayerTab] = useState<'perfil' | 'historial' | 'logros'>('perfil');
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [sortKey, setSortKey] = useState<'ovr' | 'name' | 'played' | 'winRate' | 'goals' | 'joined'>('ovr');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
-  
-  const [confirmModal, setConfirmModal] = useState<{
-    isOpen: boolean;
-    title: string;
-    msg: string;
-    onConfirm: () => void;
-    type: 'danger' | 'info';
-  }>({ isOpen: false, title: '', msg: '', onConfirm: () => { }, type: 'info' });
-
-  const [userToToggle, setUserToToggle] = useState<User | null>(null);
-  const [isToggling, setIsToggling] = useState(false);
-
-  const [isBadgesModalOpen, setIsBadgesModalOpen] = useState(false);
-
-  const { toast: addToast } = useFeedback();
-
-  const fetchUsers = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
-      const settingsSnap = await getDoc(doc(db, 'settings', 'global'));
-      let gamification = settingsSnap.exists() ? settingsSnap.data().gamification : { tiers: { legend: 25000 } };
-      if (settingsSnap.exists()) {
-        const rootBadges = settingsSnap.data().badges;
-        if (rootBadges) {
-          gamification = { ...gamification, badges: rootBadges };
-        }
-      }
-      setGamificationConfig(gamification);
-
-      const teamsSnap = await getDocs(collection(db, "teams"));
-      const allTeams = teamsSnap.docs.map(d => ({
-        id: d.id, name: d.data().name, members: d.data().members || [], ownerId: d.data().ownerId
-      }));
-
-      const q = query(collection(db, "users"));
-      const querySnapshot = await getDocs(q);
-
-      const loadedUsers: User[] = querySnapshot.docs.reduce((acc: User[], doc) => {
-        try {
-          const data = doc.data();
-          const userId = doc.id;
-          // Solo jugadores (antes el superadmin y el personal 'staff' aparecían como jugadores)
-          if (normalizeRole(data.role) !== 'player') return acc;
-
-          const userTeamsRaw = allTeams.filter(t => t.ownerId === userId || (Array.isArray(t.members) && t.members.includes(userId)));
-          const userTeams = userTeamsRaw.map(t => t.name);
-          const isCaptain = allTeams.some(t => t.ownerId === userId);
-
-          const realOvr = Number(data.ovr || data.elo || 0);
-          const xp = Number(data.xp || 0);
-          const realTier = String(data.tier || data.level || 'Bronce').toUpperCase();
-
-          const stats = data.stats || { played: 0, won: 0, lost: 0, goals: 0 };
-          const played = Number(stats.played || 0);
-          const won = Number(stats.won || 0);
-          const winRate = played > 0 ? Math.round((won / played) * 100) : 0;
-          const goalsPerMatch = played > 0 ? Number((Number(stats.goals || 0) / played).toFixed(2)) : 0;
-
-          // Manejo robusto de fechas (sin inventar "hoy" si no existe el dato)
-          let rawJoined: Date | null = null;
-          const dateCandidates: any[] = [data.createdAt, data.joinedDate, data.created_at, data.registeredAt];
-          for (const c of dateCandidates) {
-            if (!c) continue;
-            let d: Date;
-            if (c instanceof Date) d = c;
-            else if (typeof c?.toDate === 'function') d = c.toDate();
-            else if (typeof c?.seconds === 'number') d = new Date(c.seconds * 1000);
-            else d = new Date(c);
-            if (!isNaN(d.getTime())) { rawJoined = d; break; }
-          }
-
-          // Insignias: las que calcula el servidor (utils/gamificationCalc); antes esta pantalla las recalculaba con otras reglas
-          const earnedBadges: any[] = Array.isArray(data.badges) ? data.badges : [];
-
-          acc.push({
-            id: userId, name: data.displayName || data.name || "Usuario Sin Nombre",
-            email: data.email || "",
-            role: isCaptain ? 'Capitán' : 'Jugador',
-            status: data.status === 'suspended' ? 'Suspendido' : 'Activo',
-            ovr: isNaN(realOvr) ? 0 : realOvr,
-            xp: isNaN(xp) ? 0 : xp,
-            photoURL: data.photoURL || data.imageUrl || "",
-            tier: realTier, form: data.form || [], stats,
-            team: userTeams.length > 0 ? userTeams.join(', ') : "Sin Equipo",
-            teamList: userTeams,
-            joined: rawJoined ? rawJoined.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—',
-            rawJoined,
-            winRate,
-            goalsPerMatch,
-            badges: earnedBadges,
-            strikes: data.strikes || 0,
-            mainSport: data.mainSport || "",
-            position: data.position && data.position !== 'Jugador' ? data.position : "",
-            raw: data
-          });
-        } catch (innerError) {
-          console.error("Error procesando usuario indvidual:", doc.id, innerError);
-        }
-        return acc;
-      }, []);
-
-      setUsers(loadedUsers.sort((a, b) => b.ovr - a.ovr));
-    } catch (error) { 
-      console.error("Error al cargar jugadores:", error);
-      addToast("Error al cargar jugadores. Revisa la consola.", "error"); 
-    } finally { 
-      setLoading(false); 
+      const [settings, teamsSnap, usersSnap] = await Promise.all([getDoc(doc(db, "settings", "global")), getDocs(collection(db, "teams")), getDocs(collection(db, "users"))]);
+      const s = settings.data() || {};
+      setGamification({ ...(s.gamification || { tiers: { legend: 25000 } }), ...(s.badges ? { badges: s.badges } : {}) });
+      const teams: TeamRef[] = teamsSnap.docs.map((d) => ({ name: d.data().name, members: d.data().members || [], ownerId: d.data().ownerId }));
+      setPlayers(usersSnap.docs.map((d) => toPlayerRow(d.id, d.data(), teams)).filter((u): u is PlayerRow => !!u));
+    } catch (e) {
+      console.error("Jugadores", e);
+      toast("No se pudieron cargar los jugadores", "error");
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [toast]);
+  useEffect(() => { load(); }, [load]); // eslint-disable-line react-hooks/set-state-in-effect -- carga inicial
 
-  useEffect(() => { fetchUsers(); }, []);
+  const filtered = useMemo(() => sortPlayers(filterPlayers(players, { search, filter, sport }), sort.key, sort.dir), [players, search, filter, sport, sort]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const current = Math.min(page, totalPages);
+  const paged = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+  // Cambiar búsqueda, filtro u orden vuelve a la primera página
+  const reset = <T,>(set: (v: T) => void) => (v: T) => { set(v); setPage(1); };
 
-  const toggleUserStatus = async (id: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'Activo' ? 'suspended' : 'active';
+  const toggle = (id: string) => setSelected((prev) => { const n = new Set(prev); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  const toggleAll = () => setSelected((prev) => {
+    const ids = paged.map((u) => u.id), all = ids.every((id) => prev.has(id)), n = new Set(prev);
+    ids.forEach((id) => (all ? n.delete(id) : n.add(id)));
+    return n;
+  });
+  const onSort = (key: SortKey) => { setSort((s) => (s.key === key ? { key, dir: s.dir === "asc" ? "desc" : "asc" } : { key, dir: key === "name" ? "asc" : "desc" })); setPage(1); };
+
+  const sel = players.filter((u) => selected.has(u.id));
+  const activeSel = sel.filter((u) => !u.suspended), suspendedSel = sel.filter((u) => u.suspended);
+
+  const setStatus = async (targets: PlayerRow[], suspend: boolean) => {
+    if (!targets.length) return;
+    const one = targets.length === 1 ? targets[0] : null;
+    const ok = await confirm({
+      title: suspend ? (one ? "¿Suspender jugador?" : `¿Suspender ${targets.length} jugadores?`) : (one ? "¿Activar jugador?" : `¿Activar ${targets.length} jugadores?`),
+      message: suspend
+        ? (one ? <><strong>{one.name}</strong> no podrá reservar ni entrar a la app hasta que lo reactives.</> : "No podrán reservar ni entrar a la app hasta que los reactives.")
+        : (one ? <><strong>{one.name}</strong> recupera el acceso completo a la app.</> : "Recuperan el acceso completo a la app."),
+      tone: suspend ? "danger" : "default", confirmLabel: suspend ? "Suspender" : "Activar",
+    });
+    if (!ok) return;
+    setBusy("bulk");
     try {
-      await postApi('/api/admin/user-status', { uid: id, status: newStatus });
-      addToast(`Jugador ${newStatus === 'active' ? 'habilitado' : 'suspendido'}`, "success");
-      fetchUsers();
-    } catch (error: any) { addToast(error?.message || "Error al cambiar estado", "error"); }
-  };
-
-  const handleToggleStatus = async () => {
-    if (!userToToggle) return;
-    setIsToggling(true);
-    await toggleUserStatus(userToToggle.id, userToToggle.status);
-    setIsToggling(false);
-    setUserToToggle(null);
-  };
-
-  const handleBulkRecalculate = async () => {
-    setConfirmModal({
-      isOpen: true, title: 'Sincronizar ELO', type: 'info',
-      msg: 'Se recalculará la experiencia, el nivel y los logros de todas las cuentas con las reglas vigentes. Solo cuentan los partidos con ingreso registrado por un recinto: los partidos internos ya no suman, así que algunos niveles bajarán.',
-      onConfirm: async () => {
-        setConfirmModal(prev => ({ ...prev, isOpen: false }));
-        setIsBulkLoading(true);
-        try {
-          // El servidor recalcula XP, nivel y logros desde las reservas de cada jugador
-          // Todas las cuentas (dueños y personal también juegan), no solo la lista de jugadores
-          const ids = (await getDocs(collection(db, "users"))).docs.map((d) => d.id);
-          let updated = 0;
-          for (let k = 0; k < ids.length; k += 25) {
-            const r = await postApi<{ updated: number }>('/api/players/recompute', { uids: ids.slice(k, k + 25) });
-            updated += r.updated || 0;
-          }
-          addToast(`${updated} ${updated === 1 ? 'cuenta actualizada' : 'cuentas actualizadas'}`, "success");
-          fetchUsers();
-        } catch (error: any) { addToast(error?.message || "Error en sincronización", "error"); } finally { setIsBulkLoading(false); }
-      }
-    });
-  };
-
-  const filteredUsers = useMemo(() => {
-    const list = users.filter(u => {
-      const matchesSearch = u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase());
-      if (!matchesSearch) return false;
-
-      if (filter === 'Suspendidos' && u.status !== 'Suspendido') return false;
-      if (filter === 'Capitanes' && u.role !== 'Capitán') return false;
-      if (filter === 'Sin equipo' && u.teamList.length > 0) return false;
-      if (sportFilter !== 'Todos' && u.mainSport !== sportFilter) return false;
-
-      return true;
-    });
-
-    const dir = sortDir === 'asc' ? 1 : -1;
-    return [...list].sort((a, b) => {
-      switch (sortKey) {
-        case 'name': return a.name.localeCompare(b.name) * dir;
-        case 'played': return ((a.stats.played || 0) - (b.stats.played || 0)) * dir;
-        case 'winRate': return (a.winRate - b.winRate) * dir;
-        case 'goals': return ((a.stats.goals || 0) - (b.stats.goals || 0)) * dir;
-        case 'joined': return ((a.rawJoined?.getTime() || 0) - (b.rawJoined?.getTime() || 0)) * dir;
-        default: return (a.ovr - b.ovr) * dir;
-      }
-    });
-  }, [users, searchTerm, filter, sportFilter, sortKey, sortDir]);
-
-  const PAGE_SIZE = 25;
-  const [page, setPage] = useState(1);
-
-  useEffect(() => { setPage(1); }, [searchTerm, filter, sportFilter, sortKey, sortDir]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
-  const pagedUsers = useMemo(
-    () => filteredUsers.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
-    [filteredUsers, safePage]
-  );
-
-  const openPlayer = (user: any, tab: 'perfil' | 'historial' | 'logros') => {
-    setSelectedUser(user);
-    setPlayerTab(tab);
-    setIsPlayerModalOpen(true);
-  };
-
-  const toggleSort = (key: typeof sortKey) => {
-    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
-    else { setSortKey(key); setSortDir(key === 'name' ? 'asc' : 'desc'); }
-  };
-
-  const toggleSelect = (id: string) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  };
-
-  const toggleSelectAll = (ids: string[]) => {
-    setSelectedIds(prev => {
-      const allSelected = ids.every(id => prev.has(id));
-      const next = new Set(prev);
-      if (allSelected) ids.forEach(id => next.delete(id));
-      else ids.forEach(id => next.add(id));
-      return next;
-    });
-  };
-
-  const handleBulkStatus = async (suspend: boolean) => {
-    const targetStatus = suspend ? 'Activo' : 'Suspendido';
-    const ids = users.filter(u => selectedIds.has(u.id) && u.status === targetStatus).map(u => u.id);
-    if (ids.length === 0) {
-      addToast(suspend ? "No hay jugadores activos seleccionados" : "No hay jugadores suspendidos seleccionados", 'error');
-      return;
+      const r = await postApi<{ updated?: number; failed?: { error?: string }[] }>("/api/admin/user-status", one ? { uid: one.id, status: suspend ? "suspended" : "active" } : { uids: targets.map((u) => u.id), status: suspend ? "suspended" : "active" });
+      const failed = r.failed?.length || 0;
+      const done = one ? (failed ? 0 : 1) : (r.updated ?? targets.length - failed);
+      if (done) toast(`${plural(done, "jugador", "jugadores")} ${suspend ? (done === 1 ? "suspendido" : "suspendidos") : (done === 1 ? "activado" : "activados")}`);
+      if (failed) toast(`${plural(failed, "no se pudo cambiar", "no se pudieron cambiar")}: ${r.failed?.[0]?.error || "error"}`, "error");
+      setSelected(new Set());
+      setProfile(null);
+      await load();
+    } catch (e) {
+      toast((e as Error)?.message || "No se pudo cambiar el estado", "error");
+    } finally {
+      setBusy(null);
     }
-    setConfirmModal({
-      isOpen: true,
-      title: suspend ? 'Suspender seleccionados' : 'Activar seleccionados',
-      msg: `Se ${suspend ? 'suspenderán' : 'activarán'} ${ids.length} jugador${ids.length === 1 ? '' : 'es'}.`,
-      type: suspend ? 'danger' : 'info',
-      onConfirm: async () => {
-        setConfirmModal(p => ({ ...p, isOpen: false }));
-        setIsBulkLoading(true);
-        try {
-          const r = await postApi<{ updated: number; failed: { error?: string }[] }>('/api/admin/user-status', { uids: ids, status: suspend ? 'suspended' : 'active' });
-          if (r.failed?.length) addToast(`${r.failed.length} no se pudieron cambiar: ${r.failed[0]?.error || ''}`, 'error');
-          addToast(`${ids.length} jugador${ids.length === 1 ? '' : 'es'} ${suspend ? 'suspendido(s)' : 'activado(s)'}`, 'success');
-          setSelectedIds(new Set());
-          fetchUsers();
-        } catch { addToast("Error en la acción masiva", 'error'); }
-        finally { setIsBulkLoading(false); }
-      }
-    });
   };
 
-  const exportCSV = () => {
-    const rows = filteredUsers;
-    if (rows.length === 0) { addToast("No hay datos para exportar", 'error'); return; }
-    const header = ['Nombre', 'Email', 'Rol', 'Estado', 'Deporte', 'Posición', 'OVR', 'XP', 'Tier', 'Partidos', 'Ganados', 'Perdidos', '% Victorias', 'Goles', 'Equipos', 'Insignias', 'Miembro desde'];
-    const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const body = rows.map(u => [
-      u.name, u.email, u.role, u.status, u.mainSport, u.position, u.ovr, u.xp, u.tier,
-      u.stats.played || 0, u.stats.won || 0, u.stats.lost || 0, `${u.winRate}%`, u.stats.goals || 0,
-      u.teamList.join(' | '), u.badges.length, u.joined
-    ].map(esc).join(','));
-    const csv = '\uFEFF' + [header.map(esc).join(','), ...body].join('\r\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `jugadores_mvp_${new Date().toISOString().slice(0, 10)}.csv`;
+  const recompute = async () => {
+    const ok = await confirm({
+      title: "Recalcular niveles",
+      message: "Se recalcula la experiencia, el nivel y los logros de todas las cuentas con las reglas vigentes. Solo cuentan los partidos con ingreso registrado por un recinto, así que algunos niveles pueden bajar.",
+      confirmLabel: "Recalcular",
+    });
+    if (!ok) return;
+    setBusy("recompute");
+    try {
+      // Todas las cuentas (dueños y personal también juegan), de a 25
+      const ids = (await getDocs(collection(db, "users"))).docs.map((d) => d.id);
+      let updated = 0;
+      for (let k = 0; k < ids.length; k += 25) updated += (await postApi<{ updated: number }>("/api/players/recompute", { uids: ids.slice(k, k + 25) })).updated || 0;
+      toast(`${plural(updated, "cuenta actualizada", "cuentas actualizadas")}`);
+      await load();
+    } catch (e) {
+      toast((e as Error)?.message || "No se pudo recalcular", "error");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const exportCsv = () => {
+    if (!filtered.length) { toast("No hay jugadores para exportar", "error"); return; }
+    const url = URL.createObjectURL(new Blob([playersCsv(filtered)], { type: "text/csv;charset=utf-8;" }));
+    const a = Object.assign(document.createElement("a"), { href: url, download: `jugadores_mvp_${new Date().toISOString().slice(0, 10)}.csv` });
     a.click();
     URL.revokeObjectURL(url);
-    addToast(`${rows.length} jugador${rows.length === 1 ? '' : 'es'} exportado(s)`, 'success');
+    toast(`${plural(filtered.length, "jugador exportado", "jugadores exportados")}`);
   };
 
-  const uniqueSports = useMemo(() => {
-    const sports = new Set<string>();
-    users.forEach(u => {
-      if (u.mainSport) {
-        sports.add(u.mainSport);
-      }
-    });
-    return ['Todos', ...Array.from(sports)];
-  }, [users]);
-
-  const getOvrColor = (tier: string) => {
-    const t = tier.toUpperCase();
-    if (t.includes('ÉLITE')) return 'text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500/20';
-    if (t.includes('LEYENDA')) return 'text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 border-indigo-500/20';
-    if (t.includes('DIAMANTE')) return 'text-cyan-500 bg-cyan-50 dark:bg-cyan-500/10 border-cyan-500/20';
-    if (t.includes('ORO')) return 'text-amber-500 bg-amber-50 dark:bg-amber-500/10 border-amber-500/20';
-    if (t.includes('PLATA')) return 'text-slate-500 bg-slate-50 dark:bg-slate-500/10 border-slate-500/20';
-    return 'text-orange-500 bg-orange-50 dark:bg-orange-500/10 border-orange-500/20';
-  };
+  const avgOvr = players.length ? Math.round(players.reduce((a, u) => a + u.ovr, 0) / players.length) : 0;
+  const seg = "flex items-center gap-1 bg-slate-50 dark:bg-white/5 p-1 rounded-md border border-slate-100 dark:border-white/10";
+  const toolBtn = "inline-flex items-center justify-center gap-1.5 h-10 px-3 rounded-md text-slate-600 dark:text-slate-300 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10";
 
   return (
-    <div className="w-full space-y-6 pb-12 animate-fadeIn relative">
-
-      {/* HEADER */}
+    <div className="w-full space-y-6 pb-12 animate-fadeIn">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
-          <PageTitle eyebrow="Auditoría de jugadores">Directorio de <Accent>Atletas</Accent></PageTitle>
-          <div className="flex items-center gap-2">
-              <button onClick={() => setIsBadgesModalOpen(true)} className="inline-flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md hover:bg-slate-50 dark:hover:bg-white/10 transition-all active:scale-95 text-amber-600 dark:text-amber-400 text-[11px] font-black uppercase tracking-wider shadow-xs cursor-pointer">
-                  <HugeiconsIcon icon={Medal01Icon} className="w-4 h-4" strokeWidth={2} />
-                  Configurar insignias
-              </button>
-              <button onClick={handleBulkRecalculate} disabled={isBulkLoading || loading} className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00df82] text-slate-950 text-[11px] font-black uppercase tracking-wider rounded-md shadow-[0_0_25px_-8px_rgba(0,223,130,0.7)] hover:bg-[#3affa0] active:scale-95 transition-all disabled:opacity-50 cursor-pointer">
-                  <HugeiconsIcon icon={RefreshIcon} className={`w-4 h-4 ${isBulkLoading ? 'animate-spin' : ''}`} strokeWidth={2} />
-                  Sincronizar ELO
-              </button>
-          </div>
-      </div>
-
-      {/* KPI GRID */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 sm:[&>*:last-child:nth-child(odd)]:col-span-1">
-          <TarjetaKpi titulo="Jugadores" valor={users.length.toString()} sub="Base total" icono={<HugeiconsIcon icon={UserGroupIcon} className="w-6 h-6" strokeWidth={1.6} />} brillo />
-          <TarjetaKpi titulo="Capitanes" valor={users.filter(u => u.role === 'Capitán').length.toString()} sub="Líderes de equipo" icono={<HugeiconsIcon icon={Mortarboard01Icon} className="w-6 h-6" strokeWidth={1.6} />} />
-          <TarjetaKpi titulo="OVR promedio" valor={(users.length > 0 ? Math.round(users.reduce((a, b) => a + b.ovr, 0) / users.length) : 0).toString()} sub="Nivel global" icono={<HugeiconsIcon icon={BarChartIcon} className="w-6 h-6" strokeWidth={1.6} />} brillo />
-          <TarjetaKpi titulo="Agentes libres" valor={users.filter(u => u.teamList.length === 0).length.toString()} sub="Sin equipo" icono={<HugeiconsIcon icon={SparklesIcon} className="w-6 h-6" strokeWidth={1.6} />} />
-      </div>
-
-      {/* TOOLS BAR (sticky) */}
-      <div className="sticky top-16 z-20 flex flex-col xl:flex-row gap-3 xl:items-center justify-between p-3 rounded-md border border-slate-200 dark:border-white/5 bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-xl shadow-[0_8px_30px_-12px_rgba(0,0,0,0.15)]">
-          <div className="relative w-full xl:w-72 shrink-0">
-              <HugeiconsIcon icon={Search01Icon} className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" strokeWidth={1.8} />
-              <input type="text" placeholder="Buscar jugador…" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-hidden transition-all" />
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-white/5 p-1 rounded-md border border-slate-100 dark:border-white/10">
-                  {["Todos", "Capitanes", "Sin equipo", "Suspendidos"].map((f) => (
-                    <button key={f} onClick={() => setFilter(f)} className={`px-3 py-1.5 text-xs md:text-[10px] font-black uppercase rounded-md transition-all whitespace-nowrap cursor-pointer ${filter === f ? "bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-xs" : "text-slate-400 hover:text-slate-900 dark:hover:text-white"}`}>{f}</button>
-                  ))}
-              </div>
-              <div className="relative">
-                  <HugeiconsIcon icon={Activity01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" strokeWidth={1.8} />
-                  <select value={sportFilter} onChange={(e) => setSportFilter(e.target.value)} aria-label="Filtrar por deporte" className="pl-9 pr-8 py-2.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-[12px] font-semibold text-slate-700 dark:text-white outline-hidden transition-all cursor-pointer appearance-none">
-                      {uniqueSports.map((s) => <option key={s} value={s} className="bg-white text-slate-900 dark:bg-[#0B0F19] dark:text-white">{s}</option>)}
-                  </select>
-                  <HugeiconsIcon icon={ArrowDown01Icon} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" strokeWidth={2} />
-              </div>
-              <div className="flex items-center gap-1 bg-slate-50 dark:bg-white/5 p-1 rounded-md border border-slate-100 dark:border-white/10">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    aria-label="Vista cuadrícula"
-                    className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-xs' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
-                  >
-                    <HugeiconsIcon icon={Grid02Icon} className="w-4 h-4" strokeWidth={1.8} />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    aria-label="Vista listado"
-                    className={`p-2 rounded-md transition-all cursor-pointer ${viewMode === 'list' ? 'bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-xs' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
-                  >
-                    <HugeiconsIcon icon={ListViewIcon} className="w-4 h-4" strokeWidth={1.8} />
-                  </button>
-              </div>
-              <button onClick={exportCSV} aria-label="Exportar CSV" title="Exportar CSV" className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-md text-slate-500 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-white/10 transition-all cursor-pointer border border-slate-200 dark:border-white/10">
-                  <HugeiconsIcon icon={Download01Icon} className="w-4 h-4" strokeWidth={1.8} />
-                  <span className="text-xs md:text-[10px] font-black uppercase tracking-wider hidden sm:inline">CSV</span>
-              </button>
-              <button onClick={fetchUsers} aria-label="Refrescar" className="p-2.5 rounded-md text-slate-500 hover:text-emerald-600 hover:bg-slate-100 dark:hover:bg-white/10 transition-all cursor-pointer border border-slate-200 dark:border-white/10">
-                  <HugeiconsIcon icon={RefreshIcon} className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} strokeWidth={1.8} />
-              </button>
-          </div>
-      </div>
-
-      {/* Resultados / selección */}
-      {!loading && filteredUsers.length > 0 && (
-          <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
-                  <span className="font-mono text-slate-900 dark:text-white">{filteredUsers.length}</span> jugador{filteredUsers.length === 1 ? "" : "es"}
-                  {totalPages > 1 && <> · página <span className="text-slate-900 dark:text-white font-mono">{safePage}</span> de <span className="text-slate-900 dark:text-white font-mono">{totalPages}</span></>}
-              </p>
-
-              {selectedIds.size > 0 && (() => {
-                  const sel = users.filter(u => selectedIds.has(u.id));
-                  const activeCount = sel.filter(u => u.status === 'Activo').length;
-                  const suspendedCount = sel.filter(u => u.status === 'Suspendido').length;
-                  return (
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/25">
-                      <span className="text-[11px] font-black uppercase tracking-wider text-emerald-700 dark:text-[#00df82] font-mono">{selectedIds.size} seleccionado{selectedIds.size === 1 ? '' : 's'}</span>
-                      <button
-                          onClick={() => handleBulkStatus(true)}
-                          disabled={activeCount === 0}
-                          title={activeCount === 0 ? 'No hay activos seleccionados' : `Suspender ${activeCount}`}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                          <HugeiconsIcon icon={BlockedIcon} className="w-3.5 h-3.5" strokeWidth={2} />Suspender{activeCount > 0 ? ` (${activeCount})` : ''}
-                      </button>
-                      <button
-                          onClick={() => handleBulkStatus(false)}
-                          disabled={suspendedCount === 0}
-                          title={suspendedCount === 0 ? 'No hay suspendidos seleccionados' : `Activar ${suspendedCount}`}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-[#00df82] hover:bg-emerald-500/10 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                          <HugeiconsIcon icon={CheckmarkCircle02Icon} className="w-3.5 h-3.5" strokeWidth={2} />Activar{suspendedCount > 0 ? ` (${suspendedCount})` : ''}
-                      </button>
-                      <button onClick={() => setSelectedIds(new Set())} aria-label="Limpiar selección" className="p-1 rounded-md text-slate-400 hover:text-slate-700 dark:hover:text-white transition-all cursor-pointer">
-                          <HugeiconsIcon icon={Cancel01Icon} className="w-3.5 h-3.5" strokeWidth={2} />
-                      </button>
-                  </div>
-                  );
-              })()}
-          </div>
-      )}
-      {/* LISTADO */}
-      <div className="relative min-h-[400px]">
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <HugeiconsIcon icon={RefreshIcon} className="w-8 h-8 text-emerald-500 dark:text-[#00df82] animate-spin" strokeWidth={2} />
-            <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] text-center">Analizando base de talento…</p>
-          </div>
-        ) : filteredUsers.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <span className="w-16 h-16 rounded-md bg-slate-100 dark:bg-white/5 flex items-center justify-center">
-              <HugeiconsIcon icon={UserGroupIcon} className="w-8 h-8 text-slate-300 dark:text-white/15" strokeWidth={1.5} />
-            </span>
-            <div className="text-center">
-              <p className="text-[12px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">No hay jugadores que coincidan</p>
-              <p className="text-[11px] text-slate-400 mt-1">Ajusta la búsqueda o los filtros.</p>
-            </div>
-          </div>
-        ) : (
-          viewMode === 'list' ? (
-            <div className="overflow-hidden rounded-md border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/50">
-              <div className="overflow-x-auto custom-scrollbar">
-                <table className="w-full text-left border-collapse min-w-[900px]">
-                  <thead>
-                    <tr className="border-b border-slate-100 dark:border-white/5 bg-slate-50/60 dark:bg-white/2">
-                      <th className="py-4 pl-6 pr-2 w-10">
-                        <button onClick={() => toggleSelectAll(pagedUsers.map(u => u.id))} aria-label="Seleccionar página" className="text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] transition-colors cursor-pointer">
-                          <HugeiconsIcon icon={pagedUsers.length > 0 && pagedUsers.every(u => selectedIds.has(u.id)) ? CheckmarkSquare02Icon : SquareIcon} className="w-4 h-4" strokeWidth={1.8} />
-                        </button>
-                      </th>
-                      <SortableTh label="Jugador" active={sortKey === 'name'} onClick={() => toggleSort('name')} />
-                      <SortableTh label="Valoración" active={sortKey === 'ovr'} onClick={() => toggleSort('ovr')} align="center" />
-                      <SortableTh label="Partidos / récord" active={sortKey === 'played'} onClick={() => toggleSort('played')} />
-                      <SortableTh label="Goles / MVP" active={sortKey === 'goals'} onClick={() => toggleSort('goals')} />
-                      <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Equipos</th>
-                      <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">Estado</th>
-                      <th className="py-4 px-6 text-xs md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider text-right">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                    {pagedUsers.map((user) => {
-                      const winRate = user.winRate;
-                      const isSelected = selectedIds.has(user.id);
-                      return (
-                        <tr key={user.id} className={`transition-all ${isSelected ? 'bg-emerald-500/4' : 'hover:bg-slate-50/60 dark:hover:bg-white/2'}`}>
-                          <td className="py-4 pl-6 pr-2">
-                            <button onClick={() => toggleSelect(user.id)} aria-label={`Seleccionar ${user.name}`} className={`transition-colors cursor-pointer ${isSelected ? 'text-emerald-600 dark:text-[#00df82]' : 'text-slate-300 dark:text-slate-600 hover:text-slate-500 dark:hover:text-slate-400'}`}>
-                              <HugeiconsIcon icon={isSelected ? CheckmarkSquare02Icon : SquareIcon} className="w-4 h-4" strokeWidth={1.8} />
-                            </button>
-                          </td>
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center font-black text-slate-500 text-sm overflow-hidden border border-slate-100 dark:border-white/10 shrink-0">
-                                {user.photoURL ? <img src={user.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} className="w-full h-full object-cover" alt={user.name} /> : user.name.charAt(0)}
-                              </div>
-                              <div className="min-w-0">
-                                <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span className="font-black text-[12px] text-slate-900 dark:text-white uppercase truncate leading-none">{user.name}</span>
-                                  {user.role === 'Capitán' && <span className="px-1.5 py-0.5 bg-amber-500 text-slate-950 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">CAP</span>}
-                                  {user.mainSport && <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">{user.mainSport}</span>}
-                                  {user.position && <span className="px-1.5 py-0.5 bg-cyan-500/10 text-cyan-500 dark:text-cyan-400 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">{user.position}</span>}
-                                </div>
-                                <span className="text-xs md:text-[10px] font-medium text-slate-400 dark:text-slate-500 truncate block mt-1">{user.email}</span>
-                              </div>
-                            </div>
-                          </td>
-
-                          <td className="py-4 px-6 text-center">
-                            <div className="inline-flex flex-col items-center gap-1">
-                              <div className={`px-2.5 py-1 rounded-md text-[11px] font-black shadow-xs border ${getOvrColor(user.tier)}`}>
-                                {user.ovr} OVR
-                              </div>
-                              <span className="text-[11px] md:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider">{user.tier}</span>
-                            </div>
-                          </td>
-
-                          <td className="py-4 px-6">
-                            <div className="flex flex-col gap-1.5">
-                              <div className="flex items-center gap-2">
-                                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">
-                                  {user.stats.played} PJ · <span className="text-emerald-500">{user.stats.won}W</span> / <span className="text-red-400">{user.stats.lost}L</span>
-                                </span>
-                                <span className="text-xs md:text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono">({winRate}%)</span>
-                              </div>
-                              <div className="w-32 h-1 bg-slate-100 dark:bg-white/5 rounded-md overflow-hidden">
-                                <div className="h-full bg-emerald-500 rounded-md" style={{ width: `${winRate}%` }}></div>
-                              </div>
-                            </div>
-                          </td>
-
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-4">
-                              <div className="flex items-center gap-1.5">
-                                <HugeiconsIcon icon={FireIcon} className="w-3.5 h-3.5 text-rose-500" strokeWidth={1.8} />
-                                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">{user.stats.goals || 0} <span className="text-[11px] md:text-[9px] font-bold text-slate-400 uppercase">Goles</span></span>
-                              </div>
-                              <div className="flex items-center gap-1.5">
-                                <HugeiconsIcon icon={TrophyIcon} className="w-3.5 h-3.5 text-amber-500" strokeWidth={1.8} />
-                                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono">{user.stats.mvp || 0} <span className="text-[11px] md:text-[9px] font-bold text-slate-400 uppercase">MVP</span></span>
-                              </div>
-                            </div>
-                          </td>
-
-                          <td className="py-4 px-6">
-                            <div className="flex flex-wrap gap-1 max-w-[160px]">
-                              {user.teamList.length > 0 ? (
-                                user.teamList.map((t, idx) => (
-                                  <span key={idx} className="px-2 py-0.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[11px] md:text-[9px] font-black rounded-md uppercase border border-indigo-500/10 tracking-wide">{t}</span>
-                                ))
-                              ) : (
-                                <span className="text-xs md:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Libre</span>
-                              )}
-                            </div>
-                          </td>
-
-                          <td className="py-4 px-6">
-                            <div className="flex flex-col gap-1">
-                              <span className={`px-2 py-1 rounded-md text-[11px] md:text-[9px] font-black uppercase w-fit border ${user.status === 'Activo' ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-700 dark:text-[#00df82]' : 'bg-red-500/10 border-red-500/25 text-red-600 dark:text-red-400'}`}>
-                                {user.status}
-                              </span>
-                              {(user.strikes || 0) > 0 && (
-                                <span className="px-2 py-0.5 bg-rose-500 text-white rounded-md text-[11px] md:text-[9px] font-black uppercase flex items-center gap-1 w-fit">
-                                  <HugeiconsIcon icon={BlockedIcon} className="w-3 h-3" strokeWidth={2} />
-                                  {user.strikes} {user.strikes === 1 ? 'Strike' : 'Strikes'}
-                                </span>
-                              )}
-                            </div>
-                          </td>
-
-                          <td className="py-4 px-6 text-right">
-                            <button onClick={() => openPlayer(user, 'perfil')} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-md text-xs md:text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:text-emerald-600 dark:hover:text-[#00df82] hover:border-emerald-300 dark:hover:border-[#00df82]/30 hover:bg-emerald-50 dark:hover:bg-[#00df82]/10 transition-all active:scale-95 cursor-pointer">
-                              <HugeiconsIcon icon={UserCircleIcon} className="w-4 h-4" strokeWidth={1.8} />
-                              Perfil
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {pagedUsers.map((user) => (
-                <div
-                  key={user.id}
-                  className={`group relative flex flex-col overflow-hidden rounded-md border bg-white dark:bg-slate-900/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/60 dark:hover:shadow-black/40 ${
-                    user.status === 'Activo' ? 'border-slate-200 dark:border-white/5 hover:border-emerald-300 dark:hover:border-[#00df82]/30' : 'border-red-200 dark:border-red-500/20'
-                  }`}
-                >
-                  {/* Header con acento */}
-                  <div className="relative p-4 pb-3">
-                    <div
-                      aria-hidden="true"
-                      className={`absolute left-0 top-0 bottom-0 w-[3px] ${user.status === 'Activo' ? "bg-linear-to-b from-emerald-400 to-[#00df82]" : "bg-linear-to-b from-red-400 to-red-600"}`}
-                    />
-                    <div className="flex items-start justify-between gap-3 pl-1.5">
-                      <div className="relative shrink-0">
-                        <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-100 dark:border-white/10 flex items-center justify-center font-black text-slate-500 dark:text-slate-400 text-lg overflow-hidden">
-                          {user.photoURL ? <img src={user.photoURL} referrerPolicy="no-referrer" onError={hideBrokenImg} className="w-full h-full object-cover" alt={user.name} /> : user.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div className={`absolute -bottom-1 -right-1 min-w-[26px] h-[26px] px-1 rounded-md border-2 border-white dark:border-slate-900 flex items-center justify-center font-black text-xs md:text-[10px] shadow-xs ${getOvrColor(user.tier)}`}>
-                          {user.ovr}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-end gap-1.5 min-w-0">
-                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-wider border ${user.status === 'Activo' ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-700 dark:text-[#00df82]' : 'bg-red-500/10 border-red-500/25 text-red-600 dark:text-red-400'}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${user.status === 'Activo' ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                          {user.status}
-                        </span>
-                        <span className={`px-2 py-0.5 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-wider border border-transparent ${getOvrColor(user.tier)}`}>{user.tier}</span>
-                      </div>
-                    </div>
-
-                    <h3 className="mt-3 font-black text-slate-900 dark:text-white text-[15px] uppercase truncate leading-tight group-hover:text-emerald-600 dark:group-hover:text-[#00df82] transition-colors font-heading">
-                      {user.name}
-                    </h3>
-                    {user.email && (
-                      <p className="text-xs md:text-[10px] text-slate-400 truncate mt-0.5">{user.email}</p>
-                    )}
-
-                    <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                      {user.role === 'Capitán' && (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-500 text-slate-950 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">
-                          <HugeiconsIcon icon={CrownIcon} className="w-2.5 h-2.5" strokeWidth={2.5} /> Capitán
-                        </span>
-                      )}
-                      {user.mainSport && <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">{user.mainSport}</span>}
-                      {user.position && <span className="px-1.5 py-0.5 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">{user.position}</span>}
-                      {(user.strikes || 0) > 0 && (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-rose-500 text-white rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-wider">
-                          <HugeiconsIcon icon={BlockedIcon} className="w-2.5 h-2.5" strokeWidth={2.5} />
-                          {user.strikes} {user.strikes === 1 ? 'strike' : 'strikes'}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Métricas */}
-                  <div className="px-4 pb-3 grid grid-cols-3 gap-1.5">
-                    <div className="px-2 py-2.5 rounded-md bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5 text-center">
-                      <span className="block text-[15px] font-black text-slate-900 dark:text-white leading-none font-mono">{user.stats.played || 0}</span>
-                      <span className="block text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-1">Partidos</span>
-                    </div>
-                    <div className="px-2 py-2.5 rounded-md bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5 text-center">
-                      <span className={`block text-[15px] font-black leading-none font-mono ${user.winRate >= 50 ? 'text-emerald-600 dark:text-[#00df82]' : 'text-slate-900 dark:text-white'}`}>{user.winRate}%</span>
-                      <span className="block text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-1">Victorias</span>
-                    </div>
-                    <div className="px-2 py-2.5 rounded-md bg-slate-50 dark:bg-white/3 border border-slate-100 dark:border-white/5 text-center">
-                      <span className="block text-[15px] font-black text-slate-900 dark:text-white leading-none font-mono">{user.stats.goals || 0}</span>
-                      <span className="block text-[11px] md:text-[8px] font-bold text-slate-400 uppercase tracking-wider mt-1">Goles</span>
-                    </div>
-                  </div>
-
-                  {/* Detalles */}
-                  <div className="px-4 pb-3 flex flex-col gap-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="inline-flex items-center gap-1.5 text-xs md:text-[10px] font-semibold text-slate-400 min-w-0">
-                        <HugeiconsIcon icon={UserGroupIcon} className="w-3.5 h-3.5 shrink-0" strokeWidth={1.8} />
-                        <span className="truncate">{user.teamList.length > 0 ? user.teamList.join(', ') : 'Agente libre'}</span>
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-xs md:text-[10px] font-bold text-slate-400 shrink-0">
-                        <HugeiconsIcon icon={Certificate01Icon} className="w-3.5 h-3.5 text-amber-500" strokeWidth={1.8} />
-                        <span className="font-mono text-slate-900 dark:text-white">{user.badges.length}</span>
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="inline-flex items-center gap-1.5 text-xs md:text-[10px] font-semibold text-slate-400">
-                        <HugeiconsIcon icon={FireIcon} className="w-3.5 h-3.5 text-rose-500" strokeWidth={1.8} />
-                        {user.goalsPerMatch} goles/partido
-                      </span>
-                      <span className="text-xs md:text-[10px] font-semibold text-slate-400">Desde {user.joined}</span>
-                    </div>
-                  </div>
-
-                  {/* Acción */}
-                  <div className="mt-auto border-t border-slate-100 dark:border-white/5">
-                    <button onClick={() => openPlayer(user, 'perfil')} className="w-full px-4 py-3 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-[#00df82] hover:bg-emerald-50 dark:hover:bg-[#00df82]/10 transition-all cursor-pointer">
-                      <HugeiconsIcon icon={UserCircleIcon} className="w-4 h-4" strokeWidth={2} />
-                      <span className="text-xs md:text-[10px] font-black uppercase tracking-wider">Ver perfil completo</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )
-        )}
-      </div>
-
-      {/* PAGINACIÓN */}
-      {!loading && totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={safePage === 1} className="px-3 py-2 rounded-md border border-slate-200 dark:border-white/10 text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-all disabled:opacity-40 cursor-pointer">
-            Anterior
+        <PageTitle eyebrow="Auditoría de jugadores">Directorio de <Accent>Atletas</Accent></PageTitle>
+        <div className="flex flex-wrap items-center gap-2">
+          <button onClick={() => setBadgesOpen(true)} className="inline-flex items-center gap-2 px-4 h-10 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-amber-700 dark:text-amber-400 text-[11px] font-black uppercase tracking-wider active:scale-95">
+            <Icon icon={Medal01Icon} className="w-4 h-4" w={2} />Configurar insignias
           </button>
-          {Array.from({ length: totalPages }).slice(0, 7).map((_, i) => {
-            const n = i + 1;
-            return (
-              <button key={n} onClick={() => setPage(n)} className={`w-9 h-9 rounded-md text-[11px] font-black font-mono transition-all cursor-pointer ${safePage === n ? "bg-[#00df82] text-slate-950" : "border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"}`}>
-                {n}
-              </button>
-            );
-          })}
-          <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={safePage === totalPages} className="px-3 py-2 rounded-md border border-slate-200 dark:border-white/10 text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-all disabled:opacity-40 cursor-pointer">
-            Siguiente
+          <button onClick={recompute} disabled={!!busy || loading} className="inline-flex items-center gap-2 px-5 h-10 bg-[#00df82] text-slate-950 text-[11px] font-black uppercase tracking-wider rounded-md active:scale-95 disabled:opacity-50">
+            <Icon icon={RefreshIcon} className={`w-4 h-4 ${busy === "recompute" ? "animate-spin" : ""}`} w={2} />{busy === "recompute" ? "Recalculando…" : "Recalcular niveles"}
           </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <TarjetaKpi titulo="Jugadores" valor={String(players.length)} sub={`${players.filter((u) => u.suspended).length} suspendidos`} icono={<Icon icon={UserGroupIcon} className="w-6 h-6" />} brillo />
+        <TarjetaKpi titulo="Capitanes" valor={String(players.filter((u) => u.captain).length)} sub="Líderes de equipo" icono={<Icon icon={Mortarboard01Icon} className="w-6 h-6" />} />
+        <TarjetaKpi titulo="OVR promedio" valor={String(avgOvr)} sub="Nivel global" icono={<Icon icon={BarChartIcon} className="w-6 h-6" />} brillo />
+        <TarjetaKpi titulo="Agentes libres" valor={String(players.filter((u) => !u.teams.length).length)} sub="Sin equipo" icono={<Icon icon={SparklesIcon} className="w-6 h-6" />} />
+      </div>
+
+      <div className="sticky top-16 z-20 flex flex-col xl:flex-row gap-3 xl:items-center justify-between p-3 rounded-md border border-slate-200 dark:border-white/5 bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-xl">
+        <div className="relative w-full xl:w-72 shrink-0">
+          <Icon icon={Search01Icon} className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input type="search" placeholder="Buscar jugador, email o equipo…" aria-label="Buscar jugador" value={search} onChange={(e) => reset(setSearch)(e.target.value)}
+            className="w-full pl-10 pr-4 h-10 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 focus:border-emerald-500 rounded-md text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-hidden" />
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className={`${seg} overflow-x-auto no-scrollbar max-w-full`} role="group" aria-label="Filtro">
+            {FILTERS.map((f) => (
+              <button key={f} aria-pressed={filter === f} onClick={() => reset(setFilter)(f)}
+                className={`px-3 h-8 text-[10px] font-black uppercase rounded-md whitespace-nowrap ${filter === f ? "bg-white dark:bg-[#00df82] text-slate-900 dark:text-slate-950 shadow-xs" : "text-slate-500 hover:text-slate-900 dark:hover:text-white"}`}>{f}</button>
+            ))}
+          </div>
+          <div className="relative">
+            <Icon icon={Activity01Icon} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            <select value={sport} onChange={(e) => reset(setSport)(e.target.value)} aria-label="Filtrar por deporte"
+              className="pl-9 pr-8 h-10 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md text-[12px] font-semibold text-slate-700 dark:text-white outline-hidden appearance-none cursor-pointer">
+              {sportsOf(players).map((s) => <option key={s} value={s} className="dark:bg-[#0B0F19]">{s}</option>)}
+            </select>
+            <Icon icon={ArrowDown01Icon} className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" w={2} />
+          </div>
+          <div className={`${seg} hidden md:flex`}>
+            {([["grid", Grid02Icon, "Vista tarjetas"], ["list", ListViewIcon, "Vista tabla"]] as const).map(([v, ic, label]) => (
+              <button key={v} onClick={() => setView(v)} aria-label={label} aria-pressed={view === v}
+                className={`w-8 h-8 flex items-center justify-center rounded-md ${view === v ? "bg-white dark:bg-[#00df82] text-emerald-600 dark:text-slate-950 shadow-xs" : "text-slate-400"}`}><Icon icon={ic} className="w-4 h-4" /></button>
+            ))}
+          </div>
+          <button onClick={exportCsv} className={toolBtn}><Icon icon={Download01Icon} className="w-4 h-4" /><span className="text-[10px] font-black uppercase tracking-wider">CSV</span></button>
+          <button onClick={load} aria-label="Actualizar" className={`${toolBtn} w-10 px-0`}><Icon icon={RefreshIcon} className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} /></button>
+        </div>
+      </div>
+
+      {!loading && filtered.length > 0 && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-[11px] font-bold text-slate-500">
+            <span className="text-slate-900 dark:text-white tabular-nums">{filtered.length}</span> {filtered.length === 1 ? "jugador" : "jugadores"}
+            {totalPages > 1 && <> · página {current} de {totalPages}</>}
+          </p>
+          {selected.size > 0 && (
+            <div className="flex flex-wrap items-center gap-2 px-3 py-1.5 rounded-md bg-emerald-500/10 border border-emerald-500/25" role="region" aria-label="Acciones con la selección">
+              <span className="text-[11px] font-black uppercase tracking-wider text-emerald-700 dark:text-[#00df82]">{plural(selected.size, "seleccionado", "seleccionados")}</span>
+              <button onClick={() => setStatus(activeSel, true)} disabled={!activeSel.length || !!busy} className="inline-flex items-center gap-1.5 px-2.5 h-8 rounded-md text-[10px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-400 hover:bg-amber-500/10 disabled:opacity-40">
+                <Icon icon={BlockedIcon} className="w-3.5 h-3.5" w={2} />Suspender{activeSel.length ? ` (${activeSel.length})` : ""}
+              </button>
+              <button onClick={() => setStatus(suspendedSel, false)} disabled={!suspendedSel.length || !!busy} className="inline-flex items-center gap-1.5 px-2.5 h-8 rounded-md text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-[#00df82] hover:bg-emerald-500/10 disabled:opacity-40">
+                <Icon icon={CheckmarkCircle02Icon} className="w-3.5 h-3.5" w={2} />Activar{suspendedSel.length ? ` (${suspendedSel.length})` : ""}
+              </button>
+              <button onClick={() => setSelected(new Set())} aria-label="Limpiar selección" className="w-8 h-8 flex items-center justify-center rounded-md text-slate-500 hover:text-slate-800 dark:hover:text-white">
+                <Icon icon={Cancel01Icon} className="w-3.5 h-3.5" w={2} />
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {/* MODALES */}
-      <PlayerModal
-        user={selectedUser}
-        isOpen={isPlayerModalOpen}
-        onClose={() => setIsPlayerModalOpen(false)}
-        gamification={gamificationConfig}
-        initialTab={playerTab}
-        onToggleStatus={(u) => setUserToToggle(u)}
-      />
-      <BadgesConfigModal isOpen={isBadgesModalOpen} onClose={() => setIsBadgesModalOpen(false)} />
+      <div className="min-h-[300px]">
+        {loading && !players.length ? (
+          <div className="flex flex-col items-center justify-center py-24 gap-4" role="status">
+            <Icon icon={RefreshIcon} className="w-8 h-8 text-emerald-500 animate-spin" w={2} />
+            <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em]">Cargando jugadores…</p>
+          </div>
+        ) : !filtered.length ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
+            <Icon icon={UserGroupIcon} className="w-10 h-10 text-slate-300 dark:text-white/15" w={1.5} />
+            <p className="text-[12px] font-black text-slate-500 uppercase tracking-[0.15em]">{players.length ? "Ningún jugador coincide" : "Aún no hay jugadores"}</p>
+            {(search || filter !== "Todos" || sport !== "Todos") && (
+              <button onClick={() => { setSearch(""); setFilter("Todos"); setSport("Todos"); setPage(1); }} className="text-[11px] font-black uppercase text-emerald-600 dark:text-[#00df82]">Quitar filtros</button>
+            )}
+          </div>
+        ) : view === "list" ? (
+          <>
+            <div className="hidden md:block"><PlayerTable rows={paged} selected={selected} onToggle={toggle} onToggleAll={toggleAll} sort={sort} onSort={onSort} onOpen={setProfile} /></div>
+            <div className="md:hidden"><PlayerCards rows={paged} selected={selected} onToggle={toggle} onOpen={setProfile} /></div>
+          </>
+        ) : (
+          <PlayerCards rows={paged} selected={selected} onToggle={toggle} onOpen={setProfile} />
+        )}
+      </div>
 
-      {/* CONFIRM: SUSPENDER / ACTIVAR */}
-      <ConfirmDialog
-        open={!!userToToggle}
-        tone="warning"
-        title={userToToggle?.status === 'Activo' ? "¿Suspender jugador?" : "¿Activar jugador?"}
-        message={userToToggle?.status === 'Activo'
-          ? <><strong>{userToToggle?.name}</strong> no podrá reservar ni acceder a la app hasta que lo reactives.</>
-          : <><strong>{userToToggle?.name}</strong> recuperará el acceso completo a la app.</>}
-        confirmLabel={userToToggle?.status === 'Activo' ? "Suspender" : "Activar"}
-        loading={isToggling}
-        onConfirm={handleToggleStatus}
-        onCancel={() => setUserToToggle(null)}
-      />
+      {!loading && <Pagination page={current} total={totalPages} onPage={(p) => { setPage(p); window.scrollTo({ top: 0, behavior: "smooth" }); }} />}
 
-      {/* CONFIRM: SINCRONIZAR ELO */}
-      <ConfirmDialog
-        open={confirmModal.isOpen}
-        tone={confirmModal.type === 'danger' ? 'danger' : 'default'}
-        title={confirmModal.title}
-        message={confirmModal.msg}
-        confirmLabel="Confirmar"
-        loading={isBulkLoading}
-        onConfirm={confirmModal.onConfirm}
-        onCancel={() => setConfirmModal(p => ({ ...p, isOpen: false }))}
-      />
+      <PlayerModal user={profile ? forModal(profile) : null} isOpen={!!profile} onClose={() => setProfile(null)} gamification={gamification}
+        initialTab="perfil" onToggleStatus={() => profile && setStatus([profile], !profile.suspended)} />
+      <BadgesConfigModal isOpen={badgesOpen} onClose={() => setBadgesOpen(false)} />
     </div>
-  );
-}
-
-function SortableTh({ label, active, onClick, align = 'left' }: { label: string; active: boolean; onClick: () => void; align?: 'left' | 'center' | 'right' }) {
-  return (
-    <th className={`py-4 px-6 ${align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left'}`}>
-      <button
-        onClick={onClick}
-        className={`inline-flex items-center gap-1.5 text-xs md:text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer ${active ? 'text-emerald-600 dark:text-[#00df82]' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-white'}`}
-      >
-        {label}
-        {active && <HugeiconsIcon icon={ArrowUpDownIcon} className="w-3 h-3" strokeWidth={2} />}
-      </button>
-    </th>
   );
 }
