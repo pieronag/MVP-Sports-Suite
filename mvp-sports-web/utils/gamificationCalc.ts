@@ -1,4 +1,5 @@
 // Cálculo puro de experiencia, nivel y logros a partir de las reservas (sin acceso a la base).
+/* eslint-disable @typescript-eslint/no-explicit-any -- trabaja con documentos crudos de Firestore */
 
 export const DEFAULT_TIERS = { bronze: 0, silver: 1000, gold: 3000, platinum: 6000, diamond: 10000, elite: 15000, legend: 25000 };
 const TIER_NAMES: [keyof typeof DEFAULT_TIERS, string][] = [
@@ -27,6 +28,43 @@ const norm = (x: string) => String(x || "").toLowerCase().normalize("NFD").repla
 export const MAX_PER_MATCH = 15;
 const capPerMatch = (v: unknown) => Math.min(MAX_PER_MATCH, Math.max(0, Math.floor(Number(v) || 0)));
 const toDate = (d: any): Date | null => (d?.toDate ? d.toDate() : d ? new Date(d) : null);
+
+/** Puntos por acción para este jugador (la configuración por deporte se toma de su deporte principal). */
+export function xpValues(user: any, cfg: GamificationConfig) {
+  const ov = cfg.sportsOverrides[norm(user?.mainSport || "futbol")] || {};
+  return {
+    match: ov.xpPerMatch ?? cfg.xp.match, checkin: ov.xpPerCheckin ?? cfg.xp.checkin, win: ov.winXP ?? cfg.xp.win, loss: ov.lossXP ?? cfg.xp.loss,
+    goal: ov.goalXP ?? cfg.xp.goal, assist: ov.assistXP ?? cfg.xp.assist, mvp: ov.xpPerMvp ?? cfg.xp.mvp, noShow: ov.xpPerNoShow ?? cfg.xp.noShow,
+  };
+}
+
+export type BookingXp =
+  | { counts: true; xp: number; outcome: "win" | "loss" | "draw" | null; goals: number; assists: number; mvp: boolean; checkIn: boolean }
+  | { counts: false; xp: number; reason: "no-show" | "cancelled" | "internal" | "not-verified" };
+
+/**
+ * Lo que una reserva le suma (o resta) a este jugador, con las mismas reglas que computeProgress.
+ * La suma de las que cuentan, más el bono de logros, da su XP total.
+ */
+export function bookingXp(b: any, uid: string, user: any, cfg: GamificationConfig): BookingXp {
+  const x = xpValues(user, cfg);
+  const mine = b.userId === uid;
+  if (b.status === "no-show" || b.paymentStatus === "no-show" || b.noShow === true) return { counts: false, xp: mine ? -x.noShow : 0, reason: "no-show" };
+  if (b.status === "cancelled" || b.status === "rejected") return { counts: false, xp: 0, reason: "cancelled" };
+  if (b.isInternalMatch) return { counts: false, xp: 0, reason: "internal" };
+  if (!(b.checkIn || b.checkOut || b.status === "completed")) return { counts: false, xp: 0, reason: "not-verified" };
+  const team = b.teamAssignments?.[uid];
+  let outcome: "win" | "loss" | "draw" | null = null;
+  if (team === "A" || team === "B") outcome = b.winnerTeam === team ? "win" : b.winnerTeam && b.winnerTeam !== "draw" ? "loss" : b.winnerTeam === "draw" ? "draw" : null;
+  else if (mine && b.matchOutcome) outcome = b.matchOutcome === "win" ? "win" : b.matchOutcome === "loss" ? "loss" : "draw";
+  const goals = capPerMatch(b.teamStats?.[uid] ?? (mine ? b.goals : 0));
+  const assists = capPerMatch(b.teamAssists?.[uid] ?? (mine ? b.assists : 0));
+  const mvp = b.mvpUserId === uid || (mine && !!b.isMVP && !b.mvpUserId);
+  const checkIn = mine && !!b.checkIn;
+  const xp = x.match + (checkIn ? x.checkin : 0) + (outcome === "win" ? x.win : outcome === "loss" ? -x.loss : 0)
+    + goals * x.goal + assists * x.assist + (mvp ? x.mvp : 0);
+  return { counts: true, xp, outcome, goals, assists, mvp, checkIn };
+}
 
 export function computeProgress(uid: string, user: any, bookings: any[], cfg: GamificationConfig, now = Date.now()) {
   const st = { played: 0, won: 0, lost: 0, goals: 0, assists: 0, mvps: 0, checkins: 0, noShows: 0, morning: 0, night: 0, weekend: 0 };
@@ -62,11 +100,7 @@ export function computeProgress(uid: string, user: any, bookings: any[], cfg: Ga
     if (b.mvpUserId === uid || (mine && b.isMVP && !b.mvpUserId)) st.mvps++;
   }
 
-  const ov = cfg.sportsOverrides[norm(user.mainSport || "futbol")] || {};
-  const x = {
-    match: ov.xpPerMatch ?? cfg.xp.match, checkin: ov.xpPerCheckin ?? cfg.xp.checkin, win: ov.winXP ?? cfg.xp.win, loss: ov.lossXP ?? cfg.xp.loss,
-    goal: ov.goalXP ?? cfg.xp.goal, assist: ov.assistXP ?? cfg.xp.assist, mvp: ov.xpPerMvp ?? cfg.xp.mvp, noShow: ov.xpPerNoShow ?? cfg.xp.noShow,
-  };
+  const x = xpValues(user, cfg);
   let xp = st.played * x.match + st.checkins * x.checkin + st.won * x.win - st.lost * x.loss
     + st.goals * x.goal + st.assists * x.assist + st.mvps * x.mvp - st.noShows * x.noShow;
 

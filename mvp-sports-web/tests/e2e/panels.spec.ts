@@ -150,9 +150,46 @@ test.describe("Check-in con el código del ticket", () => {
     await player.locator('button[type="submit"]').click();
     await expect(player).toHaveURL(/\/player/, { timeout: 30_000 });
     await player.goto("/player/estadisticas");
-    await expect(player.getByText("XP total")).toBeVisible({ timeout: 30_000 });
-    await expect(player.getByText(user.xp.toLocaleString("es-CL"), { exact: true }).first()).toBeVisible({ timeout: 20_000 });
+    await expect(player.getByText("Experiencia", { exact: true })).toBeVisible({ timeout: 30_000 });
+    await expect(player.getByText(`${user.xp.toLocaleString("es-CL")} XP`, { exact: true }).first()).toBeVisible({ timeout: 20_000 });
     await player.close();
+  });
+});
+
+test.describe("Estadísticas: partido interno (jugador)", () => {
+  test("registra un partido interno con resultado y goles; queda en el historial sin sumar XP", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Escribe en la base: basta una vez");
+    test.skip(!(await exists(env.E2E_PLAYER_EMAIL)), "Sin datos de prueba");
+    test.setTimeout(120_000);
+    const db = admin().firestore();
+    const A = await admin().auth().getUserByEmail(env.E2E_PLAYER_EMAIL);
+    const mine = () => db.collection("bookings").where("userId", "==", A.uid).where("isInternalMatch", "==", true).get();
+    const xpBefore = (await db.collection("users").doc(A.uid).get()).data()?.xp || 0;
+    try {
+      const errors = watchErrors(page);
+      await page.goto("/login");
+      await page.waitForLoadState("networkidle");
+      await page.locator("#email").fill(env.E2E_PLAYER_EMAIL);
+      await page.locator("#password").fill(env.E2E_PLAYER_PASSWORD);
+      await page.locator('button[type="submit"]').click();
+      await expect(page).toHaveURL(/\/player/, { timeout: 30_000 });
+      await page.goto("/player/estadisticas");
+      await page.getByRole("button", { name: "Registrar partido interno" }).click({ timeout: 30_000 });
+      const sheet = page.getByRole("dialog", { name: "Registrar partido interno" });
+      await sheet.getByRole("radio", { name: "Victoria" }).click();
+      await sheet.getByRole("button", { name: "Sumar a tus goles" }).click();
+      await sheet.getByRole("button", { name: "Sumar a tus goles" }).click();
+      await sheet.getByRole("button", { name: "Guardar" }).click();
+      await expect(sheet).toHaveCount(0, { timeout: 20_000 });
+      const docs = (await mine()).docs.map((d) => d.data());
+      expect(docs).toEqual([expect.objectContaining({ matchOutcome: "win", goals: 2, isWin: true, status: "completed" })]);
+      await expect(page.getByText("Partido interno", { exact: true }).first()).toBeVisible({ timeout: 20_000 });
+      await expect(page.getByText("Los partidos internos no suman XP").first()).toBeVisible();
+      expect((await db.collection("users").doc(A.uid).get()).data()?.xp || 0).toBe(xpBefore);
+      expect(errors, errors.join("\n")).toEqual([]);
+    } finally {
+      await Promise.all((await mine()).docs.map((d) => d.ref.delete()));
+    }
   });
 });
 
