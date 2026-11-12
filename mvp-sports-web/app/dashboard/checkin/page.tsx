@@ -1,842 +1,302 @@
 "use client";
-import { useQrScanner } from "@/hooks/useQrScanner";
-import { useFeedback } from "@/components/ui/Feedback";
-import { useNow } from "@/hooks/useNow";
-import { hoursUntilStart } from "@/utils/chileTime";
-import { CHECKIN_OPENS_HOURS, CHECKIN_GRACE_HOURS } from "@/utils/bookingPolicy";
-import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
-import { postApi} from "@/services/client/apiClient";
-import { listBookings } from "@/services/client/data/bookings";
-import { isReal } from "@/utils/bookingModel";
-import { operatingDay } from "@/utils/chileTime";
-import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
-import React, { useState, useEffect} from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { db } from '@/services/client/firebase';
-import { auditService } from '@/services/client/auditService';
-import { collection, query, where, getDocs, Timestamp} from 'firebase/firestore';
+// Check-in del día (recepción): escanear el QR del ticket, buscar por código o nombre, registrar ingreso o inasistencia.
+// Qué puede hacerse con cada reserva lo decide utils/checkinDay con las mismas reglas que el servidor.
+import { useCallback, useEffect, useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
-    Alert02Icon,
-    ArrowDown01Icon,
-    Camera01Icon,
-    Cancel01Icon,
-    CheckmarkCircle02Icon,
-    Clock01Icon,
-    IdentityCardIcon as IdentificationIconHi,
-    InformationCircleIcon as InformationCircleIconHi,
-    Location01Icon,
-    QrCode01Icon as QrCodeIconHi,
-    RefreshIcon,
-    Search01Icon,
-    SecurityCheckIcon,
-    Store01Icon,
-    Ticket01Icon,
-    UnavailableIcon,
-    UserGroupIcon as UserGroupIconHi,
-    VideoOffIcon,
+  Alert02Icon, ArrowDown01Icon, Camera01Icon, CheckmarkCircle02Icon, Clock01Icon, IdentityCardIcon, QrCode01Icon, RefreshIcon,
+  Search01Icon, Store01Icon, UnavailableIcon, UserGroupIcon,
 } from "@hugeicons/core-free-icons";
+import { collection, documentId, getDocs, query, where } from "firebase/firestore";
+import PageTitle, { Accent } from "@/components/dashboard/PageTitle";
+import { useFeedback } from "@/components/ui/Feedback";
+import { BookingRow, CameraOverlay, ConfirmCheckin, formatCLP } from "@/components/checkin/CheckinViews";
+import { useAuth } from "@/context/AuthContext";
+import { useNow } from "@/hooks/useNow";
+import { useQrScanner } from "@/hooks/useQrScanner";
+import { postApi } from "@/services/client/apiClient";
+import { auditService } from "@/services/client/auditService";
+import { listBookings } from "@/services/client/data/bookings";
+import { db } from "@/services/client/firebase";
+import { getOwnedTenantsSnap } from "@/services/client/ownedTenants";
+import { isReal } from "@/utils/bookingModel";
+import { operatingDay } from "@/utils/chileTime";
+import {
+  canFlagNoShow, checkinBlocker, checkinState, findBookings, matchesFilter, summarizeCheckins, type CheckinBooking, type CheckinFilter,
+} from "@/utils/checkinDay";
 
-// Adaptadores: mantienen los nombres usados en el JSX sobre Hugeicons
-const MagnifyingGlassIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Search01Icon} className={className} strokeWidth={1.6} />;
-const QrCodeIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={QrCodeIconHi} className={className} strokeWidth={1.6} />;
-const CheckCircleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={CheckmarkCircle02Icon} className={className} strokeWidth={1.6} />;
-const ArrowPathIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={RefreshIcon} className={className} strokeWidth={1.6} />;
-const IdentificationIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={IdentificationIconHi} className={className} strokeWidth={1.6} />;
-const TicketIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Ticket01Icon} className={className} strokeWidth={1.6} />;
-const XMarkIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Cancel01Icon} className={className} strokeWidth={1.6} />;
-const VideoCameraSlashIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={VideoOffIcon} className={className} strokeWidth={1.6} />;
-const MapPinIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Location01Icon} className={className} strokeWidth={1.6} />;
-const BuildingStorefrontIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Store01Icon} className={className} strokeWidth={1.6} />;
-const ChevronDownIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={ArrowDown01Icon} className={className} strokeWidth={1.6} />;
-const CameraIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Camera01Icon} className={className} strokeWidth={1.6} />;
-const InformationCircleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={InformationCircleIconHi} className={className} strokeWidth={1.6} />;
-const UserGroupIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={UserGroupIconHi} className={className} strokeWidth={1.6} />;
-const ShieldCheckIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={SecurityCheckIcon} className={className} strokeWidth={1.6} />;
-const ExclamationTriangleIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Alert02Icon} className={className} strokeWidth={1.6} />;
-const ClockIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={Clock01Icon} className={className} strokeWidth={1.6} />;
-const NoSymbolIcon = ({ className }: { className?: string }) => <HugeiconsIcon icon={UnavailableIcon} className={className} strokeWidth={1.6} />;
-
-// --- INTERFACES ---
-interface Booking {
-    id: string;
-    courtId?: string;
-    cancelledBy?: string;
-    courtName: string;
-    sport?: string;
-    clientName: string;
-    startTime: Timestamp;
-    endTime: Timestamp;
-    date?: Timestamp;
-    startTimeStr?: string | null;
-    endTimeStr?: string | null;
-    status: string;
-    paymentStatus: 'paid' | 'pending' | 'partial' | 'no-show';
-    paymentMethod?: string;
-    price: number;
-    totalPrice?: number;
-    deposit?: number;
-    remainingBalance?: number;
-    checkIn?: boolean;
-    checkInTime?: Timestamp;
-    userId?: string;
-    noShow?: boolean;
-    notes?: string;
-}
+type IconType = typeof QrCode01Icon;
+const Icon = ({ icon, className }: { icon: IconType; className?: string }) => <HugeiconsIcon icon={icon} className={className} strokeWidth={1.6} />;
+const chileHHMM = (d: Date) => d.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "America/Santiago" });
+const FILTERS: { id: CheckinFilter; label: string }[] = [
+  { id: "pending", label: "Por llegar" }, { id: "in", label: "Ingresaron" }, { id: "noshow", label: "No llegaron" },
+  { id: "cancelled", label: "Anuladas" }, { id: "all", label: "Todas" },
+];
 
 export default function CheckInPage() {
-    const now = useNow(15_000);
-    const { alert } = useFeedback();
-    const { user, role, firestoreUser } = useAuth();
+  const now = new Date(useNow(15_000));
+  const { alert, confirm, toast } = useFeedback();
+  const { user, role, firestoreUser } = useAuth();
 
-    // ESTADOS DE DATOS
-    const [loading, setLoading] = useState(true);
-    const [bookings, setBookings] = useState<Booking[]>([]);
-    const [venues, setVenues] = useState<{ id: string, name: string }[]>([]);
-    const [selectedVenueId, setSelectedVenueId] = useState<string>('');
-    const [searchTerm, setSearchTerm] = useState('');
-    const [manualCode, setManualCode] = useState('');
-    const [processingId, setProcessingId] = useState<string | null>(null);
-    const [filter, setFilter] = useState<'all' | 'pending' | 'completed' | 'cancelled' | 'noshow'>('pending');
-    const [selectedBookingForConfirm, setSelectedBookingForConfirm] = useState<Booking | null>(null);
-    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-    // ESTADOS DE CÁMARA
+  const [venues, setVenues] = useState<{ id: string; name: string }[]>([]);
+  const [venueId, setVenueId] = useState("");
+  const [bookings, setBookings] = useState<CheckinBooking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<CheckinFilter>("pending");
+  const [confirming, setConfirming] = useState<CheckinBooking | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
-    // --- 1. CARGAR RECINTOS ---
-    useEffect(() => {
-        const fetchVenues = async () => {
-            if (!user?.uid) return;
-            try {
-                let list: { id: string, name: string }[] = [];
-                if (role === 'manager' || role === 'staff') {
-                    const tenantIds = firestoreUser?.tenantIds || (firestoreUser?.tenantId ? [firestoreUser.tenantId] : []);
-                    if (tenantIds.length > 0) {
-                        const chunkArray = (arr: any[], size: number) =>
-                            Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
-                        const promises = chunkArray(tenantIds, 10).map(async (chunk) => {
-                            const q = query(collection(db, "tenants"), where("__name__", "in", chunk));
-                            const snap = await getDocs(q);
-                            return snap.docs.map(d => ({ id: d.id, name: d.data().name }));
-                        });
-                        const results = await Promise.all(promises);
-                        list = results.flat();
-                    }
-                } else {
-                    const snap = await getOwnedTenantsSnap(user.uid);
-                    list = snap.docs.map(d => ({ id: d.id, name: d.data().name }));
-                }
-                setVenues(list);
-                if (list.length > 0) setSelectedVenueId(list[0].id);
-            } catch (error) { console.error("Error venues:", error); }
+  // Recintos: el personal ve los suyos; el dueño, los que administra
+  useEffect(() => {
+    if (!user?.uid) return;
+    (async () => {
+      try {
+        let list: { id: string; name: string }[] = [];
+        if (role === "manager" || role === "staff") {
+          const ids: string[] = firestoreUser?.tenantIds || (firestoreUser?.tenantId ? [firestoreUser.tenantId] : []);
+          for (let i = 0; i < ids.length; i += 10) {
+            const snap = await getDocs(query(collection(db, "tenants"), where(documentId(), "in", ids.slice(i, i + 10))));
+            list.push(...snap.docs.map((d) => ({ id: d.id, name: d.data().name || d.id })));
+          }
+        } else {
+          list = (await getOwnedTenantsSnap(user.uid)).docs.map((d) => ({ id: d.id, name: d.data().name || d.id }));
+        }
+        setVenues(list);
+        setVenueId((v) => v || list[0]?.id || "");
+        if (!list.length) setLoading(false);
+      } catch (e) {
+        console.error("Recintos", e);
+        setLoading(false);
+      }
+    })();
+  }, [user?.uid, role, firestoreUser]);
+
+  // Reservas del día operativo (06:00 a 05:59, hora de Chile)
+  const load = useCallback(async (silent = false) => {
+    if (!venueId) return;
+    if (!silent) setLoading(true);
+    try {
+      const { from, to } = operatingDay();
+      const list = (await listBookings([venueId], { from, to })).filter(isReal).map((b): CheckinBooking => {
+        const start = b.start || new Date();
+        return {
+          id: b.id, clientName: b.clientName || "Jugador", courtName: b.courtName || "Cancha", sport: b.sport || b.raw.category || "",
+          start, startTimeStr: b.startTime || chileHHMM(start), endTimeStr: b.endTime || null,
+          status: String(b.raw.status || ""), paymentStatus: b.isNoShow ? "no-show" : String(b.payment),
+          checkIn: !!b.raw.checkIn, noShow: b.isNoShow, cancelledBy: b.raw.cancelledBy, price: b.price || 0,
         };
-        fetchVenues();
-    }, [user, role, firestoreUser]);
+      }).sort((a, z) => a.start.getTime() - z.start.getTime());
+      setBookings(list);
+    } catch (e) {
+      console.error("Reservas del día", e);
+      if (!silent) alert("No se pudieron cargar las reservas", (e as { code?: string })?.code === "permission-denied" ? "Tu cuenta no tiene permisos sobre este recinto." : "Revisa tu conexión e inténtalo nuevamente.");
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  }, [venueId, alert]);
 
-    // --- 1.B CARGAR RESERVAS DEL DÍA ---
-    const fetchTodayBookings = async () => {
-        if (!selectedVenueId) return;
-        setLoading(true);
-        try {
-            // Día operativo (06:00 a 05:59, hora de Chile). El estado de pago lo define el servidor en la reserva.
-            const { from, to } = operatingDay();
-            const list = await listBookings([selectedVenueId], { from, to });
-            const updatedList = list.filter(isReal).map(b => {
-                const start = b.start ? Timestamp.fromDate(b.start) : Timestamp.now();
-                return {
-                    ...b.raw,
-                    id: b.id,
-                    clientName: b.clientName,
-                    courtName: b.courtName,
-                    price: b.price,
-                    sport: b.sport || b.raw.category || '',
-                    paymentStatus: b.isNoShow ? 'no-show' : b.payment,
-                    date: start,
-                    startTime: start,
-                    endTime: Timestamp.fromDate(new Date(start.toDate().getTime() + 3600000)),
-                    startTimeStr: b.startTime || null,
-                    endTimeStr: b.endTime || null,
-                } as Booking;
-            });
+  useEffect(() => { load(); }, [load]); // eslint-disable-line react-hooks/set-state-in-effect -- carga de datos al cambiar de recinto
+  // Las reservas nuevas del día llegan solas: al volver a la pestaña y cada 2 minutos
+  useEffect(() => {
+    const refresh = () => { if (document.visibilityState === "visible") load(true); };
+    const t = setInterval(refresh, 120_000);
+    document.addEventListener("visibilitychange", refresh);
+    return () => { clearInterval(t); document.removeEventListener("visibilitychange", refresh); };
+  }, [load]);
 
-            setBookings(updatedList);
-        } catch (error: any) {
-            console.error("Error fetching bookings:", error);
-            alert("No se pudieron cargar las reservas", error?.code === 'permission-denied' ? 'Tu cuenta no tiene permisos sobre este recinto.' : 'Revisa tu conexión e inténtalo nuevamente.');
-        } finally {
-            setLoading(false);
-        }
-    };
+  const tryCheckIn = (b: CheckinBooking) => {
+    const blocker = checkinBlocker(b, now);
+    if (blocker) { alert(b.checkIn ? "Ya ingresó" : "No puede ingresar", blocker); return; }
+    setConfirming(b);
+  };
 
-    useEffect(() => {
-        if (selectedVenueId) fetchTodayBookings();
-    }, [selectedVenueId]);
+  // Lo que traiga el jugador: QR (id), código del ticket o nombre
+  const resolve = (input: string, source: "qr" | "manual") => {
+    const found = findBookings(bookings, input);
+    if (!found.length) {
+      alert(source === "qr" ? "QR no reconocido" : "Sin resultados", source === "qr" ? "Ese QR no corresponde a una reserva de hoy en este recinto." : "No hay reservas de hoy con ese código o nombre.");
+      return;
+    }
+    if (found.length > 1) {
+      setSearch(input.trim());
+      setFilter("all");
+      toast(`Hay ${found.length} reservas que coinciden: elige la correcta en la lista`, "info");
+      return;
+    }
+    setSearch("");
+    tryCheckIn(found[0]);
+  };
+  const { isCameraOpen, cameraError, cameraPermission, startCamera, stopCamera, onNativeCapture } = useQrScanner((t) => resolve(t, "qr"), alert);
 
-    const formatTime = (ts: Timestamp) => {
-        const d = ts.toDate();
-        return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
-    };
+  const audit = (action: string, details: string, ok: boolean, severity: "LOW" | "MEDIUM" | "HIGH") =>
+    auditService.logAuditEvent({ action, module: "Acceso/CheckIn", details, severity, status: ok ? "SUCCESS" : "FAILED" }).catch(() => {});
 
-    // Misma ventana que el servidor (utils/bookingPolicy): desde 2 h antes hasta 15 min después del inicio, en hora de Chile
-    const validateCheckInTime = (booking: Booking): { valid: boolean, message: string, isLate: boolean } => {
-        const h = hoursUntilStart({ date: booking.startTime, startTime: booking.startTimeStr }, new Date(now));
-        if (h === null) return { valid: false, message: "La reserva no tiene horario.", isLate: false };
-        if (h > CHECKIN_OPENS_HOURS) {
-            const [sh, sm] = String(booking.startTimeStr || formatTime(booking.startTime)).split(':').map(Number);
-            const opens = ((sh * 60 + (sm || 0) - CHECKIN_OPENS_HOURS * 60) + 1440) % 1440;
-            const hh = String(Math.floor(opens / 60)).padStart(2, '0'), mm = String(opens % 60).padStart(2, '0');
-            return { valid: false, message: `Demasiado temprano. El ingreso se habilita a las ${hh}:${mm} hrs.`, isLate: false };
-        }
-        if (h < -CHECKIN_GRACE_HOURS) return { valid: false, message: "Límite de espera excedido (15 min). La reserva se considera inasistencia.", isLate: true };
-        return { valid: true, message: "", isLate: h < 0 };
-    };
+  const confirmCheckIn = async () => {
+    const b = confirming;
+    if (!b) return;
+    setBusyId(b.id);
+    try {
+      // El servidor valida recinto, pago y horario, y suma la experiencia del jugador
+      await postApi("/api/bookings/checkin", { bookingId: b.id, action: "checkin" });
+      setBookings((prev) => prev.map((x) => (x.id === b.id ? { ...x, checkIn: true, status: "active" } : x)));
+      audit("RESERVA_CHECKIN", `Ingreso registrado para la reserva ${b.id} (${b.clientName}) en ${b.courtName}.`, true, "LOW");
+      setConfirming(null);
+      alert("Ingreso exitoso", `${b.clientName} ya puede pasar a ${b.courtName}.`);
+    } catch (e) {
+      const msg = (e as Error)?.message || "Hubo un error al registrar el ingreso. Reintenta.";
+      audit("RESERVA_CHECKIN", `Falla al registrar el ingreso de la reserva ${b.id} (${b.clientName}): ${msg}`, false, "MEDIUM");
+      alert("No se pudo registrar el ingreso", msg);
+    } finally {
+      setBusyId(null);
+    }
+  };
 
-    // El cobro se registra en cualquier momento (prepago en mesón, durante o al
-    // final del partido); la ventana horaria aplica solo al ingreso a la cancha.
-    const handleCheckInAction = (booking: Booking, _action: 'checkin' = 'checkin') => {
-        // 100% online: sin pago aprobado no hay ingreso (vale para botón, QR y código manual)
-        if (booking.paymentStatus !== 'paid') {
-            alert("Reserva sin pago", "Esta reserva no tiene un pago online aprobado. El jugador debe pagar desde la app para poder ingresar.");
-            return;
-        }
-        const validation = validateCheckInTime(booking);
-        if (!validation.valid) {
-            alert("Acceso Denegado", validation.message);
-            return;
-        }
-
-        // Asegurar que el startTime/endTime sean Timestamps válidos
-        let startTimeDate: Date;
-        if (booking.startTime && (booking.startTime as any).toDate) {
-            startTimeDate = booking.startTime.toDate();
-        } else if (booking.date && (booking.date as any).toDate) {
-            startTimeDate = booking.date.toDate();
-        } else {
-            startTimeDate = new Date();
-        }
-
-        let endTimeDate: Date;
-        if (booking.endTime && (booking.endTime as any).toDate) {
-            endTimeDate = booking.endTime.toDate();
-        } else {
-            endTimeDate = new Date(startTimeDate.getTime() + 3600000);
-        }
-
-        setSelectedBookingForConfirm({
-            ...booking,
-            startTime: Timestamp.fromDate(startTimeDate),
-            endTime: Timestamp.fromDate(endTimeDate)
-        });
-        setIsConfirmModalOpen(true);
-    };
-
-    // --- 2. CÁMARA: el QR del ticket es el id de la reserva (también se acepta el código de 6 caracteres)
-    const handleScannedCode = (text: string) => {
-        const code = text.trim();
-        const found = bookings.find(b => b.id === code || b.id.slice(-6).toUpperCase() === code.toUpperCase());
-        if (!found) return alert("QR inválido", "No se reconoció ninguna reserva de hoy con ese código.");
-        if (found.checkIn) return alert("Ya ingresó", `${found.clientName} ya registró su entrada para esta reserva.`);
-        handleCheckInAction(found);
-    };
-    const { isCameraOpen, cameraError, cameraPermission, startCamera, stopCamera, onNativeCapture } = useQrScanner(handleScannedCode, alert);
-
-    const confirmCheckIn = async () => {
-        if (!selectedBookingForConfirm) return;
-
-        const booking = selectedBookingForConfirm;
-        setProcessingId(booking.id);
-
-        try {
-                // El servidor valida recinto, pago y horario, y recalcula la experiencia del jugador
-                await postApi('/api/bookings/checkin', { bookingId: booking.id, action: 'checkin' });
-                setBookings(prev => prev.map(b => b.id === booking.id ? { ...b, checkIn: true, status: 'active' } : b));
-
-                await auditService.logAuditEvent({
-                    action: 'RESERVA_CHECKIN',
-                    module: 'Acceso/CheckIn',
-                    details: `Ingreso registrado para la reserva ${booking.id} (${booking.clientName}) de la cancha ${booking.courtName}.`,
-                    severity: 'LOW',
-                    status: 'SUCCESS'
-                });
-
-                alert("Ingreso Exitoso", `El ingreso de ${booking.clientName} ha sido registrado correctamente y la reserva está en juego.`);
-
-            setIsConfirmModalOpen(false);
-            setSelectedBookingForConfirm(null);
-        } catch (error: any) {
-            console.error("Error confirming check-in:", error);
-            await auditService.logAuditEvent({
-                action: 'RESERVA_CHECKIN',
-                module: 'Acceso/CheckIn',
-                details: `Falla al procesar ingreso para la reserva ${booking.id} (${booking.clientName}). Error: ${error.message || error}`,
-                severity: 'MEDIUM',
-                status: 'FAILED'
-            });
-
-            alert("No se pudo registrar el ingreso", error?.message || "Hubo un error al procesar el ingreso. Reintenta.");
-        } finally {
-            setProcessingId(null);
-        }
-    };
-
-    const handleNoShow = async (booking: Booking) => {
-        if (!booking.id) return;
-        setProcessingId(booking.id);
-        try {
-            // El servidor cancela la reserva, suma el strike y recalcula la experiencia
-            await postApi('/api/bookings/checkin', { bookingId: booking.id, action: 'noshow' });
-
-            await auditService.logAuditEvent({
-                action: 'RESERVA_NOSHOW',
-                module: 'Acceso/CheckIn',
-                details: `Reserva ${booking.id} de ${booking.clientName} marcada como No-Show (strike aplicado al jugador).`,
-                severity: 'MEDIUM',
-                status: 'SUCCESS'
-            });
-
-            setBookings(prev => prev.map(b =>
-                b.id === booking.id ? { ...b, status: 'cancelled', noShow: true } : b
-            ));
-
-            alert("No-Show Registrado", `Se ha cancelado la reserva y aplicado un strike a ${booking.clientName}.`);
-        } catch (error: any) {
-            console.error("Error in handleNoShow:", error);
-            await auditService.logAuditEvent({
-                action: 'RESERVA_NOSHOW',
-                module: 'Acceso/CheckIn',
-                details: `Falla al registrar No-Show para la reserva ${booking.id} (${booking.clientName}). Error: ${error.message || error}`,
-                severity: 'HIGH',
-                status: 'FAILED'
-            });
-
-            alert("No se pudo registrar", error?.message || "No se pudo registrar el No-Show.");
-        } finally {
-            setProcessingId(null);
-        }
-    };
-
-    const processManualCode = (e: React.FormEvent) => {
-        e.preventDefault();
-        // El ticket muestra el código como "#AB12CD": se acepta con o sin "#" y espacios
-        const code = manualCode.trim().replace(/^#/, '').replace(/\s+/g, '');
-        if (!code) return;
-        const found = bookings.find(b =>
-            b.id.slice(-6).toUpperCase() === code.toUpperCase() ||
-            b.clientName.toLowerCase().includes(manualCode.trim().toLowerCase())
-        );
-        if (found) {
-            if (found.checkIn) alert("Ya Ingresó", `${found.clientName} ya registró su entrada anteriormente.`);
-            else handleCheckInAction(found);
-            setManualCode('');
-        } else {
-            alert("Sin Resultados", "No se encontró ninguna reserva para hoy con los datos ingresados.");
-        }
-    };
-
-    // FORMATTERS
-    const formatMoney = (amount: number) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }).format(amount);
-
-    // HELPERS DE MOTIVOS DE CANCELACIÓN
-    const isBookingNoShow = (b: Booking) => {
-        if (b.paymentStatus === 'no-show' || b.noShow === true) return true;
-        if (b.notes && (b.notes.toLowerCase().includes('no-show') || b.notes.toLowerCase().includes('inasistencia'))) return true;
-        return false;
-    };
-
-    const isBookingNoShowOrLate = (b: Booking) => {
-        if (isBookingNoShow(b)) return true;
-        if (!b.checkIn && b.status !== 'cancelled' && validateCheckInTime(b).isLate) return true;
-        return false;
-    };
-
-    // FILTROS
-    const filteredBookings = bookings.filter(b => {
-        const matchesSearch = b.clientName.toLowerCase().includes(searchTerm.toLowerCase()) || b.courtName.toLowerCase().includes(searchTerm.toLowerCase());
-        if (filter === 'pending') return matchesSearch && !b.checkIn && b.status !== 'cancelled' && !isBookingNoShowOrLate(b);
-        if (filter === 'completed') return matchesSearch && b.checkIn;
-        if (filter === 'cancelled') return matchesSearch && b.status === 'cancelled' && !isBookingNoShow(b);
-        if (filter === 'noshow') return matchesSearch && isBookingNoShowOrLate(b);
-        return matchesSearch;
+  const markNoShow = async (b: CheckinBooking) => {
+    const ok = await confirm({
+      title: "Registrar inasistencia",
+      message: <>La reserva de <strong>{b.clientName}</strong> ({b.startTimeStr}, {b.courtName}) quedará como inasistencia: se anula sin reembolso y el jugador recibe un strike. No se puede deshacer.</>,
+      tone: "danger", confirmLabel: "Registrar inasistencia",
     });
+    if (!ok) return;
+    setBusyId(b.id);
+    try {
+      // El servidor anula la reserva, suma el strike y recalcula la experiencia
+      await postApi("/api/bookings/checkin", { bookingId: b.id, action: "noshow" });
+      setBookings((prev) => prev.map((x) => (x.id === b.id ? { ...x, status: "cancelled", noShow: true, paymentStatus: "no-show" } : x)));
+      audit("RESERVA_NOSHOW", `Reserva ${b.id} de ${b.clientName} registrada como inasistencia (strike aplicado).`, true, "MEDIUM");
+      toast(`Inasistencia registrada para ${b.clientName}`);
+    } catch (e) {
+      const msg = (e as Error)?.message || "No se pudo registrar la inasistencia.";
+      audit("RESERVA_NOSHOW", `Falla al registrar la inasistencia de la reserva ${b.id} (${b.clientName}): ${msg}`, false, "HIGH");
+      alert("No se pudo registrar", msg);
+    } finally {
+      setBusyId(null);
+    }
+  };
 
-    const stats = {
-        total: bookings.length,
-        in: bookings.filter(b => b.checkIn || (isBookingNoShowOrLate(b) && (b.paymentStatus === 'paid' || b.paymentStatus === 'partial'))).length,
-        pending: bookings.filter(b => !b.checkIn && b.status !== 'cancelled' && !validateCheckInTime(b).isLate).length,
-        noShow: bookings.filter(b => isBookingNoShowOrLate(b)).length,
-        cancelled: bookings.filter(b => b.status === 'cancelled' && !isBookingNoShow(b)).length,
-        paidCount: bookings.filter(b => b.paymentStatus === 'paid').length,
-        unpaidCount: bookings.filter(b => b.paymentStatus !== 'paid' && b.status !== 'cancelled' && !isBookingNoShow(b)).length,
-        totalDebt: bookings.reduce((acc, b) => {
-            if (b.paymentStatus === 'paid' || b.status === 'cancelled' || isBookingNoShow(b)) return acc;
-            const price = b.totalPrice || b.price || 0;
-            const paid = b.paymentStatus === 'partial' ? (b.deposit || 0) : 0;
-            return acc + (price - paid);
-        }, 0),
-        totalCollected: bookings.reduce((acc, b) => {
-            if (b.paymentStatus === 'paid') return acc + (b.totalPrice || b.price || 0);
-            if (b.paymentStatus === 'partial') return acc + (b.deposit || 0);
-            return acc;
-        }, 0),
-        lostRevenue: bookings.filter(b => !b.checkIn && (b.status === 'cancelled' || isBookingNoShowOrLate(b)) && b.paymentStatus !== 'paid').reduce((acc, b) => {
-            const price = b.totalPrice || b.price || 0;
-            const paid = b.paymentStatus === 'partial' ? (b.deposit || 0) : 0;
-            return acc + (price - paid);
-        }, 0),
-        potentialTotal: bookings.reduce((acc, b) => acc + (b.totalPrice || b.price || 0), 0)
-    };
+  const summary = summarizeCheckins(bookings, now);
+  // Mientras se escribe, la lista se filtra por código, nombre o cancha
+  const q = search.trim().toLowerCase();
+  const matches = q ? new Set(findBookings(bookings, search).map((b) => b.id)) : null;
+  const visible = bookings.filter((b) => matchesFilter(checkinState(b, now), filter)
+    && (!matches || matches.has(b.id) || b.courtName.toLowerCase().includes(q)));
 
-    return (
-        <div className="space-y-6 animate-fadeIn font-sans pb-10 text-slate-600 dark:text-slate-300">
-            {/* === MODAL DE CÁMARA (Overlay Completo — funciona en móvil y web) === */}
-            {isCameraOpen && (
-                <div className="fixed inset-0 z-200 bg-black flex flex-col animate-fadeIn">
-                    {/* Header Cámara */}
-                    <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-20 bg-linear-to-b from-black/80 to-transparent">
-                        <span className="text-white text-xs md:text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-                            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_red]"></span> Escaneando QR
-                        </span>
-                        <button aria-label="Cerrar" onClick={stopCamera} className="p-2 bg-white/20 rounded-full text-white backdrop-blur-md active:scale-95 transition-transform">
-                            <XMarkIcon className="w-6 h-6" />
-                        </button>
-                    </div>
+  const kpis = [
+    { label: "Reservas del día", value: summary.counts.all, sub: formatCLP(summary.expected), icon: UserGroupIcon, tone: "text-slate-900 dark:text-white" },
+    { label: "Ingresaron", value: summary.counts.in, sub: formatCLP(summary.collectedIn), icon: CheckmarkCircle02Icon, tone: "text-emerald-600 dark:text-emerald-400" },
+    { label: "Por llegar", value: summary.counts.pending, sub: "Pagadas, sin ingreso", icon: Clock01Icon, tone: "text-slate-900 dark:text-white" },
+    { label: "No llegaron", value: summary.counts.noshow, sub: summary.lateToFlag ? `${summary.lateToFlag} por registrar` : "Al día", icon: Alert02Icon, tone: "text-red-600 dark:text-red-400" },
+  ];
 
-                    {/* Viewfinder Tunnel View - Ajustado según el ALTO */}
-                    <div className="flex-1 relative bg-black flex items-center justify-center overflow-hidden">
-                        {!cameraError ? (
-                            <div className="relative w-[70vh] h-[70vh] max-w-[90vw] max-h-[90vw] md:max-w-[400px] md:max-h-[400px] rounded-md overflow-hidden border-2 border-emerald-500/40 shadow-[0_0_40px_rgba(16,185,129,0.2)]">
-                                <div id="qr-reader" className="w-full h-full [&>video]:object-contain [&>video]:-scale-x-100"></div>
-                                
-                                {/* Guías Visuales Internas */}
-                                <div className="absolute inset-0 pointer-events-none z-10">
-                                    <div className="absolute border-[3px] border-transparent border-t-emerald-400 border-r-emerald-400 w-10 h-10 top-0 right-0 rounded-md"></div>
-                                    <div className="absolute border-[3px] border-transparent border-t-emerald-400 border-l-emerald-400 w-10 h-10 top-0 left-0 rounded-md"></div>
-                                    <div className="absolute border-[3px] border-transparent border-b-emerald-400 border-l-emerald-400 w-10 h-10 bottom-0 left-0 rounded-md"></div>
-                                    <div className="absolute border-[3px] border-transparent border-b-emerald-400 border-r-emerald-400 w-10 h-10 bottom-0 right-0 rounded-md"></div>
-                                    <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-400 shadow-[0_0_15px_#34D399] animate-scan-vertical opacity-80"></div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center text-white/70 gap-4 px-8 text-center max-w-sm">
-                                <div className="p-4 bg-red-500/20 rounded-full"><VideoCameraSlashIcon className="w-10 h-10 text-red-500" /></div>
-                                <div className="space-y-1">
-                                    <p className="text-sm font-bold text-white">Cámara inaccesible</p>
-                                    <p className="text-xs text-white/60 leading-relaxed">{cameraError}</p>
-                                </div>
-                                <div className="flex flex-col gap-2 w-full max-w-[200px]">
-                                    <button onClick={startCamera} className="w-full px-5 py-2.5 bg-white text-black rounded-md text-xs font-black uppercase tracking-wide">Reintentar</button>
-                                    <button onClick={stopCamera} className="w-full px-5 py-2.5 bg-red-500/20 text-red-500 rounded-md text-xs font-bold uppercase tracking-wide">Cerrar</button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
+  return (
+    <div className="space-y-6 animate-fadeIn pb-10 text-slate-600 dark:text-slate-300">
+      {isCameraOpen && <CameraOverlay error={cameraError} onRetry={startCamera} onClose={stopCamera} />}
 
-            {/* === HEADER FINANCE STYLE === */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6 relative z-10">
-                <PageTitle eyebrow="Terminal de Control Operativo">Gestión de <Accent>Acceso</Accent></PageTitle>
-
-                <div className="flex items-center gap-2">
-                    <div className="relative group">
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors">
-                            <BuildingStorefrontIcon className="w-3.5 h-3.5" />
-                        </div>
-                        <select
-                            value={selectedVenueId}
-                            onChange={(e) => setSelectedVenueId(e.target.value)}
-                            className="appearance-none bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-md pl-9 pr-8 py-2 text-[11px] md:text-[9px] font-black outline-hidden text-slate-700 dark:text-white uppercase cursor-pointer shadow-xs transition-all focus:border-emerald-500"
-                        >
-                            {venues.map(v => <option key={v.id} value={v.id} className="dark:bg-[#0B0F19]">{v.name}</option>)}
-                        </select>
-                        <ChevronDownIcon className="w-3 h-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    </div>
-                    <button onClick={fetchTodayBookings} className="p-2 rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 hover:text-emerald-500 hover:border-emerald-500/50 transition-all active:scale-90" title="Sincronizar Datos">
-                        <ArrowPathIcon className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-                    </button>
-                </div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-6">
+        <PageTitle eyebrow="Recepción">Control de <Accent>Acceso</Accent></PageTitle>
+        <div className="flex items-center gap-2">
+          {venues.length > 1 && (
+            <div className="relative flex-1 md:flex-none">
+              <Icon icon={Store01Icon} className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <select aria-label="Recinto" value={venueId} onChange={(e) => setVenueId(e.target.value)}
+                className="w-full appearance-none bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-md pl-9 pr-8 h-10 text-[11px] font-black outline-hidden text-slate-700 dark:text-white uppercase cursor-pointer focus:border-emerald-500">
+                {venues.map((v) => <option key={v.id} value={v.id} className="dark:bg-[#0B0F19]">{v.name}</option>)}
+              </select>
+              <Icon icon={ArrowDown01Icon} className="w-3 h-3 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
-
-            {/* === KPI GRID PREMIUM COMPACT === */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-slate-100 dark:border-white/5 shadow-xs relative overflow-hidden group">
-                    <div className="flex items-center gap-2.5 mb-2">
-                        <div className="p-1.5 bg-slate-50 dark:bg-white/5 rounded-md text-slate-400 group-hover:text-emerald-500 transition-colors">
-                            <UserGroupIcon className="w-3.5 h-3.5" />
-                        </div>
-                        <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest">Afluencia Total</p>
-                    </div>
-                    <div className="flex items-baseline justify-between">
-                        <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">{stats.total}</p>
-                        <p className="text-xs md:text-[10px] font-black text-slate-400 uppercase">{formatMoney(stats.potentialTotal)}</p>
-                    </div>
-                </div>
-
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-emerald-100 dark:border-emerald-500/20 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-12 h-12 bg-emerald-500/5 rounded-md"></div>
-                    <div className="flex items-center gap-2.5 mb-2">
-                        <div className="p-1.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-md text-emerald-500">
-                            <CheckCircleIcon className="w-3.5 h-3.5" />
-                        </div>
-                        <p className="text-[11px] md:text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Ingresos OK</p>
-                    </div>
-                    <div className="flex items-baseline justify-between">
-                        <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tighter">{stats.in}</p>
-                        <p className="text-xs md:text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase">{formatMoney(stats.totalCollected)}</p>
-                    </div>
-                </div>
-
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-red-100 dark:border-red-500/20 shadow-xs group">
-                    <div className="flex items-center gap-2.5 mb-2">
-                        <div className="p-1.5 bg-red-50 dark:bg-red-500/10 rounded-md text-red-500">
-                            <ExclamationTriangleIcon className="w-3.5 h-3.5" />
-                        </div>
-                        <p className="text-[11px] md:text-[8px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest">Inasistencias</p>
-                    </div>
-                    <div className="flex items-baseline justify-between">
-                        <p className="text-2xl font-black text-red-600 dark:text-red-400 tracking-tighter">{stats.noShow}</p>
-                        <p className="text-[11px] md:text-[8px] font-black text-red-600 dark:text-red-400 uppercase">Por Inasistencia</p>
-                    </div>
-                </div>
-
-                <div className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-slate-200 dark:border-white/10 shadow-xs group">
-                    <div className="flex items-center gap-2.5 mb-2">
-                        <div className="p-1.5 bg-slate-100 dark:bg-white/5 rounded-md text-slate-400">
-                            <NoSymbolIcon className="w-3.5 h-3.5" />
-                        </div>
-                        <p className="text-[11px] md:text-[8px] font-black text-slate-500 uppercase tracking-widest">Anuladas</p>
-                    </div>
-                    <div className="flex items-baseline justify-between">
-                        <p className="text-2xl font-black text-slate-500 tracking-tighter">{stats.cancelled}</p>
-                        <p className="text-[11px] md:text-[8px] font-black text-slate-400 uppercase">Jugador o recinto</p>
-                    </div>
-                </div>
-            </div>
-
-            {/* === ACCIÓN CENTRALIZADA COMPACT === */}
-            <div className="flex flex-col sm:flex-row gap-2">
-                <button
-                    onClick={startCamera}
-                    className="w-full sm:w-auto flex items-center justify-center gap-2 h-12 px-6 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950 rounded-md hover:scale-[1.02] active:scale-95 transition-all shrink-0 group"
-                    title="Activar Escáner de Acceso"
-                >
-                    <QrCodeIcon className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                    <span className="text-xs md:text-[10px] font-black uppercase tracking-widest">Escáner de Acceso</span>
-                </button>
-                <form onSubmit={processManualCode} className="flex-1 relative">
-                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <MagnifyingGlassIcon className="h-4 w-4 text-slate-400" />
-                    </div>
-                    <input
-                        type="text"
-                        placeholder="Buscar por código de reserva o nombre..."
-                        className="w-full h-12 pl-10 pr-24 bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-md text-[11px] font-bold outline-hidden focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder:normal-case placeholder:font-medium shadow-xs transition-all text-slate-800 dark:text-white"
-                        value={manualCode}
-                        onChange={(e) => setManualCode(e.target.value)}
-                    />
-                    <button
-                        type="submit"
-                        className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2 rounded-md text-[11px] md:text-[9px] font-black uppercase active:scale-95 transition-all shadow-md disabled:opacity-50"
-                        disabled={!manualCode}
-                    >
-                        Validar
-                    </button>
-                </form>
-            </div>
-
-            {/* Hidden inputs para el modo nativo / fallback */}
-            <input
-                id="native-camera-input"
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={onNativeCapture}
-            />
-            <div id="qr-reader-hidden" className="hidden"></div>
-
-            {/* Camera permission hint on mobile */}
-            {cameraPermission === 'denied' && (
-                <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-md p-3 text-xs md:text-[10px] text-amber-700 dark:text-amber-400 font-bold flex items-center gap-2">
-                    <CameraIcon className="w-4 h-4 shrink-0" />
-                    <span>Permiso de cámara bloqueado. Habilítalo en la configuración del navegador para escanear códigos QR.</span>
-                </div>
-            )}
-
-            {/* === BUSCAR === */}
-            <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <MagnifyingGlassIcon className="h-4 w-4 text-slate-400" />
-                    </div>
-                    <input
-                        type="text"
-                        placeholder="Filtrar por nombre o cancha..."
-                        className="w-full pl-9 pr-4 py-2 bg-white dark:bg-[#0B0F19] border border-slate-200 dark:border-white/10 rounded-md text-xs md:text-[10px] font-bold text-slate-800 dark:text-white outline-hidden focus:border-emerald-500 transition-colors shadow-xs"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-            </div>
-
-            {/* === LISTA DE RESERVAS FINANCE STYLE COMPACT === */}
-            <div className="bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 overflow-hidden">
-                <div className="p-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/2 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                    <h3 className="text-[11px] md:text-[9px] font-black text-slate-800 dark:text-white uppercase tracking-widest flex items-center gap-2 shrink-0">
-                        <ClockIcon className="w-3.5 h-3.5 text-emerald-500" /> Registro de Hoy
-                    </h3>
-                    <div className="flex gap-1.5 overflow-x-auto max-w-full pb-1 md:pb-0 scrollbar-thin">
-                        {(['all', 'pending', 'completed', 'cancelled', 'noshow'] as const).map((f) => (
-                            <button
-                                key={f}
-                                onClick={() => setFilter(f)}
-                                className={`px-2.5 py-1.5 rounded-md text-[11px] md:text-[8px] font-black uppercase whitespace-nowrap transition-all border ${filter === f
-                                    ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900 shadow-md'
-                                    : 'bg-white dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/10 hover:border-slate-300'}`}
-                            >
-                                {f === 'all' ? `Todos (${stats.total})` : f === 'pending' ? `Pendientes (${stats.pending})` : f === 'completed' ? `Listos (${stats.in})` : f === 'cancelled' ? `Anuladas (${stats.cancelled})` : `Por Inasistencia (${stats.noShow})`}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="divide-y divide-slate-100 dark:divide-white/5">
-                    {loading && bookings.length === 0 ? (
-                        <div className="py-12 text-center flex flex-col items-center gap-2">
-                            <ArrowPathIcon className="w-6 h-6 animate-spin text-emerald-500/40" />
-                            <p className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Sincronizando datos...</p>
-                        </div>
-                    ) : filteredBookings.length === 0 ? (
-                        <div className="py-16 flex flex-col items-center justify-center text-slate-400 gap-3">
-                            <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-full">
-                                <IdentificationIcon className="w-8 h-8 opacity-20" />
-                            </div>
-                            <p className="text-[11px] md:text-[9px] font-black uppercase tracking-widest">Sin registros encontrados</p>
-                        </div>
-                    ) : (
-                        filteredBookings.map((booking) => {
-                            const isPaid = booking.paymentStatus === 'paid';
-                            const isCheckedIn = booking.checkIn;
-                            const validation = validateCheckInTime(booking);
-                            const isLateNoShow = !isCheckedIn && booking.status !== 'cancelled' && validation.isLate;
-                            const isNoShow = isBookingNoShow(booking) || isLateNoShow;
-
-                            return (
-                                <div key={booking.id} className={`group flex items-center gap-4 p-3.5 transition-all hover:bg-slate-50/50 dark:hover:bg-white/1 ${(isCheckedIn || booking.status === 'cancelled' || isLateNoShow) ? 'opacity-50 grayscale-[0.5]' : ''}`}>
-                                    {/* INDICADOR DE HORA COMPACT */}
-                                    <div className="flex flex-col items-center justify-center w-12 h-12 rounded-md bg-slate-900 dark:bg-white text-white dark:text-slate-900 shrink-0 group-hover:scale-105 transition-transform">
-                                        <span className="text-[11px] font-black tracking-tighter">{booking.startTimeStr || formatTime(booking.startTime)}</span>
-                                        <span className="text-[11px] md:text-[6px] font-black uppercase opacity-60">HORA</span>
-                                    </div>
-
-                                    {/* INFO COMPACT */}
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-0.5">
-                                            <h3 className="text-[11px] font-black text-slate-900 dark:text-white uppercase truncate">
-                                                {booking.clientName}
-                                            </h3>
-                                            {!isCheckedIn && booking.status !== 'cancelled' && !isLateNoShow ? (
-                                                isPaid ? (
-                                                    <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 text-[11px] md:text-[7px] font-black uppercase rounded border border-emerald-500/20">Pagado</span>
-                                                ) : (
-                                                    <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-500 text-[11px] md:text-[7px] font-black uppercase rounded border border-amber-500/20">Pendiente</span>
-                                                )
-                                            ) : (booking.status === 'cancelled' || isLateNoShow) ? (
-                                                isNoShow ? (
-                                                    booking.paymentStatus === 'paid' ? (
-                                                        <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] md:text-[7px] font-black uppercase rounded border border-emerald-500/20">No-Show con Pago Aprobado</span>
-                                                    ) : booking.paymentStatus === 'partial' ? (
-                                                        <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[11px] md:text-[7px] font-black uppercase rounded border border-amber-500/20">No-Show con Seña Retenida</span>
-                                                    ) : (
-                                                        <span className="px-1.5 py-0.5 bg-red-500/10 text-red-500 text-[11px] md:text-[7px] font-black uppercase rounded border border-red-500/20">Cancelado por No-Show</span>
-                                                    )
-                                                ) : (
-                                                    <span className="px-1.5 py-0.5 bg-slate-500/10 text-slate-500 text-[11px] md:text-[7px] font-black uppercase rounded border border-slate-500/20">{booking.cancelledBy === 'staff' ? 'Anulada por recinto' : 'Cancelado por jugador'}</span>
-                                                )
-                                            ) : null}
-                                        </div>
-                                        <div className="flex items-center gap-3 text-slate-400">
-                                            <div className="flex items-center gap-1.5">
-                                                <MapPinIcon className="w-3 h-3 text-emerald-500" />
-                                                <span className="text-[11px] md:text-[9px] font-bold tracking-tight">
-                                                    <span className="uppercase">{booking.courtName}</span>
-                                                    {booking.sport && <span className="ml-1 text-slate-400 capitalize">· {booking.sport.toLowerCase()}</span>}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-1">
-                                                <TicketIcon className="w-3 h-3" />
-                                                <span className="text-[11px] md:text-[9px] font-mono font-bold uppercase">#{booking.id.slice(-6)}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* ACCIONES COMPACT */}
-                                    <div className="shrink-0 flex items-center gap-4">
-
-                                        <div className="flex items-center gap-2">
-                                            {isCheckedIn ? (
-                                                <div className="flex flex-col items-end gap-1">
-                                                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
-                                                        <ShieldCheckIcon className="w-3.5 h-3.5 text-emerald-500" />
-                                                        <span className="text-[11px] md:text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Acceso OK</span>
-                                                    </div>
-                                                    <span className="text-[11px] md:text-[7px] font-bold text-slate-400 uppercase mr-1">Listo</span>
-                                                </div>
-                                            ) : (booking.status === 'cancelled' || isLateNoShow) ? (
-                                                <div className="flex flex-col items-end gap-1">
-                                                    <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full ${
-                                                        isNoShow && (booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial')
-                                                            ? 'bg-emerald-500/10 border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]'
-                                                            : 'bg-red-500/10 border border-red-500/20'
-                                                    }`}>
-                                                        {isNoShow && (booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial') ? (
-                                                            <ShieldCheckIcon className="w-3.5 h-3.5 text-emerald-500" />
-                                                        ) : (
-                                                            <NoSymbolIcon className="w-3.5 h-3.5 text-red-500" />
-                                                        )}
-                                                        <span className={`text-[11px] md:text-[8px] font-black uppercase tracking-widest ${
-                                                            isNoShow && (booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial')
-                                                                ? 'text-emerald-600 dark:text-emerald-400'
-                                                                : 'text-red-600 dark:text-red-400'
-                                                        }`}>
-                                                            {isNoShow 
-                                                                ? (booking.paymentStatus === 'paid' || booking.paymentStatus === 'partial' ? 'PAGO RETENIDO' : 'INASISTENCIA')
-                                                                : 'CANCELADO'
-                                                            }
-                                                        </span>
-                                                    </div>
-                                                    <span className="text-[11px] md:text-[7px] font-bold text-slate-400 uppercase mr-1">
-                                                        {isNoShow 
-                                                            ? (booking.paymentStatus === 'paid' ? 'No-Show Pagado' : booking.paymentStatus === 'partial' ? 'Seña Retenida' : 'No-Show')
-                                                            : (booking.cancelledBy === 'staff' ? 'Por Recinto' : 'Por Jugador')
-                                                        }
-                                                    </span>
-                                                    {isLateNoShow && booking.status !== 'cancelled' && (
-                                                        <button
-                                                            onClick={() => handleNoShow(booking)}
-                                                            disabled={processingId === booking.id}
-                                                            className="mt-1 h-8 px-3 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all disabled:opacity-50"
-                                                        >
-                                                            Registrar inasistencia
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-center gap-2">
-                                                    {isPaid ? (
-                                                        <button
-                                                            onClick={() => handleCheckInAction(booking, 'checkin')}
-                                                            className="h-9 px-4 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95 bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-105 shadow-slate-900/10"
-                                                        >
-                                                            Ingresar
-                                                        </button>
-                                                    ) : (
-                                                        <span className="h-9 px-3 inline-flex items-center rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest bg-slate-100 dark:bg-white/5 text-slate-400" title="Solo se puede ingresar con una reserva pagada online">
-                                                            Sin pago online
-                                                        </span>
-                                                    )}
-                                                    <button
-                                                        onClick={() => handleNoShow(booking)}
-                                                        disabled={processingId === booking.id}
-                                                        className="h-9 w-9 flex items-center justify-center rounded-md bg-red-50 dark:bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all active:scale-90"
-                                                        title="Marcar como No-Show (Sanción)"
-                                                    >
-                                                        <NoSymbolIcon className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })
-                    )}
-                </div>
-            </div>
-
-            {/* === MODAL DE CONFIRMACIÓN DE CHECK-IN === */}
-            {isConfirmModalOpen && selectedBookingForConfirm && (
-                <div className="fixed inset-0 z-300 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-                    <div className="bg-white dark:bg-[#0B0F19] w-full max-w-sm rounded-md overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10 animate-scaleIn">
-                        {/* Header Modal FINANCE STYLE */}
-                        <div className="p-8 pb-4 text-center">
-                            <div className={`w-16 h-16 rounded-md flex items-center justify-center mb-6 mx-auto border bg-emerald-500/10 border-emerald-500/20`}>
-                                <ShieldCheckIcon className="w-8 h-8 text-emerald-500" />
-                            </div>
-                            <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
-                                <>Autorización de <span className="text-emerald-500">Acceso</span></>
-                            </h2>
-                            <p className="text-xs md:text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-2">
-                                Reserva pagada online
-                            </p>
-                        </div>
-
-                        {/* Contenido Datos PREMIUM COMPACT */}
-                        <div className="px-6 py-4 space-y-3">
-                            <div className="bg-slate-50 dark:bg-white/5 rounded-md p-4 space-y-3 border border-slate-100 dark:border-white/5 shadow-inner">
-                                <div className="flex justify-between items-center border-b border-slate-200/50 dark:border-white/5 pb-2">
-                                    <span className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Cliente</span>
-                                    <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase">{selectedBookingForConfirm?.clientName}</span>
-                                </div>
-                                <div className="flex justify-between items-center border-b border-slate-200/50 dark:border-white/5 pb-2">
-                                    <span className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Cancha</span>
-                                    <div className="text-right">
-                                        <div className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase">{selectedBookingForConfirm?.courtName}</div>
-                                        {selectedBookingForConfirm?.sport && <div className="text-[11px] md:text-[8px] font-bold text-slate-400 capitalize">{selectedBookingForConfirm.sport.toLowerCase()}</div>}
-                                    </div>
-                                </div>
-                                <div className="flex justify-between items-center border-b border-slate-200/50 dark:border-white/5 pb-2">
-                                    <span className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Horario</span>
-                                    <span className="text-[11px] font-black text-slate-900 dark:text-white uppercase font-mono tracking-tighter">
-                                        {(() => {
-                                            if (!selectedBookingForConfirm) return '--:--';
-                                            const start = selectedBookingForConfirm.startTimeStr || formatTime(selectedBookingForConfirm.startTime);
-                                            const endStr = selectedBookingForConfirm.endTimeStr;
-                                            if (endStr) return `${start} - ${endStr}`;
-                                            // Calcular endTime como start + 1 hora
-                                            const startDate = selectedBookingForConfirm.startTime?.toDate?.() || new Date();
-                                            const endDate = new Date(startDate.getTime() + 3600000);
-                                            const end = `${endDate.getHours().toString().padStart(2, '0')}:${endDate.getMinutes().toString().padStart(2, '0')}`;
-                                            return `${start} - ${end}`;
-                                        })()}
-                                    </span>
-
-                                </div>
-                                <div className="flex justify-between items-center">
-                                    <span className="text-[11px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Estado Pago</span>
-                                    <span className={`text-[11px] md:text-[9px] font-black px-2.5 py-1 rounded-md uppercase tracking-wider ${selectedBookingForConfirm?.paymentStatus === 'paid'
-                                        ? 'bg-emerald-500 text-white'
-                                        : 'bg-amber-500 text-white animate-pulse'
-                                        }`}>
-                                        {selectedBookingForConfirm?.paymentStatus === 'paid' ? 'Al Día' : `Debe ${formatMoney(selectedBookingForConfirm?.remainingBalance !== undefined ? selectedBookingForConfirm.remainingBalance : ((selectedBookingForConfirm?.totalPrice || selectedBookingForConfirm?.price || 0) - (selectedBookingForConfirm?.deposit || 0)))}`}
-                                    </span>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        {/* Footer Modal Acciones PREMIUM COMPACT */}
-                        <div className="p-6 flex gap-2">
-                            <button
-                                onClick={() => { setIsConfirmModalOpen(false); setSelectedBookingForConfirm(null); }}
-                                className="flex-1 py-3.5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/60 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest hover:bg-slate-200 transition-all active:scale-95"
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={confirmCheckIn}
-                                disabled={!!processingId}
-                                className={`flex-2 py-3.5 rounded-md text-[11px] md:text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950`}
-                            >
-                                {processingId ? (
-                                    <ArrowPathIcon className="w-4 h-4 animate-spin" />
-                                ) : (
-                                    <>Confirmar Entrada <CheckCircleIcon className="w-4 h-4" /></>
-                                )}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+          )}
+          <button onClick={() => load()} aria-label="Actualizar reservas" className="w-10 h-10 flex items-center justify-center rounded-md bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 hover:text-emerald-500 active:scale-90">
+            <Icon icon={RefreshIcon} className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          </button>
         </div>
-    );
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {kpis.map((k) => (
+          <div key={k.label} className="bg-white dark:bg-[#0B0F19] p-4 rounded-md border border-slate-100 dark:border-white/5">
+            <div className="flex items-center gap-2 mb-2">
+              <Icon icon={k.icon} className="w-4 h-4 text-slate-400" />
+              <p className="text-[11px] md:text-[9px] font-black text-slate-500 uppercase tracking-widest">{k.label}</p>
+            </div>
+            <p className={`text-2xl font-black tracking-tighter tabular-nums ${k.tone}`}>{k.value}</p>
+            <p className="text-[11px] font-bold text-slate-400 truncate">{k.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-2">
+        <button onClick={startCamera} className="w-full sm:w-auto flex items-center justify-center gap-2 h-12 px-6 bg-slate-900 dark:bg-emerald-500 text-white dark:text-slate-950 rounded-md active:scale-95 transition-all shrink-0">
+          <Icon icon={QrCode01Icon} className="w-5 h-5" />
+          <span className="text-xs font-black uppercase tracking-widest">Escanear QR</span>
+        </button>
+        <form onSubmit={(e) => { e.preventDefault(); if (search.trim()) resolve(search, "manual"); }} className="flex-1 relative">
+          <Icon icon={Search01Icon} className="h-4 w-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input type="search" enterKeyHint="go" autoComplete="off" aria-label="Código de reserva o nombre"
+            placeholder="Buscar por código de reserva o nombre (ej: #AB12CD)"
+            className="w-full h-12 pl-10 pr-24 bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-md text-[12px] font-bold outline-hidden focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder:font-medium text-slate-800 dark:text-white"
+            value={search} onChange={(e) => setSearch(e.target.value)} />
+          <button type="submit" disabled={!search.trim()}
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 h-9 rounded-md text-[11px] font-black uppercase active:scale-95 disabled:opacity-40">
+            Validar
+          </button>
+        </form>
+      </div>
+
+      <input id="native-camera-input" type="file" accept="image/*" capture="environment" className="hidden" onChange={onNativeCapture} />
+      <div id="qr-reader-hidden" className="hidden" />
+
+      {cameraPermission === "denied" && (
+        <p role="status" className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-md p-3 text-xs text-amber-700 dark:text-amber-400 font-bold flex items-center gap-2">
+          <Icon icon={Camera01Icon} className="w-4 h-4 shrink-0" />
+          El permiso de cámara está bloqueado. Habilítalo en el navegador o escribe el código del ticket.
+        </p>
+      )}
+
+      {summary.lateToFlag > 0 && filter !== "noshow" && (
+        <button onClick={() => setFilter("noshow")} className="w-full text-left bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-md p-3 text-xs text-red-700 dark:text-red-400 font-bold flex items-center gap-2">
+          <Icon icon={UnavailableIcon} className="w-4 h-4 shrink-0" />
+          {summary.lateToFlag === 1 ? "1 reserva pasó la tolerancia sin ingreso" : `${summary.lateToFlag} reservas pasaron la tolerancia sin ingreso`}: revisa y registra la inasistencia.
+        </button>
+      )}
+
+      <section className="bg-white dark:bg-[#0B0F19] rounded-md border border-slate-100 dark:border-white/5 overflow-hidden" aria-label="Reservas de hoy">
+        <div className="p-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/2">
+          <div className="flex gap-1.5 overflow-x-auto no-scrollbar" role="tablist" aria-label="Filtrar reservas">
+            {FILTERS.map((f) => (
+              <button key={f.id} role="tab" aria-selected={filter === f.id} onClick={() => setFilter(f.id)}
+                className={`px-3 h-9 rounded-md text-[11px] font-black uppercase whitespace-nowrap transition-all border ${filter === f.id ? "bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-900" : "bg-white dark:bg-white/5 text-slate-500 border-slate-200 dark:border-white/10"}`}>
+                {f.label} <span className="tabular-nums">({summary.counts[f.id]})</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        {loading && bookings.length === 0 ? (
+          <div className="py-12 text-center flex flex-col items-center gap-2">
+            <Icon icon={RefreshIcon} className="w-6 h-6 animate-spin text-emerald-500/50" />
+            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Cargando reservas de hoy…</p>
+          </div>
+        ) : visible.length === 0 ? (
+          <div className="py-14 flex flex-col items-center justify-center text-slate-400 gap-3 text-center px-6">
+            <Icon icon={IdentityCardIcon} className="w-8 h-8 opacity-30" />
+            <p className="text-[12px] font-bold">
+              {!venues.length ? "No tienes un recinto asignado." : search ? "Ninguna reserva coincide con la búsqueda." : bookings.length ? "No hay reservas en este filtro." : "Hoy no hay reservas en este recinto."}
+            </p>
+            {(search || filter !== "all") && bookings.length > 0 && (
+              <button onClick={() => { setSearch(""); setFilter("all"); }} className="text-[11px] font-black uppercase text-emerald-600 dark:text-emerald-400">Ver todas</button>
+            )}
+          </div>
+        ) : (
+          <ul className="divide-y divide-slate-100 dark:divide-white/5">
+            {visible.map((b) => (
+              <BookingRow key={b.id} b={b} state={checkinState(b, now)} busy={busyId === b.id} canNoShow={canFlagNoShow(b, now)}
+                onCheckIn={() => tryCheckIn(b)} onNoShow={() => markNoShow(b)} />
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {confirming && <ConfirmCheckin b={confirming} busy={busyId === confirming.id} onConfirm={confirmCheckIn} onClose={() => setConfirming(null)} />}
+    </div>
+  );
 }

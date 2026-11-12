@@ -385,6 +385,48 @@ test.describe("Partidos (jugador)", () => {
   });
 });
 
+test.describe("Check-in: inasistencia", () => {
+  test("una reserva que pasó la tolerancia se marca como inasistencia solo tras confirmar", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Escribe en la base: basta una vez");
+    const db = admin().firestore();
+    const base = (await db.collection("bookings").doc("E2ECHECKINAB12CD").get()).data();
+    test.skip(!base || !(await exists(env.E2E_MANAGER_EMAIL)), "Sin datos de prueba");
+    // Comenzó hace 20 minutos (hora de Chile); sin cruzar la medianoche
+    const started = new Date(Date.now() - 20 * 60_000);
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: "America/Santiago", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
+      .formatToParts(started).map((p) => [p.type, p.value]));
+    test.skip(Number(parts.hour) < 7, "Cerca del cambio de día operativo");
+    test.setTimeout(120_000);
+    const ref = db.collection("bookings").doc("E2ENOSHOWQQ77XY");
+    const userRef = db.collection("users").doc(base!.userId);
+    const strikesBefore = (await userRef.get()).data()?.strikes || 0;
+    await ref.set({ ...base, clientName: "Ausente E2E", startTime: `${parts.hour}:${parts.minute}`, endTime: "23:59", date: new Date(`${parts.year}-${parts.month}-${parts.day}T12:00:00Z`), checkIn: false });
+    try {
+      const errors = watchErrors(page);
+      await login(page, env.E2E_MANAGER_EMAIL, env.E2E_MANAGER_PASSWORD);
+      await page.goto("/dashboard/checkin");
+      await expect(page.getByText(/pasó la tolerancia sin ingreso/)).toBeVisible({ timeout: 30_000 });
+      await page.getByText(/pasó la tolerancia sin ingreso/).click();
+      const row = page.locator('[data-booking="E2ENOSHOWQQ77XY"]');
+      await expect(row.getByText("No llegó", { exact: true })).toBeVisible();
+      // No se puede dar ingreso, y la inasistencia pide confirmación
+      await expect(row.getByRole("button", { name: "Ingresar" })).toHaveCount(0);
+      await row.getByRole("button", { name: "Registrar inasistencia de Ausente E2E" }).click();
+      await page.getByRole("button", { name: "Cancelar" }).click();
+      expect((await ref.get()).data()?.noShow).toBeFalsy();
+      await row.getByRole("button", { name: "Registrar inasistencia de Ausente E2E" }).click();
+      await page.getByRole("dialog").getByRole("button", { name: "Registrar inasistencia" }).click();
+      await expect(row.getByText("Inasistencia", { exact: true })).toBeVisible({ timeout: 20_000 });
+      const after = (await ref.get()).data();
+      expect(after).toMatchObject({ noShow: true, status: "cancelled" });
+      expect(errors, errors.join("\n")).toEqual([]);
+    } finally {
+      await ref.delete();
+      await userRef.update({ strikes: strikesBefore });
+    }
+  });
+});
+
 test.describe("Check-in escaneando el QR del ticket", () => {
   test("el QR del ticket del jugador, leído por recepción, registra el ingreso", async ({ page, browser, isMobile }) => {
     test.skip(isMobile, "Escribe en la base: basta una vez");
