@@ -23,6 +23,7 @@ import { watchOwnedVenues, watchCourtsInMaintenance, type VenueSummary, type Cou
 import { isReal, bookingLabel } from '@/utils/bookingModel';
 import { rangeFor, summarizeRevenue, type TimeRange } from '@/utils/revenueSummary';
 import type { Booking } from '@/types/booking';
+import { isActiveTenant } from "@/utils/platformMetrics";
 
 // --- UTILIDADES ---
 const formatCLP = (amount: number) => {
@@ -85,7 +86,7 @@ export default function OwnerDashboard() {
         revenueMonth: summary.revenue,
         revenueToday: summary.revenueToday,
         bookingsMonth: summary.incomeCount,
-        activeVenues: myVenues.filter(v => v.status === 'Activo').length,
+        activeVenues: myVenues.filter(v => isActiveTenant(v.status)).length,
         maintenanceCount: maintenanceAlerts.length,
     };
     const revenueHistory = summary.byDay;
@@ -214,7 +215,7 @@ export default function OwnerDashboard() {
                                         <div key={i} className="flex flex-col gap-2 p-4 rounded-md bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 transition-all hover:border-emerald-400/40">
                                             <div className="flex justify-between items-center">
                                                 <span className="text-xs md:text-[10px] font-black text-slate-900 dark:text-white uppercase truncate leading-none">{venue.name}</span>
-                                                <span className={`px-2.5 py-0.5 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-widest ${venue.status === 'Activo' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>{venue.status}</span>
+                                                <span className={`px-2.5 py-0.5 rounded-md text-[11px] md:text-[8px] font-black uppercase tracking-widest ${isActiveTenant(venue.status) ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>{isActiveTenant(venue.status) ? 'Activo' : String(venue.status).toLowerCase().startsWith('susp') ? 'Suspendido' : 'Inactivo'}</span>
                                             </div>
                                             <p className="text-[11px] md:text-[8px] text-slate-400 font-black uppercase truncate flex items-center gap-2">
                                                 <HugeiconsIcon icon={MapPinIcon} className="w-3.5 h-3.5 text-slate-300" strokeWidth={1.8} /> {venue.address}
