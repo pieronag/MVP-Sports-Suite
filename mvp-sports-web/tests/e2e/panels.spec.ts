@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import fs from "fs";
-import { env, admin, exists, saPath } from "./helpers";
+import { env, admin, exists, saPath, idToken } from "./helpers";
 import { bookingDays, slotPrice } from "../../utils/venueBooking";
 import { chileDateTime } from "../../utils/chileTime";
 
@@ -595,6 +595,57 @@ test.describe("Usuarios: suspender y activar (superadmin)", () => {
         await ref.update({ status: "active" });
         await admin().auth().updateUser(B.uid, { disabled: false });
       }
+    }
+  });
+});
+
+test.describe("Dueños (superadmin)", () => {
+  test("alta con su ficha en el servidor, no se borra un dueño con recintos y la baja elimina cuenta y ficha", async ({ page, request, isMobile }) => {
+    test.skip(isMobile, "Escribe en la base: basta una vez");
+    test.skip(!(await exists(env.E2E_ADMIN_EMAIL)) || !(await exists(env.E2E_OWNER_EMAIL)), "Sin datos de prueba");
+    test.setTimeout(150_000);
+    const EMAIL = "e2e.dueno.temporal@example.test";
+    const db = admin().firestore();
+    const cleanup = async () => {
+      const u = await admin().auth().getUserByEmail(EMAIL).catch(() => null);
+      if (u) { await admin().auth().deleteUser(u.uid); await db.collection("users").doc(u.uid).delete(); }
+    };
+    await cleanup();
+    const token = await idToken(env.E2E_ADMIN_EMAIL, env.E2E_ADMIN_PASSWORD);
+    const api = (data: Record<string, unknown>) => request.post("/dashboard/owners/api", { headers: { Authorization: `Bearer ${token}` }, data });
+    try {
+      // Un dueño con recintos no se puede borrar (quedarían huérfanos)
+      const owner = await admin().auth().getUserByEmail(env.E2E_OWNER_EMAIL);
+      const refused = await api({ action: "delete", uid: owner.uid });
+      expect(refused.status()).toBe(409);
+      expect((await refused.json()).error).toMatch(/recintos/);
+      expect((await db.collection("users").doc(owner.uid).get()).exists).toBe(true);
+
+      // Alta: cuenta y ficha juntas, siempre con rol de dueño
+      const res = await api({ action: "create", email: EMAIL, password: "Temporal-E2E-1234", displayName: "Dueño Temporal E2E", role: "superadmin", phone: "" });
+      expect(res.ok()).toBe(true);
+      const { uid } = await res.json();
+      expect((await db.collection("users").doc(uid).get()).data()).toMatchObject({ role: "owner", status: "active", email: EMAIL, phone: "" });
+      expect((await admin().auth().getUser(uid)).customClaims).toEqual({ role: "owner" });
+      expect((await api({ action: "create", email: EMAIL, password: "Temporal-E2E-1234", displayName: "Otro" })).status()).toBe(400);
+
+      // En la pantalla: aparece activo y al día, y la baja borra la cuenta y la ficha
+      const errors = watchErrors(page);
+      await login(page, env.E2E_ADMIN_EMAIL, env.E2E_ADMIN_PASSWORD);
+      await page.goto("/dashboard/owners");
+      await page.getByLabel("Buscar dueño").fill("temporal", { timeout: 30_000 });
+      const row = page.locator(`[data-owner="${uid}"]:visible`);
+      await expect(row.getByText("Activo", { exact: true })).toBeVisible({ timeout: 30_000 });
+      await expect(row.getByText("Al día")).toBeVisible();
+      await row.getByRole("button", { name: "Ver perfil de Dueño Temporal E2E" }).click();
+      await page.getByRole("button", { name: "Eliminar dueño" }).click();
+      await page.getByRole("dialog", { name: "¿Eliminar dueño?" }).getByRole("button", { name: "Eliminar" }).click();
+      await expect(page.getByText("Dueño eliminado")).toBeVisible({ timeout: 20_000 });
+      expect((await db.collection("users").doc(uid).get()).exists).toBe(false);
+      expect(await admin().auth().getUser(uid).catch(() => null)).toBeNull();
+      expect(errors, errors.join("\n")).toEqual([]);
+    } finally {
+      await cleanup();
     }
   });
 });
