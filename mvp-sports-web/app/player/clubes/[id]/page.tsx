@@ -1,760 +1,171 @@
 "use client";
-import { hideBrokenImg } from "@/utils/img";
-import WhatsappLogo from "@/components/icons/WhatsappLogo";
-import { courtBlockedAt } from "@/utils/courtAvailability";
-import { slotInstant } from "@/utils/chileTime";
-import { GlowCard, SectionPill } from "@/components/player/ui";
-import { useEffect, useMemo, useState, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Clock, Star, ShieldCheck, CheckCircle2, X, Phone, Navigation, Zap, Globe, Ban, CreditCard, Images } from "@/components/player/icons";
-import { usePlayer } from "@/context/PlayerContext";
-import { venueService, Tenant, Court } from "@/services/client/player/venueService";
-import { bookingService } from "@/services/client/player/bookingService";
-import { collection, query, where, onSnapshot, doc } from "firebase/firestore";
+// Ficha del recinto (jugador): reservar primero (deporte → día y hora → confirmar) y debajo la información del recinto.
+// Reglas en utils/venueBooking; el precio es el mismo que cobran el checkout y el servidor (utils/pricing).
+import { useEffect, useMemo, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/services/client/firebase";
-import { FutbolIcon, PadelIcon, TenisIcon, BasquetbolIcon, VoleibolIcon, CanchaFutbolIcon, CanchaPadelIcon, CanchaTenisIcon, CanchaBasquetbolIcon, CanchaVoleibolIcon } from "@/components/icons/SportsIcons";
+import { venueService, type Court, type Tenant } from "@/services/client/player/venueService";
+import { bookingService } from "@/services/client/player/bookingService";
+import { usePlayer } from "@/context/PlayerContext";
+import { useNow } from "@/hooks/useNow";
+import { SportStep, StepIndicator, SummaryStep, TimeStep, sportStyle } from "@/components/player/venue/BookingFlow";
+import { Gallery, RulesSheet, VenueAbout, VenueHeader, VenueReviews } from "@/components/player/venue/VenueInfo";
+import {
+  bookableSports, bookingDays, courtsForSport, distanceLabel, freeTimes, hoursOn, slotPrice, timesWithCourts, venueCoords, weekHours,
+} from "@/utils/venueBooking";
+import { canonicalSport } from "@/utils/sports";
 
-const SPORT_ICONS: Record<string, any> = {
-  futbol: FutbolIcon, fútbol: FutbolIcon, futbolito: FutbolIcon,
-  padel: PadelIcon, pádel: PadelIcon,
-  tenis: TenisIcon,
-  basquet: BasquetbolIcon, basket: BasquetbolIcon, básquetbol: BasquetbolIcon,
-  voley: VoleibolIcon, vóley: VoleibolIcon, voleibol: VoleibolIcon,
-};
-
-const COURT_ICONS: Record<string, any> = {
-  futbol: CanchaFutbolIcon, fútbol: CanchaFutbolIcon, futbolito: CanchaFutbolIcon,
-  padel: CanchaPadelIcon, pádel: CanchaPadelIcon,
-  tenis: CanchaTenisIcon,
-  basquet: CanchaBasquetbolIcon, basket: CanchaBasquetbolIcon, básquetbol: CanchaBasquetbolIcon,
-  voley: CanchaVoleibolIcon, vóley: CanchaVoleibolIcon, voleibol: CanchaVoleibolIcon,
-};
-
-const SPORT_COLORS: Record<string, string> = {
-  futbol: "#10b981", fútbol: "#10b981", futbolito: "#10b981",
-  padel: "#3b82f6", pádel: "#3b82f6",
-  tenis: "#f59e0b",
-  basquet: "#6366f1", basket: "#6366f1", básquetbol: "#6366f1",
-  voley: "#ec4899", vóley: "#ec4899", voleibol: "#ec4899",
-};
-
-const getSportKey = (s: string) => { const n = s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); return n; };
-const getSportInfo = (sport: string) => {
-  const k = getSportKey(sport);
-  for (const [key, val] of Object.entries(SPORT_COLORS)) { if (getSportKey(key) === k) return { color: val, icon: SPORT_ICONS[key] || SPORT_ICONS.futbol, courtIcon: COURT_ICONS[key] || COURT_ICONS.futbol }; }
-  return { color: "#10b981", icon: SPORT_ICONS.futbol, courtIcon: COURT_ICONS.futbol };
-};
-
-// Numeric sort for court names (Cancha 1, Cancha 2, ..., Cancha 10, Cancha 11)
-const sortCourts = (a: any, b: any) => {
-  const numA = parseInt(a.name.replace(/\D/g, "")) || 0;
-  const numB = parseInt(b.name.replace(/\D/g, "")) || 0;
-  return numA - numB;
-};
-
-// Get price from tenant pricing config based on sport + date + time
-const getPriceFromConfig = (venue: Tenant | null, sport: string, dateStr: string, timeStr: string): number => {
-  try {
-    const v = venue as any;
-    const pricing = v?.pricing?.[sport];
-    if (!pricing) return 0;
-    const d = new Date(dateStr + "T12:00:00");
-    const day = d.getDay();
-    const isWeekend = day === 0 || day === 6;
-    const schedule = isWeekend ? pricing.weekend : pricing.weekday;
-    if (!schedule) return 0;
-    const [h, m] = timeStr.split(":").map(Number);
-    const timeMinutes = h * 60 + (m || 0);
-    let bestPrice = 0;
-    let bestDiff = Infinity;
-    for (const [slot, price] of Object.entries(schedule)) {
-      const [sh, sm] = slot.split(":").map(Number);
-      const slotMinutes = sh * 60 + (sm || 0);
-      const diff = Math.abs(timeMinutes - slotMinutes);
-      if (diff < bestDiff) { bestDiff = diff; bestPrice = price as number; }
-    }
-    return bestPrice;
-  } catch { return 0; }
-};
-
-const getLocalISODate = (d: Date) => `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,"0")}-${d.getDate().toString().padStart(2,"0")}`;
-const getChileNow = () => { const d = new Date(); return new Date(d.toLocaleString("en-US", { timeZone: "America/Santiago" })); };
-const getOperationalDate = () => { const d = getChileNow(); if (d.getHours() < 6) d.setDate(d.getDate() - 1); return getLocalISODate(d); };
-const formatDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-  const R = 6371, dLat = ((lat2 - lat1) * Math.PI) / 180, dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) < 1 ? `${Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*1000)}m` : `${(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(1)}km`;
-};
-
-// Pasos del asistente de reserva (fuera del componente: definido adentro se recreaba en cada render)
-const STEP_LABELS = ["Deporte", "Día y hora", "Confirmar"];
-function StepIndicator({ step, isDark }: { step: number; isDark: boolean }) {
-  return (
-    <ol className="grid grid-cols-3 gap-1 mb-4" aria-label="Pasos de la reserva">
-      {STEP_LABELS.map((label, i) => {
-        const s = i + 1, done = step > s, current = step === s;
-        return (
-          <li key={s} aria-current={current ? "step" : undefined} className="flex flex-col items-center gap-1.5">
-            <div className={`h-1 w-full rounded-full ${done || current ? "bg-emerald-500" : isDark ? "bg-white/8" : "bg-slate-200"}`} />
-            <span className={`text-[11px] font-semibold flex items-center gap-1 ${current ? (isDark ? "text-slate-100" : "text-slate-900") : done ? "text-emerald-500" : isDark ? "text-slate-500" : "text-slate-400"}`}>
-              {done && <CheckCircle2 size={12} />}{label}
-            </span>
-          </li>
-        );
-      })}
-    </ol>
-  );
-}
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export default function VenueDetailPage() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const params = useSearchParams();
   const { theme, profile } = usePlayer();
   const isDark = theme === "dark";
+  const now = new Date(useNow(60_000));
 
   const [venue, setVenue] = useState<Tenant | null>(null);
+  const [missing, setMissing] = useState(false);
   const [courts, setCourts] = useState<Court[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
-  const [selectedSport, setSelectedSport] = useState<string | null>(null);
-  const [selectedCourtId, setSelectedCourtId] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState(getOperationalDate());
-  const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [bookingStep, setBookingStep] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [loadingSlots, setLoadingSlots] = useState(false);
-  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
-  const [showGallery, setShowGallery] = useState(false);
-  const [galleryIndex, setGalleryIndex] = useState(0);
+  const [step, setStep] = useState(1);
+  const [sport, setSport] = useState<string | null>(null);
+  const [date, setDate] = useState(() => bookingDays(new Date(), 1)[0].date);
+  const [time, setTime] = useState<string | null>(null);
+  const [courtId, setCourtId] = useState<string | null>(null);
+  const [taken, setTaken] = useState<{ key: string; byCourt: Record<string, string[]> } | null>(null);
   const [showRules, setShowRules] = useState(false);
+  const [gallery, setGallery] = useState<number | null>(null);
 
-  useEffect(() => { navigator.geolocation.getCurrentPosition((p) => setUserLocation({ latitude: p.coords.latitude, longitude: p.coords.longitude }), () => {}, { enableHighAccuracy: true, timeout: 10000 }); }, []);
+  useEffect(() => {
+    navigator.geolocation?.getCurrentPosition((p) => setUserLocation({ latitude: p.coords.latitude, longitude: p.coords.longitude }), () => {}, { timeout: 10_000 });
+  }, []);
+
+  // Recinto y canchas en vivo (cambios de tarifa, horario o mantenimiento se ven al tiro)
   useEffect(() => {
     if (!id) return;
-    // Real-time listener for venue
-    const unsubVenue = onSnapshot(doc(db, "tenants", id as string), (snap) => {
-      if (snap.exists()) {
-        const v = { id: snap.id, ...snap.data() } as Tenant;
-        setVenue(v);
-      }
-      setLoading(false);
-    });
-    // Real-time listener for courts
-    const qCourts = query(collection(db, "courts"), where("tenantId", "==", id));
-    const unsubCourts = onSnapshot(qCourts, (snap) => {
-      const list = snap.docs.map(d => ({ id: d.id, ...d.data() } as Court));
-      setCourts(list);
-    });
-    // Load reviews
-    venueService.getVenueFeedback(id as string).then(setReviews).catch(() => {});
-    return () => { unsubVenue(); unsubCourts(); };
+    const offVenue = onSnapshot(doc(db, "tenants", id), (snap) => {
+      if (snap.exists()) setVenue({ id: snap.id, ...snap.data() } as Tenant);
+      else setMissing(true);
+    }, () => setMissing(true));
+    const offCourts = onSnapshot(query(collection(db, "courts"), where("tenantId", "==", id)), (snap) => setCourts(snap.docs.map((d) => ({ id: d.id, ...d.data() }) as Court)));
+    venueService.getVenueFeedback(id).then(setReviews).catch(() => {});
+    return () => { offVenue(); offCourts(); };
   }, [id]);
 
-  useEffect(() => {
-    (async () => {
-      if (!id || !selectedCourtId || !selectedDate) return;
-      setLoadingSlots(true);
-      try { const s = await bookingService.getAvailableTimeSlots(id as string, selectedCourtId, selectedDate); setAvailableSlots(s); } catch {}
-      finally { setLoadingSlots(false); }
-    })();
-  }, [id, selectedCourtId, selectedDate]);
+  const sports = useMemo(() => bookableSports(venue), [venue]);
+  const sportCourts = useMemo(() => (sport ? courtsForSport(courts as any[], sport) : []), [courts, sport]);
+  const days = bookingDays(now, 14, venue);
 
-  // Horarios de todas las canchas del deporte para el día elegido (paso 3)
-  const [slotsByCourt, setSlotsByCourt] = useState<Record<string, string[]>>({});
-  const [loadingAllSlots, setLoadingAllSlots] = useState(false);
+  // Deporte inicial: el de "Reservar de nuevo" (?sport=), el único del recinto o el principal del jugador
+  const [autoPicked, setAutoPicked] = useState(false);
   useEffect(() => {
-    if (!id || bookingStep !== 2 || !selectedSport || !selectedDate) return;
+    if (autoPicked || !sports.length) return;
+    const wanted = params.get("sport") || (sports.length === 1 ? sports[0] : (profile as any)?.mainSport);
+    const pick = sports.find((s) => canonicalSport(s) === canonicalSport(wanted));
+    if (pick) { setSport(pick); setStep(2); } // eslint-disable-line react-hooks/set-state-in-effect -- una vez, cuando llegan los deportes
+    setAutoPicked(true);
+  }, [sports, profile, params, autoPicked]);
+
+  // Horas tomadas de cada cancha del deporte ese día (una lectura por cancha, sin releer el recinto)
+  const takenKey = `${date}|${sportCourts.map((c) => c.id).join(",")}`;
+  useEffect(() => {
+    if (step !== 2 || !sportCourts.length) return;
     let alive = true;
-    const sel = getSportKey(selectedSport);
-    const list = courts.filter((c: any) => { const cs = getSportKey(c.sport || ""); return (cs.includes(sel) || sel.includes(cs)) && c.status !== "maintenance" && c.status !== "occupied"; });
-    setLoadingAllSlots(true);
-    Promise.all(list.map((c) => bookingService.getAvailableTimeSlots(id as string, c.id, selectedDate).then((t) => [c.id, t] as const).catch(() => [c.id, [] as string[]] as const)))
-      .then((pairs) => { if (alive) setSlotsByCourt(Object.fromEntries(pairs)); })
-      .finally(() => { if (alive) setLoadingAllSlots(false); });
+    Promise.all(sportCourts.map((c) => bookingService.getTakenTimes(c.id, date).then((t) => [c.id, t] as const).catch(() => [c.id, [] as string[]] as const)))
+      .then((pairs) => { if (alive) setTaken({ key: takenKey, byCourt: Object.fromEntries(pairs) }); });
     return () => { alive = false; };
-  }, [id, bookingStep, selectedSport, selectedDate, courts]);
+  }, [step, takenKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleBack = useCallback(() => { if (bookingStep > 1) setBookingStep(p => p - 1); else router.back(); }, [bookingStep, router]);
+  const priceOf = (t: string) => (sport ? slotPrice(venue, sport, date, t) : 0);
+  const minute = Math.floor(now.getTime() / 60_000); // los horarios que ya empezaron salen solos
+  const loadingTimes = step === 2 && sportCourts.length > 0 && taken?.key !== takenKey;
+  const rows = useMemo(() => {
+    if (!venue || !sport || taken?.key !== takenKey) return [];
+    const free = Object.fromEntries(sportCourts.map((c) => [c.id, freeTimes(venue, date, taken.byCourt[c.id] || [])]));
+    // Sin tarifa publicada para esa hora no se ofrece (el pago la rechazaría)
+    return timesWithCourts(sportCourts as any[], free, date, now).filter((r) => slotPrice(venue, sport, date, r.time) > 0);
+  }, [venue, sport, sportCourts, taken, takenKey, date, minute]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleOpenMaps = () => {
-    if (!venueCoords) return;
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${venueCoords.latitude},${venueCoords.longitude}`;
-    window.open(url, '_blank');
-  };
-
-  const availableSports = useMemo(() => {
-    const v = venue as any;
-    const pricing = v?.pricing;
-    if (!pricing) return [];
-    const normalize = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-    const hasPrice = (sport: string) => {
-      const p = pricing[sport];
-      if (!p) return false;
-      const sched = p.weekday || p.weekend;
-      if (!sched) return false;
-      return Object.values(sched).some((val: any) => Number(val) > 0);
-    };
-    // Prefer names from pricing keys, fallback to activeSports for display name
-    const map = new Map<string, string>();
-    Object.keys(pricing).forEach((s) => { if (hasPrice(s)) map.set(normalize(s), s); });
-    (v?.activeSports || []).forEach((s: string) => {
-      const key = normalize(s);
-      if (!map.has(key) && hasPrice(s)) map.set(key, s);
-    });
-    return Array.from(map.values()).sort();
-  }, [venue]);
-  const filteredCourts = useMemo(() => {
-    if (!selectedSport) return [];
-    const sel = getSportKey(selectedSport);
-    return courts.filter(c => { const cs = getSportKey(c.sport || ""); return cs.includes(sel) || sel.includes(cs); }).sort(sortCourts);
-  }, [courts, selectedSport]);
-
-  const groupedSlots = useMemo(() => {
-    const slots: Record<string, string[]> = { mañana: [], tarde: [], noche: [] };
-    [...availableSlots].sort((a, b) => { const p = (t: string) => { const [h, m] = t.split(":").map(Number); return h < 6 ? (h+24)*60+m : h*60+m; }; return p(a) - p(b); })
-      .forEach(s => { const h = parseInt(s.split(":")[0]); if (h >= 6 && h < 12) slots.mañana.push(s); else if (h >= 12 && h < 18) slots.tarde.push(s); else slots.noche.push(s); });
-    return slots;
-  }, [availableSlots]);
-
-  const currentDayHours = useMemo(() => {
-    if (!venue) return "08:00 - 23:00";
-    const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
-    const chileNow = getChileNow();
-    const dayName = days[chileNow.getDay()];
-    const s = (venue as any).schedule;
-    if (s?.[dayName]) { if (s[dayName].isOpen === false) return "Cerrado"; if (s[dayName].open) return `${s[dayName].open} - ${s[dayName].close}`; }
-    return `${(venue as any).openTime || "08:00"} - ${(venue as any).closeTime || "23:00"}`;
-  }, [venue]);
-
-  const scheduleSummary = useMemo(() => {
-    if (!venue) return "Lunes a domingo: 08:00 - 23:00";
-    const s = (venue as any).schedule;
-    const days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
-    const dayNames = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
-
-    // If no per-day schedule, use openTime/closeTime
-    if (!s) return `Lunes a Domingo: ${(venue as any).openTime || "08:00"} - ${(venue as any).closeTime || "23:00"}`;
-
-    const weekdayRanges: string[] = [];
-    const weekendRanges: string[] = [];
-    let allSame = true;
-    let firstRange = "";
-
-    for (let i = 0; i < 7; i++) {
-      const day = days[i];
-      const entry = s[day];
-      if (!entry || entry.isOpen === false) {
-        allSame = false;
-        if (i < 6) weekdayRanges.push(`${dayNames[i]}: Cerrado`);
-        else weekendRanges.push(`${dayNames[i]}: Cerrado`);
-        continue;
-      }
-      const range = `${entry.open || (venue as any).openTime || "08:00"} - ${entry.close || (venue as any).closeTime || "23:00"}`;
-      if (firstRange && range !== firstRange) allSame = false;
-      if (!firstRange) firstRange = range;
-      if (i > 0 && i < 6) weekdayRanges.push(`Lunes a Viernes: ${range}`);
-      else if (i === 0 || i === 6) weekendRanges.push(`Sábado y Domingo: ${range}`);
-    }
-
-    if (allSame && firstRange) return `Lunes a Domingo: ${firstRange}`;
-    const parts: string[] = [];
-    if (weekdayRanges.length > 0) parts.push(weekdayRanges[0]);
-    if (weekendRanges.length > 0) parts.push(weekendRanges[0]);
-    // Add any individual day overrides
-    for (let i = 1; i < 7; i++) {
-      const day = days[i];
-      const entry = s[day];
-      if ((entry?.isOpen === false || entry?.open) && i > 0 && i < 6 && !weekdayRanges.includes(`Lunes a Viernes: ${entry.open || (venue as any).openTime || "08:00"} - ${entry.close || (venue as any).closeTime || "23:00"}`) && weekdayRanges.length > 0) {
-        // skip - already handled by Lunes a Viernes
-      }
-    }
-    return parts.join(" | ");
-  }, [venue]);
-
-  const getCourtPrice = useCallback((courtId: string, sportName?: string, dateStr?: string, timeStr?: string) => {
-    const sn = sportName || selectedSport || "";
-    const ds = dateStr || selectedDate;
-    const ts = timeStr || selectedTime || "12:00";
-    return getPriceFromConfig(venue, sn, ds, ts);
-  }, [venue, selectedSport, selectedDate, selectedTime]);
-
-  const venueCoords = useMemo(() => {
-    const c = (venue as any)?.coordinates || (venue as any)?.location;
-    if (!c) return null;
-    return { latitude: c.latitude || c._lat || c.lat, longitude: c.longitude || c._long || c.lng };
-  }, [venue]);
-
-  const distanceLabel = useMemo(() => {
-    if (!userLocation || !venueCoords) return null;
-    return formatDistance(userLocation.latitude, userLocation.longitude, venueCoords.latitude, venueCoords.longitude);
-  }, [userLocation, venueCoords]);
-
-  const confirmationData = useMemo(() => {
-    if (!selectedCourtId || !selectedTime || !selectedSport) return null;
-    const court = courts.find(c => c.id === selectedCourtId);
-    const price = getPriceFromConfig(venue, selectedSport, selectedDate, selectedTime);
-    return { tenantId: id, tenantName: venue?.name, courtId: selectedCourtId, courtName: court?.name, price, date: selectedDate, startTime: selectedTime, sport: selectedSport, sportColor: getSportInfo(selectedSport).color };
-  }, [selectedCourtId, selectedTime, selectedSport, courts, venue, id, selectedDate]);
-
-  const handleConfirmBooking = () => {
-    if (!confirmationData) return;
-    const params = new URLSearchParams(confirmationData as any).toString();
-    router.push(`/player/checkout?${params}`);
-  };
-
-  // Si el recinto tiene un solo deporte, o el deporte principal del jugador, se elige solo
-  const [autoSport, setAutoSport] = useState(false);
-  useEffect(() => {
-    if (autoSport || availableSports.length === 0) return;
-    const n = (v: string) => String(v || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
-    const wanted = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("sport") : null; // "Reservar de nuevo"
-    const pick = (wanted && availableSports.find((sp: string) => n(sp) === n(wanted))) || (availableSports.length === 1 ? availableSports[0] : availableSports.find((sp: string) => n(sp) === n((profile as any)?.mainSport)));
-    if (pick) { setSelectedSport(pick); setBookingStep(2); }
-    setAutoSport(true);
-  }, [availableSports, profile, autoSport]);
-
-  const DAY_KEYS = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-
-  const renderSportSelection = () => (
-    <GlowCard isDark={isDark}>
-      <div className="p-5">
-        <p className={`text-[12px] font-semibold mb-4 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige un deporte</p>
-        <div className="flex flex-wrap gap-3">
-          {availableSports.map((sport: string) => {
-            const info = getSportInfo(sport);
-            const SportIcon = info.icon;
-            return (
-              <button key={sport} onClick={() => { setSelectedSport(sport); setSelectedCourtId(null); setSelectedTime(null); setBookingStep(2); }}
-                className={`flex items-center gap-2.5 px-5 py-3 rounded-md text-[13px] font-semibold transition-all active:scale-95 ${selectedSport === sport ? "text-white" : isDark ? "text-slate-300 bg-white/6 hover:bg-white/10" : "text-slate-700 bg-slate-100 hover:bg-slate-200"}`}
-                style={selectedSport === sport ? { backgroundColor: info.color } : {}}>
-                <SportIcon color={selectedSport === sport ? "white" : info.color} size={22} />
-                {sport}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </GlowCard>
-  );
-
-  const renderBackButton = () => (
-    <button onClick={() => setBookingStep(p => p - 1)} className={`flex items-center gap-1.5 text-[11px] font-semibold transition-all active:scale-95 ${isDark ? "text-slate-400 hover:text-slate-200" : "text-slate-500 hover:text-slate-700"}`}>
-      <ChevronLeft size={14} /> Volver
-    </button>
-  );
-
-  // Paso 3: primero la hora (todas las canchas del deporte), luego la cancha libre se asigna sola
-  const bookableCourts = filteredCourts.filter((c: any) => c.status !== "occupied");
-  const slotOrder = (t: string) => { const [h, m] = t.split(":").map(Number); return h < 6 ? (h + 24) * 60 + m : h * 60 + m; };
-  const allTimes = Array.from(new Set(Object.values(slotsByCourt).flat())).sort((a, b) => slotOrder(a) - slotOrder(b));
-  const courtsAt = (t: string) => {
-    const start = slotInstant(selectedDate, t).getTime();
-    return bookableCourts.filter((c) => (slotsByCourt[c.id] || []).includes(t) && !courtBlockedAt(c, start, start + 3_600_000));
-  };
+  const pickSport = (s: string) => { setSport(s); setTime(null); setCourtId(null); setStep(2); };
+  const pickDate = (d: string) => { setDate(d); setTime(null); setCourtId(null); };
   const pickTime = (t: string) => {
-    setSelectedTime(t);
-    const free = courtsAt(t);
-    if (!free.some((c) => c.id === selectedCourtId)) setSelectedCourtId(free[0]?.id || null);
+    setTime(t);
+    const free = rows.find((r) => r.time === t)?.courts || [];
+    if (!free.some((c) => c.id === courtId)) setCourtId(free[0]?.id || null);
   };
-  const renderCourtSelection = () => {
-    const isPastSlot = (t: string) => { const [h] = t.split(":").map(Number); return isToday && h >= 6 && h <= currentHour; };
-    const periods: Record<string, string> = { manana: "Mañana", tarde: "Tarde", noche: "Noche" };
-    const periodOf = (t: string) => { const h = Number(t.split(":")[0]); return h >= 6 && h < 12 ? "manana" : h >= 12 && h < 18 ? "tarde" : "noche"; };
-    const freeCourts = selectedTime ? courtsAt(selectedTime) : [];
+
+  // Si la hora elegida se ocupó o ya pasó, se vuelve a elegir
+  const stillFree = !time || rows.some((r) => r.time === time && r.courts.some((c) => c.id === courtId));
+  const court = courts.find((c) => c.id === courtId) as any;
+
+  const confirm = () => {
+    if (!sport || !time || !courtId || !venue) return;
+    const q = new URLSearchParams({
+      tenantId: id, tenantName: venue.name || "", courtId, courtName: court?.name || "", price: String(priceOf(time)),
+      date, startTime: time, sport, sportColor: sportStyle(sport).color,
+    });
+    router.push(`/player/checkout?${q}`);
+  };
+
+  const v = venue as any;
+  const coords = venueCoords(v);
+  const rules: string[] = Array.isArray(v?.rules) ? v.rules : [];
+  const images: string[] = Array.isArray(v?.gallery) ? v.gallery.filter(Boolean) : [];
+  const bg = isDark ? "bg-[#020611]" : "bg-[#F8FAFC]";
+
+  if (missing) {
     return (
-      <GlowCard isDark={isDark}>
-        <div className="p-5">
-          <div className="flex items-center justify-between mb-4">
-            {renderBackButton()}
-            <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Elige día y hora</p>
-            <div className="w-12" />
-          </div>
-          {/* Tira de días: cambiar de día no saca al jugador del paso */}
-          <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5 mb-4" role="tablist" aria-label="Día">
-            {Array.from({ length: 14 }, (_, off) => {
-              const d = getChileDate(off).date;
-              const on = off === dateOffset;
-              const closed = (venue as any)?.schedule?.[DAY_KEYS[d.getDay()]]?.isOpen === false;
-              return (
-                <button key={off} role="tab" aria-selected={on} onClick={() => setDateOffset(off)}
-                  className={`shrink-0 w-[58px] py-2 rounded-md flex flex-col items-center transition-all active:scale-95 ${on ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-200" : "bg-slate-100 text-slate-700"} ${closed && !on ? "opacity-45" : ""}`}>
-                  <span className="text-[11px] font-semibold">{off === 0 ? "Hoy" : off === 1 ? "Mañana" : ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"][d.getDay()]}</span>
-                  <span className="text-[18px] font-heading font-black leading-tight tabular-nums">{d.getDate()}</span>
-                  <span className={`text-[11px] font-medium ${on ? "text-white/80" : isDark ? "text-slate-500" : "text-slate-400"}`}>{closed ? "Cerrado" : d.toLocaleDateString("es-CL", { month: "short" }).replace(".", "")}</span>
-                </button>
-              );
-            })}
-          </div>
-          {(venue as any)?.schedule?.[DAY_KEYS[currentDateInfo.date.getDay()]]?.isOpen === false && (
-            <p className={`text-[13px] font-medium py-6 text-center ${isDark ? "text-slate-400" : "text-slate-500"}`}>El recinto está cerrado este día. Elige otro.</p>
-          )}
-
-          {bookableCourts.length === 0 ? (
-            <p className={`text-[13px] font-medium py-6 text-center ${isDark ? "text-slate-500" : "text-slate-400"}`}>No hay canchas disponibles para este deporte</p>
-          ) : loadingAllSlots ? (
-            <div className="flex justify-center py-8"><div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" /></div>
-          ) : allTimes.filter((t) => !isPastSlot(t) && courtsAt(t).length > 0).length === 0 ? (
-            <div className="py-6 text-center">
-              <p className={`text-[13px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>No quedan horarios este día</p>
-              <button onClick={() => setDateOffset((d) => d + 1)} className="mt-3 px-5 h-10 rounded-md text-[12px] font-semibold bg-emerald-500 text-white">Ver el día siguiente</button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {Object.keys(periods).map((pk) => {
-                const times = allTimes.filter((t) => periodOf(t) === pk && !isPastSlot(t) && courtsAt(t).length > 0);
-                if (!times.length) return null;
-                return (
-                  <div key={pk}>
-                    <p className={`text-[11px] font-semibold mb-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>{periods[pk]}</p>
-                    <div className="grid grid-cols-4 gap-2">
-                      {times.map((t) => {
-                        const on = selectedTime === t;
-                        return (
-                          <button key={t} aria-pressed={on} onClick={() => pickTime(t)}
-                            className={`h-11 rounded-md text-[13px] font-semibold transition-all active:scale-95 ${on ? "bg-emerald-500 text-white" : isDark ? "bg-white/6 text-slate-100" : "bg-slate-100 text-slate-800"}`}>
-                            {t}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-
-              {selectedTime && freeCourts.length > 0 && (
-                <div className={`pt-4 border-t ${isDark ? "border-white/6" : "border-slate-200"}`}>
-                  <p className={`text-[11px] font-semibold mb-2 ${isDark ? "text-slate-400" : "text-slate-500"}`}>
-                    {freeCourts.length === 1 ? "Cancha disponible" : `Cancha · ${freeCourts.length} libres a las ${selectedTime}`}
-                  </p>
-                  <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-5 px-5">
-                    {freeCourts.map((c: any) => {
-                      const on = selectedCourtId === c.id;
-                      return (
-                        <button key={c.id} aria-pressed={on} onClick={() => setSelectedCourtId(c.id)}
-                          className={`shrink-0 text-left px-4 py-2.5 rounded-md border transition-all ${on ? "border-emerald-500 bg-emerald-500/10" : isDark ? "border-white/8" : "border-slate-200"}`}>
-                          <p className={`text-[12px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{c.name}</p>
-                          <p className="text-[11px] font-semibold text-emerald-500">${Number(getCourtPrice(c.id, selectedSport || c.sport, selectedDate, selectedTime)).toLocaleString("es-CL")}</p>
-                          {c.surface && <p className={`text-[11px] ${isDark ? "text-slate-500" : "text-slate-400"}`}>{c.surface}</p>}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <button onClick={() => setBookingStep(3)} disabled={!selectedCourtId}
-                    className="mt-4 w-full h-12 rounded-md bg-emerald-500 text-white font-semibold text-[13px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50">
-                    Continuar <ChevronRight size={16} />
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </GlowCard>
+      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 px-8 text-center ${bg}`}>
+        <p className={`text-[15px] font-semibold ${isDark ? "text-slate-200" : "text-slate-800"}`}>No encontramos este recinto</p>
+        <button onClick={() => router.push("/player/clubes")} className="px-5 h-11 rounded-md bg-emerald-500 text-white text-[13px] font-semibold">Ver recintos</button>
+      </div>
     );
-  };
-
-  const [dateOffset, setDateOffset] = useState(0);
-
-  // Get Chile date string
-  const getChileDate = (offset: number) => {
-    const d = new Date();
-    const chile = new Date(d.toLocaleString("en-US", { timeZone: "America/Santiago" }));
-    chile.setDate(chile.getDate() + offset);
-    const y = chile.getFullYear();
-    const m = (chile.getMonth() + 1).toString().padStart(2, "0");
-    const day = chile.getDate().toString().padStart(2, "0");
-    return { str: `${y}-${m}-${day}`, date: chile };
-  };
-
-  const chileNow = getChileNow();
-  const currentDateInfo = getChileDate(dateOffset);
-  const isToday = dateOffset === 0;
-  const dayNames = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
-  const dateDayName = dayNames[currentDateInfo.date.getDay()];
-  const dateLabel = dateOffset === 0 ? "Hoy" : dateOffset === 1 ? "Mañana" : currentDateInfo.date.toLocaleDateString("es-CL", { day: "numeric", month: "short" });
-  const currentHour = chileNow.getHours();
-  const currentMin = chileNow.getMinutes();
-
-  // Update selectedDate when dateOffset changes
-  useEffect(() => {
-    setSelectedDate(currentDateInfo.str);
-    setSelectedTime(null);
-  }, [dateOffset]);
-
-  const renderSummary = () => {
-    if (!confirmationData) return null;
-    const info = getSportInfo(selectedSport || "");
-    const SportIcon = info.icon;
-    const CourtIcon = info.courtIcon;
-    const selectedCourt = courts.find(c => c.id === selectedCourtId);
+  }
+  if (!venue) {
     return (
-      <GlowCard isDark={isDark}>
-        <div className="p-5">
-          <div className="flex items-center justify-between mb-5">
-            {renderBackButton()}
-            <p className={`text-[12px] font-semibold ${isDark ? "text-slate-500" : "text-slate-400"}`}>Reserva</p>
-            <div className="w-12" />
-          </div>
-          <div className="space-y-0 divide-y divide-emerald-500/5">
-            {/* Sport */}
-            <div className="flex items-center gap-4 py-4">
-              <div className="w-12 h-12 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: `${info.color}20` }}>
-                <SportIcon color={info.color} size={24} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={`text-[15px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedSport}</p>
-                <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Deporte</p>
-              </div>
-            </div>
-            {/* Court */}
-            <div className="flex items-center gap-4 py-4">
-              <div className="w-12 h-12 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: `${info.color}15` }}>
-                {CourtIcon ? <CourtIcon color={info.color} size={26} /> : <ShieldCheck size={22} style={{ color: info.color }} />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={`text-[15px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{selectedCourt?.name || "Cancha"}</p>
-                <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Cancha {(selectedCourt as any)?.surface ? `• ${(selectedCourt as any).surface}` : ""}</p>
-              </div>
-            </div>
-            {/* Date & Time */}
-            <div className="flex items-center gap-4 py-4">
-              <div className="w-12 h-12 rounded-md flex items-center justify-center shrink-0 bg-blue-500/10">
-                <Clock size={22} className="text-blue-500" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={`text-[15px] font-semibold ${isDark ? "text-slate-100" : "text-slate-900"}`}>{dateDayName} {new Date(`${selectedDate}T12:00:00`).toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" })}</p>
-                <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>{selectedTime} hrs · 60 min</p>
-              </div>
-            </div>
-            {/* Price */}
-            <div className={`p-4 rounded-md mt-4 mb-1 ${isDark ? "bg-emerald-500/10 border border-emerald-500/10" : "bg-emerald-50 border border-emerald-200"}`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Valor de la reserva</p>
-                  <p className={`text-[11px] font-medium ${isDark ? "text-slate-500" : "text-slate-400"}`}>Pago único • Sin cargos adicionales</p>
-                </div>
-                <p className="text-[24px] font-heading font-black tabular-nums text-emerald-500">${Number(confirmationData.price).toLocaleString("es-CL")}</p>
-              </div>
-            </div>
-          </div>
-          <button onClick={handleConfirmBooking} className="w-full mt-5 h-14 rounded-md bg-emerald-500 text-white font-semibold text-[15px] flex items-center justify-center gap-3 transition-all active:scale-[0.98]">
-            <Zap size={20} /> Confirmar y pagar
-          </button>
-        </div>
-      </GlowCard>
-    );
-  };
-
-  if (loading) {
-    return (
-      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
+      <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${bg}`} role="status">
         <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-emerald-600 dark:text-emerald-400 text-[12px] font-semibold animate-pulse">Cargando</p>
+        <p className="text-emerald-600 dark:text-emerald-400 text-[12px] font-semibold">Cargando recinto</p>
       </div>
     );
   }
 
-  const venueData = venue as any;
-
   return (
-    <div className={`min-h-screen ${isDark ? "bg-[#020611]" : "bg-[#F8FAFC]"}`}>
-      {/* Cabecera compacta: lo justo para saber dónde estás; la reserva es lo principal */}
-      <div className="h-[168px] relative overflow-hidden">
-        <img src={venueData?.imageURL || venueData?.imageUrl || "https://images.unsplash.com/photo-1574629810360-7efbbe195018"} referrerPolicy="no-referrer" onError={hideBrokenImg} alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/45 to-black/20" />
-        <div className="absolute top-12 left-5 right-5 flex items-center justify-between z-10">
-          <button aria-label="Volver" onClick={() => router.back()} className="w-10 h-10 rounded-md bg-black/45 backdrop-blur-sm border border-white/10 flex items-center justify-center">
-            <ChevronLeft size={20} className="text-white" />
-          </button>
-          <div className="flex gap-2">
-            {venueData?.gallery && venueData.gallery.length > 0 && (
-              <button aria-label="Ver galería" onClick={() => setShowGallery(true)} className="w-10 h-10 rounded-md bg-black/45 backdrop-blur-sm border border-white/10 flex items-center justify-center">
-                <Images size={18} className="text-white" />
-              </button>
-            )}
-            {venueCoords && (
-              <button aria-label="Cómo llegar" onClick={handleOpenMaps} className="w-10 h-10 rounded-md bg-black/45 backdrop-blur-sm border border-white/10 flex items-center justify-center">
-                <Navigation size={18} className="text-white" />
-              </button>
-            )}
-          </div>
-        </div>
-        <div className="absolute bottom-4 left-5 right-5">
-          <h1 className="text-white text-[22px] font-heading font-black tracking-tight leading-tight line-clamp-2">{venue?.name}</h1>
-          <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-white/80 text-[12px] font-medium">
-            <span className="flex items-center gap-1"><Star size={12} className="text-amber-400" fill="currentColor" />{Number(venue?.rating) > 0 ? Number(venue?.rating).toFixed(1) : "Nuevo"}</span>
-            {distanceLabel && <><span aria-hidden>·</span><span>{distanceLabel}</span></>}
-            <span aria-hidden>·</span><span className="flex items-center gap-1"><Clock size={12} />Hoy {currentDayHours}</span>
-          </p>
-        </div>
-      </div>
+    <div className={`min-h-screen ${bg}`}>
+      <VenueHeader venue={v} todayHours={hoursOn(v, days[0].date)} onBack={() => router.back()}
+        distance={userLocation && coords ? distanceLabel(userLocation, coords) : null}
+        mapsUrl={coords ? `https://www.google.com/maps/dir/?api=1&destination=${coords.latitude},${coords.longitude}` : null}
+        onGallery={images.length ? () => setGallery(0) : null} />
 
       <div className="px-5 pt-5 pb-8 space-y-4">
-        {/* Reserva: primero en la pantalla */}
         <h2 className={`text-[18px] font-heading font-black tracking-tight ${isDark ? "text-slate-100" : "text-slate-900"}`}>Reserva tu cancha</h2>
-        <StepIndicator step={bookingStep} isDark={isDark} />
-        {bookingStep === 1 && renderSportSelection()}
-        {bookingStep === 2 && renderCourtSelection()}
-        {bookingStep === 3 && renderSummary()}
-
-        {/* Información del recinto: debajo de la reserva */}
-        <SectionPill label="Sobre el recinto" />
-        <GlowCard isDark={isDark}>
-          <div className="p-5 space-y-4">
-            {venueData?.description && <p className={`text-[13px] leading-relaxed ${isDark ? "text-slate-300" : "text-slate-600"}`}>{venueData.description}</p>}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              {venueData?.phone && (
-                <a href={`tel:${venueData.phone}`} className="flex items-center gap-1.5">
-                  <Phone size={12} className="text-emerald-500" />
-                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{venueData.phone}</span>
-                </a>
-              )}
-              {venueData?.whatsapp && (
-                <a href={`https://wa.me/${venueData.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
-                  <WhatsappLogo className="w-3 h-3 text-emerald-500" />
-                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>WhatsApp</span>
-                </a>
-              )}
-              {venueData?.instagram && (
-                <a href={`https://instagram.com/${venueData.instagram.replace(/^@/, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
-                  <Globe size={12} className="text-emerald-500" />
-                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Instagram</span>
-                </a>
-              )}
-              {venueData?.website && (
-                <a href={venueData.website.startsWith("http") ? venueData.website : `https://${venueData.website}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5">
-                  <Globe size={12} className="text-emerald-500" />
-                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>Web</span>
-                </a>
-              )}
+        <StepIndicator step={step} isDark={isDark} />
+        {step === 1 && <SportStep isDark={isDark} sports={sports} selected={sport} onPick={pickSport} />}
+        {step === 2 && sport && (
+          <TimeStep isDark={isDark} days={days} date={date} onDate={pickDate} loading={loadingTimes} hasCourts={sportCourts.length > 0}
+            rows={rows} time={stillFree ? time : null} onTime={pickTime} courtId={courtId} onCourt={setCourtId} priceOf={priceOf}
+            onBack={() => setStep(1)} onNext={() => setStep(3)} />
+        )}
+        {step === 3 && sport && time && court && (
+          stillFree ? (
+            <SummaryStep isDark={isDark} sport={sport} court={court} date={date} time={time} price={priceOf(time)} onBack={() => setStep(2)} onConfirm={confirm} />
+          ) : (
+            <div role="alert" className="p-4 rounded-md border border-amber-500/30 bg-amber-500/10 text-[13px] font-semibold text-amber-700 dark:text-amber-300">
+              Ese horario ya no está disponible.{" "}
+              <button onClick={() => { setTime(null); setStep(2); }} className="underline">Elegir otro</button>
             </div>
-            {/* Payment Methods */}
-            <div className="flex flex-wrap gap-2">
-              {venueData?.isMercadopagoActive && (
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border" style={{ borderColor: isDark ? "rgba(255,255,255,0.06)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC" }}>
-                  <CreditCard size={11} className="text-emerald-500" />
-                  <span className={`text-[12px] font-semibold ${isDark ? "text-slate-300" : "text-slate-600"}`}>Mercado Pago</span>
-                </div>
-              )}
-            </div>
-            {/* Amenities */}
-            {venueData?.amenities && venueData.amenities.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {venueData.amenities.map((a: string) => (
-                  <div key={a} className={`px-3 py-1.5 rounded-md border ${isDark ? "border-white/6 bg-white/3" : "border-slate-200 bg-slate-50"}`}>
-                    <span className={`text-[11px] font-medium ${isDark ? "text-slate-400" : "text-slate-500"}`}>{a}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </GlowCard>
-
-        {/* Reviews */}
-        <SectionPill label="Reseñas" />
-        {reviews.length > 0 ? (
-          <GlowCard isDark={isDark}>
-            <div className="divide-y divide-emerald-500/5">
-              {reviews.slice(0, 3).map((r: any) => (
-                <div key={r.id} className="p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    {[1,2,3,4,5].map(s => <Star key={s} size={10} className={s <= (r.rating || 0) ? "text-amber-500" : isDark ? "text-slate-600" : "text-slate-200"} fill={s <= (r.rating || 0) ? "currentColor" : "none"} />)}
-                    <span className={`text-[11px] font-medium ml-1 ${isDark ? "text-slate-500" : "text-slate-400"}`}>{r.userName || "Jugador"}</span>
-                  </div>
-                  {r.comment && <p className={`text-[11px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>{r.comment}</p>}
-                </div>
-              ))}
-            </div>
-          </GlowCard>
-        ) : (
-          <GlowCard isDark={isDark}>
-            <div className="py-8 flex flex-col items-center">
-              <Star size={28} className={isDark ? "text-slate-600" : "text-slate-300"} />
-              <p className={`text-[12px] font-semibold mt-3 ${isDark ? "text-slate-500" : "text-slate-400"}`}>Sin reseñas por el momento</p>
-            </div>
-          </GlowCard>
+          )
         )}
 
-        {/* Rules button */}
-        {(venueData?.rules?.length > 0 || venueData?.cancellationPolicy) && (
-          <button onClick={() => setShowRules(true)}
-            className="w-full h-[44px] rounded-md font-semibold text-[12px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] border"
-            style={{ borderColor: isDark ? "rgba(255,255,255,0.08)" : "#E2E8F0", backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#F8FAFC", color: isDark ? "#94A3B8" : "#64748B" }}>
-            <Ban size={14} /> Reglas del Recinto
-          </button>
-        )}
-
-        <p className={`text-center text-[11px] font-medium pt-2 ${isDark ? "text-slate-600" : "text-slate-400"}`}>MVP Sports &bull; 2026</p>
+        <VenueAbout isDark={isDark} venue={v} week={weekHours(v)} onRules={rules.length || v.cancellationPolicy ? () => setShowRules(true) : null} />
+        <VenueReviews isDark={isDark} reviews={reviews} />
       </div>
 
-      {feedback && (
-        <div className="fixed bottom-8 left-5 right-5 z-50 animate-in slide-in-from-bottom-4 duration-300">
-          <div className={`max-w-md mx-auto rounded-md p-4 flex items-center gap-3 ${feedback.type === "error" ? "bg-red-500/90 text-white" : "bg-emerald-500/90 text-white"}`}>
-            <span className="flex-1 text-[13px] font-medium">{feedback.msg}</span>
-            <button aria-label="Cerrar" onClick={() => setFeedback(null)} className="opacity-70 hover:opacity-100"><X size={18} /></button>
-          </div>
-        </div>
-      )}
-
-      {/* Rules Modal */}
-      {showRules && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px] px-5 py-6 animate-in fade-in duration-200" onClick={() => setShowRules(false)}>
-          <div className={`w-full max-w-sm rounded-md border ${isDark ? "bg-[#0A101D] border-white/6" : "bg-white border-slate-200"}`} onClick={(e) => e.stopPropagation()}>
-            <div className={`flex items-center justify-between px-5 py-4 border-b ${isDark ? "border-white/6" : "border-slate-200"}`}>
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-md flex items-center justify-center bg-red-500/10">
-                  <Ban size={16} className="text-red-400" />
-                </div>
-                <p className={`font-semibold text-[13px] ${isDark ? "text-slate-100" : "text-slate-900"}`}>Reglas del recinto</p>
-              </div>
-              <button aria-label="Cerrar" onClick={() => setShowRules(false)} className="w-8 h-8 rounded-md flex items-center justify-center transition-all active:scale-90" style={{ backgroundColor: isDark ? "rgba(255,255,255,0.06)" : "#F1F5F9" }}>
-                <X size={14} className={isDark ? "text-slate-400" : "text-slate-500"} />
-              </button>
-            </div>
-            <div className="p-5 max-h-[60vh] overflow-y-auto space-y-3">
-              {venueData?.rules?.map((rule: string, i: number) => (
-                <div key={i} className={`flex items-start gap-3 p-3 rounded-md border ${isDark ? "border-white/6" : "border-slate-200"}`}>
-                  <Ban size={14} className="text-red-400 shrink-0 mt-0.5" />
-                  <span className={`text-[11px] font-medium ${isDark ? "text-slate-300" : "text-slate-700"}`}>{rule}</span>
-                </div>
-              ))}
-              {venueData?.cancellationPolicy && (
-                <div className={`p-4 rounded-md border ${isDark ? "bg-amber-500/5 border-amber-500/10" : "bg-amber-50 border-amber-200"}`}>
-                  <p className={`text-[12px] font-semibold mb-1 ${isDark ? "text-amber-400" : "text-amber-600"}`}>Política de cancelación</p>
-                  <p className={`text-[11px] font-medium leading-snug ${isDark ? "text-slate-300" : "text-slate-700"}`}>{venueData.cancellationPolicy}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Gallery Lightbox */}
-      {showGallery && venueData?.gallery && (
-        <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center" onClick={() => setShowGallery(false)}>
-          <button aria-label="Cerrar" onClick={() => setShowGallery(false)} className="absolute top-14 right-5 z-10 w-10 h-10 rounded-md bg-white/10 border border-white/20 flex items-center justify-center">
-            <X size={20} className="text-white" />
-          </button>
-          <div className="w-full max-w-lg px-5" onClick={(e) => e.stopPropagation()}>
-            <div className="rounded-md overflow-hidden">
-              <img src={venueData.gallery[galleryIndex]} alt="" className="w-full h-auto max-h-[70vh] object-contain" />
-            </div>
-            {venueData.gallery.length > 1 && (
-              <div className="flex items-center justify-center gap-4 mt-5">
-                <button aria-label="Volver" onClick={() => setGalleryIndex(i => (i - 1 + venueData.gallery.length) % venueData.gallery.length)}
-                  className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                  <ChevronLeft size={16} className="text-white" />
-                </button>
-                <span className="text-white/60 text-[11px] font-medium">{galleryIndex + 1} / {venueData.gallery.length}</span>
-                <button aria-label="Siguiente" onClick={() => setGalleryIndex(i => (i + 1) % venueData.gallery.length)}
-                  className="w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                  <ChevronRight size={16} className="text-white" />
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {showRules && <RulesSheet isDark={isDark} rules={rules} policy={v.cancellationPolicy} onClose={() => setShowRules(false)} />}
+      {gallery !== null && <Gallery images={images} index={gallery} onIndex={setGallery} onClose={() => setGallery(null)} />}
     </div>
   );
 }

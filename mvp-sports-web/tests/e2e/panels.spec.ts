@@ -1,6 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
 import fs from "fs";
 import { env, admin, exists, saPath } from "./helpers";
+import { bookingDays, slotPrice } from "../../utils/venueBooking";
+import { chileDateTime } from "../../utils/chileTime";
 
 // Panel del mánager y Configuración del complejo con cuentas de prueba (@example.test).
 // El dueño de prueba administra un recinto propio e inactivo (no lo ven los jugadores).
@@ -259,6 +261,46 @@ test.describe("Sorteo del fixture", () => {
       expect(errors, errors.join("\n")).toEqual([]);
     } finally {
       await ref.delete();
+    }
+  });
+});
+
+test.describe("Reservar desde la ficha del recinto (jugador)", () => {
+  test("elige día y hora, respeta el mantenimiento programado y lleva al pago con el precio de la tarifa", async ({ page, isMobile }) => {
+    test.skip(isMobile, "Basta una vez");
+    test.skip(!(await exists(env.E2E_PLAYER_EMAIL)), "Sin datos de prueba");
+    test.setTimeout(120_000);
+    const db = admin().firestore();
+    const court = db.collection("courts").doc("e2e-cancha-prueba");
+    const tenant = (await db.collection("tenants").doc(TENANT).get()).data()!;
+    const day = bookingDays(new Date(), 3)[2]; // pasado mañana: sin reservas de prueba
+    // Mantenimiento programado ese día de 10:00 a 12:00: solo esas horas deben desaparecer
+    await court.update({ status: "maintenance", maintenanceStart: chileDateTime(day.date, 10, 0), maintenanceUntil: chileDateTime(day.date, 12, 0) });
+    try {
+      const errors = watchErrors(page);
+      await page.goto("/login");
+      await page.waitForLoadState("networkidle");
+      await page.locator("#email").fill(env.E2E_PLAYER_EMAIL);
+      await page.locator("#password").fill(env.E2E_PLAYER_PASSWORD);
+      await page.locator('button[type="submit"]').click();
+      await expect(page).toHaveURL(/\/player/, { timeout: 30_000 });
+      await page.goto(`/player/clubes/${TENANT}`);
+      // Un solo deporte: se elige solo y abre el paso de día y hora
+      await page.getByRole("tab").nth(2).click({ timeout: 30_000 });
+      await expect(page.getByRole("button", { name: "12:00", exact: true })).toBeVisible({ timeout: 20_000 });
+      for (const t of ["10:00", "11:00"]) await expect(page.getByRole("button", { name: t, exact: true })).toHaveCount(0);
+      await page.getByRole("button", { name: "12:00", exact: true }).click();
+      const price = slotPrice(tenant, "Pádel", day.date, "12:00");
+      expect(price).toBeGreaterThan(0);
+      await page.getByRole("button", { name: /^Continuar/ }).click();
+      await page.getByRole("button", { name: "Confirmar y pagar" }).click();
+      await expect(page).toHaveURL(/\/player\/checkout/, { timeout: 20_000 });
+      const q = new URL(page.url()).searchParams;
+      expect({ courtId: q.get("courtId"), date: q.get("date"), startTime: q.get("startTime"), price: q.get("price") })
+        .toEqual({ courtId: "e2e-cancha-prueba", date: day.date, startTime: "12:00", price: String(price) });
+      expect(errors, errors.join("\n")).toEqual([]);
+    } finally {
+      await court.update({ status: "available", maintenanceStart: null, maintenanceUntil: null });
     }
   });
 });

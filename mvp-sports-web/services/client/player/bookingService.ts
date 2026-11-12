@@ -56,6 +56,12 @@ export const bookingService = {
         } catch { return slots; }
     },
 
+    /** Horas ya tomadas de una cancha ese día (proyección pública court_slots; sin leer el recinto). */
+    async getTakenTimes(courtId: string, dateStr: string): Promise<string[]> {
+        const snap = await getDoc(doc(db, 'court_slots', `${courtId}_${dateStr}`)).catch(() => null);
+        return Object.keys((snap?.data() as { taken?: Record<string, unknown> } | undefined)?.taken || {});
+    },
+
     async createBooking(bookingData: Booking): Promise<string> {
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         let bookingId = '';
